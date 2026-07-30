@@ -67,7 +67,7 @@ isActive → boolean
 createdAt → datetime
 updatedAt → datetime
 
-۳. Transaction (جدول مشترک txn_transactions)
+۳. Transaction (جدول مشترک AccountsBanking_transactions)
 
 هنگام ثبت درآمد، یک تراکنش از نوع deposit-income ایجاد می‌شود.
 

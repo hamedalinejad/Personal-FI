@@ -25,7 +25,7 @@ notes → text (یادداشت)
 createdAt → datetime
 updatedAt → datetime
 
-2. Transaction (جدول: Bank_transactions)
+2. Transaction (جدول: AccountsBanking_transactions)
 
 id → UUID (Primary Key)
 date → datetime (تاریخ تراکنش)
