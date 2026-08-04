@@ -1,0 +1,182 @@
+# فیچر: Physical Assets (دارایی‌های فیزیکی)
+
+## توضیح کلی
+
+این فیچر مسئولیت مدیریت **دارایی‌های فیزیکی** کاربر را بر عهده دارد.  
+شامل طلا و سکه فیزیکی، خودرو، املاک، لوازم گران‌قیمت و سایر دارایی‌هایی است که کاربر واقعاً مالک آن‌هاست و نزد خود نگهداری می‌کند.
+
+تفاوت مهم با زیر‌فیچر Metals:
+- **Metals** → سرمایه‌گذاری دیجیتال در پلتفرم‌های آنلاین (میلی، گرمی و ...) با امکان تحویل فیزیکی
+- **Physical Assets** → دارایی‌هایی که هم‌اکنون به صورت فیزیکی در اختیار کاربر است
+
+تمام مبالغ به **ریال** ثبت می‌شوند و در هر رویداد **نرخ تتر لحظه** ذخیره می‌شود تا بتوان ارزش دارایی‌ها را نسبت به دلار/تتر نیز مقایسه کرد.
+
+---
+
+## User Stories
+
+### Must Have
+- ثبت دارایی فیزیکی جدید (طلا، سکه، خودرو، ملک، سایر)
+- ثبت خرید دارایی (با اتصال به حساب بانکی)
+- ثبت فروش دارایی
+- ثبت ارزش‌گذاری دوره‌ای (قیمت روز)
+- مشاهده لیست دارایی‌ها و ارزش فعلی آن‌ها
+- محاسبه سود و زیان (تحقق‌یافته و تحقق‌نیافته)
+- مشاهده ارزش کل دارایی‌های فیزیکی
+- ذخیره نرخ تتر لحظه هر رویداد
+
+### Should Have
+- دسته‌بندی دارایی‌ها
+- افزودن تصویر و پیوست (سند، فاکتور، سند ملک)
+- ثبت هزینه نگهداری (بیمه، تعمیرات، مالیات و ...)
+- یادآوری ارزش‌گذاری دوره‌ای
+- انتقال از Metals به Physical Assets پس از تحویل فیزیکی
+
+---
+
+## Business Rules
+
+1. تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
+2. هنگام **خرید دارایی**:
+   - موجودی حساب بانکی کاهش می‌یابد.
+   - تراکنش در `AccountsBanking_transactions` ثبت می‌شود.
+   - دارایی جدید با قیمت خرید ثبت می‌گردد.
+3. هنگام **فروش دارایی**:
+   - موجودی حساب بانکی افزایش می‌یابد.
+   - سود/زیان تحقق‌یافته محاسبه می‌شود.
+   - وضعیت دارایی به `sold` تغییر می‌کند.
+4. **ارزش‌گذاری دوره‌ای**:
+   - کاربر می‌تواند قیمت روز دارایی را ثبت کند.
+   - ارزش فعلی پرتفوی بر اساس آخرین ارزش‌گذاری محاسبه می‌شود.
+5. هزینه‌های نگهداری (بیمه، تعمیر، مالیات) قابل ثبت هستند و در محاسبه بازده واقعی لحاظ می‌شوند.
+6. موجودی حساب بانکی نمی‌تواند منفی شود.
+7. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت (`active`, `sold`, `written_off`).
+
+---
+
+## Domain Entities
+
+### ۱. Physical Asset (جدول: `physical_assets`)
+
+- `id` → UUID (Primary Key)
+- `name` → string (نام دارایی — مثلاً «سکه تمام بهار آزادی ۱۴۰۳» یا «پراید ۱۳۹۸»)
+- `category` → string (`gold`, `coin`, `vehicle`, `real_estate`, `electronics`, `other`)
+- `subCategory` → string (اختیاری — مثلاً نوع سکه یا مدل خودرو)
+- `quantity` → decimal (تعداد یا متراژ)
+- `unit` → string (`piece`, `gram`, `kilogram`, `square_meter`, ...)
+- `purchasePrice` → decimal (قیمت خرید کل — ریال)
+- `purchaseDate` → datetime
+- `currentValue` → decimal (آخرین ارزش‌گذاری — ریال)
+- `currentValueDate` → datetime
+- `averageBuyPrice` → decimal (در صورت خرید چندمرحله‌ای)
+- `status` → string (`active`, `sold`, `written_off`)
+- `location` → string (محل نگهداری — اختیاری)
+- `description` → string
+- `hasAttachment` → boolean
+- `attachmentPath` → string
+- `accountId` → UUID (حساب بانکی مرتبط با خرید — nullable)
+- `purchaseTransactionId` → UUID (لینک به تراکنش خرید)
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+### ۲. Physical Asset Valuation (جدول: `physical_asset_valuations`)
+
+- `id` → UUID
+- `assetId` → UUID
+- `value` → decimal (ارزش ثبت‌شده — ریال)
+- `exchangeRateToUSDT` → decimal
+- `note` → string
+- `date` → datetime
+- `createdAt` → datetime
+
+### ۳. Physical Asset Transaction (جدول: `physical_asset_transactions`)
+
+- `id` → UUID
+- `assetId` → UUID
+- `type` → string (`purchase`, `sale`, `expense`, `partial_sale`)
+- `amount` → decimal
+- `feeAmount` → decimal
+- `feeValueIRR` → decimal
+- `feeValueUSDT` → decimal
+- `exchangeRateToUSDT` → decimal
+- `accountId` → UUID (nullable)
+- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)
+- `description` → string
+- `date` → datetime
+- `createdAt` → datetime
+
+### ۴. AccountsBanking_transactions
+
+- در خرید و فروش دارایی و هزینه‌های مرتبط ثبت می‌شود.
+
+---
+
+## APIهای داخلی
+
+### Asset APIs
+- `createAsset(data)` → ثبت دارایی جدید + در صورت خرید، ثبت تراکنش بانکی
+- `updateAsset(id, data)`
+- `getAllAssets(filters)` → فیلتر بر اساس دسته، وضعیت و ...
+- `getAssetById(id)`
+- `changeAssetStatus(id, status)`
+
+### Valuation APIs
+- `addValuation(assetId, value, date, note?)` → ثبت ارزش‌گذاری جدید
+- `getValuations(assetId)`
+- `getLatestValuation(assetId)`
+
+### Transaction APIs
+- `createAssetTransaction(data)` → خرید، فروش، هزینه نگهداری
+- `sellAsset(assetId, amount, date, accountId)` → فروش کامل یا جزئی
+- `getAssetTransactions(assetId)`
+
+### Portfolio APIs
+- `getPortfolioValue()` → ارزش کل دارایی‌های فیزیکی (ریال + معادل تتری)
+- `calculateProfitLoss(assetId?)` → سود/زیان تحقق‌یافته و تحقق‌نیافته
+- `getAssetsByCategory()`
+
+---
+
+## روابط با سایر فیچرها
+
+- **Accounts & Banking**: خرید، فروش و هزینه‌های مرتبط
+- **Currency & Multi-Currency**: نرخ تتر لحظه‌ای
+- **Metals**: پس از تحویل فیزیکی می‌توان دارایی را از Metals به اینجا منتقل کرد
+- **Reports / Dashboard / Portfolio**: ارزش کل دارایی‌های فیزیکی و سود/زیان
+- **Document Management**: نگهداری سند ملک، فاکتور خرید و تصاویر
+
+---
+
+## دسته‌بندی‌های پیشنهادی
+
+| دسته | مثال‌ها |
+|------|---------|
+| `gold` | طلای آب‌شده فیزیکی، شمش |
+| `coin` | سکه امامی، بهار آزادی، گرمی |
+| `vehicle` | خودرو، موتورسیکلت |
+| `real_estate` | خانه، زمین، مغازه |
+| `electronics` | لپ‌تاپ، موبایل گران‌قیمت، دوربین |
+| `other` | فرش، آثار هنری، ساعت و ... |
+
+---
+
+## نکات طراحی
+
+- ارزش فعلی پرتفوی بر اساس **آخرین ارزش‌گذاری** هر دارایی محاسبه می‌شود.
+- اگر ارزش‌گذاری ثبت نشده باشد، از قیمت خرید به عنوان ارزش فعلی استفاده می‌شود.
+- هزینه‌های نگهداری در محاسبه بازده واقعی (Real Return) لحاظ می‌شوند.
+- پس از فروش کامل، وضعیت دارایی `sold` می‌شود و از محاسبات پرتفوی فعال خارج می‌گردد.
+- امکان فروش جزئی (مثلاً فروش بخشی از سکه‌ها) پشتیبانی می‌شود.
+- نرخ تتر در خرید، فروش و هر ارزش‌گذاری ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند.
+
+---
+
+## تفاوت با سایر فیچرهای مرتبط
+
+| فیچر | ماهیت |
+|------|------|
+| **Metals** | سرمایه‌گذاری دیجیتال در پلتفرم‌های آنلاین طلا/نقره/مس |
+| **Physical Assets** | دارایی فیزیکی که کاربر واقعاً در اختیار دارد |
+| **Stocks Iran** | سهام بورس ایران |
+| **Crypto** | رمزارز |

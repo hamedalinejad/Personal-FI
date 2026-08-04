@@ -1,0 +1,146 @@
+# فیچر: Financial Goals (اهداف مالی)
+
+## توضیح کلی
+
+این فیچر به کاربر امکان می‌دهد اهداف مالی مشخصی تعریف کند و پیشرفت آن‌ها را پیگیری کند.  
+اهداف می‌توانند شامل پس‌انداز برای خرید خانه، سفر، اضطراری، بازنشستگی، خرید خودرو یا هر هدف شخصی دیگر باشند.
+
+هر هدف دارای مبلغ هدف، تاریخ هدف (اختیاری) و پیشرفت فعلی است.  
+کاربر می‌تواند به صورت دستی یا خودکار (از طریق بودجه یا درآمد) به هدف پول اختصاص دهد.
+
+---
+
+## User Stories
+
+### Must Have
+- تعریف هدف مالی جدید (نام، مبلغ هدف، تاریخ هدف)
+- اختصاص مبلغ به هدف
+- مشاهده پیشرفت هر هدف (درصد و مبلغ باقی‌مانده)
+- ویرایش و تکمیل هدف
+- مشاهده لیست اهداف فعال و تکمیل‌شده
+- محاسبه مبلغ پیشنهادی ماهانه برای رسیدن به هدف در موعد مقرر
+
+### Should Have
+- اولویت‌بندی اهداف
+- اتصال هدف به پاکت بودجه
+- یادآوری پیشرفت یا عقب‌ماندن از برنامه
+- تصویر یا آیکون برای هر هدف
+- هدف‌های تکراری (مثلاً پس‌انداز ماهانه اضطراری)
+
+---
+
+## Business Rules
+
+1. هر هدف دارای یک مبلغ هدف (`targetAmount`) است.
+2. پیشرفت هدف بر اساس مجموع مبالغ اختصاص‌داده‌شده محاسبه می‌شود.
+3. هدف می‌تواند تاریخ پایان داشته باشد یا بدون مهلت باشد.
+4. هنگام رسیدن مبلغ اختصاص‌داده‌شده به مبلغ هدف، وضعیت به `completed` تغییر می‌کند.
+5. امکان برداشت از هدف (کاهش مبلغ اختصاص‌داده‌شده) وجود دارد.
+6. پول اختصاص‌داده‌شده به هدف می‌تواند از حساب بانکی یا از پاکت بودجه تأمین شود.
+7. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت (`active`, `completed`, `cancelled`, `paused`).
+
+---
+
+## Domain Entities
+
+### ۱. Financial Goal (جدول: `financial_goals`)
+
+- `id` → UUID (Primary Key)
+- `name` → string (نام هدف — مثلاً «پیش‌پرداخت خانه»)
+- `description` → string
+- `targetAmount` → decimal (مبلغ هدف — ریال)
+- `currentAmount` → decimal (مبلغ جمع‌شده تا این لحظه)
+- `currency` → string (پیش‌فرض IRR)
+- `targetDate` → datetime (تاریخ هدف — nullable)
+- `startDate` → datetime
+- `status` → string (`active`, `completed`, `cancelled`, `paused`)
+- `priority` → number (اولویت — عدد بالاتر = مهم‌تر)
+- `category` → string (`emergency`, `purchase`, `travel`, `retirement`, `debt`, `other`)
+- `icon` → string (اختیاری)
+- `color` → string (اختیاری)
+- `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
+- `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه ایجاد — برای گزارش تاریخی)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+### ۲. Goal Contribution (جدول: `goal_contributions`)
+
+- `id` → UUID
+- `goalId` → UUID
+- `amount` → decimal
+- `type` → string (`deposit`, `withdraw`)
+- `source` → string (`manual`, `budget`, `income`, `transfer`)
+- `accountId` → UUID (nullable)
+- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions` — nullable)
+- `envelopeId` → UUID (nullable)
+- `note` → string
+- `date` → datetime
+- `exchangeRateToUSDT` → decimal
+- `createdAt` → datetime
+
+---
+
+## APIهای داخلی
+
+### Goal APIs
+- `createGoal(data)` → ایجاد هدف جدید
+- `updateGoal(id, data)`
+- `getAllGoals(filters)` → فیلتر بر اساس وضعیت، دسته و ...
+- `getGoalById(id)`
+- `changeGoalStatus(id, status)`
+- `getActiveGoals()`
+- `getCompletedGoals()`
+
+### Contribution APIs
+- `addContribution(goalId, amount, source, accountId?)` → واریز به هدف
+- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف
+- `getContributions(goalId)`
+- `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
+
+### Calculation APIs
+- `calculateMonthlySuggestion(goalId)` → مبلغ پیشنهادی ماهانه برای رسیدن به هدف تا تاریخ مشخص
+- `getGoalsSummary()` → خلاصه کل اهداف (تعداد، مجموع هدف، مجموع جمع‌شده)
+
+---
+
+## روابط با سایر فیچرها
+
+- **Accounts & Banking**: واریز و برداشت واقعی پول مرتبط با هدف
+- **Budget**: امکان اتصال هدف به یک پاکت بودجه و تخصیص خودکار
+- **Income**: می‌توان بخشی از درآمد را مستقیماً به هدف اختصاص داد
+- **Notification & Reminder**: یادآوری پیشرفت یا عقب‌ماندن از برنامه
+- **Dashboard**: نمایش اهداف فعال و درصد پیشرفت
+- **Reports**: گزارش تحقق اهداف در بازه‌های زمانی
+
+---
+
+## منطق پیشرفت هدف
+درصد پیشرفت = (currentAmount / targetAmount) × 100
+مبلغ باقی‌مانده = targetAmount - currentAmount
+textاگر `targetDate` مشخص باشد:
+ماه‌های باقی‌مانده = تعداد ماه تا targetDate
+مبلغ پیشنهادی ماهانه = مبلغ باقی‌مانده ÷ ماه‌های باقی‌مانده
+text---
+
+## دسته‌بندی‌های پیشنهادی اهداف
+
+| دسته | مثال |
+|------|------|
+| `emergency` | صندوق اضطراری |
+| `purchase` | خرید خودرو، لوازم خانه |
+| `travel` | سفر خارجی یا داخلی |
+| `retirement` | بازنشستگی |
+| `debt` | تسویه بدهی یا وام |
+| `education` | هزینه تحصیل |
+| `other` | سایر اهداف شخصی |
+
+---
+
+## نکات طراحی
+
+- هدف می‌تواند بدون تاریخ پایان باشد (مثلاً صندوق اضطراری بلندمدت).
+- پس از تکمیل هدف، کاربر می‌تواند آن را بایگانی کند یا پول را به حساب دیگری منتقل کند.
+- در Dashboard بهتر است ۲ تا ۳ هدف اولویت‌دار با نوار پیشرفت نمایش داده شوند.
+- نرخ تتر در زمان ایجاد هدف و هر واریز/برداشت ذخیره می‌شود تا ارزش تاریخی هدف قابل محاسبه باشد.
+- امکان تعریف هدف به صورت درصدی از درآمد ماهانه در نسخه‌های بعدی قابل اضافه شدن است.

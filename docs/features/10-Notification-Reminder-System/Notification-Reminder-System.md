@@ -1,0 +1,160 @@
+# فیچر: Notification & Reminder System (سیستم اعلان و یادآوری)
+
+## توضیح کلی
+
+این فیچر مسئولیت مدیریت تمام **اعلان‌ها** و **یادآوری‌های** سیستم را بر عهده دارد.  
+هدف آن آگاه‌سازی کاربر از رویدادهای مهم مالی بدون نیاز به مراجعه مداوم به بخش‌های مختلف نرم‌افزار است.
+
+اعلان‌ها می‌توانند شامل موارد زیر باشند:
+- سررسید قبوض و اقساط
+- نزدیک شدن به سقف بودجه
+- پیشرفت یا عقب‌ماندن از اهداف مالی
+- سررسید چک‌ها
+- یادآوری‌های سفارشی کاربر
+
+سیستم به صورت Offline-first طراحی می‌شود و اعلان‌ها ابتدا درون‌برنامه‌ای هستند. در آینده می‌توان Push Notification نیز اضافه کرد.
+
+---
+
+## User Stories
+
+### Must Have
+- دریافت اعلان برای سررسید قبوض و تراکنش‌های تکرارشونده
+- دریافت اعلان برای سررسید اقساط وام
+- دریافت اعلان برای سررسید چک‌ها
+- دریافت هشدار نزدیک شدن به سقف بودجه یا عبور از آن
+- مشاهده لیست اعلان‌ها
+- علامت‌گذاری اعلان به عنوان خوانده‌شده
+- تنظیم تعداد روز قبل از سررسید برای یادآوری
+
+### Should Have
+- یادآوری پیشرفت اهداف مالی
+- اعلان‌های سفارشی تعریف‌شده توسط کاربر
+- تنظیم روشن/خاموش کردن هر نوع اعلان
+- حذف اعلان‌های قدیمی
+- پشتیبانی از Push Notification (آینده)
+
+---
+
+## Business Rules
+
+1. هر اعلان به یک رویداد مشخص در سیستم مرتبط است.
+2. اعلان‌ها می‌توانند از نوع `info`, `warning` یا `critical` باشند.
+3. اعلان‌های خوانده‌نشده باید در UI برجسته نمایش داده شوند.
+4. کاربر می‌تواند نوع اعلان‌ها را فعال یا غیرفعال کند.
+5. یادآوری‌ها چند روز قبل از سررسید (قابل تنظیم) ایجاد می‌شوند.
+6. اعلان‌های منقضی‌شده یا قدیمی به صورت خودکار یا دستی قابل پاک‌سازی هستند.
+7. سیستم نباید اعلان تکراری برای یک رویداد یکسان ایجاد کند.
+
+---
+
+## Domain Entities
+
+### ۱. Notification (جدول: `notifications`)
+
+- `id` → UUID (Primary Key)
+- `title` → string
+- `message` → string
+- `type` → string (`info`, `warning`, `critical`)
+- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `system`, `custom`)
+- `relatedFeature` → string (نام فیچر مرتبط)
+- `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
+- `isRead` → boolean
+- `scheduledAt` → datetime (زمان برنامه‌ریزی‌شده برای نمایش)
+- `createdAt` → datetime
+- `readAt` → datetime (nullable)
+
+### ۲. Notification Setting (جدول: `notification_settings`)
+
+- `id` → UUID
+- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `system`, `custom`)
+- `isEnabled` → boolean
+- `daysBefore` → number (چند روز قبل یادآوری شود)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+### ۳. Custom Reminder (جدول: `custom_reminders`)
+
+- `id` → UUID
+- `title` → string
+- `message` → string
+- `remindAt` → datetime
+- `repeatInterval` → string (`none`, `daily`, `weekly`, `monthly` — nullable)
+- `isActive` → boolean
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+---
+
+## APIهای داخلی
+
+### Notification APIs
+- `createNotification(data)` → ایجاد اعلان جدید
+- `getAllNotifications(filters)` → فیلتر بر اساس خوانده‌شده، دسته و ...
+- `getUnreadNotifications()`
+- `markAsRead(id)`
+- `markAllAsRead()`
+- `deleteNotification(id)`
+- `clearOldNotifications(beforeDate)`
+
+### Settings APIs
+- `getNotificationSettings()`
+- `updateNotificationSetting(category, data)`
+- `toggleCategory(category, enabled)`
+
+### Custom Reminder APIs
+- `createCustomReminder(data)`
+- `updateCustomReminder(id, data)`
+- `getActiveCustomReminders()`
+- `deactivateCustomReminder(id)`
+
+### Scheduler APIs
+- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)
+- `checkBudgetAlerts()` → بررسی وضعیت بودجه‌ها
+- `checkGoalProgress()` → بررسی پیشرفت اهداف
+
+---
+
+## روابط با سایر فیچرها
+
+- **Bills & Recurring**: یادآوری سررسید قبوض و تراکنش‌های دوره‌ای
+- **Debt & Loan**: یادآوری اقساط وام
+- **Cheque Management**: یادآوری سررسید چک‌ها
+- **Budget**: هشدار نزدیک شدن به سقف یا عبور از بودجه
+- **Financial Goals**: یادآوری پیشرفت یا عقب‌ماندن از هدف
+- **Dashboard**: نمایش تعداد اعلان‌های خوانده‌نشده و مهم‌ترین یادآوری‌ها
+
+---
+
+## انواع اعلان‌ها
+
+| دسته | مثال |
+|------|------|
+| `bill` | «قبوض برق تا ۳ روز دیگر سررسید می‌شود» |
+| `loan` | «قسط وام مسکن فردا سررسید دارد» |
+| `cheque` | «چک دریافتی به شماره ۱۲۳۴ فردا سررسید است» |
+| `budget` | «پاکت خوراک به ۸۵٪ سقف خود رسیده است» |
+| `goal` | «هدف سفر فقط ۱۵٪ پیشرفت داشته است» |
+| `system` | اعلان‌های سیستمی و به‌روزرسانی‌ها |
+| `custom` | یادآوری‌های تعریف‌شده توسط کاربر |
+
+---
+
+## سطوح اهمیت
+
+| نوع | کاربرد |
+|------|--------|
+| `info` | اطلاع‌رسانی عادی |
+| `warning` | هشدار (نزدیک شدن به سررسید یا سقف) |
+| `critical` | رویداد مهم یا معوق‌شده |
+
+---
+
+## نکات طراحی
+
+- اعلان‌ها باید سبک و غیرمزاحم باشند.
+- در حالت Offline، اعلان‌ها به صورت محلی ذخیره و نمایش داده می‌شوند.
+- Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند.
+- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود.
+- در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
+- تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.

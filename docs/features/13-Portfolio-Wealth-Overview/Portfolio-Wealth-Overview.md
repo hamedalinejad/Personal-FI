@@ -1,0 +1,180 @@
+# فیچر: Portfolio & Wealth Overview (پرتفوی و نمای ثروت)
+
+## توضیح کلی
+
+این فیچر نمای یکپارچه و تخصصی از **کل دارایی‌ها و سرمایه‌گذاری‌های** کاربر را ارائه می‌دهد.  
+تمرکز اصلی آن روی پرتفوی سرمایه‌گذاری و ثروت است، نه جریان نقدی روزمره.
+
+شامل:
+- ارزش کل پرتفوی سرمایه‌گذاری
+- تفکیک بین انواع دارایی‌ها (کریپتو، سهام، صندوق، فلزات، دارایی فیزیکی)
+- سود و زیان تحقق‌یافته و تحقق‌نیافته
+- روند ارزش پرتفوی در طول زمان
+- مقایسه عملکرد نسبت به ریال و تتر
+
+این فیچر مکمل Reports و Dashboard است:
+- **Dashboard** → خلاصه سریع
+- **Reports** → گزارش‌های تحلیلی و خروجی
+- **Portfolio** → تمرکز عمیق روی ثروت و سرمایه‌گذاری‌ها
+
+---
+
+## User Stories
+
+### Must Have
+- مشاهده ارزش کل پرتفوی
+- مشاهده تفکیک دارایی‌ها به تفکیک نوع (کریپتو، سهام ایران، صندوق درآمد ثابت، فلزات، دارایی فیزیکی)
+- مشاهده سود و زیان کل (تحقق‌یافته و تحقق‌نیافته)
+- مشاهده روند ارزش پرتفوی در بازه‌های زمانی مختلف
+- مشاهده ارزش به ریال و معادل تتری
+- مشاهده جزئیات هر بخش با امکان ورود به فیچر مربوطه
+
+### Should Have
+- مقایسه بازده بخش‌های مختلف
+- نمایش وزن هر دارایی در پرتفوی (درصد)
+- فیلتر بر اساس نوع دارایی یا پلتفرم
+- نمایش کارمزدهای تجمعی پرداخت‌شده
+- ذخیره Snapshot دوره‌ای از ارزش پرتفوی
+
+---
+
+## Business Rules
+
+1. ارزش پرتفوی از جمع ارزش روز دارایی‌های سرمایه‌گذاری و فیزیکی محاسبه می‌شود.
+2. حساب‌های بانکی نقدی می‌توانند به صورت اختیاری در محاسبه ثروت کل لحاظ شوند.
+3. بدهی‌ها و وام‌ها برای محاسبه **ثروت خالص (Net Wealth)** کسر می‌شوند.
+4. سود و زیان تحقق‌نیافته بر اساس قیمت/ارزش فعلی در مقابل میانگین خرید محاسبه می‌شود.
+5. سود و زیان تحقق‌یافته از تراکنش‌های فروش استخراج می‌شود.
+6. تمام مقادیر قابلیت نمایش با نرخ تتر تاریخی را دارند.
+7. داده‌های اصلی در فیچرهای تخصصی نگهداری می‌شوند؛ این فیچر فقط تجمیع و نمایش می‌دهد.
+
+---
+
+## ساختار ثروت و پرتفوی
+ثروت کل (Total Wealth)
+├── دارایی‌های نقدی (حساب‌های بانکی)
+├── پرتفوی سرمایه‌گذاری
+│   ├── کریپتو
+│   ├── سهام ایران
+│   ├── صندوق‌های درآمد ثابت
+│   └── فلزات (طلا، نقره، مس)
+└── دارایی‌های فیزیکی
+├── طلا و سکه فیزیکی
+├── خودرو
+├── املاک
+└── سایر
+بدهی‌ها
+└── وام‌ها و مطالبات منفی
+ثروت خالص = ثروت کل − بدهی‌ها
+text---
+
+## Domain Entities
+
+> این فیچر بیشتر تجمیعی است. جداول زیر برای عملکرد بهتر و تاریخچه پیشنهاد می‌شوند.
+
+### ۱. Portfolio Snapshot (جدول: `portfolio_snapshots`)
+
+- `id` → UUID
+- `date` → datetime
+- `totalInvestments` → decimal
+- `totalPhysicalAssets` → decimal
+- `totalCash` → decimal
+- `totalLiabilities` → decimal
+- `totalWealth` → decimal
+- `netWealth` → decimal
+- `totalWealthUSDT` → decimal
+- `netWealthUSDT` → decimal
+- `breakdown` → JSON (جزئیات هر بخش)
+- `createdAt` → datetime
+
+### ۲. Portfolio Setting (جدول: `portfolio_settings`)
+
+- `id` → UUID
+- `includeCashInWealth` → boolean
+- `includeLiabilities` → boolean
+- `defaultDisplayCurrency` → string (`IRR` یا `USDT`)
+- `updatedAt` → datetime
+
+---
+
+## APIهای داخلی
+
+### Portfolio APIs
+- `getPortfolioOverview()` → خلاصه کامل پرتفوی و ثروت
+- `getInvestmentBreakdown()` → تفکیک سرمایه‌گذاری‌ها
+- `getPhysicalAssetsBreakdown()` → تفکیک دارایی‌های فیزیکی
+- `getProfitLossSummary()` → سود/زیان کل و به تفکیک بخش
+- `getPortfolioTrend(startDate, endDate)` → روند ارزش در طول زمان
+- `getAllocationPercentages()` → درصد وزن هر بخش از پرتفوی
+
+### Snapshot APIs
+- `createPortfolioSnapshot()` → ثبت وضعیت فعلی (می‌تواند Job روزانه باشد)
+- `getPortfolioSnapshots(startDate, endDate)`
+
+### Settings APIs
+- `getPortfolioSettings()`
+- `updatePortfolioSettings(data)`
+
+---
+
+## خروجی پیشنهادی `getPortfolioOverview`
+
+```ts
+{
+  totalWealth: number,
+  netWealth: number,
+  totalWealthUSDT: number,
+  netWealthUSDT: number,
+  changePercent: number,          // نسبت به دوره قبل
+  investments: {
+    total: number,
+    profitLoss: number,
+    unrealized: number,
+    realized: number,
+    sections: {
+      crypto: { value: number, profitLoss: number },
+      stocksIran: { value: number, profitLoss: number },
+      fixedIncome: { value: number, profitLoss: number },
+      metals: { value: number, profitLoss: number }
+    }
+  },
+  physicalAssets: {
+    total: number,
+    profitLoss: number
+  },
+  cash: {
+    total: number
+  },
+  liabilities: {
+    total: number
+  },
+  allocation: Array<{
+    key: string,
+    label: string,
+    value: number,
+    percent: number
+  }>
+}
+
+روابط با سایر فیچرها
+
+Crypto: ارزش و سود/زیان رمزارز
+Stocks Iran: ارزش و سود/زیان سهام
+Fixed Income Funds: ارزش صندوق‌های درآمد ثابت
+Metals: ارزش طلا، نقره و مس در پلتفرم‌ها
+Physical Assets: ارزش دارایی‌های فیزیکی
+Accounts & Banking: موجودی نقدی
+Debt & Loan: مانده بدهی‌ها
+Currency: تبدیل به تتر
+Reports: گزارش‌های تحلیلی عمیق‌تر
+Dashboard: خلاصه برای صفحه اصلی
+
+
+نکات طراحی
+
+این فیچر باید دید «ثروت» را به کاربر بدهد، نه فقط تراکنش‌های روزمره.
+تفکیک واضح بین ارزش فعلی، سود تحقق‌نیافته و سود تحقق‌یافته ضروری است.
+Snapshot روزانه باعث می‌شود روند تاریخی دقیق و سریع قابل نمایش باشد.
+درصد تخصیص (Allocation) به کاربر کمک می‌کند ترکیب دارایی‌هایش را بهتر درک کند.
+در موبایل، نمای ساده با امکان Drill-down به جزئیات هر بخش مناسب‌تر است.
+نرخ تتر تاریخی ذخیره‌شده در تراکنش‌ها و Snapshotها برای مقایسه واقعی قدرت خرید استفاده می‌شود.
