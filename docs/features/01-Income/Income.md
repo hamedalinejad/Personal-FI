@@ -33,7 +33,7 @@ Business Rules
 
 
 Domain Entities
-۱. Income Transaction (جدول: incomes_transactions)
+۱. Income Transaction (جدول: inc_transactions)
 
 id → UUID (Primary Key)
 date → datetime (تاریخ درآمد)
@@ -44,13 +44,13 @@ accountId → UUID (حساب مقصد)
 description → string (توضیحات)
 category → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
 hasAttachment → boolean
-attachmentPath → string
-incomes_recurring_id → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
-- Bank_transactions_id → UUID (لینک به `AccountsBanking_transactions` → accountTransactionId)
-createdAt → datetime
+- `attachmentPath` → string
+- `inc_recurring_id` → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
+- `createdAt` → datetime
 updatedAt → datetime
 
-۲. Recurring Income (جدول: incomes_recurring)
+۲. Recurring Income (جدول: inc_recurring)
 
 id → UUID (Primary Key)
 title → string (عنوان درآمد تکرارشونده)
@@ -67,7 +67,7 @@ isActive → boolean
 createdAt → datetime
 updatedAt → datetime
 
-۳. Transaction (جدول مشترک AccountsBanking_transactions)
+۳. Transaction (جدول مشترک `acc_transactions`)
 
 هنگام ثبت درآمد، یک تراکنش از نوع deposit-income ایجاد می‌شود.
 
@@ -108,4 +108,4 @@ Currency & Multi-Currency: دریافت نرخ تبدیل لحظه‌ای
 Transaction: ایجاد رکورد تراکنش
 Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 
-> **نکته نام‌گذاری**: فیلد `Bank_transactions_id` لینک به `AccountsBanking_transactions` است. در فیچرهای دیگر (مثل Loan و Cheque) نام این فیلد `accountTransactionId` است. برای یکسان‌سازی، بهتر است در آینده همه‌جا از `accountTransactionId` استفاده شود.
+> **نکته نام‌گذاری**: فیلد `accountTransactionId` لینک به `acc_transactions` است.

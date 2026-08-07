@@ -2,8 +2,8 @@
 
 ## توضیح کلی
 این فیچر مدیریت کامل بدهی‌ها، مطالبات و وام‌ها را بر عهده دارد.  
-اطلاعات اصلی وام در جدول `loans` نگهداری می‌شود.  
-تمام جابه‌جایی‌های مالی واقعی مرتبط با وام در جدول `loan_transactions` به صورت **لاگ** ثبت می‌شوند و همزمان در جدول `AccountsBanking_transactions` نیز ثبت شده و موجودی حساب را تغییر می‌دهند.
+اطلاعات اصلی وام در جدول `ln_loans` نگهداری می‌شود.  
+تمام جابه‌جایی‌های مالی واقعی مرتبط با وام در جدول `ln_transactions` به صورت **لاگ** ثبت می‌شوند و همزمان در جدول `acc_transactions` نیز ثبت شده و موجودی حساب را تغییر می‌دهد.
 
 ---
 
@@ -14,14 +14,14 @@
 3. هنگام ثبت وام **دریافتی (borrowed)**:
    - مبلغ اصلی به حساب مرتبط واریز می‌شود.
    - یک رکورد در `loan_transactions` ثبت می‌شود.
-   - یک رکورد در `AccountsBanking_transactions` با نوع `deposit-loan` ثبت می‌شود.
+   - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
    - موجودی حساب افزایش می‌یابد.
 4. هنگام ثبت وام **پرداختی (lent)**:
    - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
    - یک رکورد در `loan_transactions` ثبت می‌شود.
-   - یک رکورد در `AccountsBanking_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
+   - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
    - موجودی حساب کاهش می‌یابد.
-5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، پرداخت زودهنگام) نیز هم در `loan_transactions` و هم در `AccountsBanking_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، پرداخت زودهنگام) نیز هم در `loan_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
 6. جدول `loan_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
 7. موجودی حساب نمی‌تواند منفی شود.
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
@@ -33,7 +33,7 @@
 
 ## Domain Entities
 
-### ۱. Loan (جدول: `loans`)
+### ۱. Loan (جدول: `ln_loans`)
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام وام)
@@ -60,9 +60,9 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با دیگر فیچرها).
+> **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با دیگر فیچرها).
 
-### ۲. Loan Transaction (لاگ) (جدول: `loan_transactions`)
+### ۲. Loan Transaction (لاگ) (جدول: `ln_transactions`)
 
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
@@ -73,13 +73,13 @@
 - `interestPortion` → decimal (مبلغ مربوط به سود — nullable برای وام‌های بدون سود)
 - `description` → string
 - `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه پرداخت)
-- `accountTransactionId` → UUID (ارتباط با رکورد در `AccountsBanking_transactions`)
+- `accountTransactionId` → UUID (ارتباط با رکورد در `acc_transactions`)
 - `createdAt` → datetime
 
 > این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.  
 > برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
 
-### ۳. AccountsBanking_transactions (جدول مشترک تراکنش‌های حساب)
+### ۳. acc_transactions (جدول مشترک تراکنش‌های حساب)
 
 - هنگام ایجاد وام و هر پرداخت، یک رکورد با نوع مناسب (`deposit-loan` یا `withdrawal-loan`) در این جدول ثبت می‌شود و موجودی حساب به‌روزرسانی می‌گردد.
 
@@ -89,7 +89,7 @@
 
 ### Loan APIs
 - `createLoan(data)`  
-  → ثبت وام + ثبت لاگ در `loan_transactions` + ثبت در `AccountsBanking_transactions` + به‌روزرسانی موجودی حساب
+  → ثبت وام + ثبت لاگ در `loan_transactions` + ثبت در `acc_transactions` + به‌روزرسانی موجودی حساب
 - `updateLoan(id, data)` → ویرایش (فقط قبل از اولین پرداخت)
 - `getAllLoans(filters)`
 - `getLoanById(id)`
@@ -99,8 +99,8 @@
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
   → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
-  → ثبت در `loan_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSD`)  
-  → ثبت در `AccountsBanking_transactions`  
+  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSD`)  
+  → ثبت در `acc_transactions`  
   → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
 - `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `installmentFrequency`)

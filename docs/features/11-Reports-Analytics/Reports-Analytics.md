@@ -95,7 +95,7 @@
 > این فیچر عمدتاً داده‌محور نیست و بیشتر از داده‌های سایر فیچرها استفاده می‌کند.  
 > در صورت نیاز به کش یا ذخیره تنظیمات گزارش، جداول زیر پیشنهاد می‌شود.
 
-### ۱. Report Preset (جدول: `report_presets`)
+### ۱. Report Preset (جدول: `rep_presets`)
 
 - `id` → UUID
 - `name` → string (نام گزارش ذخیره‌شده)
@@ -104,7 +104,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Net Worth Snapshot (جدول: `net_worth_snapshots`) — اختیاری
+### ۲. Net Worth Snapshot (جدول: `rep_net_worth_snapshots`) — اختیاری
 
 - `id` → UUID
 - `date` → datetime

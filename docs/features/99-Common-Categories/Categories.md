@@ -50,7 +50,7 @@
 
 ### روش ۱: جدول جدید (توصیه شده برای آینده)
 ```sql
-CREATE TABLE common_categories (
+CREATE TABLE cat_categories (
   id → UUID (Primary Key)
   type → enum (income, expense)
   code → string (مثلاً salary, food, etc.)

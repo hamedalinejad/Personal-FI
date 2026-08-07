@@ -4,7 +4,7 @@
 این زیر‌فیچر مسئولیت کامل مدیریت دارایی‌های رمزارزی را بر عهده دارد.  
 شامل مدیریت صرافی‌ها و والت‌ها (شامل والت نرم‌افزاری)، خرید، فروش، انتقال، واریز و برداشت، محاسبه میانگین خرید، سود و زیان و ارزش پرتفوی است.
 
-تمام جابه‌جایی‌های ریالی/تتری با حساب‌های بانکی از طریق جدول `AccountsBanking_transactions` ثبت می‌شوند و به تراکنش‌های صرافی لینک می‌گردند.
+تمام جابه‌جایی‌های ریالی/تتری با حساب‌های بانکی از طریق جدول `acc_transactions` ثبت می‌شوند و به تراکنش‌های صرافی لینک می‌گردند.
 
 ---
 
@@ -34,13 +34,13 @@
 1. هر معامله رمزارز باید به یک صرافی یا والت مرتبط باشد.
 2. هنگام **خرید**:
    - موجودی رمزارز افزایش می‌یابد.
-   - در صورت پرداخت از حساب بانکی → تراکنش در `AccountsBanking_transactions` + `crypto_exchange_transactions` ثبت می‌شود.
+   - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` + `crypto_exchange_transactions` ثبت می‌شود.
 3. هنگام **فروش**:
    - موجودی رمزارز کاهش می‌یابد.
    - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود (نه الزاماً حساب بانکی).
 4. **واریز از حساب بانکی** به صرافی/ولت:
    - موجودی حساب بانکی کاهش و موجودی ریال/تتر صرافی افزایش می‌یابد.
-   - تراکنش در `AccountsBanking_transactions` ثبت می‌شود.
+   - تراکنش در `acc_transactions` ثبت می‌شود.
    - تراکنش در `crypto_exchange_transactions` نیز ثبت و به تراکنش بانکی لینک می‌شود.
 5. **برداشت به حساب بانکی**:
    - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
@@ -63,7 +63,7 @@
 
 ## Domain Entities
 
-### ۱. Crypto Exchange / Wallet (جدول: `crypto_exchanges`)
+### ۱. Crypto Exchange / Wallet (جدول: `inv_crypto_exchanges`)
 
 - `id` → UUID (Primary Key)
 - `name` → string
@@ -74,7 +74,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Crypto Holding (جدول: `crypto_holdings`)
+### ۲. Crypto Holding (جدول: `inv_crypto_holdings`)
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
@@ -91,7 +91,7 @@
 
 > توضیح: در این مدل، موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. اگرچه IRR و USDT فنیٌاً "کریپتو" نیستند، اما این رویکرد ساده‌ترین روش برای یکپارچه‌سازی موجودی نقدی در پلتفرم‌های مختلف است. مقدار `quantity` نشان‌دهنده موجودی نقدی است و `averageBuyPrice` برای آن‌ها `1` در نظر گرفته می‌شود.
 
-### ۳. Crypto Transaction (جدول: `crypto_transactions`) — لاگ معاملات رمزارز
+### ۳. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
@@ -109,7 +109,7 @@
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۴. Crypto Exchange Transaction (جدول: `crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
+### ۴. Crypto Exchange Transaction (جدول: `inv_crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
@@ -120,12 +120,12 @@
 - `feeCurrency` → string
 - `exchangeRateToUSDT` → decimal
 - `accountId` → UUID (حساب بانکی مرتبط)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۵. AccountsBanking_transactions
+### ۵. acc_transactions
 
 - فقط زمانی که پول واقعاً از/به حساب بانکی جابه‌جا شود ثبت می‌شود و با `crypto_exchange_transactions` لینک می‌گردد.
 

@@ -32,12 +32,6 @@ Bashsrc/
 │   ├── budget/
 │   ├── goals/
 │   ├── bills/
-│   ├── notifications/
-│   ├── reports/
-│   ├── dashboard/
-│   ├── portfolio/
-│   ├── tax/
-│   ├── documents/
 │   └── settings/
 │
 ├── components/            # کامپوننت‌های UI مشترک

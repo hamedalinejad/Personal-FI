@@ -52,7 +52,7 @@
 
 ## Domain Entities
 
-### ۱. Notification (جدول: `notifications`)
+### ۱. Notification (جدول: `notif_notifications`)
 
 - `id` → UUID (Primary Key)
 - `title` → string
@@ -66,7 +66,7 @@
 - `createdAt` → datetime
 - `readAt` → datetime (nullable)
 
-### ۲. Notification Setting (جدول: `notification_settings`)
+### ۲. Notification Setting (جدول: `notif_settings`)
 
 - `id` → UUID
 - `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
@@ -75,7 +75,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۳. Custom Reminder (جدول: `custom_reminders`)
+### ۳. Custom Reminder (جدول: `notif_custom_reminders`)
 
 - `id` → UUID
 - `title` → string
@@ -94,9 +94,9 @@
 - `createNotification(data)` → ایجاد اعلان جدید
 - `getAllNotifications(filters)` → فیلتر بر اساس خوانده‌شده، دسته و ...
 - `getUnreadNotifications()`
-- `markAsRead(id)`
+- `markAsRead(notifId)`
 - `markAllAsRead()`
-- `deleteNotification(id)`
+- `deleteNotification(notifId)`
 - `clearOldNotifications(beforeDate)`
 
 ### Settings APIs
@@ -106,9 +106,9 @@
 
 ### Custom Reminder APIs
 - `createCustomReminder(data)`
-- `updateCustomReminder(id, data)`
+- `updateCustomReminder(notifReminderId, data)`
 - `getActiveCustomReminders()`
-- `deactivateCustomReminder(id)`
+- `deactivateCustomReminder(notifReminderId)`
 
 ### Scheduler APIs
 - `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)

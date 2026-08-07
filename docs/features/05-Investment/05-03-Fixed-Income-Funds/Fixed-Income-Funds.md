@@ -63,7 +63,7 @@ Business Rules
 
 
 Domain Entities
-۱. Fixed Income Fund (جدول: fif_funds)
+۱. Fixed Income Fund (جدول: `inv_fif_funds`)
 
 id → UUID
 name → string (نام صندوق)
@@ -79,7 +79,7 @@ description → string
 isActive → boolean
 createdAt / updatedAt
 
-۲. Fixed Income Holding (جدول: fif_holdings)
+۲. Fixed Income Holding (جدول: `inv_fif_holdings`)
 
 id → UUID
 fundId → UUID
@@ -91,7 +91,7 @@ totalFeesPaidCurrency → string (IRR یا USDT بر اساس ارز کارمز�
 currentNAV → decimal (آخرین NAV ثبت‌شده)
 createdAt / updatedAt
 
-۳. Fixed Income Transaction (جدول: fif_transactions) — لاگ رویدادها
+۳. Fixed Income Transaction (جدول: `inv_fif_transactions`) — لاگ رویدادها
 
 id → UUID
 fundId → UUID
@@ -105,12 +105,12 @@ exchangeRateToUSDT → decimal
 predictedProfit → decimal (nullable — فقط در nav_update و dividend)
 actualProfit → decimal (nullable — فقط در nav_update و dividend)
 accountId → UUID (nullable)
-accountTransactionId → UUID (لینک به AccountsBanking_transactions)
+accountTransactionId → UUID (لینک به acc_transactions)
 description → string
 date → datetime
 createdAt
 
-۴. AccountsBanking_transactions
+۴. acc_transactions
 
 در واریز/برداشت و دریافت سود نقدی (در صورت واریز به حساب بانکی) استفاده می‌شود.
 

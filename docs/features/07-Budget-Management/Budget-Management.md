@@ -54,7 +54,7 @@
 
 ## Domain Entities
 
-### ۱. Budget (جدول: `budgets`)
+### ۱. Budget (جدول: `bg_budgets`)
 
 - `id` → UUID (Primary Key)
 - `name` → string (مثلاً «بودجه مرداد ۱۴۰۵»)
@@ -72,7 +72,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Budget Envelope (جدول: `budget_envelopes`)
+### ۲. Budget Envelope (جدول: `bg_envelopes`)
 
 - `id` → UUID
 - `budgetId` → UUID
@@ -88,7 +88,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۳. Budget Transaction Link (جدول: `budget_transaction_links`)
+### ۳. Budget Transaction Link (جدول: `bg_transaction_links`)
 
 - `id` → UUID
 - `envelopeId` → UUID
@@ -100,7 +100,7 @@
 > این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
 > یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).
 
-### ۴. Budget Transfer (جدول: `budget_transfers`)
+### ۴. Budget Transfer (جدول: `bg_transfers`)
 
 - `id` → UUID
 - `budgetId` → UUID

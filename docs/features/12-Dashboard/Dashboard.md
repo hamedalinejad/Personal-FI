@@ -93,7 +93,7 @@
 > داشبورد عمدتاً بدون داده پایدار است.  
 > فقط تنظیمات شخصی‌سازی کاربر ذخیره می‌شود.
 
-### ۱. Dashboard Layout (جدول: `dashboard_layouts`)
+### ۱. Dashboard Layout (جدول: `dash_layouts`)
 
 - `id` → UUID
 - `widgets` → JSON (لیست ویجت‌ها + ترتیب + تنظیمات هر ویجت)

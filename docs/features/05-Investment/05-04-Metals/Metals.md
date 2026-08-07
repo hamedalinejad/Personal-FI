@@ -42,7 +42,7 @@ Business Rules
 - واریز از حساب بانکی به پلتفرم:
   - موجودی حساب بانکی کاهش می‌یابد.
   - موجودی نقدی پلتفرم افزایش می‌یابد.
-  - تراکنش در `AccountsBanking_transactions` + جدول تراکنش‌های پلتفرم ثبت و لینک می‌شود.
+  - تراکنش در `acc_transactions` + جدول تراکنش‌های پلتفرم ثبت و لینک می‌شود.
 - برداشت به حساب بانکی:
   - موجودی نقدی پلتفرم کاهش و موجودی حساب بانکی افزایش می‌یابد.
 - خرید فلز:
@@ -54,17 +54,17 @@ Business Rules
   - مبلغ حاصل به موجودی نقدی پلتفرم اضافه می‌شود.
   - `quantityMg` نمی‌تواند منفی شود.
 - تحویل فیزیکی:
-  - یک تراکنش جدید با `type: physical_delivery` در `metals_transactions` ثبت می‌شود.
+  - یک تراکنش جدید با `type: physical_delivery` در `inv_metals_transactions` ثبت می‌شود.
   - `quantityMg` فلز کاهش می‌یابد (از موجودی دیجیتال خارج می‌شود).
   - `deliveryFee` از موجودی نقدی پلتفرم کسر می‌شود.
-  - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
+  - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `inv_metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
   - وضعیت درخواست پیگیری می‌شود (requested, processing, delivered, cancelled).
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
 - موجودی حساب بانکی و موجودی نقدی پلتفرم نمی‌توانند منفی شوند.
 
 
 Domain Entities
-۱. Metals Platform (جدول: metals_platforms)
+۱. Metals Platform (جدول: `inv_metals_platforms`)
 
 id → UUID (Primary Key)
 name → string (نام پلتفرم — گرمی، میلی، ملی‌گلد و ...)
@@ -77,7 +77,7 @@ createdAt / updatedAt
 
 > نکته: `minBuyAmount` از MVP حذف شد (فقط به عنوان اطلاعات نمایشی در آینده می‌تواند استفاده شود).
 
-۲. Metals Holding (جدول: metals_holdings)
+۲. Metals Holding (جدول: `inv_metals_holdings`)
 
 id → UUID
 platformId → UUID
@@ -90,7 +90,7 @@ totalFeesPaid → decimal
 totalFeesPaidCurrency → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
 createdAt / updatedAt
 
-۳. Metals Transaction (جدول: metals_transactions) — لاگ خرید، فروش و تحویل فیزیکی
+۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
 
 id → UUID
 platformId → UUID
@@ -106,7 +106,7 @@ description → string
 date → datetime
 createdAt
 
-۴. Metals Platform Cash Transaction (جدول: metals_platform_transactions) — لاگ واریز و برداشت
+۴. Metals Platform Cash Transaction (جدول: `inv_metals_platform_transactions`) — لاگ واریز و برداشت
 
 id → UUID
 platformId → UUID
@@ -116,12 +116,12 @@ feeAmount → decimal
 feeCurrency → string
 exchangeRateToUSDT → decimal
 accountId → UUID
-accountTransactionId → UUID (لینک به `AccountsBanking_transactions`)
+accountTransactionId → UUID (لینک به `acc_transactions`)
 description → string
 date → datetime
 createdAt
 
-۵. Physical Delivery Request (جدول: metals_physical_deliveries)
+۵. Physical Delivery Request (جدول: `inv_metals_physical_deliveries`)
 
 id → UUID
 transactionId → UUID (لینک به `metals_transactions` که `type=physical_delivery`)
@@ -131,7 +131,7 @@ deliveredAt → datetime (nullable)
 status → string (requested, processing, delivered, cancelled)
 createdAt / updatedAt
 
-۶. AccountsBanking_transactions
+۶. acc_transactions
 
 فقط در واریز و برداشت بین حساب بانکی و پلتفرم ثبت می‌شود.
 

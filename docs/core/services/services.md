@@ -36,7 +36,8 @@ LoanPaymentDue
 Storage Service
 
 لایه انتزاعی روی LocalStorage و IndexedDB
-مدیریت داده‌های محلی
+LocalStorage: فقط برای تنظیمات UI (پیکربندی داشبورد، تم، وضعیت منوها، فیلترهای ذخیره‌شده)
+IndexedDB: داده‌های مالی حساس (تراکنش‌ها، حساب‌ها، سرمایه‌گذاری‌ها، دارایی‌ها)
 
 Notification Service
 

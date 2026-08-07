@@ -44,7 +44,7 @@
 
 ## Domain Entities
 
-### ۱. Document (جدول: `documents`)
+### ۱. Document (جدول: `docs_documents`)
 
 - `id` → UUID (Primary Key)
 - `title` → string (عنوان سند)
@@ -62,10 +62,10 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Document Link (جدول: `document_links`) — اختیاری برای ارتباط چندبه‌چند
+### ۲. Document Link (جدول: `docs_links`) — اختیاری برای ارتباط چندبه‌چند
 
 - `id` → UUID
-- `documentId` → UUID
+- `docId` → UUID
 - `relatedFeature` → string
 - `relatedId` → UUID
 - `createdAt` → datetime
@@ -95,17 +95,17 @@
 
 ### Document APIs
 - `uploadDocument(file, metadata)` → آپلود و ثبت سند
-- `updateDocument(id, data)` → ویرایش عنوان، دسته، برچسب و ...
+- `updateDocument(docId, data)` → ویرایش عنوان، دسته، برچسب و ...
 - `getAllDocuments(filters)` → فیلتر بر اساس دسته، فیچر، تاریخ و ...
-- `getDocumentById(id)`
+- `getDocumentById(docId)`
 - `getDocumentsByRelated(feature, relatedId)` → اسناد متصل به یک رکورد
-- `archiveDocument(id)`
-- `deleteDocument(id)` → حذف (با احتیاط)
-- `downloadDocument(id)` → دریافت فایل
+- `archiveDocument(docId)`
+- `deleteDocument(docId)` → حذف (با احتیاط)
+- `downloadDocument(docId)` → دریافت فایل
 
 ### Link APIs
-- `linkDocument(documentId, feature, relatedId)` → اتصال سند به رکورد
-- `unlinkDocument(documentId, feature, relatedId)`
+- `linkDocument(docId, feature, relatedId)` → اتصال سند به رکورد
+- `unlinkDocument(docId, feature, relatedId)`
 
 ---
 

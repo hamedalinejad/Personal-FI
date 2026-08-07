@@ -79,7 +79,7 @@
 
 ## Domain Entities
 
-### ۱. App Setting (جدول: `app_settings`)
+### ۱. App Setting (جدول: `stg_settings`)
 
 - `id` → UUID یا کلید ثابت
 - `key` → string (مثلاً `language`, `theme`, `base_currency`)
@@ -88,7 +88,7 @@
 
 > می‌توان به صورت Key-Value ساده پیاده‌سازی کرد.
 
-### ۲. Category (جدول: `categories`)
+### ۲. Category (جدول: `cat_categories`)
 
 - `id` → UUID
 - `name` → string
@@ -101,7 +101,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۳. Backup Log (جدول: `backup_logs`) — اختیاری
+### ۳. Backup Log (جدول: `stg_backup_logs`) — اختیاری
 
 - `id` → UUID
 - `fileName` → string
@@ -123,15 +123,15 @@
 ### Category APIs
 - `getCategories(type?)`
 - `createCategory(data)`
-- `updateCategory(id, data)`
-- `deactivateCategory(id)`
+- `updateCategory(catId, data)`
+- `deactivateCategory(catId)`
 - `reorderCategories(type, orderedIds)`
 
 ### Backup APIs
 - `createBackup()` → تولید فایل پشتیبان
 - `restoreBackup(file)` → بازیابی با تأیید کاربر
 - `listBackups()`
-- `deleteBackup(id)`
+- `deleteBackup(backupLogId)`
 
 ### Tools APIs
 - `clearCache()`

@@ -41,7 +41,7 @@
 3. **واریز از حساب بانکی به کارگزاری**:
    - موجودی حساب بانکی کاهش می‌یابد.
    - موجودی نقدی کارگزاری افزایش می‌یابد.
-   - تراکنش در `AccountsBanking_transactions` + جدول تراکنش‌های کارگزاری ثبت و به هم لینک می‌شود.
+   - تراکنش در `acc_transactions` + جدول تراکنش‌های کارگزاری ثبت و به هم لینک می‌شود.
 4. **برداشت از کارگزاری به حساب بانکی**:
    - موجودی نقدی کارگزاری کاهش و موجودی حساب بانکی افزایش می‌یابد.
    - تراکنش در هر دو جدول ثبت و لینک می‌شود.
@@ -59,7 +59,7 @@
 
 ## Domain Entities
 
-### ۱. Brokerage (جدول: `stock_iran_brokerages`)
+### ۱. Brokerage (جدول: `inv_stocks_iran_brokerages`)
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام کارگزاری)
@@ -70,7 +70,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Stock Holding (جدول: `stock_iran_holdings`)
+### ۲. Stock Holding (جدول: `inv_stocks_iran_holdings`)
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
@@ -84,7 +84,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۳. Stock Transaction (جدول: `stock_iran_transactions`) — لاگ خرید و فروش
+### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید و فروش
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
@@ -100,7 +100,7 @@
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۴. Brokerage Cash Transaction (جدول: `stock_iran_brokerage_transactions`) — لاگ واریز و برداشت
+### ۴. Brokerage Cash Transaction (جدول: `inv_stocks_iran_brokerage_transactions`) — لاگ واریز و برداشت
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
@@ -110,12 +110,12 @@
 - `feeCurrency` → string
 - `exchangeRateToUSDT` → decimal
 - `accountId` → UUID (حساب بانکی مرتبط)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۵. AccountsBanking_transactions
+### ۵. acc_transactions
 
 - فقط در واریز و برداشت بین حساب بانکی و کارگزاری ثبت می‌شود.
 

@@ -46,7 +46,7 @@
 
 ## Domain Entities
 
-### ۱. Recurring Item (جدول: `recurring_items`)
+### ۱. Bill/Recurring Item (جدول: `br_items`)
 
 - `id` → UUID (Primary Key)
 - `title` → string (مثلاً «اجاره خانه» یا «حقوق ماهانه»)
@@ -69,16 +69,16 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Recurring Occurrence (جدول: `recurring_occurrences`)
+### ۲. Bill/Recurring Occurrence (جدول: `br_occurrences`)
 
 - `id` → UUID
-- `recurringItemId` → UUID
+- `brItemId` → UUID
 - `dueDate` → datetime
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
 - `transactionId` → UUID (لینک به تراکنش واقعی Expense/Income — nullable)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions` — nullable)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -89,20 +89,20 @@
 
 ### Recurring Item APIs
 - `createRecurringItem(data)` → تعریف مورد جدید
-- `updateRecurringItem(id, data)`
+- `updateRecurringItem(brItemId, data)`
 - `getAllRecurringItems(filters)` → فیلتر بر اساس نوع، وضعیت فعال و ...
-- `getRecurringItemById(id)`
-- `deactivateRecurringItem(id)`
+- `getRecurringItemById(brItemId)`
+- `deactivateRecurringItem(brItemId)`
 - `getUpcomingItems(days)` → موارد نزدیک به سررسید
 
 ### Occurrence APIs
-- `getOccurrences(recurringItemId)`
+- `getOccurrences(brItemId)`
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
-- `markAsPaid(occurrenceId, amount, date, accountId?)`  
+- `markAsPaid(brOccurrenceId, amount, date, accountId?)`  
   → ثبت پرداخت/دریافت + ایجاد تراکنش واقعی + به‌روزرسانی nextDueDate
-- `skipOccurrence(occurrenceId)` → رد کردن این دوره
-- `updateOccurrenceAmount(occurrenceId, amount)` → برای مبالغ متغیر
+- `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
+- `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 
 ### Scheduler APIs
 - `generateUpcomingOccurrences()` → تولید Occurrenceهای آینده (Job دوره‌ای)

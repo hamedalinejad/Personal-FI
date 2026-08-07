@@ -1,6 +1,9 @@
 TypeScript Types و Interfaces مشترکی که در کل پروژه استفاده می‌شوند.
-ساختار پیشنهادی
-Bashtypes/
+
+## ساختار پیشنهادی
+
+```bash
+types/
 ├── common.ts              # انواع عمومی (ID, DateRange, ...)
 ├── currency.ts
 ├── transaction.ts
@@ -8,8 +11,12 @@ Bashtypes/
 ├── api.ts                 # انواع پاسخ API و Error
 ├── events.ts              # انواع Event Bus
 └── index.ts
-نمونه‌های مهم
-TypeScript// common.ts
+```
+
+## نمونه‌های مهم
+
+```typescript
+// common.ts
 export type UUID = string;
 export type Timestamp = string; // ISO date
 
@@ -39,18 +46,30 @@ export interface ExchangeRate {
 export type TransactionType =
   | 'deposit-income'
   | 'withdrawal-expense'
+  | 'transfer-in'
+  | 'transfer-out'
   | 'deposit-loan'
   | 'withdrawal-loan'
-  | 'transfer-in'
-  | 'transfer-out';
+  | 'withdrawal-expense-tax'  // برای مالیات
+  | 'deposit-income-tax'      // برای بازگشت مالیات
+  | 'withdrawal-cheque'       // برای چک‌ها
+  | 'deposit-cheque'
+  | 'deposit-budget'          // تخصیص از بودجه
+  | 'withdrawal-budget';      // برداشت از هدف
 
 // events.ts
 export type AppEvent =
   | { type: 'TransactionCreated'; payload: { transactionId: UUID } }
   | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID } }
-  | { type: 'BudgetExceeded'; payload: { budgetId: UUID } };
-قوانین
+  | { type: 'BudgetExceeded'; payload: { budgetId: UUID } }
+  | { type: 'LoanPaymentDue'; payload: { loanId: UUID; dueDate: Timestamp } }
+  | { type: 'ChequeDue'; payload: { chequeId: UUID; dueDate: Timestamp } }
+  | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } };
+```
 
-Types مشترک فقط اینجا تعریف شوند.
-Types مخصوص یک فیچر داخل همان فیچر قرار بگیرند.
-از any تا حد امکان استفاده نشود.
+## قوانین
+
+- Types مشترک فقط اینجا تعریف شوند.
+- Types مخصوص یک فیچر داخل همان فیچر قرار بگیرند.
+- از `any` تا حد امکان استفاده نشود.
+- `TransactionType` باید با enum فیلد `type` در جدول `AccountsBanking_transactions` یکی باشد.

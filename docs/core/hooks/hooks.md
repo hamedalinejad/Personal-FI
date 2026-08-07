@@ -1,6 +1,9 @@
 React Hooks مشترکی که در چندین فیچر استفاده می‌شوند.
-ساختار پیشنهادی
-Bashhooks/
+
+## ساختار پیشنهادی
+
+```bash
+hooks/
 ├── useLocalStorage.ts
 ├── useDebounce.ts
 ├── useMediaQuery.ts
@@ -10,13 +13,22 @@ Bashhooks/
 ├── useJalaliDate.ts
 ├── useEventBus.ts
 └── index.ts
-توضیح هر Hook
+```
 
+## توضیح هر Hook
 
- 
+| Hook | کاربرد |
+|------|--------|
+| `useLocalStorage` | همگام‌سازی State با LocalStorage |
+| `useDebounce` | تأخیر در اجرای تابع (جستجو، فیلتر و ...) |
+| `useMediaQuery` | تشخیص اندازه صفحه (موبایل / تبلت / دسکتاپ) |
+| `useClickOutside` | تشخیص کلیک بیرون از المان (بستن منو و مودال) |
+| `useOnlineStatus` | تشخیص وضعیت آنلاین/آفلاین (برای Offline-First) |
+| `useCurrency` | دسترسی آسان به نرخ ارز و تبدیل مبلغ |
+| `useJalaliDate` | کار راحت با تاریخ شمسی در کامپوننت‌ها |
+| `useEventBus` | گوش دادن و ارسال رویداد بین فیچرها |
 
-HookکاربردuseLocalStorageهمگام‌سازی State با LocalStorageuseDebounceتأخیر در اجرای تابع (جستجو، فیلتر و ...)useMediaQueryتشخیص اندازه صفحه (موبایل / تبلت / دسکتاپ)useClickOutsideتشخیص کلیک بیرون از المان (بستن منو و مودال)useOnlineStatusتشخیص وضعیت آنلاین/آفلاین (برای Offline-First)useCurrencyدسترسی آسان به نرخ ارز و تبدیل مبلغuseJalaliDateکار راحت با تاریخ شمسی در کامپوننت‌هاuseEventBusگوش دادن و ارسال رویداد بین فیچرها
-قوانین
+## قوانین
 
-فقط Hookهایی که در بیش از یک فیچر استفاده می‌شوند اینجا قرار می‌گیرند.
-Hookهای مخصوص یک فیچر باید داخل همان فیچر نوشته شوند.
+- فقط Hookهایی که در بیش از یک فیچر استفاده می‌شوند اینجا قرار می‌گیرند.
+- Hookهای مخصوص یک فیچر باید داخل همان فیچر نوشته شوند.

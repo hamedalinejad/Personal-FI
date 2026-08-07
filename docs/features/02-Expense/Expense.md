@@ -35,8 +35,7 @@ Business Rules
 ویرایش هزینه باعث به‌روزرسانی مانده حساب می‌شود.
 
 
-Domain Entities
-۱. Expense Transaction (جدول: expenses_transactions)
+### ۱. Expense Transaction (جدول: exp_transactions)
 
 id → UUID (Primary Key)
 date → datetime (تاریخ هزینه)
@@ -49,11 +48,11 @@ category → string (دسته‌بندی: خوراک، حمل‌ونقل، مس�
 hasAttachment → boolean
 attachmentPath → string
 recurringId → UUID (nullable — اگر از هزینه تکرارشونده تولید شده باشد)
-accountTransactionId → UUID (لینک به `AccountsBanking_transactions`)
+accountTransactionId → UUID (لینک به `acc_transactions`)
 createdAt → datetime
 updatedAt → datetime
 
-۲. Recurring Expense (جدول: expenses_recurring)
+۲. Recurring Expense (جدول: exp_recurring)
 
 id → UUID (Primary Key)
 title → string (عنوان هزینه تکرارشونده)
@@ -70,7 +69,7 @@ isActive → boolean
 createdAt → datetime
 updatedAt → datetime
 
-۳. Transaction (جدول مشترک AccountsBanking_transactions)
+۳. Transaction (جدول مشترک acc_transactions)
 
 هنگام ثبت هزینه، یک تراکنش از نوع withdrawal-expense ایجاد می‌شود.
 
@@ -101,4 +100,4 @@ Transaction: ایجاد رکورد تراکنش
 Reports و Dashboard: گزارش هزینه با نرخ تاریخی
 Budget: تأثیر روی بودجه ماهانه
 
-> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Loan و Cheque).
+> **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Loan و Cheque).

@@ -12,7 +12,7 @@ Business Rules
 - مانده حساب بعد از هر تراکنش در فیلد `balanceAfterTransaction` snapshot می‌شود (برای جلوگیری از بازپخش تراکنش‌ها و تغییر دستی).
 
 Domain Entities
-1. Account (جدول: Bank_accounts)
+1. Account (جدول: acc_accounts)
 
 id → UUID (Primary Key)
 name → string (نام حساب)
@@ -29,7 +29,7 @@ notes → text (یادداشت)
 createdAt → datetime
 updatedAt → datetime
 
-2. Transaction (جدول: AccountsBanking_transactions)
+2. Transaction (جدول: acc_transactions)
 
 id → UUID (Primary Key)
 date → datetime (تاریخ تراکنش)

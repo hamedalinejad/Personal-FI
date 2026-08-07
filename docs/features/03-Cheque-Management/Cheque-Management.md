@@ -41,7 +41,7 @@ Business Rules
 
 
 Domain Entities
-### ۱. Cheque (جدول: cheques)
+### ۱. Cheque (جدول: chk_cheques)
 
 id → UUID (Primary Key)
 type → string (payable یا receivable)
@@ -60,11 +60,11 @@ description → string (توضیحات)
 hasAttachment → boolean
 attachmentPath → string (تصویر چک)
 clearedDate → datetime (تاریخ وصول — nullable)
-accountTransactionId → UUID (شناسه تراکنش مرتبط در `AccountsBanking_transactions` — nullable)
+accountTransactionId → UUID (شناسه تراکنش مرتبط در `acc_transactions` — nullable)
 createdAt → datetime
 updatedAt → datetime
 
-۲. Transaction (جدول مشترک AccountsBanking_transactions)
+۲. Transaction (جدول مشترک acc_transactions)
 
 هنگام وصول چک، تراکنش مربوطه با نوع deposit-cheque یا withdrawal-cheque ایجاد می‌شود.
 
@@ -97,6 +97,6 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 تصویر چک به عنوان attachment ذخیره می‌شود.
 برای چک‌های پرداختی، موجودی حساب در زمان صدور چک قفل یا رزرو نمی‌شود (مگر تصمیم دیگری گرفته شود).
 
-> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
+> **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
 
-۲. Transaction (جدول مشترک AccountsBanking_transactions)
+۲. Transaction (جدول مشترک `acc_transactions`)

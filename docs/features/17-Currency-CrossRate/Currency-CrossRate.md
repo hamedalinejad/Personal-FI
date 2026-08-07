@@ -41,7 +41,7 @@
 
 ## Domain Entities
 
-### ۱. Currency (جدول: `currencies`)
+### ۱. Currency (جدول: `stg_currencies`)
 
 - `id` → UUID (Primary Key)
 - `code` → string (ISO code: IRR, USDT, USD, BTC و ...)
@@ -52,7 +52,7 @@
 - `isActive` → boolean
 - `createdAt` → datetime
 
-### ۲. Exchange Rate (جدول: `exchange_rates`)
+### ۲. Exchange Rate (جدول: `stg_exchange_rates`)
 
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
@@ -63,7 +63,7 @@
 - `isValid` → boolean
 - `createdAt` → datetime
 
-### ۳. User Currency Preference (جدول: `user_currency_preferences`)
+### ۳. User Currency Preference (جدول: `stg_currency_preferences`)
 
 - `id` → UUID
 - `userId` → string

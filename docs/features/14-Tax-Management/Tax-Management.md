@@ -40,7 +40,7 @@
 2. وضعیت مالیات می‌تواند `pending`, `paid`, `overdue`, `cancelled` باشد.
 3. هنگام ثبت پرداخت مالیات:
    - یک تراکنش واقعی در Expense (برای مالیات‌های هزینه‌محور) یا Income (برای مالیات‌های درآمدمحور) ایجاد می‌شود.
-   - تراکنش در `AccountsBanking_transactions` با نوع `withdrawal-expense` (یا `deposit-income` در صورت بازگشت مالیات) ثبت می‌شود.
+   - تراکنش در `acc_transactions` با نوع `withdrawal-expense` (یا `deposit-income` در صورت بازگشت مالیات) ثبت می‌شود.
    - موجودی حساب کاهش (یا افزایش) می‌یابد.
    - تراکنش Expense/Income به مالیات لینک می‌شود (از طریق `accountTransactionId`).
 4. مالیات‌های معوق باید در یادآوری‌ها و داشبورد نمایش داده شوند.
@@ -65,7 +65,7 @@
 - `year` → number (سال مالیاتی)
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions` — nullable)
+- `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)
 - `relatedFeature` → string (`investment`, `physical_assets`, `other` — nullable)
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
@@ -88,12 +88,12 @@
 
 ### Tax Record APIs
 - `createTaxRecord(data)` → ثبت مالیات جدید
-- `updateTaxRecord(id, data)` → ویرایش مالیات
+- `updateTaxRecord(taxRecordId, data)` → ویرایش مالیات
 - `getAllTaxRecords(filters)` → فیلتر بر اساس سال، نوع، وضعیت
-- `getTaxRecordById(id)` → دریافت جزئیات مالیات
-- `markAsPaid(id, paidDate, accountId, accountTransactionId, relatedFeature?, relatedId?)`  
+- `getTaxRecordById(taxRecordId)` → دریافت جزئیات مالیات
+- `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, relatedFeature?, relatedId?)`  
   → ثبت پرداخت + ایجاد تراکنش Expense + لینک به مالیات
-- `changeStatus(id, status)` → تغییر وضعیت (pending, paid, overdue, cancelled)
+- `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled)
 - `getPendingTaxes()` → مالیات‌های در انتظار
 - `getOverdueTaxes()` → مالیات‌های معوق
 
@@ -136,5 +136,5 @@
 - امکان اتصال به سال مالیاتی مشخص (مثلاً ۱۴۰۴) برای گزارش‌گیری بهتر وجود داشته باشد.
 - در Dashboard می‌توان مجموع مالیات‌های در انتظار و نزدیک به سررسید را نمایش داد.
 - نرخ تتر در زمان ثبت و پرداخت ذخیره می‌شود تا ارزش تاریخی قابل بررسی باشد.
-- تراکنش مالیاتی واقعی همیشه از طریق Expense/Income ثبت می‌شود، نه مستقیماً در AccountsBanking_transactions.
+- تراکنش مالیاتی واقعی همیشه از طریق Expense/Income ثبت می‌شود، نه مستقیماً در `acc_transactions`.
 - در نسخه‌های بعدی می‌توان قالب‌های آماده برای انواع رایج مالیات اضافه کرد.

@@ -46,7 +46,7 @@
 
 ## Domain Entities
 
-### ۱. Financial Goal (جدول: `financial_goals`)
+### ۱. Financial Goal (جدول: `fg_goals`)
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام هدف — مثلاً «پیش‌پرداخت خانه»)
@@ -67,7 +67,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Goal Contribution (جدول: `goal_contributions`)
+### ۲. Goal Contribution (جدول: `fg_contributions`)
 
 - `id` → UUID
 - `goalId` → UUID
@@ -75,7 +75,7 @@
 - `type` → string (`deposit`, `withdraw`)
 - `source` → string (`manual`, `budget`, `income`, `transfer`)
 - `accountId` → UUID (nullable)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions` — nullable)
+- `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)
 - `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime

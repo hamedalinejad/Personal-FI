@@ -42,7 +42,7 @@
    - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است.
 3. هنگام **خرید دارایی**:
    - موجودی حساب بانکی کاهش می‌یابد.
-   - تراکنش در `AccountsBanking_transactions` ثبت می‌شود.
+   - تراکنش در `acc_transactions` ثبت می‌شود.
    - دارایی جدید (یا به‌روزرسانی موجود) با قیمت خرید ثبت می‌گردد.
 4. هنگام **فروش دارایی**:
    - موجودی حساب بانکی افزایش می‌یابد.
@@ -68,7 +68,7 @@
 
 ## Domain Entities
 
-### ۱. Physical Asset (جدول: `physical_assets`)
+### ۱. Physical Asset (جدول: `pa_assets`)
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام دارایی — مثلاً «سکه تمام بهار آزادی ۱۴۰۳» یا «پراید ۱۳۹۸»)
@@ -92,7 +92,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Physical Asset Valuation (جدول: `physical_asset_valuations`)
+### ۲. Physical Asset Valuation (جدول: `pa_valuations`)
 
 - `id` → UUID
 - `assetId` → UUID
@@ -102,7 +102,7 @@
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۳. Physical Asset Transaction (جدول: `physical_asset_transactions`)
+### ۳. Physical Asset Transaction (جدول: `pa_transactions`)
 
 - `id` → UUID
 - `assetId` → UUID
@@ -112,12 +112,12 @@
 - `feeCurrency` → string
 - `exchangeRateToUSDT` → decimal
 - `accountId` → UUID (nullable)
-- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۴. AccountsBanking_transactions
+### ۴. acc_transactions
 
 - در خرید و فروش دارایی و هزینه‌های مرتبط ثبت می‌شود.
 
