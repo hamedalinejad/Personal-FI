@@ -10,6 +10,7 @@
 - نزدیک شدن به سقف بودجه
 - پیشرفت یا عقب‌ماندن از اهداف مالی
 - سررسید چک‌ها
+- سررسید مالیات‌ها
 - یادآوری‌های سفارشی کاربر
 
 سیستم به صورت Offline-first طراحی می‌شود و اعلان‌ها ابتدا درون‌برنامه‌ای هستند. در آینده می‌توان Push Notification نیز اضافه کرد.
@@ -22,6 +23,7 @@
 - دریافت اعلان برای سررسید قبوض و تراکنش‌های تکرارشونده
 - دریافت اعلان برای سررسید اقساط وام
 - دریافت اعلان برای سررسید چک‌ها
+- دریافت اعلان برای سررسید مالیات‌ها
 - دریافت هشدار نزدیک شدن به سقف بودجه یا عبور از آن
 - مشاهده لیست اعلان‌ها
 - علامت‌گذاری اعلان به عنوان خوانده‌شده
@@ -56,7 +58,7 @@
 - `title` → string
 - `message` → string
 - `type` → string (`info`, `warning`, `critical`)
-- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `system`, `custom`)
+- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
 - `relatedFeature` → string (نام فیچر مرتبط)
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
 - `isRead` → boolean
@@ -67,7 +69,7 @@
 ### ۲. Notification Setting (جدول: `notification_settings`)
 
 - `id` → UUID
-- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `system`, `custom`)
+- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
 - `isEnabled` → boolean
 - `daysBefore` → number (چند روز قبل یادآوری شود)
 - `createdAt` → datetime
@@ -120,6 +122,7 @@
 - **Bills & Recurring**: یادآوری سررسید قبوض و تراکنش‌های دوره‌ای
 - **Debt & Loan**: یادآوری اقساط وام
 - **Cheque Management**: یادآوری سررسید چک‌ها
+- **Tax Management**: یادآوری سررسید مالیات‌ها
 - **Budget**: هشدار نزدیک شدن به سقف یا عبور از بودجه
 - **Financial Goals**: یادآوری پیشرفت یا عقب‌ماندن از هدف
 - **Dashboard**: نمایش تعداد اعلان‌های خوانده‌نشده و مهم‌ترین یادآوری‌ها
@@ -133,6 +136,7 @@
 | `bill` | «قبوض برق تا ۳ روز دیگر سررسید می‌شود» |
 | `loan` | «قسط وام مسکن فردا سررسید دارد» |
 | `cheque` | «چک دریافتی به شماره ۱۲۳۴ فردا سررسید است» |
+| `tax` | «مالیات عوارض خودرو تا ۵ روز دیگر سررسید دارد» |
 | `budget` | «پاکت خوراک به ۸۵٪ سقف خود رسیده است» |
 | `goal` | «هدف سفر فقط ۱۵٪ پیشرفت داشته است» |
 | `system` | اعلان‌های سیستمی و به‌روزرسانی‌ها |

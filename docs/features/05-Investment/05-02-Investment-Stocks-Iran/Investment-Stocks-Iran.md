@@ -51,8 +51,9 @@
 6. **فروش سهام**:
    - موجودی سهم کاهش می‌یابد.
    - مبلغ حاصل به موجودی نقدی کارگزاری اضافه می‌شود.
-7. کارمزدها هم به ریال و هم معادل تتری لحظه ثبت می‌شوند.
+7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
 8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
+9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
 
 ---
 
@@ -78,8 +79,8 @@
 - `quantity` → decimal (تعداد سهم)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید — ریال)
 - `totalInvested` → decimal
-- `totalFeesPaidIRR` → decimal
-- `totalFeesPaidUSDT` → decimal
+- `totalFeesPaid` → decimal
+- `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -93,8 +94,7 @@
 - `price` → decimal (قیمت هر سهم — ریال)
 - `totalAmount` → decimal
 - `feeAmount` → decimal
-- `feeValueIRR` → decimal
-- `feeValueUSDT` → decimal
+- `feeCurrency` → string
 - `exchangeRateToUSDT` → decimal (نرخ تتر لحظه معامله)
 - `description` → string
 - `date` → datetime
@@ -107,8 +107,7 @@
 - `type` → string (`deposit`, `withdraw`)
 - `amount` → decimal (ریال)
 - `feeAmount` → decimal
-- `feeValueIRR` → decimal
-- `feeValueUSDT` → decimal
+- `feeCurrency` → string
 - `exchangeRateToUSDT` → decimal
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)

@@ -49,6 +49,7 @@ category → string (دسته‌بندی: خوراک، حمل‌ونقل، مس�
 hasAttachment → boolean
 attachmentPath → string
 recurringId → UUID (nullable — اگر از هزینه تکرارشونده تولید شده باشد)
+accountTransactionId → UUID (لینک به `AccountsBanking_transactions`)
 createdAt → datetime
 updatedAt → datetime
 
@@ -69,7 +70,7 @@ isActive → boolean
 createdAt → datetime
 updatedAt → datetime
 
-۳. Transaction (جدول مشترک txn_transactions)
+۳. Transaction (جدول مشترک AccountsBanking_transactions)
 
 هنگام ثبت هزینه، یک تراکنش از نوع withdrawal-expense ایجاد می‌شود.
 
@@ -99,3 +100,5 @@ Currency & Multi-Currency: دریافت نرخ تبدیل لحظه‌ای
 Transaction: ایجاد رکورد تراکنش
 Reports و Dashboard: گزارش هزینه با نرخ تاریخی
 Budget: تأثیر روی بودجه ماهانه
+
+> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Loan و Cheque).

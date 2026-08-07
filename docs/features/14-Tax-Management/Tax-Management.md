@@ -39,11 +39,14 @@
 1. هر رکورد مالیاتی باید نوع مشخصی داشته باشد.
 2. وضعیت مالیات می‌تواند `pending`, `paid`, `overdue`, `cancelled` باشد.
 3. هنگام ثبت پرداخت مالیات:
-   - تراکنش در `AccountsBanking_transactions` ثبت می‌شود.
-   - موجودی حساب کاهش می‌یابد.
+   - یک تراکنش واقعی در Expense (برای مالیات‌های هزینه‌محور) یا Income (برای مالیات‌های درآمدمحور) ایجاد می‌شود.
+   - تراکنش در `AccountsBanking_transactions` با نوع `withdrawal-expense` (یا `deposit-income` در صورت بازگشت مالیات) ثبت می‌شود.
+   - موجودی حساب کاهش (یا افزایش) می‌یابد.
+   - تراکنش Expense/Income به مالیات لینک می‌شود (از طریق `accountTransactionId`).
 4. مالیات‌های معوق باید در یادآوری‌ها و داشبورد نمایش داده شوند.
 5. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت.
 6. محاسبات پیچیده مالیاتی (اظهارنامه رسمی) خارج از محدوده این فیچر است.
+7. برای هر تراکنش مالیاتی، `exchangeRateToUSDT` در لحظه پرداخت ذخیره می‌شود تا ارزش تاریخی قابل محاسبه باشد.
 
 ---
 
@@ -62,8 +65,8 @@
 - `year` → number (سال مالیاتی)
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
-- `accountTransactionId` → UUID (لینک به تراکنش بانکی — nullable)
-- `relatedFeature` → string (مثلاً investment, physical_assets — nullable)
+- `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions` — nullable)
+- `relatedFeature` → string (`investment`, `physical_assets`, `other` — nullable)
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
 - `attachmentPath` → string
@@ -85,13 +88,14 @@
 
 ### Tax Record APIs
 - `createTaxRecord(data)` → ثبت مالیات جدید
-- `updateTaxRecord(id, data)`
+- `updateTaxRecord(id, data)` → ویرایش مالیات
 - `getAllTaxRecords(filters)` → فیلتر بر اساس سال، نوع، وضعیت
-- `getTaxRecordById(id)`
-- `markAsPaid(id, paidDate, accountId)` → ثبت پرداخت + ایجاد تراکنش بانکی
-- `changeStatus(id, status)`
-- `getPendingTaxes()`
-- `getOverdueTaxes()`
+- `getTaxRecordById(id)` → دریافت جزئیات مالیات
+- `markAsPaid(id, paidDate, accountId, accountTransactionId, relatedFeature?, relatedId?)`  
+  → ثبت پرداخت + ایجاد تراکنش Expense + لینک به مالیات
+- `changeStatus(id, status)` → تغییر وضعیت (pending, paid, overdue, cancelled)
+- `getPendingTaxes()` → مالیات‌های در انتظار
+- `getOverdueTaxes()` → مالیات‌های معوق
 
 ### Summary APIs
 - `getTaxSummary(year?)` → مجموع مالیات‌های پرداخت‌شده و در انتظار
@@ -102,10 +106,11 @@
 
 ## روابط با سایر فیچرها
 
-- **Accounts & Banking**: ثبت پرداخت مالیات و کاهش موجودی
-- **Income / Expense**: در صورت نیاز، ارتباط با درآمد مشمول مالیات
-- **Investment**: پیگیری مالیات احتمالی سود سرمایه‌گذاری
-- **Physical Assets**: عوارض و مالیات خودرو یا ملک
+- **Accounts & Banking**: ایجاد تراکنش Expense/Income و کاهش/افزایش موجودی حساب
+- **Expense**: ایجاد تراکنش هزینه هنگام پرداخت مالیات (برای مالیات‌های هزینه‌محور)
+- **Income**: ایجاد تراکنش درآمد هنگام بازگشت مالیات (در صورت وجود)
+- **Investment**: پیگیری مالیات احتمالی سود سرمایه‌گذاری (از طریق `relatedFeature=investment`)
+- **Physical Assets**: عوارض و مالیات خودرو یا ملک (از طریق `relatedFeature=physical_assets`)
 - **Notification & Reminder**: یادآوری موعد پرداخت
 - **Document Management**: نگهداری فیش و اسناد مالیاتی
 - **Reports / Dashboard**: نمایش مالیات‌های نزدیک و مجموع پرداختی
@@ -114,13 +119,13 @@
 
 ## انواع مالیات پیشنهادی
 
-| نوع | مثال |
-|------|------|
-| `income` | مالیات بر درآمد مشاغل / حقوق |
-| `capital_gains` | مالیات سود سرمایه‌گذاری (در صورت اعمال) |
-| `property` | مالیات یا عوارض ملک |
-| `vehicle` | عوارض خودرو |
-| `other` | سایر عوارض و مالیات‌ها |
+| نوع | مثال | نوع تراکنش |
+|------|------|------------|
+| `income` | مالیات بر درآمد مشاغل / حقوق | Expense |
+| `capital_gains` | مالیات سود سرمایه‌گذاری (در صورت اعمال) | Expense |
+| `property` | مالیات یا عوارض ملک | Expense |
+| `vehicle` | عوارض خودرو | Expense |
+| `other` | سایر عوارض و مالیات‌ها | Expense |
 
 ---
 
@@ -131,4 +136,5 @@
 - امکان اتصال به سال مالیاتی مشخص (مثلاً ۱۴۰۴) برای گزارش‌گیری بهتر وجود داشته باشد.
 - در Dashboard می‌توان مجموع مالیات‌های در انتظار و نزدیک به سررسید را نمایش داد.
 - نرخ تتر در زمان ثبت و پرداخت ذخیره می‌شود تا ارزش تاریخی قابل بررسی باشد.
+- تراکنش مالیاتی واقعی همیشه از طریق Expense/Income ثبت می‌شود، نه مستقیماً در AccountsBanking_transactions.
 - در نسخه‌های بعدی می‌توان قالب‌های آماده برای انواع رایج مالیات اضافه کرد.

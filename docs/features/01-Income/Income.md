@@ -46,7 +46,7 @@ category → string (دسته‌بندی: حقوق، فریلنس، اجاره،
 hasAttachment → boolean
 attachmentPath → string
 incomes_recurring_id → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
-Bank_transactions_id
+- Bank_transactions_id → UUID (لینک به `AccountsBanking_transactions` → accountTransactionId)
 createdAt → datetime
 updatedAt → datetime
 
@@ -96,3 +96,16 @@ Accounts & Banking: به‌روزرسانی currentBalance
 Currency & Multi-Currency: دریافت نرخ تبدیل لحظه‌ای
 Transaction: ایجاد رکورد تراکنش
 Reports و Dashboard: گزارش درآمد با نرخ تاریخی
+
+> **نکته مهم**: برای یکسان‌سازی دسته‌بندی‌ها و جلوگیری از typo، لیست استاندارد دسته‌ها در فایل `99-Common-Categories/Categories.md` تعریف شده است. برای درآمدها باید از دسته‌های لیست درآمد استفاده شود.
+
+---
+
+## روابط با سایر فیچرها
+
+Accounts & Banking: به‌روزرسانی currentBalance
+Currency & Multi-Currency: دریافت نرخ تبدیل لحظه‌ای
+Transaction: ایجاد رکورد تراکنش
+Reports و Dashboard: گزارش درآمد با نرخ تاریخی
+
+> **نکته نام‌گذاری**: فیلد `Bank_transactions_id` لینک به `AccountsBanking_transactions` است. در فیچرهای دیگر (مثل Loan و Cheque) نام این فیلد `accountTransactionId` است. برای یکسان‌سازی، بهتر است در آینده همه‌جا از `accountTransactionId` استفاده شود.

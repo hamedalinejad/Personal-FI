@@ -46,11 +46,16 @@
    - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
    - تراکنش در هر دو جدول ثبت و به هم لینک می‌شود.
 6. **انتقال بین صرافی‌ها/والت‌ها**:
-   - حتماً یک تراکنش کریپتو ثبت می‌شود.
-   - کارمزد می‌تواند از مقدار ارز کسر شود.
+   - حتماً دو تراکنش لینک‌شده ثبت می‌شود:
+     - یکی در صرافی مبدا با `type: transfer_out` و `counterExchangeId` به مقصد
+     - یکی در صرافی مقصد با `type: transfer_in` و `counterExchangeId` به مبدا
+   - کارمزد می‌تواند از مقدار ارز ارسالی کسر شود:
+     - مقدار ارسالی: `amountToSend`
+     - کارمزد: `feeAmount` (از `amountToSend` کسر می‌شود)
+     - موجودی افزایش شده در مقصد: `amountToSend - feeAmount`
    - موجودی کل رمزارز کاربر تغییر نمی‌کند (فقط جابه‌جایی بین پلتفرم‌ها).
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
-8. کارمزدها (چه از خود ارز و چه جداگانه) هم به ریال و هم به تتر در لحظه ثبت می‌شوند.
+8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
 
@@ -79,10 +84,12 @@
 - `averageBuyPrice` → decimal
 - `currency` → string
 - `totalInvested` → decimal
-- `totalFeesPaidIRR` → decimal (مجموع کارمزدهای پرداخت‌شده به ریال)
-- `totalFeesPaidUSDT` → decimal (مجموع کارمزدهای پرداخت‌شده به تتر)
+- `totalFeesPaid` → decimal (مجموع کارمزدهای پرداخت‌شده)
+- `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> توضیح: در این مدل، موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. اگرچه IRR و USDT فنیٌاً "کریپتو" نیستند، اما این رویکرد ساده‌ترین روش برای یکپارچه‌سازی موجودی نقدی در پلتفرم‌های مختلف است. مقدار `quantity` نشان‌دهنده موجودی نقدی است و `averageBuyPrice` برای آن‌ها `1` در نظر گرفته می‌شود.
 
 ### ۳. Crypto Transaction (جدول: `crypto_transactions`) — لاگ معاملات رمزارز
 
@@ -94,11 +101,9 @@
 - `price` → decimal
 - `totalAmount` → decimal
 - `feeAmount` → decimal
-- `feeSymbol` → string (ارز کارمزد)
-- `feeValueIRR` → decimal (ارزش ریالی کارمزد در لحظه)
-- `feeValueUSDT` → decimal (ارزش تتری کارمزد در لحظه)
+- `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
+- `exchangeRateToUSDT` → decimal
 - `currency` → string
-- `exchangeRateToUSD` → decimal
 - `counterExchangeId` → UUID (برای انتقال — nullable)
 - `description` → string
 - `date` → datetime
@@ -112,9 +117,8 @@
 - `amount` → decimal
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
-- `feeSymbol` → string
-- `feeValueIRR` → decimal
-- `feeValueUSDT` → decimal
+- `feeCurrency` → string
+- `exchangeRateToUSDT` → decimal
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `AccountsBanking_transactions`)
 - `description` → string
@@ -129,10 +133,13 @@
 
 ## منطق کارمزد
 
-- اگر کارمزد از **خود ارز** پرداخت شود → مقدار کارمزد + ارزش ریالی لحظه + ارزش تتری لحظه ثبت می‌شود.
-- اگر کارمزد **ریالی** باشد → مقدار ریال + معادل تتری لحظه ثبت می‌شود.
-- اگر کارمزد **تتری** باشد → مقدار تتر + معادل ریالی لحظه ثبت می‌شود.
-- مجموع کارمزدها در Holding به صورت تجمعی (به ریال و تتر) نگهداری می‌شود.
+- هر کارمزد با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ذخیره می‌شود.
+- ارزش معادل کارمزد همیشه on-the-fly محاسبه می‌شود:
+  - `convertedToUSDT = feeAmount / exchangeRateToUSDT` (اگر feeCurrency=IRR)
+  - `convertedToIRR = feeAmount * exchangeRateToUSDT` (اگر feeCurrency=USDT)
+  - `convertedToIRR = feeAmount / exchangeRateToUSDT` (اگر feeCurrency=BTC/ETH و ...)
+- مجموع کارمزدها در Holding به صورت تجمعی (یک ارز ثابت) نگهداری می‌شود.
+- در انتقال بین صرافی‌ها، اگر کارمزد از خود ارز کسر شود، تفاوت بین `amountToSend` و `amountReceived = amountToSend - feeAmount` دقیقاً مقدار کارمزد است.
 
 ---
 
@@ -173,3 +180,5 @@
 - `crypto_transactions` و `crypto_exchange_transactions` فقط لاگ هستند.
 - موجودی و میانگین خرید و مجموع کارمزدها در جدول `crypto_holdings` نگهداری می‌شود.
 - قیمت لحظه‌ای رمزارزها می‌تواند از API خارجی + کش آفلاین تأمین شود.
+
+> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.

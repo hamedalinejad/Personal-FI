@@ -31,18 +31,22 @@ Business Rules
 اگر دریافتی باشد → تراکنش deposit-cheque ایجاد و مانده حساب افزایش می‌یابد.
 اگر پرداختی باشد → تراکنش withdrawal-cheque ایجاد و مانده حساب کاهش می‌یابد.
 
-هنگام برگشت چک، وضعیت به bounced تغییر می‌کند و تراکنش معکوس (در صورت نیاز) ثبت می‌شود.
+هنگام برگشت چک، وضعیت به bounced تغییر می‌کند:
+- اگر چک هنوز pending بوده و مستقیماً bounced شده → هیچ تراکنشی ثبت نشده، پس نیازی به معکوس نیست.
+- اگر چک قبلاً cleared شده بوده (پول جابه‌جا شده) و بعداً واقعاً برگشت خورده → حتماً باید تراکنش معکوس (reversal) ثبت شود.
+- سیستم باید به صورت خودکار تراکنش reversal ایجاد کند و `isVoided = true` و `relatedTransactionId` به تراکنش اصلی تنظیم کند.
 موجودی حساب نمی‌تواند منفی شود.
 ویرایش چک فقط در وضعیت pending مجاز است.
 حذف فیزیکی وجود ندارد — فقط تغییر وضعیت به cancelled.
 
 
 Domain Entities
-۱. Cheque (جدول: cheques)
+### ۱. Cheque (جدول: cheques)
 
 id → UUID (Primary Key)
 type → string (payable یا receivable)
 chequeNumber → string (شماره چک)
+sayadiTrackingCode → string (شناسه رهگیری صیادی — nullable)
 amount → decimal (مبلغ چک)
 currency → string (ارز چک = ارز حساب)
 exchangeRateToUSD → decimal (نرخ تبدیل لحظه ثبت)
@@ -56,7 +60,7 @@ description → string (توضیحات)
 hasAttachment → boolean
 attachmentPath → string (تصویر چک)
 clearedDate → datetime (تاریخ وصول — nullable)
-transactionId → UUID (شناسه تراکنش مرتبط — nullable)
+accountTransactionId → UUID (شناسه تراکنش مرتبط در `AccountsBanking_transactions` — nullable)
 createdAt → datetime
 updatedAt → datetime
 
@@ -92,3 +96,7 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 وضعیت چک‌ها به صورت state machine مدیریت می‌شود.
 تصویر چک به عنوان attachment ذخیره می‌شود.
 برای چک‌های پرداختی، موجودی حساب در زمان صدور چک قفل یا رزرو نمی‌شود (مگر تصمیم دیگری گرفته شود).
+
+> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
+
+۲. Transaction (جدول مشترک AccountsBanking_transactions)

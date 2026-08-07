@@ -38,6 +38,9 @@
 5. امکان برداشت از هدف (کاهش مبلغ اختصاص‌داده‌شده) وجود دارد.
 6. پول اختصاص‌داده‌شده به هدف می‌تواند از حساب بانکی یا از پاکت بودجه تأمین شود.
 7. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت (`active`, `completed`, `cancelled`, `paused`).
+8. `currentAmount` نمی‌تواند منفی شود.
+9. `currentAmount` می‌تواند بیشتر از `targetAmount` شود (مثلاً اگر کاربر پس‌انداز بیشتری کند یا عوامل خارجی ارزش را افزایش دهند).
+10. وقتی `source=budget` (انتقال از پاکت به هدف)، پول واقعاً بین حساب‌ها جابه‌جا نمی‌شود؛ `accountTransactionId` باید `null` بماند (فقط یک برچسب‌گذاری داخلی است).
 
 ---
 
@@ -55,7 +58,7 @@
 - `startDate` → datetime
 - `status` → string (`active`, `completed`, `cancelled`, `paused`)
 - `priority` → number (اولویت — عدد بالاتر = مهم‌تر)
-- `category` → string (`emergency`, `purchase`, `travel`, `retirement`, `debt`, `other`)
+- `category` → string (`emergency`, `purchase`, `travel`, `retirement`, `debt`, `education`, `other`)
 - `icon` → string (اختیاری)
 - `color` → string (اختیاری)
 - `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
@@ -81,47 +84,16 @@
 
 ---
 
-## APIهای داخلی
-
-### Goal APIs
-- `createGoal(data)` → ایجاد هدف جدید
-- `updateGoal(id, data)`
-- `getAllGoals(filters)` → فیلتر بر اساس وضعیت، دسته و ...
-- `getGoalById(id)`
-- `changeGoalStatus(id, status)`
-- `getActiveGoals()`
-- `getCompletedGoals()`
-
-### Contribution APIs
-- `addContribution(goalId, amount, source, accountId?)` → واریز به هدف
-- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف
-- `getContributions(goalId)`
-- `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
-
-### Calculation APIs
-- `calculateMonthlySuggestion(goalId)` → مبلغ پیشنهادی ماهانه برای رسیدن به هدف تا تاریخ مشخص
-- `getGoalsSummary()` → خلاصه کل اهداف (تعداد، مجموع هدف، مجموع جمع‌شده)
-
----
-
-## روابط با سایر فیچرها
-
-- **Accounts & Banking**: واریز و برداشت واقعی پول مرتبط با هدف
-- **Budget**: امکان اتصال هدف به یک پاکت بودجه و تخصیص خودکار
-- **Income**: می‌توان بخشی از درآمد را مستقیماً به هدف اختصاص داد
-- **Notification & Reminder**: یادآوری پیشرفت یا عقب‌ماندن از برنامه
-- **Dashboard**: نمایش اهداف فعال و درصد پیشرفت
-- **Reports**: گزارش تحقق اهداف در بازه‌های زمانی
-
----
-
 ## منطق پیشرفت هدف
-درصد پیشرفت = (currentAmount / targetAmount) × 100
-مبلغ باقی‌مانده = targetAmount - currentAmount
-textاگر `targetDate` مشخص باشد:
-ماه‌های باقی‌مانده = تعداد ماه تا targetDate
-مبلغ پیشنهادی ماهانه = مبلغ باقی‌مانده ÷ ماه‌های باقی‌مانده
-text---
+
+**درصد پیشرفت** = `(currentAmount / targetAmount) × 100`  
+**مبلغ باقی‌مانده** = `targetAmount - currentAmount`
+
+اگر `targetDate` مشخص باشد:
+- **ماه‌های باقی‌مانده** = تعداد ماه تا `targetDate`
+- **مبلغ پیشنهادی ماهانه** = `مبلغ باقی‌مانده ÷ ماه‌های باقی‌مانده`
+
+---
 
 ## دسته‌بندی‌های پیشنهادی اهداف
 
@@ -137,6 +109,40 @@ text---
 
 ---
 
+## APIهای داخلی
+
+### Goal APIs
+- `createGoal(data)` → ایجاد هدف جدید
+- `updateGoal(id, data)` → شامل `currentAmount`, `targetAmount`, `status`
+- `getAllGoals(filters)` → فیلتر بر اساس وضعیت، دسته و ...
+- `getGoalById(id)` → شامل محاسبه `progressPercentage` و `remainingAmount`
+- `changeGoalStatus(id, status)` → تغییر وضعیت
+- `getActiveGoals()` → اهداف فعال
+- `getCompletedGoals()` → اهداف تکمیل‌شده
+
+### Contribution APIs
+- `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف
+- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف
+- `getContributions(goalId)` → تاریخچه کمک‌ها
+- `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
+
+### Calculation APIs
+- `calculateMonthlySuggestion(goalId)` → مبلغ پیشنهادی ماهانه برای رسیدن به هدف تا تاریخ مشخص
+- `getGoalsSummary()` → خلاصه کل اهداف (تعداد، مجموع هدف، مجموع جمع‌شده)
+
+---
+
+## روابط با سایر فیچرها
+
+- **Accounts & Banking**: واریز و برداشت واقعی پول مرتبط با هدف (برای `source=manual`, `income`, `transfer`)
+- **Budget**: امکان اتصال هدف به یک پاکت بودجه و تخصیص خودکار (برای `source=budget`، `accountTransactionId = null`)
+- **Income**: می‌توان بخشی از درآمد را مستقیماً به هدف اختصاص داد
+- **Notification & Reminder**: یادآوری پیشرفت یا عقب‌ماندن از برنامه
+- **Dashboard**: نمایش اهداف فعال و درصد پیشرفت
+- **Reports**: گزارش تحقق اهداف در بازه‌های زمانی
+
+---
+
 ## نکات طراحی
 
 - هدف می‌تواند بدون تاریخ پایان باشد (مثلاً صندوق اضطراری بلندمدت).
@@ -144,3 +150,4 @@ text---
 - در Dashboard بهتر است ۲ تا ۳ هدف اولویت‌دار با نوار پیشرفت نمایش داده شوند.
 - نرخ تتر در زمان ایجاد هدف و هر واریز/برداشت ذخیره می‌شود تا ارزش تاریخی هدف قابل محاسبه باشد.
 - امکان تعریف هدف به صورت درصدی از درآمد ماهانه در نسخه‌های بعدی قابل اضافه شدن است.
+- وقتی انتقال از `budget` انجام می‌شود، فقط `envelopeId` و `goalId` لینک می‌شوند و تراکنش بانکی ایجاد نمی‌شود.

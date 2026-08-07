@@ -40,12 +40,15 @@
 3. با ثبت هر **هزینه**، مبلغ از پاکت مربوطه کسر می‌شود.
 4. اگر پاکت موجودی کافی نداشته باشد:
    - هشدار نمایش داده می‌شود.
-   - در صورت فعال بودن تنظیمات سخت‌گیرانه، ثبت هزینه محدود می‌شود (اختیاری).
+   - اگر `strictMode = true`، ثبت هزینه محدود می‌شود (یا رد می‌شود).
 5. امکان انتقال مبلغ از یک پاکت به پاکت دیگر وجود دارد.
 6. باقی‌مانده پاکت در پایان ماه می‌تواند:
    - به ماه بعد منتقل شود (Rollover)
-   - یا صفر شود (بر اساس تنظیمات کاربر)
+   - یا صفر شود (بر اساس تنظیمات `rolloverEnabled`)
 7. بودجه فقط روی هزینه‌ها تأثیر می‌گذارد (نه روی سرمایه‌گذاری‌ها، مگر کاربر بخواهد).
+8. **یک هزینه می‌تواند بین چند پاکت تقسیم شود** (به دلیل جدول `budget_transaction_links`).
+9. `remainingAmount` محاسبه‌ای است: `assignedAmount + rolloverAmount - spentAmount`.
+10. `totalIncome` خودکار از جمع درآمدهای بازه محاسبه می‌شود، اما امکان override دستی وجود دارد.
 
 ---
 
@@ -60,11 +63,12 @@
 - `month` → number (برای بودجه ماهانه — nullable)
 - `startDate` → datetime
 - `endDate` → datetime
-- `totalIncome` → decimal (درآمد قابل بودجه‌بندی)
+- `totalIncome` → decimal (درآمد قابل بودجه‌بندی — خودکار محاسبه شده با امکان override)
 - `totalAssigned` → decimal (مجموع تخصیص‌داده‌شده)
 - `totalSpent` → decimal (مجموع مصرف‌شده)
+- `strictMode` → boolean (سخت‌گیری — ثبت هزینه روی سقف محدود می‌شود)
+- `rolloverEnabled` → boolean (باقی‌مانده به ماه بعد منتقل شود؟)
 - `status` → string (`active`, `closed`, `draft`)
-- `rolloverEnabled` → boolean
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -76,7 +80,7 @@
 - `category` → string (ارتباط با دسته‌بندی هزینه‌ها)
 - `assignedAmount` → decimal (مبلغ تخصیص‌داده‌شده)
 - `spentAmount` → decimal (مبلغ مصرف‌شده)
-- `remainingAmount` → decimal (باقی‌مانده — محاسبه‌ای یا ذخیره‌شده)
+- `remainingAmount` → decimal (محاسبه‌ای: assignedAmount + rolloverAmount - spentAmount)
 - `rolloverAmount` → decimal (مبلغ منتقل‌شده از دوره قبل)
 - `order` → number (ترتیب نمایش)
 - `color` → string (اختیاری — برای UI)
@@ -89,11 +93,12 @@
 - `id` → UUID
 - `envelopeId` → UUID
 - `expenseTransactionId` → UUID (لینک به تراکنش هزینه)
-- `amount` → decimal
+- `amount` → decimal (مبلغی که از این پاکت کسر شد)
 - `date` → datetime
 - `createdAt` → datetime
 
-> این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.
+> این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
+> یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).
 
 ### ۴. Budget Transfer (جدول: `budget_transfers`)
 
@@ -108,11 +113,35 @@
 
 ---
 
+## منطق Zero-Based (پاکت‌ها)
+
+### فرمول کلی
+- `remainingAmount = assignedAmount + rolloverAmount - spentAmount`
+
+### پاکت "آماده تخصیص" (System Envelope)
+- این پاکت سیستمی است و نمایانگر پولی است که هنوز به هیچ دسته‌ای اختصاص داده نشده.
+- `remainingAmount` این پاکت = `totalIncome - totalAssigned` (در کل بودجه).
+- هنگام تخصیص به پاکت‌های دیگر، مبلغ از این پاکت کم می‌شود.
+- برای Zero-Based کامل، `remainingAmount` پاکت "آماده تخصیص" باید صفر شود (یا کاربر بپذیرد که غیرصفر است).
+
+### محاسبه `totalIncome`
+- خودکار از جمع تراکنش‌های `Income` در بازه زمانی بودجه (`startDate` تا `endDate`) محاسبه می‌شود.
+- امکان override دستی وجود دارد (مثلاً اگر کاربر درآمدی خارج از سیستم دارد).
+- پس از override، محاسبات خودکار متوقف می‌شود.
+
+### Rollover
+- هنگام بستن بودجه (`status = closed`) و اگر `rolloverEnabled = true`:
+  - `rolloverAmount` هر پاکت به مقدار `remainingAmount` آن به‌روزرسانی می‌شود.
+  - `remainingAmount` هر پاکت صفر می‌شود.
+  - پاکت "آماده تخصیص" مجدد پر می‌شود با مقدار `totalIncome` دوره جدید.
+
+---
+
 ## APIهای داخلی
 
 ### Budget APIs
 - `createBudget(data)` → ایجاد بودجه جدید برای دوره مشخص
-- `updateBudget(id, data)`
+- `updateBudget(id, data)` → شامل `strictMode`, `rolloverEnabled`, `totalIncome` (override)
 - `getBudgetByPeriod(year, month?)`
 - `getActiveBudget()`
 - `closeBudget(id)` → بستن بودجه و اعمال Rollover در صورت نیاز
@@ -127,6 +156,7 @@
 
 ### Integration APIs
 - `applyExpenseToBudget(expenseId, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه
+- `splitExpenseBudget(expenseId, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
 - `getEnvelopeStatus(envelopeId)` → وضعیت مصرف (درصد و باقی‌مانده)
 - `checkBudgetAlerts(budgetId)` → بررسی هشدارها
 
@@ -143,4 +173,9 @@
 
 ---
 
-## منطق Zero-Based (پاکت‌ها)
+## نکات طراحی
+
+- `remainingAmount` محاسبه‌ای است و در دیتابیس ذخیره نمی‌شود (برای جلوگیری از out-of-sync).
+- هزینه می‌تواند بین چند پاکت تقسیم شود (به دلیل جدول `budget_transaction_links`).
+- در حالت `strictMode = true`، اگر `remainingAmount <= 0`، ثبت هزینه محدود می‌شود.
+- برای Zero-Based کامل، مبلغ پاکت "آماده تخصیص" باید صفر شود.

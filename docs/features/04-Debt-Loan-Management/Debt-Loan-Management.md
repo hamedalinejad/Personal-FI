@@ -25,6 +25,9 @@
 6. جدول `loan_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
 7. موجودی حساب نمی‌تواند منفی شود.
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
+9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `loan_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
+10. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
+11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToUSD` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
 
 ---
 
@@ -37,16 +40,19 @@
 - `loanType` → string (نوع وام — بانکی، قرض‌الحسنه، دوستانه، تسهیلات، سایر)
 - `direction` → string (`borrowed` یا `lent`)
 - `principalAmount` → decimal (مبلغ اصلی)
-- `currency` → string
-- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت)
+- `currency` → string (ارز وام)
+- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت در ابتدا)
 - `accountId` → UUID (حساب مرتبط)
 - `interestType` → string (`none`, `fixed`, `variable`)
 - `interestRate` → decimal (نرخ سود)
+- `interestRatePeriod` → string (`annual`, `monthly`) — نرخ سود سالانه است یا ماهانه؟
+- `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`) — فرکانس اقساط
 - `totalInstallments` → integer (تعداد اقساط)
 - `startDate` → datetime
 - `endDate` → datetime
 - `status` → string (`active`, `completed`, `cancelled`)
 - `remainingBalance` → decimal (مانده باقی‌مانده)
+- `fixedInstallmentAmount` → decimal (nullable — برای وام‌های ساده بدون amortization پیچیده)
 - `contactName` → string (طرف مقابل)
 - `description` → string
 - `hasAttachment` → boolean
@@ -54,18 +60,24 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
+> **نکته نام‌گذاری**: لینک به `AccountsBanking_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با دیگر فیچرها).
+
 ### ۲. Loan Transaction (لاگ) (جدول: `loan_transactions`)
 
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
 - `date` → datetime
 - `type` → string (`disbursement`, `installment_payment`, `interest_payment`, `penalty`, `early_payment`)
-- `amount` → decimal
+- `amount` → decimal (مبلغ کل پرداختی)
+- `principalPortion` → decimal (مبلغ مربوط به اصل بدهی — nullable برای وام‌های بدون سود)
+- `interestPortion` → decimal (مبلغ مربوط به سود — nullable برای وام‌های بدون سود)
 - `description` → string
+- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه پرداخت)
 - `accountTransactionId` → UUID (ارتباط با رکورد در `AccountsBanking_transactions`)
 - `createdAt` → datetime
 
-> این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.
+> این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.  
+> برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
 
 ### ۳. AccountsBanking_transactions (جدول مشترک تراکنش‌های حساب)
 
@@ -87,26 +99,29 @@
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
   → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
-  → ثبت در `loan_transactions`  
+  → ثبت در `loan_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSD`)  
   → ثبت در `AccountsBanking_transactions`  
-  → به‌روزرسانی `remainingBalance` وام و موجودی حساب
+  → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
-- `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس اطلاعات وام)
-- `getOverduePayments()`
+- `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `installmentFrequency`)
+- `getOverduePayments()` → دریافت اقساط سررسید گذشته
 
 ---
 
 ## روابط با سایر فیچرها
 
 - **Accounts & Banking**: ثبت تراکنش و تغییر موجودی حساب
-- **Currency & Multi-Currency**: دریافت نرخ تبدیل لحظه‌ای
+- **Currency & Multi-Currency**: دریافت نرخ تبدیل لحظه‌ای (هر پرداخت نرخ خود را دارد)
 - **Notification & Reminder**: یادآوری سررسیدها
-- **Reports** و **Dashboard**: نمایش مانده بدهی‌ها و مطالبات
+- **Reports** و **Dashboard**: نمایش مانده بدهی‌ها و مطالبات + محاسبه سود پرداخت شده
 
 ---
 
 ## نکات طراحی
 
-- برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط و تاریخ‌ها) محاسبه می‌شود.
+- برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط، `installmentFrequency`، `interestRatePeriod` و تاریخ‌ها) محاسبه می‌شود.
 - `loan_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
-- هر حرکت مالی وام حتماً دو جا ثبت می‌شود: لاگ وام + تراکنش حساب.
+- برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
+- برای هر پرداخت، `exchangeRateToUSD` ذخیره می‌شود تا ارزش دلاری/تتری در طول زمان حفظ شود.
+- `fixedInstallmentAmount` برای وام‌های ساده (بدون فرمول amortization بانکی) استفاده می‌شود.
+- نرخ سود با `interestRatePeriod` مشخص می‌شود: `annual` یا `monthly`.
