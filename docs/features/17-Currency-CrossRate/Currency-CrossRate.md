@@ -41,7 +41,7 @@
 
 ## Domain Entities
 
-### ۱. Currency (جدول: `stg_currencies`)
+### ۱. Currency (جدول: `cur_currencies`)
 
 - `id` → UUID (Primary Key)
 - `code` → string (ISO code: IRR, USDT, USD, BTC و ...)
@@ -52,7 +52,7 @@
 - `isActive` → boolean
 - `createdAt` → datetime
 
-### ۲. Exchange Rate (جدول: `stg_exchange_rates`)
+### ۲. Exchange Rate (جدول: `cur_exchange_rates`)
 
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
@@ -63,10 +63,9 @@
 - `isValid` → boolean
 - `createdAt` → datetime
 
-### ۳. User Currency Preference (جدول: `stg_currency_preferences`)
+### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
 - `id` → UUID
-- `userId` → string
 - `displayCurrency` → string (ارز نمایشی پیش‌فرض)
 - `baseCurrency` → string (ارز پایه برای محاسبات)
 - `createdAt` → datetime
@@ -90,8 +89,10 @@
 - `getRatesForCurrency(currencyCode)` → نرخ‌های مرتبط با یک ارز
 
 ### Preference APIs
-- `getUserCurrencyPreference(userId)` → دریافت تنظیمات نمایش کاربر
-- `updateUserCurrencyPreference(userId, displayCurrency, baseCurrency)` → به‌روزرسانی
+- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر
+- `updateUserCurrencyPreference(displayCurrency, baseCurrency)` → به‌روزرسانی
+
+> نکته: اپ تک‌کاربره است، پس فقط تنظیمات یک کاربر وجود دارد (بدون نیاز به `userId`).
 
 ---
 

@@ -34,8 +34,8 @@
 
 1. تغییر تنظیمات باید بلافاصله یا پس از ذخیره اعمال شود.
 2. پشتیبان‌گیری باید شامل تمام داده‌های مهم کاربر باشد.
-3. بازیابی از پشتیبان باید با تأیید صریح کاربر انجام شود (خطرOverwrite).
-4. تنظیمات外观 و زبان روی کل اپلیکیشن اثر می‌گذارند.
+?. ??????? ?? ??????? ???? ?? ????? ???? ????? ????? ??? (??? ?????????).
+?. ??????? ???? ? ???? ??? ?? ???????? ??? ?????????.
 5. دسته‌بندی‌های سیستمی نباید قابل حذف کامل باشند (فقط غیرفعال‌سازی).
 6. هیچ داده مالی نباید بدون رضایت کاربر به بیرون ارسال شود.
 
@@ -91,15 +91,21 @@
 ### ۲. Category (جدول: `cat_categories`)
 
 - `id` → UUID
-- `name` → string
+- `code` → string (کد یکتا مثل `salary`, `food`, `rental`)
+- `name_fa` → string (نام فارسی)
+- `name_en` → string (نام انگلیسی)
+- `description` → text (توضیحات اختیاری)
 - `type` → string (`income` یا `expense`)
-- `icon` → string (اختیاری)
-- `color` → string (اختیاری)
-- `isSystem` → boolean
+- `isSystem` → boolean (`true` برای دسته‌های استاندارد سیستم، `false` برای دسته‌های کاربر)
 - `isActive` → boolean
-- `order` → number
+- `order` → number (ترتیب نمایش)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته طراحی**: این جدول دو نقش دارد:  
+> ۱. نگهداری لیست استاندارد دسته‌ها (با `isSystem = true`) که در `99-Common-Categories/Categories.md` تعریف شده‌اند  
+> ۲. اجازه اضافه کردن دسته‌های شخصی توسط کاربر (با `isSystem = false`)  
+> فیچرهای Income و Expense می‌توانند از هر دو دسته استفاده کنند.
 
 ### ۳. Backup Log (جدول: `stg_backup_logs`) — اختیاری
 
@@ -121,11 +127,13 @@
 - `resetSettingsToDefault()`
 
 ### Category APIs
-- `getCategories(type?)`
-- `createCategory(data)`
-- `updateCategory(catId, data)`
-- `deactivateCategory(catId)`
-- `reorderCategories(type, orderedIds)`
+- `getCategories(type?)` → فیلتر بر اساس type (income/expense)
+- `getSystemCategories(type?)` → دریافت دسته‌های استاندارد سیستم
+- `getUserCategories(type?)` → دریافت دسته‌های شخصی کاربر
+- `createCategory(data)` → ایجاد دسته شخصی (با `isSystem = false`)
+- `updateCategory(catId, data)` → ویرایش دسته شخصی
+- `deactivateCategory(catId)` → غیرفعال کردن دسته (برای system categories فقط deactivate مجاز)
+- `reorderCategories(type, orderedIds)` → تغییر ترتیب نمایش دسته‌ها
 
 ### Backup APIs
 - `createBackup()` → تولید فایل پشتیبان

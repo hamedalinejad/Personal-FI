@@ -1,7 +1,9 @@
 lib/ — کتابخانه‌ها و تنظیمات کمکی
 این پوشه برای کدهایی است که نه Utils خالص هستند، نه Service کامل، بلکه تنظیمات و Wrapperهای کتابخانه‌های خارجی یا منطق‌های زیرساختی کوچک‌اند.
 ساختار پیشنهادی
-Bashlib/
+
+```bash
+lib/
 ├── react-query.ts          # تنظیمات TanStack Query
 ├── dayjs.ts                # تنظیم dayjs + تقویم شمسی
 ├── zod.ts                  # Schemaهای مشترک یا config
@@ -9,7 +11,17 @@ Bashlib/
 ├── constants.ts            # ثابت‌های سراسری
 ├── env.ts                  # متغیرهای محیطی
 └── index.ts
-مسئولیت‌ها
+```
+
+## مسئولیت‌ها
+
+| فایل | کاربرد |
+|------|--------|
+| `react-query.ts` | تنظیم QueryClient، cache time، retry |
+| `dayjs.ts` | فعال‌سازی پلاگین شمسی و locale فارسی |
+| `storage.ts` | خواندن/نوشتن امن در localStorage |
+| `constants.ts` | ثابت‌هایی مثل نام اپ، نسخه، کلیدها |
+| `env.ts` | مدیریت متغیرهای محیطی Vite |
 
 
 

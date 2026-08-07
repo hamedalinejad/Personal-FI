@@ -66,13 +66,13 @@
 بدهی‌ها
 └── وام‌ها و مطالبات منفی
 ثروت خالص = ثروت کل − بدهی‌ها
-text---
+---
 
 ## Domain Entities
 
 > این فیچر بیشتر تجمیعی است. جداول زیر برای عملکرد بهتر و تاریخچه پیشنهاد می‌شوند.
 
-### ۱. Portfolio Snapshot (جدول: `portfolio_snapshots`)
+### ۱. Portfolio Snapshot (جدول: `rep_portfolio_snapshots`)
 
 - `id` → UUID
 - `date` → datetime
@@ -87,7 +87,7 @@ text---
 - `breakdown` → JSON (جزئیات هر بخش)
 - `createdAt` → datetime
 
-### ۲. Portfolio Setting (جدول: `portfolio_settings`)
+### ۲. Portfolio Setting (جدول: `rep_portfolio_settings`)
 
 - `id` → UUID
 - `includeCashInWealth` → boolean
@@ -155,8 +155,9 @@ text---
     percent: number
   }>
 }
+```
 
-روابط با سایر فیچرها
+## روابط با سایر فیچرها
 
 Crypto: ارزش و سود/زیان رمزارز
 Stocks Iran: ارزش و سود/زیان سهام

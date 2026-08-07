@@ -72,4 +72,4 @@ export type AppEvent =
 - Types مشترک فقط اینجا تعریف شوند.
 - Types مخصوص یک فیچر داخل همان فیچر قرار بگیرند.
 - از `any` تا حد امکان استفاده نشود.
-- `TransactionType` باید با enum فیلد `type` در جدول `AccountsBanking_transactions` یکی باشد.
+- `TransactionType` باید با enum فیلد `type` در جدول `acc_transactions` یکی باشد.

@@ -45,6 +45,7 @@
 | `dash_` | Dashboard |
 | `tax_` | Tax Management |
 | `docs_` | Document Management |
+| `cur_` | Currency & Multi-Currency |
 | `stg_` | Settings & Tools |
 | `cat_` | Common Categories |
 
@@ -103,9 +104,9 @@
 | `docs_links` | Document Management | پیوندهای اسناد |
 | `stg_settings` | Settings & Tools | تنظیمات برنامه |
 | `stg_backup_logs` | Settings & Tools | لاگ‌های پشتیبان‌گیری |
-| `stg_currencies` | Currency & Multi-Currency | ارزها |
-| `stg_exchange_rates` | Currency & Multi-Currency | نرخ‌های تبدیل |
-| `stg_currency_preferences` | Currency & Multi-Currency | تنظیمات ارز کاربر |
+| `cur_currencies` | Currency & Multi-Currency | ارزها |
+| `cur_exchange_rates` | Currency & Multi-Currency | نرخ‌های تبدیل |
+| `cur_currency_preferences` | Currency & Multi-Currency | تنظیمات ارز کاربر |
 | `cat_categories` | Common Categories | دسته‌بندی‌های مشترک |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
