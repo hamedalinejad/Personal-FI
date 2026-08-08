@@ -57,19 +57,28 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `rate` → decimal (نرخ تبدیل: ۱ واحد toCurrency = rate واحد fromCurrency)
+- `rate` → decimal (نرخ تبدیل: ۱ واحد fromCurrency = rate واحد toCurrency)
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
+> **نکته توضیحی**: برای نرخ‌های پایه (IRR → USDT)، این فیلد نشان‌دهنده «تتر به ازای ۱ ریال» است (معکوس اصطلاحات رایج بانکی).  
+> برای محاسبه: `amountUSDT = amountIRR * rate` (یا `amountIRR = amountUSDT / rate`).
+
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
 - `id` → UUID
+- `userId` → UUID (nullable — برای نسخه‌های آینده با چندکاربری)
 - `displayCurrency` → string (ارز نمایشی پیش‌فرض)
 - `baseCurrency` → string (ارز پایه برای محاسبات)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته**:  
+> - در نسخه ۱.۰.۰ اپ تک‌کاربره است و `userId` nullable است  
+> - در نسخه‌های آینده (Multi User)، `userId` پر می‌شود  
+> - از Blueprint بخش ۱۳: «Multi User (Future)» — بهتر است از ابتدا طراحی آماده باشد
 
 ---
 
@@ -89,10 +98,10 @@
 - `getRatesForCurrency(currencyCode)` → نرخ‌های مرتبط با یک ارز
 
 ### Preference APIs
-- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر
-- `updateUserCurrencyPreference(displayCurrency, baseCurrency)` → به‌روزرسانی
+- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر (برای کاربر جاری یا `userId` مشخص)
+- `updateUserCurrencyPreference(userId, displayCurrency, baseCurrency)` → به‌روزرسانی
 
-> نکته: اپ تک‌کاربره است، پس فقط تنظیمات یک کاربر وجود دارد (بدون نیاز به `userId`).
+> نکته: اپ در نسخه ۱.۰.۰ تک‌کاربره است، اما طراحی آماده برای چندکاربری آینده است.
 
 ---
 
@@ -113,19 +122,19 @@
 
 ```typescript
 // pseudo-code
-function convert(amount: number, fromCurrency: string, toCurrency: string, exchangeRate: number): number {
+function convert(amount: number, fromCurrency: string, toCurrency: string, rate: number): number {
   if (fromCurrency === toCurrency) return amount;
   
   if (fromCurrency === 'IRR' && toCurrency === 'USDT') {
-    return amount / exchangeRate; // amountIRR / rate = amountUSDT
+    return amount * rate; // amountIRR * rate = amountUSDT (rate = USDT per IRR)
   }
   if (fromCurrency === 'USDT' && toCurrency === 'IRR') {
-    return amount * exchangeRate; // amountUSDT * rate = amountIRR
+    return amount / rate; // amountUSDT / rate = amountIRR
   }
   
   // برای تبدیل‌های پیچیده‌تر (مثلاً BTC → IRR):
   // 1. BTC → USDT (با نرخ BTC-to-USDT)
-  // 2. USDT → IRR (با exchangeRateToUSDT)
+  // 2. USDT → IRR (با rate از جدول)
   // یا یک تابع multiStepConvert
 }
 ```

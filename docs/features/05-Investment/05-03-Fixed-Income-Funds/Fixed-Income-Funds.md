@@ -45,10 +45,11 @@ Business Rules
 - خرید واحد:
   - موجودی نقدی (حساب بانکی یا کارگزاری) کاهش می‌یابد.
   - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید به‌روزرسانی می‌شود.
+  - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
   - `units` نمی‌تواند منفی شود.
 - فروش/ابطال واحد:
   - تعداد واحد کاهش می‌یابد.
-  - مبلغ حاصل به موجودی نقدی اضافه می‌شود.
+  - مبلغ حاصل به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
   - `units` نمی‌تواند منفی شود.
 - تقسیم سود نقدی:
   - مبلغ سود به عنوان درآمد ثبت می‌شود.
@@ -61,54 +62,69 @@ Business Rules
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
 - موجودی حساب بانکی نمی‌تواند منفی شود.
 
+> **نکته طراحی**: برای ETFها، تمام واریز/برداشت‌ها از طریق کارگزاری انجام می‌شوند. بنابراین:
+> - در `inv_fif_holdings`, `brokerageId` لینک به کارگزاری است
+> - در `inv_fif_transactions`, `brokerageId` برای واریز/برداشت ETF پر می‌شود
+> - در صورت واریز/برداشت مستقیم از حساب بانکی، `accountId` پر می‌شود
+
 
 Domain Entities
 ۱. Fixed Income Fund (جدول: `inv_fif_funds`)
 
-id → UUID
-name → string (نام صندوق)
-symbol → string (نماد — در صورت ETF)
-fundType → string (issuance_redemption یا etf)
-profitType → string (distribution یا accumulation)
-predictedAnnualRate → decimal (سود پیش‌بینی‌شده سالانه — درصد)
-distributionPeriod → string (monthly, quarterly, none)
-basePrice → decimal (قیمت پایه — nullable)
-platform → string (سایت صندوق یا کارگزاری)
-url → string
-description → string
-isActive → boolean
-createdAt / updatedAt
+- `id` → UUID (Primary Key)
+- `name` → string (نام صندوق)
+- `symbol` → string (نماد — در صورت ETF، برای issuance_redemption nullable است)
+- `fundType` → string (issuance_redemption یا etf)
+- `profitType` → string (distribution یا accumulation)
+- `predictedAnnualRate` → decimal (سود پیش‌بینی‌شده سالانه — درصد)
+- `distributionPeriod` → string (monthly, quarterly, none)
+- `basePrice` → decimal (قیمت پایه — nullable)
+- `platform` → string (سایت صندوق یا کارگزاری)
+- `url` → string
+- `description` → string
+- `isActive` → boolean
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **نکته**: برای صندوق‌های ETF، `symbol` نماد بورسی است. برای صندوق‌های issuance_redemption (صدور و ابطالی)، `symbol` nullable است زیرا این صندوق‌ها در بورس معامله نمی‌شوند.
 
 ۲. Fixed Income Holding (جدول: `inv_fif_holdings`)
 
-id → UUID
-fundId → UUID
-units → decimal (تعداد واحد فعلی)
-averageBuyPrice → decimal (میانگین قیمت خرید)
-totalInvested → decimal
-totalFeesPaid → decimal
-totalFeesPaidCurrency → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
-currentNAV → decimal (آخرین NAV ثبت‌شده)
-createdAt / updatedAt
+- `id` → UUID (Primary Key)
+- `fundId` → UUID
+- `brokerageId` → UUID (nullable — لینک به کارگزاری برای ETFها)
+- `units` → decimal (تعداد واحد فعلی)
+- `averageBuyPrice` → decimal (میانگین قیمت خرید)
+- `totalInvested` → decimal
+- `totalFeesPaid` → decimal
+- `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
+- `currentNAV` → decimal (آخرین NAV ثبت‌شده)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
 ۳. Fixed Income Transaction (جدول: `inv_fif_transactions`) — لاگ رویدادها
 
-id → UUID
-fundId → UUID
-type → string (buy, sell, dividend, reinvest, nav_update)
-units → decimal (تعداد واحد — در buy/sell/reinvest)
-price → decimal (قیمت واحد / NAV)
-amount → decimal (مبلغ ریالی)
-feeAmount → decimal
-feeCurrency → string
-exchangeRateToUSDT → decimal
-predictedProfit → decimal (nullable — فقط در nav_update و dividend)
-actualProfit → decimal (nullable — فقط در nav_update و dividend)
-accountId → UUID (nullable)
-accountTransactionId → UUID (لینک به acc_transactions)
-description → string
-date → datetime
-createdAt
+- `id` → UUID (Primary Key)
+- `fundId` → UUID
+- `brokerageId` → UUID (nullable — برای ETFها که از کارگزاری خرید می‌شوند)
+- `type` → string (buy, sell, dividend, reinvest, nav_update)
+- `units` → decimal (تعداد واحد — در buy/sell/reinvest)
+- `price` → decimal (قیمت واحد / NAV)
+- `amount` → decimal (مبلغ ریالی)
+- `feeAmount` → decimal
+- `feeCurrency` → string
+- `exchangeRateToUSDT` → decimal
+- `predictedProfit` → decimal (nullable — فقط در nav_update و dividend)
+- `actualProfit` → decimal (nullable — فقط در nav_update و dividend)
+- `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی)
+- `accountTransactionId` → UUID (لینک به acc_transactions)
+- `description` → string
+- `date` → datetime
+- `createdAt` → datetime
+
+> **نکته**: برای ETFها، واریز/برداشت از طریق کارگزاری انجام می‌شود، بنابراین `brokerageId` پر می‌شود. برای صندوق‌های issuance_redemption، ممکن است `accountId` مستقیماً پر شود.
 
 ۴. acc_transactions
 
@@ -119,6 +135,7 @@ APIهای داخلی
 
 createFund(data) / updateFund(id, data) / getAllFunds()
 createTransaction(data) → خرید، فروش، تقسیم سود، سرمایه‌گذاری مجدد
+createPlatformCashTransaction(data) → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک بانکی
 updateNAV(fundId, nav, date) → ثبت NAV جدید
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری

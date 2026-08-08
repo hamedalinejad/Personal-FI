@@ -2,13 +2,16 @@
 
 ## Overview
 
-لایه دیتابیس اصلی پروژه بر اساس **IndexedDB** با کتابخانه‌های **Dexie** یا **RxDB** پیاده‌سازی می‌شود.
+لایه دیتابیس اصلی پروژه بر اساس **SQLite** با کتابخانه **sql.js** پیاده‌سازی می‌شود.  
+این کتابخانه یک SQL engine کامل را در محیط WASM فراهم می‌کند و به IndexedDB متصل می‌شود.
 
 ## تفکیک لایه‌ها
 
 | لایه | توضیح |
 |------|------|
-| **Core DB (IndexedDB)** | ذخیره‌سازی اصلی داده‌های مالی با قابلیت Offline-First |
+| **SQL Layer** | استفاده از SQL استاندارد با تمام قابلیت‌های آن (Foreign Keys, Transactions, Views, Indexes) |
+| **sql.js** | کتابخانه اتصال به دیتابیس و مدیریت WASM |
+| **IndexedDB** | ذخیره‌سازی فایل دیتابیس SQLite در مرورگر |
 | **LocalStorage** | ذخیره داده‌های غیرحساس و کم‌حجم (پیکربندی UI، تم، تنظیمات فیلتر) |
 | **Session Storage** | داده‌های موقت فقط برای سشن فعلی |
 
@@ -19,10 +22,19 @@
 - مثال‌ها: تنظیمات UI، وضعیت منوها، تم فعال، فیلترهای ذخیره‌شده.
 - داده‌های مالی **هرگز** در LocalStorage ذخیره نشوند.
 
-### IndexedDB (Dexie/RxDB)
-- ذخیره‌سازی اصلی داده‌های مالی (همه تراکنش‌ها، حساب‌ها، سرمایه‌گذاری‌ها و ...)
-- قابلیت Offline-First
+### Session Storage
+- فقط برای داده‌های موقت در حین سشن کاربر استفاده شود.
+- مثال‌ها: فرم‌های در حال پر کردن، temporary state.
+
+### SQLite (sql.js)
+- ذخیره‌سازی اصلی داده‌های مالی با تمام قابلیت‌های SQL:
+  - **Foreign Keys**: امنیت روابط بین جداول
+  - **Transactions**: تضمین اتمیسیت تغییرات
+  - **Views**: ساخت نمایه‌های پیچیده برای گزارش‌ها
+  - **Indexes**: سرعت بالای جستجو
 - پشتیبانی از قید کردن و روابط بین جداول
+- قابلیت Offline-First کامل
+- پشتیبانی از اپراتورهای SQL کامل (JOIN, GROUP BY, HAVING, window functions و ...)
 
 ## قوانین نام‌گذاری جداول
 
@@ -42,6 +54,7 @@
 | `br_` | Bills & Recurring |
 | `notif_` | Notification & Reminder |
 | `rep_` | Reports & Analytics |
+| `port_` | Portfolio & Wealth Overview |
 | `dash_` | Dashboard |
 | `tax_` | Tax Management |
 | `docs_` | Document Management |
@@ -94,8 +107,8 @@
 | `notif_custom_reminders` | Notification & Reminder | یادآوری‌های سفارشی |
 | `rep_presets` | Reports & Analytics | پیش‌تنظیم گزارش |
 | `rep_net_worth_snapshots` | Reports & Analytics | نمونه‌گیری Net Worth |
-| `rep_portfolio_snapshots` | Reports & Portfolio | نمونه‌گیری پرتفوی |
-| `rep_portfolio_settings` | Reports & Portfolio | تنظیمات پرتفوی |
+| `port_snapshots` | Portfolio & Wealth Overview | نمونه‌گیری پرتفوی |
+| `port_settings` | Portfolio & Wealth Overview | تنظیمات پرتفوی |
 | `dash_layouts` | Dashboard | چیدمان داشبورد |
 | `dash_widget_configs` | Dashboard | تنظیمات ویجت‌ها |
 | `tax_records` | Tax Management | رکوردهای مالیاتی |
@@ -150,14 +163,19 @@ export interface AccTransaction {
 
 ```bash
 core/db/
-├── db.ts              # تعریف دیتابیس و اوبجکت استورها
+├── db.ts              # تعریف دیتابیس و اتصال
+├── schema.sql         # تعریف جداول با SQL
 ├── models.ts          # TypeScript types برای هر جدول
-├── migrations.ts      # مدیریت مایگRATION‌ها
+├── migrations.ts      # مدیریت مایگRATION‌های SQLite
+├── queries/           # کوئری‌های SQL تجمیع شده
+│   ├── reports.ts     # کوئری‌های گزارش‌گیری
+│   └── analytics.ts   # کوئری‌های تحلیلی
 └── index.ts           # Export اصلی
 ```
 
 ## قوانین
 
-- تمام تراکنش‌های مالی در IndexedDB ذخیره می‌شوند.
+- تمام تراکنش‌های مالی در SQLite ذخیره می‌شوند.
 - LocalStorage فقط برای تنظیمات UI و داده‌های غیرحساس استفاده شود.
 - داده‌های حساس (مثلاً API keys) هرگز ذخیره نشوند.
+- تمام مبالغ باید بر اساس قانون "Minor Unit Storage" ذخیره شوند (بخش ۱۱ Project-Blueprint).

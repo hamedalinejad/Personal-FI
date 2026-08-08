@@ -37,7 +37,7 @@
 
 1. هر بودجه به یک بازه زمانی مشخص (ماه یا سال) تعلق دارد.
 2. روش اصلی: **Zero-Based** — مجموع تخصیص‌ها باید با درآمد قابل بودجه‌بندی برابر شود (یا کاربر آگاهانه اختلاف را بپذیرد).
-3. با ثبت هر **هزینه**، مبلغ از پاکت مربوطه کسر می‌شود.
+3. با ثبت هر **هزینه** (از هر منبعی: حساب بانکی، چک، وام)، مبلغ از پاکت مربوطه کسر می‌شود.
 4. اگر پاکت موجودی کافی نداشته باشد:
    - هشدار نمایش داده می‌شود.
    - اگر `strictMode = true`، ثبت هزینه محدود می‌شود (یا رد می‌شود).
@@ -80,7 +80,6 @@
 - `category` → string (ارتباط با دسته‌بندی هزینه‌ها)
 - `assignedAmount` → decimal (مبلغ تخصیص‌داده‌شده)
 - `spentAmount` → decimal (مبلغ مصرف‌شده)
-- `remainingAmount` → decimal (محاسبه‌ای: assignedAmount + rolloverAmount - spentAmount)
 - `rolloverAmount` → decimal (مبلغ منتقل‌شده از دوره قبل)
 - `order` → number (ترتیب نمایش)
 - `color` → string (اختیاری — برای UI)
@@ -88,17 +87,26 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
+> **نکته طراحی**: `remainingAmount` یک فیلد **محاسبه‌ای** است و در دیتابیس ذخیره نمی‌شود.  
+> فرمول: `remainingAmount = assignedAmount + rolloverAmount - spentAmount`  
+> ذخیره این فیلد باعث out-of-sync با داده‌های واقعی می‌شود.
+
 ### ۳. Budget Transaction Link (جدول: `bg_transaction_links`)
 
 - `id` → UUID
 - `envelopeId` → UUID
-- `expenseTransactionId` → UUID (لینک به تراکنش هزینه)
+- `transactionId` → UUID (لینک به تراکنش هزینه - می‌تواند در exp_transactions, acc_transactions باشد)
+- `transactionType` → string (`expense`, `cheque`, `loan`) — نوع تراکنش برای شناسایی جدول مرتبط
 - `amount` → decimal (مبلغی که از این پاکت کسر شد)
 - `date` → datetime
 - `createdAt` → datetime
 
 > این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
-> یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).
+> یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).  
+> **نکته**: از نسخه ۱.۰.۰، این جدول همه انواع تراکنش‌های هزینه را پوشش می‌دهد:
+> - `transactionType = 'expense'` → لینک به `exp_transactions.id`
+> - `transactionType = 'cheque'` → لینک به `chk_cheques.id` (از طریق تراکنش بانکی)
+> - `transactionType = 'loan'` → لینک به `ln_transactions.id` (از طریق تراکنش بانکی)
 
 ### ۴. Budget Transfer (جدول: `bg_transfers`)
 
@@ -155,8 +163,8 @@
 - `transferBetweenEnvelopes(fromId, toId, amount)`
 
 ### Integration APIs
-- `applyExpenseToBudget(expenseId, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه
-- `splitExpenseBudget(expenseId, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
+- `applyTransactionToBudget(transactionId, transactionType, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه
+- `splitTransactionBudget(transactionId, transactionType, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
 - `getEnvelopeStatus(envelopeId)` → وضعیت مصرف (درصد و باقی‌مانده)
 - `checkBudgetAlerts(budgetId)` → بررسی هشدارها
 
@@ -176,6 +184,10 @@
 ## نکات طراحی
 
 - `remainingAmount` محاسبه‌ای است و در دیتابیس ذخیره نمی‌شود (برای جلوگیری از out-of-sync).
-- هزینه می‌تواند بین چند پاکت تقسیم شود (به دلیل جدول `budget_transaction_links`).
+- هزینه می‌تواند از هر منبعی باشد (حساب بانکی، چک، وام) و همگی از پاکت کسر می‌شوند.
+- تراکنش‌ها در `bg_transaction_links` با `transactionType` شناسایی می‌شوند:
+  - `expense` → `exp_transactions`
+  - `cheque` → `chk_cheques` (از طریق `acc_transactions`)
+  - `loan` → `ln_transactions` (از طریق `acc_transactions`)
 - در حالت `strictMode = true`، اگر `remainingAmount <= 0`، ثبت هزینه محدود می‌شود.
 - برای Zero-Based کامل، مبلغ پاکت "آماده تخصیص" باید صفر شود.

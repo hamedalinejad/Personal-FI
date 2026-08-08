@@ -41,10 +41,11 @@ Business Rules
 - واحد پایه ذخیره‌سازی موجودی: میلی‌گرم (برای دقت بالا). نمایش به کاربر می‌تواند گرم یا کیلو باشد.
 - واریز از حساب بانکی به پلتفرم:
   - موجودی حساب بانکی کاهش می‌یابد.
-  - موجودی نقدی پلتفرم افزایش می‌یابد.
-  - تراکنش در `acc_transactions` + جدول تراکنش‌های پلتفرم ثبت و لینک می‌شود.
+  - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` افزایش می‌یابد.
+  - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
 - برداشت به حساب بانکی:
-  - موجودی نقدی پلتفرم کاهش و موجودی حساب بانکی افزایش می‌یابد.
+  - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` کاهش می‌یابد و موجودی حساب بانکی افزایش می‌یابد.
+  - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
 - خرید فلز:
   - از موجودی نقدی پلتفرم کسر می‌شود.
   - موجودی فلز (`quantityMg`) افزایش و میانگین خرید به‌روزرسانی می‌شود.
@@ -56,9 +57,10 @@ Business Rules
 - تحویل فیزیکی:
   - یک تراکنش جدید با `type: physical_delivery` در `inv_metals_transactions` ثبت می‌شود.
   - `quantityMg` فلز کاهش می‌یابد (از موجودی دیجیتال خارج می‌شود).
-  - `deliveryFee` از موجودی نقدی پلتفرم کسر می‌شود.
+  - `deliveryFee` (در فیلد مخصوص) از موجودی نقدی پلتفرم کسر می‌شود.
   - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `inv_metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
   - وضعیت درخواست پیگیری می‌شود (requested, processing, delivered, cancelled).
+  - `feeAmount` فقط کارمزد معامله (خرید/فروش) است، نه هزینه تحویل.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
 - موجودی حساب بانکی و موجودی نقدی پلتفرم نمی‌توانند منفی شوند.
 
@@ -66,16 +68,25 @@ Business Rules
 Domain Entities
 ۱. Metals Platform (جدول: `inv_metals_platforms`)
 
-id → UUID (Primary Key)
-name → string (نام پلتفرم — گرمی، میلی، ملی‌گلد و ...)
-url → string
-supportedMetals → string[] (gold, silver, copper)
-minPhysicalDelivery → decimal (حداقل وزن برای تحویل فیزیکی — میلی‌گرم)
-description → string
-isActive → boolean
-createdAt / updatedAt
+- `id` → UUID (Primary Key)
+- `name` → string (نام پلتفرم — گرمی، میلی، ملی‌گلد و ...)
+- `url` → string
+- `supportedMetals` → string[] (gold, silver, copper)
+- `minPhysicalDelivery` → decimal (حداقل وزن برای تحویل فیزیکی — میلی‌گرم)
+- `cashBalance` → decimal (موجودی نقدی پلتفرم به ریال — برای سرعت بالا در محاسبات)
+- `description` → string
+- `isActive` → boolean
+- `createdAt` → datetime
+- `updatedAt` → datetime
 
-> نکته: `minBuyAmount` از MVP حذف شد (فقط به عنوان اطلاعات نمایشی در آینده می‌تواند استفاده شود).
+> **نکته طراحی**: موجودی نقدی پلتفرم از طریق فیلد `cashBalance` در این جدول با snapshot نگهداری می‌شود.  
+> - هنگام واریز: `cashBalance += amount`  
+> - هنگام برداشت: `cashBalance -= amount`  
+> - هنگام خرید فلز: `cashBalance -= totalAmount`  
+> - هنگام فروش فلز: `cashBalance += totalAmount`  
+> - هنگام تحویل فیزیکی: `cashBalance -= deliveryFee`  
+> - تراکنش‌ها در `inv_metals_platform_transactions` فقط لاگ هستند  
+> - این موجودی در محاسبه ثروت در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth` لحاظ می‌شود
 
 ۲. Metals Holding (جدول: `inv_metals_holdings`)
 
@@ -92,19 +103,25 @@ createdAt / updatedAt
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
 
-id → UUID
-platformId → UUID
-metalType → string
-type → string (buy, sell, physical_delivery)
-quantityMg → decimal
-pricePerMg → decimal (برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
-totalAmount → decimal
-feeAmount → decimal
-feeCurrency → string
-exchangeRateToUSDT → decimal
-description → string
-date → datetime
-createdAt
+- `id` → UUID (Primary Key)
+- `platformId` → UUID
+- `metalType` → string (gold, silver, copper)
+- `type` → string (buy, sell, physical_delivery)
+- `quantityMg` → decimal
+- `pricePerMg` → decimal (برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
+- `totalAmount` → decimal
+- `feeAmount` → decimal (کارمزد معامله)
+- `feeCurrency` → string
+- `exchangeRateToUSDT` → decimal
+- `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
+- `description` → string
+- `date` → datetime
+- `createdAt` → datetime
+
+> **نکته**: برای `type = 'physical_delivery'`:
+> - `deliveryFee` هزینه تحویل فیزیکی است (از موجودی نقدی پلتفرم کسر می‌شود)
+> - این مبلغ با `feeAmount` (کارمزد معامله) متفاوت است
+> - اگر `deliveryFee = 0` یا null باشد، یعنی هیچ هزینه تحویلی پرداخت نشده است
 
 ۴. Metals Platform Cash Transaction (جدول: `inv_metals_platform_transactions`) — لاگ واریز و برداشت
 
@@ -139,7 +156,9 @@ createdAt / updatedAt
 APIهای داخلی
 Platform APIs:
 
-createPlatform(data) / updatePlatform(id, data) / getAllPlatforms()
+createPlatform(data) → ایجاد پلتفرم با `cashBalance = 0`
+updatePlatform(id, data) → به‌روزرسانی اطلاعات پلتفرم (شامل `cashBalance`)
+getAllPlatforms() → لیست پلتفرم‌ها همراه با `cashBalance`
 
 Holding APIs:
 
@@ -149,11 +168,12 @@ getPortfolioValue() → ارزش کل به ریال + معادل تتری
 
 Transaction APIs:
 
-createMetalsTransaction(data) → خرید / فروش / تحویل فیزیکی
-createPlatformCashTransaction(data) → واریز / برداشت + لینک بانکی
+createMetalsTransaction(data) → خرید / فروش
+createPhysicalDeliveryTransaction(data) → تحویل فیزیکی (با `deliveryFee`)
+createPlatformCashTransaction(data) → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک بانکی
 requestPhysicalDelivery(data) → ثبت درخواست تحویل فیزیکی (ایجاد تراکنش + جزئیات)
 updateDeliveryStatus(id, status)
-getMetalsTransactions(filters)
+getMetalsTransactions(filters) → شامل `deliveryFee` برای تحویل‌ها
 getPlatformTransactions(filters)
 getPhysicalDeliveries(filters)
 calculateProfitLoss(metalType?, platformId?)

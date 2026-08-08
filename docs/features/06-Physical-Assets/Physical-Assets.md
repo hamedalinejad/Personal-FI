@@ -36,7 +36,7 @@
 
 ## Business Rules
 
-1. تمام مvanished به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
+1. تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
 2. **الگوی نگهداری دارایی‌ها:**
    - برای دسته‌های `gold` و `coin` (قابل‌تفکیک و هم‌ارز): خرید بیشتر همان نوع دارایی، `quantity` و `averageBuyPrice` (Weighted Average) را روی همان asset آپدیت می‌کند.
    - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است.
@@ -87,10 +87,15 @@
 - `hasAttachment` → boolean
 - `attachmentPath` → string
 - `accountId` → UUID (حساب بانکی مرتبط با خرید — nullable)
-- `purchaseTransactionId` → UUID (لینک به تراکنش خرید)
 - `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:  
+> - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود  
+> - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟)  
+> - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید  
+> - در صورت نیاز به لینک به تراکنش خرید اصلی، می‌توانید از `pa_transactions` با `assetId` استفاده کنید
 
 ### ۲. Physical Asset Valuation (جدول: `pa_valuations`)
 

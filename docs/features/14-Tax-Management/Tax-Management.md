@@ -38,11 +38,11 @@
 
 1. هر رکورد مالیاتی باید نوع مشخصی داشته باشد.
 2. وضعیت مالیات می‌تواند `pending`, `paid`, `overdue`, `cancelled` باشد.
-3. هنگام ثبت پرداخت مالیات:
-   - یک تراکنش واقعی در Expense (برای مالیات‌های هزینه‌محور) یا Income (برای مالیات‌های درآمدمحور) ایجاد می‌شود.
+3. هنگام پرداخت مالیات:
+   - **مرحله ۱**: تراکنش Expense/Income باید ابتدا ثبت شود (با نوع مناسب)
+   - **مرحله ۲**: `markAsPaid()` این تراکنش را به مالیات لینک می‌کند (از طریق `accountTransactionId`)
    - تراکنش در `acc_transactions` با نوع `withdrawal-expense` (یا `deposit-income` در صورت بازگشت مالیات) ثبت می‌شود.
    - موجودی حساب کاهش (یا افزایش) می‌یابد.
-   - تراکنش Expense/Income به مالیات لینک می‌شود (از طریق `accountTransactionId`).
 4. مالیات‌های معوق باید در یادآوری‌ها و داشبورد نمایش داده شوند.
 5. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت.
 6. محاسبات پیچیده مالیاتی (اظهارنامه رسمی) خارج از محدوده این فیچر است.
@@ -87,12 +87,13 @@
 ## APIهای داخلی
 
 ### Tax Record APIs
-- `createTaxRecord(data)` → ثبت مالیات جدید
+- `createTaxRecord(data)` → ثبت مالیات جدید (بدون تراکنش واقعی)
 - `updateTaxRecord(taxRecordId, data)` → ویرایش مالیات
 - `getAllTaxRecords(filters)` → فیلتر بر اساس سال، نوع، وضعیت
 - `getTaxRecordById(taxRecordId)` → دریافت جزئیات مالیات
 - `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, relatedFeature?, relatedId?)`  
-  → ثبت پرداخت + ایجاد تراکنش Expense + لینک به مالیات
+  → لینک پرداخت به مالیات (با فرض اینکه تراکنش Expense/Income قبلاً ایجاد شده)  
+  → این API فقط `accountTransactionId` را به مالیات لینک می‌کند (تراکنش Expense باید پیش‌تر ثبت شده باشد)
 - `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled)
 - `getPendingTaxes()` → مالیات‌های در انتظار
 - `getOverdueTaxes()` → مالیات‌های معوق

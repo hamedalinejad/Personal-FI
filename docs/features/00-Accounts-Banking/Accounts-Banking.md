@@ -33,7 +33,7 @@ updatedAt → datetime
 
 id → UUID (Primary Key)
 date → datetime (تاریخ تراکنش)
-type → string (با پیشوند: deposit-income, withdrawal-expense, transfer-out, transfer-in, withdrawal-loan, ...)
+type → string (با پیشوند: deposit-income, withdrawal-expense, transfer-out, transfer-in, withdrawal-loan, deposit-investment, withdrawal-investment, ...)
 amount → decimal (مبلغ)
 feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
 feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
@@ -41,12 +41,18 @@ exchangeRateToUSDT → decimal (nullable — نرخ تتر لحظه تراکنش
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)
-relatedFeature → string (نام فیچر مرتبط: income, expense, cheque, loan, investment, ...)
+relatedFeature → string (نام فیچر مرتبط: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, ...)
+
 relatedId → UUID (شناسه رکورد در فیچر مرتبط)
 isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
 relatedTransactionId → UUID (nullable — برای تراکنش‌های reversed، لینک به تراکنش اصلی)
 createdAt → datetime
 updatedAt → datetime
+
+> **نکته**: برای سرمایه‌گذاری‌ها (واریز/برداشت از/به صرافی، کارگزاری، پلتفرم):
+> - `type = 'deposit-investment'` یا `type = 'withdrawal-investment'`
+> - `relatedFeature = 'crypto_exchange'` یا `relatedFeature = 'stocks_iran'` یا `relatedFeature = 'fif'` یا `relatedFeature = 'metals'`
+> - `relatedId` به جدول مخصوص آن فیچر لینک می‌شود
 
 APIهای داخلی
 Account:

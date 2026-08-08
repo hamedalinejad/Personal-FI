@@ -33,22 +33,22 @@ Business Rules
 
 
 Domain Entities
-۱. Income Transaction (جدول: inc_transactions)
+### ۱. Income Transaction (جدول: `inc_transactions`)
 
-id → UUID (Primary Key)
-date → datetime (تاریخ درآمد)
-amount → decimal (مبلغ درآمد — به ارز حساب)
-currency → string (ارز درآمد = ارز حساب مقصد)
-exchangeRateToUSD → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
-accountId → UUID (حساب مقصد)
-description → string (توضیحات)
-category → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
-hasAttachment → boolean
+- `id` → UUID (Primary Key)
+- `date` → datetime (تاریخ درآمد)
+- `amount` → decimal (مبلغ درآمد — به ارز حساب)
+- `currency` → string (ارز درآمد = ارز حساب مقصد)
+- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+- `accountId` → UUID (حساب مقصد)
+- `description` → string (توضیحات)
+- `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
+- `hasAttachment` → boolean
 - `attachmentPath` → string
-- `inc_recurring_id` → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
+- `recurringId` → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `createdAt` → datetime
-updatedAt → datetime
+- `updatedAt` → datetime
 
 ۲. Recurring Income (جدول: inc_recurring)
 
@@ -98,14 +98,5 @@ Transaction: ایجاد رکورد تراکنش
 Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 
 > **نکته مهم**: برای یکسان‌سازی دسته‌بندی‌ها و جلوگیری از typo، لیست استاندارد دسته‌ها در فایل `99-Common-Categories/Categories.md` تعریف شده است. برای درآمدها باید از دسته‌های لیست درآمد استفاده شود.
-
----
-
-## روابط با سایر فیچرها
-
-Accounts & Banking: به‌روزرسانی currentBalance
-Currency & Multi-Currency: دریافت نرخ تبدیل لحظه‌ای
-Transaction: ایجاد رکورد تراکنش
-Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 
 > **نکته نام‌گذاری**: فیلد `accountTransactionId` لینک به `acc_transactions` است.

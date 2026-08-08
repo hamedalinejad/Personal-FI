@@ -34,8 +34,8 @@
 
 1. تغییر تنظیمات باید بلافاصله یا پس از ذخیره اعمال شود.
 2. پشتیبان‌گیری باید شامل تمام داده‌های مهم کاربر باشد.
-?. ??????? ?? ??????? ???? ?? ????? ???? ????? ????? ??? (??? ?????????).
-?. ??????? ???? ? ???? ??? ?? ???????? ??? ?????????.
+3. اپ را باید بتوان به صورت کامل آفلاین استفاده کرد (بدون نیاز به اینترنت).
+4. تنظیمات اپ نباید باعث خرابی در سایر فیچرها شوند.
 5. دسته‌بندی‌های سیستمی نباید قابل حذف کامل باشند (فقط غیرفعال‌سازی).
 6. هیچ داده مالی نباید بدون رضایت کاربر به بیرون ارسال شود.
 
@@ -109,12 +109,14 @@
 
 ### ۳. Backup Log (جدول: `stg_backup_logs`) — اختیاری
 
-- `id` → UUID
-- `fileName` → string
-- `filePath` → string
-- `fileSize` → number
+- `id` → UUID (Primary Key)
+- `fileName` → string (نام فایل پشتیبان)
+- `filePath` → string (مسیر فایل پشتیبان در سیستم)
+- `fileSize` → number (اندازه فایل به بایت)
+- `backupType` → string (`local`, `encrypted`) — نوع پشتیبان
+- `backupDate` → datetime (تاریخ ایجاد پشتیبان)
 - `createdAt` → datetime
-- `note` → string
+- `note` → string (یادداشت اختیاری)
 
 ---
 
@@ -136,10 +138,11 @@
 - `reorderCategories(type, orderedIds)` → تغییر ترتیب نمایش دسته‌ها
 
 ### Backup APIs
-- `createBackup()` → تولید فایل پشتیبان
-- `restoreBackup(file)` → بازیابی با تأیید کاربر
-- `listBackups()`
-- `deleteBackup(backupLogId)`
+- `createBackup()` → تولید فایل پشتیبان + ثبت رکورد در `stg_backup_logs`
+- `restoreBackup(file, backupLogId)` → بازیابی با تأیید کاربر
+- `listBackups()` → دریافت لیست با `backupType` و `backupDate`
+- `deleteBackup(backupLogId)` → حذف رکورد + فایل
+- `getBackupInfo(backupLogId)` → دریافت جزئیات پشتیبان
 
 ### Tools APIs
 - `clearCache()`

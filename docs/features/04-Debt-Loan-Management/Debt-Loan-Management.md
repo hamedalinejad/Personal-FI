@@ -13,19 +13,21 @@
 2. ارز وام همیشه با ارز حساب مرتبط یکی است.
 3. هنگام ثبت وام **دریافتی (borrowed)**:
    - مبلغ اصلی به حساب مرتبط واریز می‌شود.
-   - یک رکورد در `loan_transactions` ثبت می‌شود.
+   - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
    - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
+   - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
    - موجودی حساب افزایش می‌یابد.
 4. هنگام ثبت وام **پرداختی (lent)**:
    - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
-   - یک رکورد در `loan_transactions` ثبت می‌شود.
+   - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
    - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
+   - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
    - موجودی حساب کاهش می‌یابد.
-5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، پرداخت زودهنگام) نیز هم در `loan_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
-6. جدول `loan_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
+5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، پرداخت زودهنگام) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+6. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
 7. موجودی حساب نمی‌تواند منفی شود.
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
-9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `loan_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
+9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
 10. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
 11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToUSD` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
 
@@ -43,6 +45,7 @@
 - `currency` → string (ارز وام)
 - `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت در ابتدا)
 - `accountId` → UUID (حساب مرتبط)
+- `accountTransactionId` → UUID (لینک به `acc_transactions` برای تراکنش اولیه وام)
 - `interestType` → string (`none`, `fixed`, `variable`)
 - `interestRate` → decimal (نرخ سود)
 - `interestRatePeriod` → string (`annual`, `monthly`) — نرخ سود سالانه است یا ماهانه؟
@@ -51,7 +54,7 @@
 - `startDate` → datetime
 - `endDate` → datetime
 - `status` → string (`active`, `completed`, `cancelled`)
-- `remainingBalance` → decimal (مانده باقی‌مانده)
+- `remainingBalance` → decimal (مانده باقی‌مانده - اولیه برابر `principalAmount`)
 - `fixedInstallmentAmount` → decimal (nullable — برای وام‌های ساده بدون amortization پیچیده)
 - `contactName` → string (طرف مقابل)
 - `description` → string
@@ -60,7 +63,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با دیگر فیچرها).
+> **نکته طراحی**: هنگام ایجاد وام، `remainingBalance` با مقدار `principalAmount` شروع می‌شود. برای وام‌های `borrowed` (دریافتی)، این مبلغ به تدریج با پرداخت قسط‌ها کاهش می‌یابد. برای وام‌های `lent` (پرداختی)، این مبلغ نیز به تدریج کاهش می‌یابد.
 
 ### ۲. Loan Transaction (لاگ) (جدول: `ln_transactions`)
 
@@ -89,7 +92,10 @@
 
 ### Loan APIs
 - `createLoan(data)`  
-  → ثبت وام + ثبت لاگ در `loan_transactions` + ثبت در `acc_transactions` + به‌روزرسانی موجودی حساب
+  → ثبت وام در `ln_loans` (شامل `accountTransactionId`)  
+  → ثبت لاگ در `ln_transactions` با `type = 'disbursement'`  
+  → ثبت در `acc_transactions` با نوع مناسب (`deposit-loan` یا `withdrawal-loan`)  
+  → به‌روزرسانی موجودی حساب
 - `updateLoan(id, data)` → ویرایش (فقط قبل از اولین پرداخت)
 - `getAllLoans(filters)`
 - `getLoanById(id)`

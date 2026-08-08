@@ -40,11 +40,13 @@
 2. در هر معامله، نرخ تتر لحظه ثبت و قفل می‌شود.
 3. **واریز از حساب بانکی به کارگزاری**:
    - موجودی حساب بانکی کاهش می‌یابد.
-   - موجودی نقدی کارگزاری افزایش می‌یابد.
-   - تراکنش در `acc_transactions` + جدول تراکنش‌های کارگزاری ثبت و به هم لینک می‌شود.
+   - موجودی نقدی کارگزاری در `inv_stocks_iran_brokerages.cashBalance` افزایش می‌یابد.
+   - تراکنش در `acc_transactions` با `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` ثبت و به هم لینک می‌شود.
+   - تراکنش در `inv_stocks_iran_brokerage_transactions` نیز ثبت می‌شود.
 4. **برداشت از کارگزاری به حساب بانکی**:
    - موجودی نقدی کارگزاری کاهش و موجودی حساب بانکی افزایش می‌یابد.
-   - تراکنش در هر دو جدول ثبت و لینک می‌شود.
+   - هر دو تراکنش (`acc_transactions` و `inv_stocks_iran_brokerage_transactions`) ثبت و به هم لینک می‌شوند.
+   - لینک از طریق `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` انجام می‌شود.
 5. **خرید سهام**:
    - از موجودی نقدی کارگزاری کسر می‌شود.
    - موجودی سهم افزایش و میانگین خرید به‌روزرسانی می‌شود.
@@ -54,6 +56,8 @@
 7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
 8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
 9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
+
+> **نکته طراحی**: موجودی نقدی کارگزاری از طریق فیلد `cashBalance` در جدول `inv_stocks_iran_brokerages` با snapshot نگهداری می‌شود تا محاسبات سریع باشد. تراکنش‌های در `inv_stocks_iran_brokerage_transactions` فقط لاگ هستند.
 
 ---
 
@@ -67,8 +71,17 @@
 - `url` → string (آدرس سایت یا اپ — nullable)
 - `description` → string
 - `isActive` → boolean
+- `cashBalance` → decimal (موجودی نقدی کارگزاری به ریال — برای سرعت بالا در محاسبات)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته طراحی**: موجودی نقدی کارگزاری از طریق فیلد `cashBalance` در این جدول با snapshot نگهداری می‌شود.  
+> - هنگام واریز: `cashBalance += amount`  
+> - هنگام برداشت: `cashBalance -= amount`  
+> - هنگام خرید سهام: `cashBalance -= totalAmount + fees`  
+> - هنگام فروش سهام: `cashBalance += totalAmount - fees`  
+> - تراکنش‌ها در `inv_stocks_iran_brokerage_transactions` فقط لاگ هستند  
+> - برای جلوگیری از تکرار در محاسبه ثروت، این موجودی در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth = false` لحاظ نمی‌شود
 
 ### ۲. Stock Holding (جدول: `inv_stocks_iran_holdings`)
 
@@ -83,6 +96,8 @@
 - `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته**: این جدول فقط برای خرید و فروش سهام است. موجودی نقدی کارگزاری در فیلد `cashBalance` از جدول `inv_stocks_iran_brokerages` نگهداری می‌شود (برای سرعت بالا). این موجودی در محاسبه ثروت در فیچر `Portfolio & Wealth Overview` به صورت اختیاری با کنترل `includeCashInWealth` لحاظ می‌شود.
 
 ### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید و فروش
 
@@ -115,20 +130,27 @@
 - `date` → datetime
 - `createdAt` → datetime
 
+> **نکته لینک**: هنگام ایجاد این تراکنش، یک تراکنش در `acc_transactions` نیز ایجاد می‌شود با:  
+> - `relatedFeature = 'stocks_iran'`  
+> - `relatedId = inv_stocks_iran_brokerage_transactions.id`
+> 
+> **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_stocks_iran_brokerage_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در کارگزاری) است.
+
 ### ۵. acc_transactions
 
 - فقط در واریز و برداشت بین حساب بانکی و کارگزاری ثبت می‌شود.
+- لینک از طریق `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` انجام می‌شود.
 
 ---
 
 ## APIهای داخلی
 
 ### Brokerage APIs
-- `createBrokerage(data)`
-- `updateBrokerage(id, data)`
-- `getAllBrokerages()`
-- `getBrokerageById(id)`
-- `getBrokerageCashBalance(brokerageId)`
+- `createBrokerage(data)` → ایجاد کارگزاری با `cashBalance = 0`
+- `updateBrokerage(id, data)` → به‌روزرسانی اطلاعات کارگزاری (شامل `cashBalance`)
+- `getAllBrokerages()` → لیست کارگزاری‌ها همراه با `cashBalance`
+- `getBrokerageById(id)` → دریافت کارگزاری با `cashBalance`
+- `getBrokerageCashBalance(brokerageId)` → دریافت موجودی نقدی (از `cashBalance`)
 
 ### Holding APIs
 - `getHoldings(brokerageId?)`
@@ -137,9 +159,9 @@
 
 ### Transaction APIs
 - `createStockTransaction(data)` → خرید / فروش
-- `createBrokerageTransaction(data)` → واریز / برداشت + لینک به حساب بانکی
+- `createBrokerageTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک به حساب بانکی
 - `getStockTransactions(filters)`
-- `getBrokerageTransactions(filters)`
+- `getBrokerageTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, brokerageId?)`
 
 ---

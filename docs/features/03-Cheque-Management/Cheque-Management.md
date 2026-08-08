@@ -34,35 +34,45 @@ Business Rules
 هنگام برگشت چک، وضعیت به bounced تغییر می‌کند:
 - اگر چک هنوز pending بوده و مستقیماً bounced شده → هیچ تراکنشی ثبت نشده، پس نیازی به معکوس نیست.
 - اگر چک قبلاً cleared شده بوده (پول جابه‌جا شده) و بعداً واقعاً برگشت خورده → حتماً باید تراکنش معکوس (reversal) ثبت شود.
-- سیستم باید به صورت خودکار تراکنش reversal ایجاد کند و `isVoided = true` و `relatedTransactionId` به تراکنش اصلی تنظیم کند.
+- سیستم باید به صورت خودکار تراکنش reversal ایجاد کند:
+  - در `acc_transactions`: `isVoided = true` و `relatedTransactionId` به تراکنش اصلی تنظیم می‌شود
+  - در `chk_cheques`: `reversalTransactionId` به تراکنش reversal تنظیم می‌شود
+- اگر چک به cancelled تغییر وضعیت دهد (حذف قبل از وصول) → فقط `status` تغییر می‌کند و هیچ تراکنشی ثبت نمی‌شود.
 موجودی حساب نمی‌تواند منفی شود.
 ویرایش چک فقط در وضعیت pending مجاز است.
 حذف فیزیکی وجود ندارد — فقط تغییر وضعیت به cancelled.
 
 
 Domain Entities
-### ۱. Cheque (جدول: chk_cheques)
+### ۱. Cheque (جدول: `chk_cheques`)
 
-id → UUID (Primary Key)
-type → string (payable یا receivable)
-chequeNumber → string (شماره چک)
-sayadiTrackingCode → string (شناسه رهگیری صیادی — nullable)
-amount → decimal (مبلغ چک)
-currency → string (ارز چک = ارز حساب)
-exchangeRateToUSD → decimal (نرخ تبدیل لحظه ثبت)
-accountId → UUID (حساب مرتبط)
-bankName → string (بانک صادرکننده)
-issueDate → datetime (تاریخ صدور)
-dueDate → datetime (تاریخ سررسید)
-status → string (pending, cleared, bounced, cancelled)
-payeeOrPayer → string (طرف مقابل)
-description → string (توضیحات)
-hasAttachment → boolean
-attachmentPath → string (تصویر چک)
-clearedDate → datetime (تاریخ وصول — nullable)
-accountTransactionId → UUID (شناسه تراکنش مرتبط در `acc_transactions` — nullable)
-createdAt → datetime
-updatedAt → datetime
+- `id` → UUID (Primary Key)
+- `type` → string (payable یا receivable)
+- `chequeNumber` → string (شماره چک)
+- `sayadiTrackingCode` → string (شناسه رهگیری صیادی — nullable)
+- `amount` → decimal (مبلغ چک)
+- `currency` → string (ارز چک = ارز حساب)
+- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت)
+- `accountId` → UUID (حساب مرتبط)
+- `bankName` → string (بانک صادرکننده)
+- `issueDate` → datetime (تاریخ صدور)
+- `dueDate` → datetime (تاریخ سررسید)
+- `status` → string (pending, cleared, bounced, cancelled)
+- `payeeOrPayer` → string (طرف مقابل)
+- `description` → string (توضیحات)
+- `hasAttachment` → boolean
+- `attachmentPath` → string (تصویر چک)
+- `clearedDate` → datetime (تاریخ وصول — nullable)
+- `accountTransactionId` → UUID (شناسه تراکنش مرتبط در `acc_transactions` — nullable)
+- `reversalTransactionId` → UUID (شناسه تراکنش reversal هنگام برگشت چک — nullable)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **نکته طراحی**:  
+> - وقتی چک برمی‌گردد (bounced)، سیستم یک تراکنش reversal ایجاد می‌کند  
+> - این تراکنش در `acc_transactions` با `isVoided = true` ثبت می‌شود  
+> - `reversalTransactionId` در `chk_cheques` به این تراکنش reversal لینک می‌شود  
+> - `relatedTransactionId` در تراکنش reversal به تراکنش اصلی لینک می‌شود
 
 ۲. Transaction (جدول مشترک acc_transactions)
 
@@ -74,9 +84,9 @@ Cheque APIs:
 
 createCheque(data) → ثبت چک جدید (وضعیت اولیه: pending)
 updateCheque(id, data) → ویرایش چک (فقط در وضعیت pending)
-changeChequeStatus(id, newStatus) → تغییر وضعیت + ایجاد/لغو تراکنش
+changeChequeStatus(id, newStatus) → تغییر وضعیت + ایجاد/لغو تراکنش + ایجاد/به‌روزرسانی reversalTransactionId
 getAllCheques(filters) → لیست با فیلتر (وضعیت، نوع، تاریخ سررسید، حساب)
-getChequeById(id)
+getChequeById(id) → شامل reversalTransactionId برای بررسی تراکنش معکوس
 getPendingCheques() → چک‌های در انتظار
 getTotalChequesByStatus(status, startDate?, endDate?) → مجموع چک‌ها بر اساس وضعیت
 getUpcomingDueCheques(days) → چک‌های نزدیک به سررسید (برای یادآوری)

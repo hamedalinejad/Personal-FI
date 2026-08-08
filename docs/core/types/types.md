@@ -55,16 +55,25 @@ export type TransactionType =
   | 'withdrawal-cheque'       // برای چک‌ها
   | 'deposit-cheque'
   | 'deposit-budget'          // تخصیص از بودجه
-  | 'withdrawal-budget';      // برداشت از هدف
+  | 'withdrawal-budget'       // برداشت از هدف
+  | 'deposit-investment'      // واریز به سرمایه‌گذاری (صادر، کارگزاری، پلتفرم)
+  | 'withdrawal-investment';  // برداشت از سرمایه‌گذاری
 
 // events.ts
 export type AppEvent =
-  | { type: 'TransactionCreated'; payload: { transactionId: UUID } }
-  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID } }
-  | { type: 'BudgetExceeded'; payload: { budgetId: UUID } }
+  | { type: 'TransactionCreated'; payload: { transactionId: UUID; transactionType: string } }
+  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: number } }
+  | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: number } }
+  | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: number } }
+  | { type: 'InvestmentValueUpdated'; payload: { investmentType: string; investmentId: UUID; newValue: number; previousValue: number } }
+  | { type: 'PortfolioSnapshotCreated'; payload: { snapshotId: UUID; date: Timestamp } }
   | { type: 'LoanPaymentDue'; payload: { loanId: UUID; dueDate: Timestamp } }
+  | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: number } }
   | { type: 'ChequeDue'; payload: { chequeId: UUID; dueDate: Timestamp } }
-  | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } };
+  | { type: 'ChequeStatusChanged'; payload: { chequeId: UUID; newStatus: string } }
+  | { type: 'MetalsDeliveryStatusChanged'; payload: { deliveryId: UUID; newStatus: string } }
+  | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } }
+  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: number; transactionId: UUID } };
 ```
 
 ## قوانین

@@ -40,11 +40,11 @@
    - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود (نه الزاماً حساب بانکی).
 4. **واریز از حساب بانکی** به صرافی/ولت:
    - موجودی حساب بانکی کاهش و موجودی ریال/تتر صرافی افزایش می‌یابد.
-   - تراکنش در `acc_transactions` ثبت می‌شود.
-   - تراکنش در `crypto_exchange_transactions` نیز ثبت و به تراکنش بانکی لینک می‌شود.
+   - تراکنش در `acc_transactions` با `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` ثبت می‌شود.
+   - تراکنش در `inv_crypto_exchange_transactions` نیز ثبت و به تراکنش بانکی لینک می‌شود.
 5. **برداشت به حساب بانکی**:
    - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
-   - تراکنش در هر دو جدول ثبت و به هم لینک می‌شود.
+   - هر دو تراکنش (`acc_transactions` و `inv_crypto_exchange_transactions`) ثبت و به هم لینک می‌شوند.
 6. **انتقال بین صرافی‌ها/والت‌ها**:
    - حتماً دو تراکنش لینک‌شده ثبت می‌شود:
      - یکی در صرافی مبدا با `type: transfer_out` و `counterExchangeId` به مقصد
@@ -89,7 +89,14 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> توضیح: در این مدل، موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. اگرچه IRR و USDT فنیٌاً "کریپتو" نیستند، اما این رویکرد ساده‌ترین روش برای یکپارچه‌سازی موجودی نقدی در پلتفرم‌های مختلف است. مقدار `quantity` نشان‌دهنده موجودی نقدی است و `averageBuyPrice` برای آن‌ها `1` در نظر گرفته می‌شود.
+> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند.  
+> **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**:  
+> - برای IRR و USDT:  
+>   - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است)  
+>   - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود)  
+>   - `totalFeesPaid = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
+> - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
+> - این موجودی همچنین در جدول `acc_accounts.currentBalance` نیز وجود دارد (حساب بانکی مرتبط)، اما از آنجایی که تراکنش در `acc_transactions` با `relatedFeature = 'crypto_exchange'` ثبت می‌شود، می‌توان از جدول `acc_accounts` به صورت اصلی استفاده کرد
 
 ### ۳. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
@@ -125,9 +132,16 @@
 - `date` → datetime
 - `createdAt` → datetime
 
+> **نکته لینک**: هنگام ایجاد این تراکنش، یک تراکنش در `acc_transactions` نیز ایجاد می‌شود با:  
+> - `relatedFeature = 'crypto_exchange'`  
+> - `relatedId = inv_crypto_exchange_transactions.id`
+> 
+> **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_crypto_exchange_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در صرافی) است.
+
 ### ۵. acc_transactions
 
-- فقط زمانی که پول واقعاً از/به حساب بانکی جابه‌جا شود ثبت می‌شود و با `crypto_exchange_transactions` لینک می‌گردد.
+- فقط زمانی که پول واقعاً از/به حساب بانکی جابه‌جا شود ثبت می‌شود و با `inv_crypto_exchange_transactions` لینک می‌گردد.
+- لینک از طریق `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` انجام می‌شود.
 
 ---
 
@@ -158,9 +172,9 @@
 
 ### Transaction APIs
 - `createCryptoTransaction(data)` → خرید / فروش / انتقال
-- `createExchangeTransaction(data)` → واریز / برداشت + ثبت در هر دو جدول + لینک تراکنش بانکی
-- `getCryptoTransactions(filters)`
-- `getExchangeTransactions(filters)`
+- `createExchangeTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
+- `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
+- `getExchangeTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, exchangeId?)`
 
 ---
