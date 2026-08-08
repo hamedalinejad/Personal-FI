@@ -95,18 +95,20 @@
 
 - `id` → UUID
 - `envelopeId` → UUID
-- `transactionId` → UUID (لینک به تراکنش هزینه - می‌تواند در exp_transactions, acc_transactions باشد)
+- `transactionId` → UUID (شناسه رکورد در جدول مرتبط بر اساس transactionType)
 - `transactionType` → string (`expense`, `cheque`, `loan`) — نوع تراکنش برای شناسایی جدول مرتبط
 - `amount` → decimal (مبلغی که از این پاکت کسر شد)
 - `date` → datetime
 - `createdAt` → datetime
 
-> این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
+> **نکته**: این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
 > یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).  
-> **نکته**: از نسخه ۱.۰.۰، این جدول همه انواع تراکنش‌های هزینه را پوشش می‌دهد:
-> - `transactionType = 'expense'` → لینک به `exp_transactions.id`
-> - `transactionType = 'cheque'` → لینک به `chk_cheques.id` (از طریق تراکنش بانکی)
-> - `transactionType = 'loan'` → لینک به `ln_transactions.id` (از طریق تراکنش بانکی)
+> **توضیح لینک `transactionId`**:
+> - `transactionType = 'expense'` → `transactionId` به `exp_transactions.id` لینک می‌شود
+> - `transactionType = 'cheque'` → `transactionId` به `chk_cheques.id` لینک می‌شود
+> - `transactionType = 'loan'` → `transactionId` به `ln_transactions.id` لینک می‌شود
+> 
+> برای هر نوع تراکنش، `transactionId` شناسه رکورد در جدول مربوطه است.
 
 ### ۴. Budget Transfer (جدول: `bg_transfers`)
 
@@ -163,7 +165,9 @@
 - `transferBetweenEnvelopes(fromId, toId, amount)`
 
 ### Integration APIs
-- `applyTransactionToBudget(transactionId, transactionType, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه
+- `applyTransactionToBudget(transactionId, transactionType, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه  
+  → `transactionId`: شناسه رکورد در جدول مربوطه (exp_transactions, chk_cheques, ln_transactions)
+  → `transactionType`: `expense`, `cheque`, یا `loan`
 - `splitTransactionBudget(transactionId, transactionType, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
 - `getEnvelopeStatus(envelopeId)` → وضعیت مصرف (درصد و باقی‌مانده)
 - `checkBudgetAlerts(budgetId)` → بررسی هشدارها

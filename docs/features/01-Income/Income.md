@@ -39,7 +39,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
@@ -50,7 +50,7 @@ Domain Entities
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-۲. Recurring Income (جدول: inc_recurring)
+۲. Recurring Income (جدول: `inc_recurring`)
 
 id → UUID (Primary Key)
 title → string (عنوان درآمد تکرارشونده)

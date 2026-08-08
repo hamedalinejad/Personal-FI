@@ -52,7 +52,7 @@ Domain Entities
 - `sayadiTrackingCode` → string (شناسه رهگیری صیادی — nullable)
 - `amount` → decimal (مبلغ چک)
 - `currency` → string (ارز چک = ارز حساب)
-- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت)
 - `accountId` → UUID (حساب مرتبط)
 - `bankName` → string (بانک صادرکننده)
 - `issueDate` → datetime (تاریخ صدور)

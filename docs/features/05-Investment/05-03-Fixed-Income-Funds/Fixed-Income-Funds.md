@@ -47,10 +47,12 @@ Business Rules
   - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید به‌روزرسانی می‌شود.
   - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
   - `units` نمی‌تواند منفی شود.
+  - در صورت خرید از کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` کاهش می‌یابد.
 - فروش/ابطال واحد:
   - تعداد واحد کاهش می‌یابد.
   - مبلغ حاصل به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
   - `units` نمی‌تواند منفی شود.
+  - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
 - تقسیم سود نقدی:
   - مبلغ سود به عنوان درآمد ثبت می‌شود.
   - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
@@ -66,6 +68,14 @@ Business Rules
 > - در `inv_fif_holdings`, `brokerageId` لینک به کارگزاری است
 > - در `inv_fif_transactions`, `brokerageId` برای واریز/برداشت ETF پر می‌شود
 > - در صورت واریز/برداشت مستقیم از حساب بانکی، `accountId` پر می‌شود
+> 
+> **نکته مهم - جریان پول صندوق‌های issuance_redemption**:
+> - برای صندوق‌های issuance_redemption (صدور و ابطالی)، تمام معاملات از طریق حساب بانکی کاربر انجام می‌شود
+> - در `inv_fif_holdings`, `brokerageId` nullable است (چون این صندوق‌ها از طریق کارگزاری نیستند)
+> - در `inv_fif_transactions`, `accountId` حتماً پر می‌شود (چون واریز/برداشت از حساب بانکی است)
+> - در خرید issuance_redemption: `accountId` پر می‌شود و `brokerageId` nullable است
+> - در فروش issuance_redemption: مبلغ به `accountId` واریز می‌شود و `accountId` پر می‌شود
+> - تراکنش‌ها در `acc_transactions` با `type = 'deposit-investment'` یا `type = 'withdrawal-investment'` ثبت می‌شوند
 
 
 Domain Entities
@@ -103,6 +113,11 @@ Domain Entities
 - `updatedAt` → datetime
 
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
+
+> **نکته مهم - آپدیت cashBalance**:  
+> - در خرید ETF: `cashBalance -= (amount + fees)` در `inv_stocks_iran_brokerages`  
+> - در فروش ETF: `cashBalance += (amount - fees)` در `inv_stocks_iran_brokerages`  
+> - این قانون مانند `inv_stocks_iran_brokerages` در فیچر Stocks Iran است
 
 ۳. Fixed Income Transaction (جدول: `inv_fif_transactions`) — لاگ رویدادها
 

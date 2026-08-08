@@ -29,7 +29,7 @@
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
 9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
 10. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
-11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToUSD` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
+11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToUSDT` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
 
 ---
 
@@ -43,7 +43,7 @@
 - `direction` → string (`borrowed` یا `lent`)
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه ثبت در ابتدا)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت در ابتدا)
 - `accountId` → UUID (حساب مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions` برای تراکنش اولیه وام)
 - `interestType` → string (`none`, `fixed`, `variable`)
@@ -75,7 +75,7 @@
 - `principalPortion` → decimal (مبلغ مربوط به اصل بدهی — nullable برای وام‌های بدون سود)
 - `interestPortion` → decimal (مبلغ مربوط به سود — nullable برای وام‌های بدون سود)
 - `description` → string
-- `exchangeRateToUSD` → decimal (نرخ تبدیل لحظه پرداخت)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه پرداخت)
 - `accountTransactionId` → UUID (ارتباط با رکورد در `acc_transactions`)
 - `createdAt` → datetime
 

@@ -57,14 +57,15 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `rate` → decimal (نرخ تبدیل: ۱ واحد fromCurrency = rate واحد toCurrency)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل به USDT: برای IRR → USDT، مقدار نشان‌دهنده «تتر به ازای ۱ ریال» است)
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
 > **نکته توضیحی**: برای نرخ‌های پایه (IRR → USDT)، این فیلد نشان‌دهنده «تتر به ازای ۱ ریال» است (معکوس اصطلاحات رایج بانکی).  
-> برای محاسبه: `amountUSDT = amountIRR * rate` (یا `amountIRR = amountUSDT / rate`).
+> برای محاسبه: `amountUSDT = amountIRR * exchangeRateToUSDT` (یا `amountIRR = amountUSDT / exchangeRateToUSDT`).  
+> **یکسان‌سازی**: این فیلد با `exchangeRateToUSDT` در سایر جداول (Income, Expense, Cheque, Metals, Stocks) هم‌معنی است و همین نام استفاده شود.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
@@ -89,8 +90,8 @@
 - `getCurrencyByCode(code)` → دریافت ارز با کد مشخص
 
 ### Exchange Rate APIs
-- `getExchangeRate(fromCode, toCode)` → دریافت نرخ تبدیل لحظه‌ای
-- `saveExchangeRate(fromCode, toCode, rate, source)` → ذخیره نرخ تبدیل
+- `getExchangeRate(fromCode, toCode)` → دریافت نرخ تبدیل لحظه‌ای (exchangeRateToUSDT)
+- `saveExchangeRate(fromCode, toCode, exchangeRateToUSDT, source)` → ذخیره نرخ تبدیل
 - `getRateHistory(fromCode, toCode, startDate, endDate)` → تاریخچه نرخ
 
 ### Utility APIs

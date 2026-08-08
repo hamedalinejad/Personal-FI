@@ -80,7 +80,7 @@
 - `purchaseDate` → datetime
 - `currentValue` → decimal (آخرین ارزش‌گذاری — ریال)
 - `currentValueDate` → datetime
-- `averageBuyPrice` → decimal (در صورت خرید چندمرحله‌ای)
+- `averageBuyPrice` → decimal (میانگین قیمت خرید به ازای واحد — فقط برای `gold`, `coin`, `electronics`; برای `vehicle`, `real_estate` مقدار ثابت یا قیمت کل بر واحد)
 - `status` → string (`active`, `sold`, `written_off`)
 - `location` → string (محل نگهداری — اختیاری)
 - `description` → string
@@ -93,6 +93,8 @@
 
 > **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:  
 > - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود  
+> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): `averageBuyPrice` به معنی قیمت خرید به ازای هر واحد است (برای مثال قیمت هر متر مربع برای املاک یا هر قطعه برای خودروها)  
+> - برای `electronics`: `averageBuyPrice` میانگین قیمت خرید به ازای هر قطعه است (اگر چند قطعه خریده شود)  
 > - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟)  
 > - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید  
 > - در صورت نیاز به لینک به تراکنش خرید اصلی، می‌توانید از `pa_transactions` با `assetId` استفاده کنید
@@ -186,7 +188,7 @@
 - امکان فروش جزئی (مثلاً فروش بخشی از سکه‌ها) پشتیبانی می‌شود.
 - نرخ تتر در خرید، فروش و هر ارزش‌گذاری ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند.
 - برای دسته‌های `gold` و `coin`: `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود.
-- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`): هر خرید یک asset جدید است.
+- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): هر خرید یک asset جدید مستقل است.
 
 ---
 
