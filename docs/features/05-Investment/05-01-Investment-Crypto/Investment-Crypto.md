@@ -34,7 +34,7 @@
 1. هر معامله رمزارز باید به یک صرافی یا والت مرتبط باشد.
 2. هنگام **خرید**:
    - موجودی رمزارز افزایش می‌یابد.
-   - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` + `crypto_exchange_transactions` ثبت می‌شود.
+   - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` + `inv_crypto_exchange_transactions` ثبت می‌شود.
 3. هنگام **فروش**:
    - موجودی رمزارز کاهش می‌یابد.
    - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود (نه الزاماً حساب بانکی).
@@ -94,7 +94,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند.  
+> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند.  
 > **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**:  
 > - برای IRR و USDT:  
 >   - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است)  
@@ -185,7 +185,7 @@
 
 ### Transaction APIs
 - `createCryptoTransaction(data)` → خرید / فروش / انتقال
-- `createExchangeTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
+- `createExchangeTransaction(data)` → واریز (`inv_crypto_exchange_transactions.type='deposit'` و `acc_transactions.type='deposit-investment'`) / برداشت (`inv_crypto_exchange_transactions.type='withdraw'` و `acc_transactions.type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
 - `getExchangeTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, exchangeId?)`
@@ -234,8 +234,8 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 ## نکات طراحی
 
 - میانگین خرید با فرمول Weighted Average به‌روزرسانی می‌شود.
-- `crypto_transactions` و `crypto_exchange_transactions` فقط لاگ هستند.
-- موجودی و میانگین خرید و مجموع کارمزدها در جدول `crypto_holdings` نگهداری می‌شود.
+- `inv_crypto_transactions` و `inv_crypto_exchange_transactions` فقط لاگ هستند.
+- موجودی و میانگین خرید و مجموع کارمزدها در جدول `inv_crypto_holdings` نگهداری می‌شود.
 - قیمت لحظه‌ای رمزارزها می‌تواند از API خارجی + کش آفلاین تأمین شود.
 
-> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.
+> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.

@@ -89,6 +89,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `stg_` | Settings & Tools |
 | `cat_` | Common Categories |
 | `sec_` | Security & Privacy |
+| `price_` | Price Fetching |
 
 ## مدل چندکاربری (Multi-User Model)
 
@@ -112,6 +113,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `chk_cheques` | Cheque Management | چک‌ها |
 | `ln_loans` | Debt & Loan | وام‌ها |
 | `ln_transactions` | Debt & Loan | تراکنش‌های وام |
+| `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
 | `inv_crypto_holdings` | Investment Crypto | دارایی‌های رمزارز |
 | `inv_crypto_transactions` | Investment Crypto | تراکنش‌های رمزارز |
@@ -160,6 +162,8 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `cat_categories` | Common Categories | دسته‌بندی‌های مشترک |
 | `sec_settings` | Security & Privacy | تنظیمات امنیتی |
 | `sec_session_logs` | Security & Privacy | لاگ‌های نشست (Should Have) |
+| `price_sources` | Price Fetching | منابع/Providerهای قیمت |
+| `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only) |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 

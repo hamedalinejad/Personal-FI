@@ -46,3 +46,5 @@ Uploading and managing invoices, contracts, cheque images, and financial documen
 General settings, themes, language, backup, and utility tools.
 19. Security & Privacy
 Data encryption, authentication, PIN, biometric, and audit logging.
+20. Price Fetching
+Manual on-demand fetching of live asset prices (crypto in v1; stocks, housing, and metals in future) from external APIs, with full offline caching. No dedicated page — accessed from within the Investments and Settings pages.

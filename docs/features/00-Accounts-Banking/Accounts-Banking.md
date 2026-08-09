@@ -33,7 +33,7 @@ updatedAt → datetime
 
 id → UUID (Primary Key)
 date → datetime (تاریخ تراکنش)
-type → string (با پیشوند: deposit-income, withdrawal-expense, transfer-out, transfer-in, withdrawal-loan, deposit-investment, withdrawal-investment, ...)
+type → string (نوع `TransactionType` — تعریف مرکزی و تنها enum معتبر در core/types/types.md؛ مقادیر: deposit-income, withdrawal-expense, transfer-in, transfer-out, deposit-loan, withdrawal-loan, withdrawal-expense-tax, deposit-income-tax, withdrawal-cheque, deposit-cheque, deposit-investment, withdrawal-investment)
 amount → decimal (مبلغ)
 feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
 feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
