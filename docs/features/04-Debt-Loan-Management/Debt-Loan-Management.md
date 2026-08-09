@@ -23,7 +23,8 @@
    - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
    - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
    - موجودی حساب کاهش می‌یابد.
-5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، پرداخت زودهنگام) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، کارمزد پیش‌پرداخت، کارمزد صدور) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+5a. کارمزدهای وام (صدور، پیش‌پرداخت، تأخیر) مستقل از سود ثبت می‌شوند و تنها موجودی حساب را تغییر می‌دهند، نه `remainingBalance`.
 6. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
 7. موجودی حساب نمی‌تواند منفی شود.
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
@@ -56,6 +57,11 @@
 - `status` → string (`active`, `completed`, `cancelled`)
 - `remainingBalance` → decimal (مانده باقی‌مانده - اولیه برابر `principalAmount`)
 - `fixedInstallmentAmount` → decimal (nullable — برای وام‌های ساده بدون amortization پیچیده)
+- `originationFeeAmount` → decimal (nullable — کارمزد صدور/افتتاح وام)
+- `originationFeeType` → string (nullable — `fixed` یا `percentage`)
+- `earlyPaymentFeeAmount` → decimal (nullable — کارمزد پیش‌پرداخت)
+- `earlyPaymentFeeType` → string (nullable — `fixed` یا `percentage`)
+- `delayPenaltyRate` → decimal (nullable — نرخ جریمه تأخیر در پرداخت — مستقل از سود)
 - `contactName` → string (طرف مقابل)
 - `description` → string
 - `hasAttachment` → boolean
@@ -70,17 +76,21 @@
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
 - `date` → datetime
-- `type` → string (`disbursement`, `installment_payment`, `interest_payment`, `penalty`, `early_payment`)
+- `type` → string (`disbursement`, `installment_payment`, `interest_payment`, `fee_payment`, `penalty`, `early_payment`)
 - `amount` → decimal (مبلغ کل پرداختی)
-- `principalPortion` → decimal (مبلغ مربوط به اصل بدهی — nullable برای وام‌های بدون سود)
-- `interestPortion` → decimal (مبلغ مربوط به سود — nullable برای وام‌های بدون سود)
+- `principalPortion` → decimal (nullable — مبلغ مربوط به اصل بدهی — برای `type = 'installment_payment'` یا `'early_payment'`)
+- `interestPortion` → decimal (nullable — مبلغ مربوط به سود — برای `type = 'interest_payment'`)
+- `feePortion` → decimal (nullable — مبلغ کارمزد — برای `type = 'fee_payment'` یا برای صدور)
+- `penaltyPortion` → decimal (nullable — مبلغ جریمه تأخیر — برای `type = 'penalty'`)
+- `feeType` → string (nullable — نوع کارمزد برای `type = 'fee_payment'`: `origination`, `early_payment`, `late_payment_fee` و ...)
 - `description` → string
 - `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه پرداخت — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountTransactionId` → UUID (ارتباط با رکورد در `acc_transactions`)
 - `createdAt` → datetime
 
 > این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.  
-> برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
+> برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط سود، کارمزد و جریمه بر روی `remainingBalance` تأثیری ندارند).  
+> **نکته**: `type = 'fee_payment'` برای کارمزدهای پیش‌پرداخت یا دیگر کارمزدهای جانبی است. کارمزد صدور وام نیز به‌صورت تراکنش جدا ثبت می‌شود.
 
 ### ۳. acc_transactions (جدول مشترک تراکنش‌های حساب)
 
@@ -128,6 +138,6 @@
 - برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط، `installmentFrequency`، `interestRatePeriod` و تاریخ‌ها) محاسبه می‌شود.
 - `loan_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
 - برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
-- برای هر پرداخت، `exchangeRateToUSD` ذخیره می‌شود تا ارزش دلاری/تتری در طول زمان حفظ شود.
+- برای هر پرداخت، `exchangeRateToUSDT` ذخیره می‌شود تا ارزش تتری در طول زمان حفظ شود.
 - `fixedInstallmentAmount` برای وام‌های ساده (بدون فرمول amortization بانکی) استفاده می‌شود.
 - نرخ سود با `interestRatePeriod` مشخص می‌شود: `annual` یا `monthly`.

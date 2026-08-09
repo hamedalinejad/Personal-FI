@@ -57,15 +57,18 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل به USDT: ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `rate` → decimal (نرخ تبدیل عمومی: `amountTo = amountFrom / rate`)
+  - برای IRR → USDT: ریال به ازای ۱ تتر (مثال: ۶۰,۰۰۰)
+  - برای EUR → USD: یورو به ازای ۱ دلار
+  - برای هر جفت ارز: مقدار ارز From به ازای ۱ واحد ارز To
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
-> **نکته توضیحی**: برای نرخ‌های پایه (IRR → USDT)، این فیلد نشان‌دهنده «ریال به ازای ۱ تتر» است (مثال: ۶۰,۰۰۰).  
-> برای محاسبه: `amountUSDT = amountIRR / exchangeRateToUSDT` (یا `amountIRR = amountUSDT * exchangeRateToUSDT`).  
-> **یکسان‌سازی**: این تعریف برای تمام فیچرها (Income, Expense, Cheque, Loan, Stocks, Funds, Metals, Crypto, Physical Assets, Tax, Goals, Budget) یکسان است و فیلد `exchangeRateToUSDT` همیشه به معنی **ریال به ازای ۱ تتر** است. این تصمیم یکسان‌سازی، جلوی ابهام و خطاهای توسعه را می‌گیرد.
+> **نکته توضیحی**: این جدول **عمومی** برای هر جفت‌ارزی است.  
+> برای محاسبه: `amountTo = amountFrom / rate` (یا `amountFrom = amountTo * rate`).  
+> **یکسان‌سازی**: در تراکنش‌های واقعی (Income, Expense, Loan, Stocks, Crypto و غیره)، ما حتماً نرخ تبدیل به **تتر** ثبت می‌کنیم (فیلد `exchangeRateToUSDT` در جداول مربوطه)، اما این جدول برای ذخیره تمام نرخ‌های ارزی است و نام‌گذاری عمومی `rate` آن را روشن‌تر می‌کند.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
@@ -90,8 +93,8 @@
 - `getCurrencyByCode(code)` → دریافت ارز با کد مشخص
 
 ### Exchange Rate APIs
-- `getExchangeRate(fromCode, toCode)` → دریافت نرخ تبدیل لحظه‌ای (exchangeRateToUSDT)
-- `saveExchangeRate(fromCode, toCode, exchangeRateToUSDT, source)` → ذخیره نرخ تبدیل
+- `getExchangeRate(fromCode, toCode)` → دریافت نرخ تبدیل لحظه‌ای (rate)
+- `saveExchangeRate(fromCode, toCode, rate, source)` → ذخیره نرخ تبدیل
 - `getRateHistory(fromCode, toCode, startDate, endDate)` → تاریخچه نرخ
 
 ### Utility APIs

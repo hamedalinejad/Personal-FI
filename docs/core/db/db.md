@@ -141,7 +141,7 @@ export interface AccAccount {
   accountNumber: string;
   iban: string;
   currency: string;
-  currentBalance: number;
+  currentBalance: Decimal; // استفاده از decimal.js
   isArchived: boolean;
 }
 
@@ -149,15 +149,57 @@ export interface AccTransaction {
   id: string;
   date: string;
   type: string;
-  amount: number;
-  feeAmount?: number;
+  amount: Decimal; // استفاده از decimal.js — صفاف و دقیق
+  feeAmount?: Decimal;
   feeCurrency?: string;
-  exchangeRateToUSDT?: number; // ریال به ازای ۱ تتر (مثال: 60,000) - برای همه‌ی جداول یکسان است
-  balanceAfterTransaction: number;
+  exchangeRateToUSDT?: Decimal; // ریال به ازای ۱ تتر (مثال: 60000)
+  balanceAfterTransaction: Decimal; // snapshot برای جلوگیری از خطاهای رُند
   accountId: string;
   isVoided: boolean;
 }
 ```
+
+## قانون Minor Unit Storage (حتمی)
+
+تمام مبالغ در دیتابیس به **کوچک‌ترین واحد پول** ذخیره می‌شوند:
+
+| ارز | کوچک‌ترین واحد | مثال |
+|-----|---|---|
+| **IRR (ریال)** | ۱ ریال | ۱۲۳۴۵۶ (دوازده میلیون و ... ریال) |
+| **USD** | سنت (Cent) | ۱۲۳۴۵ (سنت) = ۱۲۳۳.۴۵ دلار |
+| **EUR** | سنت | ۶۷۸۹۰ (سنت) |
+| **BTC** | ۱ ساتوشی = ۱۰^-۸ BTC | ۱۲۳۴۵۶۷۸۹ (ساتوشی) |
+| **ETH** | ۱ Wei = ۱۰^-۱۸ ETH | عدد صحیح در Wei |
+| **USDT** | ۱ میکرو = ۱۰^-۶ USDT | ۱۲۳۴۵۶۷۸۹۰ (میکرو) |
+
+**قاعده**:
+- در مرحله **ورود** (لایه Presentation)، مقدار از کاربر به فرمت عادی (۱۲۳۴.۵۶) دریافت می‌شود
+- در مرحله **پردازش** (لایه Domain)، تبدیل به کوچک‌ترین واحد انجام می‌شود (۱۲۳۴۵۶)
+- در مرحله **ذخیره‌سازی** (Database)، صرفاً عدد صحیح ذخیره می‌شود
+- در مرحله **نمایش** (لایه Presentation)، دوباره به فرمت عادی برگردانده می‌شود
+
+**پیاده‌سازی**:
+```typescript
+// Domain Layer
+import Decimal from 'decimal.js';
+
+// ورود: "1234.56" → تبدیل به کوچک‌ترین واحد
+const inputAmount = new Decimal('1234.56');
+const minorUnits = inputAmount.times(100).toNumber(); // 123456
+
+// ذخیره‌سازی: 123456
+database.save({ amount: minorUnits });
+
+// خروجی: 123456 → بازگرداندن به فرمت عادی
+const storedAmount = new Decimal(123456);
+const displayAmount = storedAmount.dividedBy(100); // 1234.56
+```
+
+**نکات حساس** (ریسک‌های احتمالی):
+- خیلی مهم که هیچ محاسبه درون Database انجام نشود. تمام محاسبات در Domain Layer انجام شود.
+- هنگام محاسبه Realized Profit/Loss برای کریپتو، صفاف بودن اعشار حیاتی است (مثلاً 0.00000001 BTC)
+- هنگام تبدیل بین ارزها، از decimal.js استفاده کنید (هرگز Number)
+- Snapshot موجودی (`balanceAfterTransaction`) حتمی است
 
 ## مسیر فایل‌های دیتابیس
 
