@@ -2,10 +2,22 @@
 
 ## توضیح کلی
 
-این فیچر مسئولیت مدیریت **قبوض** و **تراکنش‌های تکرارشونده** (هزینه یا درآمد دوره‌ای) را بر عهده دارد.  
+این فیچر مسئولیت مدیریت **قبوض** و **تراکنش‌های تکرارشونده** (هزینه یا درآمد دوره‌ای) را بر عهده دارد.
 کاربر می‌تواند قبوض ماهانه، اشتراک‌ها، اجاره، حقوق و هر پرداخت یا دریافت دوره‌ای را تعریف کند تا سیستم آن‌ها را یادآوری کند و در صورت تمایل به صورت خودکار ثبت نماید.
 
 این فیچر با فیچرهای **Expense** و **Income** در ارتباط است و تراکنش‌های واقعی را از طریق آن‌ها ایجاد می‌کند.
+
+> **تفاوت با `inc_recurring` و `exp_recurring`**:
+>
+> | ویژگی | `inc_recurring` / `exp_recurring` | `br_items` |
+> |-------|----------------------------------|------------|
+> | **هدف** | تولید خودکار تراکنش بدون نیاز به تأیید | یادآوری + پیگیری وضعیت پرداخت |
+> | **جریان** | تراکنش مستقیم در `inc/exp_transactions` | `br_occurrences` → تأیید کاربر → تراکنش |
+> | **مبلغ** | ثابت | ثابت یا متغیر (`isVariableAmount`) |
+> | **وضعیت** | ندارد (تراکنش یا تولید می‌شود یا نه) | `pending / paid / overdue / skipped` |
+> | **مناسب برای** | حقوق ثابت، اجاره ثابت | قبض برق، اینترنت، اشتراک با مبلغ متغیر |
+>
+> **قانون**: برای یک تراکنش تکرارشونده فقط از **یکی** از این دو روش استفاده کنید.
 
 ---
 
@@ -77,15 +89,16 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `transactionId` → UUID (لینک به تراکنش واقعی Expense/Income (`exp_transactions.id` یا `inc_transactions.id`) — nullable)
+- `transactionId` → UUID (لینک به تراکنش واقعی `exp_transactions.id` یا `inc_transactions.id` — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
-
-> **نکته**: هر دو فیلد در `markAsPaid()` پر می‌شوند. وقتی پرداخت/دریافت ثبت می‌شود:
-> - یک تراکنش در `exp_transactions` (برای قبوض هزینه) یا `inc_transactions` (برای قبوض درآمد) ایجاد می‌شود → `transactionId` به آن لینک می‌شود
-> - یک تراکنش در `acc_transactions` ایجاد می‌شود → `accountTransactionId` به آن لینک می‌شود
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **نکته لینک در `markAsPaid()`**:
+> - `transactionId` → `exp_transactions.id` (اگر `type=expense`) یا `inc_transactions.id` (اگر `type=income`)
+> - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط)
+> - هر دو در یک عملیات atomic پر می‌شوند
 
 ---
 
@@ -103,10 +116,8 @@
 - `getOccurrences(brItemId)`
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
-- `markAsPaid(brOccurrenceId, amount, date, accountId?)`  
-  → ثبت پرداخت/دریافت + ایجاد تراکنش واقعی + به‌روزرسانی nextDueDate  
-  → `transactionId` به `exp_transactions.id` (برای expense) یا `inc_transactions.id` (برای income) لینک می‌شود  
-  → `accountTransactionId` به `acc_transactions.id` لینک می‌شود
+- `markAsPaid(brOccurrenceId, amount, date, accountId?)`
+  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + به‌روزرسانی nextDueDate
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 
