@@ -66,7 +66,7 @@
 
 - `id` → UUID (Primary Key)
 - `docId` → UUID (لینک به `docs_documents.id`)
-- `relatedFeature` → string (نام فیچر مرتبط — مقادیر مجاز مانند `relatedFeature` در `acc_transactions`)
+- `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ همان مقادیر مجاز `relatedFeature` در `acc_transactions`)
 - `relatedId` → UUID (شناسه رکورد در فیچر مرتبط)
 - `note` → string (توضیح اختیاری درباره این ارتباط — nullable)
 - `createdAt` → datetime
@@ -74,8 +74,8 @@
 > **کاربرد**: وقتی یک سند به **چند رکورد** در فیچرهای مختلف متصل باشد از این جدول استفاده می‌شود.
 > مثال: یک فاکتور که هم به یک تراکنش هزینه و هم به یک وام مرتبط است.
 >
-> **مقادیر مجاز `relatedFeature`**:
-> `income`, `expense`, `cheque`, `loan`, `crypto_exchange`, `stocks_iran`, `fif`, `metals`, `physical_assets`, `tax`, `goals`
+> **مقادیر مجاز `relatedFeature`**: نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ مقادیر:
+> `income`, `expense`, `cheque`, `loan`, `crypto_exchange`, `stocks_iran`, `fif`, `metals`, `physical_assets`, `budget`, `tax`, `goals`
 >
 > در حالت ساده‌تر (یک سند به یک رکورد)، می‌توان فقط از فیلدهای `relatedFeature` و `relatedId` در جدول `docs_documents` استفاده کرد و از `docs_links` صرف‌نظر کرد.
 

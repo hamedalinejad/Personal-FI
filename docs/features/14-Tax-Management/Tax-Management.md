@@ -66,7 +66,7 @@
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)
-- `relatedFeature` → string (`investment`, `physical_assets`, `other` — nullable)
+- `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ nullable — برای مالیات مرتبط با یک زیرفیچر خاص، مقدار دقیق آن زیرفیچر استفاده می‌شود: `crypto_exchange`, `stocks_iran`, `fif`, `metals`, `physical_assets`)
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
 - `attachmentPath` → string
@@ -110,7 +110,7 @@
 - **Accounts & Banking**: ایجاد تراکنش Expense/Income و کاهش/افزایش موجودی حساب
 - **Expense**: ایجاد تراکنش هزینه هنگام پرداخت مالیات (برای مالیات‌های هزینه‌محور)
 - **Income**: ایجاد تراکنش درآمد هنگام بازگشت مالیات (در صورت وجود)
-- **Investment**: پیگیری مالیات احتمالی سود سرمایه‌گذاری (از طریق `relatedFeature=investment`)
+- **Investment**: پیگیری مالیات احتمالی سود سرمایه‌گذاری (از طریق `relatedFeature` با مقدار دقیق زیرفیچر — یکی از `crypto_exchange`, `stocks_iran`, `fif`, `metals`)
 - **Physical Assets**: عوارض و مالیات خودرو یا ملک (از طریق `relatedFeature=physical_assets`)
 - **Notification & Reminder**: یادآوری موعد پرداخت
 - **Document Management**: نگهداری فیش و اسناد مالیاتی

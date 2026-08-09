@@ -95,20 +95,20 @@
 
 - `id` → UUID
 - `envelopeId` → UUID
-- `transactionId` → UUID (شناسه رکورد در جدول مرتبط بر اساس transactionType)
-- `transactionType` → string (`expense`, `cheque`, `loan`) — نوع تراکنش برای شناسایی جدول مرتبط
+- `relatedId` → UUID (شناسه رکورد در جدول مرتبط بر اساس relatedFeature)
+- `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ در این جدول فقط `expense`, `cheque`, `loan` معنا دارند)
 - `amount` → decimal (مبلغی که از این پاکت کسر شد)
 - `date` → datetime
 - `createdAt` → datetime
 
 > **نکته**: این جدول مشخص می‌کند هر هزینه از کدام پاکت کسر شده است.  
 > یک هزینه می‌تواند بین چند پاکت تقسیم شود (چند رکورد در این جدول).  
-> **توضیح لینک `transactionId`**:
-> - `transactionType = 'expense'` → `transactionId` به `exp_transactions.id` لینک می‌شود
-> - `transactionType = 'cheque'` → `transactionId` به `chk_cheques.id` لینک می‌شود
-> - `transactionType = 'loan'` → `transactionId` به `ln_transactions.id` لینک می‌شود
+> **توضیح لینک `relatedId`**:
+> - `relatedFeature = 'expense'` → `relatedId` به `exp_transactions.id` لینک می‌شود
+> - `relatedFeature = 'cheque'` → `relatedId` به `chk_cheques.id` لینک می‌شود
+> - `relatedFeature = 'loan'` → `relatedId` به `ln_transactions.id` لینک می‌شود
 > 
-> برای هر نوع تراکنش، `transactionId` شناسه رکورد در جدول مربوطه است.
+> برای هر نوع تراکنش، `relatedId` شناسه رکورد در جدول مربوطه است.
 
 ### ۴. Budget Transfer (جدول: `bg_transfers`)
 
@@ -165,10 +165,10 @@
 - `transferBetweenEnvelopes(fromId, toId, amount)`
 
 ### Integration APIs
-- `applyTransactionToBudget(transactionId, transactionType, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه  
-  → `transactionId`: شناسه رکورد در جدول مربوطه (exp_transactions, chk_cheques, ln_transactions)
-  → `transactionType`: `expense`, `cheque`, یا `loan`
-- `splitTransactionBudget(transactionId, transactionType, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
+- `applyTransactionToBudget(relatedId, relatedFeature, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه  
+  → `relatedId`: شناسه رکورد در جدول مربوطه (exp_transactions, chk_cheques, ln_transactions)
+  → `relatedFeature`: `expense`, `cheque`, یا `loan`
+- `splitTransactionBudget(relatedId, relatedFeature, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
 - `getEnvelopeStatus(envelopeId)` → وضعیت مصرف (درصد و باقی‌مانده)
 - `checkBudgetAlerts(budgetId)` → بررسی هشدارها
 
@@ -189,7 +189,7 @@
 
 - `remainingAmount` محاسبه‌ای است و در دیتابیس ذخیره نمی‌شود (برای جلوگیری از out-of-sync).
 - هزینه می‌تواند از هر منبعی باشد (حساب بانکی، چک، وام) و همگی از پاکت کسر می‌شوند.
-- تراکنش‌ها در `bg_transaction_links` با `transactionType` شناسایی می‌شوند:
+- تراکنش‌ها در `bg_transaction_links` با `relatedFeature` شناسایی می‌شوند:
   - `expense` → `exp_transactions`
   - `cheque` → `chk_cheques`
   - `loan` → `ln_transactions`

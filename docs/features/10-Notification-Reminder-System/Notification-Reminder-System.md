@@ -59,7 +59,7 @@
 - `message` → string
 - `type` → string (`info`, `warning`, `critical`)
 - `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
-- `relatedFeature` → string (نام فیچر مرتبط)
+- `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`)
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
 - `isRead` → boolean
 - `scheduledAt` → datetime (زمان برنامه‌ریزی‌شده برای نمایش)

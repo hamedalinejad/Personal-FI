@@ -41,7 +41,7 @@ exchangeRateToBase → decimal (nullable — نرخ تتر لحظه تراکنش
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)
-relatedFeature → string (نام فیچر مرتبط: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, ...)
+relatedFeature → string (نوع `RelatedFeature` — تعریف مرکزی در core/types/types.md؛ مقادیر: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals)
 
 relatedId → UUID (شناسه رکورد در فیچر مرتبط)
 isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
