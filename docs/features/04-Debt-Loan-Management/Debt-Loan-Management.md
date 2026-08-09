@@ -190,8 +190,26 @@
   → ثبت در `acc_transactions`  
   → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
-- `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `installmentFrequency`)
-- `getOverduePayments()` → دریافت اقساط سررسید گذشته
+- `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `calculationMethod` و `installmentFrequency`)
+  - **خروجی**: آرایه‌ای از اقساط آینده:
+    ```typescript
+    {
+      installmentNumber: number,
+      dueDate: datetime,
+      principalAmount: Decimal,
+      interestAmount: Decimal,
+      totalAmount: Decimal,
+      remainingBalanceAfter: Decimal
+    }
+    ```
+  - **منطق**:
+    - اگر `calculationMethod = 'declining_balance'`: از فرمول amortization استفاده (سود روی مانده)
+    - اگر `calculationMethod = 'flat_rate'`: اصل ثابت، سود ثابت
+    - اگر `calculationMethod = 'qarz_al_hasaneh'`: اصل ثابت، سود = 0
+    - اگر `calculationMethod = 'bullet'`: سود ماهانه، اصل صفر (غیر از ماه آخر)
+    - اگر `gracePeriodMonths > 0`: اولین N ماه فقط سود (برای تمام روش‌ها)
+    - شروع از `firstPaymentDate` + `installmentFrequency`
+- `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
 
 ---
 
