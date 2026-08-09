@@ -9,9 +9,44 @@
 
 ## Business Rules
 
+### روش‌های محاسبه اقساط (Core)
+
+**1. Declining Balance (تناژل سود):**
+- نرخ سود روی مانده باقیمانده محاسبه می‌شود
+- کاربرد: وام‌های بانکی رسمی
+- فرمول: `installment = P × r(1+r)^n / [(1+r)^n - 1]` که `r = annual_rate / 12 / 100`
+- نیاز: `calculationMethod = 'declining_balance'` و سیستم `calculatedInstallment` را محاسبه می‌کند
+- هر قسط: سود = `remainingBalance × r`، اصل = `installment - سود`
+
+**2. Flat Rate (سود ثابت):**
+- سود روی کل مبلغ اولیه محاسبه شود
+- کاربرد: وام‌های دوستانه، قرض‌الحسنه با کارمزد
+- نیاز: `fixedInstallmentAmount` ثابت، تمام قسط اصل است، سود به‌صورت جداگانه
+- هر قسط: اصل = `principalAmount / totalInstallments`، سود = `principalAmount × rate × years / totalInstallments`
+
+**3. Qarz Al-Hasaneh (قرض‌الحسنه):**
+- سود = ۰، فقط کارمزد خدمات ۴٪
+- نیاز: `calculationMethod = 'qarz_al_hasaneh'` و `serviceFeeRate = 4`
+- کارمزد یک‌بار کسر می‌شود: `serviceFeeAmount = principalAmount × serviceFeeRate / 100`
+- هر قسط: صرفاً تقسیم‌کردن اصل: `installment = principalAmount / totalInstallments`
+
+**4. Bullet:**
+- اصل کل در پایان، سود ماهانه
+- نیاز: `calculationMethod = 'bullet'` و `calculatedInstallment` برای سود ماهانه
+
+**برنامه اقساط:**
+- `getUpcomingPayments()` باید `calculationMethod` را چک کند
+- برای هر روش فرمول‌های متفاوت است
+- تاریخ اولین قسط از `firstPaymentDate` شروع می‌شود (ممکن است بعد از `disbursementDate`)
+- در صورت `gracePeriodMonths > 0`، اولین اقساط فقط سود است
+
+### دیگر Business Rules
+
 1. وام می‌تواند از نوع `borrowed` (دریافتی) یا `lent` (پرداختی / طلب) باشد.
 2. ارز وام همیشه با ارز حساب مرتبط یکی است.
-3. هنگام ثبت وام **دریافتی (borrowed)**:
+3. `loanType` باید یکی از انواع تعریف‌شده باشد (bank_installment, qarz_al_hasaneh, facility, ...)
+4. `interestRate` واحد: درصد کامل (18 برای ۱۸٪، نه 0.18)
+5. هنگام ثبت وام **دریافتی (borrowed)**:
    - مبلغ اصلی به حساب مرتبط واریز می‌شود.
    - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
    - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
@@ -38,34 +73,68 @@
 
 ### ۱. Loan (جدول: `ln_loans`)
 
+**شناسه و اطلاعات پایه:**
 - `id` → UUID (Primary Key)
 - `name` → string (نام وام)
-- `loanType` → string (نوع وام — بانکی، قرض‌الحسنه، دوستانه، تسهیلات، سایر)
+- `loanType` → enum (bank_installment | qarz_al_hasaneh | facility | friendly_loan | credit_card | mortgage | leasing | bond | other)
 - `direction` → string (`borrowed` یا `lent`)
+
+**مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت در ابتدا — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت — ریال به ازای ۱ تتر)
+
+**تاریخ‌ها:**
+- `disbursementDate` → datetime (تاریخ دریافت/واریز وام) ✅ **جدید**
+- `firstPaymentDate` → datetime (تاریخ اولین قسط) ✅ **جدید**
+- `endDate` → datetime (تاریخ پایان وام)
+
+**حساب:**
 - `accountId` → UUID (حساب مرتبط)
-- `accountTransactionId` → UUID (لینک به `acc_transactions` برای تراکنش اولیه وام)
+- `accountTransactionId` → UUID (لینک به `acc_transactions`)
+
+**محاسبه اقساط (Core):**
+- `calculationMethod` → enum (declining_balance | flat_rate | bullet | qarz_al_hasaneh) ✅ **جدید — حتمی**
 - `interestType` → string (`none`, `fixed`, `variable`)
-- `interestRate` → decimal (نرخ سود)
-- `interestRatePeriod` → string (`annual`, `monthly`) — نرخ سود سالانه است یا ماهانه؟
-- `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`) — فرکانس اقساط
-- `totalInstallments` → integer (تعداد اقساط)
-- `startDate` → datetime
-- `endDate` → datetime
-- `status` → string (`active`, `completed`, `cancelled`)
-- `remainingBalance` → decimal (مانده باقی‌مانده - اولیه برابر `principalAmount`)
-- `fixedInstallmentAmount` → decimal (nullable — برای وام‌های ساده بدون amortization پیچیده)
-- `originationFeeAmount` → decimal (nullable — کارمزد صدور/افتتاح وام)
-- `originationFeeType` → string (nullable — `fixed` یا `percentage`)
+- `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18) ✅ **توضیح واحد اضافه شد**
+- `interestRatePeriod` → string (`annual`, `monthly`)
+- `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`)
+- `totalInstallments` → integer (تعداد کل اقساط)
+- `gracePeriodMonths` → integer (nullable — ماه‌های تنفس) ✅ **جدید**
+- `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
+- `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
+
+**کارمزدها و جریمه:**
+- `originationFeeAmount` → decimal (nullable — کارمزد صدور)
+- `originationFeeType` → enum (nullable — `fixed` | `percentage`)
 - `earlyPaymentFeeAmount` → decimal (nullable — کارمزد پیش‌پرداخت)
-- `earlyPaymentFeeType` → string (nullable — `fixed` یا `percentage`)
-- `delayPenaltyRate` → decimal (nullable — نرخ جریمه تأخیر در پرداخت — مستقل از سود)
-- `contactName` → string (طرف مقابل)
+- `earlyPaymentFeeType` → enum (nullable — `fixed` | `percentage`)
+- `penaltyRate` → decimal (nullable — نرخ جریمه دیرکرد سالانه — مثلاً 6) ✅ **جدید**
+- `serviceFeeRate` → decimal (nullable — کارمزد قرض‌الحسنه — مثلاً 4) ✅ **جدید**
+- `serviceFeeAmount` → decimal (nullable — مبلغ کارمزد محاسبه‌شده) ✅ **جدید**
+
+**وضعیت:**
+- `status` → enum (`active` | `completed` | `cancelled` | `overdue`) ✅ **overdue اضافه شد**
+- `remainingBalance` → decimal (مانده باقی‌مانده)
+
+**اسنپ‌شات برای Dashboard:**
+- `totalPaidPrincipal` → decimal (مجموع اصل پرداخت‌شده) ✅ **جدید**
+- `totalPaidInterest` → decimal (مجموع سود پرداخت‌شده) ✅ **جدید**
+
+**شرایط:**
+- `disbursementType` → enum (lump_sum | phased) ✅ **جدید**
+- `collateralNote` → string (nullable — وثیقه/ضامن) ✅ **جدید**
+
+**طرف مقابل:**
+- `contactName` → string (نام)
+- `contactPhone` → string (nullable — شماره تماس) ✅ **جدید**
 - `description` → string
+
+**فایل‌ها:**
 - `hasAttachment` → boolean
 - `attachmentPath` → string
+
+**زمان:**
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -76,16 +145,18 @@
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
 - `date` → datetime
-- `type` → string (`disbursement`, `installment_payment`, `interest_payment`, `fee_payment`, `penalty`, `early_payment`)
+- `type` → enum (`disbursement`, `installment_payment`, `interest_payment`, `fee_payment`, `penalty`, `early_payment`)
 - `amount` → decimal (مبلغ کل پرداختی)
-- `principalPortion` → decimal (nullable — مبلغ مربوط به اصل بدهی — برای `type = 'installment_payment'` یا `'early_payment'`)
-- `interestPortion` → decimal (nullable — مبلغ مربوط به سود — برای `type = 'interest_payment'`)
-- `feePortion` → decimal (nullable — مبلغ کارمزد — برای `type = 'fee_payment'` یا برای صدور)
+- `principalPortion` → decimal (nullable — مبلغ اصل — برای `type = 'installment_payment'` یا `'early_payment'`)
+- `interestPortion` → decimal (nullable — مبلغ سود — برای `type = 'interest_payment'`)
+- `feePortion` → decimal (nullable — مبلغ کارمزد — برای `type = 'fee_payment'`)
 - `penaltyPortion` → decimal (nullable — مبلغ جریمه تأخیر — برای `type = 'penalty'`)
-- `feeType` → string (nullable — نوع کارمزد برای `type = 'fee_payment'`: `origination`, `early_payment`, `late_payment_fee` و ...)
+- `feeType` → enum (nullable — `origination`, `early_payment`, `late_payment_fee`, ...)
+- `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
+- `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه پرداخت — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
-- `accountTransactionId` → UUID (ارتباط با رکورد در `acc_transactions`)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
+- `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
 - `createdAt` → datetime
 
 > این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.  
@@ -135,9 +206,93 @@
 
 ## نکات طراحی
 
-- برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط، `installmentFrequency`، `interestRatePeriod` و تاریخ‌ها) محاسبه می‌شود.
-- `loan_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
-- برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion`.
-- برای هر پرداخت، `exchangeRateToUSDT` ذخیره می‌شود تا ارزش تتری در طول زمان حفظ شود.
-- `fixedInstallmentAmount` برای وام‌های ساده (بدون فرمول amortization بانکی) استفاده می‌شود.
-- نرخ سود با `interestRatePeriod` مشخص می‌شود: `annual` یا `monthly`.
+- برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط، `calculationMethod`، `gracePeriodMonths` و تاریخ‌ها) محاسبه می‌شود.
+- `ln_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
+- برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط اصل تغییر می‌دهد).
+- `totalPaidPrincipal` و `totalPaidInterest` برای سرعت Dashboard به‌روزرسانی می‌شوند (بدون جمع کردن تمام ln_transactions).
+- برای هر پرداخت، `exchangeRateToUSDT` ذخیره می‌شود.
+- `status = 'overdue'` زمانی تغییر می‌کند که قسط سررسید گذشته وجود داشته باشد.
+
+---
+
+## فرمول‌های محاسباتی
+
+### الف) Declining Balance (تناژل سود — وام بانکی)
+
+**محاسبه مبلغ قسط:**
+```
+r = interestRate / 100 / 12                    // نرخ ماهانه
+n = totalInstallments                           // تعداد اقساط
+P = principalAmount - serviceFeeAmount (if any)
+
+calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
+```
+
+**تقسیم هر قسط:**
+```
+interestPortion = remainingBalance × r
+principalPortion = calculatedInstallment - interestPortion
+remainingBalance -= principalPortion
+```
+
+**مثال:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۸ ماه، ۱۲٪ سالانه
+- r = 12 / 100 / 12 = 0.01
+- calculatedInstallment = 100000000 × [0.01(1.01)^18] / [(1.01)^18 - 1] ≈ 6,098,000 ریال
+- قسط اول: سود = 100000000 × 0.01 = 1,000,000، اصل = 5,098,000
+
+### ب) Flat Rate (سود ثابت)
+
+**محاسبه:**
+```
+totalInterest = principalAmount × (interestRate / 100) × (totalInstallments * frequency_in_years)
+fixedInstallmentAmount = (principalAmount + totalInterest) / totalInstallments
+principalPortion = principalAmount / totalInstallments  // ثابت برای تمام اقساط
+interestPortion = totalInterest / totalInstallments     // ثابت برای تمام اقساط
+```
+
+**مثال:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه، ۱۲٪
+- totalInterest = 100000000 × (12/100) × 1 = 12,000,000
+- fixedInstallmentAmount = (100000000 + 12000000) / 12 ≈ 9,333,333
+
+### ج) Qarz Al-Hasaneh (قرض‌الحسنه)
+
+**محاسبه:**
+```
+serviceFeeAmount = principalAmount × (serviceFeeRate / 100)
+installment = principalAmount / totalInstallments
+principalPortion = installment
+interestPortion = 0
+```
+
+**مثال:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط، کارمزد ۴٪
+- serviceFeeAmount = 100000000 × 0.04 = 4,000,000 (کسر یک‌بار)
+- installment = 100000000 / 12 ≈ 8,333,333
+- نت وام دریافتی = 100000000 - 4000000 = 96,000,000
+
+### د) جریمه دیرکرد
+
+**محاسبه:**
+```
+overdueAmount = amount_not_paid
+penaltyPortion = overdueAmount × (penaltyRate / 100) × (penaltyDays / 365)
+```
+
+**مثال:**
+- مبلغ معوق: ۱۰,۰۰۰,۰۰۰ ریال
+- نرخ جریمه: ۶٪ سالانه
+- روزهای تأخیر: ۳۰ روز
+- penalty = 10000000 × (6/100) × (30/365) ≈ 49,315 ریال
+
+### ه) دوره تنفس (Grace Period)
+
+اگر `gracePeriodMonths > 0`:
+- اولین `gracePeriodMonths` ماه: فقط سود
+- بقیه اقساط: اصل + سود (یا صرف اصل برای قرض‌الحسنه)
+
+**مثال:**
+- ۱۸ ماه، ۶ ماه تنفس، Declining Balance
+- ماه ۱-۶: صرفاً سود
+- ماه ۷-۱۸: قسط‌های کامل (اصل + سود)
