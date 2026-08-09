@@ -48,6 +48,18 @@ IndexedDB
 - تراکنش‌ها تغییرناپذیر هستند - برای اصلاح تراکنش جدید ایجاد شود
 - تمام تاریخ‌ها باید به صورت UTC ذخیره شوند
 
+### سازگاری PWA و موبایل آفلاین (الزامی)
+
+sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال افزایشی به IndexedDB ندارد؛ برای اجرای پایدار به‌عنوان PWA نصب‌شده روی موبایل، موارد زیر **الزامی** است (جزئیات کامل در `core/db/db.md`):
+
+- نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی (رفتن اپ به پس‌زمینه) رخ ندهد.
+- نوشتن‌ها Debounce شوند و روی رویداد `visibilitychange`/`beforeunload` یک flush اجباری انجام شود.
+- در اولین اجرا `navigator.storage.persist()` فراخوانی شود تا مرورگر (خصوصاً Safari/iOS) داده‌ها را در کمبود فضا حذف نکند.
+- **Service Worker** برای Cache کردن App Shell و فایل WASM سنگین sql.js الزامی است (بدون آن، اپ نصب‌شده روی موبایل بدون اینترنت لود نمی‌شود).
+- **Web App Manifest** (`manifest.json`) با آیکون، `display: standalone` و `start_url` باید تعریف شود.
+- یادآوری پشتیبان‌گیری دوره‌ای (Export فایل SQLite) در Dashboard نمایش داده شود، چون ماندگاری IndexedDB روی موبایل تضمین‌شده نیست.
+- مسیر ارتقای آینده در صورت رشد حجم داده: **wa-sqlite با OPFS**.
+
 
 ۳. ساختار پوشه‌بندی پروژه (Folder Structure)
 
@@ -83,5 +95,9 @@ src/
 ├── stores/                # Zustand stores
 ├── api/                   # Internal API بین فیچرها
 ├── assets/
-└── styles/
+├── styles/
+public/
+├── manifest.json          # Web App Manifest (نصب PWA روی موبایل)
+├── sw.ts                  # Service Worker (Cache App Shell + WASM sql.js)
+└── icons/                 # آیکون‌های PWA
 ```

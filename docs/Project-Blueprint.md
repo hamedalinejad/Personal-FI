@@ -163,6 +163,8 @@
 * TypeScript
 * Vite
 * PWA
+* Service Worker (Cache App Shell + WASM برای اجرای آفلاین کامل روی موبایل)
+* Web App Manifest (نصب‌پذیری روی موبایل — `display: standalone`)
 
 ## UI
 
@@ -265,6 +267,8 @@ IndexedDB
 * Backup / Restore
 * Import / Export
 * آماده برای Cloud Sync
+* Persistent Storage (`navigator.storage.persist()`) برای جلوگیری از حذف داده روی موبایل
+* الگوی نوشتن Write-to-temp-then-swap برای جلوگیری از خرابی فایل دیتابیس حین اجرای PWA روی موبایل
 
 ---
 
