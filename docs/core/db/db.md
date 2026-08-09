@@ -163,7 +163,8 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `sec_settings` | Security & Privacy | تنظیمات امنیتی |
 | `sec_session_logs` | Security & Privacy | لاگ‌های نشست (Should Have) |
 | `price_sources` | Price Fetching | منابع/Providerهای قیمت |
-| `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only) |
+| `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only؛ دستی یا از API) |
+| `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 
