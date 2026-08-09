@@ -30,7 +30,7 @@ Must Have:
 - پیگیری سود پیش‌بینی‌شده در مقابل سود واقعی (فقط در تراکنش‌های nav_update و dividend)
 - واریز/برداشت مرتبط با حساب بانکی یا کارگزاری
 - ذخیره نرخ تتر لحظه هر رویداد
-- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT`)
+- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase`)
 
 Should Have:
 
@@ -61,7 +61,7 @@ Business Rules
   - به جای دریافت نقدی، تعداد واحد جدید خریداری و به Holding اضافه می‌شود.
   - `predictedProfit` در این تراکنش نیز می‌تواند پر شود.
 - سود پیش‌بینی‌شده فقط برای نمایش و مقایسه است؛ سود واقعی از طریق تراکنش‌ها و تغییرات NAV پیگیری می‌شود.
-- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
+- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - موجودی حساب بانکی نمی‌تواند منفی شود.
 - **ویرایش/حذف معاملات**: تراکنش‌های صندوق پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
   - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
@@ -143,7 +143,7 @@ Domain Entities
 - `amount` → decimal (مبلغ ریالی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToBase` → decimal
 - `predictedProfit` → decimal (nullable — فقط در nav_update و dividend)
 - `actualProfit` → decimal (nullable — فقط در nav_update و dividend)
 - `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی — issuance_redemption)

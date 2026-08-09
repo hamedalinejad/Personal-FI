@@ -61,6 +61,16 @@
 | `cur_` | Currency & Multi-Currency |
 | `stg_` | Settings & Tools |
 | `cat_` | Common Categories |
+| `sec_` | Security & Privacy |
+
+## مدل چندکاربری (Multi-User Model)
+
+طبق Project-Blueprint.md (بخش ۶ و ۱۳)، معماری فعلی **Single-User Local-First** است اما باید قابلیت توسعه به چندکاربره (برای لایسنس‌دهی آینده) را داشته باشد. مدل انتخاب‌شده:
+
+- **هر کاربر = یک فایل دیتابیس SQLite مستقل** (نه ردیف‌های userId داخل جداول مشترک).
+- این مدل با فلسفه Local-First/Offline-First سازگار است و نیازی به افزودن ستون‌های userId/workspaceId به جداول موجود ندارد.
+- در نسخه چندکاربره، هر کاربر فایل دیتابیس خودش را دارد (مسیر جداگانه در IndexedDB یا فایل جدا هنگام Export/Backup)؛ لایه احراز هویت/لایسنس فقط تعیین می‌کند کدام فایل دیتابیس بارگذاری شود.
+- در نتیجه هیچ Migration جدیدی برای اضافه‌شدن چندکاربری لازم نیست؛ فقط لایه انتخاب/مدیریت فایل دیتابیس در سطح اپلیکیشن اضافه می‌شود.
 
 ## لیست مرکزی همه‌ی جدول‌ها
 
@@ -121,6 +131,9 @@
 | `cur_exchange_rates` | Currency & Multi-Currency | نرخ‌های تبدیل |
 | `cur_currency_preferences` | Currency & Multi-Currency | تنظیمات ارز کاربر |
 | `cat_categories` | Common Categories | دسته‌بندی‌های مشترک |
+| `sec_settings` | Security & Privacy | تنظیمات امنیتی |
+| `sec_session_logs` | Security & Privacy | لاگ‌های نشست |
+| `sec_audits` | Security & Privacy | لاگ‌های ممیزی امنیتی |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 
@@ -152,7 +165,7 @@ export interface AccTransaction {
   amount: Decimal; // استفاده از decimal.js — صفاف و دقیق
   feeAmount?: Decimal;
   feeCurrency?: string;
-  exchangeRateToUSDT?: Decimal; // ریال به ازای ۱ تتر (مثال: 60000)
+  exchangeRateToBase?: Decimal; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
   balanceAfterTransaction: Decimal; // snapshot برای جلوگیری از خطاهای رُند
   accountId: string;
   isVoided: boolean;

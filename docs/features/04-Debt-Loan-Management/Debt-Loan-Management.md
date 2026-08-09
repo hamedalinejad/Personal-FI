@@ -65,7 +65,7 @@
 8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
 9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
 10. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
-11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToUSDT` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
+11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToBase` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
 
 ---
 
@@ -82,7 +82,7 @@
 **مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت — ریال به ازای ۱ تتر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه ثبت — ریال به ازای ۱ تتر)
 
 **تاریخ‌ها:**
 - `disbursementDate` → datetime (تاریخ دریافت/واریز وام) ✅ **جدید**
@@ -155,7 +155,7 @@
 - `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
 - `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
 - `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
 - `createdAt` → datetime
 
@@ -186,7 +186,7 @@
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
   → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
-  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSDT`)  
+  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToBase`)  
   → ثبت در `acc_transactions`  
   → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
@@ -228,7 +228,7 @@
 - `ln_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
 - برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط اصل تغییر می‌دهد).
 - `totalPaidPrincipal` و `totalPaidInterest` برای سرعت Dashboard به‌روزرسانی می‌شوند (بدون جمع کردن تمام ln_transactions).
-- برای هر پرداخت، `exchangeRateToUSDT` ذخیره می‌شود.
+- برای هر پرداخت، `exchangeRateToBase` ذخیره می‌شود.
 - `status = 'overdue'` زمانی تغییر می‌کند که قسط سررسید گذشته وجود داشته باشد.
 
 ---

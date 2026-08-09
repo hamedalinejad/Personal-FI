@@ -68,21 +68,18 @@
 
 > **نکته توضیحی**: این جدول **عمومی** برای هر جفت‌ارزی است.  
 > برای محاسبه: `amountTo = amountFrom / rate` (یا `amountFrom = amountTo * rate`).  
-> **یکسان‌سازی**: در تراکنش‌های واقعی (Income, Expense, Loan, Stocks, Crypto و غیره)، ما حتماً نرخ تبدیل به **تتر** ثبت می‌کنیم (فیلد `exchangeRateToUSDT` در جداول مربوطه)، اما این جدول برای ذخیره تمام نرخ‌های ارزی است و نام‌گذاری عمومی `rate` آن را روشن‌تر می‌کند.
+> **یکسان‌سازی**: در تراکنش‌های واقعی (Income, Expense, Loan, Stocks, Crypto و غیره)، نرخ تبدیل لحظه‌ای نسبت به **ارز پایه کاربر** (`baseCurrency` در `cur_currency_preferences`) ثبت می‌شود (فیلد `exchangeRateToBase` در جداول مربوطه)، نه صرفاً نسبت به تتر. این جدول (`cur_exchange_rates`) برای ذخیره تمام نرخ‌های ارزی بین هر جفت ارز دلخواه است و نام‌گذاری عمومی `rate` آن را روشن‌تر می‌کند.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
 - `id` → UUID
-- `userId` → UUID (nullable — برای نسخه‌های آینده با چندکاربری)
 - `displayCurrency` → string (ارز نمایشی پیش‌فرض)
 - `baseCurrency` → string (ارز پایه برای محاسبات)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
 > **نکته**:  
-> - در نسخه ۱.۰.۰ اپ تک‌کاربره است و `userId` nullable است  
-> - در نسخه‌های آینده (Multi User)، `userId` پر می‌شود  
-> - از Blueprint بخش ۱۳: «Multi User (Future)» — بهتر است از ابتدا طراحی آماده باشد
+> طبق مدل چندکاربری مستندشده در `db.md` (هر کاربر = یک فایل دیتابیس SQLite مستقل)، نیازی به فیلد `userId` در این جدول یا هیچ جدول دیگری نیست؛ هر کاربر دیتابیس و به تبع آن تنظیمات ارز مستقل خودش را دارد.
 
 ---
 
@@ -98,23 +95,23 @@
 - `getRateHistory(fromCode, toCode, startDate, endDate)` → تاریخچه نرخ
 
 ### Utility APIs
-- `convert(amount, fromCurrency, toCurrency, exchangeRate)` → تبدیل مبلغ
+- `convert(amount, fromCurrency, toCurrency)` → تبدیل مبلغ (نرخ مستقیم، معکوس یا از طریق USDT به‌عنوان ارز واسط پیدا می‌شود)
 - `getRatesForCurrency(currencyCode)` → نرخ‌های مرتبط با یک ارز
 
 ### Preference APIs
-- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر (برای کاربر جاری یا `userId` مشخص)
-- `updateUserCurrencyPreference(userId, displayCurrency, baseCurrency)` → به‌روزرسانی
+- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر جاری (از دیتابیس محلی همان کاربر)
+- `updateUserCurrencyPreference(displayCurrency, baseCurrency)` → به‌روزرسانی
 
-> نکته: اپ در نسخه ۱.۰.۰ تک‌کاربره است، اما طراحی آماده برای چندکاربری آینده است.
+> نکته: هر کاربر دیتابیس مستقل خودش را دارد (به `db.md` مراجعه شود)، بنابراین APIها نیازی به پارامتر `userId` ندارند.
 
 ---
 
 ## روابط با سایر فیچرها
 
-- **Accounts & Banking**: ذخیره `currency` در Account و `exchangeRateToUSDT` در تراکنش‌ها
+- **Accounts & Banking**: ذخیره `currency` در Account و `exchangeRateToBase` در تراکنش‌ها
 - **Income / Expense**: ذخیره `currency` در تراکنش و تبدیل به نرخ لحظه
-- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToUSDT` برای هر تراکنش و محاسبه `totalFeesPaidCurrency`
-- **Physical Assets**: ذخیره `currency` و `exchangeRateToUSDT` در خرید و فروش
+- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToBase` برای هر تراکنش و محاسبه `totalFeesPaidCurrency`
+- **Physical Assets**: ذخیره `currency` و `exchangeRateToBase` در خرید و فروش
 - **Budget**: نمایش مبالغ در ارز پیش‌فرض کاربر
 - **Financial Goals**: نمایش پیشرفت اهداف به ارز پیش‌فرض
 - **Reports / Dashboard**: تبدیل مبالغ به ارز نمایشی کاربر با نرخ تاریخی
@@ -124,25 +121,52 @@
 
 ## منطق تبدیل
 
+تابع `convert` باید برای **هر جفت ارز دلخواه** کار کند، نه فقط IRR↔USDT. الگوریتم:
+
+1. اگر نرخ مستقیم بین `fromCurrency` و `toCurrency` در `cur_exchange_rates` موجود باشد، از همان استفاده شود.
+2. در غیر این صورت، از **USDT به‌عنوان ارز واسط** (Bridge Currency) استفاده شود: `fromCurrency → USDT → toCurrency`.
+3. تمام محاسبات با `decimal.js` انجام شود (هرگز `Number`).
+
 ```typescript
-// pseudo-code
-// rate = exchangeRateToUSDT = ریال به ازای ۱ تتر (مثال: 60,000)
-function convert(amount: number, fromCurrency: string, toCurrency: string, rate: number): number {
+// pseudo-code — همیشه با decimal.js در Domain Layer پیاده‌سازی شود
+import Decimal from 'decimal.js';
+
+// rate در cur_exchange_rates: مقدار ارز From به ازای ۱ واحد ارز To
+// یعنی: amountTo = amountFrom / rate
+
+async function convert(
+  amount: Decimal,
+  fromCurrency: string,
+  toCurrency: string
+): Promise<Decimal> {
   if (fromCurrency === toCurrency) return amount;
-  
-  if (fromCurrency === 'IRR' && toCurrency === 'USDT') {
-    return amount / rate; // amountIRR / rate = amountUSDT (rate = IRR per USDT)
+
+  // ۱. تلاش برای نرخ مستقیم
+  const directRate = await getExchangeRate(fromCurrency, toCurrency);
+  if (directRate) {
+    return amount.dividedBy(directRate.rate);
   }
-  if (fromCurrency === 'USDT' && toCurrency === 'IRR') {
-    return amount * rate; // amountUSDT * rate = amountIRR
+
+  // ۲. تلاش برای نرخ معکوس مستقیم (toCurrency → fromCurrency)
+  const inverseRate = await getExchangeRate(toCurrency, fromCurrency);
+  if (inverseRate) {
+    return amount.times(inverseRate.rate);
   }
-  
-  // برای تبدیل‌های پیچیده‌تر (مثلاً BTC → IRR):
-  // 1. BTC → USDT (با نرخ BTC-to-USDT)
-  // 2. USDT → IRR (با rate از جدول)
-  // یا یک تابع multiStepConvert
+
+  // ۳. تبدیل چندمرحله‌ای از طریق USDT به‌عنوان ارز واسط
+  //    مثال: BTC → USDT → IRR
+  if (fromCurrency !== 'USDT' && toCurrency !== 'USDT') {
+    const toUSDT = await convert(amount, fromCurrency, 'USDT');
+    return convert(toUSDT, 'USDT', toCurrency);
+  }
+
+  throw new Error(
+    `مسیر تبدیل بین ${fromCurrency} و ${toCurrency} یافت نشد — نرخ دستی وارد کنید`
+  );
 }
 ```
+
+> **نکته پیاده‌سازی**: در سطح تراکنش (مثلاً `inv_crypto_transactions`)، فیلد `exchangeRateToBase` همیشه **نتیجه نهایی** همین الگوریتم است که در لحظه ثبت تراکنش محاسبه و به‌صورت Snapshot ذخیره می‌شود، نه یک نرخ مستقیم فرضی.
 
 ---
 

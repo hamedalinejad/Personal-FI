@@ -44,7 +44,7 @@ id → UUID (Primary Key)
 date → datetime (تاریخ هزینه)
 amount → decimal (مبلغ هزینه — به ارز حساب)
 currency → string (ارز هزینه = ارز حساب مبدأ)
-exchangeRateToUSDT → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+exchangeRateToBase → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
 accountId → UUID (حساب مبدأ)
 description → string (توضیحات)
 category → string (دسته‌بندی: خوراک، حمل‌ونقل، مسکن، سرگرمی و ...)
@@ -95,7 +95,8 @@ APIهای داخلی (Internal APIs)
 Expense Transaction APIs:
 
 createExpense(data) → ثبت هزینه + گرفتن نرخ تبدیل + ایجاد تراکنش + کاهش مانده حساب
-updateExpense(id, data) → ویرایش هزینه + به‌روزرسانی تراکنش و مانده حساب
+correctExpense(id, data) → اصلاح هزینه؛ به‌صورت داخلی یک تراکنش Reversal برای رکورد قبلی + یک تراکنش جدید با داده‌های اصلاح‌شده می‌سازد (مطابق اصل Immutable Transactions — بخش ۱۱ Project-Blueprint). مبلغ/تاریخ/حساب هرگز مستقیم تغییر داده نمی‌شوند.
+updateExpenseMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllExpenses(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getExpenseById(id)
 getTotalExpense(startDate, endDate, accountId?, targetCurrency?) → مجموع هزینه با نرخ تاریخی

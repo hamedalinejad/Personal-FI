@@ -42,7 +42,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
@@ -93,7 +93,8 @@ APIهای داخلی (Internal APIs)
 Income Transaction APIs:
 
 createIncome(data) → ثبت درآمد + گرفتن نرخ تبدیل + ایجاد تراکنش + به‌روزرسانی مانده حساب
-updateIncome(id, data) → ویرایش درآمد + به‌روزرسانی تراکنش و مانده حساب
+correctIncome(id, data) → اصلاح درآمد؛ به‌صورت داخلی یک تراکنش Reversal برای رکورد قبلی + یک تراکنش جدید با داده‌های اصلاح‌شده می‌سازد (مطابق اصل Immutable Transactions — بخش ۱۱ Project-Blueprint). مبلغ/تاریخ/حساب هرگز مستقیم تغییر داده نمی‌شوند.
+updateIncomeMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllIncomes(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getIncomeById(id)
 getTotalIncome(startDate, endDate, accountId?, targetCurrency?) → مجموع درآمد با نرخ تاریخی

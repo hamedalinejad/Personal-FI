@@ -37,7 +37,7 @@ type → string (با پیشوند: deposit-income, withdrawal-expense, transfer
 amount → decimal (مبلغ)
 feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
 feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
-exchangeRateToUSDT → decimal (nullable — نرخ تتر لحظه تراکنش)
+exchangeRateToBase → decimal (nullable — نرخ تتر لحظه تراکنش)
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)

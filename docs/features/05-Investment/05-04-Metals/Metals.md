@@ -25,7 +25,7 @@ Must Have:
 - محاسبه سود و زیان (realized و unrealized)
 - مشاهده ارزش کل پرتفوی فلزات
 - ذخیره نرخ تتر لحظه هر معامله
-- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT`)
+- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase`)
 
 Should Have:
 
@@ -61,7 +61,7 @@ Business Rules
   - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `inv_metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
   - وضعیت درخواست پیگیری می‌شود (requested, processing, delivered, cancelled).
   - `feeAmount` فقط کارمزد معامله (خرید/فروش) است، نه هزینه تحویل.
-- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
+- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - موجودی حساب بانکی و موجودی نقدی پلتفرم نمی‌توانند منفی شوند.
 - **ویرایش/حذف معاملات**: تراکنش‌های فلزات پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
   - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
@@ -116,7 +116,7 @@ createdAt / updatedAt
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
 - `description` → string
 - `date` → datetime
@@ -135,7 +135,7 @@ type → string (deposit, withdraw)
 amount → decimal (ریال)
 feeAmount → decimal
 feeCurrency → string
-exchangeRateToUSDT → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+exchangeRateToBase → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 accountId → UUID
 accountTransactionId → UUID (لینک به `acc_transactions`)
 description → string
@@ -195,7 +195,7 @@ Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می
 
 - واحد پایه همیشه میلی‌گرم است تا دقت بالا حفظ شود (۱ گرم = ۱۰۰۰ میلی‌گرم).
 - میانگین خرید با Weighted Average محاسبه می‌شود.
-- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ثبت می‌شوند.
+- کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - تحویل فیزیکی با یک تراکنش `type=physical_delivery` در `metals_transactions` ثبت می‌شود تا تاریخچه کامل موجودی در یک جدول باشد.
 - `metals_physical_deliveries` فقط جزئیات لجستیک (آدرس، فاکتور، وضعیت) را نگهداری می‌شود و به تراکنش لینک می‌شود.
 - `deliveryFee` همیشه از موجودی نقدی پلتفرم کسر می‌شود.

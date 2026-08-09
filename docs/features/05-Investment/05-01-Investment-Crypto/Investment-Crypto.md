@@ -55,7 +55,7 @@
      - موجودی افزایش شده در مقصد: `amountToSend - feeAmount`
    - موجودی کل رمزارز کاربر تغییر نمی‌کند (فقط جابه‌جایی بین پلتفرم‌ها).
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
-8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` در لحظه ثبت می‌شوند.
+8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
 11. **ویرایش/حذف معاملات**: تراکنش‌های رمزارز پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
@@ -113,7 +113,8 @@
 - `totalAmount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
+- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (برای انتقال — nullable)
 - `description` → string
@@ -129,7 +130,8 @@
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
+- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
@@ -151,11 +153,16 @@
 
 ## منطق کارمزد
 
-- هر کارمزد با `feeAmount` + `feeCurrency` + `exchangeRateToUSDT` ذخیره می‌شود.
-- ارزش معادل کارمزد همیشه on-the-fly محاسبه می‌شود:
-  - `convertedToUSDT = feeAmount / exchangeRateToUSDT` (اگر feeCurrency=IRR)
-  - `convertedToIRR = feeAmount * exchangeRateToUSDT` (اگر feeCurrency=USDT)
-  - `convertedToIRR = feeAmount / exchangeRateToUSDT` (اگر feeCurrency=BTC/ETH و ...)
+- هر کارمزد با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ذخیره می‌شود؛ اگر `feeCurrency` رمزارزی غیر از USDT باشد (مثلاً BTC، ETH)، فیلد `feeAssetPriceToUSDT` نیز الزامی است.
+- ارزش معادل کارمزد به شرح زیر محاسبه می‌شود (همیشه با `decimal.js`، هرگز `Number`):
+  - اگر `feeCurrency = IRR`: `convertedToUSDT = feeAmount / exchangeRateToBase`
+  - اگر `feeCurrency = USDT`: `convertedToIRR = feeAmount * exchangeRateToBase`
+  - اگر `feeCurrency` رمزارز دیگری باشد (BTC/ETH و ...):
+    ```
+    convertedToUSDT = feeAmount * feeAssetPriceToUSDT
+    convertedToIRR  = convertedToUSDT * exchangeRateToBase
+    ```
+    (تقسیم مستقیم `feeAmount` بر `exchangeRateToBase` در این حالت **غلط** است، چون `exchangeRateToBase` فقط نرخ ریال-به-تتر است و ربطی به قیمت BTC/ETH ندارد.)
 - مجموع کارمزدها در Holding به صورت تجمعی (یک ارز ثابت) نگهداری می‌شود.
 - در انتقال بین صرافی‌ها، اگر کارمزد از خود ارز کسر شود، تفاوت بین `amountToSend` و `amountReceived = amountToSend - feeAmount` دقیقاً مقدار کارمزد است.
 

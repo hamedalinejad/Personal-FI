@@ -67,7 +67,7 @@
 - `color` → string (اختیاری)
 - `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
 - `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه ایجاد — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه ایجاد — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -83,7 +83,7 @@
 - `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 
 ---

@@ -92,7 +92,7 @@
 > - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است، پس `accountId` همیشه همان حساب خرید آن asset است.
 > - برای دسته‌های `gold` و `coin` (قابل‌تفکیک): چند خرید روی همان asset انجام می‌شود. `accountId` در `pa_assets` **ثابت می‌ماند** و نشان‌دهنده حساب اولین خرید است. خریدهای بعدی `accountId` خود را در `pa_transactions.accountId` ذخیره می‌کنند.
 > - برای دریافت همه حساب‌های مرتبط با یک asset: از `pa_transactions` با `assetId` استفاده کنید.
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه خرید — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -109,7 +109,7 @@
 - `id` → UUID
 - `assetId` → UUID
 - `value` → decimal (ارزش ثبت‌شده — ریال)
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `note` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -122,7 +122,7 @@
 - `amount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
