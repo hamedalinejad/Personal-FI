@@ -33,6 +33,7 @@
 **4. Bullet:**
 - اصل کل در پایان، سود ماهانه
 - نیاز: `calculationMethod = 'bullet'` و `calculatedInstallment` برای سود ماهانه
+- هر قسط تا ماه آخر: اصل = ۰، سود = `remainingBalance × r` (فرمول کامل در بخش «فرمول‌های محاسباتی»)؛ ماه آخر: کل اصل باقیمانده یک‌جا
 
 **برنامه اقساط:**
 - `getUpcomingPayments()` باید `calculationMethod` را چک کند
@@ -103,6 +104,7 @@
 - `gracePeriodMonths` → integer (nullable — ماه‌های تنفس) ✅ **جدید**
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
+- `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
 
 **کارمزدها و جریمه:**
 - `originationFeeAmount` → decimal (nullable — کارمزد صدور)
@@ -167,6 +169,20 @@
 
 - هنگام ایجاد وام و هر پرداخت، یک رکورد با نوع مناسب (`deposit-loan` یا `withdrawal-loan`) در این جدول ثبت می‌شود و موجودی حساب به‌روزرسانی می‌گردد.
 
+### ۴. Loan Rate History (جدول: `ln_rate_history`)
+
+فقط برای وام‌های با `interestType = 'variable'` استفاده می‌شود؛ تاریخچه تغییرات نرخ سود میان‌دوره را نگه می‌دارد تا `interestPortion` هر قسط با نرخ صحیح همان بازه محاسبه شود.
+
+- `id` → UUID (Primary Key)
+- `loanId` → UUID
+- `rate` → decimal (نرخ سود جدید — درصد کامل، مثل `interestRate`)
+- `effectiveDate` → datetime (تاریخی که نرخ جدید از آن به بعد اعمال می‌شود)
+- `note` → string (nullable — دلیل تغییر نرخ)
+- `createdAt` → datetime
+
+> **نکته الزامی**: برای وام‌های `variable`، فیلد `interestRate` در `ln_loans` فقط **نرخ اولیه** (در `disbursementDate`) را نشان می‌دهد. برای محاسبه سود هر قسط، سیستم باید آخرین رکورد `ln_rate_history` که `effectiveDate` آن ≤ تاریخ همان قسط است را پیدا کند و `r` را از روی آن نرخ محاسبه کند (نه از `ln_loans.interestRate`). برای وام‌های `fixed` یا `none`، این جدول اصلاً استفاده نمی‌شود و `interestRate` ثابت `ln_loans` معتبر است.
+> تغییر نرخ **بازمحاسبه خودکار قسط‌های آینده** را طبق همان منطق «بازمحاسبه پس از پیش‌پرداخت جزئی» (بخش ه) با `remainingInstallments` و `remainingBalance` فعلی و `r` جدید ایجاد می‌کند؛ قسط‌های قبلاً پرداخت‌شده دست‌نخورده می‌مانند.
+
 ---
 
 ## APIهای داخلی
@@ -182,13 +198,15 @@
 - `getLoanById(id)`
 - `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
 - `cancelLoan(id)`
+- `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه `calculatedInstallment` برای اقساط آینده (طبق منطق بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» با نرخ جدید به‌جای پیش‌پرداخت)
 
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
   → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
   → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToBase`)  
   → ثبت در `acc_transactions`  
-  → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
+  → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب  
+  → برای `type = 'early_payment'` با پیش‌پرداخت جزئی روی وام `declining_balance`: طبق `recalculateOnEarlyPayment` یا `calculatedInstallment`/`totalInstallments` به‌روزرسانی می‌شود (بازمحاسبه) یا فقط تعداد اقساط باقیمانده کم می‌شود (بدون بازمحاسبه) — فرمول کامل در بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی»
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
 - `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `calculationMethod` و `installmentFrequency`)
   - **خروجی**: آرایه‌ای از اقساط آینده:
@@ -290,7 +308,54 @@ interestPortion = 0
 - installment = 100000000 / 12 ≈ 8,333,333
 - نت وام دریافتی = 100000000 - 4000000 = 96,000,000
 
-### د) جریمه دیرکرد
+### د) Bullet (اصل یک‌جا در پایان)
+
+**محاسبه:**
+```
+r = interestRate / 100 / 12                    // نرخ ماهانه
+// برای ماه‌های ۱ تا (n-1):
+interestPortion = remainingBalance × r         // remainingBalance ثابت = principalAmount تا ماه آخر
+principalPortion = 0
+// برای ماه آخر (شماره n):
+interestPortion = remainingBalance × r
+principalPortion = remainingBalance            // کل اصل باقیمانده یک‌جا پرداخت می‌شود
+```
+
+> چون `principalPortion` تا ماه آخر صفر است، `remainingBalance` (طبق قاعده «فقط با principalPortion کم می‌شود») تا همان لحظه ثابت می‌ماند و سود هر ماه هم ثابت است.
+
+**مثال:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ ماه، ۱۸٪ سالانه
+- r = 18 / 100 / 12 = 0.015
+- ماه ۱ تا ۱۱: interestPortion = 100000000 × 0.015 = 1,500,000، principalPortion = 0
+- ماه ۱۲ (آخر): interestPortion = 1,500,000، principalPortion = 100,000,000 (کل اصل)
+
+### ه) بازمحاسبه اقساط پس از پیش‌پرداخت جزئی (Re-amortization)
+
+فقط برای `calculationMethod = 'declining_balance'` معنا دارد (در Flat Rate و Qarz Al-Hasaneh اصل و سود هر قسط از ابتدا ثابت تعریف شده‌اند، پس پیش‌پرداخت جزئی صرفاً `remainingBalance` را کم می‌کند بدون نیاز به بازمحاسبه فرمول).
+
+هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود:
+
+**حالت ۱ — `recalculateOnEarlyPayment = false` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
+```
+remainingBalance -= earlyPaymentPrincipalAmount
+// calculatedInstallment و r بدون تغییر باقی می‌مانند
+// تعداد اقساط باقیمانده جدید با حل معادله زیر برای n به‌دست می‌آید:
+newRemainingInstallments = ceil( -ln(1 - (remainingBalance × r) / calculatedInstallment) / ln(1 + r) )
+// totalInstallments وام به‌روزرسانی می‌شود: totalInstallments = installmentsPaidSoFar + newRemainingInstallments
+```
+
+**حالت ۲ — `recalculateOnEarlyPayment = true` (تعداد اقساط باقیمانده ثابت می‌ماند، مبلغ قسط کم می‌شود):**
+```
+remainingBalance -= earlyPaymentPrincipalAmount
+remainingInstallments = totalInstallments - installmentsPaidSoFar   // بدون تغییر
+calculatedInstallment = remainingBalance × [r(1+r)^remainingInstallments] / [(1+r)^remainingInstallments - 1]
+// از این پس تمام اقساط بعدی با calculatedInstallment جدید محاسبه می‌شوند
+```
+
+> **نکته مهم**: در هر دو حالت، `remainingBalance` بلافاصله با مبلغ اصل پیش‌پرداخت (`earlyPaymentPrincipalAmount`، که ممکن است شامل کارمزد پیش‌پرداخت `earlyPaymentFeeAmount` جداگانه هم باشد و آن کارمزد **در `remainingBalance` تأثیری ندارد** — طبق قاعده ۵a در Business Rules) کاهش می‌یابد؛ تفاوت فقط در نحوه محاسبه اقساط آینده است.
+> پیش‌پرداخت **کامل** (`earlyPaymentPrincipalAmount = remainingBalance`) وام را می‌بندد (`status = 'completed'`) و نیازی به این تصمیم ندارد.
+
+### و) جریمه دیرکرد
 
 **محاسبه:**
 ```
@@ -304,7 +369,7 @@ penaltyPortion = overdueAmount × (penaltyRate / 100) × (penaltyDays / 365)
 - روزهای تأخیر: ۳۰ روز
 - penalty = 10000000 × (6/100) × (30/365) ≈ 49,315 ریال
 
-### ه) دوره تنفس (Grace Period)
+### ز) دوره تنفس (Grace Period)
 
 اگر `gracePeriodMonths > 0`:
 - اولین `gracePeriodMonths` ماه: فقط سود
