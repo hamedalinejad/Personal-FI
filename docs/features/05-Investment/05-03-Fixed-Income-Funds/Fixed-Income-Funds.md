@@ -163,8 +163,7 @@ Domain Entities
 APIهای داخلی
 
 createFund(data) / updateFund(id, data) / getAllFunds()
-createTransaction(data) → خرید، فروش، تقسیم سود، سرمایه‌گذاری مجدد
-createPlatformCashTransaction(data) → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک بانکی
+createTransaction(data) → خرید، فروش، واریز/برداشت مستقیم حساب بانکی (issuance_redemption)، تقسیم سود، سرمایه‌گذاری مجدد — همگی روی `inv_fif_transactions` ثبت می‌شوند؛ برای واریز/برداشت ETF از طریق کارگزاری، به APIهای `Investment-Stocks-Iran` (`createBrokerageTransaction`) مراجعه شود.
 updateNAV(fundId, nav, date) → ثبت NAV جدید
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری

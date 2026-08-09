@@ -54,6 +54,7 @@
    - موجودی سهم کاهش می‌یابد.
    - مبلغ حاصل به موجودی نقدی کارگزاری اضافه می‌شود.
 7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
+7a. **سود نقدی (Dividend)**: با `type = 'dividend'` در `inv_stocks_iran_transactions` ثبت می‌شود؛ مبلغ به `cashBalance` کارگزاری اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود (تراکنش سهام محسوب نمی‌شود و در `calculateProfitLoss()` لحاظ نمی‌شود).
 8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
 9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
 10. **ویرایش/حذف معاملات**: تراکنش‌های سهام پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
@@ -107,16 +108,18 @@
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
 - `symbol` → string
-- `type` → string (`buy`, `sell`)
-- `quantity` → decimal
-- `price` → decimal (قیمت هر سهم — ریال)
-- `totalAmount` → decimal
+- `type` → string (`buy`, `sell`, `dividend`)
+- `quantity` → decimal (nullable برای `dividend`)
+- `price` → decimal (قیمت هر سهم — ریال — nullable برای `dividend`)
+- `totalAmount` → decimal (برای `dividend`: مبلغ کل سود نقدی دریافتی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal (نرخ تتر لحظه معامله — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
+
+> **نکته `dividend`**: سود نقدی سهام به‌صورت `type = 'dividend'` در همین جدول ثبت می‌شود (مشابه الگوی `inv_fif_transactions` در Fixed Income Funds)؛ `quantity` و `price` در این نوع `null` هستند و فقط `totalAmount` (مبلغ سود دریافتی) پر می‌شود. مبلغ به `cashBalance` کارگزاری در `inv_stocks_iran_brokerages` اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود؛ در `calculateProfitLoss()` لحاظ نمی‌شود (سود تقسیمی جزئی از Realized P&L معاملات خرید/فروش نیست).
 
 ### ۴. Brokerage Cash Transaction (جدول: `inv_stocks_iran_brokerage_transactions`) — لاگ واریز و برداشت
 
