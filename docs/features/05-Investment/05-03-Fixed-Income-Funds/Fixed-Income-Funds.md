@@ -68,7 +68,7 @@ Business Rules
 > - در `inv_fif_holdings`, `brokerageId` لینک به کارگزاری است
 > - در `inv_fif_transactions`, `brokerageId` برای واریز/برداشت ETF پر می‌شود
 > - در صورت واریز/برداشت مستقیم از حساب بانکی، `accountId` پر می‌شود
-> 
+>
 > **نکته مهم - جریان پول صندوق‌های issuance_redemption**:
 > - برای صندوق‌های issuance_redemption (صدور و ابطالی)، تمام معاملات از طریق حساب بانکی کاربر انجام می‌شود
 > - در `inv_fif_holdings`, `brokerageId` nullable است (چون این صندوق‌ها از طریق کارگزاری نیستند)
@@ -76,6 +76,15 @@ Business Rules
 > - در خرید issuance_redemption: `accountId` پر می‌شود و `brokerageId` nullable است
 > - در فروش issuance_redemption: مبلغ به `accountId` واریز می‌شود و `accountId` پر می‌شود
 > - تراکنش‌ها در `acc_transactions` با `type = 'deposit-investment'` یا `type = 'withdrawal-investment'` ثبت می‌شوند
+
+> **نکته مهم — لینک به `acc_transactions`**:
+>
+> | نوع صندوق | relatedFeature در acc_transactions | relatedId |
+> |-----------|-----------------------------------|-----------|
+> | **issuance_redemption** | `'fif'` | `inv_fif_transactions.id` |
+> | **ETF** | `'stocks_iran'` | `inv_stocks_iran_brokerage_transactions.id` |
+>
+> دلیل: ETFها از طریق کارگزاری خرید/فروش می‌شوند، پس جریان پول دقیقاً مانند سهام ایران است و از `inv_stocks_iran_brokerage_transactions` عبور می‌کند. صندوق‌های issuance_redemption مستقیماً از حساب بانکی هستند و `relatedFeature = 'fif'` می‌گیرند.
 
 
 Domain Entities
@@ -114,9 +123,9 @@ Domain Entities
 
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
-> **نکته مهم - آپدیت cashBalance**:  
-> - در خرید ETF: `cashBalance -= (amount + fees)` در `inv_stocks_iran_brokerages`  
-> - در فروش ETF: `cashBalance += (amount - fees)` در `inv_stocks_iran_brokerages`  
+> **نکته مهم - آپدیت cashBalance**:
+> - در خرید ETF: `cashBalance -= (amount + fees)` در `inv_stocks_iran_brokerages`
+> - در فروش ETF: `cashBalance += (amount - fees)` در `inv_stocks_iran_brokerages`
 > - این قانون مانند `inv_stocks_iran_brokerages` در فیچر Stocks Iran است
 
 ۳. Fixed Income Transaction (جدول: `inv_fif_transactions`) — لاگ رویدادها
@@ -130,32 +139,22 @@ Domain Entities
 - `amount` → decimal (مبلغ ریالی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToUSDT` → decimal
 - `predictedProfit` → decimal (nullable — فقط در nav_update و dividend)
 - `actualProfit` → decimal (nullable — فقط در nav_update و dividend)
-- `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی)
+- `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی — issuance_redemption)
 - `accountTransactionId` → UUID (لینک به acc_transactions)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-> **نکته**: برای ETFها، واریز/برداشت از طریق کارگزاری انجام می‌شود:
-> - هم `inv_fif_transactions` با `brokerageId` پر می‌شود
-> - هم `acc_transactions` با `relatedFeature = 'fixed_income_fund'` و `relatedId = inv_fif_transactions.id` ثبت می‌شود
-> - `accountTransactionId` در `inv_fif_transactions` به `acc_transactions.id` لینک می‌شود
-> 
-> برای صندوق‌های issuance_redemption:
-> - واریز/برداشت مستقیماً از حساب بانکی انجام می‌شود
-> - `accountId` پر می‌شود و `accountTransactionId` به `acc_transactions.id` لینک می‌شود
-> - `brokerageId` nullable است
+> **نکته لینک `accountTransactionId`**:
+> - برای ETFها: `accountTransactionId` لینک به رکوردی در `inv_stocks_iran_brokerage_transactions` **نیست** — بلکه لینک به `acc_transactions` است که خودش `relatedFeature = 'stocks_iran'` دارد.
+> - برای issuance_redemption: `accountTransactionId` لینک به `acc_transactions` با `relatedFeature = 'fif'` است.
 
 ۴. acc_transactions
 
-در واریز و برداشت از حساب بانکی به کارگزاری (برای ETFها) یا مستقیماً از حساب بانکی (برای issuance_redemption) استفاده می‌شود.  
-برای ETFها:
-- واریز به کارگزاری → هم `acc_transactions` (از حساب بانکی) و هم `inv_stocks_iran_brokerage_transactions` (به کارگزاری) ثبت می‌شود
-- برداشت از کارگزاری → هم `acc_transactions` (به حساب بانکی) و هم `inv_stocks_iran_brokerage_transactions` (از کارگزاری) ثبت می‌شود
-- در هر دو حالت، `accountTransactionId` در `inv_fif_transactions` به `acc_transactions.id` لینک می‌شود
+در واریز/برداشت و دریافت سود نقدی (در صورت واریز به حساب بانکی) استفاده می‌شود.
 
 
 APIهای داخلی
