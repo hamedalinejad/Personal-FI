@@ -86,7 +86,12 @@
 - `description` → string
 - `hasAttachment` → boolean
 - `attachmentPath` → string
-- `accountId` → UUID (حساب بانکی مرتبط با خرید — nullable)
+- `accountId` → UUID (حساب بانکی مرتبط با اولین خرید — nullable)
+
+> **نکته طراحی — `accountId` برای خریدهای بعدی**:
+> - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است، پس `accountId` همیشه همان حساب خرید آن asset است.
+> - برای دسته‌های `gold` و `coin` (قابل‌تفکیک): چند خرید روی همان asset انجام می‌شود. `accountId` در `pa_assets` **ثابت می‌ماند** و نشان‌دهنده حساب اولین خرید است. خریدهای بعدی `accountId` خود را در `pa_transactions.accountId` ذخیره می‌کنند.
+> - برای دریافت همه حساب‌های مرتبط با یک asset: از `pa_transactions` با `assetId` استفاده کنید.
 - `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
