@@ -170,6 +170,7 @@ updateNAV(fundId, nav, date) → ثبت NAV جدید
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری
 getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (بر اساس تراکنش‌ها)
+calculateProfitLoss(fundId?) → سود/زیان تحقق‌یافته از فروش/ابطال واحد (جدا از سود تقسیمی — به بخش «منطق محاسبه سود/زیان تحقق‌یافته» مراجعه شود)
 
 
 روابط با سایر فیچرها
@@ -177,6 +178,32 @@ getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌
 Accounts & Banking: واریز، برداشت و دریافت سود نقدی
 Currency & Multi-Currency: نرخ تتر لحظه‌ای
 Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
+
+
+## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+
+فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده):
+
+**هنگام خرید/صدور واحد یا سرمایه‌گذاری مجدد سود** (Weighted Average):
+```
+newTotalInvested = totalInvested + (unitsBought × price) + feeAmount
+newUnits          = units + unitsBought
+newAverageBuyPrice = newTotalInvested / newUnits
+```
+
+**هنگام فروش/ابطال واحد** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
+```
+soldPortionCost = unitsSold × averageBuyPrice
+realizedPL       = saleProceeds - soldPortionCost - feeAmount
+totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
+units            -= unitsSold
+averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند، نه با فروش/ابطال
+```
+
+> **نکات الزامی**:
+> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
+> - سود تقسیمی نقدی (`dividend`) بخشی از `realizedPL` نیست؛ به‌عنوان درآمد جداگانه ثبت می‌شود (طبق Business Rules).
+> - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentNAV - averageBuyPrice) × units` محاسبه می‌شود.
 
 
 نکات طراحی

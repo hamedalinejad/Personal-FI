@@ -199,6 +199,36 @@
 
 ---
 
+---
+
+## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+
+فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش:
+
+**هنگام خرید** (Weighted Average):
+```
+newTotalInvested = totalInvested + (quantityBought × price) + feeAmount(به ارز پایه)
+newQuantity      = quantity + quantityBought
+newAverageBuyPrice = newTotalInvested / newQuantity
+```
+
+**هنگام فروش** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**، یعنی همان مقدار فعلی Holding پیش از هر تغییر):
+```
+soldPortionCost = quantitySold × averageBuyPrice
+realizedPL       = saleProceeds - soldPortionCost - feeAmount(به ارز پایه)
+totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
+quantity         -= quantitySold
+averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
+```
+
+> **نکات الزامی**:
+> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`)، مطابق «قانون Minor Unit Storage» در `db.md`.
+> - `feeAmount` باید طبق فرمول بخش «منطق کارمزد» (بالاتر در همین فایل) ابتدا به ارز پایه تبدیل و سپس در `realizedPL` کسر شود.
+> - `calculateProfitLoss(symbol?, exchangeId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_crypto_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(currentPrice - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+> - در `transfer_out`/`transfer_in` بین صرافی‌های خودی، هیچ `realizedPL`ای ایجاد نمی‌شود (فروش واقعی نیست)؛ فقط `quantity` بین دو Holding جابه‌جا می‌شود و `averageBuyPrice` مقصد باید Weighted Average بین موجودی قبلی مقصد (اگر بود) و مقدار انتقالی با همان `averageBuyPrice` مبدأ باشد.
+
+---
+
 ## نکات طراحی
 
 - میانگین خرید با فرمول Weighted Average به‌روزرسانی می‌شود.

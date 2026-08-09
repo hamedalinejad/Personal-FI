@@ -179,6 +179,34 @@
 
 ---
 
+---
+
+## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+
+فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش:
+
+**هنگام خرید** (Weighted Average):
+```
+newTotalInvested = totalInvested + (quantityBought × price) + feeAmount
+newQuantity      = quantity + quantityBought
+newAverageBuyPrice = newTotalInvested / newQuantity
+```
+
+**هنگام فروش** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
+```
+soldPortionCost = quantitySold × averageBuyPrice
+realizedPL       = saleProceeds - soldPortionCost - feeAmount
+totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
+quantity         -= quantitySold
+averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
+```
+
+> **نکات الزامی**:
+> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
+> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(currentPrice - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+
+---
+
 ## نکات طراحی
 
 - این زیر‌فیچر مخصوص **سهام بورس ایران** است.

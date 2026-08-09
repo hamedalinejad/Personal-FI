@@ -191,6 +191,32 @@ Reports / Dashboard / Portfolio: ارزش پرتفوی فلزات و سود/زی
 Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می‌توان به دارایی فیزیکی منتقل کرد
 
 
+منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+
+فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش (واحد پایه: میلی‌گرم):
+
+**هنگام خرید** (Weighted Average):
+```
+newTotalInvested = totalInvested + (quantityMgBought × pricePerMg) + feeAmount
+newQuantityMg     = quantityMg + quantityMgBought
+newAverageBuyPricePerMg = newTotalInvested / newQuantityMg
+```
+
+**هنگام فروش** (`averageBuyPricePerMg` استفاده‌شده = میانگین خرید **قبل از این فروش**):
+```
+soldPortionCost = quantityMgSold × averageBuyPricePerMg
+realizedPL       = saleProceeds - soldPortionCost - feeAmount
+totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
+quantityMg       -= quantityMgSold
+averageBuyPricePerMg  بدون تغییر می‌ماند  // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
+```
+
+> **نکات الزامی**:
+> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
+> - در `type=physical_delivery`، هیچ `realizedPL`ای محاسبه نمی‌شود (فروش واقعی نیست)؛ فقط `quantityMg` کاهش و به دارایی فیزیکی منتقل می‌شود؛ `deliveryFee` جداگانه از موجودی نقدی پلتفرم کسر می‌شود (نه از `soldPortionCost`).
+> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود.
+
+
 نکات طراحی
 
 - واحد پایه همیشه میلی‌گرم است تا دقت بالا حفظ شود (۱ گرم = ۱۰۰۰ میلی‌گرم).
