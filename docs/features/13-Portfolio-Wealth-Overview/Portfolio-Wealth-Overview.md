@@ -52,7 +52,7 @@
 > - موجودی نقدی ریال/تتر در صرافی‌ها و کارگزاری‌ها از طریق فیچرهای Investment مدیریت می‌شود  
 > - برای جلوگیری از تکرار در محاسبه ثروت:  
 >   - در Investment-Crypto: برای IRR/USDT، `totalInvested = 0` و `totalFeesPaid = 0` در `inv_crypto_holdings`  
->   - در Investment-Stocks-Iran: موجودی نقدی کارگزاری در `inv_stocks_iran_brokerage_transactions` ذخیره می‌شود  
+>   - در Investment-Stocks-Iran: موجودی نقدی کارگزاری به‌صورت Snapshot در `inv_stocks_iran_brokerages.cashBalance` نگهداری می‌شود (جدول `inv_stocks_iran_brokerage_transactions` فقط لاگ تراکنش‌های نقدی است، نه محل نگهداری موجودی)  
 >   - در Accounts & Banking: موجودی واقعی در `acc_accounts.currentBalance` ذخیره می‌شود  
 > - تابع `getPortfolioOverview()` با کنترل `includeCashInWealth` امکان انتخاب لحاظ نکردن این موجودی‌ها را فراهم می‌کند  
 > - اگر `includeCashInWealth = false` (پیش‌فرض)، فقط سرمایه‌گذاری‌ها (سهام، رمزارز و ...) در محاسبه ثروت لحاظ می‌شوند

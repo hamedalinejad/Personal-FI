@@ -50,8 +50,8 @@ export type TransactionType =
   | 'transfer-out'
   | 'deposit-loan'
   | 'withdrawal-loan'
-  | 'withdrawal-expense-tax'  // برای مالیات
-  | 'deposit-income-tax'      // برای بازگشت مالیات
+  | 'withdrawal-expense-tax'  // پرداخت مالیات (استفاده‌شده در Tax-Management)
+  | 'deposit-income-tax'      // بازگشت مالیات (استفاده‌شده در Tax-Management)
   | 'withdrawal-cheque'       // برای چک‌ها
   | 'deposit-cheque'
   | 'deposit-budget'          // تخصیص از بودجه

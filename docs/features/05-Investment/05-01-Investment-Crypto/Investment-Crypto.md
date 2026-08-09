@@ -100,7 +100,7 @@
 >   - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود)  
 >   - `totalFeesPaid = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
 > - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
-> - این موجودی همچنین در جدول `acc_accounts.currentBalance` نیز وجود دارد (حساب بانکی مرتبط)، اما از آنجایی که تراکنش در `acc_transactions` با `relatedFeature = 'crypto_exchange'` ثبت می‌شود، می‌توان از جدول `acc_accounts` به صورت اصلی استفاده کرد
+> - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
 ### ۳. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
