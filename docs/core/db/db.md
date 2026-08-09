@@ -159,8 +159,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `cur_currency_preferences` | Currency & Multi-Currency | تنظیمات ارز کاربر |
 | `cat_categories` | Common Categories | دسته‌بندی‌های مشترک |
 | `sec_settings` | Security & Privacy | تنظیمات امنیتی |
-| `sec_session_logs` | Security & Privacy | لاگ‌های نشست |
-| `sec_audits` | Security & Privacy | لاگ‌های ممیزی امنیتی |
+| `sec_session_logs` | Security & Privacy | لاگ‌های نشست (Should Have) |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 
