@@ -41,7 +41,7 @@ id → UUID (Primary Key)
 date → datetime (تاریخ هزینه)
 amount → decimal (مبلغ هزینه — به ارز حساب)
 currency → string (ارز هزینه = ارز حساب مبدأ)
-exchangeRateToUSDT → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+exchangeRateToUSDT → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
 accountId → UUID (حساب مبدأ)
 description → string (توضیحات)
 category → string (دسته‌بندی: خوراک، حمل‌ونقل، مسکن، سرگرمی و ...)
@@ -72,6 +72,20 @@ updatedAt → datetime
 ۳. Transaction (جدول مشترک acc_transactions)
 
 هنگام ثبت هزینه، یک تراکنش از نوع withdrawal-expense ایجاد می‌شود.
+
+> **تفاوت `exp_recurring` و `br_items` (Bills & Recurring)**:
+>
+> | ویژگی | `exp_recurring` | `br_items` |
+> |-------|----------------|------------|
+> | **هدف** | قالب برای تولید خودکار تراکنش هزینه | یادآوری و پیگیری وضعیت پرداخت |
+> | **جریان** | تراکنش مستقیماً در `exp_transactions` تولید می‌شود | `br_occurrences` ایجاد می‌شود، سپس کاربر تأیید می‌کند |
+> | **مناسب برای** | هزینه‌های کاملاً ثابت که نیاز به تأیید ندارند | قبوض با مبلغ متغیر (برق، گاز، آب) یا نیاز به تأیید کاربر |
+> | **لینک به `exp_transactions`** | از طریق `recurringId` | از طریق `br_occurrences.transactionId` |
+>
+> **قانون انتخاب**:
+> - اگر هزینه **مبلغ ثابت** دارد و باید **به صورت خودکار** هر دوره ثبت شود → `exp_recurring`
+> - اگر هزینه نیاز به **تأیید کاربر** دارد یا **مبلغ متغیر** است (مثل قبض برق) → `br_items` با `type=expense`
+> - **نباید** برای یک هزینه هم در `exp_recurring` و هم در `br_items` رکورد بسازید
 
 
 APIهای داخلی (Internal APIs)
