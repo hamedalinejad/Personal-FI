@@ -39,7 +39,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
@@ -70,6 +70,20 @@ updatedAt → datetime
 ۳. Transaction (جدول مشترک `acc_transactions`)
 
 هنگام ثبت درآمد، یک تراکنش از نوع deposit-income ایجاد می‌شود.
+
+> **تفاوت `inc_recurring` و `br_items` (Bills & Recurring)**:
+>
+> | ویژگی | `inc_recurring` | `br_items` |
+> |-------|----------------|------------|
+> | **هدف** | قالب برای تولید خودکار تراکنش درآمد | یادآوری و پیگیری وضعیت پرداخت/دریافت |
+> | **جریان** | تراکنش مستقیماً در `inc_transactions` تولید می‌شود | `br_occurrences` ایجاد می‌شود، سپس کاربر تأیید می‌کند |
+> | **مناسب برای** | درآمدهای کاملاً مکانیکی مثل حقوق یا اجاره دریافتی | قبوض و دریافتی‌هایی که مبلغ یا تاریخ ممکن است تغییر کند |
+> | **لینک به `inc_transactions`** | از طریق `recurringId` | از طریق `br_occurrences.transactionId` |
+>
+> **قانون انتخاب**:
+> - اگر درآمد **مبلغ ثابت** دارد و باید **به صورت خودکار** هر دوره ثبت شود → `inc_recurring`
+> - اگر درآمد نیاز به **تأیید کاربر** دارد یا **مبلغ متغیر** است → `br_items` با `type=income`
+> - **نباید** برای یک درآمد هم در `inc_recurring` و هم در `br_items` رکورد بسازید
 
 
 APIهای داخلی (Internal APIs)
