@@ -108,5 +108,3 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 برای چک‌های پرداختی، موجودی حساب در زمان صدور چک قفل یا رزرو نمی‌شود (مگر تصمیم دیگری گرفته شود).
 
 > **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
-
-۲. Transaction (جدول مشترک `acc_transactions`)

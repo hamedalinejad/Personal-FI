@@ -21,8 +21,8 @@
 **2. Flat Rate (سود ثابت):**
 - سود روی کل مبلغ اولیه محاسبه شود
 - کاربرد: وام‌های دوستانه، قرض‌الحسنه با کارمزد
-- نیاز: `fixedInstallmentAmount` ثابت، تمام قسط اصل است، سود به‌صورت جداگانه
-- هر قسط: اصل = `principalAmount / totalInstallments`، سود = `principalAmount × rate × years / totalInstallments`
+- نیاز: `fixedInstallmentAmount` ثابت برای تمام اقساط و شامل **هم اصل و هم سود** است (نه فقط اصل)؛ `fixedInstallmentAmount = (principalAmount + totalInterest) / totalInstallments` (فرمول کامل در بخش «فرمول‌های محاسباتی»)
+- هر قسط: اصل = `principalAmount / totalInstallments`، سود = `principalAmount × rate × years / totalInstallments` — این دو مقدار **در داخل** `fixedInstallmentAmount` جمع می‌شوند، نه جدا از آن
 
 **3. Qarz Al-Hasaneh (قرض‌الحسنه):**
 - سود = ۰، فقط کارمزد خدمات ۴٪
