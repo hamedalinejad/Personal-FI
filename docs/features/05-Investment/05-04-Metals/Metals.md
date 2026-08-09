@@ -101,8 +101,7 @@ purity → string (مثلاً ۱۸ عیار، ۹۹۹ و ...)
 quantityMg → decimal (موجودی به میلی‌گرم)
 averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
 totalInvested → decimal
-totalFeesPaid → decimal
-totalFeesPaidCurrency → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
+totalFeesPaidUSDT → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با exchangeRateToBase همان تراکنش)
 createdAt / updatedAt
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی

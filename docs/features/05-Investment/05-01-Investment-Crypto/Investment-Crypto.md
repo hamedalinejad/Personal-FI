@@ -46,9 +46,10 @@
    - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
    - هر دو تراکنش (`acc_transactions` و `inv_crypto_exchange_transactions`) ثبت و به هم لینک می‌شوند.
 6. **انتقال بین صرافی‌ها/والت‌ها**:
-   - حتماً دو تراکنش لینک‌شده ثبت می‌شود:
-     - یکی در صرافی مبدا با `type: transfer_out` و `counterExchangeId` به مقصد
-     - یکی در صرافی مقصد با `type: transfer_in` و `counterExchangeId` به مبدا
+   - حتماً دو تراکنش لینک‌شده ثبت می‌شود، با یک `transferId` مشترک (UUID تازه، ساخته‌شده در لحظه ثبت انتقال) که در هر دو رکورد ذخیره می‌شود:
+     - یکی در صرافی مبدا با `type: transfer_out`، `counterExchangeId` به مقصد و `transferId` مشترک
+     - یکی در صرافی مقصد با `type: transfer_in`، `counterExchangeId` به مبدا و همان `transferId`
+   - `transferId` (نه صرفاً `counterExchangeId`) مرجع قطعی برای پیدا کردن رکورد جفت است؛ این لازم است چون ممکن است چند انتقال هم‌زمان بین همان دو صرافی در یک روز ثبت شود.
    - کارمزد می‌تواند از مقدار ارز ارسالی کسر شود:
      - مقدار ارسالی: `amountToSend`
      - کارمزد: `feeAmount` (از `amountToSend` کسر می‌شود)
@@ -57,6 +58,7 @@
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
 8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
+9a. موجودی هیچ رمزارزی (`quantity` در `inv_crypto_holdings`) و موجودی داخلی IRR/USDT هر صرافی/ولت (همان جدول، `symbol=IRR` یا `symbol=USDT`) نمی‌تواند منفی شود.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
 11. **ویرایش/حذف معاملات**: تراکنش‌های رمزارز پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
     - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
@@ -88,8 +90,7 @@
 - `averageBuyPrice` → decimal
 - `currency` → string
 - `totalInvested` → decimal
-- `totalFeesPaid` → decimal (مجموع کارمزدهای پرداخت‌شده)
-- `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
+- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT طبق فرمول بخش «منطق کارمزد» — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR، USDT یا خود رمزارز پرداخت شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -98,7 +99,7 @@
 > - برای IRR و USDT:  
 >   - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است)  
 >   - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود)  
->   - `totalFeesPaid = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
+>   - `totalFeesPaidUSDT = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
 > - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
 > - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
@@ -116,7 +117,8 @@
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
 - `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
-- `counterExchangeId` → UUID (برای انتقال — nullable)
+- `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
+- `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime

@@ -119,8 +119,7 @@ Domain Entities
 - `units` → decimal (تعداد واحد فعلی)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید)
 - `totalInvested` → decimal
-- `totalFeesPaid` → decimal
-- `totalFeesPaidCurrency` → string (IRR یا USDT بر اساس ارز کارمزد اصلی)
+- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
 - `currentNAV` → decimal (آخرین NAV ثبت‌شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
