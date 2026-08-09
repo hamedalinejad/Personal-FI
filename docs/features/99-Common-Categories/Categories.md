@@ -58,7 +58,8 @@ CREATE TABLE cat_categories (
   name_en → string (نام انگلیسی)
   description → text
   isActive → boolean
-  createdAt → datetime
+  createdAt → datetime,
+  UNIQUE(type, code)  -- نه UNIQUE(code) به‌تنهایی؛ کد gift هم در income و هم در expense تکرار شده (رجوع به جدول بالا)
 );
 ```
 

@@ -96,7 +96,7 @@
 ### ۲. Category (جدول: `cat_categories`)
 
 - `id` → UUID
-- `code` → string (کد یکتا مثل `salary`, `food`, `rental`)
+- `code` → string (کد کوتاه مثل `salary`, `food`, `rental`؛ **یکتا نیست به‌تنهایی** — یکتایی روی زوج `(type, code)` است، چون همان `code` می‌تواند هم در دسته‌های `income` و هم `expense` به‌کار رود، مثلاً `gift` هم در دسته درآمد «هدیه و کمک» و هم در دسته هزینه «هدیه و اهداء» استفاده می‌شود)
 - `name_fa` → string (نام فارسی)
 - `name_en` → string (نام انگلیسی)
 - `description` → text (توضیحات اختیاری)
@@ -106,6 +106,8 @@
 - `order` → number (ترتیب نمایش)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **قید یکتایی (الزامی)**: `UNIQUE(type, code)` روی جدول تعریف شود، نه `UNIQUE(code)`. بدون این تصریح، تلاش برای درج دسته هزینه `gift` بعد از دسته درآمد `gift` (یا برعکس) با فرض غلط یکتایی سراسری `code` رد می‌شود؛ در حالی که طبق `Categories.md` این دو رکورد مجزا و هر دو معتبرند. ارجاعات به یک دسته (مثلاً در تراکنش‌های Income/Expense) باید همیشه با هر دو فیلد `type` + `code` انجام شود، نه فقط `code`.
 
 > **نکته طراحی**: این جدول دو نقش دارد:
 > ۱. نگهداری لیست استاندارد دسته‌ها (با `isSystem = true`) که در `99-Common-Categories/Categories.md` تعریف شده‌اند
