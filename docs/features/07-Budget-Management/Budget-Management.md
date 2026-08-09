@@ -38,6 +38,7 @@
 1. هر بودجه به یک بازه زمانی مشخص (ماه یا سال) تعلق دارد.
 2. روش اصلی: **Zero-Based** — مجموع تخصیص‌ها باید با درآمد قابل بودجه‌بندی برابر شود (یا کاربر آگاهانه اختلاف را بپذیرد).
 3. با ثبت هر **هزینه** (از هر منبعی: حساب بانکی، چک، وام)، مبلغ از پاکت مربوطه کسر می‌شود.
+3a. **وام و بودجه**: از نظر حسابداری، فقط بخش‌های واقعاً «هزینه» یک پرداخت وام مجاز به لینک‌شدن به `bg_envelopes` هستند — یعنی `interestPortion` (سود)، `penaltyPortion` (جریمه) و `feePortion` (کارمزد) از `ln_transactions`. **`principalPortion` (اصل وام) هرگز نباید به یک envelope لینک شود**، چون بازپرداخت اصل کاهش بدهی در ترازنامه است، نه هزینه؛ لینک‌کردن کل مبلغ (اصل+سود) به یک پاکت، گزارش بودجه واقعی را با کم‌نمایی نادرست ظرفیت مصرف مخدوش می‌کند. در `bg_transaction_links`، فیلد `amount` برای `relatedFeature = 'loan'` باید فقط برابر مجموع `interestPortion + penaltyPortion + feePortion` همان `ln_transactions` باشد، نه `amount` کامل تراکنش وام.
 4. اگر پاکت موجودی کافی نداشته باشد:
    - هشدار نمایش داده می‌شود.
    - اگر `strictMode = true`، ثبت هزینه محدود می‌شود (یا رد می‌شود).
@@ -106,7 +107,7 @@
 > **توضیح لینک `relatedId`**:
 > - `relatedFeature = 'expense'` → `relatedId` به `exp_transactions.id` لینک می‌شود
 > - `relatedFeature = 'cheque'` → `relatedId` به `chk_cheques.id` لینک می‌شود
-> - `relatedFeature = 'loan'` → `relatedId` به `ln_transactions.id` لینک می‌شود
+> - `relatedFeature = 'loan'` → `relatedId` به `ln_transactions.id` لینک می‌شود؛ `amount` این رکورد فقط بخش سود/جریمه/کارمزد (`interestPortion + penaltyPortion + feePortion`) است، **نه** `principalPortion` (طبق قاعده ۳a در Business Rules)
 > 
 > برای هر نوع تراکنش، `relatedId` شناسه رکورد در جدول مربوطه است.
 

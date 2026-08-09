@@ -53,20 +53,20 @@
    - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
    - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
    - موجودی حساب افزایش می‌یابد.
-4. هنگام ثبت وام **پرداختی (lent)**:
+6. هنگام ثبت وام **پرداختی (lent)**:
    - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
    - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
    - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
    - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
    - موجودی حساب کاهش می‌یابد.
-5. تمام پرداخت‌های بعدی (قسط، سود، جریمه، کارمزد پیش‌پرداخت، کارمزد صدور) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
-5a. کارمزدهای وام (صدور، پیش‌پرداخت، تأخیر) مستقل از سود ثبت می‌شوند و تنها موجودی حساب را تغییر می‌دهند، نه `remainingBalance`.
-6. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
-7. موجودی حساب نمی‌تواند منفی شود.
-8. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
-9. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
-10. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
-11. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToBase` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
+7. تمام پرداخت‌های بعدی (قسط، سود، جریمه، کارمزد پیش‌پرداخت، کارمزد صدور) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+8. کارمزدهای وام (صدور، پیش‌پرداخت، تأخیر) مستقل از سود ثبت می‌شوند و تنها موجودی حساب را تغییر می‌دهند، نه `remainingBalance`.
+9. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
+10. موجودی حساب نمی‌تواند منفی شود.
+11. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
+12. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
+13. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
+14. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToBase` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
 
 ---
 
@@ -124,7 +124,7 @@
 - `totalPaidInterest` → decimal (مجموع سود پرداخت‌شده) ✅ **جدید**
 
 **شرایط:**
-- `disbursementType` → enum (lump_sum | phased) ✅ **جدید**
+- `disbursementType` → enum (`lump_sum`) — **در نسخه ۱ فقط `lump_sum` پشتیبانی می‌شود.** مقدار `phased` (واریز چندمرحله‌ای) از enum حذف شد چون پیاده‌سازی متناظری (چند رکورد `disbursement` و چند `disbursementDate`) وجود ندارد؛ ساختار فعلی (`disbursementDate` و `accountTransactionId` واحد در `ln_loans`) فقط از یک واریز یک‌باره پشتیبانی می‌کند. افزودن `phased` به نسخه‌های بعدی موکول شد و نیازمند API جداگانه (مثلاً `disburseLoanPhase()`) و مدل داده چندواریزی خواهد بود.
 - `collateralNote` → string (nullable — وثیقه/ضامن) ✅ **جدید**
 
 **طرف مقابل:**
@@ -352,7 +352,7 @@ calculatedInstallment = remainingBalance × [r(1+r)^remainingInstallments] / [(1
 // از این پس تمام اقساط بعدی با calculatedInstallment جدید محاسبه می‌شوند
 ```
 
-> **نکته مهم**: در هر دو حالت، `remainingBalance` بلافاصله با مبلغ اصل پیش‌پرداخت (`earlyPaymentPrincipalAmount`، که ممکن است شامل کارمزد پیش‌پرداخت `earlyPaymentFeeAmount` جداگانه هم باشد و آن کارمزد **در `remainingBalance` تأثیری ندارد** — طبق قاعده ۵a در Business Rules) کاهش می‌یابد؛ تفاوت فقط در نحوه محاسبه اقساط آینده است.
+> **نکته مهم**: در هر دو حالت، `remainingBalance` بلافاصله با مبلغ اصل پیش‌پرداخت (`earlyPaymentPrincipalAmount`، که ممکن است شامل کارمزد پیش‌پرداخت `earlyPaymentFeeAmount` جداگانه هم باشد و آن کارمزد **در `remainingBalance` تأثیری ندارد** — طبق قاعده ۸ در Business Rules) کاهش می‌یابد؛ تفاوت فقط در نحوه محاسبه اقساط آینده است.
 > پیش‌پرداخت **کامل** (`earlyPaymentPrincipalAmount = remainingBalance`) وام را می‌بندد (`status = 'completed'`) و نیازی به این تصمیم ندارد.
 
 ### و) جریمه دیرکرد
