@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-این فیچر مرکز تنظیمات عمومی نرم‌افزار و ابزارهای کمکی است.  
+این فیچر مرکز تنظیمات عمومی نرم‌افزار و ابزارهای کمکی است.
 کاربر از این بخش می‌تواند رفتار کلی اپ، ظاهر، زبان، ارز پایه، پشتیبان‌گیری و برخی ابزارهای کاربردی را مدیریت کند.
 
 تنظیمات باید ساده، شفاف و بدون پیچیدگی غیرضروری باشد و با اصول **Offline-First** و **Privacy-First** پروژه هم‌خوانی داشته باشد.
@@ -48,7 +48,6 @@
 - تم (Light / Dark / System)
 - فرمت تاریخ
 - فرمت اعداد
-- ارز پایه نمایش گزارش‌ها
 
 ### ۲. دسته‌بندی‌ها (Categories)
 - مدیریت دسته‌های درآمد
@@ -82,11 +81,17 @@
 ### ۱. App Setting (جدول: `stg_settings`)
 
 - `id` → UUID یا کلید ثابت
-- `key` → string (مثلاً `language`, `theme`, `base_currency`)
+- `key` → string (مثلاً `language`, `theme`)
 - `value` → string / JSON
 - `updatedAt` → datetime
 
 > می‌توان به صورت Key-Value ساده پیاده‌سازی کرد.
+
+> **نکته مهم — ارز پایه**:
+> - تنظیم ارز پایه در `stg_settings` **وجود ندارد**.
+> - ارز پایه و ارز نمایشی در جدول `cur_currency_preferences` نگهداری می‌شوند (فیچر Currency & Multi-Currency).
+> - `stg_settings` فقط برای تنظیمات UI (زبان، تم، فرمت تاریخ، فرمت اعداد) استفاده می‌شود.
+> - برای خواندن ارز پایه: `getUserCurrencyPreference()` از فیچر Currency را فراخوانی کنید.
 
 ### ۲. Category (جدول: `cat_categories`)
 
@@ -102,9 +107,9 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی**: این جدول دو نقش دارد:  
-> ۱. نگهداری لیست استاندارد دسته‌ها (با `isSystem = true`) که در `99-Common-Categories/Categories.md` تعریف شده‌اند  
-> ۲. اجازه اضافه کردن دسته‌های شخصی توسط کاربر (با `isSystem = false`)  
+> **نکته طراحی**: این جدول دو نقش دارد:
+> ۱. نگهداری لیست استاندارد دسته‌ها (با `isSystem = true`) که در `99-Common-Categories/Categories.md` تعریف شده‌اند
+> ۲. اجازه اضافه کردن دسته‌های شخصی توسط کاربر (با `isSystem = false`)
 > فیچرهای Income و Expense می‌توانند از هر دو دسته استفاده کنند.
 
 ### ۳. Backup Log (جدول: `stg_backup_logs`) — اختیاری
@@ -152,7 +157,7 @@
 
 ## روابط با سایر فیچرها
 
-- **Currency**: ارز پایه و نمایش نرخ‌ها
+- **Currency**: ارز پایه و نمایش نرخ‌ها — `cur_currency_preferences` master است
 - **Notification**: تنظیمات یادآوری
 - **Accounts & Banking**: حساب‌های پیش‌فرض
 - **Income / Expense**: دسته‌بندی‌ها
@@ -167,11 +172,12 @@
 |------|----------------|
 | `language` | `fa` |
 | `theme` | `system` |
-| `base_currency` | `IRR` |
 | `date_format` | `jalali` |
 | `number_format` | `persian` |
 | `default_income_account` | null |
 | `default_expense_account` | null |
+
+> **توجه**: `base_currency` و `display_currency` در این جدول ذخیره نمی‌شوند — آن‌ها در `cur_currency_preferences` هستند.
 
 ---
 
