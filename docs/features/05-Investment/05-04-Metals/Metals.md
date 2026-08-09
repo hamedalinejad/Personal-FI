@@ -112,7 +112,7 @@ createdAt / updatedAt
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
 - `description` → string
 - `date` → datetime
@@ -131,7 +131,7 @@ type → string (deposit, withdraw)
 amount → decimal (ریال)
 feeAmount → decimal
 feeCurrency → string
-exchangeRateToUSDT → decimal
+exchangeRateToUSDT → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 accountId → UUID
 accountTransactionId → UUID (لینک به `acc_transactions`)
 description → string

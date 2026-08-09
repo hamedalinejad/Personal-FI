@@ -39,7 +39,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)

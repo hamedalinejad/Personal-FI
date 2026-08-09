@@ -87,7 +87,7 @@
 - `hasAttachment` → boolean
 - `attachmentPath` → string
 - `accountId` → UUID (حساب بانکی مرتبط با خرید — nullable)
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید)
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه خرید — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -104,7 +104,7 @@
 - `id` → UUID
 - `assetId` → UUID
 - `value` → decimal (ارزش ثبت‌شده — ریال)
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `note` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -117,7 +117,7 @@
 - `amount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string

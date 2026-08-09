@@ -43,7 +43,7 @@
 - `direction` → string (`borrowed` یا `lent`)
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت در ابتدا)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه ثبت در ابتدا — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (حساب مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions` برای تراکنش اولیه وام)
 - `interestType` → string (`none`, `fixed`, `variable`)
@@ -75,7 +75,7 @@
 - `principalPortion` → decimal (مبلغ مربوط به اصل بدهی — nullable برای وام‌های بدون سود)
 - `interestPortion` → decimal (مبلغ مربوط به سود — nullable برای وام‌های بدون سود)
 - `description` → string
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه پرداخت)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل لحظه پرداخت — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountTransactionId` → UUID (ارتباط با رکورد در `acc_transactions`)
 - `createdAt` → datetime
 
@@ -105,7 +105,7 @@
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
   → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
-  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSD`)  
+  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToUSDT`)  
   → ثبت در `acc_transactions`  
   → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام

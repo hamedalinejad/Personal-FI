@@ -70,7 +70,7 @@
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
 - `attachmentPath` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه پرداخت — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 

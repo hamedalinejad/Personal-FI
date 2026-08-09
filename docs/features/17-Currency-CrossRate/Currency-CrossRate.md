@@ -57,15 +57,15 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `exchangeRateToUSDT` → decimal (نرخ تبدیل به USDT: برای IRR → USDT، مقدار نشان‌دهنده «تتر به ازای ۱ ریال» است)
+- `exchangeRateToUSDT` → decimal (نرخ تبدیل به USDT: ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
-> **نکته توضیحی**: برای نرخ‌های پایه (IRR → USDT)، این فیلد نشان‌دهنده «تتر به ازای ۱ ریال» است (معکوس اصطلاحات رایج بانکی).  
-> برای محاسبه: `amountUSDT = amountIRR * exchangeRateToUSDT` (یا `amountIRR = amountUSDT / exchangeRateToUSDT`).  
-> **یکسان‌سازی**: این فیلد با `exchangeRateToUSDT` در سایر جداول (Income, Expense, Cheque, Metals, Stocks) هم‌معنی است و همین نام استفاده شود.
+> **نکته توضیحی**: برای نرخ‌های پایه (IRR → USDT)، این فیلد نشان‌دهنده «ریال به ازای ۱ تتر» است (مثال: ۶۰,۰۰۰).  
+> برای محاسبه: `amountUSDT = amountIRR / exchangeRateToUSDT` (یا `amountIRR = amountUSDT * exchangeRateToUSDT`).  
+> **یکسان‌سازی**: این تعریف برای تمام فیچرها (Income, Expense, Cheque, Loan, Stocks, Funds, Metals, Crypto, Physical Assets, Tax, Goals, Budget) یکسان است و فیلد `exchangeRateToUSDT` همیشه به معنی **ریال به ازای ۱ تتر** است. این تصمیم یکسان‌سازی، جلوی ابهام و خطاهای توسعه را می‌گیرد.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
 
@@ -123,14 +123,15 @@
 
 ```typescript
 // pseudo-code
+// rate = exchangeRateToUSDT = ریال به ازای ۱ تتر (مثال: 60,000)
 function convert(amount: number, fromCurrency: string, toCurrency: string, rate: number): number {
   if (fromCurrency === toCurrency) return amount;
   
   if (fromCurrency === 'IRR' && toCurrency === 'USDT') {
-    return amount * rate; // amountIRR * rate = amountUSDT (rate = USDT per IRR)
+    return amount / rate; // amountIRR / rate = amountUSDT (rate = IRR per USDT)
   }
   if (fromCurrency === 'USDT' && toCurrency === 'IRR') {
-    return amount / rate; // amountUSDT / rate = amountIRR
+    return amount * rate; // amountUSDT * rate = amountIRR
   }
   
   // برای تبدیل‌های پیچیده‌تر (مثلاً BTC → IRR):

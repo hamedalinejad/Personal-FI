@@ -152,7 +152,7 @@ export interface AccTransaction {
   amount: number;
   feeAmount?: number;
   feeCurrency?: string;
-  exchangeRateToUSDT?: number;
+  exchangeRateToUSDT?: number; // ریال به ازای ۱ تتر (مثال: 60,000) - برای همه‌ی جداول یکسان است
   balanceAfterTransaction: number;
   accountId: string;
   isVoided: boolean;

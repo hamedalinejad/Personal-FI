@@ -110,7 +110,7 @@
 - `totalAmount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه معامله)
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه معامله — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -123,7 +123,7 @@
 - `amount` → decimal (ریال)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string

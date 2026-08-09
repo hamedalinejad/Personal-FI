@@ -191,7 +191,7 @@
 - هزینه می‌تواند از هر منبعی باشد (حساب بانکی، چک، وام) و همگی از پاکت کسر می‌شوند.
 - تراکنش‌ها در `bg_transaction_links` با `transactionType` شناسایی می‌شوند:
   - `expense` → `exp_transactions`
-  - `cheque` → `chk_cheques` (از طریق `acc_transactions`)
-  - `loan` → `ln_transactions` (از طریق `acc_transactions`)
+  - `cheque` → `chk_cheques`
+  - `loan` → `ln_transactions`
 - در حالت `strictMode = true`، اگر `remainingAmount <= 0`، ثبت هزینه محدود می‌شود.
 - برای Zero-Based کامل، مبلغ پاکت "آماده تخصیص" باید صفر شود.

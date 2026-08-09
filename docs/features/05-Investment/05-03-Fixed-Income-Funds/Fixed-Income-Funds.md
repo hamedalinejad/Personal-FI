@@ -130,7 +130,7 @@ Domain Entities
 - `amount` → decimal (مبلغ ریالی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `predictedProfit` → decimal (nullable — فقط در nav_update و dividend)
 - `actualProfit` → decimal (nullable — فقط در nav_update و dividend)
 - `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی)
@@ -139,11 +139,23 @@ Domain Entities
 - `date` → datetime
 - `createdAt` → datetime
 
-> **نکته**: برای ETFها، واریز/برداشت از طریق کارگزاری انجام می‌شود، بنابراین `brokerageId` پر می‌شود. برای صندوق‌های issuance_redemption، ممکن است `accountId` مستقیماً پر شود.
+> **نکته**: برای ETFها، واریز/برداشت از طریق کارگزاری انجام می‌شود:
+> - هم `inv_fif_transactions` با `brokerageId` پر می‌شود
+> - هم `acc_transactions` با `relatedFeature = 'fixed_income_fund'` و `relatedId = inv_fif_transactions.id` ثبت می‌شود
+> - `accountTransactionId` در `inv_fif_transactions` به `acc_transactions.id` لینک می‌شود
+> 
+> برای صندوق‌های issuance_redemption:
+> - واریز/برداشت مستقیماً از حساب بانکی انجام می‌شود
+> - `accountId` پر می‌شود و `accountTransactionId` به `acc_transactions.id` لینک می‌شود
+> - `brokerageId` nullable است
 
 ۴. acc_transactions
 
-در واریز/برداشت و دریافت سود نقدی (در صورت واریز به حساب بانکی) استفاده می‌شود.
+در واریز و برداشت از حساب بانکی به کارگزاری (برای ETFها) یا مستقیماً از حساب بانکی (برای issuance_redemption) استفاده می‌شود.  
+برای ETFها:
+- واریز به کارگزاری → هم `acc_transactions` (از حساب بانکی) و هم `inv_stocks_iran_brokerage_transactions` (به کارگزاری) ثبت می‌شود
+- برداشت از کارگزاری → هم `acc_transactions` (به حساب بانکی) و هم `inv_stocks_iran_brokerage_transactions` (از کارگزاری) ثبت می‌شود
+- در هر دو حالت، `accountTransactionId` در `inv_fif_transactions` به `acc_transactions.id` لینک می‌شود
 
 
 APIهای داخلی

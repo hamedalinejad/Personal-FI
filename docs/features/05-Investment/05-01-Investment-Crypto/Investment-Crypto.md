@@ -109,7 +109,7 @@
 - `totalAmount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `currency` → string
 - `counterExchangeId` → UUID (برای انتقال — nullable)
 - `description` → string
@@ -125,7 +125,7 @@
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string

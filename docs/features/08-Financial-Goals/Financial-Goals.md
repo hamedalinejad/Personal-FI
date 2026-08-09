@@ -41,6 +41,10 @@
 8. `currentAmount` نمی‌تواند منفی شود.
 9. `currentAmount` می‌تواند بیشتر از `targetAmount` شود (مثلاً اگر کاربر پس‌انداز بیشتری کند یا عوامل خارجی ارزش را افزایش دهند).
 10. وقتی `source=budget` (انتقال از پاکت به هدف)، پول واقعاً بین حساب‌ها جابه‌جا نمی‌شود؛ `accountTransactionId` باید `null` بماند (فقط یک برچسب‌گذاری داخلی است).
+11. `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد:
+   - وقتی `addContribution()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
+   - وقتی `withdrawFromGoal()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
+   - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن/حذف `fg_contributions` در یک transaction انجام می‌شود
 
 ---
 
@@ -63,7 +67,7 @@
 - `color` → string (اختیاری)
 - `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
 - `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
-- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه ایجاد — برای گزارش تاریخی)
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه ایجاد — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -79,7 +83,7 @@
 - `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime
-- `exchangeRateToUSDT` → decimal
+- `exchangeRateToUSDT` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
 - `createdAt` → datetime
 
 ---
@@ -121,10 +125,17 @@
 - `getCompletedGoals()` → اهداف تکمیل‌شده
 
 ### Contribution APIs
-- `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف
-- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف
+- `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
+- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
 - `getContributions(goalId)` → تاریخچه کمک‌ها
 - `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
+
+> **نکته مهم - مکانیزم sync `currentAmount`**:  
+> - `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد  
+> - وقتی `addContribution()` یا `withdrawFromGoal()` صدا زده می‌شود، تغییر `currentAmount` **atomic** انجام می‌شود (در یک transaction با `fg_contributions` اضافه شدن)  
+> - فرمول: `currentAmount = SUM(amount WHERE type='deposit') - SUM(amount WHERE type='withdraw')`  
+> - این تصمیم یکسان با `cashBalance` در `inv_stocks_iran_brokerages` و `inv_metals_platforms` است  
+> - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن `fg_contributions` در یک transaction انجام می‌شود
 
 ### Calculation APIs
 - `calculateMonthlySuggestion(goalId)` → مبلغ پیشنهادی ماهانه برای رسیدن به هدف تا تاریخ مشخص
