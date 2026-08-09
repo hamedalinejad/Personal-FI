@@ -77,8 +77,12 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `transactionId` → UUID (لینک به تراکنش واقعی Expense/Income — nullable)
-- `accountTransactionId` → UUID (لینک به `acc_transactions`)
+- `transactionId` → UUID (لینک به تراکنش واقعی Expense/Income (`exp_transactions.id` یا `inc_transactions.id`) — nullable)
+- `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
+
+> **نکته**: هر دو فیلد در `markAsPaid()` پر می‌شوند. وقتی پرداخت/دریافت ثبت می‌شود:
+> - یک تراکنش در `exp_transactions` (برای قبوض هزینه) یا `inc_transactions` (برای قبوض درآمد) ایجاد می‌شود → `transactionId` به آن لینک می‌شود
+> - یک تراکنش در `acc_transactions` ایجاد می‌شود → `accountTransactionId` به آن لینک می‌شود
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -100,7 +104,9 @@
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
 - `markAsPaid(brOccurrenceId, amount, date, accountId?)`  
-  → ثبت پرداخت/دریافت + ایجاد تراکنش واقعی + به‌روزرسانی nextDueDate
+  → ثبت پرداخت/دریافت + ایجاد تراکنش واقعی + به‌روزرسانی nextDueDate  
+  → `transactionId` به `exp_transactions.id` (برای expense) یا `inc_transactions.id` (برای income) لینک می‌شود  
+  → `accountTransactionId` به `acc_transactions.id` لینک می‌شود
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 

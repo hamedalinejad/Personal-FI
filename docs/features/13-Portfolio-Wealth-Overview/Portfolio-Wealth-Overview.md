@@ -97,7 +97,39 @@
 - `netWealth` → decimal
 - `totalWealthUSDT` → decimal
 - `netWealthUSDT` → decimal
-- `breakdown` → JSON (جزئیات هر بخش)
+- `breakdown` → JSON (جزئیات هر بخش — هم‌ساختار با خروجی `getPortfolioOverview()`)
+  ```json
+  {
+    "investments": {
+      "total": number,
+      "profitLoss": number,
+      "unrealized": number,
+      "realized": number,
+      "sections": {
+        "crypto": { "value": number, "profitLoss": number },
+        "stocksIran": { "value": number, "profitLoss": number },
+        "fixedIncome": { "value": number, "profitLoss": number },
+        "metals": { "value": number, "profitLoss": number }
+      }
+    },
+    "physicalAssets": {
+      "total": number,
+      "profitLoss": number
+    },
+    "cash": {
+      "total": number
+    },
+    "liabilities": {
+      "total": number
+    },
+    "allocation": Array<{
+      "key": string,
+      "label": string,
+      "value": number,
+      "percent": number
+    }>
+  }
+  ```
 - `createdAt` → datetime
 
 ### ۲. Portfolio Setting (جدول: `port_settings`)
