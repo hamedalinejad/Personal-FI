@@ -1,56 +1,97 @@
-سرویس‌های زیرساختی و پایه که منطق کسب‌وکار مشترک یا ارتباط با سیستم‌های خارجی را مدیریت می‌کنند.
-ساختار پیشنهادی
-Bashservices/
+# core/services/ — سرویس‌های زیرساختی پایه
+
+سرویس‌های زیرساختی و پایه که منطق کسب‌وکار مشترک یا ارتباط با لایه‌های ذخیره‌سازی را مدیریت می‌کنند. این سرویس‌ها Business Logic فیچرها را ندارند؛ فقط مکانیزم ذخیره، رویداد، لاگ و اعلان را ارائه می‌دهند.
+
+---
+
+## ساختار پوشه
+
+```bash
+services/
 ├── currency/
-│   ├── currencyService.ts
-│   ├── exchangeRateProvider.ts
+│   ├── currencyService.ts      # تبدیل ارز، کش نرخ‌ها برای آفلاین
+│   ├── exchangeRateProvider.ts # واسط دریافت نرخ از cur_exchange_rates (SQLite)
 │   └── types.ts
 ├── eventBus/
-│   └── eventBus.ts
+│   └── eventBus.ts             # ارتباط بین فیچرها بدون وابستگی مستقیم
 ├── storage/
-│   ├── localStorageService.ts
-│   └── indexedDbService.ts
+│   ├── localStorageService.ts  # خواندن/نوشتن امن در LocalStorage
+│   └── sessionStorageService.ts# داده‌های موقت سشن (مثل API Key دریافت قیمت)
+├── versionCheck/
+│   └── versionCheckService.ts  # بررسی نسخه برنامه (استثنای مجاز Network Access Policy)
 ├── notification/
-│   └── notificationService.ts
+│   └── notificationService.ts  # اعلان‌های درون‌برنامه‌ای
 ├── logger/
-│   └── logger.ts
+│   └── logger.ts               # ثبت خطاها و رویدادهای مهم (فقط local، بدون ارسال بیرون)
 └── index.ts
-سرویس‌های اصلی
-Currency Service
+```
 
-دریافت نرخ تبدیل لحظه‌ای (ریال، دلار، تتر و ...)
-کش کردن نرخ‌ها برای حالت آفلاین
-تبدیل مبلغ بین ارزها
-قفل کردن نرخ در لحظه ثبت تراکنش
+> **چرا `indexedDbService.ts` از پروژه حذف شد؟**  
+> IndexedDB در این پروژه صرفاً به‌عنوان ذخیره‌گاه فیزیکی فایل SQLite (از طریق sql.js) استفاده می‌شود — یعنی فقط یک Blob کامل در آن نوشته/خوانده می‌شود. این عملیات مستقیماً در لایه db (فایل `db/db.ts`) و با الگوی `Write-to-temp-then-swap` (مستند در `core/db/db.md`) انجام می‌شود؛ یک سرویس جداگانه برای آن ارزش افزوده‌ای ندارد و فقط پیچیدگی غیرضروری ایجاد می‌کند.
 
-Event Bus
+---
 
-ارتباط بین فیچرها بدون وابستگی مستقیم
-رویدادهایی مثل:
-TransactionCreated
-AccountBalanceUpdated
-BudgetExceeded
-LoanPaymentDue
+## سرویس‌های اصلی
 
+### Currency Service
+- دریافت نرخ‌های ارز از جدول `cur_exchange_rates` (SQLite، نه API خارجی)
+- کش کردن نرخ‌ها در `useCurrencyStore` برای مصرف سریع بدون کوئری مجدد
+- تبدیل مبلغ بین ارزها با Decimal.js (نه float)
+- قفل کردن نرخ در لحظه ثبت تراکنش (هر تراکنش `exchangeRateToBase` خودش را دارد)
 
-Storage Service
+> نرخ ارز از کجا می‌آید؟ کاربر نرخ را دستی ثبت می‌کند (فیچر `Currency-CrossRate`). به‌روزرسانی خودکار نرخ ارز در محدوده `19-Price-Fetching` نیست — نرخ ارز یک تصمیم مالی است، نه یک قیمت بازار برای دارایی.
 
-لایه انتزاعی روی LocalStorage و IndexedDB
-LocalStorage: فقط برای تنظیمات UI (پیکربندی داشبورد، تم، وضعیت منوها، فیلترهای ذخیره‌شده)
-IndexedDB: داده‌های مالی حساس (تراکنش‌ها، حساب‌ها، سرمایه‌گذاری‌ها، دارایی‌ها)
+### Event Bus
+ارتباط بین فیچرها بدون وابستگی مستقیم (`import`). رویدادهای تعریف‌شده:
 
-Notification Service
+| رویداد | توضیح |
+|--------|-------|
+| `TransactionCreated` | هر بار که یک تراکنش مالی ثبت می‌شود |
+| `AccountBalanceUpdated` | تغییر موجودی یک حساب |
+| `BudgetExceeded` | رد شدن از سقف بودجه |
+| `LoanPaymentDue` | سررسید قسط وام |
+| `PriceFetchCompleted` | پایان عملیات دریافت قیمت (موفق یا ناموفق) |
+| `VersionUpdateAvailable` | نسخه جدیدتر در دسترس است |
 
-مدیریت اعلان‌های درون‌برنامه‌ای
-یادآوری سررسیدها، بودجه و اهداف
+### Storage Service
 
-Logger
+**`localStorageService.ts`** — خواندن/نوشتن type-safe در LocalStorage:
+- فقط برای داده‌های غیرحساس و کم‌حجم UI (تنظیمات تم، زبان، فرمت‌ها، وضعیت سایدبار، فیلترهای ذخیره‌شده)
+- **داده مالی هرگز** در LocalStorage ذخیره نشود
+- همه مقادیر با JSON serialize/deserialize می‌شوند + type guard برای جلوگیری از crash در صورت corrupt بودن داده
+- کلیدهای مجاز باید به‌صورت enum یا const object در همین فایل تعریف شوند تا typo در کلید رخ ندهد
 
-ثبت خطاها و رویدادهای مهم
-مناسب برای Debug و مانیتورینگ
+**`sessionStorageService.ts`** — داده‌های موقت سشن:
+- فقط برای داده‌هایی که بعد از بستن tab باید از بین بروند
+- مثال: API Key سرویس دریافت قیمت (که طبق `Price-Fetching.md` نباید در دیتابیس ذخیره شود)
+- فرم‌های ناتمام (Draft state) در صورت نیاز
 
-قوانین
+### Version Check Service
+بررسی وجود نسخه جدیدتر از برنامه — **تنها یکی از دو استثنای مجاز Network Access Policy** (به `Technical-Architecture.md` بخش «سیاست دسترسی به شبکه» مراجعه کنید).
 
-سرویس‌ها نباید مستقیماً به UI وابسته باشند.
-بهتر است به صورت Singleton یا از طریق Dependency Injection در دسترس باشند.
-تمام Side Effectها (API، Storage و ...) باید از طریق سرویس‌ها انجام شوند.
+مسئولیت‌ها:
+- در Startup اپ، در پس‌زمینه و **بدون block کردن UI**، به یک Endpoint استاتیک درخواست می‌زند
+- هیچ داده مالی یا شناسه کاربر ارسال نمی‌شود — فقط شماره نسخه فعلی (`APP_VERSION` از `lib/constants.ts`) برای مقایسه
+- اگر نسخه جدیدتر وجود داشت: رویداد `VersionUpdateAvailable` در Event Bus منتشر می‌شود تا UI یک badge/toast نمایش دهد
+- شکست یا timeout (آفلاین، سرور ناموجود): کاملاً بی‌صدا — هیچ خطا یا پیامی به کاربر نمی‌رسد
+- اگر کاربر از تنظیمات (`stg_settings` کلید `autoVersionCheckEnabled`) این بررسی را خاموش کرده باشد: هیچ request ای ارسال نمی‌شود
+
+### Notification Service
+- مدیریت اعلان‌های درون‌برنامه‌ای (Toast، Badge)
+- یادآوری سررسیدهای وام، بودجه تجاوزکرده، اهداف مالی
+- هیچ Push Notification یا ارتباط با سرور خارجی ندارد — کاملاً local
+
+### Logger
+- ثبت خطاها و رویدادهای مهم فقط در حافظه (در حین اجرا) یا LocalStorage
+- هرگز لاگ‌ها به سرور خارجی ارسال نمی‌شوند (Privacy-First + Offline-First)
+- در build production، level DEBUG حذف شود
+
+---
+
+## قوانین
+
+1. سرویس‌ها نباید مستقیماً به UI (React components) وابسته باشند.
+2. هیچ Side Effect ای (Network، Storage) خارج از سرویس‌ها انجام نشود — کامپوننت‌ها و فیچرها فقط از سرویس‌ها فراخوانی می‌کنند.
+3. تمام Side Effectهای شبکه باید طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` مجاز باشند.
+4. سرویس‌ها به‌عنوان Singleton پیاده‌سازی شوند یا از طریق Dependency Injection در Store ها در دسترس باشند.
+5. سرویس‌ها هیچ import ای از پوشه `features/` نداشته باشند؛ فقط از `core/types/` و `core/db/` می‌توانند import کنند.
