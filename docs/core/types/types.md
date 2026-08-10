@@ -1,24 +1,28 @@
-TypeScript Types و Interfaces مشترکی که در کل پروژه استفاده می‌شوند.
+# core/types/ — TypeScript Types و Interfaces مشترک
 
-## ساختار پیشنهادی
+TypeScript Types و Interfaces مشترکی که در کل پروژه استفاده می‌شوند. Types اختصاصی یک فیچر داخل همان فیچر تعریف می‌شوند.
+
+---
+
+## ساختار پوشه
 
 ```bash
 types/
-├── common.ts              # انواع عمومی (ID, DateRange, ...)
-├── currency.ts
-├── transaction.ts
-├── account.ts
-├── api.ts                 # انواع پاسخ API و Error
-├── events.ts              # انواع Event Bus
-└── index.ts
+├── common.ts              # انواع پایه (UUID, Timestamp, DateRange, ...)
+├── currency.ts            # CurrencyCode، ExchangeRate
+├── transaction.ts         # TransactionType، RelatedFeature
+├── price.ts               # AssetCategory، PriceFetchResult (برای Price Fetching)
+├── events.ts              # AppEvent (Event Bus)
+└── index.ts               # re-export مرکزی
 ```
 
-## نمونه‌های مهم
+---
+
+## `common.ts`
 
 ```typescript
-// common.ts
 export type UUID = string;
-export type Timestamp = string; // ISO date
+export type Timestamp = string; // ISO 8601 UTC
 
 export interface DateRange {
   from: Timestamp;
@@ -31,18 +35,44 @@ export interface PaginatedResult<T> {
   page: number;
   pageSize: number;
 }
+```
 
-// currency.ts
-export type CurrencyCode = 'IRR' | 'USD' | 'USDT' | 'EUR';
+---
+
+## `currency.ts`
+
+```typescript
+// ارزهای فیات پشتیبانی‌شده
+export type FiatCurrencyCode = 'IRR' | 'USD' | 'EUR' | 'AED' | 'GBP' | 'TRY';
+
+// ارزهای دیجیتال پشتیبانی‌شده (نمادهای رایج — لیست قابل گسترش است)
+export type CryptoCurrencyCode = 'BTC' | 'ETH' | 'USDT' | 'BNB' | 'XRP' | 'SOL' | string;
+// نکته: string& برای باز بودن لیست — هر نماد رمزارز جدیدی قابل قبول است
+
+// ارز پایه پشتیبانی‌شده برای ذخیره قیمت در price_history
+export type PriceCurrency = FiatCurrencyCode | CryptoCurrencyCode;
+
+// اتحادیه کامل (برای فیلدهایی که هر نوع ارزی را می‌پذیرند)
+export type CurrencyCode = FiatCurrencyCode | CryptoCurrencyCode;
 
 export interface ExchangeRate {
   from: CurrencyCode;
   to: CurrencyCode;
-  rate: number;
+  rate: number; // ذخیره به‌صورت decimal (نه Minor Unit — استثنای مستند در db.md)
   timestamp: Timestamp;
 }
+```
 
-// transaction.ts
+> **چرا `USDT` در `CryptoCurrencyCode` است نه `FiatCurrencyCode`؟**  
+> USDT از نظر فنی یک Stablecoin رمزارز است، نه ارز فیات — حتی اگر به دلار پگ باشد. در این پروژه همه تراکنش‌های کریپتو (از جمله موجودی ریال/تتر صرافی) از طریق `priceCurrency='USDT'` یا `priceCurrency='IRR'` در `price_history` کار می‌کنند. این تفکیک با تعریف فیچر `Investment-Crypto` سازگار است.
+
+---
+
+## `transaction.ts`
+
+```typescript
+// تنها enum معتبر برای فیلد type در acc_transactions
+// هر مقدار جدید باید اینجا اضافه شود، نه در فایل فیچر
 export type TransactionType =
   | 'deposit-income'
   | 'withdrawal-expense'
@@ -50,20 +80,20 @@ export type TransactionType =
   | 'transfer-out'
   | 'deposit-loan'
   | 'withdrawal-loan'
-  | 'withdrawal-expense-tax'  // پرداخت مالیات (استفاده‌شده در Tax-Management)
-  | 'deposit-income-tax'      // بازگشت مالیات (استفاده‌شده در Tax-Management)
-  | 'withdrawal-cheque'       // برای چک‌ها
+  | 'withdrawal-expense-tax'
+  | 'deposit-income-tax'
+  | 'withdrawal-cheque'
   | 'deposit-cheque'
-  | 'deposit-investment'      // واریز به سرمایه‌گذاری (صادر، کارگزاری، پلتفرم)
-  | 'withdrawal-investment';  // برداشت از سرمایه‌گذاری
+  | 'deposit-investment'
+  | 'withdrawal-investment';
 
-> **نکته**: مقادیر `deposit-budget`/`withdrawal-budget` عمداً حذف شده‌اند. طبق Financial-Goals.md (بخش Business Rules، مورد ۱۰)، انتقال از پاکت بودجه به هدف (`source=budget`) هیچ تراکنش بانکی واقعی نمی‌سازد و `accountTransactionId` همیشه `null` می‌ماند؛ در نتیجه این دو نوع تراکنش هرگز در `acc_transactions` رخ نمی‌دهند و نگهداری آن‌ها در enum گمراه‌کننده بود.
+// نکته: deposit-budget و withdrawal-budget عمداً حذف شده‌اند.
+// انتقال از پاکت بودجه به هدف (source=budget) هیچ تراکنش بانکی واقعی نمی‌سازد
+// و accountTransactionId همیشه null می‌ماند (طبق Financial-Goals.md Business Rules #10).
 
-// related-feature.ts
-// این enum مرجع مرکزی و تنها enum معتبر برای فیلد چندریختی relatedFeature در تمام جداول پروژه است
-// (acc_transactions, docs_documents, docs_links, notif_notifications, tax_records و هر جدول آینده مشابه).
-// هیچ فایل دیگری نباید لیست جداگانه یا مقادیر ناسازگار (مثل investment مبهم) تعریف کند؛
-// همه باید مستقیماً به همین enum ارجاع دهند.
+// تنها enum معتبر برای فیلد relatedFeature در همه جداول پروژه
+// (acc_transactions, docs_documents, docs_links, notif_notifications, tax_records, ...)
+// هیچ فایل دیگری نباید مقادیر ناسازگار یا «investment» مبهم تعریف کند
 export type RelatedFeature =
   | 'income'
   | 'expense'
@@ -77,28 +107,77 @@ export type RelatedFeature =
   | 'budget'
   | 'tax'
   | 'goals';
+```
 
-// events.ts
+---
+
+## `price.ts`
+
+```typescript
+// دسته‌بندی دارایی در price_history و price_sources
+export type AssetCategory = 'crypto' | 'stock' | 'fif' | 'metal';
+
+// خروجی عملیات دریافت قیمت از API
+export interface PriceFetchResult {
+  succeeded: { symbol: string; price: string }[]; // string برای Decimal-safe
+  failed: { symbol: string; reason: string }[];
+  skipped?: { reason: 'offline' };
+  fetchedAt: Timestamp;
+  triggeredBy: 'user_click' | 'auto_sync';
+}
+
+// آخرین قیمت کش‌شده یک نماد
+export interface CachedPrice {
+  symbol: string;
+  assetCategory: AssetCategory;
+  price: string; // decimal string — نه number
+  priceCurrency: PriceCurrency;
+  source: 'manual' | 'api';
+  fetchedAt: Timestamp;
+  isStale: boolean; // اگر بیش از یک حد مشخص (مثلاً ۲۴ ساعت) از fetchedAt گذشته باشد
+}
+```
+
+---
+
+## `events.ts`
+
+```typescript
 export type AppEvent =
-  | { type: 'TransactionCreated'; payload: { transactionId: UUID; transactionType: string } }
+  // حساب و تراکنش
+  | { type: 'TransactionCreated'; payload: { transactionId: UUID; transactionType: TransactionType } }
   | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: number } }
+  // بودجه
   | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: number } }
   | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: number } }
-  | { type: 'InvestmentValueUpdated'; payload: { investmentType: string; investmentId: UUID; newValue: number; previousValue: number } }
+  // سرمایه‌گذاری
+  | { type: 'InvestmentValueUpdated'; payload: { investmentType: RelatedFeature; investmentId: UUID; newValue: number; previousValue: number } }
   | { type: 'PortfolioSnapshotCreated'; payload: { snapshotId: UUID; date: Timestamp } }
+  // وام
   | { type: 'LoanPaymentDue'; payload: { loanId: UUID; dueDate: Timestamp } }
   | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: number } }
+  // چک
   | { type: 'ChequeDue'; payload: { chequeId: UUID; dueDate: Timestamp } }
   | { type: 'ChequeStatusChanged'; payload: { chequeId: UUID; newStatus: string } }
+  // فلزات
   | { type: 'MetalsDeliveryStatusChanged'; payload: { deliveryId: UUID; newStatus: string } }
+  // مالیات
   | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } }
-  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: number; transactionId: UUID } };
+  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: number; transactionId: UUID } }
+  // دریافت قیمت (Price Fetching — فیچر ۱۹)
+  | { type: 'PriceFetchCompleted'; payload: PriceFetchResult }
+  | { type: 'PriceFetchStarted'; payload: { symbols: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
+  // نسخه برنامه
+  | { type: 'VersionUpdateAvailable'; payload: { currentVersion: string; latestVersion: string; releaseNotesUrl: string } };
 ```
+
+---
 
 ## قوانین
 
-- Types مشترک فقط اینجا تعریف شوند.
-- Types مخصوص یک فیچر داخل همان فیچر قرار بگیرند.
-- از `any` تا حد امکان استفاده نشود.
-- `TransactionType` باید با enum فیلد `type` در جدول `acc_transactions` یکی باشد.
-- تمام جداول با ارتباط چندریختی (Polymorphic) باید دقیقاً از نام‌گذاری `relatedFeature` (نوع: `RelatedFeature`) و `relatedId` (نوع: UUID) استفاده کنند — هیچ نام دیگری (مثل `transactionType`/`transactionId`) مجاز نیست.
+1. Types مشترک **فقط** اینجا تعریف شوند؛ Types اختصاصی یک فیچر داخل همان فیچر بمانند.
+2. از `any` پرهیز شود — به‌جای آن `unknown` با type guard.
+3. مبالغ مالی در Types به‌صورت `string` (نه `number`) تعریف شوند تا با Decimal.js سازگار باشند و floating-point error ایجاد نشود.
+4. `TransactionType` باید همیشه با enum فیلد `type` در `acc_transactions` یکی باشد.
+5. تمام جداول با ارتباط چندریختی (Polymorphic) دقیقاً از `relatedFeature: RelatedFeature` و `relatedId: UUID` استفاده کنند — نام دیگری مجاز نیست.
+6. هر رویداد جدید در `AppEvent` باید در `core/services/services.md` (بخش Event Bus) هم مستند شود.
