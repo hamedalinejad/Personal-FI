@@ -1,29 +1,44 @@
-قوانین کلی پوشه core
+# core/ — قوانین کلی و وابستگی‌های پوشه core
 
-بدون وابستگی به فیچرها: core نباید هیچ importی از پوشه features داشته باشد.
-قابلیت استفاده مجدد: هر چیزی که اینجا نوشته می‌شود باید در چندین بخش پروژه قابل استفاده باشد.
-قابلیت تست: utils و services باید به راحتی Unit Test شوند.
-Offline-First: سرویس‌ها باید حالت آفلاین را در نظر بگیرند.
-Type-Safe: تمام بخش‌ها با TypeScript قوی نوشته شوند.
+پوشه `core` شامل همه کدهای زیرساختی و مشترک پروژه است که فیچرها به آن‌ها وابسته هستند، اما core به هیچ فیچری وابسته نیست.
 
+---
 
-## وابستگی‌های پیشنهادی
+## قوانین کلی
 
-| بخش | کتابخانه‌های پیشنهادی |
-|------|----------------------|
-| تاریخ شمسی | `dayjs` + `@dayjs/plugin/jalali` یا `moment-jalaali` |
-| State Management | `zustand` |
-| Validation | `zod` |
-| ID Generation | `uuid` یا `nanoid` |
-| Event Bus | پیاده‌سازی ساده خودمان یا `mitt` |
+1. **بدون وابستگی به فیچرها**: `core` هیچ `import`ی از پوشه `features/` نداشته باشد.
+2. **قابلیت استفاده مجدد**: هر چیزی که اینجا نوشته می‌شود باید در چندین بخش پروژه قابل استفاده باشد.
+3. **قابلیت تست**: `utils` و `services` باید به راحتی Unit Test شوند (توابع Pure، بدون Side Effect پنهان).
+4. **Offline-First**: سرویس‌ها باید حالت آفلاین را در نظر بگیرند — هر سرویسی که با شبکه کار می‌کند باید طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` رفتار کند.
+5. **Type-Safe**: تمام بخش‌ها با TypeScript قوی نوشته شوند. از `any` پرهیز شود.
+6. **Decimal-Safe**: هرگز `Number()` یا `parseFloat()` برای مبالغ مالی استفاده نشود — فقط `Decimal.js`.
+
+---
+
+## وابستگی‌های پروژه (کتابخانه‌های خارجی)
+
+| بخش | کتابخانه | توضیح |
+|-----|----------|-------|
+| **محاسبات مالی** | `decimal.js` | **الزامی برای تمام محاسبات مالی** — هرگز از `Number` یا `float` برای مبالغ استفاده نشود |
+| **دیتابیس** | `sql.js` | SQLite در WASM — ذخیره‌سازی اصلی در IndexedDB |
+| **تاریخ شمسی** | `dayjs` + `dayjs-jalali` | پیکربندی مرکزی در `lib/dayjs.ts` |
+| **State Management** | `zustand` | Storeهای سبک و ماژولار |
+| **Validation** | `zod` | اعتبارسنجی ورودی‌ها و Schema تعریف Type |
+| **ID Generation** | `uuid` | تولید UUID v4 در `utils/id/generateId.ts` |
+| **Event Bus** | `mitt` یا پیاده‌سازی ساده | ارتباط بین فیچرها بدون coupling مستقیم |
+| **Styling** | `tailwindcss` | کلاس‌های utility؛ متغیرهای رنگ مالی در `styles/themes.css` |
+
+> **چرا TanStack Query/React Query در لیست نیست؟**  
+> این کتابخانه برای کش‌کردن نتایج fetch از API خارجی طراحی شده. در این پروژه هیچ API خارجی برای داده مالی وجود ندارد — همه داده‌ها از SQLite محلی می‌آیند. State کوئری‌های دیتابیس در Zustand Storeها نگه‌داری می‌شود.
 
 ---
 
 ## خلاصه مسئولیت‌ها
 
-| دسته | مسئولیت اصلی |
-|------|--------------|
-| `utils` | توابع خالص و کمکی (بدون وابستگی به React) |
-| `hooks` | React Hooks مشترک (فقط اگر در بیش از یک فیچر استفاده شود) |
-| `services` | منطق زیرساختی و Side Effects (API، Storage، Notification) |
-| `types` | تعاریف TypeScript مشترک |
+| پوشه | مسئولیت اصلی | سند کامل |
+|------|--------------|----------|
+| `db/` | لایه دیتابیس SQLite، Schema، Migration، قانون Minor Unit | `docs/core/db/db.md` |
+| `utils/` | توابع خالص: تاریخ، عدد، پول، اعتبارسنجی، رشته | `docs/core/utils/utils.md` |
+| `hooks/` | React Hooks مشترک (فقط برای بیش از یک فیچر) | `docs/core/hooks/hooks.md` |
+| `services/` | سرویس‌های زیرساختی: ارز، EventBus، Storage، VersionCheck، Logger | `docs/core/services/services.md` |
+| `types/` | TypeScript Types مشترک: TransactionType، RelatedFeature، AppEvent، AssetCategory | `docs/core/types/types.md` |
