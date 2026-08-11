@@ -119,7 +119,7 @@ Domain Entities
 - `units` → decimal (تعداد واحد فعلی)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید)
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
+- `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`baseCurrency`) با `exchangeRateToBase` همان تراکنش)
 - `currentNAV` → decimal (آخرین NAV ثبت‌شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -152,8 +152,13 @@ Domain Entities
 - `createdAt` → datetime
 
 > **نکته لینک `accountTransactionId`**:
-> - برای ETFها: `accountTransactionId` لینک به رکوردی در `inv_stocks_iran_brokerage_transactions` **نیست** — بلکه لینک به `acc_transactions` است که خودش `relatedFeature = 'stocks_iran'` دارد.
-> - برای issuance_redemption: `accountTransactionId` لینک به `acc_transactions` با `relatedFeature = 'fif'` است.
+> - برای **issuance_redemption**: `accountTransactionId` → `acc_transactions.id` که `relatedFeature='fif'` و `relatedId=inv_fif_transactions.id` دارد.
+> - برای **ETF**: `accountTransactionId` → `acc_transactions.id` که `relatedFeature='stocks_iran'` و `relatedId=inv_stocks_iran_brokerage_transactions.id` دارد.
+>
+> **نکته مهم برای ETF**: لینک معکوس از `acc_transactions` به `inv_fif_transactions` از طریق `relatedId` مستقیم وجود ندارد (چون `relatedId` به `inv_stocks_iran_brokerage_transactions` اشاره می‌کند). برای یافتن صندوق مرتبط با یک تراکنش بانکی ETF:
+> 1. از `acc_transactions.relatedId` → `inv_stocks_iran_brokerage_transactions.id`
+> 2. از `inv_fif_transactions.accountTransactionId` = `acc_transactions.id` مطابقت را چک کن
+> این lookup دو مرحله‌ای است و باید در service layer مستند شود.
 
 ۴. acc_transactions
 
