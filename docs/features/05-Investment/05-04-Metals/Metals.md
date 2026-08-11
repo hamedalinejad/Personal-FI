@@ -97,7 +97,23 @@ Domain Entities
 id → UUID
 platformId → UUID
 metalType → string (gold, silver, copper)
-purity → string (مثلاً ۱۸ عیار، ۹۹۹ و ...)
+purity → string (کد استاندارد خلوص فلز — مقادیر مجاز:)
+
+> | کد | معنا | فلز |
+> |----|------|-----|
+> | `18k` | طلای ۱۸ عیار (۷۵٪ خلوص) | طلا |
+> | `21k` | طلای ۲۱ عیار (۸۷.۵٪ خلوص) | طلا |
+> | `22k` | طلای ۲۲ عیار (۹۱.۶٪ خلوص) | طلا |
+> | `24k` | طلای ۲۴ عیار (۹۹.۹٪ خلوص) — شمش | طلا |
+> | `999` | خلوص ۹۹.۹٪ | نقره / مس |
+> | `9999` | خلوص ۹۹.۹۹٪ — شمش بانکی | طلا / نقره |
+> | `coin_emami` | سکه امامی | طلا |
+> | `coin_bahar` | نیم‌سکه بهار آزادی | طلا |
+> | `coin_quarter` | ربع‌سکه | طلا |
+> | `coin_gerami` | سکه گرمی | طلا |
+> | `other` | سایر | همه |
+>
+> **نکته**: `purity` در `getHoldingByMetal(metalType, platformId?)` برای گروه‌بندی استفاده می‌شود — اهمیت یکسان‌سازی مقادیر بسیار زیاد است.
 quantityMg → decimal (موجودی به میلی‌گرم)
 averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
 totalInvested → decimal
@@ -111,7 +127,9 @@ createdAt / updatedAt
 - `metalType` → string (gold, silver, copper)
 - `type` → string (buy, sell, physical_delivery)
 - `quantityMg` → decimal
-- `pricePerMg` → decimal (برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
+- `pricePerMg` → decimal (nullable برای `physical_delivery` — برای خرید و فروش: قیمت بازار در لحظه معامله؛ برای تحویل فیزیکی: `null` چون هیچ محاسبه P&L رخ نمی‌دهد)
+
+> **نکته**: `pricePerMg` در `physical_delivery` لازم نیست پر شود — تحویل فیزیکی فروش نیست و `realizedPL` ایجاد نمی‌کند. اگر مقداری ذخیره شود فقط برای رفرنس است.
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
