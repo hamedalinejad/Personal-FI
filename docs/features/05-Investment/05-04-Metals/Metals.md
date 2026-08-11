@@ -237,6 +237,7 @@ averageBuyPricePerMg  بدون تغییر می‌ماند  // Weighted Average �
 نکات طراحی
 
 - واحد پایه همیشه میلی‌گرم است تا دقت بالا حفظ شود (۱ گرم = ۱۰۰۰ میلی‌گرم).
+- **قیمت لحظه‌ای فلزات (برای Unrealized P&L)** از فیچر `19-Price-Fetching` (جدول `price_history` با `assetCategory='metal'`) به‌صورت **قیمت هر گرم** خوانده می‌شود؛ تبدیل از گرم به میلی‌گرم (`÷ 1000`) در لایه Domain انجام می‌شود.
 - میانگین خرید با Weighted Average محاسبه می‌شود.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - تحویل فیزیکی با یک تراکنش `type=physical_delivery` در `metals_transactions` ثبت می‌شود تا تاریخچه کامل موجودی در یک جدول باشد.
