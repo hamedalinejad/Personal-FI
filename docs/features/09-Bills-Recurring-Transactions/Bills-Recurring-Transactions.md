@@ -89,8 +89,11 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `transactionId` → UUID (لینک به تراکنش واقعی `exp_transactions.id` یا `inc_transactions.id` — nullable)
+- `expenseTransactionId` → UUID (nullable — لینک به `exp_transactions.id` فقط وقتی `br_items.type = 'expense'`)
+- `incomeTransactionId` → UUID (nullable — لینک به `inc_transactions.id` فقط وقتی `br_items.type = 'income'`)
 - `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
+
+> **نکته طراحی**: به‌جای یک فیلد `transactionId` که به دو جدول متفاوت اشاره می‌کند، دو فیلد مجزا تعریف شده‌اند تا Foreign Key در SQLite معنادار باشد. همیشه فقط یکی پر می‌شود (بسته به `br_items.type`) و دیگری `null` است.
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -117,7 +120,7 @@
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
 - `markAsPaid(brOccurrenceId, amount, date, accountId?)`
-  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + به‌روزرسانی nextDueDate
+  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp_transactions` (اگر expense) یا `inc_transactions` (اگر income) + ثبت در `acc_transactions` + پر کردن `expenseTransactionId` یا `incomeTransactionId` (بسته به نوع) و `accountTransactionId` + به‌روزرسانی nextDueDate
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 
