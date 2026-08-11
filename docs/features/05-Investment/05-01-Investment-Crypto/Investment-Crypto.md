@@ -137,7 +137,7 @@
 - `totalAmountBase` → decimal (معادل `totalAmount` به ارز پایه — این فیلد و نه `totalAmount` است که در فرمول‌های Weighted Average/Realized P&L و به‌روزرسانی `inv_crypto_holdings` استفاده می‌شود)
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه ارز پایه کاربر باشد؛ قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر، از `getLatestPrice(feeCurrency, baseCurrency)` — مثلاً اگر `baseCurrency=USDT`، قیمت BTC = ۶۵,۰۰۰ USDT)
 - `exchangeRateToBase` → decimal (نرخ تبدیل لحظه به ارز پایه کاربر — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد. در معامله رمزارز-به-رمزارز که نه ارز اصلی و نه کارمزد ریالی نیستند، `null` می‌ماند و تبدیل از طریق `getLatestPrice()` فیچر `19-Price-Fetching` انجام می‌شود)
 - `currency` → string (ارز طرف مقابل معامله: IRR، USDT، یا سیمبل یک رمزارز دیگر برای معاملات رمزارز-به-رمزارز)
 - `tradeId` → UUID (نال مگر برای معامله رمزارز-به-رمزارز طبق قاعده ۲a — UUID مشترک بین رکورد `sell` رمزارز پرداختی و رکورد `buy` رمزارز دریافتی همان معامله)
@@ -156,8 +156,8 @@
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
-- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه ارز پایه کاربر باشد؛ قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر)
+- `exchangeRateToBase` → decimal (نرخ IRR به ازای ۱ واحد ارز پایه کاربر، در لحظه ثبت — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
@@ -179,17 +179,16 @@
 
 ## منطق کارمزد
 
-- هر کارمزد با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ذخیره می‌شود؛ اگر `feeCurrency` رمزارزی غیر از USDT باشد (مثلاً BTC، ETH)، فیلد `feeAssetPriceToUSDT` نیز الزامی است.
-- ارزش معادل کارمزد به شرح زیر محاسبه می‌شود (همیشه با `decimal.js`، هرگز `Number`):
-  - اگر `feeCurrency = IRR`: `convertedToUSDT = feeAmount / exchangeRateToBase`
-  - اگر `feeCurrency = USDT`: `convertedToIRR = feeAmount * exchangeRateToBase`
+- هر کارمزد با `feeAmount` + `feeCurrency` ذخیره می‌شود؛ اگر `feeCurrency` نه ارز پایه کاربر و نه IRR باشد (یعنی خود یک رمزارز دیگر، مثلاً BTC، ETH)، فیلد `feeAssetPriceToBase` نیز الزامی است.
+- ارزش معادل کارمزد به ارز پایه کاربر (`baseCurrency`) به شرح زیر محاسبه می‌شود (همیشه با `decimal.js`، هرگز `Number`):
+  - اگر `feeCurrency = baseCurrency`: بدون تبدیل (ضریب ۱)
+  - اگر `feeCurrency = IRR` و `baseCurrency ≠ IRR`: `convertedToBase = feeAmount / exchangeRateToBase`
   - اگر `feeCurrency` رمزارز دیگری باشد (BTC/ETH و ...):
     ```
-    convertedToUSDT = feeAmount * feeAssetPriceToUSDT
-    convertedToIRR  = convertedToUSDT * exchangeRateToBase
+    convertedToBase = feeAmount * feeAssetPriceToBase
     ```
-    (تقسیم مستقیم `feeAmount` بر `exchangeRateToBase` در این حالت **غلط** است، چون `exchangeRateToBase` فقط نرخ ریال-به-تتر است و ربطی به قیمت BTC/ETH ندارد.)
-- مجموع کارمزدها در Holding به صورت تجمعی (یک ارز ثابت) نگهداری می‌شود.
+    (`feeAssetPriceToBase` قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر است — از `getLatestPrice(feeCurrency, baseCurrency)` فیچر `19-Price-Fetching` گرفته می‌شود. تقسیم مستقیم `feeAmount` بر `exchangeRateToBase` در این حالت **غلط** است، چون `exchangeRateToBase` فقط نرخ IRR-به-ارز‌پایه است و ربطی به قیمت BTC/ETH ندارد.)
+- مجموع کارمزدها در Holding به‌صورت تجمعی و همیشه به ارز پایه کاربر (`totalFeesPaidBase`) نگهداری می‌شود.
 - در انتقال بین صرافی‌ها، اگر کارمزد از خود ارز کسر شود، تفاوت بین `amountToSend` و `amountReceived = amountToSend - feeAmount` دقیقاً مقدار کارمزد است.
 
 ---
