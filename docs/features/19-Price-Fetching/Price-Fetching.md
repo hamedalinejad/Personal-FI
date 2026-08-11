@@ -18,7 +18,7 @@
 |---|---|---|---|---|
 | Crypto | `symbol` (BTC, ETH, ...) | USDT | API عمومی استاندارد و شناخته‌شده فراوان (CoinGecko و مشابه) | خودکار/دستی هر دو کاملاً عملی |
 | Stocks Iran | `symbol` (نماد بورسی، مثل فولاد) | ریال | منبع نیمه‌رسمی TSETMC/سایت‌های آینه — یک منبع غالب، نه چند منبع رقیب مثل کریپتو | خودکار/دستی هر دو عملی، با یک منبع پیش‌فرض |
-| FIF (صندوق) | `fundId` (نه symbol — چون issuance_redemption نماد بورسی ندارد) | NAV به ریال | **هیچ API عمومی یکپارچه‌ای وجود ندارد** — هر صندوق NAV را در سایت خودش منتشر می‌کند | **دستی، Fetch به‌صورت اختیاری per-fund در آینده** |
+| FIF (صندوق) | `fundId` (نه symbol — چون issuance_redemption نماد بورسی ندارد) | NAV به ریال | **هیچ API عمومی یکپارچه‌ای وجود ندارد** — هر صندوق NAV را در سایت خودش منتشر می‌کند | **دستی به‌عنوان مسیر اصلی (Must Have)؛ Fetch اختیاری per-fund برای صندوق‌های دارای منبع مشخص** |
 | Metals | `metalType + purity` (نه symbol تکی) | ریال به ازای هر گرم | منابع نیمه‌رسمی قیمت طلا/سکه ایران (چند منبع رایج) | خودکار/دستی هر دو عملی |
 
 نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. به همین دلیل ستون `symbol` در `price_history` باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID) و برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`) خواهد بود؛ این‌ها همچنان یک رشته یکتا در ستون `symbol` هستند، فقط معنای دامنه‌ای متفاوتی دارند که در `assetCategory` مشخص می‌شود.
@@ -92,7 +92,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام منبع، مثلاً «Nobitex»، «CoinGecko»)
-- `assetCategory` → enum (`crypto`, `stock`, `housing`, `metal`) — دسته دارایی‌ای که این منبع پوشش می‌دهد
+- `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`, `housing`) — دسته دارایی‌ای که این منبع پوشش می‌دهد (`fif` برای صندوق‌های issuance_redemption که منبع اختصاصی per-fund دارند؛ صندوق‌های ETF از `stock` استفاده می‌کنند)
 - `baseUrl` → string (آدرس API)
 - `requiresApiKey` → boolean
 - `isActive` → boolean
@@ -105,7 +105,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `id` → UUID (Primary Key)
 - `sourceId` → UUID (nullable — لینک به `price_sources`؛ برای رکوردهای `source='manual'` مقدارش `null` است)
 - `symbol` → string (مثلاً `BTC`, `ETH`؛ برای زیرفیچرهای آینده: نماد سهام، کد ملک و ...)
-- `assetCategory` → enum (`crypto`, `stock`, `housing`, `metal`)
+- `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`, `housing`) — همان مقادیر `price_sources`؛ برای صندوق‌های `issuance_redemption` مقدار `fif` است، برای ETF مقدار `stock` است
 - `price` → decimal (قیمت — با `decimal.js`)
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
 - `source` → enum (`manual`, `api`) — منشأ این رکورد؛ فیلد اصلی برای تفکیک دو مسیر بخش «دو مسیر دریافت قیمت»
@@ -119,7 +119,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 - `id` → UUID (Primary Key)
 - `scope` → enum (`asset_category`, `symbol`) — آیا این تنظیم روی کل یک دسته دارایی اعمال می‌شود یا فقط یک نماد خاص
-- `assetCategory` → enum (nullable — وقتی `scope='asset_category'`)
+- `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`, `housing`) (nullable — وقتی `scope='asset_category'`)
 - `symbol` → string (nullable — وقتی `scope='symbol'`؛ برای Override یک نماد خاص، مستقل از تنظیم کلی دسته‌اش)
 - `autoSyncEnabled` → boolean (پیش‌فرض: `false`)
 - `syncIntervalMinutes` → integer (پیش‌فرض پیشنهادی: ۱۵؛ حداقل مجاز در Validation لایه Domain، نه دیتابیس، اعمال شود — مثلاً ≥ ۵)
