@@ -57,10 +57,11 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `rate` → decimal (نرخ تبدیل عمومی: `amountTo = amountFrom / rate`)
-  - برای IRR → USDT: ریال به ازای ۱ تتر (مثال: ۶۰,۰۰۰)
-  - برای EUR → USD: یورو به ازای ۱ دلار
-  - برای هر جفت ارز: مقدار ارز From به ازای ۱ واحد ارز To
+- `rate` → decimal (نرخ تبدیل: `amountTo = amountFrom / rate`)
+  - تعریف یکتا: **«مقدار ارز From به ازای ۱ واحد ارز To»**
+  - برای IRR → USDT: rate = ۶۰,۰۰۰ (یعنی ۶۰,۰۰۰ ریال = ۱ تتر)
+  - برای EUR → USD: rate = ۰.۹۲ (یعنی ۰.۹۲ یورو = ۱ دلار)
+  - **قرارداد ذخیره‌سازی**: فقط یک جهت از هر جفت ارز ذخیره می‌شود — ترجیحاً جهتی که rate > 1 دارد (ارز ضعیف→ارز قوی). جهت معکوس در `convert()` محاسبه می‌شود.
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
@@ -131,8 +132,27 @@
 // pseudo-code — همیشه با decimal.js در Domain Layer پیاده‌سازی شود
 import Decimal from 'decimal.js';
 
-// rate در cur_exchange_rates: مقدار ارز From به ازای ۱ واحد ارز To
-// یعنی: amountTo = amountFrom / rate
+// ── تعریف یکتای rate ──────────────────────────────────────────────────────────
+// rate در cur_exchange_rates همیشه به معنای:
+//   «چه مقدار ارز FROM برابر ۱ واحد ارز TO است»
+//
+//   مثال‌ها:
+//   IRR → USDT : rate = 60000   (یعنی ۶۰,۰۰۰ ریال = ۱ تتر)
+//   USDT → IRR : rate = 0.0000167  (یعنی ۰.۰۰۰۰۱۶۷ تتر = ۱ ریال)
+//   EUR → USD  : rate = 0.92   (یعنی ۰.۹۲ یورو = ۱ دلار)
+//
+//   فرمول تبدیل مستقیم:
+//   amountTo = amountFrom / rate(from→to)
+//
+// ── قرارداد ذخیره‌سازی ────────────────────────────────────────────────────────
+// فقط رکوردهایی که rate > 1 هستند یا «ارز ضعیف→ارز قوی» در دیتابیس ذخیره می‌شوند.
+// مثال: IRR→USDT با rate=60000 ذخیره می‌شود.
+//        USDT→IRR ذخیره نمی‌شود (معکوس آن محاسبه می‌شود).
+//        BTC→USDT ذخیره نمی‌شود — در عوض USDT→BTC با rate=0.0000154 ذخیره می‌شود.
+//
+// برای نمادهای کریپتو، قیمت از Price Fetching (فیچر ۱۹) می‌آید و به صورت
+// «USDT→symbol» در cur_exchange_rates درج می‌شود.
+// ──────────────────────────────────────────────────────────────────────────────
 
 async function convert(
   amount: Decimal,
@@ -141,27 +161,38 @@ async function convert(
 ): Promise<Decimal> {
   if (fromCurrency === toCurrency) return amount;
 
-  // ۱. تلاش برای نرخ مستقیم
+  // ۱. نرخ مستقیم (from→to) موجود است
   const directRate = await getExchangeRate(fromCurrency, toCurrency);
   if (directRate) {
+    // amountTo = amountFrom / rate(from→to)
     return amount.dividedBy(directRate.rate);
   }
 
-  // ۲. تلاش برای نرخ معکوس مستقیم (toCurrency → fromCurrency)
+  // ۲. نرخ معکوس (to→from) موجود است — از آن معکوس استفاده می‌شود
+  //    rate(to→from): مقدار To به ازای ۱ From
+  //    پس: amountTo = amountFrom / (1 / rate(to→from)) = amountFrom * rate(to→from)
+  //    ❗ نکته: این منطق فقط زمانی درست است که rate(to→from) = 1/rate(from→to)
+  //            یعنی هر دو جهت دقیقاً معکوس هم باشند.
+  //    مثال: rate(USDT→IRR) = 0.0000167 → amountIRR = amountUSDT / 0.0000167 ✅
+  //          اما چون این رکورد ذخیره نشده، از rate(IRR→USDT)=60000 استفاده می‌کنیم:
+  //          amountIRR = amountUSDT * 60000 ✅ (معادل amountUSDT / (1/60000))
   const inverseRate = await getExchangeRate(toCurrency, fromCurrency);
   if (inverseRate) {
+    // amountTo = amountFrom * rate(to→from)
+    // زیرا rate(to→from) = «مقدار To به ازای ۱ From» — دقیقاً ضریب تبدیل است
     return amount.times(inverseRate.rate);
   }
 
-  // ۳. تبدیل چندمرحله‌ای از طریق USDT به‌عنوان ارز واسط
+  // ۳. تبدیل دومرحله‌ای از طریق USDT به‌عنوان ارز واسط
   //    مثال: BTC → USDT → IRR
+  //    شرط: هیچ‌کدام USDT نباشند (وگرنه حلقه بی‌نهایت)
   if (fromCurrency !== 'USDT' && toCurrency !== 'USDT') {
-    const toUSDT = await convert(amount, fromCurrency, 'USDT');
-    return convert(toUSDT, 'USDT', toCurrency);
+    const amountInUSDT = await convert(amount, fromCurrency, 'USDT');
+    return convert(amountInUSDT, 'USDT', toCurrency);
   }
 
   throw new Error(
-    `مسیر تبدیل بین ${fromCurrency} و ${toCurrency} یافت نشد — نرخ دستی وارد کنید`
+    `مسیر تبدیل بین ${fromCurrency} و ${toCurrency} یافت نشد — نرخ را دستی وارد کنید`
   );
 }
 ```
