@@ -99,9 +99,10 @@
 - `updatedAt` → datetime
 
 > **نکته لینک در `markAsPaid()`**:
-> - `transactionId` → `exp_transactions.id` (اگر `type=expense`) یا `inc_transactions.id` (اگر `type=income`)
-> - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط)
-> - هر دو در یک عملیات atomic پر می‌شوند
+> - اگر `br_items.type = 'expense'`: فیلد `expenseTransactionId` با `exp_transactions.id` تراکنش ساخته‌شده پر می‌شود؛ `incomeTransactionId` همچنان `null` می‌ماند
+> - اگر `br_items.type = 'income'`: فیلد `incomeTransactionId` با `inc_transactions.id` تراکنش ساخته‌شده پر می‌شود؛ `expenseTransactionId` همچنان `null` می‌ماند
+> - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط — در هر دو حالت پر می‌شود)
+> - هر سه فیلد در یک عملیات atomic پر می‌شوند
 
 ---
 
