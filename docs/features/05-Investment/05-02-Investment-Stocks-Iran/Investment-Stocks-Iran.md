@@ -97,7 +97,7 @@
 - `quantity` → decimal (تعداد سهم)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید — ریال)
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR یا USDT پرداخت شده)
+- `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`baseCurrency`) با `exchangeRateToBase` همان تراکنش — صرف‌نظر از اینکه کارمزد به IRR یا USDT پرداخت شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
