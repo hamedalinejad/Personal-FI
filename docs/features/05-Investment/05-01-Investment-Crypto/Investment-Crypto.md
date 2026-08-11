@@ -90,7 +90,9 @@
 - `averageBuyPrice` → decimal
 - `currency` → string
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT طبق فرمول بخش «منطق کارمزد» — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR، USDT یا خود رمزارز پرداخت شده)
+- `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`cur_currency_preferences.baseCurrency`) در لحظه ثبت هر تراکنش — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR، USDT یا خود رمزارز پرداخت شده)
+
+> **نکته نام‌گذاری**: نام این فیلد از `totalFeesPaidUSDT` به `totalFeesPaidBase` تغییر کرد چون `baseCurrency` کاربر ممکن است USDT نباشد. فرمول تبدیل کارمزد به ارز پایه در بخش «منطق کارمزد» تعریف شده است.
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -185,6 +187,17 @@
 
 ### Transaction APIs
 - `createCryptoTransaction(data)` → خرید / فروش / انتقال
+  - برای `type=transfer_out`/`transfer_in` (انتقال بین صرافی‌های خودی):
+    1. `quantity` را از Holding مبدا کم کن، `totalInvested` متناسب کاهش می‌یابد، `averageBuyPrice` بدون تغییر
+    2. Holding مقصد را با **Weighted Average** آپدیت کن:
+       ```
+       transferredCost    = quantityTransferred × averageBuyPrice_source
+       newTotalInvested   = dest.totalInvested + transferredCost
+       newQuantity        = dest.quantity + quantityTransferred
+       newAverageBuyPrice = newTotalInvested / newQuantity
+       ```
+    3. `transferId` یکسان در هر دو رکورد `transfer_out` و `transfer_in` ذخیره شود
+    4. کارمزد انتقال (از خود ارز کسر می‌شود) از `amountToSend` برداشته می‌شود — `dest.quantity += amountToSend - feeAmount`
 - `createExchangeTransaction(data)` → واریز (`inv_crypto_exchange_transactions.type='deposit'` و `acc_transactions.type='deposit-investment'`) / برداشت (`inv_crypto_exchange_transactions.type='withdraw'` و `acc_transactions.type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
 - `getExchangeTransactions(filters)` → برای واریز/برداشت
