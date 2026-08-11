@@ -205,7 +205,7 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(currentPrice - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice(symbol, baseCurrency) - averageBuyPrice) × quantity` محاسبه می‌شود (طبق فیچر `19-Price-Fetching` — به بخش «نکات طراحی» پایین همین فایل مراجعه شود) و نباید با Realized P&L مخلوط شود.
 
 ---
 
