@@ -1,8 +1,12 @@
-فیچر: Accounts & Banking
-توضیح کلی:
-مدیریت حساب‌های بانکی واقعی (جاری، پس‌انداز، سپرده و غیره). صندوق نقدی، کیف پول و صرافی در فیچرهای جداگانه مدیریت می‌شوند.
+# فیچر: Accounts & Banking
 
-Business Rules
+## توضیح کلی
+مدیریت حساب‌های بانکی واقعی (جاری، پس‌انداز، سپرده و غیره).
+صندوق نقدی، کیف پول و صرافی در فیچرهای جداگانه مدیریت می‌شوند.
+
+---
+
+## Business Rules
 
 - موجودی حساب نمی‌تواند منفی شود (مگر حساب اعتباری در آینده).
 - انتقال وجه بین حساب‌ها باعث ایجاد دو تراکنش مستقل می‌شود (برداشت از مبدا + واریز به مقصد).
@@ -10,68 +14,119 @@ Business Rules
 - حذف حساب وجود ندارد — فقط آرشیو (Soft Archive).
 - تراکنش‌ها پس از ثبت تغییرناپذیر هستند؛ برای اصلاح، تراکنش reversed/voided ثبت می‌شود.
 - مانده حساب بعد از هر تراکنش در فیلد `balanceAfterTransaction` snapshot می‌شود (برای جلوگیری از بازپخش تراکنش‌ها و تغییر دستی).
+- ارز تراکنش باید با ارز حساب مرتبط یکی باشد.
 
-Domain Entities
-1. Account (جدول: acc_accounts)
+---
 
-id → UUID (Primary Key)
-name → string (نام حساب)
-accountNumber → string (شماره حساب)
-iban → string (شماره شبا)
-cardNumber → string (شماره کارت)
-branchName → string (نام شعبه)
-bankName → string (نام بانک)
-currency → string (ارز حساب: IRR, USDT, USD و ...)
-accountType → enum (جاری، پس‌انداز، سپرده ثابت، ...)
-currentBalance → decimal (مانده فعلی)
-isArchived → boolean
-notes → text (یادداشت)
-createdAt → datetime
-updatedAt → datetime
+## Domain Entities
 
-2. Transaction (جدول: acc_transactions)
+### ۱. Account (جدول: `acc_accounts`)
 
-id → UUID (Primary Key)
-date → datetime (تاریخ تراکنش)
-type → string (نوع `TransactionType` — تعریف مرکزی و تنها enum معتبر در core/types/types.md؛ مقادیر: deposit-income, withdrawal-expense, transfer-in, transfer-out, deposit-loan, withdrawal-loan, withdrawal-expense-tax, deposit-income-tax, withdrawal-cheque, deposit-cheque, deposit-investment, withdrawal-investment)
-amount → decimal (مبلغ)
-feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
-feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
-exchangeRateToBase → decimal (nullable — نرخ تتر لحظه تراکنش)
-balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
-accountId → UUID (حساب مرتبط)
-description → string (توضیحات)
-relatedFeature → string (نوع `RelatedFeature` — تعریف مرکزی در core/types/types.md؛ مقادیر: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals)
+- `id` → UUID (Primary Key)
+- `name` → string (نام حساب — باید منحصر به فرد باشد)
+- `accountNumber` → string (nullable — شماره حساب)
+- `iban` → string (nullable — شماره شبا)
+- `cardNumber` → string (nullable — شماره کارت)
+- `branchName` → string (nullable — نام شعبه)
+- `bankName` → string (نام بانک)
+- `currency` → string (ارز حساب: `IRR`, `USDT`, `USD` و ...)
+- `accountType` → enum — مقادیر مجاز:
+  - `checking` — جاری
+  - `savings` — پس‌انداز
+  - `fixed_deposit` — سپرده ثابت
+  - `wallet` — کیف پول الکترونیک (مثل آپ، ایوا)
+  - `cash` — صندوق نقدی
+  - `other` — سایر
+- `currentBalance` → decimal (مانده فعلی — با `decimal.js`)
+- `isArchived` → boolean (پیش‌فرض: `false`)
+- `notes` → text (nullable — یادداشت)
+- `createdAt` → datetime
+- `updatedAt` → datetime
 
-relatedId → UUID (شناسه رکورد در فیچر مرتبط)
-isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
-relatedTransactionId → UUID (nullable — برای تراکنش‌های reversed، لینک به تراکنش اصلی)
-createdAt → datetime
-updatedAt → datetime
+### ۲. Transaction (جدول: `acc_transactions`)
 
-> **نکته**: برای سرمایه‌گذاری‌ها (واریز/برداشت از/به صرافی، کارگزاری، پلتفرم):
-> - `type = 'deposit-investment'` یا `type = 'withdrawal-investment'`
-> - `relatedFeature = 'crypto_exchange'` یا `relatedFeature = 'stocks_iran'` یا `relatedFeature = 'fif'` یا `relatedFeature = 'metals'`
-> - `relatedId` به جدول مخصوص آن فیچر لینک می‌شود
+- `id` → UUID (Primary Key)
+- `date` → datetime (تاریخ تراکنش)
+- `type` → `TransactionType` (تعریف مرکزی در `core/types/types.md` — مقادیر معتبر: `deposit-income`, `withdrawal-expense`, `transfer-in`, `transfer-out`, `deposit-loan`, `withdrawal-loan`, `withdrawal-expense-tax`, `deposit-income-tax`, `withdrawal-cheque`, `deposit-cheque`, `deposit-investment`, `withdrawal-investment`)
+- `amount` → decimal (مبلغ — با `decimal.js`، Minor Unit طبق `db.md`)
+- `feeAmount` → decimal (nullable — کارمزد تراکنش)
+- `feeCurrency` → string (nullable — ارز کارمزد: `IRR`, `USDT` و ...)
+- `exchangeRateToBase` → decimal (nullable — نرخ تبدیل نسبت به `baseCurrency` کاربر در `cur_currency_preferences`؛ مثال: اگر `baseCurrency=IRR`، مقدار = ریال به ازای ۱ واحد ارز تراکنش)
+- `balanceAfterTransaction` → decimal (مانده حساب **پس از** این تراکنش — snapshot اجباری)
+- `accountId` → UUID (حساب مرتبط)
+- `description` → string (nullable — توضیحات)
+- `relatedFeature` → `RelatedFeature` (nullable — تعریف مرکزی در `core/types/types.md`؛ مقادیر: `income`, `expense`, `cheque`, `loan`, `crypto_exchange`, `stocks_iran`, `fif`, `metals`, `physical_assets`, `budget`, `tax`, `goals`)
+- `relatedId` → UUID (nullable — شناسه رکورد در فیچر مرتبط؛ همیشه با `relatedFeature` پر یا خالی می‌شود)
+- `isVoided` → boolean (پیش‌فرض: `false` — تراکنش لغوشده؛ هرگز حذف یا ویرایش مستقیم نمی‌شود)
+- `relatedTransactionId` → UUID (nullable — برای تراکنش‌های reversal: لینک به تراکنش اصلی که این را معکوس کرده)
+- `createdAt` → datetime
+- `updatedAt` → datetime
 
-APIهای داخلی
-Account:
+> **قانون `relatedFeature` + `relatedId`**: این دو فیلد همیشه با هم پر یا با هم `null` هستند. اگر `relatedFeature` پر شود، `relatedId` اجباری است و برعکس.
 
-createAccount(data)
-updateAccount(id, data)   // فقط ویرایش اطلاعات حساب
-getAllAccounts(includeArchived = false)
-getAccountById(id)
-archiveAccount(id)
-getCurrentBalance(accountId)
+> **مقادیر `relatedFeature` به تفکیک نوع تراکنش**:
+>
+> | `type` | `relatedFeature` | `relatedId` |
+> |--------|-----------------|-------------|
+> | `deposit-income` | `income` | `inc_transactions.id` |
+> | `withdrawal-expense` | `expense` | `exp_transactions.id` |
+> | `deposit-cheque` / `withdrawal-cheque` | `cheque` | `chk_cheques.id` |
+> | `deposit-loan` / `withdrawal-loan` | `loan` | `ln_transactions.id` |
+> | `deposit-investment` / `withdrawal-investment` (صرافی کریپتو) | `crypto_exchange` | `inv_crypto_exchange_transactions.id` |
+> | `deposit-investment` / `withdrawal-investment` (کارگزاری سهام / ETF) | `stocks_iran` | `inv_stocks_iran_brokerage_transactions.id` |
+> | `deposit-investment` / `withdrawal-investment` (صندوق issuance_redemption) | `fif` | `inv_fif_transactions.id` |
+> | `deposit-investment` / `withdrawal-investment` (پلتفرم فلزات) | `metals` | `inv_metals_platform_transactions.id` |
+> | `transfer-in` / `transfer-out` | `null` | `null` (انتقال داخلی) |
+> | `withdrawal-expense-tax` / `deposit-income-tax` | `tax` | `tax_records.id` |
 
-Transaction:
+---
 
-createTransaction(data)
-updateTransaction(id, data)   // فقط برای update متنی (description و ...)
-voidTransaction(id, reason, relatedTransactionId?)   // لغو تراکنش و ثبت reversed
-getTransactionsByAccount(accountId, filters)
-getTransactionById(id)
+## APIهای داخلی
 
-Transfer:
+### Account APIs
+- `createAccount(data)` → ایجاد حساب جدید با `currentBalance = 0` (یا مقدار اولیه)
+- `updateAccount(id, data)` → ویرایش فقط فیلدهای توصیفی: `name`, `bankName`, `branchName`, `accountNumber`, `iban`, `cardNumber`, `notes` — هرگز `currentBalance` یا `currency` مستقیم ویرایش نمی‌شود
+- `getAllAccounts(includeArchived = false)`
+- `getAccountById(id)`
+- `archiveAccount(id)` → `isArchived = true`؛ حساب آرشیوشده تراکنش جدید نمی‌پذیرد
+- `getCurrentBalance(accountId)` → برگرداندن `currentBalance` از جدول (نه جمع تراکنش‌ها)
 
-transferBetweenAccounts(sourceAccountId, targetAccountId, amount, description)
+### Transaction APIs
+- `createTransaction(data)` → ثبت تراکنش + آپدیت `currentBalance` + ثبت `balanceAfterTransaction`؛ اگر موجودی کافی نباشد، خطا برمی‌گرداند
+- `updateTransactionMetadata(id, data)` → ویرایش فقط فیلدهای غیرمالی: `description`؛ هیچ فیلد مالی (`amount`, `date`, `type`, `accountId`) مستقیم ویرایش نمی‌شود
+- `voidTransaction(id, reason)`:
+  1. تراکنش اصلی: `isVoided = true`
+  2. یک تراکنش معکوس جدید با همان `amount` ولی جهت مخالف ایجاد می‌شود
+  3. `relatedTransactionId` در تراکنش معکوس → `id` تراکنش اصلی
+  4. `currentBalance` حساب آپدیت می‌شود
+  5. `balanceAfterTransaction` در تراکنش معکوس snapshot می‌شود
+- `getTransactionsByAccount(accountId, filters)` → فیلتر: `dateRange`, `type`, `isVoided`
+- `getTransactionById(id)`
+
+### Transfer APIs
+- `transferBetweenAccounts(sourceAccountId, targetAccountId, amount, feeAmount?, description?)`:
+  1. تراکنش `transfer-out` در حساب مبدا ایجاد می‌شود (شامل `feeAmount` اگر وجود داشته باشد)
+  2. تراکنش `transfer-in` در حساب مقصد ایجاد می‌شود
+  3. `relatedTransactionId` در هر تراکنش → `id` تراکنش دیگر (لینک دوطرفه)
+  4. `relatedFeature` و `relatedId` هر دو `null` هستند (انتقال داخلی)
+  5. هر دو `balanceAfterTransaction` مستقل محاسبه و ثبت می‌شوند
+  6. عملیات atomic است — اگر یکی شکست بخورد، هیچ‌کدام ثبت نمی‌شود
+
+---
+
+## روابط با سایر فیچرها
+
+- **Income / Expense / Cheque / Loan**: هر تراکنش مالی واقعی یک رکورد در `acc_transactions` ایجاد می‌کند
+- **Investment (Crypto / Stocks / FIF / Metals)**: واریز و برداشت از پلتفرم‌های سرمایه‌گذاری از طریق `acc_transactions` ثبت می‌شود
+- **Budget**: لینک هزینه‌ها به پاکت‌های بودجه از طریق `bg_transaction_links`
+- **Currency**: `exchangeRateToBase` در لحظه هر تراکنش از `cur_exchange_rates` خوانده و قفل می‌شود
+- **Reports / Dashboard / Portfolio**: منبع اصلی داده برای گزارش‌ها
+
+---
+
+## نکات طراحی
+
+- `currentBalance` در `acc_accounts` همیشه snapshot است و باید با جمع تراکنش‌ها برابر باشد — هرگز مستقیم ویرایش نمی‌شود.
+- `balanceAfterTransaction` در هر رکورد `acc_transactions` ثبت می‌شود تا بتوان تاریخچه موجودی را بدون بازپخش همه تراکنش‌ها بازسازی کرد.
+- تمام محاسبات مالی با `decimal.js` انجام می‌شود (هرگز `Number` یا `float`).
+- مبالغ در دیتابیس با Minor Unit ذخیره می‌شوند (طبق `db.md`).
