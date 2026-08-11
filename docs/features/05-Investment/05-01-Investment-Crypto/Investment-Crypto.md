@@ -8,18 +8,31 @@
 
 ---
 
+## ارز پایه محاسبات — قانون بنیادین
+
+کاربر می‌تواند رمزارز را با **هر ارزی** بخرد یا بفروشد: ریال، تتر، یا مستقیماً با یک رمزارز دیگر (مثلاً خرید BTC با پرداخت مستقیم ETH، بدون عبور از ریال یا تتر). چون `inv_crypto_holdings` باید یک `averageBuyPrice`/`totalInvested` **قابل‌جمع و قابل‌مقایسه** برای هر دارایی نگه دارد، صرف‌نظر از اینکه هر خرید با چه ارزی پرداخت شده، قانون زیر برای همه محاسبات الزامی است (کاملاً هم‌راستا با تغییر نام‌گذاری `totalFeesPaidBase` که پیش‌تر در همین فایل انجام شده):
+
+> **همه‌چیز در `inv_crypto_holdings` (میانگین خرید، مجموع سرمایه‌گذاری، مجموع کارمزد) همیشه به ارز پایه کاربر (`cur_currency_preferences.baseCurrency`) است — هرگز به ارز پرداخت آن تراکنش خاص.**
+
+برای این کار، هر تراکنش خرید/فروش (`inv_crypto_transactions`) علاوه بر مبلغ به ارز واقعی پرداخت‌شده (`price`, `totalAmount`, `currency`)، معادل آن را به ارز پایه هم در لحظه ثبت ذخیره می‌کند (`priceBase`, `totalAmountBase`) — دقیقاً مشابه الگوی `totalFeesPaidBase`. منبع این تبدیل:
+- اگر `currency` = ارز پایه کاربر: بدون تبدیل (ضریب ۱)
+- اگر `currency = IRR` و ارز پایه چیز دیگری باشد (مثلاً USDT): با `exchangeRateToBase`
+- اگر `currency` رمزارز دیگری باشد (مثلاً ETH، یعنی معامله رمزارز-به-رمزارز): با `getLatestPrice(symbol, baseCurrency)` از فیچر `19-Price-Fetching`، یا در نبود قیمت کش‌شده، وارد‌شده دستی توسط کاربر در لحظه ثبت تراکنش
+
+---
+
 ## User Stories
 
 ### Must Have
 - ثبت صرافی یا والت (شامل والت نرم‌افزاری) همراه با آدرس سایت/اپ
-- ثبت خرید رمزارز (ریالی یا تتری)
-- ثبت فروش رمزارز (مبلغ می‌تواند به کیف پول صرافی/ولت اضافه شود)
+- ثبت خرید رمزارز **با هر ارز پرداختی** (ریال، تتر، یا مستقیماً با یک رمزارز دیگر — معامله رمزارز-به-رمزارز)
+- ثبت فروش رمزارز (مبلغ می‌تواند به موجودی ریال/تتر صرافی/ولت اضافه شود، یا مستقیماً صرف خرید رمزارز دیگری شود)
 - واریز از حساب بانکی به صرافی/ولت
 - برداشت از صرافی/ولت به حساب بانکی
 - انتقال بین صرافی‌ها یا والت‌ها (با امکان کسر کارمزد از ارز)
-- مشاهده موجودی هر رمزارز و میانگین خرید
-- ثبت و پیگیری کارمزدهای پرداخت‌شده (به ریال و تتر)
-- محاسبه سود و زیان (realized و unrealized)
+- مشاهده موجودی هر رمزارز و میانگین خرید (همیشه به ارز پایه کاربر — به بخش «ارز پایه محاسبات» مراجعه شود)
+- ثبت و پیگیری کارمزدهای پرداخت‌شده (با هر ارزی، تجمیع‌شده به ارز پایه)
+- محاسبه سود و زیان (realized و unrealized) — دقیق، حتی وقتی خریدهای یک دارایی با ارزهای مختلف انجام شده باشند
 - مشاهده ارزش کل پرتفوی رمزارز
 - ذخیره نرخ تبدیل لحظه معامله
 
@@ -32,12 +45,18 @@
 ## Business Rules
 
 1. هر معامله رمزارز باید به یک صرافی یا والت مرتبط باشد.
-2. هنگام **خرید**:
-   - موجودی رمزارز افزایش می‌یابد.
+2. هنگام **خرید** (با هر ارز پرداختی — ریال، تتر، یا رمزارز دیگر):
+   - موجودی رمزارز خریداری‌شده افزایش می‌یابد.
    - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` + `inv_crypto_exchange_transactions` ثبت می‌شود.
+   - در صورت پرداخت با رمزارز دیگر (معامله رمزارز-به-رمزارز) → به قاعده ۲a مراجعه شود.
+2a. **معامله رمزارز-به-رمزارز (Crypto-to-Crypto Trade)**: وقتی کاربر مستقیماً یک رمزارز را با رمزارز دیگری می‌خرد (مثلاً خرید BTC با پرداخت ETH، بدون عبور از ریال/تتر)، این یک معامله اتمیک ولی از نظر حسابداری دو رویداد است و **باید به‌صورت دو رکورد لینک‌شده در `inv_crypto_transactions` با یک `tradeId` مشترک** (UUID تازه، مشابه الگوی `transferId`) ثبت شود:
+   - یک رکورد `type = 'sell'` روی Holding رمزارز پرداختی (مثلاً ETH) با `quantity` = مقدار پرداختی؛ این رکورد `realizedPL` واقعی روی ETH تولید می‌کند (طبق فرمول بخش Realized P&L).
+   - یک رکورد `type = 'buy'` روی Holding رمزارز دریافتی (مثلاً BTC) با `quantity` = مقدار خریداری‌شده؛ مبنای هزینه (`totalAmountBase`) این خرید دقیقاً برابر `totalAmountBase` رکورد فروش بالا به‌علاوهٔ کارمزد (اگر جدا پرداخت شده) است.
+   - هر دو رکورد یک `tradeId` مشترک دارند تا به‌عنوان یک معامله واحد قابل شناسایی، نمایش و Reversal باشند.
+   - `price`/`totalAmount`/`currency` هر رکورد به ارز طرف مقابل معامله همان رکورد اشاره دارد (مثلاً در رکورد `sell` ETH، `currency = BTC`)، اما `priceBase`/`totalAmountBase` (طبق «ارز پایه محاسبات») در هر دو رکورد باید یکسان و منطبق باشند.
 3. هنگام **فروش**:
    - موجودی رمزارز کاهش می‌یابد.
-   - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود (نه الزاماً حساب بانکی).
+   - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود، یا (طبق قاعده ۲a) مستقیماً صرف خرید رمزارز دیگری شود.
 4. **واریز از حساب بانکی** به صرافی/ولت:
    - موجودی حساب بانکی کاهش و موجودی ریال/تتر صرافی افزایش می‌یابد.
    - تراکنش در `acc_transactions` با `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` ثبت می‌شود.
@@ -87,9 +106,9 @@
 - `symbol` → string (BTC, ETH, USDT, IRR و ...)
 - `name` → string
 - `quantity` → decimal (موجودی فعلی)
-- `averageBuyPrice` → decimal
-- `currency` → string
-- `totalInvested` → decimal
+- `averageBuyPrice` → decimal (همیشه به **ارز پایه کاربر**، طبق «ارز پایه محاسبات» — صرف‌نظر از اینکه خریدهای این دارایی با چه ارزهایی پرداخت شده‌اند)
+- `currency` → string (ثابت = `baseCurrency` کاربر برای همه ردیف‌ها؛ نگهداری می‌شود صرفاً برای وضوح در UI/گزارش‌ها)
+- `totalInvested` → decimal (همیشه به **ارز پایه کاربر**)
 - `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`cur_currency_preferences.baseCurrency`) در لحظه ثبت هر تراکنش — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR، USDT یا خود رمزارز پرداخت شده)
 
 > **نکته نام‌گذاری**: نام این فیلد از `totalFeesPaidUSDT` به `totalFeesPaidBase` تغییر کرد چون `baseCurrency` کاربر ممکن است USDT نباشد. فرمول تبدیل کارمزد به ارز پایه در بخش «منطق کارمزد» تعریف شده است.
@@ -101,7 +120,7 @@
 > - برای IRR و USDT:  
 >   - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است)  
 >   - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود)  
->   - `totalFeesPaidUSDT = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
+>   - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
 > - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
 > - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
@@ -112,13 +131,16 @@
 - `symbol` → string
 - `type` → string (`buy`, `sell`, `transfer_in`, `transfer_out`)
 - `quantity` → decimal
-- `price` → decimal
-- `totalAmount` → decimal
+- `price` → decimal (به ارز `currency` این رکورد — یعنی ارز طرف مقابل معامله؛ می‌تواند IRR، USDT یا یک رمزارز دیگر باشد)
+- `totalAmount` → decimal (به ارز `currency`)
+- `priceBase` → decimal (معادل `price` به ارز پایه کاربر (`baseCurrency`)، طبق «ارز پایه محاسبات» — الزامی برای `buy`/`sell`)
+- `totalAmountBase` → decimal (معادل `totalAmount` به ارز پایه — این فیلد و نه `totalAmount` است که در فرمول‌های Weighted Average/Realized P&L و به‌روزرسانی `inv_crypto_holdings` استفاده می‌شود)
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
-- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
-- `currency` → string
+- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه به ارز پایه کاربر — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد. در معامله رمزارز-به-رمزارز که نه ارز اصلی و نه کارمزد ریالی نیستند، `null` می‌ماند و تبدیل از طریق `getLatestPrice()` فیچر `19-Price-Fetching` انجام می‌شود)
+- `currency` → string (ارز طرف مقابل معامله: IRR، USDT، یا سیمبل یک رمزارز دیگر برای معاملات رمزارز-به-رمزارز)
+- `tradeId` → UUID (نال مگر برای معامله رمزارز-به-رمزارز طبق قاعده ۲a — UUID مشترک بین رکورد `sell` رمزارز پرداختی و رکورد `buy` رمزارز دریافتی همان معامله)
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
 - `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
 - `description` → string
@@ -186,7 +208,7 @@
 - `getPortfolioValue(targetCurrency?)`
 
 ### Transaction APIs
-- `createCryptoTransaction(data)` → خرید / فروش / انتقال
+- `createCryptoTransaction(data)` → خرید / فروش / انتقال؛ برای معامله رمزارز-به-رمزارز (قاعده ۲a) دو بار با `tradeId` مشترک فراخوانی می‌شود (یک `sell` + یک `buy`)، یا با یک متد کمکی اختصاصی `createCryptoToCryptoTrade(data)` که هر دو رکورد را در یک تراکنش دیتابیسی اتمیک ایجاد می‌کند
   - برای `type=transfer_out`/`transfer_in` (انتقال بین صرافی‌های خودی):
     1. `quantity` را از Holding مبدا کم کن، `totalInvested` متناسب کاهش می‌یابد، `averageBuyPrice` بدون تغییر
     2. Holding مقصد را با **Weighted Average** آپدیت کن:
@@ -220,17 +242,17 @@
 
 فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش:
 
-**هنگام خرید** (Weighted Average):
+**هنگام خرید** (Weighted Average — همه مبالغ به ارز پایه کاربر، طبق «ارز پایه محاسبات»):
 ```
-newTotalInvested = totalInvested + (quantityBought × price) + feeAmount(به ارز پایه)
+newTotalInvested = totalInvested + totalAmountBase(بدون احتساب کارمزد) + feeAmount(به ارز پایه)
 newQuantity      = quantity + quantityBought
-newAverageBuyPrice = newTotalInvested / newQuantity
+newAverageBuyPrice = newTotalInvested / newQuantity   // نتیجه همیشه به ارز پایه
 ```
 
-**هنگام فروش** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**، یعنی همان مقدار فعلی Holding پیش از هر تغییر):
+**هنگام فروش** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**، یعنی همان مقدار فعلی Holding پیش از هر تغییر؛ همه مبالغ به ارز پایه):
 ```
-soldPortionCost = quantitySold × averageBuyPrice
-realizedPL       = saleProceeds - soldPortionCost - feeAmount(به ارز پایه)
+soldPortionCost = quantitySold × averageBuyPrice        // به ارز پایه
+realizedPL       = totalAmountBase(بدون احتساب کارمزد) - soldPortionCost - feeAmount(به ارز پایه)
 totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
 quantity         -= quantitySold
 averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
@@ -238,8 +260,10 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`)، مطابق «قانون Minor Unit Storage» در `db.md`.
-> - `feeAmount` باید طبق فرمول بخش «منطق کارمزد» (بالاتر در همین فایل) ابتدا به ارز پایه تبدیل و سپس در `realizedPL` کسر شود.
-> - `calculateProfitLoss(symbol?, exchangeId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_crypto_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(currentPrice - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+> - ورودی این فرمول‌ها همیشه `totalAmountBase`/`priceBase` است، نه `totalAmount`/`price` خام تراکنش (که به ارز واقعی پرداخت‌شده است) — طبق «ارز پایه محاسبات».
+> - `feeAmount` باید طبق فرمول بخش «منطق کارمزد» (بالاتر در همین فایل) ابتدا به ارز پایه تبدیل و سپس در `realizedPL`/`totalInvested` لحاظ شود.
+> - **معامله رمزارز-به-رمزارز (قاعده ۲a)**: دو رکورد `sell`/`buy` با `tradeId` مشترک، هرکدام طبق فرمول بالای خودشان (فروش/خرید) روی Holding خودشان اعمال می‌شوند؛ `realizedPL` رکورد `sell` مثل هر فروش دیگری محاسبه و ثبت می‌شود (سود/زیان واقعی روی دارایی پرداختی) و `totalAmountBase` همان رکورد، مبنای هزینه (`totalInvested`) رکورد `buy` طرف مقابل را می‌سازد.
+> - `calculateProfitLoss(symbol?, exchangeId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_crypto_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice(symbol, baseCurrency) - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
 > - در `transfer_out`/`transfer_in` بین صرافی‌های خودی، هیچ `realizedPL`ای ایجاد نمی‌شود (فروش واقعی نیست)؛ فقط `quantity` بین دو Holding جابه‌جا می‌شود و `averageBuyPrice` مقصد باید Weighted Average بین موجودی قبلی مقصد (اگر بود) و مقدار انتقالی با همان `averageBuyPrice` مبدأ باشد.
 
 ---
