@@ -228,6 +228,13 @@
     - اگر `gracePeriodMonths > 0`: اولین N ماه فقط سود (برای تمام روش‌ها)
     - شروع از `firstPaymentDate` + `installmentFrequency`
 - `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
+- `checkAndUpdateOverdueStatus()` → بررسی همه وام‌های `active` و تغییر `status` به `overdue` در صورت وجود قسط سررسید گذشته پرداخت‌نشده؛ این تابع باید هنگام **باز شدن اپ** و هنگام **ورود به صفحه وام‌ها** فراخوانی شود (lazy update — نه background job چون اپ آفلاین‌فرست است)
+
+> **قانون `status = overdue`**: وامی `overdue` تلقی می‌شود که:
+> 1. `status = 'active'` باشد، و
+> 2. تاریخ سررسید حداقل یک قسط پرداخت‌نشده از `getUpcomingPayments()` گذشته باشد (یعنی تاریخ قسط < امروز و رکورد پرداخت در `ln_transactions` با `installmentNumber` مربوطه وجود ندارد)
+>
+> برگشت از `overdue` به `active`: زمانی که کاربر همه اقساط معوق را پرداخت کند، `status` مجدداً `active` می‌شود.
 
 ---
 
@@ -247,7 +254,7 @@
 - برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط اصل تغییر می‌دهد).
 - `totalPaidPrincipal` و `totalPaidInterest` برای سرعت Dashboard به‌روزرسانی می‌شوند (بدون جمع کردن تمام ln_transactions).
 - برای هر پرداخت، `exchangeRateToBase` ذخیره می‌شود.
-- `status = 'overdue'` زمانی تغییر می‌کند که قسط سررسید گذشته وجود داشته باشد.
+- `status = 'overdue'` از طریق `checkAndUpdateOverdueStatus()` به‌روز می‌شود — این تابع هنگام باز شدن اپ و ورود به صفحه وام‌ها فراخوانی می‌شود (Lazy Update، سازگار با Offline-First).
 
 ---
 
