@@ -59,6 +59,29 @@
 - `timestamp` → datetime
 - `success` → boolean
 
+### ۳. Security Audit Log (جدول: `sec_audits`) — Should Have
+
+رویدادهای حساس مرتبط با داده (نه فقط ورود/خروج) را برای بازبینی امنیتی ثبت می‌کند. برخلاف `sec_session_logs` که فقط رویداد احراز هویت دارد، این جدول دسترسی‌های مهم به داده‌های مالی را هم لاگ می‌کند.
+
+- `id` → UUID (Primary Key)
+- `action` → string — نوع رویداد؛ مقادیر مجاز:
+  - `export_data` — صدور فایل SQLite یا گزارش
+  - `import_data` — وارد کردن فایل دیتابیس
+  - `change_pin` — تغییر PIN یا رمز عبور
+  - `change_biometric` — تغییر تنظیمات بیومتریک
+  - `disable_lock` — غیرفعال کردن قفل اپ
+  - `failed_unlock` — تلاش ناموفق برای بازکردن قفل (دنباله)
+  - `lockout_triggered` — شروع Backoff پس از تجاوز از `maxFailedAttempts`
+  - `settings_changed` — تغییر تنظیمات امنیتی (`sec_settings`)
+- `timestamp` → datetime (لحظه وقوع رویداد — UTC)
+- `details` → string (nullable — اطلاعات تکمیلی؛ هرگز شامل PIN، رمز عبور یا کلید رمزنگاری نباشد)
+- `createdAt` → datetime
+
+> **قوانین این جدول**:
+> - Append-Only — هیچ رکوردی ویرایش یا حذف نمی‌شود.
+> - `details` هرگز داده حساس (کلید، رمز، PIN) ندارد — فقط metadata مثل «تعداد دفعات شکست» یا «نوع تنظیم تغییریافته».
+> - این جدول در نسخه ۱ اختیاری (Should Have) است؛ اگر پیاده نشد، موارد حیاتی (`lockout_triggered`, `export_data`) باید حداقل در `sec_session_logs` ثبت شوند.
+
 ---
 
 ## APIهای داخلی
@@ -84,6 +107,10 @@
 - `endSession()` → پایان جلسه
 - `checkSession()` → بررسی وضعیت جلسه
 - `extendSession()` → تمدید جلسه
+
+### Audit Log APIs — Should Have
+- `logAuditEvent(action, details?)` → ثبت رویداد در `sec_audits` (Append-Only؛ هرگز داده حساس در `details` نرود)
+- `getAuditLog(limit?)` → دریافت آخرین رویدادهای امنیتی برای نمایش در صفحه تنظیمات
 
 ---
 
