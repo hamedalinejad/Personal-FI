@@ -117,7 +117,7 @@ purity → string (کد استاندارد خلوص فلز — مقادیر مج
 quantityMg → decimal (موجودی به میلی‌گرم)
 averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
 totalInvested → decimal
-totalFeesPaidUSDT → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با exchangeRateToBase همان تراکنش)
+totalFeesPaidBase → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به ارز پایه (ریال) با exchangeRateToBase همان تراکنش)
 createdAt / updatedAt
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
