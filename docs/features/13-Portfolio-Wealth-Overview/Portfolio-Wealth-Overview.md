@@ -95,41 +95,12 @@
 - `totalLiabilities` → decimal
 - `totalWealth` → decimal
 - `netWealth` → decimal
-- `totalWealthUSDT` → decimal
-- `netWealthUSDT` → decimal
-- `breakdown` → JSON (جزئیات هر بخش — هم‌ساختار با خروجی `getPortfolioOverview()`)
-  ```json
-  {
-    "investments": {
-      "total": number,
-      "profitLoss": number,
-      "unrealized": number,
-      "realized": number,
-      "sections": {
-        "crypto": { "value": number, "profitLoss": number },
-        "stocksIran": { "value": number, "profitLoss": number },
-        "fixedIncome": { "value": number, "profitLoss": number },
-        "metals": { "value": number, "profitLoss": number }
-      }
-    },
-    "physicalAssets": {
-      "total": number,
-      "profitLoss": number
-    },
-    "cash": {
-      "total": number
-    },
-    "liabilities": {
-      "total": number
-    },
-    "allocation": Array<{
-      "key": string,
-      "label": string,
-      "value": number,
-      "percent": number
-    }>
-  }
-  ```
+- `totalWealthBase` → decimal (معادل ارز پایه کاربر — سازگار با نام‌گذاری `Base` در سایر فیچرها)
+- `netWealthBase` → decimal (معادل ارز پایه کاربر)
+- `schemaVersion` → integer (نسخه ساختار `breakdown` — برای backward compatibility؛ پیش‌فرض: `1`)
+- `breakdown` → JSON typed به `PortfolioBreakdown` (تعریف کامل در `core/types/types.md` — بخش `portfolio.ts`)
+
+> ⚠️ **هشدار backward compatibility**: ساختار `breakdown` هرگز بدون افزایش `schemaVersion` تغییر نکند. هنگام خواندن snapshot قدیمی، `schemaVersion` را چک کنید و در صورت نیاز migration اعمال کنید. ساختار فعلی (`schemaVersion=1`) در `core/types/types.md` تعریف شده است.
 - `createdAt` → datetime
 
 ### ۲. Portfolio Setting (جدول: `port_settings`)
