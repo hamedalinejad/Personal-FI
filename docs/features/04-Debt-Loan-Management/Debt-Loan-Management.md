@@ -104,7 +104,7 @@
 - `gracePeriodMonths` → integer (nullable — ماه‌های تنفس) ✅ **جدید**
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
-- `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
+- `recalculateOnEarlyPayment` → boolean | null (پیش‌فرض: `null`؛ **فقط برای `calculationMethod = 'declining_balance'` معنا دارد** — برای `flat_rate`, `bullet`, `qarz_al_hasaneh` همیشه `null` است چون این روش‌ها مفهوم Re-amortization ندارند. وقتی `null` است سیستم رفتار `false` را اعمال می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
 
 **کارمزدها و جریمه:**
 - `originationFeeAmount` → decimal (nullable — کارمزد صدور)
@@ -340,9 +340,9 @@ principalPortion = remainingBalance            // کل اصل باقیمانده
 
 فقط برای `calculationMethod = 'declining_balance'` معنا دارد (در Flat Rate و Qarz Al-Hasaneh اصل و سود هر قسط از ابتدا ثابت تعریف شده‌اند، پس پیش‌پرداخت جزئی صرفاً `remainingBalance` را کم می‌کند بدون نیاز به بازمحاسبه فرمول).
 
-هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود:
+هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود. مقدار `null` (پیش‌فرض) معادل `false` در نظر گرفته می‌شود:
 
-**حالت ۱ — `recalculateOnEarlyPayment = false` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
+**حالت ۱ — `recalculateOnEarlyPayment = false` یا `null` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
 ```
 remainingBalance -= earlyPaymentPrincipalAmount
 // calculatedInstallment و r بدون تغییر باقی می‌مانند
