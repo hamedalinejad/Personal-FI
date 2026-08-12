@@ -66,18 +66,23 @@
 
 > **مقادیر `relatedFeature` به تفکیک نوع تراکنش**:
 >
-> | `type` | `relatedFeature` | `relatedId` |
-> |--------|-----------------|-------------|
-> | `deposit-income` | `income` | `inc_transactions.id` |
-> | `withdrawal-expense` | `expense` | `exp_transactions.id` |
-> | `deposit-cheque` / `withdrawal-cheque` | `cheque` | `chk_cheques.id` |
-> | `deposit-loan` / `withdrawal-loan` | `loan` | `ln_transactions.id` |
-> | `deposit-investment` / `withdrawal-investment` (صرافی کریپتو) | `crypto_exchange` | `inv_crypto_exchange_transactions.id` |
-> | `deposit-investment` / `withdrawal-investment` (کارگزاری سهام / ETF) | `stocks_iran` | `inv_stocks_iran_brokerage_transactions.id` |
-> | `deposit-investment` / `withdrawal-investment` (صندوق issuance_redemption) | `fif` | `inv_fif_transactions.id` |
-> | `deposit-investment` / `withdrawal-investment` (پلتفرم فلزات) | `metals` | `inv_metals_platform_transactions.id` |
-> | `transfer-in` / `transfer-out` | `null` | `null` (انتقال داخلی) |
-> | `withdrawal-expense-tax` / `deposit-income-tax` | `tax` | `tax_records.id` |
+> | `type` | `relatedFeature` | `relatedId` | `relatedTransactionId` |
+> |--------|-----------------|-------------|------------------------|
+> | `deposit-income` | `income` | `inc_transactions.id` | `null` |
+> | `withdrawal-expense` | `expense` | `exp_transactions.id` | `null` |
+> | `deposit-cheque` / `withdrawal-cheque` | `cheque` | `chk_cheques.id` | `null` |
+> | `deposit-loan` / `withdrawal-loan` | `loan` | `ln_transactions.id` | `null` |
+> | `deposit-investment` / `withdrawal-investment` (صرافی کریپتو) | `crypto_exchange` | `inv_crypto_exchange_transactions.id` | `null` |
+> | `deposit-investment` / `withdrawal-investment` (کارگزاری سهام / ETF) | `stocks_iran` | `inv_stocks_iran_brokerage_transactions.id` | `null` |
+> | `deposit-investment` / `withdrawal-investment` (صندوق issuance_redemption) | `fif` | `inv_fif_transactions.id` | `null` |
+> | `deposit-investment` / `withdrawal-investment` (پلتفرم فلزات) | `metals` | `inv_metals_platform_transactions.id` | `null` |
+> | `transfer-in` / `transfer-out` | `null` | `null` | **`acc_transactions.id` تراکنش طرف مقابل** (لینک دوطرفه — اجباری) |
+> | `withdrawal-expense-tax` / `deposit-income-tax` | `tax` | `tax_records.id` | `null` |
+> | تراکنش reversal (هر نوع) | (همان نوع اصل) | (همان relatedId اصل) | **`acc_transactions.id` تراکنش اصلی که معکوس شده** |
+>
+> **توجه**: `relatedTransactionId` دو کاربرد دارد و هیچ‌گاه با `relatedFeature`/`relatedId` تداخل ندارد:
+> 1. **Transfer**: لینک دوطرفه بین `transfer-out` و `transfer-in` همان انتقال — اجباری، هر دو طرف باید پر شوند
+> 2. **Reversal**: لینک تراکنش معکوس به تراکنش اصلی که `isVoided = true` شده — اجباری در `voidTransaction()`
 
 ---
 
