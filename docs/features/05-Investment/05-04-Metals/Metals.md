@@ -97,10 +97,10 @@ Domain Entities
 id → UUID
 platformId → UUID
 metalType → string (gold, silver, copper)
-purity → string (کد استاندارد خلوص فلز — مقادیر مجاز:)
+purity → enum (کد استاندارد خلوص فلز — فقط مقادیر زیر مجاز هستند؛ CHECK constraint در DB و validation در لایه Domain الزامی است):
 
-> | کد | معنا | فلز |
-> |----|------|-----|
+> | مقدار enum | معنا | فلز |
+> |------------|------|-----|
 > | `18k` | طلای ۱۸ عیار (۷۵٪ خلوص) | طلا |
 > | `21k` | طلای ۲۱ عیار (۸۷.۵٪ خلوص) | طلا |
 > | `22k` | طلای ۲۲ عیار (۹۱.۶٪ خلوص) | طلا |
@@ -113,7 +113,11 @@ purity → string (کد استاندارد خلوص فلز — مقادیر مج
 > | `coin_gerami` | سکه گرمی | طلا |
 > | `other` | سایر | همه |
 >
-> **نکته**: `purity` در `getHoldingByMetal(metalType, platformId?)` برای گروه‌بندی استفاده می‌شود — اهمیت یکسان‌سازی مقادیر بسیار زیاد است.
+> **الزامات پیاده‌سازی**:
+> - در DB (SQLite/PostgreSQL): `CHECK (purity IN ('18k','21k','22k','24k','999','9999','coin_emami','coin_bahar','coin_quarter','coin_gerami','other'))`
+> - در لایه Domain/Store: قبل از insert/update، مقدار `purity` در برابر این لیست ثابت validate شود؛ در صورت مغایرت، خطا برگردانده شود.
+> - در UI: فقط از dropdown با این مقادیر ثابت استفاده شود — ورودی آزاد (free-text) برای این فیلد ممنوع است.
+> - **دلیل**: `purity` در `getHoldingByMetal(metalType, platformId?)` برای GROUP BY استفاده می‌شود؛ هر typo مثل `Gold_18K` یا `18K` یک holding جداگانه می‌سازد و موجودی خراب می‌شود.
 quantityMg → decimal (موجودی به میلی‌گرم)
 averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
 totalInvested → decimal
