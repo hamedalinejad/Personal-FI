@@ -52,7 +52,7 @@
    - اگر پس از کاهش `quantity = 0` شود (یعنی `quantitySold` برابر کل موجودی قبل از فروش بود)، وضعیت دارایی به `sold` تغییر می‌کند؛ در غیر این صورت دارایی `active` می‌ماند (فروش جزئی).
 5. **فروش جزئی در برابر فروش کامل:**
    - هیچ نوع تراکنش جداگانه‌ای وجود ندارد؛ هر دو حالت با همان `type = 'sale'` ثبت می‌شوند و تنها با مقایسه `quantitySold` نسبت به `quantity` پیش از فروش (فروش کامل) یا کمتر از آن (فروش جزئی) تشخیص داده می‌شوند.
-   - `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود (در فروش کامل بدون تأثیر عملی، چون دارایی بسته می‌شود).
+   - برای `gold` و `coin`: `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود (در فروش کامل بدون تأثیر عملی چون دارایی بسته می‌شود). برای سایر دسته‌ها `averageBuyPrice = null` است و تغییر نمی‌کند.
    - `purchasePrice` (کل هزینه اولیه) تغییر نمی‌کند.
 6. **ارزش‌گذاری دوره‌ای:**
    - کاربر می‌تواند قیمت روز دارایی را ثبت کند.
@@ -80,7 +80,7 @@
 - `purchaseDate` → datetime
 - `currentValue` → decimal (آخرین ارزش‌گذاری — ریال)
 - `currentValueDate` → datetime
-- `averageBuyPrice` → decimal (میانگین قیمت خرید به ازای واحد — فقط برای `gold`, `coin`, `electronics`; برای `vehicle`, `real_estate` مقدار ثابت یا قیمت کل بر واحد)
+- `averageBuyPrice` → decimal **nullable** (میانگین قیمت خرید به ازای واحد — **فقط برای** `gold` و `coin` معنا دارد و با Weighted Average به‌روزرسانی می‌شود؛ برای `vehicle`, `real_estate`, `electronics`, `other` این فیلد **`null` است** — چون هر خرید یک asset مستقل است و Weighted Average بی‌معناست؛ قیمت خرید کل در `purchasePrice` نگهداری می‌شود)
 - `status` → string (`active`, `sold`, `written_off`)
 - `location` → string (محل نگهداری — اختیاری)
 - `description` → string
@@ -96,13 +96,10 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:  
-> - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود  
-> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): `averageBuyPrice` به معنی قیمت خرید به ازای هر واحد است (برای مثال قیمت هر متر مربع برای املاک یا هر قطعه برای خودروها)  
-> - برای `electronics`: `averageBuyPrice` میانگین قیمت خرید به ازای هر قطعه است (اگر چند قطعه خریده شود)  
-> - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟)  
-> - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید  
-> - در صورت نیاز به لینک به تراکنش خرید اصلی، می‌توانید از `pa_transactions` با `assetId` استفاده کنید
+> **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:
+> - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): چند خرید روی همان asset مجاز است؛ `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود.
+> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): هر خرید یک asset جدید مستقل است — بنابراین **`averageBuyPrice = null`** برای این دسته‌هاست. قیمت کل خرید در `purchasePrice` نگهداری می‌شود و نیازی به میانگین نیست.
+> - برای ردیابی خریدهای بعدی (مثلاً هزینه تعمیر یا بهسازی)، از جدول `pa_transactions` با `type='purchase'` و `assetId` استفاده کنید.
 
 ### ۲. Physical Asset Valuation (جدول: `pa_valuations`)
 
@@ -193,8 +190,8 @@
 - پس از فروش کامل، وضعیت دارایی `sold` می‌شود و از محاسبات پرتفوی فعال خارج می‌گردد.
 - امکان فروش جزئی (مثلاً فروش بخشی از سکه‌ها) پشتیبانی می‌شود.
 - نرخ تتر در خرید، فروش و هر ارزش‌گذاری ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند.
-- برای دسته‌های `gold` و `coin`: `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود.
-- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): هر خرید یک asset جدید مستقل است.
+- برای دسته‌های `gold` و `coin` (قابل‌تفکیک): `averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود؛ این تنها دسته‌هایی هستند که `averageBuyPrice` مقدار دارد.
+- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): هر خرید یک asset جدید مستقل است؛ `averageBuyPrice = null` و قیمت خرید در `purchasePrice` نگهداری می‌شود — Weighted Average برای این دسته‌ها بی‌معناست.
 
 ---
 
