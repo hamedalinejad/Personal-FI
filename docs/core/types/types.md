@@ -12,6 +12,7 @@ types/
 ├── currency.ts            # CurrencyCode، ExchangeRate
 ├── transaction.ts         # TransactionType، RelatedFeature
 ├── price.ts               # AssetCategory، PriceFetchResult (برای Price Fetching)
+├── portfolio.ts           # PortfolioBreakdown (ساختار typed برای port_snapshots.breakdown)
 ├── events.ts              # AppEvent (Event Bus)
 └── index.ts               # re-export مرکزی
 ```
@@ -135,6 +136,68 @@ export interface CachedPrice {
   source: 'manual' | 'api';
   fetchedAt: Timestamp;
   isStale: boolean; // اگر بیش از یک حد مشخص (مثلاً ۲۴ ساعت) از fetchedAt گذشته باشد
+}
+```
+
+---
+
+## `portfolio.ts`
+
+> این type کانونی برای فیلد `breakdown` در جدول `port_snapshots` است.  
+> هر تغییر در این ساختار **باید** با افزایش `schemaVersion` در `port_snapshots` همراه باشد تا snapshot‌های قدیمی قابل خواندن بمانند.
+
+```typescript
+// نسخه ساختار breakdown — هر تغییر breaking باید schemaVersion را افزایش دهد
+export const PORTFOLIO_BREAKDOWN_SCHEMA_VERSION = 1;
+
+export interface InvestmentSection {
+  value: string;       // decimal string — نه number
+  profitLoss: string;  // decimal string
+}
+
+export interface PortfolioBreakdown {
+  schemaVersion: number; // باید با port_snapshots.schemaVersion برابر باشد
+  investments: {
+    total: string;
+    profitLoss: string;
+    unrealized: string;
+    realized: string;
+    sections: {
+      crypto:      InvestmentSection;
+      stocksIran:  InvestmentSection;
+      fixedIncome: InvestmentSection;
+      metals:      InvestmentSection;
+    };
+  };
+  physicalAssets: {
+    total: string;
+    profitLoss: string;
+  };
+  cash: {
+    total: string;
+  };
+  liabilities: {
+    total: string;
+  };
+  allocation: Array<{
+    key: string;
+    label: string;
+    value: string;   // decimal string
+    percent: string; // decimal string
+  }>;
+}
+
+// Migration helper: snapshot قدیمی را به آخرین نسخه تبدیل می‌کند
+// باید در service layer پیش از استفاده از breakdown صدا زده شود
+export function migrateBreakdown(
+  raw: unknown,
+  fromVersion: number
+): PortfolioBreakdown {
+  if (fromVersion === PORTFOLIO_BREAKDOWN_SCHEMA_VERSION) {
+    return raw as PortfolioBreakdown;
+  }
+  // نسخه‌های آینده: migration chain اضافه شود
+  throw new Error(`Unknown breakdown schemaVersion: ${fromVersion}`);
 }
 ```
 
