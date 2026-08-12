@@ -111,7 +111,7 @@
 - `totalAssets` → decimal
 - `totalLiabilities` → decimal
 - `netWorth` → decimal
-- `netWorthUSDT` → decimal
+- `netWorthBase` → decimal (معادل ارز پایه کاربر (`baseCurrency`) — سازگار با نام‌گذاری `Base` در سایر فیچرها)
 - `createdAt` → datetime
 
 > این جدول برای نمایش روند تاریخی Net Worth و افزایش سرعت گزارش‌گیری مفید است.
