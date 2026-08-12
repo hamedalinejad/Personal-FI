@@ -168,7 +168,37 @@ Domain Entities
 APIهای داخلی
 
 createFund(data) / updateFund(id, data) / getAllFunds()
-createTransaction(data) → خرید، فروش، واریز/برداشت مستقیم حساب بانکی (issuance_redemption)، تقسیم سود، سرمایه‌گذاری مجدد — همگی روی `inv_fif_transactions` ثبت می‌شوند؛ برای واریز/برداشت ETF از طریق کارگزاری، به APIهای `Investment-Stocks-Iran` (`createBrokerageTransaction`) مراجعه شود.
+
+createTransaction(data) → **فقط برای صندوق‌های issuance_redemption** (خرید/فروش/صدور/ابطال، تقسیم سود، سرمایه‌گذاری مجدد با واریز/برداشت مستقیم از حساب بانکی) — روی `inv_fif_transactions` ثبت می‌شود.
+
+> ⛔ **ممنوع برای ETF**: `createTransaction()` در FIF را **هرگز** برای خرید/فروش ETF مستقیم صدا نزنید — `cashBalance` کارگزاری آپدیت نمی‌شود و داده خراب می‌شود.
+
+**توالی اجباری برای خرید/فروش ETF** (دو مرحله، هر دو الزامی):
+
+```
+// مرحله ۱ — در فیچر Stocks Iran (آپدیت cashBalance کارگزاری)
+brokerageTx = createBrokerageTransaction({
+  brokerageId,
+  type: 'withdraw',        // برای خرید ETF (پول از کارگزاری خارج می‌شود)
+  amount,
+  feeAmount, feeCurrency,
+  exchangeRateToBase,
+  accountTransactionId     // ← id از acc_transactions که همین‌جا ساخته می‌شود
+})
+// نتیجه: cashBalance کارگزاری کاهش می‌یابد + acc_transactions با relatedFeature='stocks_iran' ثبت می‌شود
+
+// مرحله ۲ — در FIF (ثبت رویداد صندوق)
+fifTx = createFIFTransaction({
+  fundId, brokerageId,
+  type: 'buy',
+  units, price, amount,
+  feeAmount, feeCurrency, exchangeRateToBase,
+  accountTransactionId: brokerageTx.accountTransactionId  // همان acc_transactions.id از مرحله ۱
+})
+// نتیجه: inv_fif_holdings.units افزایش + inv_fif_transactions ثبت می‌شود
+```
+
+> **توجه**: برای فروش ETF، مرحله ۱ با `type: 'deposit'` انجام می‌شود (پول به کارگزاری برمی‌گردد) و مرحله ۲ با `type: 'sell'`.
 updateNAV(fundId, nav, date) → ثبت NAV جدید (از نسخه ۱، این تابع یک Wrapper نازک روی `setManualFundNAV` فیچر `19-Price-Fetching` است تا NAV هم در `price_history` مرکزی و هم در `inv_fif_holdings.currentNAV` ثبت شود؛ جزئیات کامل در `19-03-Fund-NAV/Fund-NAV.md`)
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری
