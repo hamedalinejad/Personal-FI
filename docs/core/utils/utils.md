@@ -100,20 +100,32 @@ import Decimal from 'decimal.js';
 
 /**
  * محاسبه میانگین وزنی خرید — استفاده در Crypto, Stocks Iran, FIF, Metals
- * همه پارامترها Decimal string (نه Minor Unit)
+ *
+ * **قرارداد مهم**: همه پارامترهای مبلغ (currentAvgPrice، newPrice، newFeeInBaseCurrency)
+ * باید به **ارز پایه کاربر (baseCurrency)** باشند، نه ارز پرداخت تراکنش.
+ *
+ * این تابع هیچ تبدیل ارزی انجام نمی‌دهد — caller مسئول تبدیل است:
+ * - اگر کارمزد به baseCurrency پرداخت شده: مستقیم پاس دهید.
+ * - اگر کارمزد به IRR پرداخت شده (و baseCurrency ≠ IRR): ÷ exchangeRateToBase
+ * - اگر کارمزد به رمزارز دیگری (BTC/ETH) پرداخت شده: × feeAssetPriceToBase
+ *
+ * فرمول کامل تبدیل کارمزد در بخش «منطق کارمزد» هر سند فیچر سرمایه‌گذاری مستند است
+ * (Crypto: Investment-Crypto.md، Stocks: Investment-Stocks-Iran.md و ...).
+ *
+ * همه پارامترها Decimal string (نه Minor Unit).
  */
 export function calculateWeightedAverage(
   currentQuantity: string,
-  currentAvgPrice: string,
+  currentAvgPrice: string,   // به baseCurrency
   newQuantity: string,
-  newPrice: string,
-  newFeeInPriceCurrency: string = '0',
+  newPrice: string,           // به baseCurrency (برای Crypto: همان priceBase، نه price خام)
+  newFeeInBaseCurrency: string = '0', // کارمزد از قبل به baseCurrency تبدیل‌شده — هرگز مستقیم از feeAmount خام استفاده نشود
 ): { newAvgPrice: Decimal; newTotalInvested: Decimal; newQuantity: Decimal } {
   const cQ = new Decimal(currentQuantity);
   const cA = new Decimal(currentAvgPrice);
   const nQ = new Decimal(newQuantity);
   const nP = new Decimal(newPrice);
-  const fee = new Decimal(newFeeInPriceCurrency);
+  const fee = new Decimal(newFeeInBaseCurrency);
 
   const prevInvested = cQ.times(cA);
   const newInvested = nQ.times(nP).plus(fee);
