@@ -101,7 +101,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته**: این جدول فقط برای خرید و فروش سهام است. موجودی نقدی کارگزاری در فیلد `cashBalance` از جدول `inv_stocks_iran_brokerages` نگهداری می‌شود (برای سرعت بالا). این موجودی در محاسبه ثروت در فیچر `Portfolio & Wealth Overview` به صورت اختیاری با کنترل `includeCashInWealth` لحاظ می‌شود.
+> **نکته**: این جدول فقط برای خرید و فروش سهام است. موجودی نقدی کارگزاری در فیلد `cashBalance` از جدول `inv_stocks_iran_brokerages` نگهداری می‌شود (برای سرعت بالا). این موجودی **در `Portfolio & Wealth Overview` با `includeCashInWealth = false` به‌طور پیش‌فرض لحاظ نمی‌شود** تا از شمارش دوگانه (چون همان پول از حساب بانکی آمده) جلوگیری شود.
 
 ### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید و فروش
 
@@ -161,7 +161,7 @@
 ### Holding APIs
 - `getHoldings(brokerageId?)`
 - `getHoldingBySymbol(symbol, brokerageId?)`
-- `getPortfolioValue()` → ارزش کل پرتفوی ایران (ریال + معادل تتری)
+- `getPortfolioValue()` → ارزش کل **سهام** پرتفوی ایران (ریال + معادل تتری) — **فقط** ارزش بازار holdings (quantity × currentPrice)؛ موجودی نقدی کارگزاری (`cashBalance`) را **شامل نمی‌شود** و جداگانه از طریق `getBrokerageCashBalance(brokerageId)` در اختیار Portfolio & Wealth Overview قرار می‌گیرد
 
 ### Transaction APIs
 - `createStockTransaction(data)` → خرید / فروش
