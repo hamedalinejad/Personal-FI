@@ -155,7 +155,7 @@
 - `penaltyPortion` → decimal (nullable — مبلغ جریمه تأخیر — برای `type = 'penalty'`)
 - `feeType` → enum (nullable — `origination`, `early_payment`, `late_payment_fee`, ...)
 - `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
-- `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
+- `installmentNumber` → integer (**اجباری برای `type='repayment'`**؛ nullable برای سایر انواع — شماره قسط برای tracking و تطابق با جدول اقساط) ✅ **جدید**
 - `description` → string
 - `exchangeRateToBase` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
 - `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
@@ -232,9 +232,21 @@
 
 > **قانون `status = overdue`**: وامی `overdue` تلقی می‌شود که:
 > 1. `status = 'active'` باشد، و
-> 2. تاریخ سررسید حداقل یک قسط پرداخت‌نشده از `getUpcomingPayments()` گذشته باشد (یعنی تاریخ قسط < امروز و رکورد پرداخت در `ln_transactions` با `installmentNumber` مربوطه وجود ندارد)
+> 2. تاریخ سررسید حداقل یک قسط از جدول اقساط محاسبه‌شده گذشته باشد **و** هیچ رکورد `ln_transactions` با `type='repayment'` و `installmentNumber` برابر آن قسط وجود نداشته باشد.
 >
-> برگشت از `overdue` به `active`: زمانی که کاربر همه اقساط معوق را پرداخت کند، `status` مجدداً `active` می‌شود.
+> **الگوریتم دقیق تطابق در `checkAndUpdateOverdueStatus()`**:
+> ```
+> برای هر وام با status='active':
+>   اقساط = getUpcomingPayments(loanId)   // برنامه کامل اقساط محاسبه‌شده
+>   برای هر قسط که dueDate < امروز:
+>     پرداخت = ln_transactions WHERE loanId=X AND type='repayment' AND installmentNumber=قسط.number
+>     اگر پرداخت وجود نداشت → وام overdue است → break
+> ```
+>
+> **چرا `installmentNumber` در `ln_transactions` برای `type='repayment'` اجباری است**:  
+> اگر `installmentNumber = null` مجاز باشد، الگوریتم بالا نمی‌تواند تشخیص دهد کدام قسط پرداخت شده — پرداخت بدون شماره قسط به‌عنوان «نپرداخته» شمرده می‌شود و وضعیت overdue غلط می‌شود. به همین دلیل `installmentNumber` برای `type='repayment'` **اجباری** است (constraint در لایه Domain — قبل از insert چک شود).
+>
+> برگشت از `overdue` به `active`: زمانی که کاربر همه اقساط معوق را با `installmentNumber` صحیح ثبت کند، `status` مجدداً `active` می‌شود.
 
 ---
 
