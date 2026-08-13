@@ -170,6 +170,7 @@
 - `network` → string (nullable — شبکه بلاکچینی که واریز/برداشت از طریق آن انجام شده؛ مثلاً `TRC20`، `ERC20`؛ برای واریز/برداشت ریالی null است)
 - `txHash` → string (nullable — شناسه تراکنش آنچین برای واریز/برداشت کریپتویی؛ برای واریز/برداشت ریالی فیات null است)
 - `blockNumber` → integer (nullable — شماره بلاک تأییدشده در بلاکچین؛ اختیاری)
+- `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی — فقط وقتی `txHash` موجود باشد معنی دارد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
