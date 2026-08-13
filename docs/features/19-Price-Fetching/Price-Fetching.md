@@ -200,7 +200,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
     symbol: string,
     price: Decimal,
     priceCurrency: string,        // ارزی که قیمت در آن است (USDT, IRR, etc.)
-    timestamp: datetime,          // لحظه دریافت/ثبت قیمت
+    priceTimestamp: datetime,     // لحظه دقیقی که این قیمت در price_history ثبت شده (= fetchedAt آن رکورد) — برای Historical Valuation در port_snapshots الزامی است
     isStale: boolean,             // بر اساس TTL این asset category
     source: 'manual' | 'api',    // منشأ قیمت
     triggeredBy?: 'user_click' | 'auto_sync' | 'manual_entry'
