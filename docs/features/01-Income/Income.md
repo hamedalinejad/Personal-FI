@@ -53,22 +53,30 @@ Domain Entities
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-۲. Recurring Income (جدول: `inc_recurring`)
+### ۲. Recurring Income (جدول: `inc_recurring`)
 
-id → UUID (Primary Key)
-title → string (عنوان درآمد تکرارشونده)
-amount → decimal
-currency → string
-accountId → UUID
-category → string
-description → string
-interval → string (monthly, weekly, yearly, custom)
-startDate → datetime
-endDate → datetime (اختیاری)
-nextOccurrence → datetime
-isActive → boolean
-createdAt → datetime
-updatedAt → datetime
+- `id` → UUID (Primary Key)
+- `title` → string (عنوان درآمد تکرارشونده)
+- `amount` → decimal (مبلغ ثابت هر دوره)
+- `currency` → string (ارز درآمد = ارز حساب مقصد)
+- `exchangeRateToBase` → decimal (نرخ تبدیل در زمان ایجاد قالب — هنگام generate هر دوره به‌روزرسانی می‌شود)
+- `accountId` → UUID (حساب مقصد)
+- `category` → string (دسته‌بندی — از `cat_categories`)
+- `description` → string (توضیحات اختیاری)
+- `interval` → enum (`daily`, `weekly`, `monthly`, `yearly`, `custom`)
+- `customIntervalDays` → integer (nullable — فقط برای `interval='custom'`؛ تعداد روز بین دو تکرار)
+- `startDate` → datetime (اولین تاریخ تولید تراکنش)
+- `endDate` → datetime (nullable — تاریخ پایان؛ اگر `null` به صورت نامحدود ادامه می‌یابد)
+- `nextOccurrence` → datetime (تاریخ دوره بعدی — پس از هر generate آپدیت می‌شود)
+- `isActive` → boolean
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **منطق `generateRecurringIncomes()` (Job روزانه)**:
+> 1. همه رکوردهای `inc_recurring` که `isActive=true` و `nextOccurrence <= امروز` را پیدا کن
+> 2. برای هر کدام: `createIncome()` را با داده‌های قالب صدا بزن (تراکنش جدید در `inc_transactions` + `acc_transactions`)
+> 3. در همان DB transaction: `nextOccurrence` را بر اساس `interval` یک دوره جلو ببر
+> 4. اگر `endDate` تعریف شده و `nextOccurrence > endDate`: `isActive = false`
 
 ۳. Transaction (جدول مشترک `acc_transactions`)
 
