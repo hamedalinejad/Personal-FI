@@ -19,10 +19,9 @@ utils/
 │   └── round.ts               # گرد کردن اعشار (Decimal-safe)
 ├── money/
 │   ├── formatMoney.ts         # فرمت مبلغ با واحد ارز برای نمایش
-│   ├── minorUnit.ts           # تبدیل بین Minor Unit و Decimal — مرکز Currency Amount
+│   ├── minorUnit.ts           # تبدیل بین Minor Unit و Decimal — مرکز Minor Unit کل پروژه
 │   ├── calculateWeightedAverage.ts # میانگین وزنی خرید (Crypto/Stocks/Metals)
 │   └── rialToToman.ts         # تبدیل ریال ↔ تومان برای نمایش
-│   # Precision/Scale برای Quantity/Price/Rate/Percentage/NAV → core/types/precision.ts
 ├── validation/
 │   ├── iban.ts                # اعتبارسنجی شبا (IBAN ایران)
 │   ├── cardNumber.ts          # اعتبارسنجی کارت بانکی (Luhn)
@@ -35,6 +34,8 @@ utils/
 ├── id/
 │   └── generateId.ts          # تولید UUID v4
 └── index.ts
+
+> **مهم**: فایل `money/round.ts` تنها نقطه رسمی برای round کردن مبالغ مالی در کل پروژه است — جزئیات کامل در `docs/core/rounding/Rounding-Policy.md`.
 ```
 
 ---
@@ -92,10 +93,6 @@ export function fromMinorUnit(minorUnits: bigint | number, currency: string): De
 
 > **قانون مهم**: هیچ‌جای پروژه نباید `amount * 100` یا `amount / 100` به‌صورت دستی نوشته شود. همیشه از `toMinorUnit` و `fromMinorUnit` استفاده شود تا تعداد اعشار هر ارز در یک‌جا مدیریت شود.
 
-> **ارجاع به Precision**: این فایل فقط **Currency Amount** (مبالغ مالی با minor unit) را پوشش می‌دهد.  
-> برای **Quantity** (تعداد دارایی)، **Price** (قیمت)، **Rate** (نرخ)، **Percentage**، و **NAV**  
-> به `core/types/precision.ts` مراجعه کنید — توابع `roundQuantity`, `roundPrice`, `roundRate`, `roundPercentage`, `roundNAV` آنجا تعریف شده‌اند.
-
 ---
 
 ## `money/calculateWeightedAverage.ts`
@@ -105,32 +102,20 @@ import Decimal from 'decimal.js';
 
 /**
  * محاسبه میانگین وزنی خرید — استفاده در Crypto, Stocks Iran, FIF, Metals
- *
- * **قرارداد مهم**: همه پارامترهای مبلغ (currentAvgPrice، newPrice، newFeeInBaseCurrency)
- * باید به **ارز پایه کاربر (baseCurrency)** باشند، نه ارز پرداخت تراکنش.
- *
- * این تابع هیچ تبدیل ارزی انجام نمی‌دهد — caller مسئول تبدیل است:
- * - اگر کارمزد به baseCurrency پرداخت شده: مستقیم پاس دهید.
- * - اگر کارمزد به IRR پرداخت شده (و baseCurrency ≠ IRR): ÷ exchangeRateToBase
- * - اگر کارمزد به رمزارز دیگری (BTC/ETH) پرداخت شده: × feeAssetPriceToBase
- *
- * فرمول کامل تبدیل کارمزد در بخش «منطق کارمزد» هر سند فیچر سرمایه‌گذاری مستند است
- * (Crypto: Investment-Crypto.md، Stocks: Investment-Stocks-Iran.md و ...).
- *
- * همه پارامترها Decimal string (نه Minor Unit).
+ * همه پارامترها Decimal string (نه Minor Unit)
  */
 export function calculateWeightedAverage(
   currentQuantity: string,
-  currentAvgPrice: string,   // به baseCurrency
+  currentAvgPrice: string,
   newQuantity: string,
-  newPrice: string,           // به baseCurrency (برای Crypto: همان priceBase، نه price خام)
-  newFeeInBaseCurrency: string = '0', // کارمزد از قبل به baseCurrency تبدیل‌شده — هرگز مستقیم از feeAmount خام استفاده نشود
+  newPrice: string,
+  newFeeInPriceCurrency: string = '0',
 ): { newAvgPrice: Decimal; newTotalInvested: Decimal; newQuantity: Decimal } {
   const cQ = new Decimal(currentQuantity);
   const cA = new Decimal(currentAvgPrice);
   const nQ = new Decimal(newQuantity);
   const nP = new Decimal(newPrice);
-  const fee = new Decimal(newFeeInBaseCurrency);
+  const fee = new Decimal(newFeeInPriceCurrency);
 
   const prevInvested = cQ.times(cA);
   const newInvested = nQ.times(nP).plus(fee);

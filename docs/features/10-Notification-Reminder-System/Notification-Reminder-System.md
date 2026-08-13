@@ -80,18 +80,11 @@
 - `id` → UUID
 - `title` → string
 - `message` → string
-- `remindAt` → datetime (زمان اولین یادآوری — برای یادآوری‌های تکراری، زمان شروع سری)
-- `nextRemindAt` → datetime (nullable — زمان بعدی trigger برای یادآوری‌های تکراری؛ برای `repeatInterval='none'` همیشه `null` است؛ پس از هر trigger آپدیت می‌شود)
-- `lastNotifiedAt` → datetime (nullable — آخرین بار که اعلان ایجاد شد؛ برای جلوگیری از اعلان تکراری در یک بازه)
+- `remindAt` → datetime
 - `repeatInterval` → string (`none`, `daily`, `weekly`, `monthly` — nullable)
 - `isActive` → boolean
 - `createdAt` → datetime
 - `updatedAt` → datetime
-
-> **منطق `generateDueReminders()` برای یادآوری‌های سفارشی**:
-> - اگر `repeatInterval = 'none'`: وقتی `remindAt <= now` و `lastNotifiedAt IS NULL` → اعلان ایجاد شود؛ سپس `isActive = false`.
-> - اگر `repeatInterval != 'none'`: وقتی `nextRemindAt <= now` → اعلان ایجاد شود؛ سپس `lastNotifiedAt = now` و `nextRemindAt` بر اساس `repeatInterval` به‌روزرسانی شود.
-> - این منطق از Business Rule 7 (جلوگیری از اعلان تکراری) پشتیبانی می‌کند.
 
 ---
 

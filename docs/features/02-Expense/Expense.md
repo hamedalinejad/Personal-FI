@@ -55,32 +55,22 @@ accountTransactionId → UUID (لینک به `acc_transactions`)
 createdAt → datetime
 updatedAt → datetime
 
-### ۲. Recurring Expense (جدول: `exp_recurring`)
+۲. Recurring Expense (جدول: exp_recurring)
 
-- `id` → UUID (Primary Key)
-- `title` → string (عنوان هزینه تکرارشونده)
-- `amount` → decimal (مبلغ ثابت هر دوره)
-- `currency` → string (ارز هزینه = ارز حساب مبدأ)
-- `exchangeRateToBase` → decimal (نرخ تبدیل در زمان ایجاد قالب — هنگام generate هر دوره به‌روزرسانی می‌شود)
-- `accountId` → UUID (حساب مبدأ)
-- `category` → string (دسته‌بندی — از `cat_categories`)
-- `description` → string (توضیحات اختیاری)
-- `envelopeId` → UUID (nullable — اگر این هزینه به یک پاکت بودجه متصل است)
-- `interval` → enum (`daily`, `weekly`, `monthly`, `yearly`, `custom`)
-- `customIntervalDays` → integer (nullable — فقط برای `interval='custom'`؛ تعداد روز بین دو تکرار)
-- `startDate` → datetime (اولین تاریخ تولید تراکنش)
-- `endDate` → datetime (nullable — تاریخ پایان؛ اگر `null` به صورت نامحدود ادامه می‌یابد)
-- `nextOccurrence` → datetime (تاریخ دوره بعدی — پس از هر generate آپدیت می‌شود)
-- `isActive` → boolean
-- `createdAt` → datetime
-- `updatedAt` → datetime
-
-> **منطق `generateRecurringExpenses()` (Job روزانه)**:
-> 1. همه رکوردهای `exp_recurring` که `isActive=true` و `nextOccurrence <= امروز` را پیدا کن
-> 2. برای هر کدام: `createExpense()` را با داده‌های قالب صدا بزن (تراکنش جدید در `exp_transactions` + `acc_transactions`)
-> 3. اگر `envelopeId` تعریف شده: `applyTransactionToBudget()` را هم صدا بزن (atomic با مرحله ۲)
-> 4. در همان DB transaction: `nextOccurrence` را بر اساس `interval` یک دوره جلو ببر
-> 5. اگر `endDate` تعریف شده و `nextOccurrence > endDate`: `isActive = false`
+id → UUID (Primary Key)
+title → string (عنوان هزینه تکرارشونده)
+amount → decimal
+currency → string
+accountId → UUID
+category → string
+description → string
+interval → string (monthly, weekly, yearly, custom)
+startDate → datetime
+endDate → datetime (اختیاری)
+nextOccurrence → datetime
+isActive → boolean
+createdAt → datetime
+updatedAt → datetime
 
 ۳. Transaction (جدول مشترک acc_transactions)
 

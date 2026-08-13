@@ -104,7 +104,7 @@
 - `gracePeriodMonths` → integer (nullable — ماه‌های تنفس) ✅ **جدید**
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
-- `recalculateOnEarlyPayment` → boolean | null (پیش‌فرض: `null`؛ **فقط برای `calculationMethod = 'declining_balance'` معنا دارد** — برای `flat_rate`, `bullet`, `qarz_al_hasaneh` همیشه `null` است چون این روش‌ها مفهوم Re-amortization ندارند. وقتی `null` است سیستم رفتار `false` را اعمال می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
+- `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
 
 **کارمزدها و جریمه:**
 - `originationFeeAmount` → decimal (nullable — کارمزد صدور)
@@ -155,7 +155,7 @@
 - `penaltyPortion` → decimal (nullable — مبلغ جریمه تأخیر — برای `type = 'penalty'`)
 - `feeType` → enum (nullable — `origination`, `early_payment`, `late_payment_fee`, ...)
 - `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
-- `installmentNumber` → integer (**اجباری برای `type='repayment'`**؛ nullable برای سایر انواع — شماره قسط برای tracking و تطابق با جدول اقساط) ✅ **جدید**
+- `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
 - `exchangeRateToBase` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
 - `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
@@ -228,25 +228,6 @@
     - اگر `gracePeriodMonths > 0`: اولین N ماه فقط سود (برای تمام روش‌ها)
     - شروع از `firstPaymentDate` + `installmentFrequency`
 - `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
-- `checkAndUpdateOverdueStatus()` → بررسی همه وام‌های `active` و تغییر `status` به `overdue` در صورت وجود قسط سررسید گذشته پرداخت‌نشده؛ این تابع باید هنگام **باز شدن اپ** و هنگام **ورود به صفحه وام‌ها** فراخوانی شود (lazy update — نه background job چون اپ آفلاین‌فرست است)
-
-> **قانون `status = overdue`**: وامی `overdue` تلقی می‌شود که:
-> 1. `status = 'active'` باشد، و
-> 2. تاریخ سررسید حداقل یک قسط از جدول اقساط محاسبه‌شده گذشته باشد **و** هیچ رکورد `ln_transactions` با `type='repayment'` و `installmentNumber` برابر آن قسط وجود نداشته باشد.
->
-> **الگوریتم دقیق تطابق در `checkAndUpdateOverdueStatus()`**:
-> ```
-> برای هر وام با status='active':
->   اقساط = getUpcomingPayments(loanId)   // برنامه کامل اقساط محاسبه‌شده
->   برای هر قسط که dueDate < امروز:
->     پرداخت = ln_transactions WHERE loanId=X AND type='repayment' AND installmentNumber=قسط.number
->     اگر پرداخت وجود نداشت → وام overdue است → break
-> ```
->
-> **چرا `installmentNumber` در `ln_transactions` برای `type='repayment'` اجباری است**:  
-> اگر `installmentNumber = null` مجاز باشد، الگوریتم بالا نمی‌تواند تشخیص دهد کدام قسط پرداخت شده — پرداخت بدون شماره قسط به‌عنوان «نپرداخته» شمرده می‌شود و وضعیت overdue غلط می‌شود. به همین دلیل `installmentNumber` برای `type='repayment'` **اجباری** است (constraint در لایه Domain — قبل از insert چک شود).
->
-> برگشت از `overdue` به `active`: زمانی که کاربر همه اقساط معوق را با `installmentNumber` صحیح ثبت کند، `status` مجدداً `active` می‌شود.
 
 ---
 
@@ -266,11 +247,13 @@
 - برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط اصل تغییر می‌دهد).
 - `totalPaidPrincipal` و `totalPaidInterest` برای سرعت Dashboard به‌روزرسانی می‌شوند (بدون جمع کردن تمام ln_transactions).
 - برای هر پرداخت، `exchangeRateToBase` ذخیره می‌شود.
-- `status = 'overdue'` از طریق `checkAndUpdateOverdueStatus()` به‌روز می‌شود — این تابع هنگام باز شدن اپ و ورود به صفحه وام‌ها فراخوانی می‌شود (Lazy Update، سازگار با Offline-First).
+- `status = 'overdue'` زمانی تغییر می‌کند که قسط سررسید گذشته وجود داشته باشد.
 
 ---
 
 ## فرمول‌های محاسباتی
+
+> **Rounding Policy**: تمام محاسبات وام از `docs/core/rounding/Rounding-Policy.md` پیروی می‌کنند. خلاصه الزامات: (الف) `calculatedInstallment` با ROUND_HALF_UP به ۰ اعشار IRR. (ب) `interestPortion` با ROUND_HALF_UP به ۰ اعشار. (ج) `principalPortion = installment − interestPortion` — هرگز مستقل round نمی‌شود. (د) آخرین قسط: `principalPortion = remainingBalance` (دقیق). (ه) هیچ round میانی در زنجیره محاسبه مجاز نیست.
 
 ### الف) Declining Balance (تناژل سود — وام بانکی)
 
@@ -352,9 +335,9 @@ principalPortion = remainingBalance            // کل اصل باقیمانده
 
 فقط برای `calculationMethod = 'declining_balance'` معنا دارد (در Flat Rate و Qarz Al-Hasaneh اصل و سود هر قسط از ابتدا ثابت تعریف شده‌اند، پس پیش‌پرداخت جزئی صرفاً `remainingBalance` را کم می‌کند بدون نیاز به بازمحاسبه فرمول).
 
-هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود. مقدار `null` (پیش‌فرض) معادل `false` در نظر گرفته می‌شود:
+هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود:
 
-**حالت ۱ — `recalculateOnEarlyPayment = false` یا `null` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
+**حالت ۱ — `recalculateOnEarlyPayment = false` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
 ```
 remainingBalance -= earlyPaymentPrincipalAmount
 // calculatedInstallment و r بدون تغییر باقی می‌مانند

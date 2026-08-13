@@ -80,9 +80,8 @@
 - `type` → string (`deposit`, `withdraw`)
 - `source` → string (`manual`, `budget`, `income`, `transfer`)
 - `accountId` → UUID (nullable)
-- `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable — فقط برای `source=manual` و `source=transfer` پر می‌شود)
-- `envelopeId` → UUID (nullable — لینک به پاکت بودجه، فقط برای `source=budget` پر می‌شود)
-- `incomeTransactionId` → UUID (nullable — لینک به `inc_transactions.id`، فقط برای `source=income` پر می‌شود؛ امکان گزارش «این مبلغ از کدام درآمد به هدف رفته» را فراهم می‌کند)
+- `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)
+- `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime
 - `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
@@ -127,10 +126,7 @@
 - `getCompletedGoals()` → اهداف تکمیل‌شده
 
 ### Contribution APIs
-- `addContribution(goalId, amount, source, accountId?, envelopeId?, incomeTransactionId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
-  - اگر `source='income'`، پارامتر `incomeTransactionId` **اجباری** است — بدون آن lookup گزارشی ممکن نیست
-  - اگر `source='budget'`، پارامتر `envelopeId` اجباری است
-  - اگر `source='manual'` یا `source='transfer'`، پارامتر `accountId` اجباری و `accountTransactionId` باید پر شود
+- `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
 - `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
 - `getContributions(goalId)` → تاریخچه کمک‌ها
 - `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
@@ -152,7 +148,7 @@
 
 - **Accounts & Banking**: واریز و برداشت واقعی پول مرتبط با هدف (فقط برای `source=manual` و `transfer`؛ `income` و `budget` برچسب‌گذاری داخلی هستند بدون تراکنش بانکی جدید — به قاعده ۱۰a مراجعه شود)
 - **Budget**: امکان اتصال هدف به یک پاکت بودجه و تخصیص خودکار (برای `source=budget`، `accountTransactionId = null`)
-- **Income**: می‌توان بخشی از یک درآمد ثبت‌شده را به هدف اختصاص داد (`source=income`، `accountTransactionId = null`، **`incomeTransactionId = inc_transactions.id` اجباری** — طبق قاعده ۱۰a، بدون تراکنش بانکی جدید)
+- **Income**: می‌توان بخشی از یک درآمد ثبت‌شده را به هدف اختصاص داد (`source=income`، `accountTransactionId = null` — طبق قاعده ۱۰a، بدون تراکنش بانکی جدید)
 - **Notification & Reminder**: یادآوری پیشرفت یا عقب‌ماندن از برنامه
 - **Dashboard**: نمایش اهداف فعال و درصد پیشرفت
 - **Reports**: گزارش تحقق اهداف در بازه‌های زمانی
@@ -166,5 +162,4 @@
 - در Dashboard بهتر است ۲ تا ۳ هدف اولویت‌دار با نوار پیشرفت نمایش داده شوند.
 - نرخ تتر در زمان ایجاد هدف و هر واریز/برداشت ذخیره می‌شود تا ارزش تاریخی هدف قابل محاسبه باشد.
 - امکان تعریف هدف به صورت درصدی از درآمد ماهانه در نسخه‌های بعدی قابل اضافه شدن است.
-- وقتی انتقال از `budget` انجام می‌شود، `envelopeId` لینک به پاکت بودجه را نگه می‌دارد (بدون تراکنش بانکی جدید).
-- وقتی انتقال از `income` انجام می‌شود، `incomeTransactionId` لینک به `inc_transactions.id` را نگه می‌دارد — این فیلد الزامی است و بدون آن گزارش «از کدام درآمد» غیرممکن است (بدون تراکنش بانکی جدید).
+- وقتی انتقال از `budget` یا `income` انجام می‌شود، فقط لینک (`envelopeId`/تراکنش درآمد) و `goalId` ثبت می‌شوند و تراکنش بانکی جدیدی ایجاد نمی‌شود.

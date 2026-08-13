@@ -97,31 +97,11 @@ Domain Entities
 id → UUID
 platformId → UUID
 metalType → string (gold, silver, copper)
-purity → enum (کد استاندارد خلوص فلز — فقط مقادیر زیر مجاز هستند؛ CHECK constraint در DB و validation در لایه Domain الزامی است):
-
-> | مقدار enum | معنا | فلز |
-> |------------|------|-----|
-> | `18k` | طلای ۱۸ عیار (۷۵٪ خلوص) | طلا |
-> | `21k` | طلای ۲۱ عیار (۸۷.۵٪ خلوص) | طلا |
-> | `22k` | طلای ۲۲ عیار (۹۱.۶٪ خلوص) | طلا |
-> | `24k` | طلای ۲۴ عیار (۹۹.۹٪ خلوص) — شمش | طلا |
-> | `999` | خلوص ۹۹.۹٪ | نقره / مس |
-> | `9999` | خلوص ۹۹.۹۹٪ — شمش بانکی | طلا / نقره |
-> | `coin_emami` | سکه امامی | طلا |
-> | `coin_bahar` | نیم‌سکه بهار آزادی | طلا |
-> | `coin_quarter` | ربع‌سکه | طلا |
-> | `coin_gerami` | سکه گرمی | طلا |
-> | `other` | سایر | همه |
->
-> **الزامات پیاده‌سازی**:
-> - در DB (SQLite/PostgreSQL): `CHECK (purity IN ('18k','21k','22k','24k','999','9999','coin_emami','coin_bahar','coin_quarter','coin_gerami','other'))`
-> - در لایه Domain/Store: قبل از insert/update، مقدار `purity` در برابر این لیست ثابت validate شود؛ در صورت مغایرت، خطا برگردانده شود.
-> - در UI: فقط از dropdown با این مقادیر ثابت استفاده شود — ورودی آزاد (free-text) برای این فیلد ممنوع است.
-> - **دلیل**: `purity` در `getHoldingByMetal(metalType, platformId?)` برای GROUP BY استفاده می‌شود؛ هر typo مثل `Gold_18K` یا `18K` یک holding جداگانه می‌سازد و موجودی خراب می‌شود.
+purity → string (مثلاً ۱۸ عیار، ۹۹۹ و ...)
 quantityMg → decimal (موجودی به میلی‌گرم)
 averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
 totalInvested → decimal
-totalFeesPaidBase → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به ارز پایه (ریال) با exchangeRateToBase همان تراکنش)
+totalFeesPaidUSDT → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با exchangeRateToBase همان تراکنش)
 createdAt / updatedAt
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
@@ -131,9 +111,7 @@ createdAt / updatedAt
 - `metalType` → string (gold, silver, copper)
 - `type` → string (buy, sell, physical_delivery)
 - `quantityMg` → decimal
-- `pricePerMg` → decimal (nullable برای `physical_delivery` — برای خرید و فروش: قیمت بازار در لحظه معامله؛ برای تحویل فیزیکی: `null` چون هیچ محاسبه P&L رخ نمی‌دهد)
-
-> **نکته**: `pricePerMg` در `physical_delivery` لازم نیست پر شود — تحویل فیزیکی فروش نیست و `realizedPL` ایجاد نمی‌کند. اگر مقداری ذخیره شود فقط برای رفرنس است.
+- `pricePerMg` → decimal (برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
@@ -235,13 +213,12 @@ averageBuyPricePerMg  بدون تغییر می‌ماند  // Weighted Average �
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
 > - در `type=physical_delivery`، هیچ `realizedPL`ای محاسبه نمی‌شود (فروش واقعی نیست)؛ فقط `quantityMg` کاهش و به دارایی فیزیکی منتقل می‌شود؛ `deliveryFee` جداگانه از موجودی نقدی پلتفرم کسر می‌شود (نه از `soldPortionCost`).
-> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود، که در آن `currentPricePerMg = getLatestPrice('metal', '{metalType}_{purity}', baseCurrency).price / 1000` است (چون `19-Price-Fetching` قیمت را به‌ازای هر گرم برمی‌گرداند — به بخش «نکات طراحی» پایین همین فایل مراجعه شود).
+> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود.
 
 
 نکات طراحی
 
 - واحد پایه همیشه میلی‌گرم است تا دقت بالا حفظ شود (۱ گرم = ۱۰۰۰ میلی‌گرم).
-- **قیمت لحظه‌ای فلزات (برای Unrealized P&L)** از فیچر `19-Price-Fetching` (جدول `price_history` با `assetCategory='metal'`) به‌صورت **قیمت هر گرم** خوانده می‌شود؛ تبدیل از گرم به میلی‌گرم (`÷ 1000`) در لایه Domain انجام می‌شود.
 - میانگین خرید با Weighted Average محاسبه می‌شود.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - تحویل فیزیکی با یک تراکنش `type=physical_delivery` در `metals_transactions` ثبت می‌شود تا تاریخچه کامل موجودی در یک جدول باشد.

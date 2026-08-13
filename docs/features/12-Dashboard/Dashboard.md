@@ -147,55 +147,47 @@
 
 ## ساختار پیشنهادی داده خروجی `getDashboardData`
 
-> ⚠️ **قانون مالی پروژه**: تمام مقادیر مالی به صورت `string` (نه `number`) برگردانده می‌شوند تا از خطای floating-point در محاسبات مالی جلوگیری شود. در لایه UI، از `Decimal.js` برای نمایش استفاده کنید. درصدها هم `string` هستند.
-
 ```ts
 {
   accounts: {
-    totalBalance: string,        // ارز پایه کاربر
-    totalBalanceBase: string     // معادل ارز پایه (جایگزین totalBalanceUSDT)
+    totalBalance: number,
+    totalBalanceUSDT: number
   },
   cashFlow: {
-    income: string,
-    expense: string,
-    net: string                  // income - expense
+    income: number,
+    expense: number,
+    net: number
   },
   netWorth: {
-    current: string,
-    changePercent: string,       // درصد تغییر نسبت به دوره قبل
-    trend: Array<{ date: string, value: string }>
+    current: number,
+    changePercent: number,
+    trend: Array<{ date: string, value: number }>
   },
   budget: {
-    totalAssigned: string,
-    totalSpent: string,
-    percentUsed: string,         // رشته عددی مثل "84.5"
-    criticalEnvelopes: Array<{
-      id: string,
-      name: string,
-      percentUsed: string,
-      remainingAmount: string
-    }>
+    totalAssigned: number,
+    totalSpent: number,
+    percentUsed: number,
+    criticalEnvelopes: Array<...>
   },
   goals: Array<{
     id: string,
     name: string,
-    progressPercent: string,     // رشته عددی مثل "45.2"
-    remaining: string            // مبلغ باقی‌مانده به ارز پایه
+    progressPercent: number,
+    remaining: number
   }>,
   upcoming: Array<{
     type: 'bill' | 'loan' | 'cheque' | 'tax',
     title: string,
     dueDate: string,
-    amount: string,              // مبلغ به ارز پایه
-    currency: string,            // ارز اصلی رکورد
+    amount: number,
     status: string
   }>,
   investments: {
-    totalValue: string,
-    profitLoss: string
+    totalValue: number,
+    profitLoss: number
   },
   notifications: {
-    unreadCount: number          // استثنا: count عدد صحیح است — number مجاز
+    unreadCount: number
   }
 }
 ```

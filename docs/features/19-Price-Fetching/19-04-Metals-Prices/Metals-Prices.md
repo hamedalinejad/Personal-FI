@@ -26,7 +26,7 @@
 2. قیمت همیشه **به ازای هر گرم** (نه میلی‌گرم) دریافت و در `price_history` ذخیره می‌شود (`priceCurrency='IRR'`)؛ چون این واحد رایج نمایش بازار طلای ایران است. تبدیل به میلی‌گرم (واحد ذخیره‌سازی `inv_metals_holdings.quantityMg`) در لحظه مصرف با تقسیم بر ۱۰۰۰ در لایه Domain انجام می‌شود، نه در این زیرفیچر — دقیقاً طبق قاعده «Minor Unit فقط در Domain Layer تبدیل شود» در `db.md`.
 3. **سکه (coin) به‌عنوان یک `purity`/شناسه جداگانه در نظر گرفته می‌شود، نه صرفاً وزن طلا**، چون قیمت سکه در بازار ایران به‌خاطر حباب (Coin Premium) معمولاً با ارزش وزنی خالص طلای داخلش متفاوت است؛ قیمت‌گیری جدا برای هر نوع سکه (امامی، بهار آزادی، ربع، نیم) لازم است، نه محاسبه از روی قیمت گرمی طلا.
 4. اگر یک ترکیب `metalType_purity` در پاسخ API نباشد (مثلاً یک عیار خاص و غیررایج)، همان مورد Skip می‌شود و پیام «قیمت این مورد یافت نشد — می‌توانید دستی وارد کنید» نمایش داده می‌شود؛ بقیه دریافت می‌شوند (Partial Success).
-5. مابقی قواعد (Batch، آفلاین، Auto-Sync) دقیقاً طبق `Price-Fetching.md` است — از جمله اینکه **ثبت دستی قیمت برای هر ترکیب `metalType_purity` مجاز است، حتی اگر کاربر آن نوع فلز/عیار را در holdings نداشته باشد** (مثلاً ثبت قیمت عیار غیررایجی که API پوشش نمی‌دهد، یا پیگیری قیمت فلزی که در نظر دارد بخرد).
+5. مابقی قواعد (Batch، آفلاین، Auto-Sync) دقیقاً طبق `Price-Fetching.md` است.
 
 ### فرمول تبدیل (فقط برای Providerهایی که قیمت جهانی اونس می‌دهند، نه قیمت داخلی ایران)
 
@@ -45,9 +45,9 @@ gramPriceIRR_18k = gramPriceIRR_24k × (18/24)      // تبدیل عیار ۲۴ 
 ## APIهای داخلی
 
 - `fetchMetalsPrices(items: {metalType, purity}[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص فلزات روی `fetchAndStorePrices` فیچر پدر (`assetCategory='metal'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped`.
-- `getLatestMetalPrice(metalType, purity)` → میانبر روی `getLatestPrice('metal', '{metalType}_{purity}')` — `assetCategory='metal'` همیشه hardcode است؛ همراه با تبدیل خودکار واحد از میلی‌گرم به گرم برای نمایش.
-- `setManualMetalPrice(metalType, purity, pricePerGram, isOverride?: boolean)` → میانبر روی `setManualPrice('metal', '{metalType}_{purity}', pricePerGram, 'IRR', isOverride)` فیچر پدر. اگر `isOverride=true`، قیمت‌های API بعدی override نمی‌کنند تا `clearManualOverride('metal', '{metalType}_{purity}')` صدا زده شود.
-- `getMetalsAutoSyncSettings()` / `setMetalsAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='metal'` ارجاع دهد
+- `getLatestMetalPrice(metalType, purity)` → میانبر روی `getLatestPrice('{metalType}_{purity}')` با `assetCategory='metal'`، همراه با تبدیل خودکار واحد به گرم برای نمایش.
+- `setManualMetalPrice(metalType, purity, pricePerGram)` → ثبت دستی
+- `getMetalsAutoSyncSettings()` / `setMetalsAutoSyncSettings(data)`
 
 ---
 

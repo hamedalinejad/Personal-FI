@@ -25,16 +25,16 @@
 1. نمادهایی که قیمت‌گیری می‌شوند، از `DISTINCT symbol` روی `inv_stocks_iran_holdings` **به‌علاوه** `DISTINCT symbol` روی `inv_fif_holdings` با `fundType='etf'` استخراج می‌شوند (چون ETF از نظر قیمت‌گیری دقیقاً مثل سهام معمولی است، فقط holding آن در جدول دیگری ذخیره شده).
 2. بر خلاف کریپتو که چند API رقیب معمول دارد، بازار بورس ایران معمولاً یک منبع نیمه‌رسمی غالب دارد (مثل TSETMC یا یک سرویس آینه آن)؛ به همین دلیل `price_sources` برای `assetCategory='stock'` معمولاً فقط یک رکورد فعال دارد، اما ساختار داده همچنان چند-منبعی باقی می‌ماند تا در صورت از‌کارافتادن منبع اصلی، افزودن منبع جایگزین نیاز به تغییر Schema نداشته باشد.
 3. بازار بورس ایران ساعات معاملاتی مشخصی دارد (شنبه تا چهارشنبه، صبح تا اوایل بعدازظهر به وقت ایران). دریافت خارج از ساعت بازار **مجاز و بی‌مانع** است (چون هدف گرفتن آخرین قیمت پایانی موجود است، نه قیمت زنده)، اما در UI باید برچسب زمان دقیق `fetchedAt` رکورد نمایش داده شود تا کاربر بداند این قیمت مربوط به چه لحظه‌ای بوده — به‌خصوص برای Auto-Sync که ممکن است در ساعات بسته بازار هم اجرا شود و همان عدد ثابت را دوباره ذخیره کند (بدون خطا، فقط یک رکورد تکراری اما بی‌ضرر در تاریخچه).
-4. مابقی قواعد (Batch، Partial Success، آفلاین، ثبت دستی) دقیقاً طبق `Price-Fetching.md` است؛ هیچ Override خاصی ندارد — از جمله اینکه **ثبت دستی قیمت برای هر نماد بورسی مجاز است، حتی اگر کاربر آن سهم را در holdings نداشته باشد** (برای نمادهایی که در API وجود ندارند، یا وقتی کاربر آفلاین است).
+4. مابقی قواعد (Batch، Partial Success، آفلاین، ثبت دستی) دقیقاً طبق `Price-Fetching.md` است؛ هیچ Override خاصی ندارد.
 
 ---
 
 ## APIهای داخلی
 
 - `fetchStockPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص سهام روی `fetchAndStorePrices` فیچر پدر (`assetCategory='stock'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped` سند کریپتو.
-- `getLatestStockPrice(symbol)` → میانبر روی `getLatestPrice('stock', symbol)` — `assetCategory='stock'` همیشه hardcode است
-- `setManualStockPrice(symbol, price, isOverride?: boolean)` → میانبر روی `setManualPrice('stock', symbol, price, 'IRR', isOverride)` فیچر پدر؛ `priceCurrency='IRR'` ثابت (بر خلاف کریپتو که پایه USDT است، اینجا پایه ریال است چون کل بازار سهام ایران ریالی است). اگر `isOverride=true`، قیمت‌های API بعدی override نمی‌کنند تا `clearManualOverride('stock', symbol)` صدا زده شود.
-- `getStockAutoSyncSettings()` / `setStockAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='stock'` ارجاع دهد
+- `getLatestStockPrice(symbol)` → میانبر روی `getLatestPrice(symbol)` با `assetCategory='stock'`
+- `setManualStockPrice(symbol, price)` → ثبت دستی، `priceCurrency='IRR'` ثابت (بر خلاف کریپتو که پایه USDT است، اینجا پایه ریال است چون کل بازار سهام ایران ریالی است)
+- `getStockAutoSyncSettings()` / `setStockAutoSyncSettings(data)`
 
 ---
 

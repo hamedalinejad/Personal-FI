@@ -12,6 +12,7 @@
 4. **Offline-First**: سرویس‌ها باید حالت آفلاین را در نظر بگیرند — هر سرویسی که با شبکه کار می‌کند باید طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` رفتار کند.
 5. **Type-Safe**: تمام بخش‌ها با TypeScript قوی نوشته شوند. از `any` پرهیز شود.
 6. **Decimal-Safe**: هرگز `Number()` یا `parseFloat()` برای مبالغ مالی استفاده نشود — فقط `Decimal.js`.
+7. **Rounding-Policy**: هر محاسبه مالی که نیاز به گرد کردن دارد باید از `utils/money/round.ts` و طبق `docs/core/rounding/Rounding-Policy.md` انجام شود. Round در میانه محاسبه زنجیره‌ای ممنوع است.
 
 ---
 
@@ -42,3 +43,4 @@
 | `hooks/` | React Hooks مشترک (فقط برای بیش از یک فیچر) | `docs/core/hooks/hooks.md` |
 | `services/` | سرویس‌های زیرساختی: ارز، EventBus، Storage، VersionCheck، Logger | `docs/core/services/services.md` |
 | `types/` | TypeScript Types مشترک: TransactionType، RelatedFeature، AppEvent، AssetCategory | `docs/core/types/types.md` |
+| `rounding/` | **سیاست گرد کردن اعداد — Critical Cross-Cutting** | `docs/core/rounding/Rounding-Policy.md` |

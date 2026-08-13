@@ -95,45 +95,41 @@
 - `totalLiabilities` → decimal
 - `totalWealth` → decimal
 - `netWealth` → decimal
-- `totalWealthBase` → decimal (معادل ارز پایه کاربر — سازگار با نام‌گذاری `Base` در سایر فیچرها)
-- `netWealthBase` → decimal (معادل ارز پایه کاربر)
-- `schemaVersion` → integer (نسخه ساختار `breakdown` — برای backward compatibility؛ پیش‌فرض: `1`)
-- `breakdown` → JSON typed به `PortfolioBreakdown` (تعریف کامل در `core/types/types.md` — بخش `portfolio.ts`)
-
-> ⚠️ **هشدار backward compatibility**: ساختار `breakdown` هرگز بدون افزایش `schemaVersion` تغییر نکند. هنگام خواندن snapshot قدیمی، `schemaVersion` را چک کنید و در صورت نیاز migration اعمال کنید. ساختار فعلی (`schemaVersion=1`) در `core/types/types.md` تعریف شده است.
-
----
-
-### ⚠️ فیلدهای اجباری برای Historical Valuation (بدون اینها Portfolio تاریخی قابل اعتماد نیست)
-
-هنگام ساخت یک Snapshot، **هر چهار بردار تاریخی** باید در همان لحظه Snapshot شوند. بدون این فیلدها، `getPortfolioTrend()` مجبور می‌شود از قیمت فعلی، نرخ FX فعلی، یا کوانتیتی فعلی استفاده کند — که برای نمودار روند تاریخی کاملاً اشتباه است.
-
-فیلدهای الزامی اضافه‌شده به `port_snapshots`:
-
-- `fxRateAtSnapshot` → decimal (نرخ تبدیل baseCurrency ← USDT در **لحظه دقیق Snapshot**، از `cur_exchange_rates`)
-- `fxTimestamp` → datetime (لحظه‌ای که این FX Rate از `cur_exchange_rates` گرفته شده — ممکن است با `date` اختلاف داشته باشد اگر نرخ قدیمی باشد)
-- `pricesUsed` → JSON — Map از `{assetCategory}:{symbol}` به `{price, priceCurrency, priceTimestamp}` برای **هر دارایی‌ای که در این Snapshot ارزش‌گذاری شده**:
+- `totalWealthUSDT` → decimal
+- `netWealthUSDT` → decimal
+- `breakdown` → JSON (جزئیات هر بخش — هم‌ساختار با خروجی `getPortfolioOverview()`)
   ```json
   {
-    "crypto:BTC":  { "price": "65000", "priceCurrency": "USDT", "priceTimestamp": "2024-01-15T10:30:00Z" },
-    "crypto:ETH":  { "price": "3200",  "priceCurrency": "USDT", "priceTimestamp": "2024-01-15T10:30:00Z" },
-    "metal:gold_18k": { "price": "2850000", "priceCurrency": "IRR", "priceTimestamp": "2024-01-15T09:00:00Z" }
+    "investments": {
+      "total": number,
+      "profitLoss": number,
+      "unrealized": number,
+      "realized": number,
+      "sections": {
+        "crypto": { "value": number, "profitLoss": number },
+        "stocksIran": { "value": number, "profitLoss": number },
+        "fixedIncome": { "value": number, "profitLoss": number },
+        "metals": { "value": number, "profitLoss": number }
+      }
+    },
+    "physicalAssets": {
+      "total": number,
+      "profitLoss": number
+    },
+    "cash": {
+      "total": number
+    },
+    "liabilities": {
+      "total": number
+    },
+    "allocation": Array<{
+      "key": string,
+      "label": string,
+      "value": number,
+      "percent": number
+    }>
   }
   ```
-- `quantitiesAtSnapshot` → JSON — Map از `{assetCategory}:{symbol}:{holdingId}` به `quantity` در **لحظه Snapshot**:
-  ```json
-  {
-    "crypto:BTC:<holdingId>": "0.45",
-    "crypto:ETH:<holdingId>": "2.1",
-    "metal:gold_18k:<holdingId>": "10000"
-  }
-  ```
-
-> **چرا این فیلدها حیاتی هستند**:
-> اگر کاربر در تاریخ X مقداری BTC داشته و بعداً بخشی را فروخته، `getPortfolioTrend()` باید بتواند ارزش تاریخی را با **کوانتیتی همان روز** و **قیمت همان روز** محاسبه کند. بدون `quantitiesAtSnapshot` و `pricesUsed`، سیستم ناچار است از `inv_crypto_holdings.quantity` فعلی استفاده کند که دیگر آن روز را نشان نمی‌دهد.
->
-> **Corporate Actions (برای سهام ایران)**: تغییرات سرمایه (افزایش سرمایه، سود سهام جایزه) که تعداد سهام را تغییر می‌دهند، در `inv_stocks_iran_transactions` با `type='capital_increase'`/`'bonus_shares'` لاگ می‌شوند. `quantitiesAtSnapshot` باید **بعد از اعمال تمام Corporate Actions تا آن تاریخ** محاسبه و ذخیره شود — نه quantity خام Holding.
-
 - `createdAt` → datetime
 
 ### ۲. Portfolio Setting (جدول: `port_settings`)
@@ -151,16 +147,16 @@
 ## APIهای داخلی
 
 ### Portfolio APIs
-- `getPortfolioOverview()` → خلاصه کامل پرتفوی و ثروت (فقط از داده‌های محلی، بدون شبکه)
+- `getPortfolioOverview()` → خلاصه کامل پرتفوی و ثروت
 - `getInvestmentBreakdown()` → تفکیک سرمایه‌گذاری‌ها
 - `getPhysicalAssetsBreakdown()` → تفکیک دارایی‌های فیزیکی
 - `getProfitLossSummary()` → سود/زیان کل و به تفکیک بخش
-- `getPortfolioTrend(startDate, endDate)` → روند ارزش در طول زمان — **فقط از `port_snapshots` می‌خواند** (نه از Holdingهای فعلی)؛ بنابراین دقت نتیجه مستقیماً به تعداد و کیفیت Snapshotهای ذخیره‌شده بستگی دارد
+- `getPortfolioTrend(startDate, endDate)` → روند ارزش در طول زمان
 - `getAllocationPercentages()` → درصد وزن هر بخش از پرتفوی
 
 ### Snapshot APIs
-- `createPortfolioSnapshot()` → ثبت وضعیت کامل لحظه جاری — **باید همه چهار بردار تاریخی را یک‌جا Snapshot کند**: (۱) `fxRateAtSnapshot` از جدیدترین رکورد `cur_exchange_rates`، (۲) `fxTimestamp` همان لحظه، (۳) `pricesUsed` از جدیدترین `price_history` برای هر دارایی، (۴) `quantitiesAtSnapshot` از Holdingهای فعلی (بعد از Corporate Actions). می‌تواند Job دوره‌ای (روزانه/هفتگی) باشد.
-- `getPortfolioSnapshots(startDate, endDate)` → دریافت Snapshotهای تاریخی
+- `createPortfolioSnapshot()` → ثبت وضعیت فعلی (می‌تواند Job روزانه باشد)
+- `getPortfolioSnapshots(startDate, endDate)` → دریافت ساکندهای تاریخی
 
 ### Settings APIs
 - `getPortfolioSettings()` → دریافت تنظیمات پرتفوی
@@ -170,43 +166,40 @@
 
 ## خروجی پیشنهادی `getPortfolioOverview`
 
-> **قانون**: همه مقادیر مالی در خروجی باید `string` (نه `number`) باشند تا با `decimal.js` در UI قابل استفاده باشند. هرگز `number`/`float` برای مبالغ مالی.
-
 ```ts
 {
-  totalWealth: string,           // Decimal string — به baseCurrency
-  netWealth: string,
-  totalWealthBase: string,       // معادل ارز پایه (baseCurrency)
-  netWealthBase: string,
-  changePercent: string,         // نسبت به Snapshot قبلی
-  snapshotDate?: string,         // تاریخ Snapshot پایه برای changePercent
+  totalWealth: number,
+  netWealth: number,
+  totalWealthUSDT: number,
+  netWealthUSDT: number,
+  changePercent: number,          // نسبت به دوره قبل
   investments: {
-    total: string,
-    profitLoss: string,
-    unrealized: string,
-    realized: string,
+    total: number,
+    profitLoss: number,
+    unrealized: number,
+    realized: number,
     sections: {
-      crypto:      { value: string, profitLoss: string },
-      stocksIran:  { value: string, profitLoss: string },
-      fixedIncome: { value: string, profitLoss: string },
-      metals:      { value: string, profitLoss: string }
+      crypto: { value: number, profitLoss: number },
+      stocksIran: { value: number, profitLoss: number },
+      fixedIncome: { value: number, profitLoss: number },
+      metals: { value: number, profitLoss: number }
     }
   },
   physicalAssets: {
-    total: string,
-    profitLoss: string
+    total: number,
+    profitLoss: number
   },
   cash: {
-    total: string
+    total: number
   },
   liabilities: {
-    total: string
+    total: number
   },
   allocation: Array<{
     key: string,
     label: string,
-    value: string,
-    percent: string
+    value: number,
+    percent: number
   }>
 }
 ```

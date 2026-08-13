@@ -54,22 +54,9 @@ Business Rules
   - `units` نمی‌تواند منفی شود.
   - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
 - تقسیم سود نقدی:
-  - **MUST ایجاد Income Transaction در `acc_transactions`**:
-    ```
-    acc_transactions {
-      type: 'deposit-income',
-      relatedFeature: 'fif',
-      relatedId: dividend_transaction_id,
-      amount: dividend_amount,
-      date: dividend_date,
-      description: "Dividend from [fundName]: [amount]",
-      accountId: linked_bank_account  // کجا پول رسید
-    }
-    ```
-  - مبلغ سود به عنوان درآمد ثبت می‌شود (Accounting Ledger میل شود)
+  - مبلغ سود به عنوان درآمد ثبت می‌شود.
   - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
   - `predictedProfit` در این تراکنش می‌تواند پر شود (برای مقایسه با سود واقعی).
-  - نه سهام محسوب نمی‌شود، نه در `calculateProfitLoss()` (realized/unrealized)
 - سرمایه‌گذاری مجدد سود:
   - به جای دریافت نقدی، تعداد واحد جدید خریداری و به Holding اضافه می‌شود.
   - `predictedProfit` در این تراکنش نیز می‌تواند پر شود.
@@ -132,7 +119,7 @@ Domain Entities
 - `units` → decimal (تعداد واحد فعلی)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید)
 - `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`baseCurrency`) با `exchangeRateToBase` همان تراکنش)
+- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
 - `currentNAV` → decimal (آخرین NAV ثبت‌شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -165,13 +152,8 @@ Domain Entities
 - `createdAt` → datetime
 
 > **نکته لینک `accountTransactionId`**:
-> - برای **issuance_redemption**: `accountTransactionId` → `acc_transactions.id` که `relatedFeature='fif'` و `relatedId=inv_fif_transactions.id` دارد.
-> - برای **ETF**: `accountTransactionId` → `acc_transactions.id` که `relatedFeature='stocks_iran'` و `relatedId=inv_stocks_iran_brokerage_transactions.id` دارد.
->
-> **نکته مهم برای ETF**: لینک معکوس از `acc_transactions` به `inv_fif_transactions` از طریق `relatedId` مستقیم وجود ندارد (چون `relatedId` به `inv_stocks_iran_brokerage_transactions` اشاره می‌کند). برای یافتن صندوق مرتبط با یک تراکنش بانکی ETF:
-> 1. از `acc_transactions.relatedId` → `inv_stocks_iran_brokerage_transactions.id`
-> 2. از `inv_fif_transactions.accountTransactionId` = `acc_transactions.id` مطابقت را چک کن
-> این lookup دو مرحله‌ای است و باید در service layer مستند شود.
+> - برای ETFها: `accountTransactionId` لینک به رکوردی در `inv_stocks_iran_brokerage_transactions` **نیست** — بلکه لینک به `acc_transactions` است که خودش `relatedFeature = 'stocks_iran'` دارد.
+> - برای issuance_redemption: `accountTransactionId` لینک به `acc_transactions` با `relatedFeature = 'fif'` است.
 
 ۴. acc_transactions
 
@@ -181,37 +163,7 @@ Domain Entities
 APIهای داخلی
 
 createFund(data) / updateFund(id, data) / getAllFunds()
-
-createTransaction(data) → **فقط برای صندوق‌های issuance_redemption** (خرید/فروش/صدور/ابطال، تقسیم سود، سرمایه‌گذاری مجدد با واریز/برداشت مستقیم از حساب بانکی) — روی `inv_fif_transactions` ثبت می‌شود.
-
-> ⛔ **ممنوع برای ETF**: `createTransaction()` در FIF را **هرگز** برای خرید/فروش ETF مستقیم صدا نزنید — `cashBalance` کارگزاری آپدیت نمی‌شود و داده خراب می‌شود.
-
-**توالی اجباری برای خرید/فروش ETF** (دو مرحله، هر دو الزامی):
-
-```
-// مرحله ۱ — در فیچر Stocks Iran (آپدیت cashBalance کارگزاری)
-brokerageTx = createBrokerageTransaction({
-  brokerageId,
-  type: 'withdraw',        // برای خرید ETF (پول از کارگزاری خارج می‌شود)
-  amount,
-  feeAmount, feeCurrency,
-  exchangeRateToBase,
-  accountTransactionId     // ← id از acc_transactions که همین‌جا ساخته می‌شود
-})
-// نتیجه: cashBalance کارگزاری کاهش می‌یابد + acc_transactions با relatedFeature='stocks_iran' ثبت می‌شود
-
-// مرحله ۲ — در FIF (ثبت رویداد صندوق)
-fifTx = createFIFTransaction({
-  fundId, brokerageId,
-  type: 'buy',
-  units, price, amount,
-  feeAmount, feeCurrency, exchangeRateToBase,
-  accountTransactionId: brokerageTx.accountTransactionId  // همان acc_transactions.id از مرحله ۱
-})
-// نتیجه: inv_fif_holdings.units افزایش + inv_fif_transactions ثبت می‌شود
-```
-
-> **توجه**: برای فروش ETF، مرحله ۱ با `type: 'deposit'` انجام می‌شود (پول به کارگزاری برمی‌گردد) و مرحله ۲ با `type: 'sell'`.
+createTransaction(data) → خرید، فروش، واریز/برداشت مستقیم حساب بانکی (issuance_redemption)، تقسیم سود، سرمایه‌گذاری مجدد — همگی روی `inv_fif_transactions` ثبت می‌شوند؛ برای واریز/برداشت ETF از طریق کارگزاری، به APIهای `Investment-Stocks-Iran` (`createBrokerageTransaction`) مراجعه شود.
 updateNAV(fundId, nav, date) → ثبت NAV جدید (از نسخه ۱، این تابع یک Wrapper نازک روی `setManualFundNAV` فیچر `19-Price-Fetching` است تا NAV هم در `price_history` مرکزی و هم در `inv_fif_holdings.currentNAV` ثبت شود؛ جزئیات کامل در `19-03-Fund-NAV/Fund-NAV.md`)
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری

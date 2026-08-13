@@ -30,18 +30,18 @@
 
 1. صندوق‌های `issuance_redemption` با `assetCategory='fif'` و صندوق‌های `etf` با `assetCategory='stock'` در `price_history` ذخیره می‌شوند (طبق بند ۳ بالا) — این دو هرگز قاطی نمی‌شوند چون منطق Fetch‌شان کاملاً متفاوت است.
 2. `symbol` رکورد `price_history` برای صندوق‌های `issuance_redemption` برابر `fundId` (رشته UUID) است، نه یک نماد بورسی واقعی (چون این صندوق‌ها اصلاً نماد ندارند — طبق `Fixed-Income-Funds.md`).
-3. ثبت دستی NAV هیچ‌گاه به شبکه نیاز ندارد و همیشه ممکن است — طبق قانون عمومی ثبت دستی در `Price-Fetching.md`. **ثبت دستی برای هر `fundId` مجاز است، حتی اگر کاربر هنوز واحدی از آن صندوق در `inv_fif_holdings` نداشته باشد** (مثلاً پیگیری NAV صندوقی که در نظر دارد بخرد، یا صندوقی که API ندارد).
-4. برای صندوقی که `price_sync_settings` با `scope='symbol'`، `symbol=fundId`، **`sourceId` مشخص** (لینک به `price_sources` اختصاصی همان صندوق)، و `autoSyncEnabled=true` دارد، سیستم طبق همان تایمر عمومی Auto-Sync تلاش می‌کند NAV را از همان `sourceId` بگیرد؛ در غیر این صورت هیچ تلاش خودکاری برای آن صندوق نمی‌شود و کاربر باید دستی وارد کند.
+3. ثبت دستی NAV هیچ‌گاه به شبکه نیاز ندارد و همیشه ممکن است — طبق قانون عمومی ثبت دستی در `Price-Fetching.md`.
+4. برای صندوقی که `price_sync_settings` با `scope='symbol'` و `symbol=fundId` و `autoSyncEnabled=true` دارد، سیستم طبق همان تایمر عمومی Auto-Sync تلاش می‌کند NAV را از `price_sources` اختصاصی همان صندوق بگیرد؛ در غیر این صورت هیچ تلاش خودکاری برای آن صندوق نمی‌شود و کاربر باید دستی وارد کند.
 5. اگر Fetch خودکار per-fund شکست بخورد (Parser صفحه صندوق تغییر کرده، سایت در دسترس نیست)، فقط همان صندوق Skip می‌شود؛ خطا در نتیجه گزارش می‌شود ولی هرگز به کاربر اجازه ثبت دستی را نمی‌گیرد — دستی همیشه باز است، حتی اگر Auto-Sync برای همان صندوق هم فعال باشد.
 
 ---
 
 ## APIهای داخلی
 
-- `setManualFundNAV(fundId, nav, date, isOverride?: boolean)` → جایگزین مستقیم `updateNAV` قبلی در `Fixed-Income-Funds.md`؛ داخلش `setManualPrice('fif', fundId, nav, 'IRR', isOverride)` فیچر پدر را صدا می‌زند و علاوه‌بر آن `inv_fif_holdings.currentNAV` را هم به‌روزرسانی می‌کند (برای سازگاری با APIهای موجود فیچر Investment). اگر `isOverride=true` باشد، قیمت‌های API بعدی آن را override نمی‌کنند.
-- `fetchFundNAV(fundId)` → ابتدا Source مناسب را از `price_sources` با `WHERE assetCategory='fif' AND symbol=fundId AND isActive=true` پیدا می‌کند؛ اگر Source اختصاصی نداشت، خطای واضح `NO_SOURCE_DEFINED` برمی‌گرداند (نه خاموش fail می‌کند). یک صندوق در هر بار (نه Batch سراسری مثل بقیه زیرفیچرها).
-- `getLatestFundNAV(fundId)` → میانبر روی `getLatestPrice('fif', fundId)` — `assetCategory='fif'` همیشه hardcode است
-- `getFundAutoSyncSettings(fundId)` / `setFundAutoSyncSettings(fundId, data)` → میانبر روی `getSyncSettings`/`setSyncSettings` با `scope='symbol'`، `symbol=fundId`؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='fif'` که برای همین صندوق ساخته شده ارجاع دهد
+- `setManualFundNAV(fundId, nav, date)` → جایگزین مستقیم `updateNAV` قبلی در `Fixed-Income-Funds.md`؛ داخلش `setManualPrice(fundId, nav, priceCurrency='IRR')` فیچر پدر را صدا می‌زند و علاوه‌بر آن `inv_fif_holdings.currentNAV` را هم به‌روزرسانی می‌کند (برای سازگاری با APIهای موجود فیچر Investment).
+- `fetchFundNAV(fundId)` → فقط برای صندوق‌هایی با `price_sources` اختصاصی تعریف‌شده؛ یک صندوق در هر بار (نه Batch سراسری مثل بقیه زیرفیچرها).
+- `getLatestFundNAV(fundId)` → میانبر روی `getLatestPrice(fundId)` با `assetCategory='fif'`
+- `getFundAutoSyncSettings(fundId)` / `setFundAutoSyncSettings(fundId, data)`
 
 ---
 

@@ -75,23 +75,7 @@
 - `nextDueDate` → datetime (تاریخ سررسید بعدی)
 - `reminderDaysBefore` → number (چند روز قبل یادآوری شود)
 - `autoCreateTransaction` → boolean (ثبت خودکار تراکنش؟)
-- `envelopeCategoryCode` → string (nullable — **کد دسته‌بندی پاکت** به جای `envelopeId` مستقیم؛ مثلاً `food`, `transport`)
-- `envelopeId` → UUID (nullable — **snapshot** آخرین envelope فعال با این `envelopeCategoryCode` در بودجه جاری — در زمان `markAsPaid()` به‌روزرسانی می‌شود، نه در زمان ایجاد `br_items`)
-
-> **چرا `envelopeCategoryCode` به جای `envelopeId` ثابت**:
-> - بودجه‌ها ماهانه بسته و دوباره ایجاد می‌شوند؛ هر دوره `bg_envelopes` جدید با `id` جدید ساخته می‌شود
-> - اگر `br_items.envelopeId` به envelope ماه قبل اشاره کند، `applyTransactionToBudget()` در ماه جدید روی envelope اشتباه اعمال می‌شود
-> - **راه‌حل**: `envelopeCategoryCode` به عنوان مرجع پایدار نگه داشته می‌شود؛ در زمان `markAsPaid()`، سیستم envelope فعال با این code را در بودجه جاری جستجو می‌کند:
-> ```
-> activeEnvelope = bg_envelopes WHERE categoryCode=envelopeCategoryCode AND budgetId=currentBudgetId AND isActive=true
-> if activeEnvelope exists:
->   envelopeId = activeEnvelope.id  // snapshot آپدیت می‌شود
->   applyTransactionToBudget(relatedId, relatedFeature, activeEnvelope.id, amount)
-> else:
->   // پاکت برای ماه جاری تعریف نشده — بدون کسر بودجه، بدون خطا
->   envelopeId = null
-> ```
-> - `envelopeId` snapshot است: برای lookup آپدیت می‌شود، اما هرگز به عنوان Foreign Key ثابت تکیه نمی‌شود
+- `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
 - `isActive` → boolean
 - `description` → string
 - `createdAt` → datetime
@@ -105,20 +89,16 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `expenseTransactionId` → UUID (nullable — لینک به `exp_transactions.id` فقط وقتی `br_items.type = 'expense'`)
-- `incomeTransactionId` → UUID (nullable — لینک به `inc_transactions.id` فقط وقتی `br_items.type = 'income'`)
+- `transactionId` → UUID (لینک به تراکنش واقعی `exp_transactions.id` یا `inc_transactions.id` — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
-
-> **نکته طراحی**: به‌جای یک فیلد `transactionId` که به دو جدول متفاوت اشاره می‌کند، دو فیلد مجزا تعریف شده‌اند تا Foreign Key در SQLite معنادار باشد. همیشه فقط یکی پر می‌شود (بسته به `br_items.type`) و دیگری `null` است.
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
 > **نکته لینک در `markAsPaid()`**:
-> - اگر `br_items.type = 'expense'`: فیلد `expenseTransactionId` با `exp_transactions.id` تراکنش ساخته‌شده پر می‌شود؛ `incomeTransactionId` همچنان `null` می‌ماند
-> - اگر `br_items.type = 'income'`: فیلد `incomeTransactionId` با `inc_transactions.id` تراکنش ساخته‌شده پر می‌شود؛ `expenseTransactionId` همچنان `null` می‌ماند
-> - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط — در هر دو حالت پر می‌شود)
-> - هر سه فیلد در یک عملیات atomic پر می‌شوند
+> - `transactionId` → `exp_transactions.id` (اگر `type=expense`) یا `inc_transactions.id` (اگر `type=income`)
+> - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط)
+> - هر دو در یک عملیات atomic پر می‌شوند
 
 ---
 
@@ -137,7 +117,7 @@
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
 - `markAsPaid(brOccurrenceId, amount, date, accountId?)`
-  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp_transactions` (اگر expense) یا `inc_transactions` (اگر income) + ثبت در `acc_transactions` + پر کردن `expenseTransactionId` یا `incomeTransactionId` (بسته به نوع) و `accountTransactionId` + به‌روزرسانی nextDueDate
+  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + به‌روزرسانی nextDueDate
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 

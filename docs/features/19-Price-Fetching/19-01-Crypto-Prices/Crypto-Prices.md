@@ -33,7 +33,7 @@
 5. اگر یک نماد در پاسخ API نباشد (مثلاً توکن خیلی جدید یا کم‌شناخته)، آن نماد Skip می‌شود و در UI با پیام «قیمت این نماد یافت نشد — می‌توانید دستی وارد کنید» نمایش داده می‌شود؛ باقی نمادها دریافت می‌شوند (Partial Success).
 6. اگر کاربر آفلاین باشد (چه هنگام کلیک دستی، چه در لحظه‌ای که تایمر Auto-Sync قرار است اجرا شود)، هیچ Request ای ارسال نمی‌شود؛ آخرین قیمت کش‌شده (دستی یا API، هرکدام جدیدتر بود) بدون تغییر باقی می‌ماند و فقط پیام وضعیت آفلاین/برچسب «قیمت قدیمی» نشان داده می‌شود.
 7. منبع قیمت پیش‌فرض نسخه ۱ در `price_sources` با `assetCategory = 'crypto'` ثبت می‌شود؛ انتخاب Provider مشخص (مثلاً CoinGecko یا Nobitex) در پیاده‌سازی نهایی تعیین و در همان جدول `baseUrl` می‌شود — این سند فقط قرارداد داده و رفتار را مشخص می‌کند، یک Provider خاص را قفل نمی‌کند.
-8. ثبت دستی قیمت (`source = 'manual'`) هیچ وابستگی به شبکه، `price_sources`، یا Batch ندارد؛ مستقیماً یک رکورد در `price_history` با `sourceId = null` اضافه می‌شود و بلافاصله در `getLatestPrice` دیده می‌شود — دقیقاً مثل این‌که از API آمده باشد. **ثبت دستی برای هر نماد رمزارز مجاز است، حتی اگر کاربر آن رمزارز را در `inv_crypto_holdings` نداشته باشد** — برای رمزارزهایی که API پوشش نمی‌دهد، وقتی کاربر آفلاین است، یا وقتی می‌خواهد قیمتی را که خودش از منبع دیگری می‌داند ثبت کند. (محدودیت holdings فقط برای Fetch خودکار/دستی API اعمال می‌شود، نه Manual Entry.)
+8. ثبت دستی قیمت (`source = 'manual'`) هیچ وابستگی به شبکه، `price_sources`، یا Batch ندارد؛ مستقیماً یک رکورد در `price_history` با `sourceId = null` اضافه می‌شود و بلافاصله در `getLatestPrice` دیده می‌شود — دقیقاً مثل این‌که از API آمده باشد.
 9. تنظیم Auto-Sync برای کریپتو هم از همان جدول عمومی `price_sync_settings` استفاده می‌کند؛ کاربر می‌تواند یا کل دسته `crypto` را روشن کند یا فقط چند نماد خاص (مثلاً فقط BTC و ETH خودکار، بقیه دستی) — طبق «قاعده اولویت» در سند اصلی فیچر.
 
 ---
@@ -50,9 +50,9 @@
     triggeredBy: 'user_click' | 'auto_sync'
   }
   ```
-- `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice('crypto', symbol)` فیچر پدر — `assetCategory='crypto'` همیشه hardcode است تا collision با نمادهای هم‌نام در سهام/فلزات ممکن نباشد
-- `setManualCryptoPrice(symbol, price, isOverride?: boolean)` → میانبر روی `setManualPrice('crypto', symbol, price, 'USDT', isOverride)` فیچر پدر؛ کاملاً آفلاین. اگر `isOverride=true` ست شود، قیمت‌های API بعدی این قیمت را override نمی‌کنند تا `clearManualOverride('crypto', symbol)` صدا زده شود.
-- `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='crypto'` ارجاع دهد
+- `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice(symbol)` فیچر پدر، مخصوص `assetCategory='crypto'`
+- `setManualCryptoPrice(symbol, price)` → میانبر روی `setManualPrice(symbol, price, priceCurrency='USDT')` فیچر پدر؛ کاملاً آفلاین
+- `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
 
 ---
 

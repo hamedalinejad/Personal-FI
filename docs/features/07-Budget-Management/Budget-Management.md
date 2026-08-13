@@ -88,13 +88,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی — `spentAmount` (snapshot اجباری)**:
-> - `spentAmount` یک فیلد **snapshot** است که باید همیشه با مجموع `bg_transaction_links.amount WHERE envelopeId = this.id` برابر باشد.
-> - **تنها راه مجاز آپدیت**: از طریق `applyTransactionToBudget()` یا `splitTransactionBudget()` — هرگز مستقیم ویرایش نشود.
-> - آپدیت `spentAmount` **atomic** است: همیشه همراه با درج رکورد `bg_transaction_links` در یک DB transaction انجام می‌شود.
-> - هنگام **حذف یا void** یک هزینه: `spentAmount -= amount` و رکورد `bg_transaction_links` حذف می‌شوند (atomic).
->
-> **`remainingAmount`** یک فیلد **محاسبه‌ای** است و در دیتابیس ذخیره نمی‌شود.  
+> **نکته طراحی**: `remainingAmount` یک فیلد **محاسبه‌ای** است و در دیتابیس ذخیره نمی‌شود.  
 > فرمول: `remainingAmount = assignedAmount + rolloverAmount - spentAmount`  
 > ذخیره این فیلد باعث out-of-sync با داده‌های واقعی می‌شود.
 
@@ -173,24 +167,9 @@
 
 ### Integration APIs
 - `applyTransactionToBudget(relatedId, relatedFeature, envelopeId, amount)` → کسر خودکار از پاکت هنگام ثبت هزینه  
-  → `relatedId`: شناسه رکورد در جدول مربوطه (exp_transactions, chk_cheques, ln_transactions)  
+  → `relatedId`: شناسه رکورد در جدول مربوطه (exp_transactions, chk_cheques, ln_transactions)
   → `relatedFeature`: `expense`, `cheque`, یا `loan`
-
-  > **توالی اجباری — همه مراحل زیر در یک DB transaction (atomic) انجام می‌شوند؛ هر خطا کل عملیات را rollback می‌کند:**
-  > 1. ایجاد رکورد در `bg_transaction_links` با `envelopeId`, `relatedId`, `relatedFeature`, `amount`
-  > 2. `bg_envelopes.spentAmount += amount` (آپدیت snapshot پاکت)
-  > 3. `bg_budgets.totalSpent += amount` (آپدیت snapshot کل بودجه)
-  > 4. اگر `bg_envelopes.remainingAmount <= 0` و `strictMode = true` → rollback و خطا برگردان
-  >
-  > **قانون**: هرگز `spentAmount` یا `totalSpent` را بدون درج رکورد متناظر در `bg_transaction_links` آپدیت نکن — این دو همیشه با هم یا هیچ‌کدام.
-
 - `splitTransactionBudget(relatedId, relatedFeature, envelopeAmounts)` → تقسیم هزینه بین چند پاکت
-
-  > **توالی اجباری (atomic)** — به‌ازای هر `{envelopeId, amount}` در `envelopeAmounts`:
-  > 1. رکورد در `bg_transaction_links` ایجاد می‌شود
-  > 2. `bg_envelopes.spentAmount += amount` برای آن پاکت
-  > 3. `bg_budgets.totalSpent += sum(envelopeAmounts)` یک‌بار در پایان
-  > همه در یک DB transaction — rollback کامل در صورت هر خطا
 - `getEnvelopeStatus(envelopeId)` → وضعیت مصرف (درصد و باقی‌مانده)
 - `checkBudgetAlerts(budgetId)` → بررسی هشدارها
 
