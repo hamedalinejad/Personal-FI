@@ -93,3 +93,45 @@
 - در `Investment-Stocks-Iran.md`: اضافه‌شدن معماری Journal=Truth/snapshot=Cache، الگوی Atomic UPDATE، `calculateTrueCashBalance()` با فرمول کامل، `reconcileBrokerage()` API با auto-fix و audit log.
 - در `Investment-Crypto.md`: اضافه‌شدن `calculateTrueCashBalance(exchangeId, symbol)` برای IRR/USDT، `reconcileExchange()` API، و مستندسازی معماری Journal/Cache در بخش نکات طراحی.
 - قوانین Never/Always مشخص شد: هرگز آپدیت مستقیم snapshot بدون Journal؛ برای UI از cache، برای validation عملیات حساس از True Balance.
+---
+
+## ✅ رفع‌شده در بررسی چهارم (باگ‌های ۱۹ و ۲۰)
+
+### باگ ۱۹ — وابستگی ساختاری Currency Engine به USDT به‌عنوان تنها Bridge
+**Severity: High**  
+**محل:** `docs/features/17-Currency-CrossRate/Currency-CrossRate.md` — بخش «منطق تبدیل»
+
+**شرح:** تابع `convert()` پیشین از USDT به‌عنوان تنها ارز واسط (Bridge) استفاده می‌کرد:
+```
+from → USDT → to
+```
+اگر نرخ USDT در `cur_exchange_rates` موجود نبود یا invalid بود، هر تبدیلی که شامل USDT نمی‌شد (مثلاً `IRR → EUR`) هم شکست می‌خورد — حتی اگر نرخ مستقیم یا مسیر دیگری (IRR→USD→EUR) موجود بود. این وابستگی ساختاری یک Single Point of Failure بود که با اهداف سیستم (پشتیبانی از هر ارز با هر ارز) ناسازگار است.
+
+**راه‌حل اعمال‌شده در `Currency-CrossRate.md`:**
+- تابع `convert()` کاملاً بازنویسی شد با **Graph-Based Multi-Hop BFS Routing**.
+- تابع `buildRateGraph()` اضافه شد: همه جفت‌ارزهای موجود در `cur_exchange_rates` (هر دو جهت — ذخیره‌شده و معکوس محاسبه‌شده) به یک Graph تبدیل می‌شوند.
+- BFS کوتاه‌ترین مسیر (کمترین hop) را پیدا می‌کند — بدون وابستگی به USDT یا هیچ ارز خاص دیگری.
+- اگر هیچ مسیری پیدا نشد، خطای واضح برمی‌گردد.
+- قانون «USDT نباید dependency بنیادی سیستم باشد» به بخش نکات طراحی اضافه شد.
+- پیشنهاد کش‌کردن Graph در حافظه (و rebuild فقط پس از تغییر نرخ) برای عملکرد بهتر.
+
+---
+
+### باگ ۲۰ — عدم تعریف قانون جامع برای تغییر `baseCurrency` پس از وجود تراکنش‌ها
+**Severity: Critical**  
+**محل:** `docs/features/17-Currency-CrossRate/Currency-CrossRate.md` — بخش «Preference APIs»
+
+**شرح:** سیستم `baseCurrency` را در `cur_currency_preferences` ذخیره می‌کند و فیلدهای متعددی با پسوند `Base` وجود دارند (`averageBuyPrice`, `totalInvested`, `totalFeesPaidBase`, `priceBase`, `totalAmountBase` و ...). هیچ قانونی مستند نشده بود که:
+- آیا این فیلدها پس از تغییر `baseCurrency` به‌صورت تاریخی rebase می‌شوند؟
+- کدام فیلدها Snapshot تاریخی (قفل) هستند و کدام Cache تجمیعی (بازمحاسبه)?
+- اگر rebase نشوند، چطور داده‌های قبل و بعد از تغییر با هم سازگار می‌مانند؟
+
+این ابهام می‌توانست منجر به پیاده‌سازی‌های ناسازگار در فیچرهای مختلف شود.
+
+**راه‌حل اعمال‌شده در `Currency-CrossRate.md`:**
+- بخش کامل «قانون تغییر `baseCurrency` پس از وجود تراکنش‌ها» اضافه شد.
+- **قانون بنیادین**: داده‌های تاریخی (Snapshot در لاگ تراکنش‌ها) **هرگز** rebase نمی‌شوند؛ Cache‌های تجمیعی (در جداول Holdings) **باید** از لاگ با `baseCurrency` جدید بازمحاسبه شوند.
+- تابع `updateBaseCurrency()` با توالی اجباری ۶ مرحله‌ای (بررسی نرخ → rebuild cache → ذخیره → rebuild graph → audit log) مستند شد.
+- جدول خلاصه رفتار هر فیلد هنگام تغییر `baseCurrency` اضافه شد (Snapshot ثابت vs Cache بازمحاسبه).
+- قانون نمایش داده‌های تاریخی با ذکر ارز پایه زمان ثبت در UI.
+- پیشنهاد هشدار UI قبل از تغییر `baseCurrency`.
