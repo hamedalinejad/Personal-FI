@@ -107,10 +107,9 @@
 - `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
 
 **کارمزدها و جریمه:**
-- `originationFeeAmount` → decimal (nullable — کارمزد صدور)
-- `originationFeeType` → enum (nullable — `fixed` | `percentage`)
-- `earlyPaymentFeeAmount` → decimal (nullable — کارمزد پیش‌پرداخت)
-- `earlyPaymentFeeType` → enum (nullable — `fixed` | `percentage`)
+
+> **طراحی**: به‌جای دو فیلد جداگانه `originationFeeAmount`/`originationFeeType` برای هر نوع کارمزد، از یک جدول جدا `ln_loan_fees` استفاده می‌شود که همه کارمزدهای انواع مختلف (صدور، پیش‌پرداخت، ماهانه، تراکنشی، پلکانی) را با ساختار یکسان ذخیره می‌کند. این امکان می‌دهد یک وام چند کارمزد از انواع مختلف داشته باشد — مثلاً کارمزد صدور ثابت + کارمزد ماهانه درصدی از مانده. جزئیات کامل در بخش «Domain Entity: ln_loan_fees» و «ح) انواع کارمزد وام».
+
 - `penaltyRate` → decimal (nullable — نرخ جریمه دیرکرد سالانه — مثلاً 6) ✅ **جدید**
 - `penaltyBasis` → enum (nullable — `overdue_installment` | `remaining_balance`; پیش‌فرض: `overdue_installment` — جزئیات در بخش «و) جریمه دیرکرد») ✅ **جدید**
 - `penaltyMaxCapAmount` → decimal (nullable — سقف مطلق جریمه به ریال) ✅ **جدید**
@@ -186,9 +185,37 @@
 
 > **نکته الزامی**: برای وام‌های `variable`، فیلد `interestRate` در `ln_loans` فقط **نرخ اولیه** (در `disbursementDate`) را نشان می‌دهد. برای محاسبه سود هر قسط، سیستم باید آخرین رکورد `ln_rate_history` که `effectiveDate` آن ≤ `dueDate` همان قسط است را پیدا کند و `r` را از روی آن نرخ محاسبه کند (نه از `ln_loans.interestRate`). برای وام‌های `fixed` یا `none`، این جدول اصلاً استفاده نمی‌شود و `interestRate` ثابت `ln_loans` معتبر است. الگوریتم کامل تغییر نرخ و تمام edge caseها در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate» آمده است.
 
----
+### ۵. Loan Fees (جدول: `ln_loan_fees`)
 
-## APIهای داخلی
+یک وام می‌تواند چند کارمزد از انواع مختلف همزمان داشته باشد (مثلاً کارمزد صدور ثابت + کارمزد مدیریت ماهانه). به‌جای ذخیره هر نوع کارمزد در فیلدهای جداگانه `ln_loans`، همه کارمزدها در این جدول با ساختار یکسان ذخیره می‌شوند.
+
+- `id` → UUID (Primary Key)
+- `loanId` → UUID
+- `feeCategory` → enum:
+  - `origination` — کارمزد صدور/ثبت (یک‌بار، در disbursement)
+  - `early_payment` — کارمزد پیش‌پرداخت (هنگام early_payment)
+  - `monthly_management` — کارمزد مدیریت ماهانه (هر دوره قسط)
+  - `per_transaction` — به‌ازای هر تراکنش پرداخت
+  - `insurance` — حق بیمه وام (ماهانه یا یک‌بار)
+  - `other` — سایر کارمزدها با توضیح دستی
+- `feeType` → enum:
+  - `fixed` — مبلغ ثابت (مثلاً ۵۰۰,۰۰۰ ریال)
+  - `percentage_of_principal` — درصدی از اصل وام (`principalAmount`)
+  - `percentage_of_installment` — درصدی از مبلغ هر قسط (`calculatedInstallment` یا `fixedInstallmentAmount`)
+  - `percentage_of_remaining_balance` — درصدی از مانده وام (برای کارمزدهای ماهانه مثل بعضی وام‌های مسکن)
+  - `tiered` — پلکانی (مثلاً: اگر پیش‌پرداخت ≤ ۳۰٪ → ۲٪؛ اگر > ۳۰٪ → ۴٪)
+- `amount` → decimal (nullable — مبلغ ثابت برای `feeType = 'fixed'`)
+- `rate` → decimal (nullable — نرخ درصدی برای `feeType` های percentage-based — مثلاً 1.5)
+- `minAmount` → decimal (nullable — حداقل کارمزد — برای همه انواع)
+- `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
+- `tiers` → JSON (nullable — فقط برای `feeType = 'tiered'` — آرایه‌ای از `{upToPercent, rate}`)
+- `calculatedAmount` → decimal (nullable — مبلغ نهایی محاسبه‌شده — پس از `createLoan` یا `payLoan` پر می‌شود)
+- `description` → string (nullable — توضیح اضافه، لازم برای `feeCategory = 'other'`)
+- `createdAt` → datetime
+
+> **نکته**: `serviceFeeRate`/`serviceFeeAmount` در `ln_loans` مختص قرض‌الحسنه باقی می‌مانند (ساختار ساده‌تر، یک‌بار در disbursement). برای سایر وام‌ها، همه کارمزدها از طریق `ln_loan_fees` مدیریت می‌شوند.
+
+---
 
 ### Loan APIs
 - `createLoan(data)`  
@@ -202,6 +229,9 @@
 - `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
 - `cancelLoan(id)`
 - `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'` و `calculationMethod = 'declining_balance'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه اقساط آینده — الگوریتم کامل در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate»
+- `addLoanFee(loanId, feeData)` → افزودن رکورد کارمزد به `ln_loan_fees`؛ فقط قبل از اولین پرداخت مجاز است (بعد از آن `updateLoanFee` ممنوع)
+- `getLoanFees(loanId)` → دریافت تمام کارمزدهای یک وام از `ln_loan_fees`
+- `calculateFeeAmount(loanId, feeId, context?)` → محاسبه مبلغ یک کارمزد بر اساس نوعش (برای نمایش پیش از ثبت پرداخت)
 
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
@@ -843,4 +873,129 @@ interestPortion  = 0
 Error: "دوره تنفس برای وام‌های Bullet معنا ندارد.
 وام Bullet از ابتدا فقط سود دوره‌ای دارد تا قسط آخر.
 برای تمدید مدت وام، تعداد اقساط را افزایش دهید."
+```
+
+---
+
+### ح) انواع کارمزد وام — مدل محاسباتی کامل
+
+کارمزدها از `ln_loan_fees` خوانده می‌شوند. محاسبه هر نوع:
+
+#### ح-۱) Fixed — مبلغ ثابت
+
+```
+calculatedAmount = fee.amount
+// اعمال کف و سقف:
+if fee.minAmount: calculatedAmount = MAX(calculatedAmount, fee.minAmount)
+if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
+```
+
+**مثال:** کارمزد صدور ثابت ۵۰۰,۰۰۰ ریال.
+
+---
+
+#### ح-۲) Percentage of Principal — درصد از اصل
+
+```
+calculatedAmount = principalAmount × (fee.rate / 100)
+if fee.minAmount: calculatedAmount = MAX(calculatedAmount, fee.minAmount)
+if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
+```
+
+**مثال:** کارمزد صدور ۱٪ از اصل وام ۱۰۰,۰۰۰,۰۰۰ ریال = ۱,۰۰۰,۰۰۰ ریال.
+
+---
+
+#### ح-۳) Percentage of Installment — درصد از قسط
+
+```
+installmentBase = calculatedInstallment ?? fixedInstallmentAmount
+calculatedAmount = installmentBase × (fee.rate / 100)
+if fee.minAmount: calculatedAmount = MAX(calculatedAmount, fee.minAmount)
+if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
+```
+
+> برای `feeCategory = 'monthly_management'` با این نوع، `calculatedAmount` به‌ازای هر قسط محاسبه و در `ln_transactions` ثبت می‌شود (نه یک‌بار در disbursement).
+
+**مثال:** کارمزد مدیریت ۰.۵٪ از هر قسط ۶,۰۰۰,۰۰۰ ریالی = ۳۰,۰۰۰ ریال در هر قسط.
+
+---
+
+#### ح-۴) Percentage of Remaining Balance — درصد از مانده (ماهانه)
+
+```
+// محاسبه در لحظه هر قسط:
+calculatedAmount = remainingBalance × (fee.rate / 100)
+if fee.minAmount: calculatedAmount = MAX(calculatedAmount, fee.minAmount)
+if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
+```
+
+> `remainingBalance` در این فرمول، مانده **قبل از کسر اصل همان قسط** است.
+
+**مثال:** کارمزد بیمه وام ۰.۱٪ از مانده ۹۰,۰۰۰,۰۰۰ ریال = ۹۰,۰۰۰ ریال.
+
+---
+
+#### ح-۵) Tiered — پلکانی
+
+```json
+// fee.tiers نمونه (برای کارمزد پیش‌پرداخت):
+[
+  { "upToPercent": 30, "rate": 1.0 },
+  { "upToPercent": 60, "rate": 2.0 },
+  { "upToPercent": 100, "rate": 3.0 }
+]
+```
+
+```
+earlyPaymentPercent = (earlyPaymentPrincipalAmount / originalPrincipalAmount) × 100
+
+// پیدا کردن tier مناسب:
+applicableTier = اولین tier که earlyPaymentPercent ≤ upToPercent
+calculatedAmount = earlyPaymentPrincipalAmount × (applicableTier.rate / 100)
+if fee.minAmount: calculatedAmount = MAX(calculatedAmount, fee.minAmount)
+if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
+```
+
+> اگر `earlyPaymentPercent` از همه `upToPercent`ها بیشتر شد (tier آخر)، آخرین tier اعمال می‌شود.
+
+**مثال:**
+- اصل وام: ۱۰۰,۰۰۰,۰۰۰ ریال
+- پیش‌پرداخت: ۲۵,۰۰۰,۰۰۰ ریال → ۲۵٪ از اصل → tier اول (≤30٪) → ۱٪
+- کارمزد = ۲۵,۰۰۰,۰۰۰ × ۰.۰۱ = ۲۵۰,۰۰۰ ریال
+
+---
+
+#### ح-۶) زمان‌بندی ثبت کارمزدها در `ln_transactions`
+
+| feeCategory | زمان ثبت در ln_transactions |
+|-------------|----------------------------|
+| `origination` | هنگام `createLoan` (disbursement) — قبل یا همزمان با واریز |
+| `early_payment` | هنگام `payLoan` با `type='early_payment'` |
+| `monthly_management` | هنگام `payLoan` با `type='installment_payment'` — همراه هر قسط |
+| `per_transaction` | هنگام هر `payLoan` (صرف‌نظر از نوع) |
+| `insurance` | بر اساس تعریف: اگر `monthly_management` → هر قسط؛ اگر `origination` → یک‌بار |
+| `other` | بر اساس `description` — دستی توسط کاربر |
+
+> **نکته**: تمام ثبت‌های کارمزد با `type = 'fee_payment'` و `feePortion = calculatedAmount` در `ln_transactions` ذخیره می‌شوند. `feeType` در `ln_transactions` به `ln_loan_fees.feeCategory` اشاره می‌کند. هیچ کارمزدی `remainingBalance` را تغییر نمی‌دهد.
+
+---
+
+#### ح-۷) مثال ترکیبی — وام بانکی با سه کارمزد همزمان
+
+```
+وام: ۵۰۰,۰۰۰,۰۰۰ ریال، ۶۰ قسط ماهانه Declining Balance
+
+ln_loan_fees:
+  1. origination / percentage_of_principal / rate=1.5 / max=5,000,000
+     → calculatedAmount = 500,000,000 × 1.5% = 7,500,000 → MIN(7,500,000, 5,000,000) = 5,000,000 ریال
+     → ثبت یک‌بار در disbursement
+
+  2. monthly_management / percentage_of_installment / rate=0.3
+     → calculatedAmount per month = 9,500,000 × 0.3% ≈ 28,500 ریال
+     → ثبت همراه هر یک از ۶۰ قسط
+
+  3. early_payment / tiered
+     → tiers: [{upToPercent:50, rate:1}, {upToPercent:100, rate:2}]
+     → فقط اگر پیش‌پرداخت انجام شود محاسبه می‌شود
 ```
