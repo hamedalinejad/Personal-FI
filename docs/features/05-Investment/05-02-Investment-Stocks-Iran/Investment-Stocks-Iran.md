@@ -131,12 +131,64 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی**: موجودی نقدی کارگزاری از طریق فیلد `cashBalance` در این جدول با snapshot نگهداری می‌شود.  
-> - هنگام واریز: `cashBalance += amount`  
-> - هنگام برداشت: `cashBalance -= amount`  
-> - هنگام خرید سهام: `cashBalance -= totalAmount + fees`  
-> - هنگام فروش سهام: `cashBalance += totalAmount - fees`  
-> - تراکنش‌ها در `inv_stocks_iran_brokerage_transactions` فقط لاگ هستند  
+> **معماری حسابداری — Journal به‌عنوان تنها Source of Truth**
+>
+> `inv_stocks_iran_brokerage_transactions` = **Truth (Journal/Log)**  
+> `inv_stocks_iran_brokerages.cashBalance` = **Cache (Snapshot برای سرعت UI)**
+>
+> **قانون طلایی**: هرگز مستقیم روی `cashBalance` بدون ثبت همزمان تراکنش در لاگ ننویسید.
+>
+> **آپدیت Atomic (الزامی — همه عملیات باید از این الگو پیروی کنند)**:
+> ```
+> BEGIN TRANSACTION
+>   1. محاسبه: newCashBalance = calculateTrueCashBalance(brokerageId) ± amount
+>   2. INSERT inv_stocks_iran_brokerage_transactions (یا inv_stocks_iran_transactions)
+>   3. UPDATE inv_stocks_iran_brokerages SET cashBalance = newCashBalance
+> COMMIT یا ROLLBACK (اتمیک)
+> ```
+>
+> **محاسبه True Balance از Journal**:
+> ```typescript
+> calculateTrueCashBalance(brokerageId: UUID): Decimal {
+>   // واریز + فروش + سود نقدی − برداشت − خرید − کارمزدها
+>   const brokTxs = db.query(`
+>     SELECT type, amount, feeAmount FROM inv_stocks_iran_brokerage_transactions
+>     WHERE brokerageId = ? AND isVoided = false`, [brokerageId])
+>   const stockTxs = db.query(`
+>     SELECT type, totalAmount, feeAmount FROM inv_stocks_iran_transactions
+>     WHERE brokerageId = ? AND isVoided = false
+>       AND type IN ('buy','sell','dividend','rights_exercised')`, [brokerageId])
+>
+>   let balance = new Decimal(0)
+>   for (const tx of brokTxs) {
+>     if (tx.type === 'deposit')  balance = balance.plus(tx.amount).minus(tx.feeAmount ?? 0)
+>     if (tx.type === 'withdraw') balance = balance.minus(tx.amount).minus(tx.feeAmount ?? 0)
+>   }
+>   for (const tx of stockTxs) {
+>     if (tx.type === 'sell' || tx.type === 'dividend') balance = balance.plus(tx.totalAmount).minus(tx.feeAmount ?? 0)
+>     if (tx.type === 'buy' || tx.type === 'rights_exercised') balance = balance.minus(tx.totalAmount).minus(tx.feeAmount ?? 0)
+>   }
+>   return balance
+> }
+> ```
+>
+> **هرگز این کارها را نکنید** ❌:
+> ```typescript
+> // ❌ آپدیت مستقیم بدون Journal
+> db.update('inv_stocks_iran_brokerages', { cashBalance: 1000 })
+> // ❌ استفاده از snapshot در عملیات حساس (برداشت/انتقال)
+> const balance = brokerage.cashBalance  // اشتباه — ممکن است stale باشد
+> ```
+>
+> **برای عملیات حساس** (مثل برداشت یا خرید با موجودی بالا):
+> ```typescript
+> // ✅ برای UI و نمایش: از cache استفاده کنید
+> const balance = brokerage.cashBalance
+> // ✅ برای validation قبل از برداشت: از True Balance استفاده کنید
+> const trueBalance = calculateTrueCashBalance(brokerageId)
+> validate(trueBalance >= withdrawAmount)
+> ```
+>
 > - برای جلوگیری از تکرار در محاسبه ثروت، این موجودی در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth = false` لحاظ نمی‌شود
 
 ### ۲. Stock Holding (جدول: `inv_stocks_iran_holdings`)
@@ -260,7 +312,31 @@
 - `updateBrokerage(id, data)` → به‌روزرسانی اطلاعات کارگزاری (شامل `cashBalance`)
 - `getAllBrokerages()` → لیست کارگزاری‌ها همراه با `cashBalance`
 - `getBrokerageById(id)` → دریافت کارگزاری با `cashBalance`
-- `getBrokerageCashBalance(brokerageId)` → دریافت موجودی نقدی (از `cashBalance`)
+- `getBrokerageCashBalance(brokerageId)` → دریافت موجودی نقدی (از `cashBalance` برای سرعت — برای عملیات حساس از `calculateTrueCashBalance` استفاده کنید)
+- `calculateTrueCashBalance(brokerageId)` → محاسبه موجودی واقعی از لاگ تراکنش‌ها (بدون استفاده از `cashBalance` cache) — برای validation قبل از عملیات حساس
+- **`reconcileBrokerage(brokerageId)`** → بررسی انطباق `cashBalance` با جمع journal
+
+  ```typescript
+  reconcileBrokerage(brokerageId: UUID): {
+    status: 'ok' | 'mismatch'
+    calculatedBalance: Decimal   // از calculateTrueCashBalance()
+    storedBalance: Decimal       // از inv_stocks_iran_brokerages.cashBalance
+    transactionsCount: number
+  }
+  ```
+
+  **زمان استفاده**:
+  - دکمه «بررسی انطباق موجودی» در صفحه کارگزاری
+  - پس از Import/Restore داده
+  - پس از هر Migration
+  - بررسی دوره‌ای (اختیاری — مثلاً هفتگی)
+
+  **در صورت Mismatch**:
+  ```
+  1. ثبت در audit log: {brokerageId, calculatedBalance, storedBalance, timestamp}
+  2. هشدار به کاربر: «ناهماهنگی موجودی شناسایی شد — تراکنش‌ها را بررسی کنید»
+  3. گزینه auto-fix: cashBalance = calculateTrueCashBalance() (محاسبه مجدد از لاگ)
+  ```
 
 ### Holding APIs
 - `getHoldings(brokerageId?)`
