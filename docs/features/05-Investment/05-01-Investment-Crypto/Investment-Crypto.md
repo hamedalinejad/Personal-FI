@@ -207,7 +207,110 @@
 - `getPortfolioValue(targetCurrency?)`
 
 ### Transaction APIs
-- `createCryptoTransaction(data)` → خرید / فروش / انتقال؛ برای معامله رمزارز-به-رمزارز (قاعده ۲a) دو بار با `tradeId` مشترک فراخوانی می‌شود (یک `sell` + یک `buy`)، یا با یک متد کمکی اختصاصی `createCryptoToCryptoTrade(data)` که هر دو رکورد را در یک تراکنش دیتابیسی اتمیک ایجاد می‌کند
+- `createCryptoTransaction(data)` → خرید / فروش / انتقال (تک‌رکورد)
+- `createCryptoToCryptoTrade(data)` → **معامله رمزارز-به-رمزارز — الزاماً Atomic**
+
+  این متد تنها نقطه ورود معتبر برای معامله رمزارز-به-رمزارز (قاعده ۲a) است.
+  هر implementation باید **تمام ۸ مرحله زیر را در یک تراکنش دیتابیسی واحد (SQLite BEGIN/COMMIT) اجرا کند**.
+  اگر هر مرحله‌ای شکست بخورد، کل تراکنش ROLLBACK می‌شود.
+
+  **ورودی `data`**:
+  ```typescript
+  {
+    tradeId: UUID,                  // از پیش ساخته‌شده توسط caller
+    date: Timestamp,
+    exchangeId: UUID,
+
+    // رمزارز پرداختی (مثلاً ETH که می‌فروشیم)
+    fromSymbol: string,             // ETH
+    fromQuantity: Decimal,          // مقدار ETH که پرداخت می‌شود
+    fromPriceBase: Decimal,         // قیمت ۱ واحد ETH به baseCurrency در لحظه معامله
+
+    // رمزارز دریافتی (مثلاً BTC که می‌خریم)
+    toSymbol: string,               // BTC
+    toQuantity: Decimal,            // مقدار BTC که دریافت می‌شود
+    toPriceBase: Decimal,           // قیمت ۱ واحد BTC به baseCurrency در لحظه معامله
+
+    // کارمزد
+    feeAmount: Decimal,
+    feeCurrency: string,
+    feeAssetPriceToBase: Decimal,   // nullable — فقط اگر feeCurrency رمزارز دیگری باشد
+
+    description: string,
+  }
+  ```
+
+  **قرارداد Atomic — ۸ مرحله اجباری (داخل یک SQLite transaction)**:
+
+  ```
+  BEGIN TRANSACTION;
+
+  ── مرحله ۱: محاسبه مقادیر ──────────────────────────────────────────
+  feeBase          = convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase)
+  fromTotalBase    = fromQuantity × fromPriceBase
+  toTotalBase      = fromTotalBase + feeBase   // Cost Basis رمزارز دریافتی
+
+  ── مرحله ۲: بررسی موجودی کافی (Guard) ──────────────────────────────
+  fromHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=fromSymbol FOR UPDATE
+  IF fromHolding.quantity < fromQuantity → ROLLBACK + خطا «موجودی کافی نیست»
+
+  ── مرحله ۳: محاسبه Realized P&L برای رمزارز پرداختی ────────────────
+  soldPortionCost  = fromQuantity × fromHolding.averageBuyPrice
+  realizedPL_from  = fromTotalBase - soldPortionCost - feeBase
+
+  ── مرحله ۴: ثبت رکورد SELL در inv_crypto_transactions ──────────────
+  INSERT inv_crypto_transactions (
+    type='sell', symbol=fromSymbol, quantity=fromQuantity,
+    price=toQuantity/fromQuantity,   // نرخ مستقیم به واحد toSymbol
+    currency=toSymbol,
+    priceBase=fromPriceBase, totalAmountBase=fromTotalBase,
+    feeAmount, feeCurrency, feeAssetPriceToBase,
+    tradeId, exchangeId, date
+  )
+
+  ── مرحله ۵: آپدیت Holding رمزارز پرداختی ──────────────────────────
+  UPDATE inv_crypto_holdings SET
+    quantity        = fromHolding.quantity - fromQuantity,
+    totalInvested   = fromHolding.totalInvested - soldPortionCost,
+    totalFeesPaidBase = fromHolding.totalFeesPaidBase + feeBase
+    -- averageBuyPrice بدون تغییر (فروش averageBuyPrice را تغییر نمی‌دهد)
+  WHERE id = fromHolding.id
+
+  ── مرحله ۶: ثبت رکورد BUY در inv_crypto_transactions ───────────────
+  INSERT inv_crypto_transactions (
+    type='buy', symbol=toSymbol, quantity=toQuantity,
+    price=fromQuantity/toQuantity,   // نرخ معکوس
+    currency=fromSymbol,
+    priceBase=toPriceBase, totalAmountBase=toTotalBase,
+    feeAmount=0, feeCurrency=null,   // کارمزد کامل در رکورد SELL لحاظ شده
+    tradeId, exchangeId, date
+  )
+
+  ── مرحله ۷: آپدیت Holding رمزارز دریافتی (Weighted Average) ────────
+  toHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=toSymbol
+  IF toHolding EXISTS:
+    newQuantity      = toHolding.quantity + toQuantity
+    newTotalInvested = toHolding.totalInvested + toTotalBase
+    newAvgBuyPrice   = newTotalInvested / newQuantity
+    UPDATE inv_crypto_holdings SET
+      quantity=newQuantity, totalInvested=newTotalInvested, averageBuyPrice=newAvgBuyPrice
+    WHERE id = toHolding.id
+  ELSE:
+    INSERT inv_crypto_holdings (
+      exchangeId, symbol=toSymbol, quantity=toQuantity,
+      averageBuyPrice=toPriceBase, totalInvested=toTotalBase, totalFeesPaidBase=0
+    )
+
+  ── مرحله ۸: ذخیره Realized P&L (اختیاری اما توصیه‌شده) ────────────
+  -- realizedPL_from را در inv_crypto_transactions رکورد SELL ذخیره کن
+  -- (یا در یک جدول جداگانه اگر نیاز به گزارش تاریخی دارید)
+
+  COMMIT;
+  ```
+
+  > **نکته پیاده‌سازی SQLite**: SQLite به‌صورت پیش‌فرض autocommit است. برای اجرای atomic، حتماً از `db.run('BEGIN')` / `db.run('COMMIT')` / `db.run('ROLLBACK')` استفاده کنید — یا از wrapper library‌ای که transaction را expose می‌کند (مثل `better-sqlite3` که synchronous است و transaction را نیتیو پشتیبانی می‌کند).
+
+  > **قانون طلایی**: هیچ‌کدام از ۸ مرحله بالا نباید خارج از این transaction اجرا شود. حتی اگر فقط مرحله ۷ (آپدیت Holding مقصد) fail شود، باید همه چیز rollback شود — وگرنه ETH از Holding کسر شده اما BTC به Holding اضافه نشده: دارایی کاربر از بین رفته.
   - برای `type=transfer_out`/`transfer_in` (انتقال بین صرافی‌های خودی):
     1. `quantity` را از Holding مبدا کم کن، `totalInvested` متناسب کاهش می‌یابد، `averageBuyPrice` بدون تغییر
     2. Holding مقصد را با **Weighted Average** آپدیت کن:
