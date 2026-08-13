@@ -39,7 +39,7 @@
 - `getUpcomingPayments()` باید `calculationMethod` را چک کند
 - برای هر روش فرمول‌های متفاوت است
 - تاریخ اولین قسط از `firstPaymentDate` شروع می‌شود (ممکن است بعد از `disbursementDate`)
-- در صورت `gracePeriodMonths > 0`، اولین اقساط فقط سود است
+- در صورت `gracePeriodMonths > 0`، رفتار به روش محاسبه بستگی دارد (Declining: Interest-Only / Qarz: Payment Holiday / Flat Rate و Bullet: مجاز نیستند — بخش «ز» فرمول‌های کامل)
 
 ### دیگر Business Rules
 
@@ -225,7 +225,7 @@
     - اگر `calculationMethod = 'flat_rate'`: اصل ثابت، سود ثابت
     - اگر `calculationMethod = 'qarz_al_hasaneh'`: اصل ثابت، سود = 0
     - اگر `calculationMethod = 'bullet'`: سود ماهانه، اصل صفر (غیر از ماه آخر)
-    - اگر `gracePeriodMonths > 0`: اولین N ماه فقط سود (برای تمام روش‌ها)
+    - اگر `gracePeriodMonths > 0`: رفتار به روش محاسبه بستگی دارد — Declining Balance: Interest-Only (فقط سود، اصل دست‌نخورده)؛ Qarz Al-Hasaneh: Payment Holiday (هیچ پرداختی)؛ Flat Rate و Bullet: مجاز نیست (خطا می‌دهد). جزئیات کامل در بخش «ز) دوره تنفس».
     - شروع از `firstPaymentDate` + `installmentFrequency`
 - `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
 
@@ -531,31 +531,111 @@ penaltyPortion = overdueAmount × (penaltyRate / 100) × (penaltyDays / 365)
 
 ---
 
-### ز) دوره تنفس (Grace Period)
+### ز) دوره تنفس (Grace Period) — رفتار به تفکیک روش محاسبه
+
+> **چهار مفهوم متفاوت** که نباید با هم اشتباه گرفته شوند:
+> - **Interest-Only**: وام‌گیرنده هر دوره فقط سود می‌پردازد، اصل دست‌نخورده می‌ماند (Declining Balance در دوره تنفس).
+> - **Capitalized Interest**: سود دوره تنفس پرداخت نمی‌شود و به اصل اضافه می‌شود (نوع دیگری از تنفس که در این سیستم پشتیبانی **نمی‌شود** — ثبت می‌شود ولی در نسخه ۱ اعمال نمی‌شود).
+> - **Payment Holiday**: هیچ پرداختی (نه اصل، نه سود) انجام نمی‌شود (مناسب Qarz Al-Hasaneh).
+> - **Grace Period روی Bullet**: مفهوماً بی‌معنی است (Bullet اصلاً تا قسط آخر هیچ اصلی ندارد).
 
 `gracePeriodMonths` همیشه بر اساس **ماه** تعریف شده، حتی اگر `installmentFrequency` هفتگی یا فصلی باشد. برای تبدیل:
 
 ```
 gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
-// monthly: gracePeriods = gracePeriodMonths × 1
-// weekly:  gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
-//          → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
+// monthly:   gracePeriods = gracePeriodMonths × 1
+// weekly:    gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
+//            → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
 // quarterly: gracePeriods = gracePeriodMonths / 3
 //            → اگر نتیجه کسری شود، ROUND_DOWN
-// custom: gracePeriods = gracePeriodMonths × 30 / customIntervalDays
-//         → ROUND_DOWN
+// custom:    gracePeriods = gracePeriodMonths × 30 / customIntervalDays
+//            → ROUND_DOWN
 ```
 
+---
+
+#### ز-۱) Declining Balance — Interest-Only در دوره تنفس
+
 در طول دوره تنفس (دوره‌های ۱ تا `gracePeriods`):
-- `principalPortion = 0`
-- `interestPortion = remainingBalance × r`
-- `installment = interestPortion`
+```
+principalPortion = 0
+interestPortion  = remainingBalance × r      // remainingBalance = principalAmount (دست‌نخورده)
+installment      = interestPortion
+```
 
-پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `totalInstallments`):
-- فرمول Declining Balance/Flat Rate/Qarz Al-Hasaneh روی `remainingBalance` فعلی و `remainingInstallments = totalInstallments - gracePeriods` اعمال می‌شود.
+پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `gracePeriods+totalInstallments`):
+```
+// بازمحاسبه قسط روی همان principalAmount (تغییر نکرده) با تعداد اقساط کامل
+calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
+// که در آن P = principalAmount، n = totalInstallments (بدون کسر gracePeriods)
+```
 
-**مثال هفتگی با تنفس:**
+> **نکته مهم**: دوره تنفس به طول مدت وام اضافه می‌شود — تعداد اقساط اصلی (`totalInstallments`) **تغییر نمی‌کند**. کل دوره بازپرداخت = `gracePeriods + totalInstallments`.
+
+**مثال ماهانه:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۸ قسط، ۱۸٪ سالانه، ۲ ماه تنفس
+- ماه ۱-۲: فقط سود = 100,000,000 × 0.015 = 1,500,000 ریال
+- ماه ۳-۲۰: قسط Declining کامل روی 100,000,000 با n=18
+
+**مثال هفتگی:**
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، ۱۸٪ سالانه، ۲ ماه تنفس
 - gracePeriods = 2 × 52/12 = 8.666 → ROUND_DOWN = ۸ هفته
-- هفته ۱-۸: فقط سود (۳۴۶,۱۵۴ ریال در هفته)
-- هفته ۹-۵۲: قسط کامل Declining روی ۱۰۰,۰۰۰,۰۰۰ با n=44 باقیمانده
+- هفته ۱-۸: فقط سود = 100,000,000 × (0.18/52) ≈ 346,154 ریال
+- هفته ۹-۶۰: قسط Declining کامل روی 100,000,000 با n=52
+
+---
+
+#### ز-۲) Flat Rate — تنفس روی Flat Rate مجاز نیست (v1)
+
+در Flat Rate، کل سود وام (`totalInterest`) از همان ابتدا محاسبه و به اقساط تقسیم می‌شود. یک دوره تنفس واقعی مستلزم بازمحاسبه کل جدول سود است که با ساده‌بودن این روش در تضاد است.
+
+**قانون**: اگر `calculationMethod = 'flat_rate'` و `gracePeriodMonths > 0` باشد، سیستم باید در هنگام ثبت وام خطا بدهد:
+
+```
+Error: "دوره تنفس برای وام‌های Flat Rate پشتیبانی نمی‌شود.
+اگر بانک یا موسسه مالی برای وام شما دوره تنفس تعریف کرده،
+لطفاً وام را با تاریخ شروع بعد از پایان دوره تنفس ثبت کنید."
+```
+
+> **راه‌حل عملی برای کاربر**: در صورت وجود دوره تنفس از طرف بانک، `startDate` وام را برابر تاریخ اولین قسط اصلی (بعد از تنفس) تنظیم کند و دوره تنفس را به‌عنوان یادداشت (`description`) ثبت کند.
+
+---
+
+#### ز-۳) Qarz Al-Hasaneh — Payment Holiday (بدون هیچ پرداختی)
+
+در قرض‌الحسنه سود وجود ندارد، بنابراین «Interest-Only» معنا ندارد. دوره تنفس در این روش به معنای **Payment Holiday** است: در دوره تنفس هیچ پرداختی (نه اصل، نه سود، نه کارمزد) انجام نمی‌شود.
+
+در طول دوره تنفس (دوره‌های ۱ تا `gracePeriods`):
+```
+principalPortion = 0
+interestPortion  = 0
+installment      = 0      // قسط صفر — هیچ پرداختی ثبت نمی‌شود
+```
+
+پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `gracePeriods+totalInstallments`):
+```
+installment      = principalAmount / totalInstallments    // همان فرمول معمول Qarz
+principalPortion = installment
+interestPortion  = 0
+```
+
+> **نکته**: کارمزد خدمات (`serviceFeeAmount`) در روز واریز وام (disbursement) کسر می‌شود و ربطی به دوره تنفس ندارد.
+
+**مثال:**
+- وام ۱۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه قرض‌الحسنه، کارمزد ۴٪، ۱ ماه تنفس
+- ماه ۱: هیچ پرداختی (Payment Holiday)
+- ماه ۲-۱۳: installment = 10,000,000 / 12 ≈ 833,333 ریال
+
+---
+
+#### ز-۴) Bullet — دوره تنفس مفهوماً بی‌معنی است
+
+در Bullet، همه اقساط میانی (غیر از آخری) قبلاً `principalPortion = 0` دارند — یعنی وام از ابتدا در حالت «Interest-Only» است. بنابراین یک «دوره تنفس» در بالای Bullet چیزی اضافه نمی‌کند و نباید مجاز باشد.
+
+**قانون**: اگر `calculationMethod = 'bullet'` و `gracePeriodMonths > 0` باشد، سیستم باید در هنگام ثبت وام خطا بدهد:
+
+```
+Error: "دوره تنفس برای وام‌های Bullet معنا ندارد.
+وام Bullet از ابتدا فقط سود دوره‌ای دارد تا قسط آخر.
+برای تمدید مدت وام، تعداد اقساط را افزایش دهید."
+```
