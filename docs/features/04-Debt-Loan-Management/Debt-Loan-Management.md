@@ -255,129 +255,307 @@
 
 > **Rounding Policy**: تمام محاسبات وام از `docs/core/rounding/Rounding-Policy.md` پیروی می‌کنند. خلاصه الزامات: (الف) `calculatedInstallment` با ROUND_HALF_UP به ۰ اعشار IRR. (ب) `interestPortion` با ROUND_HALF_UP به ۰ اعشار. (ج) `principalPortion = installment − interestPortion` — هرگز مستقل round نمی‌شود. (د) آخرین قسط: `principalPortion = remainingBalance` (دقیق). (ه) هیچ round میانی در زنجیره محاسبه مجاز نیست.
 
-### الف) Declining Balance (تناژل سود — وام بانکی)
+---
+
+### پیش‌نیاز: محاسبه نرخ دوره‌ای (Period Rate) و تعداد دوره‌ها
+
+**این بخش اساسی‌ترین مفهوم در تمام فرمول‌های وام است.**  
+همه فرمول‌های زیر (Declining Balance، Bullet، Re-amortization) به یک `r` (نرخ دوره‌ای) و `n` (تعداد کل دوره‌ها) نیاز دارند. این دو مقدار از `installmentFrequency`، `interestRate`، `interestRatePeriod` و (برای `custom`) `customIntervalDays` محاسبه می‌شوند.
+
+#### قرارداد تبدیل نرخ سالانه به نرخ دوره‌ای
+
+برای همه روش‌های محاسبه از **Simple Division** (تقسیم خطی) استفاده می‌شود، نه Compounding. دلیل: بانک‌ها و مؤسسات مالی ایران نرخ سالانه را به‌صورت خطی تقسیم می‌کنند (Nominal Rate)، نه Effective APR. این قرارداد با استاندارد وام‌های بانکی ایران سازگار است.
+
+```
+annualRate = interestRate / 100           // تبدیل درصد به کسر — e.g. 18% → 0.18
+
+// نرخ دوره‌ای (r) بر اساس فرکانس:
+r = annualRate / periodsPerYear
+
+// تعداد دوره‌ها در سال (periodsPerYear) بر اساس installmentFrequency:
+monthly   → periodsPerYear = 12          // هر ماه یک قسط
+weekly    → periodsPerYear = 52          // هر هفته یک قسط
+quarterly → periodsPerYear = 4           // هر سه ماه یک قسط
+custom    → periodsPerYear = 365 / customIntervalDays   // مثلاً هر ۴۵ روز → 365/45 ≈ 8.111
+```
+
+#### Day Count Convention برای `interestRatePeriod = 'annual'`
+
+| `installmentFrequency` | `periodsPerYear` | `r` | یادداشت |
+|---|---|---|---|
+| `monthly` | ۱۲ | `annualRate / 12` | استاندارد بانک ایران |
+| `weekly` | ۵۲ | `annualRate / 52` | هفته ۷ روز — ۵۲ هفته = ۳۶۴ روز (۱ روز کسری قابل چشم‌پوشی برای وام‌های کوتاه‌مدت؛ برای وام‌های بلندمدت هفتگی از `customIntervalDays = 7` استفاده شود تا دقت بالاتر) |
+| `quarterly` | ۴ | `annualRate / 4` | استاندارد — ۴ فصل در سال |
+| `custom` | `365 / customIntervalDays` | `annualRate × customIntervalDays / 365` | Day Count = Actual/365 — مناسب برای اکثر وام‌های ایرانی |
+
+> **چرا Actual/365 و نه Actual/360؟**  
+> در ایران تقویم شمسی ۳۶۵ یا ۳۶۶ روز دارد. برای سادگی و سازگاری با محاسبات بانکی رایج، از ۳۶۵ روز به‌عنوان پایه ثابت استفاده می‌شود (نه ۳۶۶ در سال کبیسه و نه ۳۶۰). اگر وام‌دهنده قرارداد صریحی با پایه متفاوت داشت، می‌توان `customIntervalDays` را با دقت بیشتر تعریف کرد.
+
+#### اگر `interestRatePeriod = 'monthly'` باشد
+
+```
+r = interestRate / 100                    // نرخ ماهانه مستقیم — بدون تقسیم بر ۱۲
+// در این حالت fequency باید monthly باشد؛ برای weekly/quarterly/custom:
+// ابتدا annualRate = r × 12 محاسبه، سپس همان جدول بالا
+```
+
+#### مثال: وام هفتگی
+
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، ۱۸٪ سالانه
+- `r = 0.18 / 52 = 0.003461538...`
+- `n = 52`
+- قسط هفتگی = `100000000 × [r(1+r)^52] / [(1+r)^52 - 1] ≈ 2,115,000 ریال`
+
+#### مثال: وام فصلی (quarterly)
+
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۸ قسط فصلی (۲ سال)، ۲۴٪ سالانه
+- `r = 0.24 / 4 = 0.06`
+- `n = 8`
+- قسط فصلی = `100000000 × [0.06(1.06)^8] / [(1.06)^8 - 1] ≈ 16,103,594 ریال`
+
+#### مثال: وام سفارشی هر ۴۵ روز
+
+- وام ۵۰,۰۰۰,۰۰۰ ریال، ۸ قسط هر ۴۵ روز، ۱۸٪ سالانه
+- `r = 0.18 × 45 / 365 = 0.022191...`
+- `n = 8`
+- قسط = `50000000 × [r(1+r)^8] / [(1+r)^8 - 1] ≈ 6,956,000 ریال`
+
+---
+
+### تابع کمکی `getPeriodRate(loan)`
+
+برای جلوگیری از تکرار این محاسبه در هر فرمول، باید یک تابع مرکزی وجود داشته باشد:
+
+```typescript
+/**
+ * نرخ دوره‌ای (r) را از تنظیمات وام محاسبه می‌کند.
+ * این تنها تابع مجاز برای محاسبه r در کل سیستم وام است.
+ * هیچ فرمولی نباید r را مستقیم با annual/12 محاسبه کند.
+ */
+function getPeriodRate(loan: Loan): Decimal {
+  const annualRate = new Decimal(loan.interestRate).dividedBy(100);
+
+  // اگر نرخ ماهانه مستقیم ثبت شده، ابتدا به سالانه تبدیل می‌شود
+  const annualRateNormalized =
+    loan.interestRatePeriod === 'monthly'
+      ? annualRate.times(12)
+      : annualRate;
+
+  switch (loan.installmentFrequency) {
+    case 'monthly':   return annualRateNormalized.dividedBy(12);
+    case 'weekly':    return annualRateNormalized.dividedBy(52);
+    case 'quarterly': return annualRateNormalized.dividedBy(4);
+    case 'custom':
+      if (!loan.customIntervalDays || loan.customIntervalDays <= 0)
+        throw new Error('customIntervalDays برای فرکانس custom الزامی است');
+      return annualRateNormalized
+        .times(loan.customIntervalDays)
+        .dividedBy(365);
+    default:
+      throw new Error(`installmentFrequency نامعتبر: ${loan.installmentFrequency}`);
+  }
+}
+
+/**
+ * تعداد دوره‌های کل (n) را از تنظیمات وام برمی‌گرداند.
+ * برای همه روش‌های محاسبه یکسان است.
+ */
+function getTotalPeriods(loan: Loan): number {
+  return loan.totalInstallments;
+}
+```
+
+> **قانون**: هیچ‌جا در کد نباید `annualRate / 12` یا `interestRate / 100 / 12` به‌صورت مستقیم نوشته شود. همیشه از `getPeriodRate(loan)` استفاده شود.
+
+---
+
+### الف) Declining Balance (تناژل سود)
 
 **محاسبه مبلغ قسط:**
 ```
-r = interestRate / 100 / 12                    // نرخ ماهانه
-n = totalInstallments                           // تعداد اقساط
-P = principalAmount - serviceFeeAmount (if any)
+r = getPeriodRate(loan)                        // نرخ دوره‌ای (ماهانه / هفتگی / فصلی / custom)
+n = getTotalPeriods(loan)                      // تعداد کل اقساط
+P = principalAmount                            // (برای قرض‌الحسنه: P = principalAmount - serviceFeeAmount)
 
 calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
 ```
 
-**تقسیم هر قسط:**
+**تقسیم هر قسط i (از ۱ تا n):**
 ```
-interestPortion = remainingBalance × r
-principalPortion = calculatedInstallment - interestPortion
-remainingBalance -= principalPortion
+interestPortion_i  = remainingBalance × r          // ROUND_HALF_UP به ۰ اعشار
+principalPortion_i = installment - interestPortion_i  // بدون round مستقل
+remainingBalance  -= principalPortion_i
 ```
 
-**مثال:**
+**آخرین قسط (i = n):**
+```
+principalPortion_n = remainingBalance              // دقیق — تسویه کامل
+interestPortion_n  = remainingBalance × r          // ROUND_HALF_UP
+installment_n      = principalPortion_n + interestPortion_n  // ممکن است با اقساط قبلی کمی متفاوت باشد
+```
+
+**مثال ماهانه:**
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۸ ماه، ۱۲٪ سالانه
-- r = 12 / 100 / 12 = 0.01
-- calculatedInstallment = 100000000 × [0.01(1.01)^18] / [(1.01)^18 - 1] ≈ 6,098,000 ریال
-- قسط اول: سود = 100000000 × 0.01 = 1,000,000، اصل = 5,098,000
+- r = 0.12 / 12 = 0.01
+- calculatedInstallment ≈ ۶,۰۹۸,۰۰۰ ریال
+- قسط اول: سود = 1,000,000، اصل = 5,098,000
+
+**مثال هفتگی:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط، ۱۸٪ سالانه
+- r = 0.18 / 52 = 0.003461538
+- calculatedInstallment ≈ ۲,۱۱۵,۰۰۰ ریال
+- قسط اول: سود = ۳۴۶,۱۵۴، اصل = ۱,۷۶۸,۸۴۶
+
+**مثال فصلی:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۸ قسط فصلی، ۲۴٪ سالانه
+- r = 0.24 / 4 = 0.06
+- calculatedInstallment ≈ ۱۶,۱۰۳,۵۹۴ ریال
+- قسط اول: سود = ۶,۰۰۰,۰۰۰، اصل = ۱۰,۱۰۳,۵۹۴
+
+---
 
 ### ب) Flat Rate (سود ثابت)
 
 **محاسبه:**
 ```
-totalInterest = principalAmount × (interestRate / 100) × (totalInstallments * frequency_in_years)
-fixedInstallmentAmount = (principalAmount + totalInterest) / totalInstallments
-principalPortion = principalAmount / totalInstallments  // ثابت برای تمام اقساط
-interestPortion = totalInterest / totalInstallments     // ثابت برای تمام اقساط
+r        = getPeriodRate(loan)                        // نرخ دوره‌ای
+n        = getTotalPeriods(loan)                      // تعداد اقساط
+yearsTotal = n / periodsPerYear(loan)                 // مدت کل وام به سال
+
+totalInterest        = principalAmount × (interestRate/100) × yearsTotal
+fixedInstallmentAmount = (principalAmount + totalInterest) / n
+principalPortion     = principalAmount / n            // ثابت برای تمام اقساط
+interestPortion      = totalInterest / n              // ثابت برای تمام اقساط
 ```
 
-**مثال:**
-- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه، ۱۲٪
-- totalInterest = 100000000 × (12/100) × 1 = 12,000,000
-- fixedInstallmentAmount = (100000000 + 12000000) / 12 ≈ 9,333,333
+> `periodsPerYear(loan)` همان مخرج تقسیم در `getPeriodRate` است: 12، 52، 4، یا `365/customIntervalDays`.
+
+**مثال ماهانه:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ ماه، ۱۲٪ سالانه
+- yearsTotal = 12/12 = 1
+- totalInterest = 12,000,000
+- fixedInstallmentAmount ≈ 9,333,333
+
+**مثال فصلی:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۸ قسط فصلی، ۲۴٪ سالانه
+- yearsTotal = 8/4 = 2
+- totalInterest = 100,000,000 × 0.24 × 2 = 48,000,000
+- fixedInstallmentAmount = 148,000,000 / 8 = 18,500,000
+
+---
 
 ### ج) Qarz Al-Hasaneh (قرض‌الحسنه)
 
-**محاسبه:**
+فرکانس تأثیری بر سود ندارد (سود = صفر). فقط تعداد اقساط تغییر می‌کند:
+
 ```
-serviceFeeAmount = principalAmount × (serviceFeeRate / 100)
-installment = principalAmount / totalInstallments
+serviceFeeAmount = principalAmount × (serviceFeeRate / 100)   // یک‌بار کسر
+installment      = principalAmount / totalInstallments         // بدون توجه به فرکانس
 principalPortion = installment
-interestPortion = 0
+interestPortion  = 0
 ```
 
-**مثال:**
-- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط، کارمزد ۴٪
-- serviceFeeAmount = 100000000 × 0.04 = 4,000,000 (کسر یک‌بار)
-- installment = 100000000 / 12 ≈ 8,333,333
-- نت وام دریافتی = 100000000 - 4000000 = 96,000,000
+**مثال هفتگی:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، کارمزد ۴٪
+- serviceFeeAmount = 4,000,000
+- installment = 100,000,000 / 52 ≈ 1,923,077 ریال در هفته
+
+---
 
 ### د) Bullet (اصل یک‌جا در پایان)
 
-**محاسبه:**
 ```
-r = interestRate / 100 / 12                    // نرخ ماهانه
-// برای ماه‌های ۱ تا (n-1):
-interestPortion = remainingBalance × r         // remainingBalance ثابت = principalAmount تا ماه آخر
-principalPortion = 0
-// برای ماه آخر (شماره n):
-interestPortion = remainingBalance × r
-principalPortion = remainingBalance            // کل اصل باقیمانده یک‌جا پرداخت می‌شود
+r = getPeriodRate(loan)                        // نرخ دوره‌ای
+
+// دوره‌های ۱ تا n-1:
+interestPortion_i = remainingBalance × r       // remainingBalance ثابت = principalAmount
+principalPortion_i = 0
+
+// دوره آخر (n):
+interestPortion_n  = remainingBalance × r
+principalPortion_n = remainingBalance          // کل اصل یک‌جا
 ```
 
-> چون `principalPortion` تا ماه آخر صفر است، `remainingBalance` (طبق قاعده «فقط با principalPortion کم می‌شود») تا همان لحظه ثابت می‌ماند و سود هر ماه هم ثابت است.
+**مثال هفتگی:**
+- وام ۱۰,۰۰۰,۰۰۰ ریال، ۴ قسط هفتگی Bullet، ۱۸٪ سالانه
+- r = 0.18 / 52 = 0.003461538
+- هفته ۱-۳: سود = 10,000,000 × 0.003461538 ≈ 34,615 ریال، اصل = 0
+- هفته ۴: سود = 34,615، اصل = 10,000,000
 
-**مثال:**
-- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ ماه، ۱۸٪ سالانه
-- r = 18 / 100 / 12 = 0.015
-- ماه ۱ تا ۱۱: interestPortion = 100000000 × 0.015 = 1,500,000، principalPortion = 0
-- ماه ۱۲ (آخر): interestPortion = 1,500,000، principalPortion = 100,000,000 (کل اصل)
+**مثال فصلی:**
+- وام ۵۰,۰۰۰,۰۰۰ ریال، ۴ قسط Bullet فصلی، ۲۰٪ سالانه
+- r = 0.20 / 4 = 0.05
+- فصل ۱-۳: سود = 50,000,000 × 0.05 = 2,500,000، اصل = 0
+- فصل ۴: سود = 2,500,000، اصل = 50,000,000
+
+---
 
 ### ه) بازمحاسبه اقساط پس از پیش‌پرداخت جزئی (Re-amortization)
 
-فقط برای `calculationMethod = 'declining_balance'` معنا دارد (در Flat Rate و Qarz Al-Hasaneh اصل و سود هر قسط از ابتدا ثابت تعریف شده‌اند، پس پیش‌پرداخت جزئی صرفاً `remainingBalance` را کم می‌کند بدون نیاز به بازمحاسبه فرمول).
+فقط برای `calculationMethod = 'declining_balance'`. در Flat Rate و Qarz Al-Hasaneh اصل و سود از ابتدا ثابت است؛ پیش‌پرداخت جزئی صرفاً `remainingBalance` را کم می‌کند.
 
-هنگام ثبت `type = 'early_payment'` با مبلغی که کمتر از کل `remainingBalance` است (پیش‌پرداخت جزئی)، فیلد `recalculateOnEarlyPayment` در `ln_loans` تعیین می‌کند کدام یک از دو حالت زیر اجرا شود:
+در هر دو حالت زیر، `r = getPeriodRate(loan)` همان نرخ اولیه وام باقی می‌ماند (تغییر نمی‌کند):
 
-**حالت ۱ — `recalculateOnEarlyPayment = false` (پیش‌فرض؛ مبلغ قسط ثابت می‌ماند، تعداد اقساط کم می‌شود):**
+**حالت ۱ — مبلغ قسط ثابت، تعداد اقساط کم می‌شود (`recalculateOnEarlyPayment = false`):**
 ```
 remainingBalance -= earlyPaymentPrincipalAmount
-// calculatedInstallment و r بدون تغییر باقی می‌مانند
-// تعداد اقساط باقیمانده جدید با حل معادله زیر برای n به‌دست می‌آید:
+// r و calculatedInstallment بدون تغییر
 newRemainingInstallments = ceil( -ln(1 - (remainingBalance × r) / calculatedInstallment) / ln(1 + r) )
-// totalInstallments وام به‌روزرسانی می‌شود: totalInstallments = installmentsPaidSoFar + newRemainingInstallments
+totalInstallments = installmentsPaidSoFar + newRemainingInstallments
 ```
 
-**حالت ۲ — `recalculateOnEarlyPayment = true` (تعداد اقساط باقیمانده ثابت می‌ماند، مبلغ قسط کم می‌شود):**
+**حالت ۲ — تعداد اقساط ثابت، مبلغ قسط کم می‌شود (`recalculateOnEarlyPayment = true`):**
 ```
 remainingBalance -= earlyPaymentPrincipalAmount
-remainingInstallments = totalInstallments - installmentsPaidSoFar   // بدون تغییر
+remainingInstallments = totalInstallments - installmentsPaidSoFar
 calculatedInstallment = remainingBalance × [r(1+r)^remainingInstallments] / [(1+r)^remainingInstallments - 1]
-// از این پس تمام اقساط بعدی با calculatedInstallment جدید محاسبه می‌شوند
 ```
 
-> **نکته مهم**: در هر دو حالت، `remainingBalance` بلافاصله با مبلغ اصل پیش‌پرداخت (`earlyPaymentPrincipalAmount`، که ممکن است شامل کارمزد پیش‌پرداخت `earlyPaymentFeeAmount` جداگانه هم باشد و آن کارمزد **در `remainingBalance` تأثیری ندارد** — طبق قاعده ۸ در Business Rules) کاهش می‌یابد؛ تفاوت فقط در نحوه محاسبه اقساط آینده است.
-> پیش‌پرداخت **کامل** (`earlyPaymentPrincipalAmount = remainingBalance`) وام را می‌بندد (`status = 'completed'`) و نیازی به این تصمیم ندارد.
+> **نکته `r` در re-amortization هفتگی/فصلی/custom**: چون `r = getPeriodRate(loan)` است (نه `annualRate/12`)، فرمول برای همه فرکانس‌ها یکسان کار می‌کند. مثلاً برای وام هفتگی، `r = annualRate/52` در هر دو حالت بالا به‌کار می‌رود.
+
+---
 
 ### و) جریمه دیرکرد
 
-**محاسبه:**
+جریمه روزانه محاسبه می‌شود، نه بر اساس دوره قسط:
+
 ```
-overdueAmount = amount_not_paid
 penaltyPortion = overdueAmount × (penaltyRate / 100) × (penaltyDays / 365)
 ```
 
+> این فرمول مستقل از `installmentFrequency` است — جریمه همیشه با پایه ۳۶۵ روزه محاسبه می‌شود (Day Count = Actual/365)، حتی اگر قسط‌های وام هفتگی یا فصلی باشند.
+
 **مثال:**
-- مبلغ معوق: ۱۰,۰۰۰,۰۰۰ ریال
-- نرخ جریمه: ۶٪ سالانه
-- روزهای تأخیر: ۳۰ روز
-- penalty = 10000000 × (6/100) × (30/365) ≈ 49,315 ریال
+- مبلغ معوق: ۱۰,۰۰۰,۰۰۰ ریال، نرخ جریمه: ۶٪، تأخیر: ۳۰ روز
+- penalty = 10,000,000 × (6/100) × (30/365) ≈ 49,315 ریال
+
+---
 
 ### ز) دوره تنفس (Grace Period)
 
-اگر `gracePeriodMonths > 0`:
-- اولین `gracePeriodMonths` ماه: فقط سود
-- بقیه اقساط: اصل + سود (یا صرف اصل برای قرض‌الحسنه)
+`gracePeriodMonths` همیشه بر اساس **ماه** تعریف شده، حتی اگر `installmentFrequency` هفتگی یا فصلی باشد. برای تبدیل:
 
-**مثال:**
-- ۱۸ ماه، ۶ ماه تنفس، Declining Balance
-- ماه ۱-۶: صرفاً سود
-- ماه ۷-۱۸: قسط‌های کامل (اصل + سود)
+```
+gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
+// monthly: gracePeriods = gracePeriodMonths × 1
+// weekly:  gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
+//          → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
+// quarterly: gracePeriods = gracePeriodMonths / 3
+//            → اگر نتیجه کسری شود، ROUND_DOWN
+// custom: gracePeriods = gracePeriodMonths × 30 / customIntervalDays
+//         → ROUND_DOWN
+```
+
+در طول دوره تنفس (دوره‌های ۱ تا `gracePeriods`):
+- `principalPortion = 0`
+- `interestPortion = remainingBalance × r`
+- `installment = interestPortion`
+
+پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `totalInstallments`):
+- فرمول Declining Balance/Flat Rate/Qarz Al-Hasaneh روی `remainingBalance` فعلی و `remainingInstallments = totalInstallments - gracePeriods` اعمال می‌شود.
+
+**مثال هفتگی با تنفس:**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، ۱۸٪ سالانه، ۲ ماه تنفس
+- gracePeriods = 2 × 52/12 = 8.666 → ROUND_DOWN = ۸ هفته
+- هفته ۱-۸: فقط سود (۳۴۶,۱۵۴ ریال در هفته)
+- هفته ۹-۵۲: قسط کامل Declining روی ۱۰۰,۰۰۰,۰۰۰ با n=44 باقیمانده
