@@ -13,6 +13,7 @@ types/
 ├── transaction.ts         # TransactionType، RelatedFeature
 ├── price.ts               # AssetCategory، PriceFetchResult (برای Price Fetching)
 ├── portfolio.ts           # PortfolioBreakdown (ساختار typed برای port_snapshots.breakdown)
+├── report.ts              # ReportFilters (ساختار typed برای rep_presets.filters)
 ├── events.ts              # AppEvent (Event Bus)
 └── index.ts               # re-export مرکزی
 ```
@@ -198,6 +199,53 @@ export function migrateBreakdown(
   }
   // نسخه‌های آینده: migration chain اضافه شود
   throw new Error(`Unknown breakdown schemaVersion: ${fromVersion}`);
+}
+```
+
+---
+
+## `report.ts`
+
+> این type کانونی برای فیلد `filters` در جدول `rep_presets` است.  
+> هر تغییر در این ساختار **باید** با افزایش `filtersSchemaVersion` در `rep_presets` همراه باشد.
+
+```typescript
+export const REPORT_FILTERS_SCHEMA_VERSION = 1;
+
+export type ReportType =
+  | 'cash_flow'
+  | 'income_expense'
+  | 'net_worth'
+  | 'investment_performance'
+  | 'budget_vs_actual'
+  | 'tax_summary';
+
+export interface ReportFilters {
+  schemaVersion: number;    // باید با rep_presets.filtersSchemaVersion برابر باشد
+  dateRange?: {
+    from: string;           // ISO 8601 date string
+    to: string;
+  };
+  accountIds?: UUID[];      // null یا empty = همه حساب‌ها
+  categoryIds?: string[];   // کدهای cat_categories — null یا empty = همه
+  relatedFeatures?: RelatedFeature[]; // فیلتر بر اساس نوع فیچر
+  currency?: string;        // ارز نمایش گزارش — null = ارز پایه کاربر
+  groupBy?: 'day' | 'week' | 'month' | 'quarter' | 'year' | 'category' | 'account';
+  // فیلدهای اختصاصی بر اساس reportType
+  investmentTypes?: RelatedFeature[];  // فقط برای income_expense و investment_performance
+  taxYear?: number;         // فقط برای tax_summary
+}
+
+// Migration helper: preset قدیمی را به آخرین نسخه تبدیل می‌کند
+export function migrateReportFilters(
+  raw: unknown,
+  fromVersion: number
+): ReportFilters {
+  if (fromVersion === REPORT_FILTERS_SCHEMA_VERSION) {
+    return raw as ReportFilters;
+  }
+  // نسخه‌های آینده: migration chain اضافه شود
+  throw new Error(`Unknown filters schemaVersion: ${fromVersion}`);
 }
 ```
 
