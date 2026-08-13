@@ -217,7 +217,43 @@ export interface AccTransaction {
   accountId: string;
   isVoided: boolean;
 }
+
+// --- نمونه مفهومی صندوق درآمد ثابت (تمایز NAV و قیمت معامله — باگ ۳۴) ---
+export interface InvFifHolding {
+  id: string;
+  fundId: string;
+  brokerageId?: string;
+  units: Decimal;
+  averageBuyPrice: Decimal;      // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
+  totalInvested: Decimal;
+  totalFeesPaidUSDT: Decimal;
+  currentNAV: Decimal;           // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
+  lastSubscriptionPrice?: Decimal;
+  lastRedemptionPrice?: Decimal;
+}
+
+export interface InvFifTransaction {
+  id: string;
+  fundId: string;
+  brokerageId?: string;
+  type: 'buy' | 'sell' | 'dividend' | 'reinvest' | 'nav_update';
+  units?: Decimal;
+  nav?: Decimal;                 // NAV در تاریخ تراکنش
+  transactionPrice?: Decimal;    // قیمت واقعی معامله (صدور در buy، ابطال در sell)
+  amount?: Decimal;
+  feeAmount?: Decimal;
+  feeCurrency?: string;
+  exchangeRateToBase?: Decimal;
+  predictedProfit?: Decimal;
+  actualProfit?: Decimal;
+  accountId?: string;
+  accountTransactionId?: string;
+  description?: string;
+  date: string;
+}
 ```
+
+> **تمایز حیاتی در FIF**: `nav` / `currentNAV` هرگز با `transactionPrice` یکی فرض نمی‌شوند. جزئیات کامل و قوانین پر کردن در `Fixed-Income-Funds.md`.
 
 ## قانون Minor Unit Storage (حتمی)
 

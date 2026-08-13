@@ -19,6 +19,10 @@
 - در `inv_fif_holdings`: توضیح صریح تمایز `currentNAV` و `averageBuyPrice` + فیلدهای اختیاری `lastSubscriptionPrice` و `lastRedemptionPrice`
 - منطق Weighted Average و Realized P&L فقط بر اساس `transactionPrice`؛ Unrealized P&L بر اساس `currentNAV`
 - Business Rules خرید/فروش به‌روز شد تا صریحاً از کدام قیمت استفاده شود
+- اسناد مرتبط همگام‌سازی شدند:
+  - `docs/core/db/db.md` — نمونه Schema مفهومی `InvFifHolding` و `InvFifTransaction`
+  - `docs/features/19-Price-Fetching/19-03-Fund-NAV/Fund-NAV.md` — مرز مسئولیت: فقط NAV
+  - `docs/features/19-Price-Fetching/Price-Fetching.md` — یادآوری تمایز NAV در برابر transactionPrice
 
 
 ### باگ ۱ — نام جدول بدون پیشوند در سند Crypto
