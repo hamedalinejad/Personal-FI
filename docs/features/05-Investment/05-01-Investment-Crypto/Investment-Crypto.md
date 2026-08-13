@@ -60,10 +60,84 @@
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 9a. موجودی هیچ رمزارزی (`quantity` در `inv_crypto_holdings`) و موجودی داخلی IRR/USDT هر صرافی/ولت (همان جدول، `symbol=IRR` یا `symbol=USDT`) نمی‌تواند منفی شود.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
-11. **ویرایش/حذف معاملات**: تراکنش‌های رمزارز پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
-    - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
-    - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها درست شوند
-    - این رویکرد تاریخچه معاملات و محاسبات Average Buy Price را حفظ می‌کند
+11. **ویرایش/حذف معاملات — Reversal Contract (الزاماً Atomic)**: تراکنش‌های رمزارز پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف، از الگوی **Reversal** استفاده می‌شود:
+
+    **قانون کلی همه انواع:**
+    - تراکنش اصلی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — برای audit trail)
+    - تراکنش معکوس ثبت می‌شود تا اثر تراکنش اصلی خنثی شود
+    - همه این مراحل در **یک SQLite Transaction واحد** (BEGIN/COMMIT) اجرا می‌شوند
+
+    **الف) Reversal معامله معمولی (BUY یا SELL) — ۴ مرحله Atomic:**
+    ```
+    BEGIN TRANSACTION;
+      1. originalTx = SELECT * FROM inv_crypto_transactions WHERE id=txId AND isVoided=false
+         IF NOT EXISTS → ROLLBACK + خطا
+      2. UPDATE inv_crypto_transactions SET isVoided=true WHERE id=txId
+      3. INSERT reversal_tx (type = معکوس originalTx.type، quantity، totalAmountBase همان)
+         -- نتیجه: اگر originalTx یک BUY بود، reversal یک SELL با همان quantity و cost است
+      4. rebuildHolding(originalTx.exchangeId, originalTx.symbol)
+         -- همیشه Rebuild می‌کند چون averageBuyPrice ممکن است تغییر کرده باشد
+    COMMIT;
+    ```
+
+    **ب) Reversal معامله رمزارز-به-رمزارز (C2C با `tradeId`) — ۶ مرحله Atomic (Critical):**
+    > یک C2C trade شامل دو رکورد است: `SELL fromSymbol` و `BUY toSymbol`. Reversal باید هر دو را
+    > به‌صورت یک عملیات واحد معکوس کند — نمی‌توان فقط یکی را void کرد.
+
+    ```
+    BEGIN TRANSACTION;
+
+    ── مرحله ۱: خواندن هر دو رکورد اصلی ───────────────────────────────
+    sellTx = SELECT * FROM inv_crypto_transactions WHERE tradeId=? AND type='sell' AND isVoided=false
+    buyTx  = SELECT * FROM inv_crypto_transactions WHERE tradeId=? AND type='buy'  AND isVoided=false
+    IF NOT (sellTx AND buyTx) → ROLLBACK + خطا «تراکنش‌های C2C جفت پیدا نشد»
+
+    ── مرحله ۲: void کردن هر دو رکورد اصلی ────────────────────────────
+    UPDATE inv_crypto_transactions SET isVoided=true WHERE tradeId=?
+
+    ── مرحله ۳: ثبت reversal SELL برای fromSymbol ──────────────────────
+    -- اثر: BUY fromSymbol — Cost Basis همان sellTx.totalAmountBase است
+    INSERT reversal_buy (type='buy', symbol=sellTx.symbol, exchangeId=sellTx.exchangeId,
+      quantity=sellTx.quantity, totalAmountBase=sellTx.totalAmountBase,
+      feeAmount=0, tradeId=newReversalTradeId, isReversal=true, reversedTradeId=originalTradeId)
+
+    ── مرحله ۴: ثبت reversal BUY برای toSymbol ────────────────────────
+    -- اثر: SELL toSymbol — مقدار BTC که کسر می‌شود همان buyTx.quantity است
+    INSERT reversal_sell (type='sell', symbol=buyTx.symbol, exchangeId=buyTx.exchangeId,
+      quantity=buyTx.quantity, totalAmountBase=buyTx.totalAmountBase,
+      feeAmount=0, tradeId=newReversalTradeId, isReversal=true, reversedTradeId=originalTradeId)
+
+    ── مرحله ۵: Rebuild Holding fromSymbol ─────────────────────────────
+    rebuildHolding(sellTx.exchangeId, sellTx.symbol)
+
+    ── مرحله ۶: Rebuild Holding toSymbol ───────────────────────────────
+    rebuildHolding(buyTx.exchangeId, buyTx.symbol)
+
+    COMMIT;
+    ```
+    > **قانون طلایی**: اگر مرحله ۵ یا ۶ fail شود، کل ROLLBACK می‌شود —
+    > وگرنه یکی از دو Holding اصلاح شده و دیگری نه: پرتفوی کاملاً خراب می‌شود.
+    > `rebuildHolding` به جای تنظیم دستی `averageBuyPrice` استفاده می‌شود تا خطای محاسباتی نداشته باشیم.
+
+    **ج) Reversal انتقال (TRANSFER با `transferId`) — ۵ مرحله Atomic:**
+    ```
+    BEGIN TRANSACTION;
+      1. outTx = SELECT * WHERE transferId=? AND type='transfer_out'
+         inTx  = SELECT * WHERE transferId=? AND type='transfer_in'
+         IF NOT (outTx AND inTx) → ROLLBACK + خطا
+      2. UPDATE SET isVoided=true WHERE transferId=?  (هر دو رکورد)
+      3. INSERT reversal_in  (type='transfer_in',  exchangeId=outTx.exchangeId, quantity=outTx.quantity)
+         INSERT reversal_out (type='transfer_out', exchangeId=inTx.exchangeId,  quantity=inTx.quantity)
+      4. rebuildHolding(outTx.exchangeId, outTx.symbol)
+      5. rebuildHolding(inTx.exchangeId,  inTx.symbol)
+    COMMIT;
+    ```
+
+    > **فیلدهای اضافی برای Reversal traceability**: در `inv_crypto_transactions` دو فیلد اضافه می‌شود:
+    > - `isReversal` → boolean (پیش‌فرض `false`) — این رکورد یک Reversal است نه تراکنش اصلی
+    > - `reversedTxId` → UUID (nullable) — id رکورد اصلی که این Reversal آن را خنثی می‌کند
+    > - `reversedTradeId` → UUID (nullable) — برای C2C: tradeId معامله اصلی
+    > - `reversedTransferId` → UUID (nullable) — برای Transfer: transferId انتقال اصلی
 
 ---
 
@@ -158,6 +232,10 @@
 - `txHash` → string (nullable — شناسه تراکنش آنچین (Transaction Hash) روی بلاکچین؛ برای `transfer_in`/`transfer_out` بین والت‌ها بسیار ارزشمند است؛ برای `buy`/`sell` داخل صرافی متمرکز معمولاً null است)
 - `blockNumber` → integer (nullable — شماره بلاکی که تراکنش در آن تأیید شده؛ فقط اگر `txHash` موجود باشد معنی دارد)
 - `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی)
+- `isReversal` → boolean (پیش‌فرض `false` — این رکورد یک تراکنش معکوس/Reversal است)
+- `reversedTxId` → UUID (nullable — برای Reversal تک‌رکوردی: id رکورد `inv_crypto_transactions` اصلی که این Reversal آن را خنثی می‌کند)
+- `reversedTradeId` → UUID (nullable — برای Reversal C2C: `tradeId` معامله اصلی)
+- `reversedTransferId` → UUID (nullable — برای Reversal انتقال: `transferId` انتقال اصلی)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -205,18 +283,169 @@
 
 ## منطق کارمزد
 
-- هر کارمزد با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ذخیره می‌شود؛ اگر `feeCurrency` رمزارزی غیر از USDT باشد (مثلاً BTC، ETH)، فیلد `feeAssetPriceToUSDT` نیز الزامی است.
-- ارزش معادل کارمزد به شرح زیر محاسبه می‌شود (همیشه با `decimal.js`، هرگز `Number`):
-  - اگر `feeCurrency = IRR`: `convertedToUSDT = feeAmount / exchangeRateToBase`
-  - اگر `feeCurrency = USDT`: `convertedToIRR = feeAmount * exchangeRateToBase`
-  - اگر `feeCurrency` رمزارز دیگری باشد (BTC/ETH و ...):
-    ```
-    convertedToUSDT = feeAmount * feeAssetPriceToUSDT
-    convertedToIRR  = convertedToUSDT * exchangeRateToBase
-    ```
-    (تقسیم مستقیم `feeAmount` بر `exchangeRateToBase` در این حالت **غلط** است، چون `exchangeRateToBase` فقط نرخ ریال-به-تتر است و ربطی به قیمت BTC/ETH ندارد.)
-- مجموع کارمزدها در Holding به صورت تجمعی (یک ارز ثابت) نگهداری می‌شود.
-- در انتقال بین صرافی‌ها، اگر کارمزد از خود ارز کسر شود، تفاوت بین `amountToSend` و `amountReceived = amountToSend - feeAmount` دقیقاً مقدار کارمزد است.
+### بخش ۱ — تبدیل کارمزد به ارز پایه (`feeBase`)
+
+این تابع در **همه** عملیات (خرید، فروش، انتقال، C2C) یکسان است:
+
+```typescript
+function convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase, exchangeRateToBase, baseCurrency): Decimal {
+  if (feeAmount.isZero()) return new Decimal(0);
+  if (feeCurrency === baseCurrency)  return feeAmount;                          // بدون تبدیل
+  if (feeCurrency === 'IRR')         return feeAmount.dividedBy(exchangeRateToBase); // IRR → base
+  /* feeCurrency = رمزارز دیگر (BTC, ETH, ...) — feeAssetPriceToBase الزامی */
+  return feeAmount.times(feeAssetPriceToBase);                                  // crypto → base
+}
+```
+
+> ❌ هرگز `feeAmount / exchangeRateToBase` برای `feeCurrency=BTC/ETH` استفاده نکنید —
+> `exchangeRateToBase` فقط نرخ IRR است، نه قیمت BTC/ETH.
+
+---
+
+### بخش ۲ — قانون واحد Fee Treatment روی `quantity` و `Cost Basis`
+
+> **اصل بنیادی**: کارمزد **هرگز** از `quantity` کسر نمی‌شود — حتی وقتی `feeCurrency = symbol` دارایی است.
+> کارمزد فقط روی **Cost Basis** (`totalInvested`) و **Realized P&L** تأثیر می‌گذارد.
+
+#### ۲-الف) خرید (BUY)
+
+```
+مثال: خرید ۱ BTC — fee = 0.001 BTC (feeCurrency = BTC)
+
+quantity ثبت‌شده در inv_crypto_transactions.quantity  = 1        ✅ (کل مقدار خریداری‌شده)
+quantity اضافه‌شده به inv_crypto_holdings.quantity    = 1        ✅
+
+feeBase = 0.001 × feeAssetPriceToBase  (قیمت BTC به baseCurrency)
+
+Cost Basis آپدیت:
+  newTotalInvested  = totalInvested + totalAmountBase + feeBase
+  newQuantity       = quantity + 1
+  newAverageBuyPrice = newTotalInvested / newQuantity
+```
+
+> **چرا `quantity = 1` نه `0.999`؟**
+> چون کارمزد بخشی از **هزینه تملک** آن ۱ BTC است، نه کسری از تعداد.
+> یعنی ما ۱ BTC داریم، اما هزینه‌ای که برای آن پرداختیم شامل کارمزد هم می‌شود.
+> این رویکرد Cost Basis را درست نگه می‌دارد و از undercosting جلوگیری می‌کند.
+
+#### ۲-ب) فروش (SELL)
+
+```
+مثال: فروش ۱ BTC — fee = 0.001 BTC (feeCurrency = BTC)
+
+quantity ثبت‌شده در inv_crypto_transactions.quantity  = 1        ✅ (کل مقدار فروخته‌شده)
+quantity کسرشده از inv_crypto_holdings.quantity       = 1        ✅
+
+feeBase = 0.001 × feeAssetPriceToBase
+
+soldPortionCost = 1 × averageBuyPrice
+realizedPL      = totalAmountBase(مبلغ دریافتی خالص) - soldPortionCost - feeBase
+totalInvested  -= soldPortionCost
+```
+
+> **توجه**: `totalAmountBase` در رکورد تراکنش فروش = مبلغ **قبل** از کسر کارمزد است (gross amount).
+> کارمزد جداگانه در `feeBase` از P&L کسر می‌شود.
+
+#### ۲-ج) انتقال (TRANSFER)
+
+**قرارداد ریاضی کامل (Mathematical Contract):**
+
+```
+ورودی:
+  amountToSend   = مقدار BTC ارسالی از مبدا (کل، قبل از کارمزد)
+  feeAmount      = کارمزد
+  feeCurrency    = BTC (از خود ارز ارسالی کسر می‌شود)
+
+محاسبات اجباری:
+  quantityDeducted  = amountToSend                          // از مبدا همین مقدار کسر می‌شود
+  quantityReceived  = amountToSend - feeAmount              // مقصد همین مقدار دریافت می‌کند
+  feeBase           = feeAmount × feeAssetPriceToBase        // کارمزد به ارز پایه
+  costDeducted      = amountToSend × averageBuyPrice_source  // هزینه‌ای که از مبدا خارج می‌شود
+  costTransferred   = quantityReceived × averageBuyPrice_source  // هزینه‌ای که به مقصد می‌رسد
+  // (فرق costDeducted - costTransferred = feeAmount × averageBuyPrice_source = هزینه‌ی BTC خودِ کارمزد)
+
+در صرافی مبدا (transfer_out):
+  holdings.quantity      -= quantityDeducted                 (= amountToSend)
+  holdings.totalInvested -= costDeducted                     (= amountToSend × averageBuyPrice_source)
+  holdings.totalFeesPaidBase += feeBase
+  averageBuyPrice بدون تغییر (فروش/انتقال averageBuyPrice را عوض نمی‌کند)
+
+در صرافی مقصد (transfer_in):
+  quantityReceived = amountToSend - feeAmount                (BTC واقعاً کمتر رسیده)
+  costTransferred  = quantityReceived × averageBuyPrice_source  (Cost Basis متناسب با BTC دریافتی)
+  newQuantity      = dest.quantity + quantityReceived
+  newTotalInvested = dest.totalInvested + costTransferred
+  newAverageBuyPrice = newTotalInvested / newQuantity        (Weighted Average)
+```
+
+**مثال عددی:**
+```
+amountToSend = 1 BTC, feeAmount = 0.001 BTC, averageBuyPrice_source = 50,000 USDT
+
+quantityDeducted  = 1 BTC
+quantityReceived  = 0.999 BTC
+feeBase           = 0.001 × (قیمت BTC در ارز پایه)
+costDeducted      = 1 × 50,000 = 50,000 USDT
+costTransferred   = 0.999 × 50,000 = 49,950 USDT  ← این است که به مقصد می‌رسد
+
+مبدا بعد از انتقال:
+  quantity      : قبلی − 1 BTC
+  totalInvested : قبلی − 50,000 USDT
+
+مقصد بعد از انتقال:
+  quantity      : قبلی + 0.999 BTC
+  totalInvested : قبلی + 49,950 USDT  ← نه 50,000
+  averageBuyPrice: Weighted Average جدید
+```
+
+> **چرا `costTransferred = quantityReceived × averageBuyPrice_source` و نه `costDeducted`؟**
+> چون ۰.۰۰۱ BTC کارمزد به‌عنوان هزینه واقعی سوخته شد (مانند SELL با `quantity=0.001`).
+> مقصد فقط ۰.۹۹۹ BTC گرفته — Cost Basis اش نسبت به همان ۰.۹۹۹ است، نه ۱.
+
+> **چرا در انتقال `quantity` کمتر می‌شود؟**
+> چون در transfer، کارمزد از **ارز ارسالی خودِ BTC** برداشته می‌شود —
+> مقصد واقعاً ۰.۹۹۹ BTC دریافت کرده، نه ۱ BTC.
+> این تفاوت اساسی با خرید/فروش است که کارمزد از موجودی دارایی کسر **نمی‌شود**.
+
+#### ۲-د) معامله رمزارز-به-رمزارز (C2C)
+
+```
+مثال: فروش ۱ ETH — خرید BTC — fee = 0.0001 BTC (feeCurrency = BTC)
+
+رکورد SELL (ETH):
+  quantity = 1 ETH  ✅
+  feeBase = 0.0001 × BTC_price_in_base
+  realizedPL_ETH = fromTotalBase - soldPortionCost_ETH - feeBase
+
+رکورد BUY (BTC):
+  quantity = مقدار BTC دریافتی  ✅
+  toTotalBase = fromTotalBase + feeBase  (Cost Basis BTC شامل کارمزد)
+  holdings.quantity += مقدار BTC دریافتی  ✅ (کامل، نه کسر کارمزد)
+```
+
+---
+
+### بخش ۳ — جدول خلاصه
+
+| عملیات | `feeCurrency = baseCurrency/IRR` | `feeCurrency = symbol دارایی` |
+|---------|----------------------------------|-------------------------------|
+| **BUY** | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه |
+| **SELL** | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر |
+| **TRANSFER** | `quantity` بدون تغییر در مبدا ✅ — `quantity` کامل در مقصد ✅ — `feeBase` به `totalFeesPaidBase` | `quantity` کامل در مبدا ✅ — `quantity` کاهش‌یافته در مقصد ⚠️ (چون ارز کمتری رسیده) |
+| **C2C** | `quantity` هر دو طرف بدون تغییر ✅ — `feeBase` در SELL از P&L کسر و در BUY به Cost Basis اضافه | همان قانون ✅ |
+
+> **قانون طلایی**: `feeCurrency = symbol` تنها در **TRANSFER** روی `quantity` مقصد تأثیر می‌گذارد —
+> در هر عملیات دیگری (BUY/SELL/C2C) فقط روی `Cost Basis` یا `realizedPL` اثر دارد.
+
+---
+
+### بخش ۴ — آپدیت `totalFeesPaidBase`
+
+در **همه** عملیات، پس از محاسبه `feeBase`:
+```
+holding.totalFeesPaidBase += feeBase
+```
+این فیلد تجمعی است و هرگز کاهش نمی‌یابد (حتی در فروش).
 
 ---
 
@@ -232,10 +461,254 @@
 - `getHoldings(exchangeId?)`
 - `getHoldingBySymbol(symbol, exchangeId?)`
 - `getPortfolioValue(targetCurrency?)`
+- **`rebuildHolding(exchangeId, symbol)`** → بازسازی کامل یک Holding از لاگ تراکنش‌ها (بدون استفاده از مقادیر فعلی cache)
+
+  ```typescript
+  rebuildHolding(exchangeId: UUID, symbol: string): {
+    quantity: Decimal
+    totalInvested: Decimal
+    averageBuyPrice: Decimal
+    totalFeesPaidBase: Decimal
+  } {
+    // تمام تراکنش‌های این symbol را به‌ترتیب تاریخ پردازش کن
+    const txs = db.query(`
+      SELECT type, quantity, totalAmountBase, feeAmount, feeCurrency,
+             feeAssetPriceToBase, exchangeRateToBase, transferId, tradeId
+      FROM inv_crypto_transactions
+      WHERE exchangeId = ? AND symbol = ? AND isVoided = false
+      ORDER BY date ASC, createdAt ASC`, [exchangeId, symbol])
+
+    let qty = new Decimal(0)
+    let totalInvested = new Decimal(0)
+    let totalFeesPaidBase = new Decimal(0)
+
+    for (const tx of txs) {
+      const feeBase = convertFeeToBase(tx.feeAmount, tx.feeCurrency, tx.feeAssetPriceToBase, tx.exchangeRateToBase, baseCurrency)
+      totalFeesPaidBase = totalFeesPaidBase.plus(feeBase)
+
+      if (tx.type === 'buy') {
+        totalInvested = totalInvested.plus(tx.totalAmountBase).plus(feeBase)
+        qty = qty.plus(tx.quantity)
+      } else if (tx.type === 'sell') {
+        const soldCost = tx.quantity.times(qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty))
+        totalInvested = totalInvested.minus(soldCost)
+        qty = qty.minus(tx.quantity)
+      } else if (tx.type === 'transfer_in') {
+        // Cost Basis از رکورد transfer_out متناظر خوانده می‌شود
+        const outTx = db.query(`SELECT quantity, totalAmountBase FROM inv_crypto_transactions
+          WHERE transferId = ? AND type = 'transfer_out' AND isVoided = false
+          LIMIT 1`, [tx.transferId])[0]
+        const costTransferred = outTx
+          ? tx.quantity.times(outTx.totalAmountBase.dividedBy(outTx.quantity))  // proportional cost
+          : tx.totalAmountBase
+        totalInvested = totalInvested.plus(costTransferred)
+        qty = qty.plus(tx.quantity)
+      } else if (tx.type === 'transfer_out') {
+        const avgBuy = qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty)
+        totalInvested = totalInvested.minus(tx.quantity.times(avgBuy))
+        qty = qty.minus(tx.quantity)
+      }
+    }
+
+    const averageBuyPrice = qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty)
+    return { quantity: qty, totalInvested, averageBuyPrice, totalFeesPaidBase }
+  }
+  ```
+
+  > **نکته**: برای رمزارزهایی که از IRR/USDT خریداری شده‌اند، `totalAmountBase` رکورد تراکنش مستقیماً هزینه به ارز پایه را دارد (طبق «ارز پایه محاسبات»). این تابع فقط از آن فیلد استفاده می‌کند — نیازی به نرخ ارز تاریخی در زمان Rebuild نیست.
+
+- **`reconcileHolding(exchangeId, symbol)`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
+
+  ```typescript
+  reconcileHolding(exchangeId: UUID, symbol: string): {
+    status: 'ok' | 'mismatch'
+    fields: {
+      quantity:         { stored: Decimal, calculated: Decimal, match: boolean }
+      totalInvested:    { stored: Decimal, calculated: Decimal, match: boolean }
+      averageBuyPrice:  { stored: Decimal, calculated: Decimal, match: boolean }
+      totalFeesPaidBase:{ stored: Decimal, calculated: Decimal, match: boolean }
+    }
+  }
+  ```
+
+  **در صورت Mismatch**: ثبت در audit log + هشدار کاربر + گزینه auto-fix از `rebuildHolding`.
+
+- **`rebuildAllHoldings(exchangeId?)`** → اجرای `rebuildHolding` برای همه symbol‌های یک صرافی (یا همه صرافی‌ها اگر `exchangeId` داده نشود) و آپدیت atomic هر Holding پس از Rebuild
+
+  **زمان استفاده الزامی**:
+  - پس از هر Migration
+  - پس از Import/Restore فایل دیتابیس
+  - پس از هر Reversal (void) تراکنش
+  - در صورت مشاهده Mismatch در `reconcileHolding`
 
 ### Transaction APIs
-- `createCryptoTransaction(data)` → خرید / فروش / انتقال
-- `createExchangeTransaction(data)` → واریز (`inv_crypto_exchange_transactions.type='deposit'` و `acc_transactions.type='deposit-investment'`) / برداشت (`inv_crypto_exchange_transactions.type='withdraw'` و `acc_transactions.type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
+- `createCryptoTransaction(data)` → خرید / فروش / انتقال (تک‌رکورد)
+- `createCryptoToCryptoTrade(data)` → **معامله رمزارز-به-رمزارز — الزاماً Atomic**
+
+  این متد تنها نقطه ورود معتبر برای معامله رمزارز-به-رمزارز (قاعده ۲a) است.
+  هر implementation باید **تمام ۸ مرحله زیر را در یک تراکنش دیتابیسی واحد (SQLite BEGIN/COMMIT) اجرا کند**.
+  اگر هر مرحله‌ای شکست بخورد، کل تراکنش ROLLBACK می‌شود.
+
+  **ورودی `data`**:
+  ```typescript
+  {
+    tradeId: UUID,                  // از پیش ساخته‌شده توسط caller
+    date: Timestamp,
+    exchangeId: UUID,
+
+    // رمزارز پرداختی (مثلاً ETH که می‌فروشیم)
+    fromSymbol: string,             // ETH
+    fromQuantity: Decimal,          // مقدار ETH که پرداخت می‌شود
+    fromPriceBase: Decimal,         // قیمت ۱ واحد ETH به baseCurrency در لحظه معامله
+    fromPriceHistoryId: UUID,       // id رکورد price_history که fromPriceBase از آن آمده
+
+    // رمزارز دریافتی (مثلاً BTC که می‌خریم)
+    toSymbol: string,               // BTC
+    toQuantity: Decimal,            // مقدار BTC که دریافت می‌شود
+    toPriceBase: Decimal,           // قیمت ۱ واحد BTC به baseCurrency در لحظه معامله
+    toPriceHistoryId: UUID,         // id رکورد price_history که toPriceBase از آن آمده
+
+    // کارمزد
+    feeAmount: Decimal,
+    feeCurrency: string,
+    feeAssetPriceToBase: Decimal,   // nullable — فقط اگر feeCurrency رمزارز دیگری باشد
+
+    description: string,
+  }
+  ```
+
+  **قرارداد Atomic — ۸ مرحله اجباری (داخل یک SQLite transaction)**:
+
+  ```
+  BEGIN TRANSACTION;
+
+  ── مرحله ۱: محاسبه مقادیر ──────────────────────────────────────────
+  feeBase          = convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase)
+  fromTotalBase    = fromQuantity × fromPriceBase
+  toTotalBase      = fromTotalBase + feeBase   // Cost Basis رمزارز دریافتی
+
+  ── مرحله ۲: بررسی موجودی کافی (Guard) ──────────────────────────────
+  fromHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=fromSymbol FOR UPDATE
+  IF fromHolding.quantity < fromQuantity → ROLLBACK + خطا «موجودی کافی نیست»
+
+  ── مرحله ۳: محاسبه Realized P&L برای رمزارز پرداختی ────────────────
+  soldPortionCost  = fromQuantity × fromHolding.averageBuyPrice
+  realizedPL_from  = fromTotalBase - soldPortionCost - feeBase
+
+  ── مرحله ۴: ثبت رکورد SELL در inv_crypto_transactions ──────────────
+  INSERT inv_crypto_transactions (
+    type='sell', symbol=fromSymbol, quantity=fromQuantity,
+    price=toQuantity/fromQuantity,   // نرخ مستقیم به واحد toSymbol
+    currency=toSymbol,
+    priceBase=fromPriceBase, totalAmountBase=fromTotalBase,
+    feeAmount, feeCurrency, feeAssetPriceToBase,
+    tradeId, exchangeId, date
+  )
+
+  ── مرحله ۵: آپدیت Holding رمزارز پرداختی ──────────────────────────
+  UPDATE inv_crypto_holdings SET
+    quantity        = fromHolding.quantity - fromQuantity,
+    totalInvested   = fromHolding.totalInvested - soldPortionCost,
+    totalFeesPaidBase = fromHolding.totalFeesPaidBase + feeBase
+    -- averageBuyPrice بدون تغییر (فروش averageBuyPrice را تغییر نمی‌دهد)
+  WHERE id = fromHolding.id
+
+  ── مرحله ۶: ثبت رکورد BUY در inv_crypto_transactions ───────────────
+  INSERT inv_crypto_transactions (
+    type='buy', symbol=toSymbol, quantity=toQuantity,
+    price=fromQuantity/toQuantity,   // نرخ معکوس
+    currency=fromSymbol,
+    priceBase=toPriceBase, totalAmountBase=toTotalBase,
+    feeAmount=0, feeCurrency=null,   // کارمزد کامل در رکورد SELL لحاظ شده
+    tradeId, exchangeId, date
+  )
+
+  ── مرحله ۷: آپدیت Holding رمزارز دریافتی (Weighted Average) ────────
+  toHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=toSymbol
+  IF toHolding EXISTS:
+    newQuantity      = toHolding.quantity + toQuantity
+    newTotalInvested = toHolding.totalInvested + toTotalBase
+    newAvgBuyPrice   = newTotalInvested / newQuantity
+    UPDATE inv_crypto_holdings SET
+      quantity=newQuantity, totalInvested=newTotalInvested, averageBuyPrice=newAvgBuyPrice
+    WHERE id = toHolding.id
+  ELSE:
+    INSERT inv_crypto_holdings (
+      exchangeId, symbol=toSymbol, quantity=toQuantity,
+      averageBuyPrice=toPriceBase, totalInvested=toTotalBase, totalFeesPaidBase=0
+    )
+
+  ── مرحله ۸: ذخیره Realized P&L (اختیاری اما توصیه‌شده) ────────────
+  -- realizedPL_from را در inv_crypto_transactions رکورد SELL ذخیره کن
+  -- (یا در یک جدول جداگانه اگر نیاز به گزارش تاریخی دارید)
+
+  COMMIT;
+  ```
+
+  > **نکته پیاده‌سازی SQLite**: SQLite به‌صورت پیش‌فرض autocommit است. برای اجرای atomic، حتماً از `db.run('BEGIN')` / `db.run('COMMIT')` / `db.run('ROLLBACK')` استفاده کنید — یا از wrapper library‌ای که transaction را expose می‌کند (مثل `better-sqlite3` که synchronous است و transaction را نیتیو پشتیبانی می‌کند).
+
+  > **قانون طلایی**: هیچ‌کدام از ۸ مرحله بالا نباید خارج از این transaction اجرا شود. حتی اگر فقط مرحله ۷ (آپدیت Holding مقصد) fail شود، باید همه چیز rollback شود — وگرنه ETH از Holding کسر شده اما BTC به Holding اضافه نشده: دارایی کاربر از بین رفته.
+  - برای `type=transfer_out`/`transfer_in` (انتقال بین صرافی‌های خودی — **الزاماً Atomic در یک SQLite Transaction**):
+
+    **قرارداد ۵ مرحله‌ای (همه یا هیچ):**
+    ```
+    BEGIN TRANSACTION;
+
+    ── مرحله ۱: Guard — بررسی موجودی کافی در مبدا ──────────────────────
+    srcHolding = SELECT * FROM inv_crypto_holdings
+                 WHERE exchangeId=sourceExchangeId AND symbol=? FOR UPDATE
+    IF srcHolding.quantity < amountToSend → ROLLBACK + خطا «موجودی کافی نیست»
+
+    ── مرحله ۲: محاسبات ────────────────────────────────────────────────
+    quantityReceived = amountToSend - feeAmount              // BTC دریافتی مقصد
+    feeBase          = feeAmount × feeAssetPriceToBase       // کارمزد به ارز پایه
+    costDeducted     = amountToSend × srcHolding.averageBuyPrice    // هزینه خارج‌شده از مبدا
+    costTransferred  = quantityReceived × srcHolding.averageBuyPrice // هزینه رسیده به مقصد
+
+    ── مرحله ۳: آپدیت Holding مبدا ─────────────────────────────────────
+    UPDATE inv_crypto_holdings SET
+      quantity           = srcHolding.quantity - amountToSend,
+      totalInvested      = srcHolding.totalInvested - costDeducted,
+      totalFeesPaidBase  = srcHolding.totalFeesPaidBase + feeBase
+      -- averageBuyPrice بدون تغییر
+    WHERE id = srcHolding.id
+
+    ── مرحله ۴: ثبت دو رکورد transfer_out و transfer_in ────────────────
+    INSERT inv_crypto_transactions (type='transfer_out', exchangeId=source, quantity=amountToSend,
+      feeAmount, feeCurrency, feeAssetPriceToBase, transferId, counterExchangeId=dest, ...)
+    INSERT inv_crypto_transactions (type='transfer_in',  exchangeId=dest,   quantity=quantityReceived,
+      feeAmount=0, feeCurrency=null, transferId, counterExchangeId=source, ...)
+
+    ── مرحله ۵: آپدیت Holding مقصد (Weighted Average) ──────────────────
+    destHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=destExchangeId AND symbol=?
+    IF destHolding EXISTS:
+      newQuantity      = destHolding.quantity + quantityReceived
+      newTotalInvested = destHolding.totalInvested + costTransferred
+      UPDATE inv_crypto_holdings SET
+        quantity=newQuantity, totalInvested=newTotalInvested,
+        averageBuyPrice=newTotalInvested/newQuantity
+      WHERE id = destHolding.id
+    ELSE:
+      INSERT inv_crypto_holdings (exchangeId=dest, symbol, quantity=quantityReceived,
+        averageBuyPrice=srcHolding.averageBuyPrice, totalInvested=costTransferred, totalFeesPaidBase=0)
+
+    COMMIT;
+    ```
+- `createExchangeTransaction(data)` → واریز/برداشت بین حساب بانکی و صرافی — **توالی اجباری (atomic)**:
+
+  **برداشت از صرافی به حساب بانکی** (`type='withdraw'`):
+  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='withdraw'` ثبت شود
+  > 2. رکورد در `acc_transactions` با `type='withdrawal-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز برداشتی)` آپدیت شود**: `quantity -= amount` (و اگر `quantity <= 0` رکورد holding غیرفعال یا حذف شود)
+  > 4. اگر ارز برداشتی `IRR` یا `USDT` است (موجودی نقدی صرافی): همان holding با `symbol=IRR/USDT` آپدیت می‌شود — نه یک holding رمزارز جدید
+  >
+  > ⛔ **ممنوع**: ثبت withdraw بدون آپدیت `inv_crypto_holdings` — موجودی نقدی صرافی اشتباه می‌شود
+
+  **واریز از حساب بانکی به صرافی** (`type='deposit'`):
+  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='deposit'` ثبت شود
+  > 2. رکورد در `acc_transactions` با `type='deposit-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز واریزی)` آپدیت شود**: `quantity += amount` (اگر رکورد وجود نداشت، ایجاد شود)
+  > 4. برای واریز IRR/USDT: `averageBuyPrice=1`، `totalInvested=0`، `totalFeesPaidBase=0` ثابت می‌مانند (طبق تصمیم طراحی موجودی نقدی)
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
 - `getExchangeTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, exchangeId?)`
