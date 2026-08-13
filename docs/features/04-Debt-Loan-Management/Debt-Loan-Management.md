@@ -180,8 +180,7 @@
 - `note` → string (nullable — دلیل تغییر نرخ)
 - `createdAt` → datetime
 
-> **نکته الزامی**: برای وام‌های `variable`، فیلد `interestRate` در `ln_loans` فقط **نرخ اولیه** (در `disbursementDate`) را نشان می‌دهد. برای محاسبه سود هر قسط، سیستم باید آخرین رکورد `ln_rate_history` که `effectiveDate` آن ≤ تاریخ همان قسط است را پیدا کند و `r` را از روی آن نرخ محاسبه کند (نه از `ln_loans.interestRate`). برای وام‌های `fixed` یا `none`، این جدول اصلاً استفاده نمی‌شود و `interestRate` ثابت `ln_loans` معتبر است.
-> تغییر نرخ **بازمحاسبه خودکار قسط‌های آینده** را طبق همان منطق «بازمحاسبه پس از پیش‌پرداخت جزئی» (بخش ه) با `remainingInstallments` و `remainingBalance` فعلی و `r` جدید ایجاد می‌کند؛ قسط‌های قبلاً پرداخت‌شده دست‌نخورده می‌مانند.
+> **نکته الزامی**: برای وام‌های `variable`، فیلد `interestRate` در `ln_loans` فقط **نرخ اولیه** (در `disbursementDate`) را نشان می‌دهد. برای محاسبه سود هر قسط، سیستم باید آخرین رکورد `ln_rate_history` که `effectiveDate` آن ≤ `dueDate` همان قسط است را پیدا کند و `r` را از روی آن نرخ محاسبه کند (نه از `ln_loans.interestRate`). برای وام‌های `fixed` یا `none`، این جدول اصلاً استفاده نمی‌شود و `interestRate` ثابت `ln_loans` معتبر است. الگوریتم کامل تغییر نرخ و تمام edge caseها در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate» آمده است.
 
 ---
 
@@ -198,7 +197,7 @@
 - `getLoanById(id)`
 - `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
 - `cancelLoan(id)`
-- `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه `calculatedInstallment` برای اقساط آینده (طبق منطق بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» با نرخ جدید به‌جای پیش‌پرداخت)
+- `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'` و `calculationMethod = 'declining_balance'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه اقساط آینده — الگوریتم کامل در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate»
 
 ### Payment APIs
 - `payLoan(loanId, amount, type, date, description)`  
@@ -512,6 +511,98 @@ calculatedInstallment = remainingBalance × [r(1+r)^remainingInstallments] / [(1
 ```
 
 > **نکته `r` در re-amortization هفتگی/فصلی/custom**: چون `r = getPeriodRate(loan)` است (نه `annualRate/12`)، فرمول برای همه فرکانس‌ها یکسان کار می‌کند. مثلاً برای وام هفتگی، `r = annualRate/52` در هر دو حالت بالا به‌کار می‌رود.
+
+---
+
+### ه-۲) تغییر نرخ سود در وام‌های Variable Rate
+
+> این بخش فقط برای `interestType = 'variable'` و `calculationMethod = 'declining_balance'` است. برای Flat Rate، Qarz و Bullet با نرخ متغیر باید از ابتدا `interestType = 'fixed'` استفاده شود (نرخ متغیر روی این روش‌ها معنای عملی ندارد).
+
+#### قوانین پایه‌ای (غیرقابل تغییر)
+
+1. **اقساط قبلاً پرداخت‌شده هرگز بازمحاسبه نمی‌شوند.** هر تراکنش در `ln_transactions` تاریخی و تغییرناپذیر است.
+2. **`remainingBalance` تغییر نمی‌کند.** تغییر نرخ فقط مبلغ قسط آینده یا تعداد اقساط را تغییر می‌دهد — اصل بدهی دست‌نخورده می‌ماند.
+3. **نرخ جدید از اولین قسطی اعمال می‌شود که `dueDate` آن ≥ `effectiveDate` باشد.** هیچ سودِ انباشته‌ای (accrued interest) بین آخرین قسط پرداخت‌شده و `effectiveDate` به‌طور جداگانه محاسبه نمی‌شود — سیستم روزانه سود تجمیع نمی‌کند، بلکه دوره‌ای (per installment) حساب می‌کند.
+4. **`interestRate` در `ln_loans` تغییر نمی‌کند** — همان نرخ اولیه است. برای همه محاسبات آینده، `r` از آخرین رکورد `ln_rate_history` با `effectiveDate ≤ dueDate` آن قسط خوانده می‌شود.
+
+#### الگوریتم `updateLoanRate(loanId, newRate, effectiveDate, note?)`
+
+```
+// ۱. Validation
+if loan.interestType ≠ 'variable' → Error: "فقط برای وام‌های Variable Rate"
+if loan.calculationMethod ≠ 'declining_balance' → Error: "تغییر نرخ فقط برای Declining Balance"
+if effectiveDate < loan.disbursementDate → Error: "تاریخ مؤثر نمی‌تواند قبل از تاریخ واریز باشد"
+if newRate < 0 → Error: "نرخ نمی‌تواند منفی باشد"
+if رکوردی با همین effectiveDate قبلاً وجود دارد → Error: "برای این تاریخ قبلاً نرخ ثبت شده"
+
+// ۲. ثبت رکورد جدید
+INSERT INTO ln_rate_history (loanId, rate, effectiveDate, note, createdAt)
+
+// ۳. شناسایی اولین قسط آینده متأثر
+firstAffectedDueDate = MIN(dueDate) WHERE dueDate ≥ effectiveDate AND status ≠ 'paid'
+// اگر همه اقساط پرداخت شده → هیچ بازمحاسبه‌ای لازم نیست (نرخ صرفاً تاریخی ثبت می‌شود)
+
+// ۴. محاسبه وضعیت در لحظه effectiveDate
+remainingBalance_atChange   = آخرین remainingBalance از ln_transactions (بعد از آخرین قسط پرداخت‌شده)
+remainingInstallments_atChange = totalInstallments - installmentsPaidSoFar
+
+// ۵. بازمحاسبه قسط با نرخ جدید
+r_new = getNewPeriodRate(newRate, loan.installmentFrequency, loan.customIntervalDays)
+
+if loan.recalculateOnEarlyPayment = true (حالت: تعداد ثابت، مبلغ تغییر می‌کند):
+    calculatedInstallment = remainingBalance_atChange × [r_new(1+r_new)^n] / [(1+r_new)^n - 1]
+    // که در آن n = remainingInstallments_atChange
+    UPDATE ln_loans SET calculatedInstallment = ...
+
+else (حالت: مبلغ قسط ثابت — recalculateOnEarlyPayment = false):
+    // مبلغ قسط دست‌نخورده می‌ماند (کاربر یا همان مبلغ قسط قبلی یا مبلغ توافق‌شده با بانک)
+    // تعداد اقساط باقیمانده بازمحاسبه می‌شود:
+    newRemainingInstallments = ceil( -ln(1 - (remainingBalance_atChange × r_new) / calculatedInstallment) / ln(1 + r_new) )
+    UPDATE ln_loans SET totalInstallments = installmentsPaidSoFar + newRemainingInstallments
+```
+
+#### accrued interest — دقیقاً چه اتفاقی می‌افتد؟
+
+سیستم **روزانه سود تجمیع نمی‌کند** (Daily Accrual). سود هر دوره دقیقاً در لحظه محاسبه آن قسط (هنگام `payLoan` یا `getUpcomingPayments`) حساب می‌شود:
+
+```
+interestPortion_i = remainingBalance × r_effective(dueDate_i)
+```
+
+که در آن `r_effective(dueDate_i)` = نرخ دوره‌ای محاسبه‌شده از آخرین `ln_rate_history.rate` با `effectiveDate ≤ dueDate_i`.
+
+**مثال عملی:**
+
+```
+وام: ۱۲۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه Declining Balance، نرخ اولیه ۱۸٪
+
+قسط ۱ (فروردین): r = 0.18/12 = 0.015 → سود = 1,800,000، اصل = 4,218,000
+قسط ۲ (اردیبهشت): r = 0.015   → سود = 1,736,730، اصل = 4,281,270
+
+→ در اردیبهشت: بانک نرخ را به ۲۴٪ تغییر می‌دهد، effectiveDate = ابتدای خرداد
+
+→ updateLoanRate(loanId, 24, '1404-03-01')
+   remainingBalance_atChange = 111,500,730
+   r_new = 0.24/12 = 0.02
+   remainingInstallments = 10
+
+   if recalculateOnEarlyPayment = true:
+       calculatedInstallment = 111,500,730 × [0.02(1.02)^10] / [(1.02)^10 - 1]
+                             ≈ 12,373,000 ریال (بالاتر از قسط اولیه ~6,095,000)
+
+قسط ۳ (خرداد): r = 0.02 → سود = 2,230,015، اصل = 10,142,985
+// قسط‌های ۱ و ۲ دست‌نخورده؛ سودِ بین قسط ۲ و effectiveDate صفر است (daily accrual نداریم)
+```
+
+#### edge caseهای الزامی
+
+| حالت | رفتار |
+|------|-------|
+| `effectiveDate` قبل از پرداخت اولین قسط | نرخ برای همه اقساط تغییر می‌کند (مثل بازمحاسبه کامل) |
+| `effectiveDate` بین دو تاریخ سررسید | نرخ از **قسط بعدی** اعمال می‌شود، نه بازمحاسبه بخشی از دوره |
+| دو تغییر نرخ متوالی قبل از پرداخت | هر دو در `ln_rate_history` ثبت می‌شوند؛ `getUpcomingPayments` برای هر قسط آخرین رکورد با `effectiveDate ≤ dueDate` را پیدا می‌کند |
+| `newRate = 0` (بخشودگی سود) | مجاز است؛ `calculationMethod` همچنان `declining_balance` می‌ماند؛ قسط‌های آینده فقط اصل خواهند بود |
+| نرخ جدید باعث می‌شود `calculatedInstallment < interestPortion` (قسط ثابت پایین‌تر از سود) | در `recalculateOnEarlyPayment = false`: خطا — «مبلغ قسط از سود ماهانه با نرخ جدید کمتر است؛ وام هرگز تسویه نمی‌شود. لطفاً مبلغ قسط را افزایش دهید یا حالت بازمحاسبه را فعال کنید» |
 
 ---
 
