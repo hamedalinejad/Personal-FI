@@ -355,6 +355,51 @@ holding.totalFeesPaidBase += feeBase
 - `updateExchange(id, data)`
 - `getAllExchanges()`
 - `getExchangeById(id)`
+- `calculateTrueCashBalance(exchangeId, symbol)` → محاسبه موجودی واقعی IRR/USDT یک صرافی مستقیماً از لاگ (بدون cache)
+
+  ```typescript
+  calculateTrueCashBalance(exchangeId: UUID, symbol: 'IRR' | 'USDT'): Decimal {
+    // واریز − برداشت از inv_crypto_exchange_transactions
+    const exchTxs = db.query(`
+      SELECT type, amount, feeAmount FROM inv_crypto_exchange_transactions
+      WHERE exchangeId = ? AND currency = ? AND isVoided = false`, [exchangeId, symbol])
+    // خرید/فروش که این symbol درگیر بوده از inv_crypto_transactions
+    const tradeTxs = db.query(`
+      SELECT type, totalAmount, feeAmount FROM inv_crypto_transactions
+      WHERE exchangeId = ? AND currency = ? AND isVoided = false
+        AND type IN ('buy','sell')`, [exchangeId, symbol])
+
+    let balance = new Decimal(0)
+    for (const tx of exchTxs) {
+      if (tx.type === 'deposit')  balance = balance.plus(tx.amount).minus(tx.feeAmount ?? 0)
+      if (tx.type === 'withdraw') balance = balance.minus(tx.amount).minus(tx.feeAmount ?? 0)
+    }
+    for (const tx of tradeTxs) {
+      // خرید رمزارز با IRR/USDT → موجودی نقدی کم می‌شود
+      if (tx.type === 'buy')  balance = balance.minus(tx.totalAmount).minus(tx.feeAmount ?? 0)
+      // فروش رمزارز و دریافت IRR/USDT → موجودی نقدی زیاد می‌شود
+      if (tx.type === 'sell') balance = balance.plus(tx.totalAmount).minus(tx.feeAmount ?? 0)
+    }
+    return balance
+  }
+  ```
+
+- **`reconcileExchange(exchangeId)`** → بررسی انطباق موجودی‌های Holding با لاگ (هم برای رمزارزها هم برای IRR/USDT)
+
+  ```typescript
+  reconcileExchange(exchangeId: UUID): {
+    brokerageId: UUID
+    results: Array<{
+      symbol: string
+      status: 'ok' | 'mismatch'
+      calculatedQuantity: Decimal  // از calculateTrueCashBalance یا محاسبه از لاگ تراکنش‌ها
+      storedQuantity: Decimal      // از inv_crypto_holdings.quantity
+    }>
+  }
+  ```
+
+  **زمان استفاده**: پس از Import/Restore، بعد از Migration، بررسی دوره‌ای.  
+  **در صورت Mismatch**: ثبت در audit log + هشدار به کاربر + گزینه auto-fix از لاگ.
 
 ### Holding APIs
 - `getHoldings(exchangeId?)`
@@ -545,7 +590,7 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 ## نکات طراحی
 
 - میانگین خرید با فرمول Weighted Average به‌روزرسانی می‌شود.
-- `inv_crypto_transactions` و `inv_crypto_exchange_transactions` فقط لاگ هستند.
+- **معماری Journal/Cache**: `inv_crypto_transactions` و `inv_crypto_exchange_transactions` = **Truth (Journal)**؛ `inv_crypto_holdings.quantity` = **Cache (Snapshot برای سرعت)**. هر عملیاتی که موجودی را تغییر می‌دهد باید Atomic باشد (BEGIN → INSERT log → UPDATE holding → COMMIT).
 - موجودی و میانگین خرید و مجموع کارمزدها در جدول `inv_crypto_holdings` نگهداری می‌شود.
 - قیمت لحظه‌ای رمزارزها از فیچر `19-Price-Fetching` (جدول `price_history`) خوانده می‌شود؛ این فیچر مستقیماً به API بیرونی وصل نمی‌شود — برای Unrealized P&L و ارزش پرتفوی فقط `getLatestPrice('crypto', symbol)` را صدا می‌زند.
 
