@@ -17,13 +17,13 @@
 برای این کار، هر تراکنش خرید/فروش (`inv_crypto_transactions`) علاوه بر مبلغ به ارز واقعی پرداخت‌شده (`price`, `totalAmount`, `currency`)، معادل آن را به ارز پایه هم در لحظه ثبت ذخیره می‌کند (`priceBase`, `totalAmountBase`) — دقیقاً مشابه الگوی `totalFeesPaidBase`. منبع این تبدیل:
 - اگر `currency` = ارز پایه کاربر: بدون تبدیل (ضریب ۱)
 - اگر `currency = IRR` و ارز پایه چیز دیگری باشد (مثلاً USDT): با `exchangeRateToBase`
-- اگر `currency` رمزارز دیگری باشد (مثلاً ETH، یعنی معامله رمزارز-به-رمزارز): با `getLatestPrice(symbol, baseCurrency)` از فیچر `19-Price-Fetching`، یا در نبود قیمت کش‌شده، وارد‌شده دستی توسط کاربر در لحظه ثبت تراکنش
+- اگر `currency` رمزارز دیگری باشد (مثلاً ETH، یعنی معامله رمزارز-به-رمزارز): با `getLatestPrice('crypto', symbol, baseCurrency)` از فیچر `19-Price-Fetching`، یا در نبود قیمت کش‌شده، وارد‌شده دستی توسط کاربر در لحظه ثبت تراکنش
 
 ---
 
 ## Rate Provenance — زنجیره منشأ نرخ (Immutable Audit Trail)
 
-> **مشکل**: `priceBase` و `totalAmountBase` در لحظه تراکنش ذخیره و قفل می‌شوند — اما اگر فقط مقدار نهایی ذخیره شود، در آینده نمی‌توان تأیید کرد این عدد از کجا آمده. `getLatestPrice()` می‌تواند تغییر کند؛ نباید بتوان تراکنش تاریخی را با قیمت جدید بازمحاسبه کرد.
+> **مشکل**: `priceBase` و `totalAmountBase` در لحظه تراکنش ذخیره و قفل می‌شوند — اما اگر فقط مقدار نهایی ذخیره شود، در آینده نمی‌توان تأیید کرد این عدد از کجا آمده. `getLatestPrice('crypto', symbol)` می‌تواند تغییر کند؛ نباید بتوان تراکنش تاریخی را با قیمت جدید بازمحاسبه کرد.
 
 **راه‌حل**: هر تراکنش علاوه بر مقدار محاسبه‌شده، به **رکورد دقیق قیمتی** که آن مقدار را ساخته لینک می‌دهد:
 
@@ -51,12 +51,12 @@ inv_crypto_transactions
 
 | سناریو | `priceHistoryId` |
 |---------|-----------------|
-| خرید/فروش با قیمت از `getLatestPrice()` | `price_history.id` رکورد مصرف‌شده — **الزامی** |
+| خرید/فروش با قیمت از `getLatestPrice('crypto', symbol)` | `price_history.id` رکورد مصرف‌شده — **الزامی** |
 | خرید/فروش با قیمت وارد‌شده دستی توسط کاربر | ابتدا `setManualPrice()` فراخوانی شود → رکورد در `price_history` ثبت شود → سپس `id` آن رکورد اینجا ذخیره شود — **الزامی** |
 | معامله رمزارز-به-رمزارز (C2C) | همان — `priceHistoryId` برای هر دو طرف (fromSymbol و toSymbol) جداگانه ذخیره شود |
 | واریز/برداشت ریالی (بدون قیمت رمزارز) | `null` — چون `priceBase` برای IRR/USDT محاسبه نمی‌شود |
 
-> **نکته پیاده‌سازی**: هنگام ثبت تراکنش، `getLatestPrice()` یک `CachedPrice` برمی‌گرداند که شامل `priceHistoryId` (id رکورد `price_history`) است. این id باید مستقیماً در تراکنش ذخیره شود — نه اینکه بعداً دوباره query شود.
+> **نکته پیاده‌سازی**: هنگام ثبت تراکنش، `getLatestPrice('crypto', symbol)` یک `CachedPrice` برمی‌گرداند که شامل `priceHistoryId` (id رکورد `price_history`) است. این id باید مستقیماً در تراکنش ذخیره شود — نه اینکه بعداً دوباره query شود.
 
 ---
 
@@ -174,12 +174,12 @@ inv_crypto_transactions
 - `totalAmount` → decimal (به ارز `currency`)
 - `priceBase` → decimal (معادل `price` به ارز پایه کاربر (`baseCurrency`)، طبق «ارز پایه محاسبات» — الزامی برای `buy`/`sell`)
 - `totalAmountBase` → decimal (معادل `totalAmount` به ارز پایه — این فیلد و نه `totalAmount` است که در فرمول‌های Weighted Average/Realized P&L و به‌روزرسانی `inv_crypto_holdings` استفاده می‌شود)
-- `priceHistoryId` → UUID (nullable — لینک به `price_history.id`؛ رکورد دقیقی از `price_history` که `priceBase` از آن محاسبه شده. برای معاملات رمزارز-به-رمزارز که قیمت از `getLatestPrice()` می‌آید الزامی است؛ برای معاملات ریالی/USDT که قیمت را کاربر مستقیم وارد می‌کند `null` است)
+- `priceHistoryId` → UUID (nullable — لینک به `price_history.id`؛ رکورد دقیقی از `price_history` که `priceBase` از آن محاسبه شده. برای معاملات رمزارز-به-رمزارز که قیمت از `getLatestPrice('crypto', symbol)` می‌آید الزامی است؛ برای معاملات ریالی/USDT که قیمت را کاربر مستقیم وارد می‌کند `null` است)
 - `feeAssetPriceHistoryId` → UUID (nullable — لینک به `price_history.id` برای قیمتی که `feeAssetPriceToBase` از آن گرفته شده؛ فقط وقتی `feeCurrency` یک رمزارز است الزامی است)
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه ارز پایه کاربر باشد؛ قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر، از `getLatestPrice(feeCurrency, baseCurrency)` — مثلاً اگر `baseCurrency=USDT`، قیمت BTC = ۶۵,۰۰۰ USDT)
-- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه به ارز پایه کاربر — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد. در معامله رمزارز-به-رمزارز که نه ارز اصلی و نه کارمزد ریالی نیستند، `null` می‌ماند و تبدیل از طریق `getLatestPrice()` فیچر `19-Price-Fetching` انجام می‌شود)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه ارز پایه کاربر باشد؛ قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر، از `getLatestPrice('crypto', feeCurrency, baseCurrency)` — مثلاً اگر `baseCurrency=USDT`، قیمت BTC = ۶۵,۰۰۰ USDT)
+- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه به ارز پایه کاربر — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد. در معامله رمزارز-به-رمزارز که نه ارز اصلی و نه کارمزد ریالی نیستند، `null` می‌ماند و تبدیل از طریق `getLatestPrice('crypto', symbol)` فیچر `19-Price-Fetching` انجام می‌شود)
 - `exchangeRateHistoryId` → UUID (nullable — لینک به `cur_exchange_rates.id` (یا رکورد تاریخچه نرخ ارز) که `exchangeRateToBase` از آن گرفته شده؛ برای audit مالی نرخ‌های ریالی)
 - `currency` → string (ارز طرف مقابل معامله: IRR، USDT، یا سیمبل یک رمزارز دیگر برای معاملات رمزارز-به-رمزارز)
 - `tradeId` → UUID (نال مگر برای معامله رمزارز-به-رمزارز طبق قاعده ۲a — UUID مشترک بین رکورد `sell` رمزارز پرداختی و رکورد `buy` رمزارز دریافتی همان معامله)
@@ -537,7 +537,7 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 > - ورودی این فرمول‌ها همیشه `totalAmountBase`/`priceBase` است، نه `totalAmount`/`price` خام تراکنش (که به ارز واقعی پرداخت‌شده است) — طبق «ارز پایه محاسبات».
 > - `feeAmount` باید طبق فرمول بخش «منطق کارمزد» (بالاتر در همین فایل) ابتدا به ارز پایه تبدیل و سپس در `realizedPL`/`totalInvested` لحاظ شود.
 > - **معامله رمزارز-به-رمزارز (قاعده ۲a)**: دو رکورد `sell`/`buy` با `tradeId` مشترک، هرکدام طبق فرمول بالای خودشان (فروش/خرید) روی Holding خودشان اعمال می‌شوند؛ `realizedPL` رکورد `sell` مثل هر فروش دیگری محاسبه و ثبت می‌شود (سود/زیان واقعی روی دارایی پرداختی) و `totalAmountBase` همان رکورد، مبنای هزینه (`totalInvested`) رکورد `buy` طرف مقابل را می‌سازد.
-> - `calculateProfitLoss(symbol?, exchangeId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_crypto_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice(symbol, baseCurrency) - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+> - `calculateProfitLoss(symbol?, exchangeId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_crypto_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice('crypto', symbol, baseCurrency).price - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
 > - در `transfer_out`/`transfer_in` بین صرافی‌های خودی، هیچ `realizedPL`ای ایجاد نمی‌شود (فروش واقعی نیست)؛ فقط `quantity` بین دو Holding جابه‌جا می‌شود و `averageBuyPrice` مقصد باید Weighted Average بین موجودی قبلی مقصد (اگر بود) و مقدار انتقالی با همان `averageBuyPrice` مبدأ باشد.
 
 ---
@@ -547,6 +547,6 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 - میانگین خرید با فرمول Weighted Average به‌روزرسانی می‌شود.
 - `inv_crypto_transactions` و `inv_crypto_exchange_transactions` فقط لاگ هستند.
 - موجودی و میانگین خرید و مجموع کارمزدها در جدول `inv_crypto_holdings` نگهداری می‌شود.
-- قیمت لحظه‌ای رمزارزها از فیچر `19-Price-Fetching` (جدول `price_history`) خوانده می‌شود؛ این فیچر مستقیماً به API بیرونی وصل نمی‌شود — برای Unrealized P&L و ارزش پرتفوی فقط `getLatestPrice(symbol)` را صدا می‌زند.
+- قیمت لحظه‌ای رمزارزها از فیچر `19-Price-Fetching` (جدول `price_history`) خوانده می‌شود؛ این فیچر مستقیماً به API بیرونی وصل نمی‌شود — برای Unrealized P&L و ارزش پرتفوی فقط `getLatestPrice('crypto', symbol)` را صدا می‌زند.
 
 > **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.

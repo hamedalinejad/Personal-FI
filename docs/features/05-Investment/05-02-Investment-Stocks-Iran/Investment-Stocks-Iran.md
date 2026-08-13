@@ -268,7 +268,7 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice(symbol, baseCurrency) - averageBuyPrice) × quantity` محاسبه می‌شود (طبق فیچر `19-Price-Fetching` — به بخش «نکات طراحی» پایین همین فایل مراجعه شود) و نباید با Realized P&L مخلوط شود.
+> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice('stock', symbol, baseCurrency).price - averageBuyPrice) × quantity` محاسبه می‌شود (طبق فیچر `19-Price-Fetching` — به بخش «نکات طراحی» پایین همین فایل مراجعه شود) و نباید با Realized P&L مخلوط شود.
 
 ---
 
@@ -279,5 +279,5 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 - میانگین خرید با Weighted Average محاسبه می‌شود.
 - کارمزدها هم به ریال و هم معادل تتری ثبت می‌شوند.
 - موجودی نقدی کارگزاری جدا از موجودی سهام مدیریت می‌شود.
-- **قیمت لحظه‌ای سهام (برای Unrealized P&L)** از فیچر `19-Price-Fetching` (جدول `price_history` با `assetCategory='stock'`) خوانده می‌شود؛ این فیچر مستقیماً به API بیرونی وصل نمی‌شود — فقط `getLatestPrice(symbol)` را صدا می‌زند.
+- **قیمت لحظه‌ای سهام (برای Unrealized P&L)** از فیچر `19-Price-Fetching` (جدول `price_history` با `assetCategory='stock'`) خوانده می‌شود؛ این فیچر مستقیماً به API بیرونی وصل نمی‌شود — فقط `getLatestPrice('stock', symbol)` را صدا می‌زند.
 - در آینده زیر‌فیچر جداگانه‌ای برای سهام خارجی اضافه خواهد شد.

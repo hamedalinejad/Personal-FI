@@ -73,7 +73,7 @@ stores/
 | `lastFetchResult` | `FetchResult \| null` | خلاصه آخرین fetch (succeeded/failed) — فقط برای نمایش در UI؛ داده واقعی در `price_history` است |
 | `autoSyncActive` | `boolean` | آیا تایمر Auto-Sync الان در حال اجرا است |
 
-> این Store هیچ‌وقت قیمت‌های واقعی را کش نمی‌کند — فقط وضعیت UI عملیات fetch را نگه می‌دارد. آخرین قیمت واقعی همیشه از `price_history` (SQLite) از طریق `getLatestPrice()` خوانده می‌شود.
+> این Store هیچ‌وقت قیمت‌های واقعی را کش نمی‌کند — فقط وضعیت UI عملیات fetch را نگه می‌دارد. آخرین قیمت واقعی همیشه از `price_history` (SQLite) از طریق `getLatestPrice(assetCategory, symbol)` خوانده می‌شود.
 
 ---
 

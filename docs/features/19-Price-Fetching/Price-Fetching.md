@@ -56,7 +56,7 @@
 - **دستی/On-Demand:** کاربر روی دکمه «دریافت قیمت‌ها» کلیک می‌کند → سیستم **فقط همان یک بار** به اینترنت وصل می‌شود، نتیجه را می‌گیرد، ذخیره می‌کند و تمام.
 - **خودکار/Auto-Sync (اختیاری، Opt-in):** اگر کاربر از تنظیمات فعالش کرده باشد، تا وقتی اپ **باز و در Foreground** است و مرورگر گزارش می‌دهد که آنلاین است (`navigator.onLine`)، هر `syncIntervalMinutes` دقیقه یک‌بار خودش Batch را صدا می‌زند. این حالت **پیش‌فرض خاموش** است؛ کاربر باید صریحاً روشنش کند (طبق قانون ۱ بالا). اپ بسته یا در پس‌زمینه یا آفلاین → auto-sync اصلاً اجرا نمی‌شود (نسخه ۱ از Background Sync واقعی سرویس‌ورکر استفاده نمی‌کند، فقط از یک تایمر سبک وقتی تب باز است — به همین دلیل مصرف باتری/داده کنترل‌شده می‌ماند).
 
-هر دو مسیر در همان جدول `price_history` ذخیره می‌شوند؛ تنها تفاوتشان فیلد `source` رکورد است (`manual` در برابر `api`، به بخش «Domain Entities» نگاه کنید) — از نظر بقیه سیستم (`getLatestPrice`) کاملاً یکسان مصرف می‌شوند.
+هر دو مسیر در همان جدول `price_history` ذخیره می‌شوند؛ تنها تفاوتشان فیلد `source` رکورد است (`manual` در برابر `api`، به بخش «Domain Entities» نگاه کنید) — از نظر بقیه سیستم (`getLatestPrice(assetCategory, symbol)`) کاملاً یکسان مصرف می‌شوند.
 
 ---
 
@@ -65,7 +65,7 @@
 1. هر منبع قیمت (Provider) به‌صورت مستقل در `price_sources` تعریف می‌شود؛ هر نماد می‌تواند از چند منبع قیمت بگیرد (مثلاً BTC هم از منبع A هم از منبع B).
 2. دریافت از API همیشه با اراده کاربر شروع می‌شود — یا با کلیک دستی، یا (در صورت فعال بودن) با تایمر Auto-Sync که خودِ کاربر روشنش کرده. **هیچ حالت سومی وجود ندارد.**
 3. هر بار دریافت موفق (چه دستی، چه Auto-Sync، چه ثبت دستی کاربر)، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی هرگز overwrite/حذف نمی‌شوند تا امکان نمودار تاریخچه قیمت حفظ شود.
-4. آخرین قیمت هر نماد از طریق `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود؛ این تابع همیشه جدیدترین رکورد `price_history` را برمی‌گرداند (فارغ از این‌که منبعش `manual` بوده یا `api`)، نه میانگین.
+4. آخرین قیمت هر نماد از طریق `getLatestPrice(assetCategory, symbol, targetCurrency?)` خوانده می‌شود؛ پارامتر `assetCategory` **اجباری و اول** است — چون یک نماد مثل `LINK` می‌تواند هم در کریپتو و هم در سهام وجود داشته باشد و بدون این پارامتر Query ممکن است رکورد اشتباه را برگرداند. این تابع همیشه جدیدترین رکورد `price_history` را با فیلتر `WHERE assetCategory = ? AND symbol = ?` برمی‌گرداند (فارغ از این‌که منبعش `manual` بوده یا `api`)، نه میانگین.
 5. **قبل از هر تلاش برای اتصال (چه دستی چه Auto-Sync)**، سیستم ابتدا `navigator.onLine` را چک می‌کند؛ اگر `false` باشد، حتی تلاش برای Request هم نمی‌شود — مستقیم پیام «آفلاین هستید» نشان داده می‌شود (نه Timeout و نه Retry بی‌مورد که باتری/داده هدر بدهد). اگر `navigator.onLine = true` بود ولی Request واقعاً شکست خورد (سرور در دسترس نیست)، همان رفتار قاعده ۷ (Partial/Full Failure) اجرا می‌شود.
 6. اگر اتصال اینترنت یا API در دسترس نباشد، آخرین قیمت کش‌شده (آخرین رکورد `price_history`، صرف‌نظر از `manual`/`api` بودنش) همراه با برچسب «قیمت قدیمی — آخرین به‌روزرسانی: [تاریخ/ساعت]» نمایش داده می‌شود؛ خطای دریافت هرگز نباید مانع کارکرد بقیه اپ (دیدن پرتفوی، ثبت تراکنش جدید و ...) شود.
 7. کلید API (در صورت نیاز منبع به کلید) هرگز در دیتابیس یا LocalStorage ذخیره نمی‌شود (طبق قانون `db.md`: «داده‌های حساس هرگز ذخیره نشوند»)؛ در Session Storage یا فایل تنظیمات محلی خارج از دیتابیس نگهداری می‌شود.
@@ -77,7 +77,7 @@
     - وقتی کاربر می‌خواهد قیمتی را که خودش تأیید می‌کند جایگزین آخرین قیمت API کند
     - پیگیری قیمت یک دارایی که هنوز نخریده ولی در نظر دارد بخرد
 
-    > این رکوردها در `price_history` با `source='manual'` ذخیره می‌شوند و `getLatestPrice()` آن‌ها را دقیقاً مثل رکوردهای `api` می‌بیند — هیچ تفاوتی در مصرف ندارند.
+    > این رکوردها در `price_history` با `source='manual'` ذخیره می‌شوند و `getLatestPrice(assetCategory, symbol)` آن‌ها را دقیقاً مثل رکوردهای `api` می‌بیند — هیچ تفاوتی در مصرف ندارند.
 
 ---
 
@@ -141,19 +141,31 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 ### مدیریت منبع و تاریخچه
 - `getAllSources(assetCategory?)`
 - `createSource(data)` / `updateSource(id, data)`
-- `getLatestPrice(symbol, targetCurrency?)` → آخرین قیمت کش‌شده یک نماد (از هر دو منبع `manual`/`api`)
+- `getLatestPrice(assetCategory, symbol, targetCurrency?)` → آخرین قیمت کش‌شده یک نماد (از هر دو منبع `manual`/`api`)
+
+  > **چرا `assetCategory` اجباری و اول است؟** یک نماد مثل `LINK` (Chainlink) در کریپتو و `LINK` در سهام بورس می‌تواند همزمان در `price_history` وجود داشته باشد. کوئری بدون این فیلتر (`WHERE symbol = 'LINK' ORDER BY fetchedAt DESC LIMIT 1`) ممکن است قیمت دارایی اشتباه را برگرداند — باگ ساکت و بحرانی در محاسبه P&L. کوئری درست: `WHERE assetCategory = ? AND symbol = ? ORDER BY fetchedAt DESC LIMIT 1`.
+
   ```typescript
+  // امضای درست — assetCategory همیشه اول و اجباری است
+  getLatestPrice(
+    assetCategory: AssetCategory,  // 'crypto' | 'stock' | 'fif' | 'metal'
+    symbol: string,
+    targetCurrency?: string        // اگر داده شود، تبدیل به این ارز با cur_exchange_rates
+  ): LatestPrice | null
+
   interface LatestPrice {
+    assetCategory: AssetCategory,
+    symbol: string,
     price: Decimal,
     priceCurrency: string,        // ارزی که قیمت در آن است (USDT, IRR, etc.)
     timestamp: datetime,          // لحظه دریافت/ثبت قیمت
-    isStale: boolean,            // بر اساس TTL این asset category
+    isStale: boolean,             // بر اساس TTL این asset category
     source: 'manual' | 'api',    // منشأ قیمت
     triggeredBy?: 'user_click' | 'auto_sync' | 'manual_entry'
   }
   ```
-  
-- `getPriceHistory(symbol, dateRange?)` → برای نمودار تاریخچه قیمت
+
+- `getPriceHistory(assetCategory, symbol, dateRange?)` → برای نمودار تاریخچه قیمت (`assetCategory` اینجا هم اجباری است به همان دلیل)
 
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
 - `fetchAndStorePrices(symbols[], sourceId, triggeredBy: 'user_click' | 'auto_sync')`:
@@ -186,7 +198,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 ## روابط با سایر فیچرها
 
-- **Investment - Crypto / Stocks Iran / FIF / Metals**: این فیچرها برای محاسبه Unrealized P&L و ارزش لحظه‌ای پرتفوی فقط از `getLatestPrice()` می‌خوانند؛ خودشان هرگز API خارجی صدا نمی‌زنند و هرگز خودشان تصمیم به آنلاین‌شدن نمی‌گیرند. برای FIF، تابع `updateNAV(fundId, nav, date)` خودِ فیچر Investment در واقع یک لایه نازک روی `setManualPrice`/`fetchAndStorePrices` همین فیچر است (به `19-03-Fund-NAV` مراجعه شود) تا NAV هم در `inv_fif_holdings.currentNAV` (برای سرعت) و هم در `price_history` (برای تاریخچه و استاندارد یکپارچه) ثبت شود.
+- **Investment - Crypto / Stocks Iran / FIF / Metals**: این فیچرها برای محاسبه Unrealized P&L و ارزش لحظه‌ای پرتفوی فقط از `getLatestPrice(assetCategory, symbol)` می‌خوانند؛ خودشان هرگز API خارجی صدا نمی‌زنند و هرگز خودشان تصمیم به آنلاین‌شدن نمی‌گیرند. برای FIF، تابع `updateNAV(fundId, nav, date)` خودِ فیچر Investment در واقع یک لایه نازک روی `setManualPrice`/`fetchAndStorePrices` همین فیچر است (به `19-03-Fund-NAV` مراجعه شود) تا NAV هم در `inv_fif_holdings.currentNAV` (برای سرعت) و هم در `price_history` (برای تاریخچه و استاندارد یکپارچه) ثبت شود.
 - **Portfolio & Wealth Overview**: استفاده از آخرین قیمت‌ها برای Snapshot ارزش کل ثروت — کاملاً از دادهٔ محلی، بدون هیچ اتصال شبکه.
 - **Currency & Multi-Currency**: تبدیل نهایی قیمت به ارز پایه کاربر با `cur_exchange_rates` انجام می‌شود، نه در همین فیچر.
 - **Settings & Tools**: مدیریت منابع قیمت و تنظیمات Auto-Sync (`price_sync_settings`) از صفحه تنظیمات انجام می‌شود؛ این فیچر صفحه مستقل در ناوبری اصلی ندارد (طبق اصل «صفحات کم» در `Pages-IA.md`) و به‌صورت دکمه «دریافت قیمت‌ها» + سوییچ «به‌روزرسانی خودکار» داخل صفحه «سرمایه‌گذاری» (`/investments`) و بخش تنظیمات (`/settings`) نمایش داده می‌شود.

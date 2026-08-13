@@ -32,7 +32,7 @@
 ## APIهای داخلی
 
 - `fetchStockPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص سهام روی `fetchAndStorePrices` فیچر پدر (`assetCategory='stock'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped` سند کریپتو.
-- `getLatestStockPrice(symbol)` → میانبر روی `getLatestPrice(symbol)` با `assetCategory='stock'`
+- `getLatestStockPrice(symbol)` → میانبر روی `getLatestPrice('stock', symbol)` — `assetCategory='stock'` همیشه hardcode است
 - `setManualStockPrice(symbol, price)` → ثبت دستی، `priceCurrency='IRR'` ثابت (بر خلاف کریپتو که پایه USDT است، اینجا پایه ریال است چون کل بازار سهام ایران ریالی است)
 - `getStockAutoSyncSettings()` / `setStockAutoSyncSettings(data)`
 

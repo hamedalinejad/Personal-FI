@@ -235,7 +235,7 @@ averageBuyPricePerMg  بدون تغییر می‌ماند  // Weighted Average �
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
 > - در `type=physical_delivery`، هیچ `realizedPL`ای محاسبه نمی‌شود (فروش واقعی نیست)؛ فقط `quantityMg` کاهش و به دارایی فیزیکی منتقل می‌شود؛ `deliveryFee` جداگانه از موجودی نقدی پلتفرم کسر می‌شود (نه از `soldPortionCost`).
-> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود، که در آن `currentPricePerMg = getLatestPrice(metalType, baseCurrency) / 1000` است (چون `19-Price-Fetching` قیمت را به‌ازای هر گرم برمی‌گرداند — به بخش «نکات طراحی» پایین همین فایل مراجعه شود).
+> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود، که در آن `currentPricePerMg = getLatestPrice('metal', '{metalType}_{purity}', baseCurrency).price / 1000` است (چون `19-Price-Fetching` قیمت را به‌ازای هر گرم برمی‌گرداند — به بخش «نکات طراحی» پایین همین فایل مراجعه شود).
 
 
 نکات طراحی

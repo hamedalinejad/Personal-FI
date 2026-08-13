@@ -50,7 +50,7 @@
     triggeredBy: 'user_click' | 'auto_sync'
   }
   ```
-- `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice(symbol)` فیچر پدر، مخصوص `assetCategory='crypto'`
+- `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice('crypto', symbol)` فیچر پدر — `assetCategory='crypto'` همیشه hardcode است تا collision با نمادهای هم‌نام در سهام/فلزات ممکن نباشد
 - `setManualCryptoPrice(symbol, price)` → میانبر روی `setManualPrice(symbol, price, priceCurrency='USDT')` فیچر پدر؛ کاملاً آفلاین
 - `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
 

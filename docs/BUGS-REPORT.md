@@ -59,9 +59,9 @@
 **شرح:** برخلاف نتیجه‌گیری قبلی این گزارش، یک باگ محاسباتی واقعی وجود داشت: User Story فقط «ریالی یا تتری» را پوشش می‌داد و فرمول Weighted Average مستقیماً از `price`/`totalAmount` **خام** (به ارز پرداخت همان تراکنش) استفاده می‌کرد. اگر کاربر یک دارایی را یک‌بار با تتر و بار دیگر مستقیماً با یک رمزارز دیگر (بدون عبور از ریال/تتر) می‌خرید، این دو مبلغ اصلاً هم‌ارز نبودند و جمع‌شان در `totalInvested`/`averageBuyPrice` نتیجه‌ای کاملاً غلط تولید می‌کرد. همچنین هیچ مدل داده‌ای برای معامله مستقیم رمزارز-به-رمزارز (مثلاً خرید BTC با پرداخت ETH) وجود نداشت.
 **راه‌حل اعمال‌شده:**
 - افزوده‌شدن بخش «ارز پایه محاسبات» که تصریح می‌کند `averageBuyPrice`/`totalInvested` در `inv_crypto_holdings` همیشه به `baseCurrency` کاربرند، نه ارز پرداخت هر تراکنش (هم‌راستا با تغییرنام قبلی `totalFeesPaidBase`).
-- افزودن فیلدهای `priceBase`/`totalAmountBase` به `inv_crypto_transactions` (معادل هر تراکنش به ارز پایه، با استفاده از `exchangeRateToBase` یا `getLatestPrice()` از فیچر `19-Price-Fetching`)، دقیقاً مطابق الگوی موجود `feeAssetPriceToBase`.
+- افزودن فیلدهای `priceBase`/`totalAmountBase` به `inv_crypto_transactions` (معادل هر تراکنش به ارز پایه، با استفاده از `exchangeRateToBase` یا `getLatestPrice('crypto', symbol)` از فیچر `19-Price-Fetching`)، دقیقاً مطابق الگوی موجود `feeAssetPriceToBase`.
 - افزودن قانون کسب‌وکار ۲a: معامله رمزارز-به-رمزارز به‌صورت دو رکورد لینک‌شده (`sell` + `buy`) با یک `tradeId` مشترک (مشابه الگوی `transferId`) ثبت می‌شود؛ فروش، سود/زیان واقعی روی دارایی پرداختی تولید می‌کند و مبنای هزینه خرید طرف مقابل را می‌سازد.
-- به‌روزرسانی فرمول‌های Realized/Unrealized P&L برای استفاده از `totalAmountBase`/`priceBase` به‌جای مقادیر خام، و ارجاع Unrealized P&L به `getLatestPrice(symbol, baseCurrency)`.
+- به‌روزرسانی فرمول‌های Realized/Unrealized P&L برای استفاده از `totalAmountBase`/`priceBase` به‌جای مقادیر خام، و ارجاع Unrealized P&L به `getLatestPrice('crypto', symbol, baseCurrency)`.
 
 ### باگ ۸ — `exchangeRateToBase` و `feeAssetPriceToUSDT` در معامله رمزارز-به-رمزارز/کارمزد غیر-USDT بی‌معنی بودند
 **محل:** `Investment-Crypto.md` — بخش «منطق کارمزد» و جدول‌های `inv_crypto_transactions`/`inv_crypto_exchange_transactions`

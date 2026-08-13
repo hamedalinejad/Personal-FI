@@ -40,7 +40,7 @@
 
 - `setManualFundNAV(fundId, nav, date)` → جایگزین مستقیم `updateNAV` قبلی در `Fixed-Income-Funds.md`؛ داخلش `setManualPrice(fundId, nav, priceCurrency='IRR')` فیچر پدر را صدا می‌زند و علاوه‌بر آن `inv_fif_holdings.currentNAV` را هم به‌روزرسانی می‌کند (برای سازگاری با APIهای موجود فیچر Investment).
 - `fetchFundNAV(fundId)` → فقط برای صندوق‌هایی با `price_sources` اختصاصی تعریف‌شده؛ یک صندوق در هر بار (نه Batch سراسری مثل بقیه زیرفیچرها).
-- `getLatestFundNAV(fundId)` → میانبر روی `getLatestPrice(fundId)` با `assetCategory='fif'`
+- `getLatestFundNAV(fundId)` → میانبر روی `getLatestPrice('fif', fundId)` — `assetCategory='fif'` همیشه hardcode است
 - `getFundAutoSyncSettings(fundId)` / `setFundAutoSyncSettings(fundId, data)`
 
 ---
