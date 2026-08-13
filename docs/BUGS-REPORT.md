@@ -9,6 +9,19 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۵۶ — Tax از Investment جدا بود بدون metadata روی معامله
+**راه‌حل:** فیلدهای tax metadata اجباری روی تراکنش‌های Investment (isTaxableEvent, cost basis, proceeds, realizedGain, taxYear, …)؛ قرارداد در Tax-Management؛ پل getTaxableEvents.
+
+### باگ ۵۷ — Audit Trail ناکافی
+**راه‌حل:** operationId، createdBy، source، reason، reversalOf روی عملیات حساس؛ fin_audit_log اختیاری برای void/repair.
+
+### باگ ۵۸ — License نباید به Data Model مالی قفل شود
+**راه‌حل:** لایسنس بیرون SQLite مالی؛ بدون FK لایسنس به تراکنش‌ها؛ backup/restore آفلاین مستقل از سرور لایسنس.
+
+### باگ ۵۹ — Domain زیاد ≠ صفحه زیاد
+**راه‌حل:** تأیید الگوی Price Fetching/Tax/Documents؛ قانون «فیچر جدید اول داخل ۹ صفحه موجود».
+
+
 ### باگ ۵۱ — Reconciliation مرکزی نبود (Critical)
 **راه‌حل:** APIهای reconcileAccount/Crypto/Brokerage/Fund/Metals/Loan/Portfolio/All؛ مقایسه snapshot با ledger؛ خروجی ReconcileResult؛ بدون auto-repair در v1.
 

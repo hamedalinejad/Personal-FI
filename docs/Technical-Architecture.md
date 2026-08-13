@@ -153,3 +153,16 @@ UI / Hooks
 - **CHECK + FK**: schema سطح SQLite با CHECK و ON DELETE صریح؛ پیش‌فرض مالی RESTRICT.
 - **Polymorphic links**: Domain validate + reconcile؛ SQLite enforce کامل ندارد.
 - **Time**: UTC timestamps + فیلدهای business/market/settlement/due جدا برای بازار ایران.
+
+---
+
+## مرز License و داده مالی (باگ ۵۸)
+
+مدل v1: **هر کاربر منطقی = یک فایل SQLite مستقل** (مناسب offline).
+
+### قوانین مرزبندی
+1. **License هرگز داخل DB مالی کاربر به‌عنوان وابستگی معنایی ذخیره نمی‌شود** — نه foreign key به تراکنش‌ها، نه قفل کردن ردیف‌های مالی بر اساس وضعیت لایسنس.
+2. وضعیت لایسنس در storage جدا (مثلاً LocalStorage رمزشده / فایل تنظیمات اپ / حافظه امن) با `lastValidatedAt` و Grace Period (طبق سیاست شبکه).
+3. لایه License فقط تعیین می‌کند کدام فایل DB باز شود یا آیا قابلیت‌های محصولی فعال‌اند — **نه** اینکه داده مالی چگونه تفسیر شود.
+4. Backup/Export مالی می‌تواند بدون اسرار لایسنس باشد؛ Restore مالی نباید به سرور لایسنس نیاز داشته باشد (offline-first).
+5. Implementation آینده multi-user/cloud نباید `acc_transactions` را با `licenseId` آلوده کند؛ mapping کاربر↔فایل DB بیرون از schema مالی است.

@@ -201,3 +201,29 @@
 3. هر بار که فیچر جدیدی اضافه می‌شود، این سند **قبل از شروع پیاده‌سازی UI** آپدیت شود.
 4. تغییر sub-route نیازی به تصمیم محصولی ندارد؛ تغییر در ستون «صفحه اصلی» جدول بالا نیاز به بحث تیم دارد.
 5. هر Sheet/Modal باید یک route داشته باشد (نه state در حافظه) تا Deep Link و بازگشت با دکمه Back مرورگر/موبایل درست کار کند.
+
+---
+
+## Domain زیاد، صفحه کم (باگ ۵۹ — خطر معماری، نه باگ منطقی)
+
+تعداد **Feature/Domain** زیاد است (Accounts, Income, Expense, Cheque, Loans, Investment, Assets, Budget, Goals, Bills, Notifications, Reports, Dashboard, Portfolio, Tax, Documents, Settings, Currency, Security, Price Fetching، …). این برای modularity خوب است.
+
+### قانون طلایی محصول
+**هر Domain ≠ یک صفحه Navigation.**
+
+الگوی تأییدشده:
+| Domain | محل UI |
+|--------|--------|
+| Price Fetching | کنترل داخل `/investments` + `/settings` — **بدون route ناوبری** |
+| Tax | زیر `/reports/tax` |
+| Documents | از داخل فیچرها + `/settings/documents` |
+| Currency | Settings / هنگام تراکنش |
+| Security | Settings |
+| Notifications | سیستم + بخش‌های مرتبط، نه لزوماً تب اصلی جدا |
+| Portfolio | Dashboard و/یا تب گزارش/سرمایه‌گذاری |
+
+### قوانین
+1. فیچر جدید اول باید در یکی از **۹ صفحه اصلی** جا شود (طبق جدول بالا).
+2. فقط با اثبات قطعی نیاز محصولی، صفحه ناوبری جدید اضافه می‌شود.
+3. Implementation: پوشه `features/*` می‌تواند زیاد باشد؛ `Pages-IA` و ناوبری باید کم بمانند.
+4. Internal API و Domain جدا از IA صفحات است — زیاد شدن Domain به معنی زیاد شدن منو نیست.

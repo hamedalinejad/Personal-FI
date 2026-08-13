@@ -89,6 +89,7 @@
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
+- **Tax metadata (باگ ۵۶)**: `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount` (هم‌راستا با `feeTax`), `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — قرارداد کامل در `Tax-Management.md`
 
 **Invariant جدید:**
 

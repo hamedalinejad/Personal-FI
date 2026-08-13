@@ -502,6 +502,8 @@ COMMIT;
 2. Reversal = تراکنش معکوس جدید، نه حذف خام تاریخچه (طبق قوانین موجود void).
 3. اگر persist بعد از COMMIT حافظه شکست بخورد، طبق باگ ۴۳ رفتار خطا — نه «ثبت شد» کاذب.
 4. پیاده‌سازی‌ها در Featureهای مختلف باید از یک helper مشترک `runAtomicFinancialOperation(fn)` در `db/` یا `core` استفاده کنند تا رفتار یکسان بماند.
+5. هر فراخوانی یک `operationId` تولید و روی تمام ردیف‌های همان COMMIT می‌نویسد (باگ ۵۷ Audit).
+6. در فروش/سود مشمول مالیات، tax metadata (باگ ۵۶) در همان COMMIT پر می‌شود.
 
 
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
@@ -641,3 +643,35 @@ SQLite نمی‌تواند enforce کند که `relatedId` به جدول درس�
 4. Price snapshot: `fetchedAt` (UTC) + در صورت نیاز `marketDate` برای NAV روزانه.
 5. هیچ محاسبه سود/جریمه دیرکرد صرفاً روی timezone محلی مرورگر بدون ذخیره businessDate انجام نشود.
 
+---
+
+## قرارداد Audit Trail مالی (باگ ۵۷)
+
+Immutable transaction کافی نیست؛ برای عملیات حساس باید ردپای عملیاتی مشخص باشد (آینده multi-user / license).
+
+### فیلدهای مشترک Audit (روی جداول تراکنش مالی و عملیات حساس)
+
+| فیلد | الزام v1 | توضیح |
+|------|----------|--------|
+| `createdAt` | بله | از قبل |
+| `createdBy` | بله (nullable در single-user) | شناسه کاربر منطقی؛ در v1 می‌تواند `'local'` یا null |
+| `operationId` | بله | UUID یکسان برای همه ردیف‌های یک `runAtomicFinancialOperation` |
+| `reversalOf` / `relatedTransactionId` | بله وقتی reversal | لینک به عملیات/تراکنش اصلی |
+| `source` | بله | `ui` \| `import` \| `system` \| `migration` \| `api` |
+| `reason` | برای void/reversal/repair | متن کوتاه دلیل |
+
+### جدول اختیاری `fin_audit_log` (Should Have قوی)
+
+```text
+id, operationId, action, entityTable, entityId,
+actorId, source, reason, payloadSummary, createdAt
+```
+
+- برای تغییر وضعیت‌های حساس (void، restore، repair reconcile، تغییر تنظیمات امنیتی)
+- payload کامل اسرار (API key) هرگز در audit ذخیره نشود
+
+### قوانین
+1. هر atomic financial op یک `operationId` مشترک روی تمام ردیف‌های نوشته‌شده در همان COMMIT دارد.
+2. Reversal باید `reversalOf` / `relatedTransactionId` پر کند.
+3. Import انبوه `source='import'` می‌گیرد.
+4. حذف فیزیکی ردیف audit ممنوع.

@@ -279,3 +279,5 @@ fineWeightMg = quantityMg × purityRatio
 - `inv_metals_physical_deliveries` فقط جزئیات لجستیک را نگه می‌دارد.
 - `deliveryFee` همیشه از موجودی نقدی پلتفرم کسر می‌شود.
 - این زیر‌فیچر مخصوص پلتفرم‌های ایران است (طلا، نقره، مس، سکه).
+
+> **Tax metadata (باگ ۵۶)**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.

@@ -154,6 +154,13 @@
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
+- **Tax metadata (باگ ۵۶)** — طبق قرارداد `Tax-Management.md`:
+  - `isTaxableEvent` → boolean
+  - `costBasisAmount` / `costBasisCurrency` → decimal/string nullable
+  - `proceedsAmount` / `realizedGainAmount` → decimal nullable
+  - `taxYear` → number nullable
+  - `withholdingTaxAmount` → decimal nullable
+  - `taxLotId` / `linkedTaxRecordId` / `taxExemptReason` → nullable
 
 ### ۵. Crypto Exchange Transaction (جدول: `inv_crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
 

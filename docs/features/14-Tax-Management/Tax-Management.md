@@ -139,3 +139,37 @@
 - نرخ تتر در زمان ثبت و پرداخت ذخیره می‌شود تا ارزش تاریخی قابل بررسی باشد.
 - تراکنش مالیاتی واقعی همیشه از طریق Expense/Income ثبت می‌شود، نه مستقیماً در `acc_transactions`.
 - در نسخه‌های بعدی می‌توان قالب‌های آماده برای انواع رایج مالیات اضافه کرد.
+
+---
+
+## قرارداد Tax Metadata روی تراکنش‌های سرمایه‌گذاری (باگ ۵۶)
+
+Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بعدی مالیات باید از همان لحظه ثبت معامله حفظ شود** — بعداً قابل بازیابی از هیچ‌جا نیست («هیچ فیلدی از بین نره»).
+
+### فیلدهای مشترک (روی جداول تراکنش Investment)
+
+روی `inv_crypto_transactions`, `inv_stocks_iran_transactions`, `inv_fif_transactions`, `inv_metals_transactions` (و در صورت نیاز physical):
+
+| فیلد | نوع | توضیح |
+|------|-----|--------|
+| `taxLotId` | UUID nullable | گروه lot برای FIFO/LIFO آینده |
+| `costBasisAmount` | decimal nullable | مبنای هزینه در لحظه (پس از fee تخصیص‌یافته) |
+| `costBasisCurrency` | string nullable | |
+| `proceedsAmount` | decimal nullable | عایدی فروش/ابطال قبل از مالیات (برای sell/redemption) |
+| `realizedGainAmount` | decimal nullable | سود/زیان تحقق‌یافته محاسبه‌شده در همان atomic op |
+| `isTaxableEvent` | boolean | پیش‌فرض true برای sell/dividend؛ false برای transfer داخلی در صورت تعریف |
+| `taxExemptReason` | string nullable | اگر مشمول نیست |
+| `taxYear` | number nullable | سال مالیاتی business (جلالی یا میلادی طبق تنظیم — در v1 عدد سال businessDate) |
+| `withholdingTaxAmount` | decimal nullable | مالیات کسرشده در مبدأ (مثلاً بخشی از feeTax سهام) |
+| `linkedTaxRecordId` | UUID nullable | لینک به `tax_records` بعد از ایجاد رکورد مالیاتی |
+
+### قوانین
+1. در `runAtomicFinancialOperation` فروش/سود نقدی، حداقل `isTaxableEvent`, `costBasisAmount`/`proceedsAmount` یا `realizedGainAmount`, `taxYear` باید در همان COMMIT نوشته شوند (اگر قابل محاسبه باشند).
+2. Tax Feature **منبع حقیقت رویداد** نیست؛ از این metadata + reconcile می‌خواند و `tax_records` می‌سازد.
+3. `feeTax` در سهام ایران بخشی از کارمزد است و در `withholdingTaxAmount` یا تفکیک fee نیز منعکس می‌شود (از قبل `feeTax` وجود دارد).
+4. انتقال داخلی (transfer بین صرافی‌های خود کاربر) معمولاً `isTaxableEvent=false` مگر قانون خلاف بگوید.
+5. حذف این فیلدها از schema ممنوع است حتی اگر UI مالیات در v1 ساده باشد.
+
+### API پل
+- `tax.getTaxableEvents(filters)` → خواندن از تراکنش‌های Investment با `isTaxableEvent=true`
+- `tax.attachTaxRecord(transactionRef, taxRecordId)` → پر کردن `linkedTaxRecordId`
