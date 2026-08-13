@@ -135,3 +135,32 @@ from → USDT → to
 - جدول خلاصه رفتار هر فیلد هنگام تغییر `baseCurrency` اضافه شد (Snapshot ثابت vs Cache بازمحاسبه).
 - قانون نمایش داده‌های تاریخی با ذکر ارز پایه زمان ثبت در UI.
 - پیشنهاد هشدار UI قبل از تغییر `baseCurrency`.
+
+---
+
+## ✅ رفع‌شده در بررسی پنجم (باگ ۲۱)
+
+### باگ ۲۱ — تضاد Minor Unit Storage با Crypto Decimal Precision
+**Severity: Critical**  
+**محل:** `docs/core/db/db.md` — بخش «قانون Minor Unit Storage»
+
+**شرح:** معماری قبلی یک قانون Minor Unit واحد برای همه مبالغ داشت، اما دو مشکل بنیادی وجود داشت:
+
+۱. **فیلدهای `quantity` رمزارزها بدون `scale` یا `precision` مشخص** — فقط نوشته شده بود `decimal` بدون اینکه روشن شود این در SQLite چطور ذخیره می‌شود. اگر پیاده‌ساز از `REAL` استفاده می‌کرد، floating point error مستقیماً P&L را خراب می‌کرد (مثلاً `0.1 + 0.2 ≠ 0.3`).
+
+۲. **Minor Unit برای Asset Quantity معنا ندارد** — ساتوشی برای BTC تعریف‌شده است، اما برای SOL (9 decimal)، سایر ERC-20 Tokenها (تا 18 decimal)، یا طلا (4 decimal) هیچ Minor Unit ثابتی وجود ندارد. اعمال Minor Unit یکسان باعث از دست رفتن دقت یا overflow در SQLite INTEGER می‌شد.
+
+**راه‌حل اعمال‌شده در `db.md`:**
+
+بخش «قانون Minor Unit Storage» به چهار زیربخش تفکیک شد:
+
+- **بخش الف — Currency Amount** (مبالغ مالی مثل `totalAmount`, `averageBuyPrice`): همچنان `INTEGER` minor unit در SQLite — با جدول کامل Scale برای هر ارز (IRR=0, USD=2, USDT=6, BTC=8, ETH=9/Gwei).
+- **بخش ب — Asset Quantity** (تعداد دارایی مثل `quantity` در crypto/metals): **`TEXT` (decimal string)** در SQLite، خوانده/نوشته‌شده با `decimal.js` در Domain Layer. دلیل: هر Token precision متفاوتی دارد (BTC=8, SOL=9, ERC-20 تا 18).
+- **بخش ج — جدول خلاصه**: کدام فیلد چه نوع SQLite دارد (INTEGER / TEXT).
+- **بخش د — توابع `toMinorUnit`, `fromMinorUnit`, `parseQuantity`, `formatQuantity`**: در `core/utils/amount.ts` با استفاده از `BigInt` برای Currency Amount (جلوگیری از 53-bit Number overflow برای مقادیر بزرگ IRR).
+
+**قوانین کلیدی اضافه‌شده:**
+- هرگز `REAL` یا `FLOAT` در SQLite برای هیچ فیلد مالی
+- `toFixed()` روی Decimal.js برای جلوگیری از نماد علمی (`1e-8`) هنگام ذخیره در TEXT
+- `BigInt` در Domain Layer برای Currency Amount — هرگز `Number`
+- هنگام P&L: `quantity` (TEXT→Decimal) × `averageBuyPrice` (INTEGER→Decimal) هر دو در Domain Layer تبدیل و سپس ضرب شوند
