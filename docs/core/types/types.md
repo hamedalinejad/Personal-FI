@@ -206,19 +206,22 @@ export function migrateBreakdown(
 ## `events.ts`
 
 ```typescript
+// قانون: تمام مبالغ مالی در payload رویدادها string هستند (نه number)
+// تا با Decimal.js سازگار باشند و از floating-point error جلوگیری شود (طبق قانون ۳)
+
 export type AppEvent =
   // حساب و تراکنش
   | { type: 'TransactionCreated'; payload: { transactionId: UUID; transactionType: TransactionType } }
-  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: number } }
+  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: string } }  // string — مبلغ مالی
   // بودجه
-  | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: number } }
-  | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: number } }
+  | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: string } }  // string — مبلغ مالی
+  | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: string } }  // string — مبلغ مالی
   // سرمایه‌گذاری
-  | { type: 'InvestmentValueUpdated'; payload: { investmentType: RelatedFeature; investmentId: UUID; newValue: number; previousValue: number } }
+  | { type: 'InvestmentValueUpdated'; payload: { investmentType: RelatedFeature; investmentId: UUID; newValue: string; previousValue: string } }  // string — مبالغ مالی
   | { type: 'PortfolioSnapshotCreated'; payload: { snapshotId: UUID; date: Timestamp } }
   // وام
   | { type: 'LoanPaymentDue'; payload: { loanId: UUID; dueDate: Timestamp } }
-  | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: number } }
+  | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: string } }  // string — مبلغ مالی
   // چک
   | { type: 'ChequeDue'; payload: { chequeId: UUID; dueDate: Timestamp } }
   | { type: 'ChequeStatusChanged'; payload: { chequeId: UUID; newStatus: string } }
@@ -226,7 +229,7 @@ export type AppEvent =
   | { type: 'MetalsDeliveryStatusChanged'; payload: { deliveryId: UUID; newStatus: string } }
   // مالیات
   | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } }
-  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: number; transactionId: UUID } }
+  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: string; transactionId: UUID } }  // string — مبلغ مالی
   // دریافت قیمت (Price Fetching — فیچر ۱۹)
   | { type: 'PriceFetchCompleted'; payload: PriceFetchResult }
   | { type: 'PriceFetchStarted'; payload: { symbols: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
