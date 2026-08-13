@@ -710,3 +710,18 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 Ledger correct + Snapshot wrong  → rebuild snapshot from ledger
 Ledger wrong                     → reversal/corrective transactions (never silent snapshot edit as truth)
 ```
+
+---
+
+## Multi-Tab Concurrency (BUG-031)
+
+sql.js در هر Tab یک کپی در RAM دارد. بدون هماهنگی، Last-Write-Wins می‌تواند تراکنش Tab دیگر را در IndexedDB overwrite کند.
+
+### قرارداد نسخه ۱
+1. **Single-Writer lock** با `navigator.locks` (در صورت پشتیبانی) روی نام `personal-fi-db-writer`.
+2. قبل از persist: خواندن `db_meta.version` از IndexedDB؛ اگر با version حافظه یکی نبود → **Conflict** — UI: «داده از Tab دیگر تازه‌تر است؛ Reload».
+3. بعد از swap موفق: `version++` در meta.
+4. اگر `navigator.locks` نبود: هشدار در UI وقتی چند Tab تشخیص داده شد (`BroadcastChannel('personal-fi')` heartbeat) + توصیه به یک Tab.
+5. عملیات مالی در Tab غیر-holder قفل: صف یا reject با پیام واضح — نه silent LWW.
+
+v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از از دست رفتن commit بدون اطلاع کاربر است.

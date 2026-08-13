@@ -9,6 +9,34 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-031 — Multi-tab sql.js
+**راه‌حل:** navigator.locks + db version optimistic; conflict → reload; no silent LWW.
+
+### BUG-032 — Version check vs offline
+**راه‌حل:** sole default network exception; toggleable; documented in onboarding/settings.
+
+### BUG-033 — API key lifecycle
+**راه‌حل:** per-provider session keys; clear on tab close/crash; never in logs/backup.
+
+### BUG-034 — Event bus money as string
+**راه‌حل:** reinforce all financial event payloads are decimal strings.
+
+### BUG-035 — Unify fetch result types
+**راه‌حل:** ProviderFetchResult → map to single PriceFetchResult public API.
+
+### BUG-036 — price_history instrumentId
+**راه‌حل:** assetCategory + instrumentId; symbol not sole identity (FIF fundId).
+
+### BUG-037/038 — Quote + marketDate
+**راه‌حل:** marketDate + quoteType; latest for NAV/stock by marketDate not only fetchedAt.
+
+### BUG-039 — Route sprawl
+**راه‌حل:** prefer generic sheets; justify new sub-routes; bookmark only key paths.
+
+### BUG-040 — Enforce feature boundaries
+**راه‌حل:** public-api imports + ESLint/arch tests required at implementation.
+
+
 ### BUG-026 — Declining rate vs frequency
 **راه‌حل:** r فقط از getPeriodRate؛ weekly/52، quarterly/4، custom days/365؛ ممنوع annual/12 ثابت در فرمول اصلی.
 

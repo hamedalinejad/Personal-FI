@@ -176,6 +176,10 @@ export interface ProviderFetchResult {
   skipped: Array<{ symbol: string; reason: string }>;
 }
 
+// BUG-035: مرز عمومی اپ فقط PriceFetchResult است.
+// ProviderFetchResult خروجی خام Adapter است؛ Application آن را به PriceFetchResult نگاشت می‌کند.
+// Crypto/Stocks wrappers نباید نوع سومی با Decimal class در public API تعریف کنند.
+
 export interface PriceProviderAdapter {
   readonly adapterKey: string;
   readonly supportedAssetCategories: AssetCategory[];

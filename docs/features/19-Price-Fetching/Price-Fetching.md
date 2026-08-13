@@ -418,3 +418,38 @@ Adapter فقط `PriceAssetRef` می‌گیرد — نه Holding خام متفا�
 `exchangeRateToBase` روی **تراکنش** برای تبدیل تاریخی مبلغ معامله است؛ برای ارزش‌گذاری holding در زمان T:
 `valueInBase(T) = quantity × price(T) × rate(priceCurrency → base, at T)`  
 نرخ تتر جدا بدون `priceCurrency` و `asOf` کافی نیست.
+
+---
+
+## شناسه قیمت در `price_history` (BUG-036)
+
+ستون تاریخی `symbol` برای چند معنی overload شده بود (BTC در برابر UUID صندوق). قرارداد واحد:
+
+| فیلد | نقش |
+|------|-----|
+| `assetCategory` | crypto / stock / fif / metal |
+| `instrumentId` | شناسه پایدار داخلی (برای FIF = fundId؛ crypto = assetKey؛ stock = symbol داخلی؛ metal = metalType_purity) |
+| `symbol` | **deprecated به‌عنوان شناسه اصلی**؛ می‌تواند display/legacy برابر instrumentId بماند برای سازگاری |
+
+APIهای جدید: `getLatestPrice({ assetCategory, instrumentId })`.  
+Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند نه فقط symbol.
+
+---
+
+## Quote کامل‌تر (BUG-037 / BUG-038)
+
+حداقل فیلدهای `price_history` برای Quote مالی:
+
+| فیلد | الزام |
+|------|--------|
+| `price`, `priceCurrency` | بله |
+| `fetchedAt` | بله — زمان دریافت UTC |
+| `marketDate` | بله برای stock/fif NAV روزانه؛ nullable برای crypto لحظه‌ای اگر session معنی ندارد |
+| `quoteType` | `last` \| `nav` \| `close` \| `manual` \| `indicative` |
+| `source` / `sourceId` | بله |
+| `bid` / `ask` | اختیاری Should Have |
+
+قوانین:
+1. برای NAV و بورس ایران، **`marketDate` مبنای «قیمت کدام روز»** است؛ `fetchedAt` فقط زمان دریافت است.
+2. `getLatestPrice` برای fif/stock ترجیحاً بر اساس آخرین `marketDate` (سپس fetchedAt) انتخاب می‌کند، نه فقط fetchedAt خام.
+3. اگر Provider فقط timestamp بدهد، Adapter باید `marketDate` را از تقویم بازار استخراج یا از کاربر برای manual بگیرد.

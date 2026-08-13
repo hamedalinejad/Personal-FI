@@ -72,7 +72,10 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 
 **استثناهای مجاز** (فقط همین دو مورد؛ هر مورد جدید باید صریحاً به همین لیست اضافه شود، نه به‌صورت پیش‌فرض مجاز فرض شود):
 
-1. **بررسی نسخه (Version Check)** — هر بار باز شدن اپ، **در پس‌زمینه و بدون مسدود کردن UI**، یک درخواست سبک به یک Endpoint استاتیک (مثلاً یک فایل JSON روی GitHub Releases یا سرور خود پروژه شامل `{ latestVersion, minSupportedVersion, releaseNotesUrl }`) زده می‌شود تا اگر نسخه جدیدتری موجود بود، یک Badge/Toast غیرمزاحم («نسخه جدید در دسترس است») نشان داده شود.
+1. **بررسی نسخه (Version Check)** — **استثنای صریح Offline-first (BUG-032)**: هر بار باز شدن اپ، در پس‌زمینه و بدون مسدود کردن UI، یک درخواست سبک به Endpoint استاتیک نسخه ممکن است زده شود. این **تنها** Network خودکار پیش‌فرض است.
+   - کاربر می‌تواند کاملاً خاموش کند (`autoVersionCheckEnabled=false`) → حالت نزدیک به air-gapped.
+   - در Onboarding/Settings/Install docs باید نوشته شود: «با روشن بودن بررسی نسخه، در Startup یک درخواست شبکه زده می‌شود».
+   - بدون این شفافیت، ادعای «کاملاً آفلاین» گمراه‌کننده است.
    - این درخواست **هیچ داده مالی یا شخصی کاربر را ارسال نمی‌کند** — فقط شماره نسخه فعلی اپ (برای مقایسه) و هیچ شناسه‌ای که بتواند به کاربر خاصی نسبت داده شود.
    - شکست این درخواست (آفلاین بودن، سرور در دسترس نبودن) **کاملاً بی‌صدا** مدیریت می‌شود؛ هیچ خطا یا پیامی به کاربر نشان داده نمی‌شود و اپ دقیقاً مثل قبل کار می‌کند.
    - کاربر می‌تواند از تنظیمات (`stg_settings`، کلید `autoVersionCheckEnabled`) این بررسی خودکار را کاملاً خاموش کند؛ در آن صورت بررسی نسخه فقط با کلیک دستی روی «بررسی به‌روزرسانی» در صفحه تنظیمات انجام می‌شود.
@@ -166,3 +169,31 @@ UI / Hooks
 3. لایه License فقط تعیین می‌کند کدام فایل DB باز شود یا آیا قابلیت‌های محصولی فعال‌اند — **نه** اینکه داده مالی چگونه تفسیر شود.
 4. Backup/Export مالی می‌تواند بدون اسرار لایسنس باشد؛ Restore مالی نباید به سرور لایسنس نیاز داشته باشد (offline-first).
 5. Implementation آینده multi-user/cloud نباید `acc_transactions` را با `licenseId` آلوده کند؛ mapping کاربر↔فایل DB بیرون از schema مالی است.
+
+---
+
+## API Key Secret Lifecycle (BUG-033)
+
+علاوه بر UX Session Storage (باگ ۳۷):
+
+| رویداد | رفتار |
+|--------|--------|
+| Tab close | پاک شدن sessionStorage (رفتار مرورگر) |
+| Crash / kill | کلید از بین می‌رود؛ ورود مجدد |
+| Soft refresh همان Tab | sessionStorage معمولاً می‌ماند |
+| Shared device | کاربر باید Tab را ببندد؛ راهنمای Settings: «روی دستگاه مشترک پس از کار Tab را ببندید» |
+| Isolation | کلید per `sourceId` / provider — یک کلید برای همه Providerها share نمی‌شود |
+| Log/Audit/Error | کلید هرگز در پیام خطا، event bus، یا backup نیست |
+
+قبل از نسخه licenseable: همین جدول Contract پیاده‌سازی است، نه فقط متن UX.
+
+---
+
+## Enforce مرز Feature (BUG-040)
+
+قرارداد `UI → Feature API → Domain → DB` باید در implementation قابل enforce باشد:
+
+1. **Import boundary**: `features/A` نباید از `features/B/db` یا SQL خام B import کند؛ فقط از `features/B/public-api` (یا `api/`).
+2. **ESLint** `no-restricted-imports` / dependency-cruiser / arch unit test در CI.
+3. تست نمونه: هیچ فایلی خارج از `db/` نباید `sql.js` یا `runQuery` مستقیم صدا بزند مگر از طریق API فیچر.
+4. تا قبل از وجود این ruleها در repo، مرز فقط مستند است — در checklist پیاده‌سازی v1 این item باید tick شود.
