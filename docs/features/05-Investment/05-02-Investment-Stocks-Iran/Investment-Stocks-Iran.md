@@ -1,36 +1,8 @@
 # زیر‌فیچر: Investment - Stocks Iran (سهام بورس ایران)
 
 ## توضیح کلی
-این زیر‌فیچر مدیریت سرمایه‌گذاری در **بازار بورس ایران** را بر عهده دارد.  
-تمام مبالغ به **ریال** هستند، اما در هر معامله **نرخ تتر لحظه** ذخیره می‌شود تا بتوان در آینده عملکرد سرمایه‌گذاری را نسبت به دلار/تتر نیز مقایسه کرد.
-
-جریان کار:
-1. واریز وجه از حساب بانکی به حساب کارگزاری
-2. خرید و فروش سهام از طریق موجودی کارگزاری
-3. برداشت وجه از کارگزاری به حساب بانکی
-
-> نکته: این زیر‌فیچر مخصوص سهام ایران است. سهام خارجی در زیر‌فیچر جداگانه‌ای در آینده اضافه خواهد شد.
-
----
-
-## User Stories
-
-### Must Have
-- ثبت کارگزاری
-- واریز از حساب بانکی به کارگزاری
-- برداشت از کارگزاری به حساب بانکی
-- ثبت خرید سهام ایران
-- ثبت فروش سهام ایران
-- مشاهده موجودی هر سهم و میانگین خرید
-- محاسبه سود و زیان (realized و unrealized)
-- مشاهده ارزش کل پرتفوی بورسی ایران
-- ذخیره نرخ تتر لحظه هر معامله
-- ثبت و پیگیری کارمزدها (به ریال + معادل تتری)
-
-### Should Have
-- ثبت سود نقدی (Dividend)
-- پیوست رسید معامله
-- تاریخچه قیمت سهام
+این زیر‌فیچر مدیریت سرمایه‌گذاری در **بازار بورس ایران** را بر عهده دارد.
+تمام مبالغ به **ریال** هستند، اما در هر معامله **نرخ تتر لحظه** ذخیره می‌شود.
 
 ---
 
@@ -38,184 +10,201 @@
 
 1. تمام مبالغ به ریال هستند.
 2. در هر معامله، نرخ تتر لحظه ثبت و قفل می‌شود.
-3. **واریز از حساب بانکی به کارگزاری**:
-   - موجودی حساب بانکی کاهش می‌یابد.
-   - موجودی نقدی کارگزاری در `inv_stocks_iran_brokerages.cashBalance` افزایش می‌یابد.
-   - تراکنش در `acc_transactions` با `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` ثبت و به هم لینک می‌شود.
-   - تراکنش در `inv_stocks_iran_brokerage_transactions` نیز ثبت می‌شود.
-4. **برداشت از کارگزاری به حساب بانکی**:
-   - موجودی نقدی کارگزاری کاهش و موجودی حساب بانکی افزایش می‌یابد.
-   - هر دو تراکنش (`acc_transactions` و `inv_stocks_iran_brokerage_transactions`) ثبت و به هم لینک می‌شوند.
-   - لینک از طریق `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` انجام می‌شود.
-5. **خرید سهام**:
-   - از موجودی نقدی کارگزاری کسر می‌شود.
-   - موجودی سهم افزایش و میانگین خرید به‌روزرسانی می‌شود.
-6. **فروش سهام**:
-   - موجودی سهم کاهش می‌یابد.
-   - مبلغ حاصل به موجودی نقدی کارگزاری اضافه می‌شود.
-7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
-7a. **سود نقدی (Dividend)**: با `type = 'dividend'` در `inv_stocks_iran_transactions` ثبت می‌شود؛ مبلغ به `cashBalance` کارگزاری اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود (تراکنش سهام محسوب نمی‌شود و در `calculateProfitLoss()` لحاظ نمی‌شود).
-8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
-9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
-10. **ویرایش/حذف معاملات**: تراکنش‌های سهام پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
-    - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
-    - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها و میانگین خرید درست شوند
-    - این رویکرد تاریخچه معاملات و محاسبات سود/زیان را حفظ می‌کند
-
-> **نکته طراحی**: موجودی نقدی کارگزاری از طریق فیلد `cashBalance` در جدول `inv_stocks_iran_brokerages` با snapshot نگهداری می‌شود تا محاسبات سریع باشد. تراکنش‌های در `inv_stocks_iran_brokerage_transactions` فقط لاگ هستند.
+3. واریز/برداشت بین حساب بانکی و کارگزاری باید در `acc_transactions` و `inv_stocks_iran_brokerage_transactions` با لینک متقابل ثبت شود.
+4. خرید از cashBalance کارگزاری کسر و به Holding اضافه می‌شود.
+5. فروش از Holding کسر و خالص مبلغ به cashBalance کارگزاری اضافه می‌شود.
+6. **کارمزد و مالیات**:
+   - `feeAmount` فیلد Total و برای سازگاری با مدل قبلی **حذف نمی‌شود**.
+   - `feeBrokerCommission` = کارمزد کارگزار.
+   - `feeExchange` = کارمزد/هزینه بورس و ارکان بازار.
+   - `feeTax` = مالیات.
+   - `feeOther` = سایر هزینه‌ها و کارمزدهای قابل گزارش.
+   - برای تراکنش‌های جدید: `feeAmount = feeBrokerCommission + feeExchange + feeTax + feeOther`.
+   - برای داده‌های قدیمی که Breakdown ندارند، `feeAmount` اصلی بدون تغییر حفظ می‌شود و اجزای Breakdown می‌توانند null/0 باشند؛ هیچ داده‌ای نباید حذف یا بازنویسی شود.
+7. سود نقدی با `type = 'dividend'` ثبت می‌شود و جزو Realized P&L خرید/فروش نیست.
+8. موجودی حساب بانکی، cashBalance کارگزاری و quantity سهم نمی‌توانند منفی شوند.
+9. تراکنش ثبت‌شده قابل ویرایش/حذف مستقیم نیست و اصلاح با void/reversal انجام می‌شود.
+10. **Price Mapping**:
+    - `symbol` فقط شناسه داخلی و قابل نمایش سیستم است.
+    - `priceProviderId` به `price_sources.id` اشاره می‌کند و Provider قیمت را مشخص می‌کند.
+    - `providerSymbol` شناسه دقیق همان نماد در همان Provider است.
+    - `market` context بازار است و در صورت نیاز Provider ارسال می‌شود.
+    - Price Fetching باید از ترکیب `priceProviderId + providerSymbol + market` استفاده کند.
+    - استفاده مستقیم از `symbol` فقط fallback موقت هنگام نبود Mapping است و نباید به‌عنوان Mapping قطعی ذخیره شود.
+    - Mapping ناقص باید قابل تشخیص و گزارش در UI/API باشد.
+    - `price_history.sourceId` باید Provider واقعی قیمت ذخیره‌شده را حفظ کند.
 
 ---
 
 ## Domain Entities
 
-### ۱. Brokerage (جدول: `inv_stocks_iran_brokerages`)
+### ۱. Brokerage — `inv_stocks_iran_brokerages`
 
-- `id` → UUID (Primary Key)
-- `name` → string (نام کارگزاری)
-- `accountNumber` → string (شماره حساب معاملاتی — nullable)
-- `url` → string (آدرس سایت یا اپ — nullable)
+- `id` → UUID
+- `name` → string
+- `accountNumber` → string nullable
+- `url` → string nullable
 - `description` → string
 - `isActive` → boolean
-- `cashBalance` → decimal (موجودی نقدی کارگزاری به ریال — برای سرعت بالا در محاسبات)
+- `cashBalance` → decimal ریال
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی**: موجودی نقدی کارگزاری از طریق فیلد `cashBalance` در این جدول با snapshot نگهداری می‌شود.  
-> - هنگام واریز: `cashBalance += amount`  
-> - هنگام برداشت: `cashBalance -= amount`  
-> - هنگام خرید سهام: `cashBalance -= totalAmount + fees`  
-> - هنگام فروش سهام: `cashBalance += totalAmount - fees`  
-> - تراکنش‌ها در `inv_stocks_iran_brokerage_transactions` فقط لاگ هستند  
-> - برای جلوگیری از تکرار در محاسبه ثروت، این موجودی در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth = false` لحاظ نمی‌شود
+`cashBalance` یک snapshot برای محاسبات سریع است و باید با تراکنش‌های مالی هماهنگ بماند.
 
-### ۲. Stock Holding (جدول: `inv_stocks_iran_holdings`)
+### ۲. Stock Holding — `inv_stocks_iran_holdings`
 
-- `id` → UUID (Primary Key)
+- `id` → UUID
 - `brokerageId` → UUID
-- `symbol` → string (نماد سهم — مثلاً فولاد، شپنا؛ نماد داخلی سیستم — همان چیزی که کاربر وارد می‌کند)
-- `name` → string (نام شرکت)
-- `providerSymbol` → string (nullable — شناسه این نماد در Provider قیمت‌گیری؛ برخی Providerها نماد TSETMC را عیناً می‌پذیرند، برخی دیگر کد ISIN یا URL slug متفاوتی دارند — مثلاً `فولاد` در سیستم ممکن است در Provider به‌صورت `IRO1MSMI0001` یا `foulad` شناخته شود؛ اگر null باشد، `symbol` مستقیم برای قیمت‌گیری استفاده می‌شود اما ریسک Not Found در Provider وجود دارد)
-- `market` → string (nullable — بازار معامله‌ای که نماد در آن است — مثلاً `bourse` (بورس)، `fara_bourse` (فرابورس)، `base_market` (بازار پایه)؛ مفید برای نمایش و فیلتر)
-- `quantity` → decimal (تعداد سهم)
-- `averageBuyPrice` → decimal (میانگین قیمت خرید — ریال)
+- `symbol` → string — شناسه داخلی سیستم، مثلاً `فولاد`
+- `name` → string
+- `providerSymbol` → string nullable — شناسه دقیق نماد در Provider انتخاب‌شده، مثلاً TSETMC/ISIN/slug
+- `priceProviderId` → UUID nullable — FK → `price_sources.id`
+- `market` → string nullable — مانند `bourse`, `fara_bourse`, `base_market`
+- `quantity` → decimal
+- `averageBuyPrice` → decimal ریال
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR یا USDT پرداخت شده)
+- `totalFeesPaidUSDT` → decimal
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته**: این جدول فقط برای خرید و فروش سهام است. موجودی نقدی کارگزاری در فیلد `cashBalance` از جدول `inv_stocks_iran_brokerages` نگهداری می‌شود (برای سرعت بالا). این موجودی در محاسبه ثروت در فیچر `Portfolio & Wealth Overview` به صورت اختیاری با کنترل `includeCashInWealth` لحاظ می‌شود.
+> **قرارداد Mapping**: `symbol` شناسه داخلی است؛ `priceProviderId` Provider را تعیین می‌کند؛ `providerSymbol` شناسه همان نماد در آن Provider است. اگر Provider نیاز داشته باشد `market` نیز ارسال می‌شود. Provider هرگز نباید فرض کند `symbol` همان شناسه خارجی است.
 
-### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید و فروش
+### ۳. Stock Transaction — `inv_stocks_iran_transactions`
 
-- `id` → UUID (Primary Key)
+- `id` → UUID
 - `brokerageId` → UUID
 - `symbol` → string
-- `type` → string (`buy`, `sell`, `dividend`)
-- `quantity` → decimal (nullable برای `dividend`)
-- `price` → decimal (قیمت هر سهم — ریال — nullable برای `dividend`)
-- `totalAmount` → decimal (برای `dividend`: مبلغ کل سود نقدی دریافتی)
-- `feeAmount` → decimal
+- `type` → `buy | sell | dividend`
+- `quantity` → decimal nullable برای dividend
+- `price` → decimal nullable برای dividend
+- `totalAmount` → decimal
+- `feeAmount` → decimal — Total و سازگار با مدل قبلی
+- `feeBrokerCommission` → decimal nullable/default 0
+- `feeExchange` → decimal nullable/default 0
+- `feeTax` → decimal nullable/default 0
+- `feeOther` → decimal nullable/default 0
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه معامله — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-> **نکته `dividend`**: سود نقدی سهام به‌صورت `type = 'dividend'` در همین جدول ثبت می‌شود (مشابه الگوی `inv_fif_transactions` در Fixed Income Funds)؛ `quantity` و `price` در این نوع `null` هستند و فقط `totalAmount` (مبلغ سود دریافتی) پر می‌شود. مبلغ به `cashBalance` کارگزاری در `inv_stocks_iran_brokerages` اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود؛ در `calculateProfitLoss()` لحاظ نمی‌شود (سود تقسیمی جزئی از Realized P&L معاملات خرید/فروش نیست).
+**Invariant جدید:**
 
-### ۴. Brokerage Cash Transaction (جدول: `inv_stocks_iran_brokerage_transactions`) — لاگ واریز و برداشت
+```text
+feeAmount =
+    feeBrokerCommission
+  + feeExchange
+  + feeTax
+  + feeOther
+```
 
-- `id` → UUID (Primary Key)
+این invariant برای تراکنش‌های جدید الزامی است. داده‌های legacy که فقط `feeAmount` دارند باید بدون تغییر باقی بمانند.
+
+### ۴. Brokerage Cash Transaction — `inv_stocks_iran_brokerage_transactions`
+
+- `id` → UUID
 - `brokerageId` → UUID
-- `type` → string (`deposit`, `withdraw`)
-- `amount` → decimal (ریال)
+- `type` → `deposit | withdraw`
+- `amount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
-- `accountId` → UUID (حساب بانکی مرتبط)
-- `accountTransactionId` → UUID (لینک به `acc_transactions`)
+- `exchangeRateToBase` → decimal
+- `accountId` → UUID
+- `accountTransactionId` → UUID
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-> **نکته لینک**: هنگام ایجاد این تراکنش، یک تراکنش در `acc_transactions` نیز ایجاد می‌شود با:  
-> - `relatedFeature = 'stocks_iran'`  
-> - `relatedId = inv_stocks_iran_brokerage_transactions.id`
-> 
-> **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_stocks_iran_brokerage_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در کارگزاری) است.
+### ۵. `acc_transactions`
 
-### ۵. acc_transactions
-
-- فقط در واریز و برداشت بین حساب بانکی و کارگزاری ثبت می‌شود.
-- لینک از طریق `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` انجام می‌شود.
+واریز/برداشت باید با `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` لینک شود.
 
 ---
 
 ## APIهای داخلی
 
-### Brokerage APIs
-- `createBrokerage(data)` → ایجاد کارگزاری با `cashBalance = 0`
-- `updateBrokerage(id, data)` → به‌روزرسانی اطلاعات کارگزاری (شامل `cashBalance`)
-- `getAllBrokerages()` → لیست کارگزاری‌ها همراه با `cashBalance`
-- `getBrokerageById(id)` → دریافت کارگزاری با `cashBalance`
-- `getBrokerageCashBalance(brokerageId)` → دریافت موجودی نقدی (از `cashBalance`)
+### Brokerage
+- `createBrokerage(data)`
+- `updateBrokerage(id, data)`
+- `getAllBrokerages()`
+- `getBrokerageById(id)`
+- `getBrokerageCashBalance(brokerageId)`
 
-### Holding APIs
+### Holding
 - `getHoldings(brokerageId?)`
 - `getHoldingBySymbol(symbol, brokerageId?)`
-- `getPortfolioValue()` → ارزش کل پرتفوی ایران (ریال + معادل تتری)
+- `getPortfolioValue()`
 
-### Transaction APIs
-- `createStockTransaction(data)` → خرید / فروش
-- `createBrokerageTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک به حساب بانکی
+### Transaction
+- `createStockTransaction(data)`
+- `createBrokerageTransaction(data)`
 - `getStockTransactions(filters)`
-- `getBrokerageTransactions(filters)` → برای واریز/برداشت
+- `getBrokerageTransactions(filters)`
 - `calculateProfitLoss(symbol?, brokerageId?)`
 
----
-
-## روابط با سایر فیچرها
-
-- **Accounts & Banking**: واریز و برداشت
-- **Currency & Multi-Currency**: دریافت نرخ تتر لحظه‌ای
-- **Reports** و **Dashboard**: ارزش پرتفوی و سود/زیان
-- **Portfolio & Wealth Overview**: تأمین داده سهام ایران
+### Price Mapping
+- `setStockPriceMapping(holdingId, data)` → `priceProviderId`, `providerSymbol`, `market`
+- `getStockPriceMapping(holdingId)`
+- `validateStockPriceMapping(holdingId)`
 
 ---
 
----
+## قرارداد Price Fetching
 
-## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+برای هر Holding:
 
-فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش:
-
-**هنگام خرید** (Weighted Average):
+```text
+1. holding.priceProviderId → price_sources.id
+2. holding.providerSymbol → شناسه دقیق همان Provider
+3. holding.market → در صورت نیاز Provider
+4. fetch(provider, providerSymbol, market)
+5. price_history.sourceId = holding.priceProviderId
 ```
+
+Fallback به `symbol` فقط برای تلاش موقت مجاز است و نباید Mapping قطعی ایجاد کند.
+
+---
+
+## منطق Realized / Unrealized P&L
+
+تمام محاسبات پولی باید با `decimal.js` انجام شوند و استفاده از `Number` برای محاسبات مالی مجاز نیست.
+
+### خرید
+
+```text
 newTotalInvested = totalInvested + (quantityBought × price) + feeAmount
-newQuantity      = quantity + quantityBought
+newQuantity = quantity + quantityBought
 newAverageBuyPrice = newTotalInvested / newQuantity
 ```
 
-**هنگام فروش** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
-```
+### فروش
+
+```text
 soldPortionCost = quantitySold × averageBuyPrice
-realizedPL       = saleProceeds - soldPortionCost - feeAmount
-totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
-quantity         -= quantitySold
-averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
+realizedPL = saleProceeds - soldPortionCost - feeAmount
+totalInvested -= soldPortionCost
+quantity -= quantitySold
+averageBuyPrice بدون تغییر می‌ماند
 ```
 
-> **نکات الزامی**:
-> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(currentPrice - averageBuyPrice) × quantity` محاسبه می‌شود و نباید با Realized P&L مخلوط شود.
+### Unrealized
+
+```text
+unrealizedPL = (currentPrice - averageBuyPrice) × quantity
+```
+
+Realized و Unrealized نباید با یکدیگر مخلوط شوند.
 
 ---
 
 ## نکات طراحی
 
-- این زیر‌فیچر مخصوص **سهام بورس ایران** است.
-- همه چیز به ریال است، اما نرخ تتر در هر رکورد ذخیره می‌شود.
-- میانگین خرید با Weighted Average محاسبه می‌شود.
-- کارمزدها هم به ریال و هم معادل تتری ثبت می‌شوند.
-- موجودی نقدی کارگزاری جدا از موجودی سهام مدیریت می‌شود.
-- در آینده زیر‌فیچر جداگانه‌ای برای سهام خارجی اضافه خواهد شد.
+- این زیر‌فیچر مخصوص سهام بورس ایران است.
+- همه مبالغ ریالی هستند و نرخ تتر لحظه‌ای هر رکورد حفظ می‌شود.
+- `feeAmount` هرگز حذف نمی‌شود.
+- Breakdown کارمزد شامل کارگزار، بورس/ارکان، مالیات و سایر هزینه‌ها است.
+- Mapping قیمت صریح و قابل اعتبارسنجی است.
+- موجودی نقدی کارگزاری از موجودی سهام جداست.
+- ساختار باید ساده، ماژولار، Offline-First و قابل استفاده توسط APIهای مستقل باقی بماند.
