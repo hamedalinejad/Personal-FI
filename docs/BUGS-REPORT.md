@@ -9,6 +9,28 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-002 — Decimal string در Events و ExchangeRate
+**راه‌حل:** همه payloadهای مالی Event و `ExchangeRate.rate` به `string` (decimal)؛ `number` فقط برای شمارنده‌های غیرمالی.
+
+### BUG-003 — exchangeRateToBase = نرخ به Base واقعی
+**راه‌حل:** تعریف صریح amount→baseCurrency کاربر؛ ممنوع فرض دائمی «ریال/تتر»؛ قرارداد در Currency-CrossRate.md.
+
+### BUG-004 — هویت قیمت Crypto
+**راه‌حل:** قیمت‌گیری با assetKey / chainId+contract نه فقط symbol؛ USDT چند شبکه جدا.
+
+### BUG-005 — تفکیک cash صرافی و on-chain
+**راه‌حل:** `inv_crypto_exchange_transactions` فقط Bank↔Exchange؛ transfer آنچین در `inv_crypto_transactions`.
+
+### BUG-006 — networkId یکسان
+**راه‌حل:** FK `networkId` روی Transaction و Holding؛ ممنوع string آزاد network.
+
+### BUG-007 — Unique Holding Crypto
+**راه‌حل:** UNIQUE ترکیب‌های exchangeId+symbol / exchangeId+networkId+contractAddress / native.
+
+### BUG-008 — Fee و quantity/cost basis
+**راه‌حل:** قرارداد fee-in-quote در برابر fee-in-asset؛ net quantity و cost سازگار؛ feeQuantity وقتی fee از خود asset است.
+
+
 ### باگ ۵۶ — Tax از Investment جدا بود بدون metadata روی معامله
 **راه‌حل:** فیلدهای tax metadata اجباری روی تراکنش‌های Investment (isTaxableEvent, cost basis, proceeds, realizedGain, taxYear, …)؛ قرارداد در Tax-Management؛ پل getTaxableEvents.
 

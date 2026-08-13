@@ -122,6 +122,13 @@
 
 > **نکته `networkId`**: این فیلد فقط برای والت‌ها معنی دارد. مثلاً کاربری که USDT دارد روی هر دو شبکه TRC20 و ERC20 در یک والت، **دو ردیف جداگانه** در `inv_crypto_holdings` خواهد داشت (هر کدام با `networkId` متفاوت)؛ این تفکیک برای محاسبه صحیح انتقال بین شبکه‌ها الزامی است.
 
+> **Unique Identity Holding (BUG-007)**: یکتایی منطقی و DB:
+> - صرافی: `UNIQUE(exchangeId, symbol)` وقتی `networkId` و `contractAddress` هر دو null (دارایی داخلی صرافی)
+> - والت توکن: `UNIQUE(exchangeId, networkId, contractAddress)` با `contractAddress` non-null
+> - والت native: `UNIQUE(exchangeId, networkId, symbol)` با `contractAddress` IS NULL
+> کلید قیمت‌گیری داخلی: `assetKey` (محاسبه‌شده یا ذخیره‌شده) = برای توکن `chainId:contractAddress`؛ برای native `chainId:native:symbol`؛ برای موجودی صرافی بدون زنجیره `exchange:symbol`.
+> دو Holding با هویت یکسان ممنوع است؛ P&L نباید دوبار شمرده شود.
+
 > **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند.  
 > **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**:  
 > - برای IRR و USDT:  
@@ -143,7 +150,7 @@
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
-- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003 — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
 - `network` → string (nullable — شبکه بلاکچینی که انتقال از طریق آن انجام شده؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی، برای `buy`/`sell` null)
@@ -172,7 +179,7 @@
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
-- `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `network` → string (nullable — شبکه بلاکچینی که واریز/برداشت از طریق آن انجام شده؛ مثلاً `TRC20`، `ERC20`؛ برای واریز/برداشت ریالی null است)
 - `txHash` → string (nullable — شناسه تراکنش آنچین برای واریز/برداشت کریپتویی؛ برای واریز/برداشت ریالی فیات null است)
@@ -282,3 +289,78 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 - قیمت لحظه‌ای رمزارزها می‌تواند از API خارجی + کش آفلاین تأمین شود.
 
 > **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.
+
+---
+
+## هویت قیمت‌گیری دارایی کریپتو (BUG-004)
+
+`DISTINCT symbol` به‌تنهایی برای Fetch قیمت **کافی نیست**.
+
+### قوانین
+1. مسیر قیمت از `assetKey` / (`chainId` + `contractAddress` یا native) استفاده می‌کند، نه فقط `symbol`.
+2. `price_history.symbol` برای کریپتو می‌تواند همان `assetKey` باشد (مثلاً `1:0xdac17f...` برای USDT-ERC20، `728126428:native:USDT` یا قرارداد TRC20).
+3. `assetId` (شناسه Provider) روی Holding برای نگاشت به CoinGecko/Nobitex؛ اگر null، Adapter با `normalizeSymbol` از assetKey استفاده می‌کند.
+4. USDT-TRC20 و USDT-ERC20 دو قیمت/دو Holding جدا هستند مگر Provider صراحتاً یک قیمت واحد بدهد و کاربر همان را بخواهد (پیش‌فرض: جدا).
+
+`19-01-Crypto-Prices` باید `DISTINCT assetKey` (یا معادل chain+contract) از holdings بگیرد، نه فقط `symbol`.
+
+---
+
+## تفکیک Cash Movement و On-chain Transfer (BUG-005)
+
+`inv_crypto_exchange_transactions` **فقط** برای جریان نقدی فیات/استیبل **مرتبط با حساب بانکی** است (Bank ↔ Exchange cash):
+
+| فیلد مرتبط | نقش |
+|------------|-----|
+| `accountId` / `accountTransactionId` | لینک اجباری به بانک |
+| `type` | deposit / withdraw |
+| مبالغ ریال/USDT | |
+
+**On-chain / wallet transfer** در `inv_crypto_transactions` با `type = transfer_in | transfer_out` مدل می‌شود:
+
+| فیلد | نقش |
+|------|-----|
+| `networkId` | FK به `inv_crypto_wallet_networks` (نه string آزاد — BUG-006) |
+| `txHash`, `blockNumber`, `confirmations` | فقط اینجا |
+| `transferId` | جفت in/out |
+| بدون `accountId` بانکی اجباری | مگر پل fiat همزمان |
+
+جریان‌ها:
+| سناریو | جداول |
+|--------|--------|
+| Bank → Exchange | `acc_transactions` + `inv_crypto_exchange_transactions` |
+| Exchange → Bank | همین |
+| Wallet → Wallet / Exchange on-chain | فقط `inv_crypto_transactions` (transfer_*) |
+| Buy/Sell روی صرافی | `inv_crypto_transactions` (+ در صورت نیاز کاهش USDT/IRR holding) |
+
+فیلدهای `network`/`txHash` روی جدول exchange cash **deprecate** می‌شوند اگر هنوز در متن باشند؛ نباید مدل واحد Wallet و Bank باشند.
+
+---
+
+## networkId روی Transaction (BUG-006)
+
+- Holding: `networkId` → FK `inv_crypto_wallet_networks`
+- Transaction (transfer/buy on wallet): همان `networkId` FK
+- **ممنوع**: فیلد متنی آزاد `network` با مقادیر `TRC20`/`TRON`/`tron`
+- نمایش UI از entity شبکه (`name`, `chainId`) می‌آید
+
+---
+
+## قرارداد Fee و Quantity / Cost Basis (BUG-008)
+
+### حالت‌ها
+1. **Fee به quote (IRR/USDT/دیگر غیر از خود asset)**  
+   - `quantity` = مقدار دارایی دریافت/واگذارشده  
+   - `totalInvested += quantity × price + feeInQuote` (پس از تبدیل fee به currency سرمایه‌گذاری با نرخ همان تراکنش)
+
+2. **Fee از خود asset کسر می‌شود** (`feeCurrency === symbol` دارایی)  
+   - `grossQuantity` = مقدار قبل از fee (اختیاری ذخیره)  
+   - `feeQuantity` = مقدار fee به واحد asset  
+   - `quantity` (net) = gross − fee برای buy دریافتی؛ برای sell مقدار فروخته‌شده جدا از fee شبکه  
+   - Cost basis روی **net quantity** محاسبه می‌شود مگر مستند lot خلاف بگوید  
+   - `totalInvested` برای buy: هزینه quote پرداختی (بدون دوبار شمردن fee asset به‌عنوان quote)
+
+3. همیشه در تراکنش ذخیره شود: `feeAmount`, `feeCurrency`, و در صورت fee-in-asset: `feeQuantity`  
+4. Reconcile: `Σ quantity effects` با holding؛ fee-in-asset باید در ledger quantity دیده شود.
+
+فرمول Average Buy فقط با quantity **خالص** و cost **سازگار با همان quantity** اجرا شود؛ در غیر این صورت Unrealized P&L منحرف می‌شود.

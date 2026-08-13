@@ -178,3 +178,33 @@ async function convert(
 - امکان تنظیم ارز پیش‌فرض نمایش برای کاربر وجود دارد.
 - این فیچر به تنهایی تراکنش مالی ایجاد نمی‌کند؛ فقط توابع کمکی ارائه می‌دهد.
 - برای کاربران ایرانی، پیش‌فرض IRR → USDT است.
+
+---
+
+## قرارداد `exchangeRateToBase` واقعی (BUG-003)
+
+### تعریف صحیح
+`exchangeRateToBase` = چند واحد **ارز پایه کاربر** (`cur_currency_preferences.baseCurrency`) به ازای **۱ واحد ارز تراکنش** در لحظه ثبت.
+
+مثال‌ها اگر `baseCurrency = IRR`:
+- تراکنش USDT: `exchangeRateToBase ≈ 600000` یعنی ۱ USDT = ۶۰۰٬۰۰۰ IRR
+- تراکنش USD: نرخ دلار به ریال
+
+اگر `baseCurrency = USD`:
+- تراکنش USDT: نزدیک `1` (نه ریال به تتر)
+- تراکنش IRR: نرخ ریال→دلار (عدد کوچک)
+
+### ممنوع
+توضیح یا پیاده‌سازی که `exchangeRateToBase` را **همیشه** «ریال به ازای یک USDT» فرض کند — مگر `baseCurrency` واقعاً IRR و ارز تراکنش USDT باشد.
+
+### Snapshotهای مکمل (برای کریپتو/ایران — اختیاری ولی توصیه‌شده)
+وقتی ارز گزارش‌دهی محلی جدا از base است، علاوه بر `exchangeRateToBase` می‌توان ذخیره کرد:
+| فیلد | معنی |
+|------|------|
+| `exchangeRateToBase` | ارز تراکنش → base کاربر (اجباری) |
+| `quoteCurrency` | ارز مبلغ تراکنش (مثلاً USDT) |
+| `rateQuoteToIrr` | nullable — اگر UI ایران بخواهد معادل ریالی تاریخی جدا از base |
+
+محاسبه ارزش به base: `amountInBase = amount × exchangeRateToBase` (با decimal.js).
+
+همه فیچرها (Crypto, Stocks, FIF, Loans, Tax, Metals) باید از همین تعریف استفاده کنند؛ متن‌های قدیمی «ریال به ازای ۱ تتر» فقط مثال وقتی base=IRR هستند.

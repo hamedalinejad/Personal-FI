@@ -58,7 +58,7 @@ export type CurrencyCode = FiatCurrencyCode | CryptoCurrencyCode;
 export interface ExchangeRate {
   from: CurrencyCode;
   to: CurrencyCode;
-  rate: number; // ذخیره به‌صورت decimal (نه Minor Unit — استثنای مستند در db.md)
+  rate: string; // decimal string — هرگز number/float (BUG-002)
   timestamp: Timestamp;
 }
 ```
@@ -191,16 +191,16 @@ export interface PriceProviderAdapter {
 export type AppEvent =
   // حساب و تراکنش
   | { type: 'TransactionCreated'; payload: { transactionId: UUID; transactionType: TransactionType } }
-  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: number } }
+  | { type: 'AccountBalanceUpdated'; payload: { accountId: UUID; newBalance: string } // decimal string }
   // بودجه
-  | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: number } }
-  | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: number } }
+  | { type: 'BudgetExceeded'; payload: { budgetId: UUID; envelopeId: UUID; amount: string } }
+  | { type: 'BudgetUpdated'; payload: { budgetId: UUID; envelopeId: UUID; remainingAmount: string } }
   // سرمایه‌گذاری
-  | { type: 'InvestmentValueUpdated'; payload: { investmentType: RelatedFeature; investmentId: UUID; newValue: number; previousValue: number } }
+  | { type: 'InvestmentValueUpdated'; payload: { investmentType: RelatedFeature; investmentId: UUID; newValue: string; previousValue: string } }
   | { type: 'PortfolioSnapshotCreated'; payload: { snapshotId: UUID; date: Timestamp } }
   // وام
   | { type: 'LoanPaymentDue'; payload: { loanId: UUID; dueDate: Timestamp } }
-  | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: number } }
+  | { type: 'LoanPaymentMade'; payload: { loanId: UUID; transactionId: UUID; amount: string } }
   // چک
   | { type: 'ChequeDue'; payload: { chequeId: UUID; dueDate: Timestamp } }
   | { type: 'ChequeStatusChanged'; payload: { chequeId: UUID; newStatus: string } }
@@ -208,7 +208,7 @@ export type AppEvent =
   | { type: 'MetalsDeliveryStatusChanged'; payload: { deliveryId: UUID; newStatus: string } }
   // مالیات
   | { type: 'TaxDue'; payload: { taxId: UUID; dueDate: Timestamp } }
-  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: number; transactionId: UUID } }
+  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: string; transactionId: UUID } }
   // دریافت قیمت (Price Fetching — فیچر ۱۹)
   | { type: 'PriceFetchCompleted'; payload: PriceFetchResult }
   | { type: 'PriceFetchStarted'; payload: { symbols: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
