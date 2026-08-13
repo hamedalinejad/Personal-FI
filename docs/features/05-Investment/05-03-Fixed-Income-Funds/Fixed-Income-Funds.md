@@ -44,13 +44,15 @@ Business Rules
 - تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
 - خرید واحد:
   - موجودی نقدی (حساب بانکی یا کارگزاری) کاهش می‌یابد.
-  - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید به‌روزرسانی می‌شود.
+  - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید بر اساس `transactionPrice` (قیمت صدور) به‌روزرسانی می‌شود.
+  - فیلد `nav` (NAV همان روز) برای snapshot تاریخی توصیه می‌شود ولی مبنای میانگین خرید نیست.
   - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
   - `units` نمی‌تواند منفی شود.
   - در صورت خرید از کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` کاهش می‌یابد.
 - فروش/ابطال واحد:
   - تعداد واحد کاهش می‌یابد.
-  - مبلغ حاصل به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
+  - مبلغ حاصل بر اساس `transactionPrice` (قیمت ابطال) به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
+  - Realized P&L با مقایسه `transactionPrice` فروش و `averageBuyPrice` محاسبه می‌شود.
   - `units` نمی‌تواند منفی شود.
   - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
 - تقسیم سود نقدی:
@@ -117,12 +119,19 @@ Domain Entities
 - `fundId` → UUID
 - `brokerageId` → UUID (nullable — لینک به کارگزاری برای ETFها)
 - `units` → decimal (تعداد واحد فعلی)
-- `averageBuyPrice` → decimal (میانگین قیمت خرید)
-- `totalInvested` → decimal
+- `averageBuyPrice` → decimal (میانگین قیمت **خرید/صدور** بر اساس `transactionPrice` تراکنش‌های buy/reinvest)
+- `totalInvested` → decimal (مجموع سرمایه‌گذاری بر اساس قیمت واقعی خرید)
 - `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
-- `currentNAV` → decimal (آخرین NAV ثبت‌شده)
+- `currentNAV` → decimal (آخرین **NAV** ثبت‌شده — فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با قیمت صدور/ابطال قاطی نشود)
+- `lastSubscriptionPrice` → decimal (nullable — آخرین قیمت صدور دیده‌شده)
+- `lastRedemptionPrice` → decimal (nullable — آخرین قیمت ابطال دیده‌شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **تمایز حیاتی NAV و قیمت معامله**:
+> - `currentNAV` = ارزش خالص دارایی هر واحد (برای ارزش پرتفوی و Unrealized P&L)
+> - `averageBuyPrice` = میانگین قیمت واقعی خرید/صدور (`transactionPrice`)
+> - این دو در صندوق‌های صدور/ابطال ایران اغلب متفاوت‌اند و **نباید** یکی فرض شوند.
 
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
@@ -137,9 +146,10 @@ Domain Entities
 - `fundId` → UUID
 - `brokerageId` → UUID (nullable — برای ETFها که از کارگزاری خرید می‌شوند)
 - `type` → string (buy, sell, dividend, reinvest, nav_update)
-- `units` → decimal (تعداد واحد — در buy/sell/reinvest)
-- `price` → decimal (قیمت واحد / NAV)
-- `amount` → decimal (مبلغ ریالی)
+- `units` → decimal (تعداد واحد — در buy/sell/reinvest؛ در nav_update و dividend معمولاً خالی)
+- `nav` → decimal (nullable — **NAV** در تاریخ تراکنش؛ الزامی در nav_update؛ توصیه‌شده در buy/sell برای snapshot تاریخی)
+- `transactionPrice` → decimal (nullable — **قیمت واقعی معامله**: قیمت صدور در buy/reinvest، قیمت ابطال در sell؛ در nav_update خالی می‌ماند)
+- `amount` → decimal (مبلغ ریالی خالص معامله؛ معمولاً `units × transactionPrice` برای buy/sell)
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal
@@ -150,6 +160,21 @@ Domain Entities
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
+
+> **تمایز قطعی فیلدهای قیمت (باگ ۳۴ — رفع‌شده)**:
+> | فیلد | نقش | استفاده |
+> |------|-----|---------|
+> | `nav` | ارزش خالص دارایی هر واحد | ارزش‌گذاری، Unrealized P&L، nav_update |
+> | `transactionPrice` | قیمت واقعی خرید/فروش کاربر | میانگین خرید، Realized P&L، amount |
+> | `feeAmount` | کارمزد جدا | کسر از سود |
+>
+> قوانین پر کردن:
+> - `type = 'buy'` یا `'reinvest'`: `transactionPrice` = قیمت صدور؛ `nav` = NAV همان روز (توصیه می‌شود)
+> - `type = 'sell'`: `transactionPrice` = قیمت ابطال؛ `nav` = NAV همان روز (توصیه می‌شود)
+> - `type = 'nav_update'`: فقط `nav` پر می‌شود؛ `transactionPrice` و `units` و `amount` خالی
+> - `type = 'dividend'`: معمولاً فقط مبلغ سود؛ `units`/`transactionPrice` خالی
+>
+> در صندوق‌های صدور/ابطال ایران، NAV و قیمت صدور و قیمت ابطال اغلب در یک روز با هم فرق دارند و **نباید** یکی فرض شوند.
 
 > **نکته لینک `accountTransactionId`**:
 > - برای ETFها: `accountTransactionId` لینک به رکوردی در `inv_stocks_iran_brokerage_transactions` **نیست** — بلکه لینک به `acc_transactions` است که خودش `relatedFeature = 'stocks_iran'` دارد.
@@ -180,28 +205,35 @@ Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
 
 ## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 
-فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده):
+فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده).
+
+> **قانون اصلی**: محاسبات خرید و میانگین و Realized P&L همیشه بر اساس `transactionPrice` (قیمت واقعی صدور/ابطال) انجام می‌شود. `nav` فقط برای ارزش‌گذاری و Unrealized P&L استفاده می‌شود.
 
 **هنگام خرید/صدور واحد یا سرمایه‌گذاری مجدد سود** (Weighted Average):
 ```
-newTotalInvested = totalInvested + (unitsBought × price) + feeAmount
-newUnits          = units + unitsBought
+cost               = (unitsBought × transactionPrice) + feeAmount
+newTotalInvested   = totalInvested + cost
+newUnits           = units + unitsBought
 newAverageBuyPrice = newTotalInvested / newUnits
 ```
+(در صورت وجود، `lastSubscriptionPrice` را با `transactionPrice` به‌روز کنید.)
 
 **هنگام فروش/ابطال واحد** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
 ```
 soldPortionCost = unitsSold × averageBuyPrice
-realizedPL       = saleProceeds - soldPortionCost - feeAmount
-totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
-units            -= unitsSold
-averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند، نه با فروش/ابطال
+saleProceeds    = unitsSold × transactionPrice          // قیمت ابطال واقعی
+realizedPL      = saleProceeds - soldPortionCost - feeAmount
+totalInvested  -= soldPortionCost                       // کاهش متناسب با بخش فروخته‌شده
+units          -= unitsSold
+averageBuyPrice بدون تغییر می‌ماند                      // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند
 ```
+(در صورت وجود، `lastRedemptionPrice` را با `transactionPrice` به‌روز کنید.)
 
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
 > - سود تقسیمی نقدی (`dividend`) بخشی از `realizedPL` نیست؛ به‌عنوان درآمد جداگانه ثبت می‌شود (طبق Business Rules).
-> - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentNAV - averageBuyPrice) × units` محاسبه می‌شود.
+> - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند.
+> - سود/زیان **تحقق‌نیافته (Unrealized P&L)** جداگانه بر اساس `(currentNAV - averageBuyPrice) × units` محاسبه می‌شود — اینجا عمداً از NAV استفاده می‌شود، نه از قیمت ابطال.
 
 
 نکات طراحی

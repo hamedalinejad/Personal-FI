@@ -9,6 +9,18 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۳۴ — تمایز قطعی NAV و قیمت معامله در صندوق‌های درآمد ثابت (Severity: High)
+**محل:** `docs/features/05-Investment/05-03-Fixed-Income-Funds/Fixed-Income-Funds.md` (Domain Entities + منطق محاسبه)
+**شرح:** مدل قبلی فقط یک فیلد `price` داشت که هم به‌عنوان NAV و هم به‌عنوان قیمت واحد معامله استفاده می‌شد. در صندوق‌های صدور/ابطال ایران، NAV، قیمت صدور (subscription) و قیمت ابطال (redemption) اغلب در یک روز با هم متفاوت‌اند. این باعث می‌شد میانگین خرید، Realized P&L و Unrealized P&L اشتباه محاسبه شوند.
+**راه‌حل اعمال‌شده:**
+- در `inv_fif_transactions`: فیلد `price` حذف و جایگزین شد با:
+  - `nav` → NAV در تاریخ تراکنش (برای nav_update و snapshot)
+  - `transactionPrice` → قیمت واقعی معامله (صدور در buy/reinvest، ابطال در sell)
+- در `inv_fif_holdings`: توضیح صریح تمایز `currentNAV` و `averageBuyPrice` + فیلدهای اختیاری `lastSubscriptionPrice` و `lastRedemptionPrice`
+- منطق Weighted Average و Realized P&L فقط بر اساس `transactionPrice`؛ Unrealized P&L بر اساس `currentNAV`
+- Business Rules خرید/فروش به‌روز شد تا صریحاً از کدام قیمت استفاده شود
+
+
 ### باگ ۱ — نام جدول بدون پیشوند در سند Crypto
 **محل:** `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` (خطوط ~۳۷، ۹۷، ۲۳۷، ۲۴۱)
 **شرح:** سند چندین‌بار جداول را با نام `crypto_holdings`، `crypto_transactions`، `crypto_exchange_transactions` (بدون پیشوند `inv_`) ارجاع داده بود، در حالی‌که فهرست مرکزی جداول در `db.md` این جداول را با نام‌های `inv_crypto_holdings`، `inv_crypto_transactions`، `inv_crypto_exchange_transactions` تعریف کرده. اگر این ناهماهنگی در مرحله کدنویسی دیده نمی‌شد، احتمال ساخته‌شدن جدول با نام اشتباه یا Query شکسته وجود داشت.
