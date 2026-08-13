@@ -164,3 +164,38 @@ from → USDT → to
 - `toFixed()` روی Decimal.js برای جلوگیری از نماد علمی (`1e-8`) هنگام ذخیره در TEXT
 - `BigInt` در Domain Layer برای Currency Amount — هرگز `Number`
 - هنگام P&L: `quantity` (TEXT→Decimal) × `averageBuyPrice` (INTEGER→Decimal) هر دو در Domain Layer تبدیل و سپس ضرب شوند
+
+---
+
+## ✅ رفع‌شده در بررسی ششم (باگ ۲۲)
+
+### باگ ۲۲ — نبود تعریف مرکزی Precision برای انواع مقادیر عددی
+**Severity: Critical**  
+**محل:** `docs/core/types/types.md` و `docs/core/utils/utils.md`
+
+**شرح:** در تمام فیچرها فیلدها با نوع `decimal` توصیف شده بودند بدون اینکه `scale`، `precision`، یا `rounding mode` برای هر نوع مقدار مشخص باشد. شش نوع مقدار عددی کاملاً متفاوت — همه با یک برچسب:
+- `BTC quantity` (8 decimal) و `stock quantity` (0 decimal) هر دو فقط `decimal`
+- `IRR price` (0 decimal) و `BTC/USDT price` (2 decimal) هر دو فقط `decimal`
+- `exchange rate` (باید 10+ decimal باشد) و `percentage` (4 decimal) هر دو فقط `decimal`
+- `NAV صندوق ایران` (0 decimal، مطابق بورس) بدون هیچ مشخصه‌ای
+
+اگر هر پیاده‌ساز precision متفاوتی انتخاب می‌کرد، P&L های محاسبه‌شده ناسازگار می‌شدند.
+
+**راه‌حل اعمال‌شده:**
+
+فایل جدید `core/types/precision.ts` ایجاد شد — **تنها مرجع precision برای کل پروژه** — با شش بخش مستقل:
+
+| نوع | Precision | Rounding | SQLite | مثال |
+|-----|-----------|----------|--------|------|
+| **Money** | per-currency (از `minorUnit.ts`) | ROUND_HALF_UP | INTEGER | minor unit |
+| **Quantity** | per-asset: BTC=8, ETH=9, SOL=9, ERC-20=18, Gold=4, Stock=0 | **ROUND_DOWN** | TEXT | `"0.00000001"` |
+| **Price** | per-pair: BTC/IRR=0, BTC/USDT=2, altcoin/USDT=8 | ROUND_HALF_UP | TEXT | `"65432.12"` |
+| **Rate** | 10 (یکسان برای همه) | ROUND_HALF_UP | TEXT | `"0.0000166667"` |
+| **Percentage** | 4 | ROUND_HALF_UP | TEXT | `"12.3456"` |
+| **NAV** | IRR=0، USD=2 (مطابق بورس ایران) | ROUND_HALF_UP | TEXT | `"45231"` |
+
+توابع `roundQuantity()`, `roundPrice()`, `roundRate()`, `roundPercentage()`, `roundNAV()` تعریف شدند.
+
+**چرا Quantity از ROUND_DOWN استفاده می‌کند؟** — محافظه‌کارانه: نشان دادن دارایی کمتر از واقع بهتر از بیشتر است (P&L safe).
+
+**آپدیت `utils.md`:** ارجاع صریح از `minorUnit.ts` به `precision.ts` برای انواع غیر-Money اضافه شد تا پیاده‌ساز سردرگم نشود.
