@@ -130,6 +130,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `ln_transactions` | Debt & Loan | تراکنش‌های وام |
 | `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
+| `inv_crypto_wallet_networks` | Investment Crypto | شبکه‌های بلاکچین هر والت (TRC20/ERC20/BEP20 و ...) |
 | `inv_crypto_holdings` | Investment Crypto | دارایی‌های رمزارز |
 | `inv_crypto_transactions` | Investment Crypto | تراکنش‌های رمزارز |
 | `inv_crypto_exchange_transactions` | Investment Crypto | تراکنش‌های نقدی صرافی |
