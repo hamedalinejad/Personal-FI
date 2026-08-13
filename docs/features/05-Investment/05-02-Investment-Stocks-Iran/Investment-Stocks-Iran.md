@@ -55,23 +55,27 @@
    - مبلغ حاصل به موجودی نقدی کارگزاری اضافه می‌شود.
 7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 7a. **سود نقدی (Dividend) — CRITICAL ACCOUNTING**:
-   - ثبت در `inv_stocks_iran_transactions` با `type = 'dividend'`
-   - **MUST** ایجاد Income Transaction در `acc_transactions`:
+   - یک رکورد `type = 'dividend'` در `inv_stocks_iran_transactions` ثبت می‌شود (با `totalAmount = netAmount`)
+   - **یک رکورد کامل** در `inv_stocks_iran_dividends` ثبت می‌شود با جزئیات:
+     - `grossAmountPerShare` × `holdingQuantityAtRecord` = `grossAmount`
+     - `taxAmount = grossAmount × taxRate / 100` (اگر معاف از مالیات: `taxAmount = 0`)
+     - `netAmount = grossAmount - taxAmount` → این مقدار به `cashBalance` اضافه و در `acc_transactions` ثبت می‌شود
+     - تاریخ‌های `exDate`, `recordDate`, `paymentDate` ثبت می‌شوند
+     - `holdingQuantityAtRecord` = تعداد سهم در تاریخ `recordDate` (نه تعداد فعلی)
+   - **MUST** ایجاد Income Transaction در `acc_transactions` با مبلغ `netAmount`:
      ```
      acc_transactions {
        type: 'deposit-income',
        relatedFeature: 'stocks_iran',
        relatedId: dividend_transaction_id,
-       amount: dividend_amount,
-       date: dividend_date,
-       description: "Dividend from [symbol]: [amount]",
-       accountId: brokerage_account  // کارگزاری حساب
+       amount: netAmount,
+       date: paymentDate,
+       description: "Dividend: [symbol] — ناخالص [grossAmount] ریال، مالیات [taxAmount] ریال"
      }
      ```
-   - مبلغ به `inv_stocks_iran_brokerages.cashBalance` اضافه می‌شود
-   - **Accounting Ledger میل شود**: بانک نقدی کارگزاری + موجودی Income
-   - Dividend **نه** سهام محسوب نمی‌شود، **نه** در `calculateProfitLoss()` (realized/unrealized)
-   - اما **یک درآمد محسوب می‌شود** و در Income بخش حسابداری ثبت می‌شود
+   - اگر `taxAmount > 0`: یک رکورد در `tax_records` ثبت و `inv_stocks_iran_dividends.taxEntryId` پر می‌شود
+   - Dividend در `calculateProfitLoss()` (realized/unrealized) لحاظ نمی‌شود — فقط درآمد است
+   - گزارش بازده واقعی: `yieldPerShare = grossAmountPerShare`، `totalYield = grossAmount`، `netYield = netAmount`
 
 7b. **افزایش سرمایه از اندوخته — سهام جایزه (`capital_increase_reserve`)**:
    - `quantity += newShares` در Holding
@@ -214,7 +218,35 @@
 > 
 > **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_stocks_iran_brokerage_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در کارگزاری) است.
 
-### ۵. acc_transactions
+### ۵. Dividend Record (جدول: `inv_stocks_iran_dividends`) — سود نقدی با جزئیات کامل
+
+برای پشتیبانی از گزارش‌های سود سرمایه‌گذاری، درآمد، مالیات، و بازده واقعی، سود نقدی علاوه بر یک رکورد در `inv_stocks_iran_transactions`، در این جدول مستقل هم ذخیره می‌شود تا تمام جزئیات مالی و تاریخی قابل گزارش‌گیری باشد.
+
+- `id` → UUID (Primary Key)
+- `brokerageId` → UUID
+- `symbol` → string (نماد سهم)
+- `holdingQuantityAtRecord` → decimal (**تعداد سهم در تاریخ `recordDate`** — برای محاسبه بازده واقعی per-share الزامی است؛ نه تعداد فعلی)
+- `grossAmountPerShare` → decimal (سود ناخالص به ازای هر سهم — ریال)
+- `grossAmount` → decimal (`grossAmountPerShare × holdingQuantityAtRecord`)
+- `taxRate` → decimal (nullable — نرخ مالیات کسر‌شده به درصد، مثلاً `5.0` برای ۵٪؛ اگر معاف از مالیات باشد `0` و اگر نامشخص باشد `null`)
+- `taxAmount` → decimal (nullable — مبلغ مالیات کسر‌شده: `grossAmount × taxRate / 100`)
+- `netAmount` → decimal (**مبلغ واقعی دریافتی** = `grossAmount - taxAmount`؛ این مقدار به `cashBalance` کارگزاری اضافه می‌شود)
+- `exDate` → date (nullable — آخرین روزی که با خرید سهام، مشمول دریافت این سود می‌شوید)
+- `recordDate` → date (nullable — تاریخ ثبت سهامداران واجد شرایط — برای محاسبه `holdingQuantityAtRecord`)
+- `paymentDate` → date (**تاریخ واقعی پرداخت سود** — این تاریخ در `acc_transactions` و `inv_stocks_iran_transactions` استفاده می‌شود)
+- `source` → enum (`bourse_announcement`, `brokerage_statement`, `manual`) — منبع اطلاعات سود
+- `transactionId` → UUID (لینک به `inv_stocks_iran_transactions.id` با `type='dividend'`)
+- `accountingEntryId` → UUID (لینک به `acc_transactions.id` — Income entry)
+- `taxEntryId` → UUID (nullable — لینک به `tax_records.id` اگر مالیات این سود در Tax Management پیگیری شود)
+- `description` → string (nullable)
+- `createdAt` → datetime
+
+> **رابطه با `inv_stocks_iran_transactions`**:
+> - یک رکورد `type='dividend'` در `inv_stocks_iran_transactions` همیشه با یک رکورد در `inv_stocks_iran_dividends` همراه است (یک‌به‌یک).
+> - `inv_stocks_iran_transactions.totalAmount` = همان `netAmount` در این جدول (مبلغ واقعی دریافتی).
+> - اگر به جزئیات `gross`/`tax` نیازی نباشد (مثلاً برای ورودی سریع)، `taxRate=0` و `taxAmount=0` ست می‌شود و `grossAmount = netAmount`.
+
+### ۶. acc_transactions
 
 - فقط در واریز و برداشت بین حساب بانکی و کارگزاری ثبت می‌شود.
 - لینک از طریق `relatedFeature = 'stocks_iran'` و `relatedId = inv_stocks_iran_brokerage_transactions.id` انجام می‌شود.
@@ -238,51 +270,69 @@
 ### Transaction APIs
 - `createStockTransaction(data)` → خرید / فروش (`type = 'buy'` یا `'sell'`)
 - `createBrokerageTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک به حساب بانکی
-- **`recordDividend(brokerageId, symbol, amount, date, description)` — NEW (CRITICAL)**
+- **`recordDividend(data)` — سود نقدی کامل**
   ```typescript
   interface RecordDividendInput {
     brokerageId: UUID
-    symbol: string     // نماد سهم (مثلاً فولاد)
-    amount: Decimal    // مبلغ سود نقدی (ریال)
-    date: datetime     // تاریخ دریافت سود
-    description: string // توضیح (مثلاً "Dividend from FOLAD - 1000 ریال/سهم")
+    symbol: string
+    grossAmountPerShare: Decimal   // سود ناخالص هر سهم (ریال)
+    holdingQuantityAtRecord: Decimal // تعداد سهم در تاریخ recordDate (اجباری)
+    taxRate?: Decimal              // نرخ مالیات درصدی (پیش‌فرض: 0)
+    exDate?: date                  // آخرین تاریخ مشمولیت خرید
+    recordDate?: date              // تاریخ ثبت سهامداران
+    paymentDate: date              // تاریخ واقعی پرداخت (اجباری)
+    source: 'bourse_announcement' | 'brokerage_statement' | 'manual'
+    description?: string
   }
   ```
-  
-  **Process**:
+
+  **Process** (atomic — همه یا هیچ):
   ```
+  grossAmount = grossAmountPerShare × holdingQuantityAtRecord
+  taxAmount   = grossAmount × (taxRate ?? 0) / 100
+  netAmount   = grossAmount - taxAmount
+
   1. CREATE inv_stocks_iran_transactions {
-       type: 'dividend',
-       brokerageId,
-       symbol,
-       totalAmount: amount,
-       quantity: null,
-       price: null,
-       date
+       type: 'dividend', brokerageId, symbol,
+       totalAmount: netAmount,  // مبلغ واقعی دریافتی
+       date: paymentDate
      }
-  
+
   2. CREATE acc_transactions {
        type: 'deposit-income',
        relatedFeature: 'stocks_iran',
-       relatedId: dividend_transaction.id,
-       amount,
-       date,
-       description: "Dividend: " + description,
-       accountId: brokerage.linkedBankAccountId  // کارگزاری کدام حساب بانکی لینک شده
+       relatedId: step1.id,
+       amount: netAmount,
+       date: paymentDate,
+       description: "Dividend: " + symbol + " — ناخالص " + grossAmount + "، مالیات " + taxAmount
      }
-  
-  3. UPDATE inv_stocks_iran_brokerages {
-       cashBalance += amount
+
+  3. IF taxAmount > 0:
+     CREATE tax_records {
+       type: 'dividend_withholding',
+       relatedFeature: 'stocks_iran',
+       relatedId: step1.id,
+       amount: taxAmount,
+       date: paymentDate,
+       status: 'paid'   // مالیات تکلیفی — از قبل کسر شده
      }
-  
-  4. RETURN { success: true, dividend_id, accounting_entry_id }
+
+  4. CREATE inv_stocks_iran_dividends {
+       brokerageId, symbol,
+       holdingQuantityAtRecord,
+       grossAmountPerShare, grossAmount,
+       taxRate: taxRate ?? 0, taxAmount, netAmount,
+       exDate, recordDate, paymentDate, source,
+       transactionId: step1.id,
+       accountingEntryId: step2.id,
+       taxEntryId: step3.id (nullable)
+     }
+
+  5. UPDATE inv_stocks_iran_brokerages { cashBalance += netAmount }
+
+  6. RETURN { dividendId: step4.id, transactionId: step1.id,
+              grossAmount, taxAmount, netAmount }
   ```
-  
-  **Important**:
-  - ✅ Dividend میل شود `acc_transactions` (Income entry)
-  - ✅ Accounting Ledger یاد شود
-  - ✅ Bank account لینک شود (شفاف کجا پول رفت)
-  - ✅ NOT counted in Realized P&L (فقط درآمد، نه معامله)
 
 ### Corporate Action APIs
 
@@ -316,6 +366,8 @@
 - `getStockTransactions(filters)`
 - `getBrokerageTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, brokerageId?)`
+- `getDividends(filters?)` → لیست سودهای نقدی از `inv_stocks_iran_dividends` با فیلتر symbol/brokerage/dateRange
+- `getDividendSummary(symbol?, dateRange?)` → خلاصه: `totalGross`, `totalTax`, `totalNet`, `yieldBySymbol[]`
 
 ---
 
