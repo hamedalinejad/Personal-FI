@@ -51,7 +51,7 @@
   }
   ```
 - `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice('crypto', symbol)` فیچر پدر — `assetCategory='crypto'` همیشه hardcode است تا collision با نمادهای هم‌نام در سهام/فلزات ممکن نباشد
-- `setManualCryptoPrice(symbol, price)` → میانبر روی `setManualPrice(symbol, price, priceCurrency='USDT')` فیچر پدر؛ کاملاً آفلاین
+- `setManualCryptoPrice(symbol, price, isOverride?: boolean)` → میانبر روی `setManualPrice('crypto', symbol, price, 'USDT', isOverride)` فیچر پدر؛ کاملاً آفلاین. اگر `isOverride=true` ست شود، قیمت‌های API بعدی این قیمت را override نمی‌کنند تا `clearManualOverride('crypto', symbol)` صدا زده شود.
 - `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='crypto'` ارجاع دهد
 
 ---

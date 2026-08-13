@@ -46,7 +46,7 @@ gramPriceIRR_18k = gramPriceIRR_24k × (18/24)      // تبدیل عیار ۲۴ 
 
 - `fetchMetalsPrices(items: {metalType, purity}[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص فلزات روی `fetchAndStorePrices` فیچر پدر (`assetCategory='metal'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped`.
 - `getLatestMetalPrice(metalType, purity)` → میانبر روی `getLatestPrice('metal', '{metalType}_{purity}')` — `assetCategory='metal'` همیشه hardcode است؛ همراه با تبدیل خودکار واحد از میلی‌گرم به گرم برای نمایش.
-- `setManualMetalPrice(metalType, purity, pricePerGram)` → ثبت دستی
+- `setManualMetalPrice(metalType, purity, pricePerGram, isOverride?: boolean)` → میانبر روی `setManualPrice('metal', '{metalType}_{purity}', pricePerGram, 'IRR', isOverride)` فیچر پدر. اگر `isOverride=true`، قیمت‌های API بعدی override نمی‌کنند تا `clearManualOverride('metal', '{metalType}_{purity}')` صدا زده شود.
 - `getMetalsAutoSyncSettings()` / `setMetalsAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='metal'` ارجاع دهد
 
 ---

@@ -135,6 +135,7 @@ export interface CachedPrice {
   price: string; // decimal string — نه number
   priceCurrency: PriceCurrency;
   source: 'manual' | 'api';
+  isManualOverride: boolean; // اگر true، قیمت‌های API جدیدتر نادیده گرفته می‌شوند تا Override لغو شود
   fetchedAt: Timestamp;
   isStale: boolean; // اگر بیش از یک حد مشخص (مثلاً ۲۴ ساعت) از fetchedAt گذشته باشد
 }

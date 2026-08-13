@@ -97,14 +97,20 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 ### ۱. Price Source (جدول: `price_sources`)
 
 - `id` → UUID (Primary Key)
-- `name` → string (نام منبع، مثلاً «Nobitex»، «CoinGecko»)
+- `name` → string (نام منبع، مثلاً «Nobitex»، «CoinGecko»، «صندوق پاداش سرمایه»)
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`, `housing`) — دسته دارایی‌ای که این منبع پوشش می‌دهد (`fif` برای صندوق‌های issuance_redemption که منبع اختصاصی per-fund دارند؛ صندوق‌های ETF از `stock` استفاده می‌کنند)
+- **`symbol` → string (nullable)** — اگر این Source فقط برای یک نماد/صندوق خاص است (per-fund یا per-symbol)، اینجا مشخص می‌شود؛ مثلاً برای صندوق `issuance_redemption` مقدار `fundId` (UUID به‌صورت رشته) است. اگر `null` باشد، Source برای همه نمادهای `assetCategory` قابل استفاده است (مثل CoinGecko که همه رمزارزها را پوشش می‌دهد).
+
+  > **مثال برای ایران**: صندوق «آرمان افرا» → یک رکورد `price_sources` با `assetCategory='fif'`، `symbol='<fundId>'`، `baseUrl='https://armancapital.ir/nav'`؛ صندوق «کمند» → رکورد جداگانه با `symbol='<fundId-kamand>'`. این mapping صریح `fundId → sourceId` است که `fetchFundNAV(fundId)` برای پیدا کردن Provider خودش نیاز دارد.
+
 - `baseUrl` → string (آدرس API)
 - `requiresApiKey` → boolean
 - `isActive` → boolean
 - `notes` → string (nullable)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> **کوئری انتخاب Source برای یک نماد**: ابتدا `WHERE assetCategory = ? AND symbol = ? AND isActive = true` (per-symbol) — اگر نبود، `WHERE assetCategory = ? AND symbol IS NULL AND isActive = true` (عمومی آن دسته). اولویت همیشه با Source اختصاصی‌تر است.
 
 ### ۲. Price History (جدول: `price_history`) — لاگ Append-Only
 
@@ -116,8 +122,39 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
 - `source` → enum (`manual`, `api`) — منشأ این رکورد؛ فیلد اصلی برای تفکیک دو مسیر بخش «دو مسیر دریافت قیمت»
 - `triggeredBy` → enum (`user_click`, `auto_sync`, `manual_entry`) — دقیقاً چه چیزی این رکورد را ایجاد کرده (برای UI و لاگ شفافیت بیشتر از `source` می‌دهد: مثلاً `source='api'` می‌تواند هم از `user_click` باشد هم از `auto_sync`)
+- **`isManualOverride` → boolean (پیش‌فرض: `false`)** — وقتی کاربر صریحاً قیمتی را به‌عنوان Override ثبت می‌کند (نه فقط یک قیمت دستی معمولی)، این فیلد `true` است. تفاوت رفتاری: API بعدی این Override را نادیده نمی‌گیرد تا کاربر خودش آن را لغو کند.
 - `fetchedAt` → datetime (لحظه دریافت/ثبت واقعی)
 - `createdAt` → datetime
+
+> **سیاست Override در `getLatestPrice(assetCategory, symbol)`:**
+>
+> ```
+> ۱. اگر آخرین رکورد price_history (ORDER BY fetchedAt DESC LIMIT 1)
+>    isManualOverride = true باشد → همان قیمت را برگردان (صرف‌نظر از قیمت‌های API بعدی)
+>
+> ۲. در غیر این صورت → آخرین رکورد (isManualOverride یا نه، هر منبعی) را برگردان
+>    (همان رفتار فعلی: جدیدترین رکورد بر اساس fetchedAt)
+> ```
+>
+> **مثال**: `10:00 API=100` → `10:05 Manual(override=true)=110` → `10:10 API=101`
+> - `getLatestPrice` → **110** (چون Override فعال است)
+> - تا زمانی که کاربر Override را با `clearManualOverride(assetCategory, symbol)` لغو نکند، قیمت‌های API جدید دیده نمی‌شوند
+>
+> **مثال بدون Override**: `10:00 API=100` → `10:05 Manual(override=false)=110` → `10:10 API=101`
+> - `getLatestPrice` → **101** (رفتار معمول: جدیدترین رکورد)
+>
+> **پیاده‌سازی کوئری**:
+> ```sql
+> -- ابتدا بررسی Override فعال
+> SELECT * FROM price_history
+> WHERE assetCategory = ? AND symbol = ? AND isManualOverride = true
+> ORDER BY fetchedAt DESC LIMIT 1;
+> -- اگر نتیجه داشت → برگردان
+> -- اگر نداشت → fallback به جدیدترین رکورد (هر منبعی)
+> SELECT * FROM price_history
+> WHERE assetCategory = ? AND symbol = ?
+> ORDER BY fetchedAt DESC LIMIT 1;
+> ```
 
 > **نکته**: `price_history` هرگز توسط فیچرهای سرمایه‌گذاری مستقیماً نوشته نمی‌شود؛ فقط از طریق APIهای همین فیچر (`fetchAndStorePrices` یا `setManualPrice`) پر می‌شود. فیچرهای دیگر فقط Read دارند (`getLatestPrice`).
 
@@ -181,7 +218,8 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
   5. خروجی یکسان با ساختار `succeeded[]` / `failed[]` که در `19-01-Crypto-Prices` تعریف شده برمی‌گرداند.
 
 ### ثبت دستی (کاملاً آفلاین)
-- `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.
+- `setManualPrice(assetCategory, symbol, price, priceCurrency, isOverride?: boolean)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. اگر `isOverride=true` باشد، فیلد `isManualOverride=true` ست می‌شود و `getLatestPrice` از این لحظه آن قیمت را بر API ترجیح می‌دهد تا زمانی که Override لغو شود. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.
+- `clearManualOverride(assetCategory, symbol)` → آخرین رکورد `isManualOverride=true` برای این نماد را پیدا کرده و `isManualOverride=false` می‌کند (update روی یک رکورد موجود — استثنای مجاز از اصل Append-Only چون Override یک وضعیت است، نه یک رکورد تاریخی). بعد از این، `getLatestPrice` دوباره به رفتار معمول (جدیدترین رکورد) برمی‌گردد.
 
 ### مدیریت Auto-Sync
 - `getSyncSettings(scope, assetCategory?, symbol?)` → رکوردهای `price_sync_settings` را با فیلتر برمی‌گرداند

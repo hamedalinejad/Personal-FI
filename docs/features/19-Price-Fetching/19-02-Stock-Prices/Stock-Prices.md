@@ -33,7 +33,7 @@
 
 - `fetchStockPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص سهام روی `fetchAndStorePrices` فیچر پدر (`assetCategory='stock'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped` سند کریپتو.
 - `getLatestStockPrice(symbol)` → میانبر روی `getLatestPrice('stock', symbol)` — `assetCategory='stock'` همیشه hardcode است
-- `setManualStockPrice(symbol, price)` → ثبت دستی، `priceCurrency='IRR'` ثابت (بر خلاف کریپتو که پایه USDT است، اینجا پایه ریال است چون کل بازار سهام ایران ریالی است)
+- `setManualStockPrice(symbol, price, isOverride?: boolean)` → میانبر روی `setManualPrice('stock', symbol, price, 'IRR', isOverride)` فیچر پدر؛ `priceCurrency='IRR'` ثابت (بر خلاف کریپتو که پایه USDT است، اینجا پایه ریال است چون کل بازار سهام ایران ریالی است). اگر `isOverride=true`، قیمت‌های API بعدی override نمی‌کنند تا `clearManualOverride('stock', symbol)` صدا زده شود.
 - `getStockAutoSyncSettings()` / `setStockAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='stock'` ارجاع دهد
 
 ---
