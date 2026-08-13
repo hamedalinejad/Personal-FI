@@ -52,7 +52,7 @@
   ```
 - `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice('crypto', symbol)` فیچر پدر — `assetCategory='crypto'` همیشه hardcode است تا collision با نمادهای هم‌نام در سهام/فلزات ممکن نباشد
 - `setManualCryptoPrice(symbol, price)` → میانبر روی `setManualPrice(symbol, price, priceCurrency='USDT')` فیچر پدر؛ کاملاً آفلاین
-- `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
+- `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='crypto'` ارجاع دهد
 
 ---
 

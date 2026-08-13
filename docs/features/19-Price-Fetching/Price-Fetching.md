@@ -127,12 +127,17 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `scope` → enum (`asset_category`, `symbol`) — آیا این تنظیم روی کل یک دسته دارایی اعمال می‌شود یا فقط یک نماد خاص
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`, `housing`) (nullable — وقتی `scope='asset_category'`)
 - `symbol` → string (nullable — وقتی `scope='symbol'`؛ برای Override یک نماد خاص، مستقل از تنظیم کلی دسته‌اش)
+- **`sourceId` → UUID — Foreign Key به `price_sources.id` (NOT NULL)** — کدام Provider برای این sync استفاده شود؛ `runDueAutoSyncs()` این فیلد را مستقیماً به `fetchAndStorePrices(symbols[], sourceId, ...)` پاس می‌دهد. بدون این فیلد، Auto-Sync نمی‌داند از کدام API باید قیمت بگیرد.
 - `autoSyncEnabled` → boolean (پیش‌فرض: `false`)
 - `syncIntervalMinutes` → integer (پیش‌فرض پیشنهادی: ۱۵؛ حداقل مجاز در Validation لایه Domain، نه دیتابیس، اعمال شود — مثلاً ≥ ۵)
 - `lastSyncAt` → datetime (nullable)
 - `createdAt` / `updatedAt` → datetime
 
-> **قاعده اولویت**: اگر برای یک نماد مشخص رکورد `scope='symbol'` وجود داشته باشد، همان معتبر است (Override)؛ در غیر این صورت تنظیم `scope='asset_category'` همان دسته اعمال می‌شود؛ اگر هیچ‌کدام نبود، پیش‌فرض سیستم `autoSyncEnabled=false` است (یعنی سکوت = خاموش، طبق اصل Offline-First بالا).
+> **رابطه `price_sync_settings` ↔ `price_sources`**: یک نماد می‌تواند چند رکورد `price_sync_settings` با `sourceId`های مختلف داشته باشد — یعنی کاربر می‌تواند BTC را هم از CoinGecko و هم از Nobitex به‌طور مستقل sync کند. هر رکورد یک تنظیم مستقل است با `lastSyncAt` و `syncIntervalMinutes` جداگانه. این رویکرد ساده‌تر از یک جدول N:M جداگانه است و قابلیت مشابهی ارائه می‌دهد.
+
+> **قاعده اولویت در `getLatestPrice`**: اگر چند Provider برای یک نماد sync شوند، `getLatestPrice(assetCategory, symbol)` همیشه **جدیدترین رکورد** در `price_history` را برمی‌گرداند (بر اساس `fetchedAt DESC`) بدون توجه به اینکه از کدام Provider آمده — کاربر می‌تواند با انتخاب Provider مناسب، قیمت «معتبرتر» را جدیدتر نگه دارد.
+
+> **قاعده اولویت در Auto-Sync**: هر رکورد `price_sync_settings` (با `sourceId` خودش) مستقل اجرا می‌شود؛ اگر برای یک نماد مشخص رکورد `scope='symbol'` وجود داشته باشد، علاوه بر رکورد `scope='asset_category'` اجرا می‌شود (نه به‌جای آن) — چون هر رکورد یک Provider جداگانه دارد. اگر هیچ رکورد `autoSyncEnabled=true` نبود، پیش‌فرض سیستم `autoSyncEnabled=false` است (سکوت = خاموش، طبق اصل Offline-First).
 
 ---
 
@@ -179,9 +184,25 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.
 
 ### مدیریت Auto-Sync
-- `getSyncSettings(scope, assetCategory?, symbol?)`
-- `setSyncSettings(data)` → روشن/خاموش کردن و تنظیم `syncIntervalMinutes` برای یک دسته یا یک نماد
-- `runDueAutoSyncs()` → روی همه رکوردهای `autoSyncEnabled=true` که `now - lastSyncAt >= syncIntervalMinutes` است چک می‌کند و برای هرکدام `fetchAndStorePrices(..., triggeredBy='auto_sync')` را صدا می‌زند؛ این تابع فقط از تایمر داخل اپ (وقتی تب باز و آنلاین است) صدا زده می‌شود، نه از بیرون.
+- `getSyncSettings(scope, assetCategory?, symbol?)` → رکوردهای `price_sync_settings` را با فیلتر برمی‌گرداند
+- `setSyncSettings(data)` → ایجاد یا ویرایش یک رکورد sync؛ **`sourceId` اجباری است** — بدون Provider نمی‌توان Auto-Sync فعال کرد. اگر کاربر بخواهد یک نماد را از دو Provider sync کند، دو بار `setSyncSettings` با `sourceId`های مختلف صدا می‌زند (دو رکورد مستقل)
+- `runDueAutoSyncs()` → روی همه رکوردهای `autoSyncEnabled=true` که `now - lastSyncAt >= syncIntervalMinutes` است چک می‌کند و برای هرکدام `fetchAndStorePrices(symbols[], record.sourceId, triggeredBy='auto_sync')` را صدا می‌زند — **`sourceId` مستقیماً از رکورد `price_sync_settings` خوانده می‌شود**، نه از جای دیگری. این تابع فقط از تایمر داخل اپ (وقتی تب باز و آنلاین است) صدا زده می‌شود، نه از بیرون.
+
+  ```typescript
+  // منطق runDueAutoSyncs:
+  const dueRecords = db.query(`
+    SELECT * FROM price_sync_settings
+    WHERE autoSyncEnabled = true
+    AND (lastSyncAt IS NULL OR
+         (unixepoch('now') - unixepoch(lastSyncAt)) >= syncIntervalMinutes * 60)
+  `);
+
+  for (const record of dueRecords) {
+    const symbols = resolveSymbols(record); // scope='symbol'→[record.symbol] / scope='asset_category'→holdings
+    await fetchAndStorePrices(symbols, record.sourceId, 'auto_sync');
+    // lastSyncAt در داخل fetchAndStorePrices آپدیت می‌شود (قانون ۴ در fetchAndStorePrices)
+  }
+  ```
 
 ---
 

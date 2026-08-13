@@ -47,7 +47,7 @@ gramPriceIRR_18k = gramPriceIRR_24k × (18/24)      // تبدیل عیار ۲۴ 
 - `fetchMetalsPrices(items: {metalType, purity}[], triggeredBy: 'user_click' | 'auto_sync')` → Wrapper مخصوص فلزات روی `fetchAndStorePrices` فیچر پدر (`assetCategory='metal'`)؛ همان ساختار خروجی `succeeded[]`/`failed[]`/`skipped`.
 - `getLatestMetalPrice(metalType, purity)` → میانبر روی `getLatestPrice('metal', '{metalType}_{purity}')` — `assetCategory='metal'` همیشه hardcode است؛ همراه با تبدیل خودکار واحد از میلی‌گرم به گرم برای نمایش.
 - `setManualMetalPrice(metalType, purity, pricePerGram)` → ثبت دستی
-- `getMetalsAutoSyncSettings()` / `setMetalsAutoSyncSettings(data)`
+- `getMetalsAutoSyncSettings()` / `setMetalsAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر؛ **`data.sourceId` اجباری است** — باید یک `price_sources.id` با `assetCategory='metal'` ارجاع دهد
 
 ---
 
