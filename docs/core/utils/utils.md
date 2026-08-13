@@ -19,9 +19,10 @@ utils/
 │   └── round.ts               # گرد کردن اعشار (Decimal-safe)
 ├── money/
 │   ├── formatMoney.ts         # فرمت مبلغ با واحد ارز برای نمایش
-│   ├── minorUnit.ts           # تبدیل بین Minor Unit و Decimal — مرکز Minor Unit کل پروژه
+│   ├── minorUnit.ts           # تبدیل بین Minor Unit و Decimal — مرکز Currency Amount
 │   ├── calculateWeightedAverage.ts # میانگین وزنی خرید (Crypto/Stocks/Metals)
 │   └── rialToToman.ts         # تبدیل ریال ↔ تومان برای نمایش
+│   # Precision/Scale برای Quantity/Price/Rate/Percentage/NAV → core/types/precision.ts
 ├── validation/
 │   ├── iban.ts                # اعتبارسنجی شبا (IBAN ایران)
 │   ├── cardNumber.ts          # اعتبارسنجی کارت بانکی (Luhn)
@@ -90,6 +91,10 @@ export function fromMinorUnit(minorUnits: bigint | number, currency: string): De
 ```
 
 > **قانون مهم**: هیچ‌جای پروژه نباید `amount * 100` یا `amount / 100` به‌صورت دستی نوشته شود. همیشه از `toMinorUnit` و `fromMinorUnit` استفاده شود تا تعداد اعشار هر ارز در یک‌جا مدیریت شود.
+
+> **ارجاع به Precision**: این فایل فقط **Currency Amount** (مبالغ مالی با minor unit) را پوشش می‌دهد.  
+> برای **Quantity** (تعداد دارایی)، **Price** (قیمت)، **Rate** (نرخ)، **Percentage**، و **NAV**  
+> به `core/types/precision.ts` مراجعه کنید — توابع `roundQuantity`, `roundPrice`, `roundRate`, `roundPercentage`, `roundNAV` آنجا تعریف شده‌اند.
 
 ---
 
