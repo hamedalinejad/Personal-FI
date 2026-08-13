@@ -9,6 +9,16 @@
 ## Business Rules
 
 - موجودی حساب نمی‌تواند منفی شود (مگر حساب اعتباری در آینده).
+- **افتتاحیه حساب (CRITICAL)**: هر حساب جدید باید با Opening Balance Transaction ایجاد شود:
+  ```
+  1. createAccount() → currentBalance = 0 (always)
+  2. createOpeningBalanceTransaction(accountId, amount, date)
+  3. Only then → currentBalance = amount
+  ```
+  - اگر opening balance = ۵۰۰M ریال ⟹ **باید** type='opening_balance' transaction وجود داشته باشد
+  - بدون Opening Transaction ⟹ **نمی‌تواند** opening balance داشته باشد
+  - **Reconciliation از روز اول کار می‌کند**: balance = SUM(transactions)
+  
 - انتقال وجه بین حساب‌ها باعث ایجاد دو تراکنش مستقل می‌شود (برداشت از مبدا + واریز به مقصد).
 - نام حساب باید منحصر به فرد باشد.
 - حذف حساب وجود ندارد — فقط آرشیو (Soft Archive).
@@ -47,7 +57,7 @@
 
 - `id` → UUID (Primary Key)
 - `date` → datetime (تاریخ تراکنش)
-- `type` → `TransactionType` (تعریف مرکزی در `core/types/types.md` — مقادیر معتبر: `deposit-income`, `withdrawal-expense`, `transfer-in`, `transfer-out`, `deposit-loan`, `withdrawal-loan`, `withdrawal-expense-tax`, `deposit-income-tax`, `withdrawal-cheque`, `deposit-cheque`, `deposit-investment`, `withdrawal-investment`)
+- `type` → `TransactionType` (تعریف مرکزی در `core/types/types.md` — مقادیر معتبر: `opening_balance`, `deposit-income`, `withdrawal-expense`, `transfer-in`, `transfer-out`, `deposit-loan`, `withdrawal-loan`, `withdrawal-expense-tax`, `deposit-income-tax`, `withdrawal-cheque`, `deposit-cheque`, `deposit-investment`, `withdrawal-investment`)
 - `amount` → decimal (مبلغ — با `decimal.js`، Minor Unit طبق `db.md`)
 - `feeAmount` → decimal (nullable — کارمزد تراکنش)
 - `feeCurrency` → string (nullable — ارز کارمزد: `IRR`, `USDT` و ...)
@@ -89,12 +99,54 @@
 ## APIهای داخلی
 
 ### Account APIs
-- `createAccount(data)` → ایجاد حساب جدید با `currentBalance = 0` (یا مقدار اولیه)
+- `createAccount(data)` → ایجاد حساب جدید **با currentBalance = 0**
+  ```typescript
+  interface CreateAccountInput {
+    name: string
+    accountNumber: string
+    iban: string
+    currency: string
+    accountType: AccountType
+    bankName: string
+    branchName: string
+    cardNumber?: string
+    notes?: string
+    // ❌ currentBalance پارامتر نیست — فقط از طریق Opening Transaction
+  }
+  ```
+  
+  **قاعده مهم**: حساب جدید **باید** دارای Opening Balance Transaction باشد (یا ۰ شروع کند)
+  - اگر `currentBalance ≠ 0` ⟹ **باید** `createOpeningBalanceTransaction()` فراخوانی شود
+  - بدون Opening Transaction ⟹ balance همیشه ۰ است و reconcilable است
+
+- `createOpeningBalanceTransaction(accountId, amount, date, source, relatedDocument?)` → ثبت تراکنش Opening Balance (جدید)
+  ```typescript
+  interface OpeningBalanceTransaction {
+    type: 'opening_balance'  // enum خاص، فقط یکی در دوره عمر حساب
+    accountId: UUID
+    amount: Decimal  // مانده افتتاحیه (۵۰۰٬۰۰۰٬۰۰۰ IRR)
+    date: datetime   // تاریخ افتتاح واقعی (مثلاً ۱۴۰۰-۰۱-۰۱)
+    description: string  // "Opening Balance as of [date]"
+    source: 'manual' | 'bank_statement'  // منبع تأیید
+    relatedDocument?: UUID  // صورت‌حساب بانکی اولیه (اگر موجود)
+    createdAt: datetime
+  }
+  ```
+  
+  **فرآیند**:
+  ```
+  1. INSERT acc_accounts with currentBalance = 0
+  2. User enters opening balance via createOpeningBalanceTransaction()
+  3. INSERT acc_transactions with type='opening_balance'
+  4. UPDATE acc_accounts.currentBalance = amount
+  5. Now: balance = 500M, SUM(transactions) = 500M ✓ Reconcilable
+  ```
+
 - `updateAccount(id, data)` → ویرایش فقط فیلدهای توصیفی: `name`, `bankName`, `branchName`, `accountNumber`, `iban`, `cardNumber`, `notes` — هرگز `currentBalance` یا `currency` مستقیم ویرایش نمی‌شود
 - `getAllAccounts(includeArchived = false)`
 - `getAccountById(id)`
 - `archiveAccount(id)` → `isArchived = true`؛ حساب آرشیوشده تراکنش جدید نمی‌پذیرد
-- `getCurrentBalance(accountId)` → برگرداندن `currentBalance` از جدول (نه جمع تراکنش‌ها)
+- `getCurrentBalance(accountId)` → برگرداندن `currentBalance` از جدول (نه جمع تراکنش‌ها) — یا Mode B: calculate from journal
 
 ### Transaction APIs
 - `createTransaction(data)` → ثبت تراکنش + آپدیت `currentBalance` + ثبت `balanceAfterTransaction`؛ اگر موجودی کافی نباشد، خطا برمی‌گرداند
