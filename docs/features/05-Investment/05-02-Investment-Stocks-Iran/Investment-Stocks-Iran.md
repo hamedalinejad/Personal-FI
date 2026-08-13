@@ -92,8 +92,10 @@
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
-- `symbol` → string (نماد سهم — مثلاً فولاد، شپنا)
+- `symbol` → string (نماد سهم — مثلاً فولاد، شپنا؛ نماد داخلی سیستم — همان چیزی که کاربر وارد می‌کند)
 - `name` → string (نام شرکت)
+- `providerSymbol` → string (nullable — شناسه این نماد در Provider قیمت‌گیری؛ برخی Providerها نماد TSETMC را عیناً می‌پذیرند، برخی دیگر کد ISIN یا URL slug متفاوتی دارند — مثلاً `فولاد` در سیستم ممکن است در Provider به‌صورت `IRO1MSMI0001` یا `foulad` شناخته شود؛ اگر null باشد، `symbol` مستقیم برای قیمت‌گیری استفاده می‌شود اما ریسک Not Found در Provider وجود دارد)
+- `market` → string (nullable — بازار معامله‌ای که نماد در آن است — مثلاً `bourse` (بورس)، `fara_bourse` (فرابورس)، `base_market` (بازار پایه)؛ مفید برای نمایش و فیلتر)
 - `quantity` → decimal (تعداد سهم)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید — ریال)
 - `totalInvested` → decimal
