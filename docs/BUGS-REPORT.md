@@ -9,6 +9,19 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۳۵ — تمایز واحد، عیار و وزن خالص در فلزات (Severity: High)
+**محل:** `docs/features/05-Investment/05-04-Metals/Metals.md` + `19-04-Metals-Prices` + `db.md`
+**شرح:** مدل قبلی `purity` را فقط روی Holding داشت و روی Transaction نداشت؛ وزن خالص (Fine Weight) تعریف نشده بود؛ خطر قاطی‌شدن `1g Gold 18K` با `1g pure gold` و اشتباه گرفتن mg/gram/ounce وجود داشت.
+**راه‌حل اعمال‌شده:**
+- واحد پایه ذخیره‌سازی فقط `quantityMg` (وزن **ناخالص**)؛ گرم/اونس فقط در UI
+- `purity` + `purityRatio` اجباری روی Holding و Transaction (کد استاندارد، نه متن آزاد)
+- `fineWeightMg = quantityMg × purityRatio` فقط محاسبه برای گزارش؛ ذخیره نمی‌شود
+- کلید یکتای Holding: `(platformId, metalType, purity)`
+- قیمت و میانگین همیشه per-mg **همان عیار**؛ Unrealized از `getLatestMetalPrice(metalType, purity)`
+- جدول تبدیل واحد (mg/g/kg/troy oz) در Business Rules
+- همگام‌سازی `Metals-Prices.md` و نمونه Schema در `db.md`
+
+
 ### باگ ۳۴ — تمایز قطعی NAV و قیمت معامله در صندوق‌های درآمد ثابت (Severity: High)
 **محل:** `docs/features/05-Investment/05-03-Fixed-Income-Funds/Fixed-Income-Funds.md` (Domain Entities + منطق محاسبه)
 **شرح:** مدل قبلی فقط یک فیلد `price` داشت که هم به‌عنوان NAV و هم به‌عنوان قیمت واحد معامله استفاده می‌شد. در صندوق‌های صدور/ابطال ایران، NAV، قیمت صدور (subscription) و قیمت ابطال (redemption) اغلب در یک روز با هم متفاوت‌اند. این باعث می‌شد میانگین خرید، Realized P&L و Unrealized P&L اشتباه محاسبه شوند.

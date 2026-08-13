@@ -38,7 +38,22 @@ Should Have:
 Business Rules
 
 - تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
-- واحد پایه ذخیره‌سازی موجودی: میلی‌گرم (برای دقت بالا). نمایش به کاربر می‌تواند گرم یا کیلو باشد.
+- **واحد، عیار و وزن خالص باید همیشه مستقل بمانند (باگ ۳۵ — High)**:
+  - واحد پایه ذخیره‌سازی موجودی: **میلی‌گرم (`quantityMg`)** — هرگز گرم/اونس در دیتابیس ذخیره نمی‌شود.
+  - نمایش به کاربر می‌تواند میلی‌گرم / گرم / کیلو / اونس باشد؛ تبدیل فقط در Presentation Layer.
+  - `purity` (عیار/خلوص) فیلد اجباری و مستقل از وزن است؛ `1g Gold 18K` هرگز معادل `1g pure gold` نیست.
+  - **وزن خالص (Fine Weight)** محاسبه می‌شود و ذخیره نمی‌شود:
+    - طلای عیاری: `fineWeightMg = quantityMg × (karat / 24)`
+    - نقره/مس با خلوص permille: `fineWeightMg = quantityMg × (purityPermille / 1000)`
+    - سکه (`gold_coin`): وزن خالص از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
+  - قیمت و میانگین خرید همیشه **به ازای همان purity همان holding** است.
+  - جدول تبدیل واحد (فقط نمایش/ورود):
+    | واحد نمایش | به میلی‌گرم |
+    |------------|-------------|
+    | ۱ میلی‌گرم | ۱ |
+    | ۱ گرم | ۱٬۰۰۰ |
+    | ۱ کیلوگرم | ۱٬۰۰۰٬۰۰۰ |
+    | ۱ اونس تروی (troy oz) | ۳۱٬۱۰۳٫۴۷۶۸ |
 - واریز از حساب بانکی به پلتفرم:
   - موجودی حساب بانکی کاهش می‌یابد.
   - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` افزایش می‌یابد.
@@ -48,10 +63,11 @@ Business Rules
   - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
 - خرید فلز:
   - از موجودی نقدی پلتفرم کسر می‌شود.
-  - موجودی فلز (`quantityMg`) افزایش و میانگین خرید به‌روزرسانی می‌شود.
+  - موجودی فلز همان `(metalType, purity)` افزایش و میانگین خرید به‌روزرسانی می‌شود.
+  - `purity` و `quantityMg` (وزن ناخالص) اجباری‌اند؛ `pricePerMg` باید قیمت همان عیار باشد.
   - `quantityMg` نمی‌تواند منفی شود.
 - فروش فلز:
-  - موجودی فلز (`quantityMg`) کاهش می‌یابد.
+  - موجودی فلز همان `(metalType, purity)` کاهش می‌یابد.
   - مبلغ حاصل به موجودی نقدی پلتفرم اضافه می‌شود.
   - `quantityMg` نمی‌تواند منفی شود.
 - تحویل فیزیکی:
@@ -94,34 +110,54 @@ Domain Entities
 
 ۲. Metals Holding (جدول: `inv_metals_holdings`)
 
-id → UUID
-platformId → UUID
-metalType → string (gold, silver, copper)
-purity → string (مثلاً ۱۸ عیار، ۹۹۹ و ...)
-quantityMg → decimal (موجودی به میلی‌گرم)
-averageBuyPricePerMg → decimal (میانگین قیمت خرید به ازای هر میلی‌گرم — ریال)
-totalInvested → decimal
-totalFeesPaidUSDT → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با exchangeRateToBase همان تراکنش)
-createdAt / updatedAt
+- `id` → UUID (Primary Key)
+- `platformId` → UUID
+- `metalType` → string (`gold` | `silver` | `copper` | `gold_coin`)
+- `purity` → string (کد استاندارد؛ آزاد نیست — مثلاً `18k`, `24k`, `999`, `emami`, `bahar`, `half`, `quarter`, `gram_coin`)
+- `purityRatio` → decimal (نسبت خلوص ۰ تا ۱ برای محاسبه وزن خالص؛ مثلاً ۱۸ عیار = `0.750`، ۹۹۹ = `0.999`؛ برای سکه از مشخصات استاندارد)
+- `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم — واحد پایه ذخیره‌سازی؛ هرگز گرم/اونس)
+- `averageBuyPricePerMg` → decimal (میانگین قیمت خرید به ازای **هر میلی‌گرم از همین purity** — ریال؛ نه قیمت طلای خالص)
+- `totalInvested` → decimal
+- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **تمایز حیاتی واحد / عیار / وزن خالص (باگ ۳۵)**:
+> | مفهوم | فیلد / محاسبه | مثال ۱ گرم طلای ۱۸ عیار |
+> |--------|----------------|---------------------------|
+> | وزن ناخالص (Gross) | `quantityMg` | ۱٬۰۰۰ mg |
+> | عیار / خلوص | `purity` + `purityRatio` | `18k` / `0.750` |
+> | وزن خالص (Fine) | `quantityMg × purityRatio` | ۷۵۰ mg طلای خالص |
+> | قیمت میانگین | `averageBuyPricePerMg` | به ازای هر mg از طلای ۱۸ عیار، نه ۲۴ عیار |
+>
+> `1g Gold 18K` ≠ `1g pure gold`. این دو با `purity` متفاوت‌اند و قیمت‌شان از `price_history` با کلید `metalType_purity` جدا خوانده می‌شود.
+>
+> **کلید یکتای منطقی Holding**: `(platformId, metalType, purity)` — نمی‌توان طلای ۱۸ و ۲۴ را در یک ردیف قاطی کرد.
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
 
 - `id` → UUID (Primary Key)
 - `platformId` → UUID
-- `metalType` → string (gold, silver, copper)
+- `metalType` → string (`gold` | `silver` | `copper` | `gold_coin`)
+- `purity` → string (**اجباری** — همان کد استاندارد Holding؛ مثلاً `18k`, `999`, `emami`)
+- `purityRatio` → decimal (نسبت خلوص در تاریخ تراکنش — snapshot)
 - `type` → string (buy, sell, physical_delivery)
-- `quantityMg` → decimal
-- `pricePerMg` → decimal (برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
+- `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم)
+- `pricePerMg` → decimal (قیمت به ازای هر میلی‌گرم **از همین purity**؛ برای physical_delivery می‌تواند `averageBuyPricePerMg` باشد)
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر)
 - `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-> **نکته**: برای `type = 'physical_delivery'`:
+> **قوانین واحد و عیار در تراکنش**:
+> - `quantityMg` همیشه وزن ناخالص است؛ وزن خالص = `quantityMg × purityRatio` فقط برای گزارش/نمایش.
+> - `pricePerMg` قیمت همان عیار است؛ هرگز نباید قیمت ۲۴ عیار را بدون اعمال نسبت روی ۱۸ عیار اعمال کرد (مگر Fallback جهانی با برچسب «تخمینی» در `19-04-Metals-Prices`).
+>
+> **نکته physical_delivery**:
 > - `deliveryFee` هزینه تحویل فیزیکی است (از موجودی نقدی پلتفرم کسر می‌شود)
 > - این مبلغ با `feeAmount` (کارمزد معامله) متفاوت است
 > - اگر `deliveryFee = 0` یا null باشد، یعنی هیچ هزینه تحویلی پرداخت نشده است
@@ -192,36 +228,54 @@ Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می
 
 منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 
-فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش (واحد پایه: میلی‌گرم):
+فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش.
+
+> **پیش‌شرط**: Holding بر اساس `(platformId, metalType, purity)` یکتاست. خرید/فروش فقط روی همان `purity` اعمال می‌شود. واحد همه محاسبات: میلی‌گرم ناخالص + قیمت per-mg همان عیار.
 
 **هنگام خرید** (Weighted Average):
 ```
-newTotalInvested = totalInvested + (quantityMgBought × pricePerMg) + feeAmount
-newQuantityMg     = quantityMg + quantityMgBought
-newAverageBuyPricePerMg = newTotalInvested / newQuantityMg
+cost                      = (quantityMgBought × pricePerMg) + feeAmount
+newTotalInvested          = totalInvested + cost
+newQuantityMg             = quantityMg + quantityMgBought
+newAverageBuyPricePerMg   = newTotalInvested / newQuantityMg
 ```
 
-**هنگام فروش** (`averageBuyPricePerMg` استفاده‌شده = میانگین خرید **قبل از این فروش**):
+**هنگام فروش** (`averageBuyPricePerMg` = میانگین خرید **قبل از این فروش**):
 ```
 soldPortionCost = quantityMgSold × averageBuyPricePerMg
-realizedPL       = saleProceeds - soldPortionCost - feeAmount
-totalInvested    -= soldPortionCost      // کاهش متناسب با بخش فروخته‌شده
-quantityMg       -= quantityMgSold
-averageBuyPricePerMg  بدون تغییر می‌ماند  // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
+realizedPL      = saleProceeds - soldPortionCost - feeAmount
+totalInvested  -= soldPortionCost
+quantityMg     -= quantityMgSold
+averageBuyPricePerMg بدون تغییر می‌ماند
+```
+
+**Unrealized P&L**:
+```
+currentPricePerMg = getLatestMetalPrice(metalType, purity) / 1000   // قیمت گرمی → per-mg
+unrealizedPL      = (currentPricePerMg - averageBuyPricePerMg) × quantityMg
+```
+قیمت لحظه‌ای **همان `metalType_purity`** از `price_history` خوانده می‌شود؛ هرگز قیمت ۲۴ عیار جایگزین ۱۸ عیار نمی‌شود.
+
+**وزن خالص (فقط گزارش، نه مبنای P&L پیش‌فرض)**:
+```
+fineWeightMg = quantityMg × purityRatio
 ```
 
 > **نکات الزامی**:
-> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - در `type=physical_delivery`، هیچ `realizedPL`ای محاسبه نمی‌شود (فروش واقعی نیست)؛ فقط `quantityMg` کاهش و به دارایی فیزیکی منتقل می‌شود؛ `deliveryFee` جداگانه از موجودی نقدی پلتفرم کسر می‌شود (نه از `soldPortionCost`).
-> - `calculateProfitLoss(metalType?, platformId?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** جداگانه بر اساس `(currentPricePerMg - averageBuyPricePerMg) × quantityMg` محاسبه می‌شود.
+> - تمام محاسبات با `decimal.js` (هرگز `Number`).
+> - `type=physical_delivery`: بدون `realizedPL`؛ فقط کاهش `quantityMg` و کسر `deliveryFee` از نقد پلتفرم.
+> - `calculateProfitLoss(metalType?, platformId?, purity?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند.
+> - `1g 18K` و `1g 24K` دو دارایی جدا با قیمت و میانگین جدا هستند.
 
 
 نکات طراحی
 
-- واحد پایه همیشه میلی‌گرم است تا دقت بالا حفظ شود (۱ گرم = ۱۰۰۰ میلی‌گرم).
-- میانگین خرید با Weighted Average محاسبه می‌شود.
+- واحد پایه همیشه میلی‌گرم (**وزن ناخالص**) است؛ گرم/کیلو/اونس فقط در UI.
+- `purity` و `purityRatio` اجباری‌اند؛ کدهای `purity` از لیست استاندارد می‌آیند (نه متن آزاد).
+- وزن خالص (`fineWeightMg`) محاسبه می‌شود و ذخیره نمی‌شود تا از دوباره‌کاری و ناسازگاری جلوگیری شود.
+- میانگین خرید و قیمت لحظه‌ای همیشه per-mg **همان عیار** هستند؛ `1g Gold 18K ≠ 1g pure gold`.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
-- تحویل فیزیکی با یک تراکنش `type=physical_delivery` در `metals_transactions` ثبت می‌شود تا تاریخچه کامل موجودی در یک جدول باشد.
-- `metals_physical_deliveries` فقط جزئیات لجستیک (آدرس، فاکتور، وضعیت) را نگهداری می‌شود و به تراکنش لینک می‌شود.
+- تحویل فیزیکی با `type=physical_delivery` در `inv_metals_transactions` ثبت می‌شود.
+- `inv_metals_physical_deliveries` فقط جزئیات لجستیک را نگه می‌دارد.
 - `deliveryFee` همیشه از موجودی نقدی پلتفرم کسر می‌شود.
-- این زیر‌فیچر مخصوص پلتفرم‌های ایران است (طلا، نقره، مس).
+- این زیر‌فیچر مخصوص پلتفرم‌های ایران است (طلا، نقره، مس، سکه).

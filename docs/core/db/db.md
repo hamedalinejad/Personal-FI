@@ -255,6 +255,40 @@ export interface InvFifTransaction {
 
 > **تمایز حیاتی در FIF**: `nav` / `currentNAV` هرگز با `transactionPrice` یکی فرض نمی‌شوند. جزئیات کامل و قوانین پر کردن در `Fixed-Income-Funds.md`.
 
+```typescript
+// --- نمونه مفهومی فلزات (تمایز واحد / عیار / وزن خالص — باگ ۳۵) ---
+export interface InvMetalsHolding {
+  id: string;
+  platformId: string;
+  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
+  purity: string;                 // کد استاندارد: 18k, 24k, 999, emami, ...
+  purityRatio: Decimal;           // 0..1 — fineWeightMg = quantityMg × purityRatio
+  quantityMg: Decimal;            // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
+  averageBuyPricePerMg: Decimal;  // میانگین همان purity (نه طلای خالص)
+  totalInvested: Decimal;
+  totalFeesPaidUSDT: Decimal;
+}
+
+export interface InvMetalsTransaction {
+  id: string;
+  platformId: string;
+  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
+  purity: string;                 // اجباری
+  purityRatio: Decimal;           // snapshot
+  type: 'buy' | 'sell' | 'physical_delivery';
+  quantityMg: Decimal;            // وزن ناخالص
+  pricePerMg: Decimal;            // قیمت همان purity
+  totalAmount?: Decimal;
+  feeAmount?: Decimal;
+  feeCurrency?: string;
+  exchangeRateToBase?: Decimal;
+  deliveryFee?: Decimal;
+  date: string;
+}
+```
+
+> **تمایز حیاتی در Metals**: `quantityMg` = وزن ناخالص؛ وزن خالص (`fineWeightMg`) محاسبه می‌شود و ذخیره نمی‌شود؛ `purity` و `purityRatio` مستقل‌اند. `1g Gold 18K ≠ 1g pure gold`. جزئیات کامل در `Metals.md`.
+
 ## قانون Minor Unit Storage (حتمی)
 
 تمام مبالغ در دیتابیس به **کوچک‌ترین واحد پول** ذخیره می‌شوند:
