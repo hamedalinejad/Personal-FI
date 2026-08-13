@@ -219,7 +219,21 @@
        ```
     3. `transferId` یکسان در هر دو رکورد `transfer_out` و `transfer_in` ذخیره شود
     4. کارمزد انتقال (از خود ارز کسر می‌شود) از `amountToSend` برداشته می‌شود — `dest.quantity += amountToSend - feeAmount`
-- `createExchangeTransaction(data)` → واریز (`inv_crypto_exchange_transactions.type='deposit'` و `acc_transactions.type='deposit-investment'`) / برداشت (`inv_crypto_exchange_transactions.type='withdraw'` و `acc_transactions.type='withdrawal-investment'`) + ثبت در هر دو جدول + لینک تراکنش بانکی
+- `createExchangeTransaction(data)` → واریز/برداشت بین حساب بانکی و صرافی — **توالی اجباری (atomic)**:
+
+  **برداشت از صرافی به حساب بانکی** (`type='withdraw'`):
+  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='withdraw'` ثبت شود
+  > 2. رکورد در `acc_transactions` با `type='withdrawal-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز برداشتی)` آپدیت شود**: `quantity -= amount` (و اگر `quantity <= 0` رکورد holding غیرفعال یا حذف شود)
+  > 4. اگر ارز برداشتی `IRR` یا `USDT` است (موجودی نقدی صرافی): همان holding با `symbol=IRR/USDT` آپدیت می‌شود — نه یک holding رمزارز جدید
+  >
+  > ⛔ **ممنوع**: ثبت withdraw بدون آپدیت `inv_crypto_holdings` — موجودی نقدی صرافی اشتباه می‌شود
+
+  **واریز از حساب بانکی به صرافی** (`type='deposit'`):
+  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='deposit'` ثبت شود
+  > 2. رکورد در `acc_transactions` با `type='deposit-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز واریزی)` آپدیت شود**: `quantity += amount` (اگر رکورد وجود نداشت، ایجاد شود)
+  > 4. برای واریز IRR/USDT: `averageBuyPrice=1`، `totalInvested=0`، `totalFeesPaidBase=0` ثابت می‌مانند (طبق تصمیم طراحی موجودی نقدی)
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
 - `getExchangeTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, exchangeId?)`
