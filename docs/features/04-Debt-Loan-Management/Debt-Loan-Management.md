@@ -112,6 +112,10 @@
 - `earlyPaymentFeeAmount` → decimal (nullable — کارمزد پیش‌پرداخت)
 - `earlyPaymentFeeType` → enum (nullable — `fixed` | `percentage`)
 - `penaltyRate` → decimal (nullable — نرخ جریمه دیرکرد سالانه — مثلاً 6) ✅ **جدید**
+- `penaltyBasis` → enum (nullable — `overdue_installment` | `remaining_balance`; پیش‌فرض: `overdue_installment` — جزئیات در بخش «و) جریمه دیرکرد») ✅ **جدید**
+- `penaltyMaxCapAmount` → decimal (nullable — سقف مطلق جریمه به ریال) ✅ **جدید**
+- `penaltyMaxCapRate` → decimal (nullable — سقف جریمه به درصد از اصل — مثلاً 10) ✅ **جدید**
+- `penaltyGraceDays` → integer (nullable, default: 0 — روزهای معافیت قبل از شروع جریمه) ✅ **جدید**
 - `serviceFeeRate` → decimal (nullable — کارمزد قرض‌الحسنه — مثلاً 4) ✅ **جدید**
 - `serviceFeeAmount` → decimal (nullable — مبلغ کارمزد محاسبه‌شده) ✅ **جدید**
 
@@ -606,19 +610,129 @@ interestPortion_i = remainingBalance × r_effective(dueDate_i)
 
 ---
 
-### و) جریمه دیرکرد
+### و) جریمه دیرکرد — مدل کامل برای ایران
 
-جریمه روزانه محاسبه می‌شود، نه بر اساس دوره قسط:
+#### مفاهیم پایه‌ای (اجباری برای پیاده‌سازی صحیح)
+
+> **پنج سوال حیاتی که باید قبل از اعمال جریمه جواب داشته باشند:**
+> 1. ساده یا مرکب؟ → **ساده (Simple Interest)** — بانک مرکزی ایران جریمه مرکب را در قراردادهای بانکی معتبر نمی‌شناسد.
+> 2. روزانه یا ماهانه؟ → **روزانه، پایه ۳۶۵ روز** (Actual/365) — مستقل از `installmentFrequency`.
+> 3. روی چه مبلغی؟ → **روی مبلغ معوق قسط** (اصل + سود همان قسط که دیر پرداخت شده) — نه روی کل `remainingBalance`.
+> 4. آیا سود معوق هم جریمه می‌خورد؟ → **در نسخه ۱: خیر** — جریمه فقط روی `overdueInstallmentAmount` (اصل + سود همان قسط) محاسبه می‌شود، نه روی جریمه‌های انباشته قبلی (جریمه مرکب).
+> 5. سقف جریمه؟ → **اختیاری** — `penaltyMaxCapAmount` (مطلق) یا `penaltyMaxCapRate` (درصدی از اصل) که در `ln_loans` ذخیره می‌شود.
+
+#### تعریف `overdueAmount`
 
 ```
-penaltyPortion = overdueAmount × (penaltyRate / 100) × (penaltyDays / 365)
+// هر قسط که dueDate آن گذشته و status آن 'unpaid' است:
+overdueInstallmentAmount = principalPortion + interestPortion   // مبلغ معوق همان قسط (نه کل وام)
+
+// اگر چند قسط همزمان عقب باشند، جریمه هر قسط جداگانه با penaltyDays مختص خودش محاسبه می‌شود
+penaltyDays_i = (today - dueDate_i).days   // تعداد روزهای دیرکرد قسط i
 ```
 
-> این فرمول مستقل از `installmentFrequency` است — جریمه همیشه با پایه ۳۶۵ روزه محاسبه می‌شود (Day Count = Actual/365)، حتی اگر قسط‌های وام هفتگی یا فصلی باشند.
+#### فرمول جریمه (Simple Interest — Actual/365)
 
-**مثال:**
-- مبلغ معوق: ۱۰,۰۰۰,۰۰۰ ریال، نرخ جریمه: ۶٪، تأخیر: ۳۰ روز
-- penalty = 10,000,000 × (6/100) × (30/365) ≈ 49,315 ریال
+```
+penaltyPortion_i = overdueInstallmentAmount_i × (penaltyRate / 100) × (penaltyDays_i / 365)
+```
+
+**سقف جریمه (اگر تعریف شده باشد):**
+```
+if penaltyMaxCapAmount is not null:
+    penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
+
+if penaltyMaxCapRate is not null:
+    maxByRate = principalAmount × (penaltyMaxCapRate / 100)   // سقف درصدی از اصل وام
+    penaltyPortion_i = MIN(penaltyPortion_i, maxByRate)
+```
+
+**جمع جریمه کل (چند قسط معوق):**
+```
+totalPenalty = Σ penaltyPortion_i     // برای هر قسط معوق جداگانه
+```
+
+> **قانون مهم**: جریمه روی جریمه (Compound Penalty) ممنوع است — `penaltyPortion` قبلاً پرداخت‌نشده هرگز به `overdueInstallmentAmount` اضافه نمی‌شود.
+
+#### فیلدهای جدید در `ln_loans`
+
+```
+penaltyRate           → decimal (nullable — نرخ سالانه جریمه، درصد — مثلاً 6)
+penaltyBasis          → enum ('overdue_installment' | 'remaining_balance')
+                        // پیش‌فرض: 'overdue_installment' (توصیه‌شده برای ایران)
+                        // 'remaining_balance': برخی وام‌های تجاری/خاص — جریمه روی کل مانده
+penaltyMaxCapAmount   → decimal (nullable — سقف مطلق جریمه — مثلاً ۵,۰۰۰,۰۰۰ ریال)
+penaltyMaxCapRate     → decimal (nullable — سقف جریمه به‌عنوان درصد از اصل — مثلاً 10 یعنی حداکثر ۱۰٪ اصل)
+penaltyGraceDays      → integer (nullable, default: 0 — روزهای تأخیر قبل از شروع جریمه)
+                        // اگر penaltyGraceDays = 3: تا ۳ روز تأخیر جریمه تعلق نمی‌گیرد؛ از روز ۴ به بعد
+                        // penaltyDays_effective = MAX(0, penaltyDays - penaltyGraceDays)
+```
+
+#### فرمول نهایی با `penaltyGraceDays` و `penaltyBasis`
+
+```
+penaltyDays_effective = MAX(0, penaltyDays_i - (penaltyGraceDays ?? 0))
+
+if penaltyBasis = 'overdue_installment':
+    base = overdueInstallmentAmount_i    // اصل + سود همان قسط معوق
+else:  // 'remaining_balance'
+    base = remainingBalance              // کل مانده وام (برای وام‌های خاص)
+
+penaltyPortion_i = base × (penaltyRate / 100) × (penaltyDays_effective / 365)
+
+// اعمال سقف:
+if penaltyMaxCapAmount is not null:
+    penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
+if penaltyMaxCapRate is not null:
+    penaltyPortion_i = MIN(penaltyPortion_i, principalAmount × penaltyMaxCapRate / 100)
+```
+
+#### مثال‌های عددی
+
+**مثال ۱ — بانک معمولی ایران:**
+```
+قسط معوق: اصل ۵,۰۰۰,۰۰۰ + سود ۵۰۰,۰۰۰ = ۵,۵۰۰,۰۰۰ ریال
+penaltyRate: 6٪، penaltyDays: 30، penaltyGraceDays: 0، penaltyBasis: 'overdue_installment'
+
+penalty = 5,500,000 × (6/100) × (30/365) = 27,123 ریال
+```
+
+**مثال ۲ — با دوره معافیت:**
+```
+penaltyGraceDays: 3، penaltyDays: 10
+penaltyDays_effective = 10 - 3 = 7
+penalty = 5,500,000 × (6/100) × (7/365) = 6,329 ریال
+```
+
+**مثال ۳ — دو قسط معوق با سقف:**
+```
+قسط ۱: ۵,۵۰۰,۰۰۰ ریال، ۴۵ روز دیر
+قسط ۲: ۵,۵۰۰,۰۰۰ ریال، ۱۵ روز دیر
+penaltyRate: 6٪، penaltyMaxCapAmount: 50,000 ریال
+
+penalty_1 = 5,500,000 × 0.06 × (45/365) = 40,685 ریال → MIN(40,685, 50,000) = 40,685 ریال
+penalty_2 = 5,500,000 × 0.06 × (15/365) = 13,562 ریال → MIN(13,562, 50,000) = 13,562 ریال
+totalPenalty = 54,247 ریال
+// سقف روی هر قسط جداگانه اعمال می‌شود، نه روی مجموع
+```
+
+**مثال ۴ — قرض‌الحسنه (penaltyRate = null):**
+```
+جریمه دیرکرد برای قرض‌الحسنه تعلق نمی‌گیرد (penaltyRate = null)
+// سیستم نباید جریمه محاسبه کند — عدم پرداخت صرفاً وضعیت 'overdue' می‌شود
+```
+
+#### ثبت جریمه در `ln_transactions`
+
+```
+type:           'penalty'
+amount:         penaltyPortion (مجموع همه قسط‌های معوق در این پرداخت)
+penaltyPortion: penaltyPortion
+penaltyDays:    penaltyDays_i (برای قسط جداگانه — اگر چند قسط معوق است، یک رکورد penalty جداگانه برای هر قسط)
+principalPortion: 0
+interestPortion:  0
+// جریمه remainingBalance را تغییر نمی‌دهد
+```
 
 ---
 
