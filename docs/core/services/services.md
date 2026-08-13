@@ -66,7 +66,11 @@ services/
 
 **`sessionStorageService.ts`** — داده‌های موقت سشن:
 - فقط برای داده‌هایی که بعد از بستن tab باید از بین بروند
-- مثال: API Key سرویس دریافت قیمت (که طبق `Price-Fetching.md` نباید در دیتابیس ذخیره شود)
+- **API Key قیمت (باگ ۳۷ — تصمیم v1)**:
+  - کلید فقط اینجا نگه داشته می‌شود (نه SQLite، نه LocalStorage plaintext)
+  - API پیشنهادی: `setPriceApiKey(sourceId, key)` / `getPriceApiKey(sourceId)` / `clearPriceApiKey(sourceId)`
+  - با بستن tab کلید پاک است؛ caller (Price Fetching) باید نبود کلید را با UX مشخص مدیریت کند (مودال ورود یا Skip در Auto-Sync)
+  - جزئیات سیاست در `Price-Fetching.md`
 - فرم‌های ناتمام (Draft state) در صورت نیاز
 
 ### Version Check Service

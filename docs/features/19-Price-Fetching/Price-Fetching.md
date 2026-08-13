@@ -68,7 +68,20 @@
 4. آخرین قیمت هر نماد از طریق `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود؛ این تابع همیشه جدیدترین رکورد `price_history` را برمی‌گرداند (فارغ از این‌که منبعش `manual` بوده یا `api`)، نه میانگین.
 5. **قبل از هر تلاش برای اتصال (چه دستی چه Auto-Sync)**، سیستم ابتدا `navigator.onLine` را چک می‌کند؛ اگر `false` باشد، حتی تلاش برای Request هم نمی‌شود — مستقیم پیام «آفلاین هستید» نشان داده می‌شود (نه Timeout و نه Retry بی‌مورد که باتری/داده هدر بدهد). اگر `navigator.onLine = true` بود ولی Request واقعاً شکست خورد (سرور در دسترس نیست)، همان رفتار قاعده ۷ (Partial/Full Failure) اجرا می‌شود.
 6. اگر اتصال اینترنت یا API در دسترس نباشد، آخرین قیمت کش‌شده (آخرین رکورد `price_history`، صرف‌نظر از `manual`/`api` بودنش) همراه با برچسب «قیمت قدیمی — آخرین به‌روزرسانی: [تاریخ/ساعت]» نمایش داده می‌شود؛ خطای دریافت هرگز نباید مانع کارکرد بقیه اپ (دیدن پرتفوی، ثبت تراکنش جدید و ...) شود.
-7. کلید API (در صورت نیاز منبع به کلید) هرگز در دیتابیس یا LocalStorage ذخیره نمی‌شود (طبق قانون `db.md`: «داده‌های حساس هرگز ذخیره نشوند»)؛ در Session Storage یا فایل تنظیمات محلی خارج از دیتابیس نگهداری می‌شود.
+7. **سیاست API Key — تصمیم صریح نسخه ۱ (باگ ۳۷)**:
+   - کلید API **هرگز** در SQLite / `price_sources` / هر جدول دیگری ذخیره نمی‌شود.
+   - کلید API **هرگز** به‌صورت plaintext در LocalStorage نوشته نمی‌شود.
+   - **نسخه ۱ — فقط Session Storage** (از طریق `sessionStorageService`):
+     - کلید تا وقتی تب/پنجره باز است زنده می‌ماند.
+     - با **بستن tab** یا پایان سشن مرورگر، کلید پاک می‌شود.
+     - کاربر در اولین `fetch` یا وقتی Auto-Sync به منبع `requiresApiKey=true` برسد و کلید نباشد، باید دوباره وارد کند (پرامپت در Settings یا مودال دریافت قیمت).
+   - **UX الزامی وقتی کلید نیست**:
+     - دکمه «دریافت قیمت‌ها» → مودال «API Key لازم است» با فیلد ورود + لینک به محل دریافت کلید Provider؛ پس از ورود، فقط در Session Storage ذخیره و همان لحظه Fetch ادامه می‌یابد.
+     - Auto-Sync → آن منبع Skip می‌شود؛ در UI وضعیت «کلید API وارد نشده — Sync انجام نشد»؛ **هیچ** Request بی‌کلید و **هیچ** پرامپت مزاحم تکراری در پس‌زمینه.
+   - **عمداً خارج از نسخه ۱** (مسیر آینده، نه پیاده‌سازی الان):
+     - «Remember on this device» با رمزنگاری Web Crypto (AES-GCM) در LocalStorage
+     - Credential Vault / اتصال به قفل اپ (PIN/biometrics) برای باز کردن کلید
+   - دلیل انتخاب Session-only در v1: سادگی، هم‌خوانی با Privacy-First، و اجتناب از ذخیره بلندمدت راز در مرورگر بدون زیرساخت رمزنگاری کامل. هزینه UX (ورود مجدد پس از بستن tab) برای Providerهای اختیاری قیمت قابل‌قبول است؛ بسیاری از منابع نسخه ۱ اصلاً کلید نمی‌خواهند.
 8. اگر دریافت قیمت یک نماد شکست بخورد (Network Error، Rate Limit، نماد ناموجود در API)، فقط همان نماد Skip می‌شود و خطا در نتیجه نهایی گزارش می‌شود؛ بقیه نمادهای درخواستی در همان دسته باید دریافت شوند (Partial Success مجاز است) — این قانون برای دسته‌های بزرگ (صدها نماد) هم صدق می‌کند، به بخش «دریافت انبوه» پایین نگاه کنید.
 9. تبدیل قیمت به ارز پایه کاربر (`cur_currency_preferences.baseCurrency`) در لحظه دریافت انجام **نمی‌شود**؛ `price_history` قیمت را دقیقاً در همان ارزی که API برگردانده ذخیره می‌کند (`priceCurrency`) و تبدیل به ارز پایه در لایه Domain هنگام مصرف (مثل `getPortfolioValue`) با `cur_exchange_rates` انجام می‌شود — تا اگر نرخ ارز پایه بعداً عوض شود، نیازی به واکشی دوباره قیمت‌ها نباشد.
 10. ثبت دستی قیمت (`source = 'manual'`) هیچ محدودیت شبکه‌ای ندارد و همیشه، حتی کاملاً آفلاین، ممکن است؛ اما فقط برای نمادهایی مجاز است که کاربر واقعاً در `inv_*_holdings` دارد (نمی‌توان برای نماد ناموجود قیمت دستی ثبت کرد چون معنایی ندارد).
@@ -236,7 +249,7 @@ export interface PriceProviderAdapter {
 | `name` | نام نمایشی |
 | `assetCategory` | دسته |
 | `baseUrl` | اختیاری برای Adapterهایی که URL ثابت دارند |
-| `requiresApiKey` | اگر true، Application کلید را از storage امن می‌خواند و به `options.apiKey` می‌دهد |
+| `requiresApiKey` | اگر true، Application کلید را **فقط از Session Storage** می‌خواند و به `options.apiKey` می‌دهد؛ اگر نبود → Skip + پیام UX (باگ ۳۷) |
 | `adapterKey` | **جدید (اجباری)** — کلید registry برای پیدا کردن کلاس Adapter (مثلاً `coingecko`) |
 | `isActive` | فعال/غیرفعال |
 
@@ -268,11 +281,14 @@ UI / Auto-Sync
 - `fetchAndStorePrices(symbols[], sourceId, triggeredBy: 'user_click' | 'auto_sync')`:
   1. چک `navigator.onLine` — اگر `false`، بلافاصله برمی‌گردد با `{ skipped: true, reason: 'offline' }` و هیچ Request ای نمی‌رود.
   2. ردیف `price_sources` را می‌خواند؛ بدون `adapterKey` معتبر خطا می‌دهد و شبکه را صدا نمی‌زند.
-  3. Adapter را از registry با `getAdapter(adapterKey)` می‌گیرد (فقط `PriceProviderAdapter` — نه SDK اختصاصی).
-  4. نمادها را طبق «دریافت انبوه» و `adapter.maxBatchSize` به Batch تقسیم می‌کند.
-  5. برای هر Batch: `adapter.fetchPrices(batch)` → فقط `NormalizedPriceQuote`؛ سپس ذخیره در `price_history` با `source='api'` و `triggeredBy`.
-  6. اگر `triggeredBy='auto_sync'` بود، `price_sync_settings.lastSyncAt` را آپدیت می‌کند.
-  7. خروجی `ProviderFetchResult` / ساختار `succeeded[]`/`failed[]`/`skipped[]`.
+  3. اگر `requiresApiKey=true`: کلید را از `sessionStorageService.getPriceApiKey(sourceId)` بخواند.
+     - نبود کلید + `user_click` → برگرداندن `{ skipped: true, reason: 'api_key_required' }` تا UI مودال ورود را نشان دهد (باگ ۳۷).
+     - نبود کلید + `auto_sync` → Skip همان منبع بدون پرامپت؛ وضعیت در UI.
+  4. Adapter را از registry با `getAdapter(adapterKey)` می‌گیرد (فقط `PriceProviderAdapter` — نه SDK اختصاصی).
+  5. نمادها را طبق «دریافت انبوه» و `adapter.maxBatchSize` به Batch تقسیم می‌کند.
+  6. برای هر Batch: `adapter.fetchPrices(batch, { apiKey })` → فقط `NormalizedPriceQuote`؛ سپس ذخیره در `price_history` با `source='api'` و `triggeredBy`.
+  7. اگر `triggeredBy='auto_sync'` بود، `price_sync_settings.lastSyncAt` را آپدیت می‌کند.
+  8. خروجی `ProviderFetchResult` / ساختار `succeeded[]`/`failed[]`/`skipped[]`.
 
 ### ثبت دستی (کاملاً آفلاین)
 - `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.

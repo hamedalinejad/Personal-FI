@@ -9,6 +9,16 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۳۷ — سیاست ذخیره API Key مبهم بود (SessionStorage / UX / امنیت)
+**محل:** `Price-Fetching.md`, `db.md`, `services.md`, `Security-Privacy.md`
+**شرح:** معماری فقط می‌گفت کلید در Session Storage باشد؛ مشخص نبود بعد از بستن tab چه می‌شود، آیا LocalStorage رمزنگاری‌شده مجاز است، و Auto-Sync بدون کلید چه رفتاری دارد.
+**تصمیم صریح نسخه ۱:**
+- فقط Session Storage (`sessionStorageService`)؛ با بستن tab کلید از بین می‌رود و کاربر دوباره وارد می‌کند
+- هرگز SQLite و هرگز LocalStorage plaintext
+- Fetch دستی بدون کلید → مودال ورود کلید؛ Auto-Sync بدون کلید → Skip منبع + پیام وضعیت (بدون پرامپت مزاحم)
+- خارج از v1: Remember با Web Crypto و Credential Vault
+
+
 ### باگ ۳۶ — قرارداد Adapter برای Providerهای قیمت ناقص بود (Severity: High)
 **محل:** `docs/features/19-Price-Fetching/Price-Fetching.md` + `core/types/types.md` + `core/services/services.md`
 **شرح:** بدون interface واحد، هر Provider مستقیماً وارد Domain می‌شد و با افزودن منبع دوم معماری ماژولار از بین می‌رفت.
