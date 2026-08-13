@@ -221,47 +221,154 @@ export interface AccTransaction {
 
 ## قانون Minor Unit Storage (حتمی)
 
-تمام مبالغ در دیتابیس به **کوچک‌ترین واحد پول** ذخیره می‌شوند:
+> **باگ ۲۱ — تضاد بالقوه Minor Unit با Crypto Decimals (رفع‌شده)**  
+> معماری قبلی برای همه مبالغ یک قانون Minor Unit یکسان داشت اما `scale` و `precision` برای فیلدهای `quantity` رمزارزها مشخص نشده بود. این ابهام می‌توانست مستقیماً P&L را خراب کند.  
+> **قانون جدید**: دو دسته مجزا — **Currency Amount** (مبالغ مالی) و **Asset Quantity** (تعداد دارایی) — هرکدام قانون ذخیره‌سازی جداگانه دارند.
 
-| ارز | کوچک‌ترین واحد | مثال |
-|-----|---|---|
-| **IRR (ریال)** | ۱ ریال | ۱۲۳۴۵۶۷۸ = ۱۲،۳۴۵،۶۷۸ ریال |
-| **USD** | سنت (Cent) | ۱۲۳۴۵ سنت = ۱۲۳.۴۵ دلار |
-| **EUR** | سنت | ۶۷۸۹۰ سنت = ۶۷۸.۹۰ یورو |
-| **BTC** | ۱ ساتوشی = ۱۰^-۸ BTC | ۱۲۳۴۵۶۷۸۹ ساتوشی |
-| **ETH** | ۱ Gwei = ۱۰^-۹ ETH | از Gwei برای ذخیره استفاده شود (نه Wei که بیش از حد کوچک است) |
-| **USDT** | ۱ میکرو = ۱۰^-۶ USDT | ۱۲۳۴۵۶۷۸۹۰ میکرو |
+---
 
-> **استثنا — قیمت دارایی‌ها در `price_history`**: فیلد `price` در جدول `price_history` **از این قانون مستثناست**؛ به‌جای Minor Unit، قیمت به‌صورت `decimal` (عدد اعشاری خام) ذخیره می‌شود. دلیل: قیمت دارایی (مثلاً قیمت طلا به ریال به ازای هر گرم، یا BTC به USDT) یک «نرخ تبدیل/مرجع» است، نه یک «مبلغ تراکنش مالی» — Minor Unit آن معنای مشخص و ثابتی ندارد (چون واحد پایه متفاوت است: «هر گرم»، «هر BTC»). همین استثنا برای `cur_exchange_rates.rate` هم صدق می‌کند.
+### بخش الف — Currency Amount (مبالغ مالی)
 
-**قاعده**:
-- در مرحله **ورود** (لایه Presentation)، مقدار از کاربر به فرمت عادی (۱۲۳۴.۵۶) دریافت می‌شود
-- در مرحله **پردازش** (لایه Domain)، تبدیل به کوچک‌ترین واحد انجام می‌شود (۱۲۳۴۵۶)
-- در مرحله **ذخیره‌سازی** (Database)، صرفاً عدد صحیح ذخیره می‌شود
-- در مرحله **نمایش** (لایه Presentation)، دوباره به فرمت عادی برگردانده می‌شود
+فیلدهایی که **مبلغ پولی** هستند: `totalAmount`, `totalAmountBase`, `priceBase`, `feeAmount`, `totalInvested`, `averageBuyPrice`, `currentBalance`, `cashBalance` و مشابهات.
 
-**پیاده‌سازی**:
+این فیلدها به **کوچک‌ترین واحد پول** (Minor Unit) ذخیره می‌شوند — **عدد صحیح**:
+
+| ارز | Minor Unit | Scale (توان ۱۰) | مثال |
+|-----|---|---|---|
+| **IRR (ریال)** | ۱ ریال | 0 | ۱۲۳۴۵۶۷۸ = ۱۲،۳۴۵،۶۷۸ ریال |
+| **USD** | ۱ سنت | 2 | ۱۲۳۴۵ = ۱۲۳.۴۵ دلار |
+| **EUR** | ۱ سنت | 2 | ۶۷۸۹۰ = ۶۷۸.۹۰ یورو |
+| **AED** | ۱ فلس | 2 | ۱۰۰۰ = ۱۰.۰۰ درهم |
+| **USDT** | ۱ میکرو‌تتر | 6 | ۱۲۳۴۵۶۷۸۹۰ = ۱۲۳۴.۵۶۷۸۹۰ USDT |
+| **BTC** | ۱ ساتوشی | 8 | ۱۰۰۰۰۰۰۰۰ = ۱ BTC |
+| **ETH** | ۱ Gwei | 9 | ۱۰۰۰۰۰۰۰۰۰ = ۱ ETH (نه Wei؛ 18 رقم بیش از حد است) |
+
+> **چرا ETH از Gwei استفاده می‌کند نه Wei؟**  
+> Wei (scale=18) عدد صحیحی با ۱۸ رقم می‌سازد که در SQLite INTEGER (64-bit signed max ≈ 9.2×10^18) برای مقادیر بزرگ overflow می‌کند. Gwei (scale=9) برای اکثر تراکنش‌های DeFi کافی است. اگر در آینده نیاز به scale=18 پیش آمد، باید به TEXT ذخیره‌سازی مهاجرت شود.
+
+> **استثنا — قیمت دارایی‌ها در `price_history`**: فیلد `price` در جدول `price_history` **از این قانون مستثناست**؛ به‌جای Minor Unit، قیمت به‌صورت `TEXT` (decimal string — مثلاً `"65432.12345678"`) ذخیره می‌شود. دلیل: قیمت دارایی یک «نرخ تبدیل/مرجع» است، نه یک «مبلغ تراکنش مالی» — Minor Unit آن معنای مشخص و ثابتی ندارد. همین استثنا برای `cur_exchange_rates.rate` هم صدق می‌کند.
+
+---
+
+### بخش ب — Asset Quantity (تعداد/مقدار دارایی)
+
+فیلدهایی که **تعداد دارایی** هستند: `quantity` در `inv_crypto_holdings`, `inv_crypto_transactions`, `inv_metals_holdings`, `inv_metals_transactions` و مشابهات.
+
+این فیلدها **متفاوت از Currency Amount** هستند — قانون:
+
+> **Asset Quantity به‌صورت `TEXT` (decimal string) در SQLite ذخیره می‌شود و در Domain Layer با `decimal.js` خوانده/نوشته می‌شود.**
+
+دلیل: هر رمزارز precision متفاوتی دارد و هیچ Minor Unit ثابتی برای «تعداد دارایی» معنا ندارد:
+
+| دارایی | Max Decimal Places | مثال |
+|--------|---|---|
+| **BTC** | 8 | `"0.00000001"` (1 ساتوشی) |
+| **ETH** | 9 (در این سیستم — Gwei-based) | `"0.000000001"` |
+| **USDT** | 6 | `"0.000001"` |
+| **SOL** | 9 | `"0.000000001"` |
+| **سایر ERC-20 / Token** | تا 18 | `"0.000000000000000001"` |
+| **طلا (گرم)** | 4 | `"0.0001"` |
+| **سهام (ایران)** | 0 | `"1"` (واحد کامل) |
+
 ```typescript
-// Domain Layer
-import Decimal from 'decimal.js';
+// SQLite Schema (schema.sql)
+-- ❌ اشتباه:
+quantity REAL  -- floating point: دقت گم می‌شود
 
-// ورود: "1234.56" → تبدیل به کوچک‌ترین واحد
-const inputAmount = new Decimal('1234.56');
-const minorUnits = inputAmount.times(100).toNumber(); // 123456
+-- ✅ درست:
+quantity TEXT  -- decimal string: "0.00000001"
 
-// ذخیره‌سازی: 123456
-database.save({ amount: minorUnits });
-
-// خروجی: 123456 → بازگرداندن به فرمت عادی
-const storedAmount = new Decimal(123456);
-const displayAmount = storedAmount.dividedBy(100); // 1234.56
+-- ✅ برای Currency Amount:
+amount INTEGER -- minor unit: 100000000 = 1 BTC
 ```
 
-**نکات حساس** (ریسک‌های احتمالی):
-- خیلی مهم که هیچ محاسبه درون Database انجام نشود. تمام محاسبات در Domain Layer انجام شود.
-- هنگام محاسبه Realized Profit/Loss برای کریپتو، صفاف بودن اعشار حیاتی است (مثلاً 0.00000001 BTC)
-- هنگام تبدیل بین ارزها، از decimal.js استفاده کنید (هرگز Number)
-- Snapshot موجودی (`balanceAfterTransaction`) حتمی است
+```typescript
+// Domain Layer — خواندن quantity از DB
+import Decimal from 'decimal.js';
+
+// خواندن از SQLite (TEXT)
+const rawQty = row.quantity; // "0.12345678"
+const qty = new Decimal(rawQty); // دقیق — بدون floating point error
+
+// نوشتن به SQLite (TEXT)
+const newQty = qty.plus(new Decimal('0.00000001'));
+db.run('UPDATE inv_crypto_holdings SET quantity = ? WHERE id = ?',
+  [newQty.toFixed(), holdingId]); // "0.12345679"
+```
+
+---
+
+### بخش ج — جدول خلاصه «کدام فیلد چه نوع ذخیره‌سازی»
+
+| نوع فیلد | مثال | SQLite Type | Domain Layer |
+|----------|------|-------------|--------------|
+| مبلغ مالی (ارز فیات/USDT) | `totalAmount`, `currentBalance` | `INTEGER` (minor unit) | `new Decimal(row.amount).dividedBy(scale)` |
+| مبلغ مالی (به ارز پایه) | `totalAmountBase`, `averageBuyPrice` | `INTEGER` (minor unit ارز پایه) | همان |
+| تعداد دارایی کریپتو/فلز | `quantity` | `TEXT` (decimal string) | `new Decimal(row.quantity)` |
+| قیمت مرجع/نرخ ارز | `price_history.price`, `cur_exchange_rates.rate` | `TEXT` (decimal string) | `new Decimal(row.price)` |
+| تعداد سهام (ایران) | `quantity` در stocks/fif | `INTEGER` | مستقیم |
+
+---
+
+### بخش د — قانون تبدیل در Domain Layer
+
+```typescript
+// core/utils/amount.ts
+
+import Decimal from 'decimal.js';
+
+// Scale map برای Currency Amount (minor unit)
+const CURRENCY_SCALE: Record<string, number> = {
+  IRR: 0,   // 10^0 = 1
+  USD: 2,   // 10^2 = 100
+  EUR: 2,
+  AED: 2,
+  GBP: 2,
+  TRY: 2,
+  USDT: 6,  // 10^6 = 1_000_000
+  BTC: 8,   // 10^8 = 100_000_000
+  ETH: 9,   // 10^9 = 1_000_000_000 (Gwei-based)
+};
+
+/** Currency Amount: عدد کاربر → INTEGER minor unit برای ذخیره در DB */
+export function toMinorUnit(amount: Decimal, currency: string): bigint {
+  const scale = CURRENCY_SCALE[currency];
+  if (scale === undefined) throw new Error(`Unknown currency scale: ${currency}`);
+  return BigInt(amount.times(new Decimal(10).pow(scale)).toFixed(0));
+}
+
+/** Currency Amount: INTEGER minor unit از DB → عدد قابل نمایش */
+export function fromMinorUnit(minorUnit: bigint | number, currency: string): Decimal {
+  const scale = CURRENCY_SCALE[currency];
+  if (scale === undefined) throw new Error(`Unknown currency scale: ${currency}`);
+  return new Decimal(minorUnit.toString()).dividedBy(new Decimal(10).pow(scale));
+}
+
+/** Asset Quantity: رشته TEXT از DB → Decimal */
+export function parseQuantity(raw: string): Decimal {
+  return new Decimal(raw); // decimal.js از string می‌خواند — بدون precision loss
+}
+
+/** Asset Quantity: Decimal → رشته TEXT برای ذخیره در DB */
+export function formatQuantity(qty: Decimal): string {
+  return qty.toFixed(); // مثلاً "0.00000001" — بدون نماد علمی
+}
+```
+
+> **نکته مهم — `BigInt` برای Currency Amount**:  
+> چون SQLite INTEGER 64-bit signed است و `Number` در JavaScript فقط 53 بیت دقت دارد، مقادیر بزرگ IRR (مثلاً `1_000_000_000_000` ریال) با `Number` دقت از دست می‌دهند. در Domain Layer برای Currency Amount از `BigInt` یا `Decimal` استفاده شود — هرگز `Number`.
+
+**قاعده کلی**:
+- در مرحله **ورود** (Presentation): مقدار از کاربر به‌صورت string دریافت شود
+- در مرحله **پردازش** (Domain): `toMinorUnit()` یا `parseQuantity()` بر اساس نوع فیلد
+- در مرحله **ذخیره‌سازی** (Database): INTEGER برای Currency Amount، TEXT برای Asset Quantity
+- در مرحله **نمایش** (Presentation): `fromMinorUnit()` یا `parseQuantity()`
+
+**نکات حساس**:
+- هیچ محاسبه‌ای درون Database انجام نشود — تمام محاسبات در Domain Layer
+- هنگام محاسبه Realized P&L برای کریپتو: `quantity` (TEXT→Decimal) × `averageBuyPrice` (INTEGER→Decimal) باید هر دو از DB خوانده و سپس در Domain Layer ضرب شوند
+- `toFixed()` روی Decimal.js از نماد علمی (مثل `1e-8`) جلوگیری می‌کند — الزامی است
+- هرگز `REAL` یا `FLOAT` در SQLite برای هیچ فیلد مالی استفاده نشود
 
 ## مسیر فایل‌های دیتابیس
 
