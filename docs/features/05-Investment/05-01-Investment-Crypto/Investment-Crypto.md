@@ -108,6 +108,10 @@
 - `networkId` → UUID (nullable — کلید خارجی به `inv_crypto_wallet_networks.id`؛ فقط برای wallet‌ها؛ برای صرافی null است)
 - `symbol` → string (BTC, ETH, USDT, IRR و ...)
 - `name` → string
+- `chainId` → string (nullable — شناسه شبکه بلاکچین؛ مثلاً `1` برای Ethereum Mainnet، `56` برای BSC، `728126428` برای Tron؛ برای tokenهای native مثل BTC یا ETH از نام شبکه مادر استفاده می‌شود)
+- `contractAddress` → string (nullable — آدرس قرارداد هوشمند توکن؛ برای native tokenهایی مثل BTC و ETH که آدرس قرارداد ندارند null است؛ برای USDT-TRC20، USDT-ERC20، و هر ERC20/BEP20/TRC20 Token دیگری الزامی است)
+- `decimals` → integer (nullable — تعداد اعشار توکن؛ مثلاً 18 برای USDT-ERC20، 6 برای USDT-TRC20؛ اگر null باشد فرض می‌شود هسته اصلی شبکه — مثلاً 18 برای ETH؛ برای IRR و USDT داخلی صرافی null قابل قبول است)
+- `assetId` → string (nullable — شناسه این رمزارز در Provider قیمت‌گیری — مثلاً `bitcoin` در CoinGecko یا `BTC_USDT` در Nobitex؛ وقتی null باشد، `symbol` برای جستجوی قیمت استفاده می‌شود اما ممکن است tokenهای همنام تداخل داشته باشند)
 - `quantity` → decimal (موجودی فعلی)
 - `averageBuyPrice` → decimal
 - `currency` → string
@@ -144,6 +148,9 @@
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
 - `network` → string (nullable — شبکه بلاکچینی که انتقال از طریق آن انجام شده؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی، برای `buy`/`sell` null)
 - `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
+- `txHash` → string (nullable — شناسه تراکنش آنچین (Transaction Hash) روی بلاکچین؛ برای `transfer_in`/`transfer_out` بین والت‌ها بسیار ارزشمند است؛ برای `buy`/`sell` داخل صرافی متمرکز معمولاً null است)
+- `blockNumber` → integer (nullable — شماره بلاکی که تراکنش در آن تأیید شده؛ فقط اگر `txHash` موجود باشد معنی دارد)
+- `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -161,6 +168,8 @@
 - `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت)
 - `accountId` → UUID (حساب بانکی مرتبط)
 - `network` → string (nullable — شبکه بلاکچینی که واریز/برداشت از طریق آن انجام شده؛ مثلاً `TRC20`، `ERC20`؛ برای واریز/برداشت ریالی null است)
+- `txHash` → string (nullable — شناسه تراکنش آنچین برای واریز/برداشت کریپتویی؛ برای واریز/برداشت ریالی فیات null است)
+- `blockNumber` → integer (nullable — شماره بلاک تأییدشده در بلاکچین؛ اختیاری)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
