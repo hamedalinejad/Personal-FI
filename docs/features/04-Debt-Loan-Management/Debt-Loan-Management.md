@@ -14,7 +14,9 @@
 **1. Declining Balance (تناژل سود):**
 - نرخ سود روی مانده باقیمانده محاسبه می‌شود
 - کاربرد: وام‌های بانکی رسمی
-- فرمول: `installment = P × r(1+r)^n / [(1+r)^n - 1]` که `r = annual_rate / 12 / 100`
+- فرمول: `installment = P × r(1+r)^n / [(1+r)^n - 1]` که **`r = getPeriodRate(loan)`** — نه همیشه `/12` (BUG-026)
+- `r` از `interestRate` + `interestRatePeriod` + `installmentFrequency` (+ `customIntervalDays`) به‌صورت deterministic محاسبه می‌شود (بخش «پیش‌نیاز: نرخ دوره‌ای»)
+- weekly → `/52`، quarterly → `/4`، monthly → `/12`، custom → `× days/365`
 - نیاز: `calculationMethod = 'declining_balance'` و سیستم `calculatedInstallment` را محاسبه می‌کند
 - هر قسط: سود = `remainingBalance × r`، اصل = `installment - سود`
 
@@ -33,7 +35,7 @@
 **4. Bullet:**
 - اصل کل در پایان، سود ماهانه
 - نیاز: `calculationMethod = 'bullet'` و `calculatedInstallment` برای سود ماهانه
-- هر قسط تا ماه آخر: اصل = ۰، سود = `remainingBalance × r` (فرمول کامل در بخش «فرمول‌های محاسباتی»)؛ ماه آخر: کل اصل باقیمانده یک‌جا
+- هر قسط تا دوره آخر: اصل = ۰، سود = `remainingBalance × r` با همان `getPeriodRate`؛ دوره آخر: کل اصل باقیمانده یک‌جا (BUG-026)
 
 **برنامه اقساط:**
 - `getUpcomingPayments()` باید `calculationMethod` را چک کند
@@ -66,7 +68,7 @@
 11. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
 12. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
 13. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
-14. برای هر پرداخت، نرخ تبدیل لحظه در `exchangeRateToBase` ذخیره شود تا ارزش دلاری/تتری قسط حفظ شود.
+14. برای هر پرداخت، `exchangeRateToBase` (ارز قسط → baseCurrency کاربر) ذخیره شود تا ارزش تاریخی به base حفظ شود (BUG-029).
 
 ---
 
@@ -83,7 +85,7 @@
 **مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه ثبت — ریال به ازای ۱ تتر)
+- `exchangeRateToBase` → decimal (نرخ ارز وام/قسط → **baseCurrency کاربر** در لحظه ثبت — BUG-029 / BUG-003؛ نه الزاماً ریال/تتر)
 
 **تاریخ‌ها:**
 - `disbursementDate` → datetime (تاریخ دریافت/واریز وام) ✅ **جدید**
@@ -97,11 +99,13 @@
 **محاسبه اقساط (Core):**
 - `calculationMethod` → enum (declining_balance | flat_rate | bullet | qarz_al_hasaneh) ✅ **جدید — حتمی**
 - `interestType` → string (`none`, `fixed`, `variable`)
-- `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18) ✅ **توضیح واحد اضافه شد**
-- `interestRatePeriod` → string (`annual`, `monthly`)
+- `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18)
+- `interestRatePeriod` → string (`annual`, `monthly`) — **فقط از طریق `getPeriodRate` وارد فرمول می‌شود (BUG-027)**؛ هیچ فرمولی نباید `interestRate/12` را مستقیم فرض کند
 - `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`)
+- `customIntervalDays` → integer (nullable — اجباری اگر frequency=custom)
 - `totalInstallments` → integer (تعداد کل اقساط)
-- `gracePeriodMonths` → integer (nullable — ماه‌های تنفس) ✅ **جدید**
+- `gracePeriodMonths` → integer (nullable — طول تنفس به **ماه تقویمی**؛ برای تبدیل به تعداد period از `gracePeriods = gracePeriodMonths × periodsPerYear / 12` — BUG-028)
+- `gracePeriodCount` → integer (nullable — **جایگزین صریح**: تعداد periodهای تنفس هم‌فرکانس با `installmentFrequency`؛ اگر پر باشد بر `gracePeriodMonths` مقدم است)
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
 - `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
@@ -160,7 +164,7 @@
 - `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
 - `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
-- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه — ریال به ازای ۱ تتر)
+- `exchangeRateToBase` → decimal (نرخ ارز قسط → baseCurrency کاربر — BUG-029)
 - `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
 - `createdAt` → datetime
 
@@ -208,7 +212,8 @@
 - `rate` → decimal (nullable — نرخ درصدی برای `feeType` های percentage-based — مثلاً 1.5)
 - `minAmount` → decimal (nullable — حداقل کارمزد — برای همه انواع)
 - `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
-- `tiers` → JSON (nullable — فقط برای `feeType = 'tiered'` — آرایه‌ای از `{upToPercent, rate}`)
+- `tiers` → JSON (nullable — **deprecated برای داده جدید**؛ فقط مهاجرت)
+- برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers` (BUG-030)
 - `calculatedAmount` → decimal (nullable — مبلغ نهایی محاسبه‌شده — پس از `createLoan` یا `payLoan` پر می‌شود)
 - `description` → string (nullable — توضیح اضافه، لازم برای `feeCategory = 'other'`)
 - `createdAt` → datetime
@@ -328,7 +333,7 @@ custom    → periodsPerYear = 365 / customIntervalDays   // مثلاً هر ۴�
 
 ```
 r = interestRate / 100                    // نرخ ماهانه مستقیم — بدون تقسیم بر ۱۲
-// در این حالت fequency باید monthly باشد؛ برای weekly/quarterly/custom:
+// در این حالت frequency باید monthly باشد؛ برای weekly/quarterly/custom:
 // ابتدا annualRate = r × 12 محاسبه، سپس همان جدول بالا
 ```
 
@@ -784,6 +789,13 @@ gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
 // quarterly: gracePeriods = gracePeriodMonths / 3
 //            → اگر نتیجه کسری شود، ROUND_DOWN
 // custom:    gracePeriods = gracePeriodMonths × 30 / customIntervalDays
+
+
+> **BUG-028 — قرارداد تنفس**:
+> 1. اگر `gracePeriodCount` مقدار داشته باشد → همان تعداد period با فرکانس وام (هفتگی/فصلی/…) اعمال می‌شود.
+> 2. وگرنه `gracePeriodMonths` به period تبدیل می‌شود: `gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12` (همان جدول موجود).
+> 3. تاریخ واقعی پایان تنفس از `firstPaymentDate` و تعداد period محاسبه می‌شود، نه فقط جمع ماه‌های خام روی تقویم وقتی frequency هفتگی است.
+
 //            → ROUND_DOWN
 ```
 

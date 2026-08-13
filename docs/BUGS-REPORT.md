@@ -9,6 +9,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-026 — Declining rate vs frequency
+**راه‌حل:** r فقط از getPeriodRate؛ weekly/52، quarterly/4، custom days/365؛ ممنوع annual/12 ثابت در فرمول اصلی.
+
+### BUG-027 — interestRatePeriod در فرمول
+**راه‌حل:** monthly rate از طریق نرمال‌سازی در getPeriodRate وارد می‌شود؛ هیچ فرمول مستقیمی /12 بدون توجه به period.
+
+### BUG-028 — Grace vs frequency
+**راه‌حل:** gracePeriodCount (تعداد period) مقدم؛ یا تبدیل gracePeriodMonths با periodsPerYear/12.
+
+### BUG-029 — Loan exchangeRateToBase
+**راه‌حل:** نرخ به baseCurrency کاربر؛ هم‌راستا با BUG-003.
+
+### BUG-030 — Fee tiers JSON
+**راه‌حل:** جدول ln_loan_fee_tiers رابطه‌ای؛ JSON deprecated.
+
+
 ### BUG-021 — Tax payment double ledger
 **راه‌حل:** فقط یک acc_transactions با type اختصاصی Tax داخل markAsPaid/payTax؛ ممنوع Expense عمومی + Tax جدا.
 
