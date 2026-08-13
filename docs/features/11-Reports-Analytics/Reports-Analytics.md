@@ -99,10 +99,13 @@
 
 - `id` → UUID
 - `name` → string (نام گزارش ذخیره‌شده)
-- `reportType` → string
-- `filters` → JSON (بازه زمانی، حساب‌ها، دسته‌ها و ...)
+- `reportType` → string (`cash_flow`, `income_expense`, `net_worth`, `investment_performance`, `budget_vs_actual`, `tax_summary`)
+- `filtersSchemaVersion` → integer (نسخه ساختار `filters` — برای backward compatibility؛ پیش‌فرض: `1`)
+- `filters` → JSON typed به `ReportFilters` (تعریف کامل در `core/types/types.md` — بخش `report.ts`)
 - `createdAt` → datetime
 - `updatedAt` → datetime
+
+> ⚠️ **هشدار backward compatibility**: ساختار `filters` هرگز بدون افزایش `filtersSchemaVersion` تغییر نکند. هنگام بارگذاری preset قدیمی، `filtersSchemaVersion` را چک کنید و در صورت نیاز migration اعمال کنید.
 
 ### ۲. Net Worth Snapshot (جدول: `rep_net_worth_snapshots`) — اختیاری
 
