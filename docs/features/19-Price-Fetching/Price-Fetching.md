@@ -92,8 +92,9 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 - `id` → UUID (Primary Key)
 - `name` → string (نام منبع، مثلاً «Nobitex»، «CoinGecko»)
-- `assetCategory` → enum (`crypto`, `stock`, `housing`, `metal`) — دسته دارایی‌ای که این منبع پوشش می‌دهد
-- `baseUrl` → string (آدرس API)
+- `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — دسته دارایی‌ای که این منبع پوشش می‌دهد
+- `adapterKey` → string (**اجباری** — کلید registry Adapter، مثلاً `coingecko`، `nobitex`، `tsetmc`؛ به بخش Provider Adapter Contract مراجعه شود)
+- `baseUrl` → string (آدرس پایه API — در صورت نیاز Adapter)
 - `requiresApiKey` → boolean
 - `isActive` → boolean
 - `notes` → string (nullable)
@@ -130,6 +131,131 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 ---
 
+## Provider Adapter Contract (باگ ۳۶ — High)
+
+هر منبع قیمت بیرونی **فقط** از طریق یک Adapter پیاده‌سازی می‌شود. Domain و Application هرگز SDK/URL/پارس اختصاصی یک Provider را مستقیم صدا نمی‌زنند؛ در غیر این صورت با افزودن Provider دوم معماری ماژولار از بین می‌رود.
+
+### محل کد (پیشنهادی)
+
+```text
+features/19-Price-Fetching/
+├── domain/
+│   └── PriceProviderAdapter.ts    # فقط interface + انواع مشترک
+├── application/
+│   └── fetchAndStorePrices.ts     # فقط به interface وابسته است
+└── infrastructure/providers/
+    ├── coingeckoAdapter.ts
+    ├── nobitexAdapter.ts
+    ├── tsetmcAdapter.ts
+    ├── metalIranAdapter.ts
+    └── index.ts                   # registry: sourceId → adapter
+```
+
+### Interface واحد (اجباری برای همه Providerها)
+
+```typescript
+/** پاسخ خام یک نماد پس از نرمال‌سازی Adapter — قبل از نوشتن در price_history */
+export interface NormalizedPriceQuote {
+  symbol: string;           // نماد داخلی سیستم (پس از normalizeSymbol)
+  price: string;            // decimal به‌صورت string
+  priceCurrency: string;    // ISO یا USDT / IRR
+  fetchedAt: string;        // ISO datetime معتبر
+  rawSymbol?: string;       // نماد اصلی Provider (برای دیباگ)
+}
+
+export interface ProviderFetchResult {
+  succeeded: NormalizedPriceQuote[];
+  failed: Array<{ symbol: string; reason: string }>;
+  skipped: Array<{ symbol: string; reason: string }>;
+}
+
+/**
+ * قرارداد اجباری هر Provider.
+ * Domain فقط این متدها را می‌شناسد؛ جزئیات HTTP/JSON داخل Adapter می‌ماند.
+ */
+export interface PriceProviderAdapter {
+  /** شناسه پایدار Adapter — با price_sources.id یا یک کلید منطقی مثل 'coingecko' */
+  readonly adapterKey: string;
+  /** دسته‌هایی که این Adapter پوشش می‌دهد */
+  readonly supportedAssetCategories: Array<'crypto' | 'stock' | 'fif' | 'metal'>;
+  /** حداکثر نماد در یک Request (برای Bulk Fetch) */
+  readonly maxBatchSize: number;
+
+  /**
+   * دریافت قیمت‌ها از API بیرونی.
+   * ورودی: نمادهای **داخلی** سیستم (نه لزوماً فرمت Provider).
+   * خروجی: فقط NormalizedPriceQuote — نه JSON خام Provider.
+   */
+  fetchPrices(
+    symbols: string[],
+    options?: { apiKey?: string; signal?: AbortSignal }
+  ): Promise<ProviderFetchResult>;
+
+  /** تبدیل نماد داخلی ↔ نماد Provider (دو طرفه در صورت نیاز) */
+  normalizeSymbol(symbol: string, direction: 'toProvider' | 'toInternal'): string;
+
+  /**
+   * استخراج و اعتبارسنجی قیمت از payload خام یک آیتم.
+   * باید decimal معتبر و > 0 برگرداند؛ در غیر این صورت throw یا null.
+   */
+  normalizePrice(rawItem: unknown): string | null;
+
+  /**
+   * استخراج زمان معتبر از پاسخ.
+   * اگر Provider timestamp ندهد، Adapter می‌تواند «الان» را برگرداند ولی باید صریح باشد.
+   */
+  validateTimestamp(rawItem: unknown): string | null; // ISO datetime
+
+  /**
+   * استخراج/ثابت‌کردن ارز قیمت.
+   * مثلاً CoinGecko ممکن است vs_currencies=usd بدهد → Adapter به USDT/USD نگاشت می‌کند.
+   */
+  validateCurrency(rawItem: unknown): string | null;
+}
+```
+
+### قوانین معماری
+
+1. **هیچ Providerی مستقیم وارد Domain نمی‌شود.** فقط `infrastructure/providers/*` این interface را implement می‌کند.
+2. `fetchAndStorePrices` در Application لایه فقط `PriceProviderAdapter` را از registry می‌گیرد (`getAdapter(sourceId)`) و `fetchPrices` را صدا می‌زند؛ سپس `NormalizedPriceQuote` را در `price_history` می‌نویسد.
+3. افزودن Provider جدید = یک فایل Adapter جدید + یک ردیف در `price_sources` — **بدون تغییر** در Domain، Crypto/Stocks/FIF/Metals، یا UI.
+4. اگر Adapter یکی از متدهای نرمال‌سازی را ناقص پیاده کند (مثلاً `normalizePrice` همیشه null بدهد)، آن نماد در `failed[]` می‌رود؛ Partial Success حفظ می‌شود.
+5. `normalizeSymbol` باید برای همه دسته‌ها کار کند:
+   - Crypto: `BTC` ↔ `bitcoin` (بسته به Provider)
+   - Stock: نماد بورسی عیناً یا نگاشت آینه
+   - FIF: `fundId` (UUID) معمولاً بدون تغییر
+   - Metals: `gold_18k` ↔ کد داخلی منبع طلا
+6. `validateCurrency` خروجی را به یکی از ارزهای مجاز پروژه محدود می‌کند (`IRR`, `USDT`, `USD`, ... طبق `types.md`).
+7. تست واحد: هر Adapter باید با fixture JSON ثابت تست شود (normalize + validate) بدون شبکه.
+
+### اتصال به `price_sources`
+
+| فیلد موجود / جدید | نقش |
+|-------------------|-----|
+| `id` | UUID رکورد منبع |
+| `name` | نام نمایشی |
+| `assetCategory` | دسته |
+| `baseUrl` | اختیاری برای Adapterهایی که URL ثابت دارند |
+| `requiresApiKey` | اگر true، Application کلید را از storage امن می‌خواند و به `options.apiKey` می‌دهد |
+| `adapterKey` | **جدید (اجباری)** — کلید registry برای پیدا کردن کلاس Adapter (مثلاً `coingecko`) |
+| `isActive` | فعال/غیرفعال |
+
+بدون `adapterKey` معتبر، `fetchAndStorePrices` نباید شبکه را صدا بزند و باید با خطای واضح برگردد.
+
+### جریان فراخوانی
+
+```text
+UI / Auto-Sync
+    → fetchAndStorePrices(symbols, sourceId, triggeredBy)
+        → load price_sources row
+        → getAdapter(row.adapterKey)   // registry
+        → adapter.fetchPrices(symbols) // داخلش: normalizeSymbol → HTTP → normalizePrice/Currency/Timestamp
+        → write NormalizedPriceQuote[] to price_history
+        → emit PriceFetchCompleted
+```
+
+---
+
 ## APIهای داخلی (مشترک)
 
 ### مدیریت منبع و تاریخچه
@@ -141,10 +267,12 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
 - `fetchAndStorePrices(symbols[], sourceId, triggeredBy: 'user_click' | 'auto_sync')`:
   1. چک `navigator.onLine` — اگر `false`، بلافاصله برمی‌گردد با `{ skipped: true, reason: 'offline' }` و هیچ Request ای نمی‌رود.
-  2. نمادها را طبق «دریافت انبوه» (پایین) به Batchهای کوچک تقسیم می‌کند.
-  3. برای هر Batch نتیجه را در `price_history` با `source='api'` و `triggeredBy` داده‌شده ذخیره می‌کند.
-  4. اگر `triggeredBy='auto_sync'` بود، `price_sync_settings.lastSyncAt` مربوطه را هم آپدیت می‌کند.
-  5. خروجی یکسان با ساختار `succeeded[]` / `failed[]` که در `19-01-Crypto-Prices` تعریف شده برمی‌گرداند.
+  2. ردیف `price_sources` را می‌خواند؛ بدون `adapterKey` معتبر خطا می‌دهد و شبکه را صدا نمی‌زند.
+  3. Adapter را از registry با `getAdapter(adapterKey)` می‌گیرد (فقط `PriceProviderAdapter` — نه SDK اختصاصی).
+  4. نمادها را طبق «دریافت انبوه» و `adapter.maxBatchSize` به Batch تقسیم می‌کند.
+  5. برای هر Batch: `adapter.fetchPrices(batch)` → فقط `NormalizedPriceQuote`؛ سپس ذخیره در `price_history` با `source='api'` و `triggeredBy`.
+  6. اگر `triggeredBy='auto_sync'` بود، `price_sync_settings.lastSyncAt` را آپدیت می‌کند.
+  7. خروجی `ProviderFetchResult` / ساختار `succeeded[]`/`failed[]`/`skipped[]`.
 
 ### ثبت دستی (کاملاً آفلاین)
 - `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.

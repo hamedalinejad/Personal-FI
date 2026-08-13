@@ -69,3 +69,5 @@
 - این زیرفیچر هیچ صفحه مستقلی در ناوبری ندارد؛ کاملاً به‌صورت دکمه/ویجت + سوییچ Auto-Sync داخل صفحه سرمایه‌گذاری پیاده می‌شود (طبق اصل «صفحات کم»).
 - هر سه مسیر (دستی، خودکار، ثبت دستی بدون شبکه) هم‌زمان از نسخه ۱ پشتیبانی می‌شوند — هیچ‌کدام «آینده» نیستند.
 - الگوی این فایل (استفاده از جداول مشترک `price_sources`/`price_history`/`price_sync_settings` + منطق Fetch/Parse مخصوص هر دسته دارایی) باید برای زیرفیچرهای بعدی (`19-02-Stock-Prices`, `19-03-Housing-Prices`, `19-04-Metals-Prices`) بدون تغییر در `Price-Fetching.md` یا فیچرهای دیگر تکرار شود.
+
+> **Adapter (باگ ۳۶)**: هر Provider کریپتو (CoinGecko، Nobitex، ...) باید `PriceProviderAdapter` را implement کند (`fetchPrices`, `normalizeSymbol`, `normalizePrice`, `validateTimestamp`, `validateCurrency`). جزئیات قرارداد در `Price-Fetching.md` بخش Provider Adapter Contract.

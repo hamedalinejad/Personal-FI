@@ -9,6 +9,18 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۳۶ — قرارداد Adapter برای Providerهای قیمت ناقص بود (Severity: High)
+**محل:** `docs/features/19-Price-Fetching/Price-Fetching.md` + `core/types/types.md` + `core/services/services.md`
+**شرح:** بدون interface واحد، هر Provider مستقیماً وارد Domain می‌شد و با افزودن منبع دوم معماری ماژولار از بین می‌رفت.
+**راه‌حل اعمال‌شده:**
+- تعریف `PriceProviderAdapter` با متدهای اجباری: `fetchPrices`, `normalizeSymbol`, `normalizePrice`, `validateTimestamp`, `validateCurrency`
+- انواع `NormalizedPriceQuote` و `ProviderFetchResult`
+- فیلد `adapterKey` روی `price_sources` برای registry
+- قوانین: Domain فقط interface را می‌شناسد؛ Adapterها در `infrastructure/providers/`
+- به‌روزرسانی جریان `fetchAndStorePrices` برای عبور اجباری از Adapter
+- Types در `types.md`؛ مرز مسئولیت در `services.md`؛ اشاره در زیرفیچرهای قیمت
+
+
 ### باگ ۳۵ — تمایز واحد، عیار و وزن خالص در فلزات (Severity: High)
 **محل:** `docs/features/05-Investment/05-04-Metals/Metals.md` + `19-04-Metals-Prices` + `db.md`
 **شرح:** مدل قبلی `purity` را فقط روی Holding داشت و روی Transaction نداشت؛ وزن خالص (Fine Weight) تعریف نشده بود؛ خطر قاطی‌شدن `1g Gold 18K` با `1g pure gold` و اشتباه گرفتن mg/gram/ounce وجود داشت.

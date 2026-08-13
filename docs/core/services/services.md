@@ -26,6 +26,9 @@ services/
 └── index.ts
 ```
 
+> **Providerهای قیمت کجا هستند؟**  
+> Adapterهای API قیمت (`PriceProviderAdapter`) داخل فیچر `19-Price-Fetching/infrastructure/providers/` زندگی می‌کنند، نه در `core/services`. دلیل: وابسته به دامنه قیمت‌اند و قراردادشان در `Price-Fetching.md` (باگ ۳۶) تعریف شده. `core/services` فقط زیرساخت عمومی (storage برای API Key، eventBus برای `PriceFetchCompleted`) را می‌دهد.
+
 > **چرا `indexedDbService.ts` از پروژه حذف شد؟**  
 > IndexedDB در این پروژه صرفاً به‌عنوان ذخیره‌گاه فیزیکی فایل SQLite (از طریق sql.js) استفاده می‌شود — یعنی فقط یک Blob کامل در آن نوشته/خوانده می‌شود. این عملیات مستقیماً در لایه db (فایل `db/db.ts`) و با الگوی `Write-to-temp-then-swap` (مستند در `core/db/db.md`) انجام می‌شود؛ یک سرویس جداگانه برای آن ارزش افزوده‌ای ندارد و فقط پیچیدگی غیرضروری ایجاد می‌کند.
 

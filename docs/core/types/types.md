@@ -136,6 +136,35 @@ export interface CachedPrice {
   fetchedAt: Timestamp;
   isStale: boolean; // اگر بیش از یک حد مشخص (مثلاً ۲۴ ساعت) از fetchedAt گذشته باشد
 }
+
+// --- Provider Adapter Contract (باگ ۳۶) — تعریف کامل رفتاری در Price-Fetching.md ---
+export interface NormalizedPriceQuote {
+  symbol: string;
+  price: string; // decimal string
+  priceCurrency: PriceCurrency | string;
+  fetchedAt: string; // ISO datetime
+  rawSymbol?: string;
+}
+
+export interface ProviderFetchResult {
+  succeeded: NormalizedPriceQuote[];
+  failed: Array<{ symbol: string; reason: string }>;
+  skipped: Array<{ symbol: string; reason: string }>;
+}
+
+export interface PriceProviderAdapter {
+  readonly adapterKey: string;
+  readonly supportedAssetCategories: AssetCategory[];
+  readonly maxBatchSize: number;
+  fetchPrices(
+    symbols: string[],
+    options?: { apiKey?: string; signal?: AbortSignal }
+  ): Promise<ProviderFetchResult>;
+  normalizeSymbol(symbol: string, direction: 'toProvider' | 'toInternal'): string;
+  normalizePrice(rawItem: unknown): string | null;
+  validateTimestamp(rawItem: unknown): string | null;
+  validateCurrency(rawItem: unknown): string | null;
+}
 ```
 
 ---
