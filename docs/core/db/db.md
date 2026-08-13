@@ -134,8 +134,9 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `inv_crypto_exchange_transactions` | Investment Crypto | تراکنش‌های نقدی صرافی |
 | `inv_stocks_iran_brokerages` | Investment Stocks Iran | کارگزاری‌ها |
 | `inv_stocks_iran_holdings` | Investment Stocks Iran | دارایی‌های سهام |
-| `inv_stocks_iran_transactions` | Investment Stocks Iran | تراکنش‌های سهام |
+| `inv_stocks_iran_transactions` | Investment Stocks Iran | تراکنش‌های سهام و Corporate Actions |
 | `inv_stocks_iran_brokerage_transactions` | Investment Stocks Iran | تراکنش‌های نقدی کارگزاری |
+| `inv_stocks_iran_dividends` | Investment Stocks Iran | سود نقدی با جزئیات gross/tax/net و تاریخ‌های ex/record/payment |
 | `inv_fif_funds` | Investment Fixed Income Funds | صندوق‌های درآمد ثابت |
 | `inv_fif_holdings` | Investment Fixed Income Funds | دارایی‌های صندوق |
 | `inv_fif_transactions` | Investment Fixed Income Funds | تراکنش‌های صندوق |
