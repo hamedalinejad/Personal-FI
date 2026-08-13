@@ -21,6 +21,45 @@
 
 ---
 
+## Rate Provenance — زنجیره منشأ نرخ (Immutable Audit Trail)
+
+> **مشکل**: `priceBase` و `totalAmountBase` در لحظه تراکنش ذخیره و قفل می‌شوند — اما اگر فقط مقدار نهایی ذخیره شود، در آینده نمی‌توان تأیید کرد این عدد از کجا آمده. `getLatestPrice()` می‌تواند تغییر کند؛ نباید بتوان تراکنش تاریخی را با قیمت جدید بازمحاسبه کرد.
+
+**راه‌حل**: هر تراکنش علاوه بر مقدار محاسبه‌شده، به **رکورد دقیق قیمتی** که آن مقدار را ساخته لینک می‌دهد:
+
+```
+inv_crypto_transactions.priceHistoryId → price_history.id
+```
+
+چون `price_history` **Append-Only** است (رکوردهای قدیمی هرگز overwrite یا حذف نمی‌شوند)، این لینک برای همیشه معتبر می‌ماند و زنجیره کامل provenance را می‌سازد:
+
+```
+inv_crypto_transactions
+  └─ priceHistoryId ──────────→ price_history
+                                  ├─ price (قیمت خام)
+                                  ├─ priceCurrency
+                                  ├─ fetchedAt (لحظه دریافت)
+                                  ├─ source ('manual' | 'api')
+                                  ├─ triggeredBy ('user_click' | 'auto_sync' | 'manual_entry')
+                                  └─ sourceId ────────────────→ price_sources
+                                                                  ├─ name (مثلاً 'CoinGecko')
+                                                                  ├─ url
+                                                                  └─ apiEndpoint
+```
+
+**قوانین پر کردن `priceHistoryId`**:
+
+| سناریو | `priceHistoryId` |
+|---------|-----------------|
+| خرید/فروش با قیمت از `getLatestPrice()` | `price_history.id` رکورد مصرف‌شده — **الزامی** |
+| خرید/فروش با قیمت وارد‌شده دستی توسط کاربر | ابتدا `setManualPrice()` فراخوانی شود → رکورد در `price_history` ثبت شود → سپس `id` آن رکورد اینجا ذخیره شود — **الزامی** |
+| معامله رمزارز-به-رمزارز (C2C) | همان — `priceHistoryId` برای هر دو طرف (fromSymbol و toSymbol) جداگانه ذخیره شود |
+| واریز/برداشت ریالی (بدون قیمت رمزارز) | `null` — چون `priceBase` برای IRR/USDT محاسبه نمی‌شود |
+
+> **نکته پیاده‌سازی**: هنگام ثبت تراکنش، `getLatestPrice()` یک `CachedPrice` برمی‌گرداند که شامل `priceHistoryId` (id رکورد `price_history`) است. این id باید مستقیماً در تراکنش ذخیره شود — نه اینکه بعداً دوباره query شود.
+
+---
+
 ## User Stories
 
 ### Must Have
@@ -135,10 +174,13 @@
 - `totalAmount` → decimal (به ارز `currency`)
 - `priceBase` → decimal (معادل `price` به ارز پایه کاربر (`baseCurrency`)، طبق «ارز پایه محاسبات» — الزامی برای `buy`/`sell`)
 - `totalAmountBase` → decimal (معادل `totalAmount` به ارز پایه — این فیلد و نه `totalAmount` است که در فرمول‌های Weighted Average/Realized P&L و به‌روزرسانی `inv_crypto_holdings` استفاده می‌شود)
+- `priceHistoryId` → UUID (nullable — لینک به `price_history.id`؛ رکورد دقیقی از `price_history` که `priceBase` از آن محاسبه شده. برای معاملات رمزارز-به-رمزارز که قیمت از `getLatestPrice()` می‌آید الزامی است؛ برای معاملات ریالی/USDT که قیمت را کاربر مستقیم وارد می‌کند `null` است)
+- `feeAssetPriceHistoryId` → UUID (nullable — لینک به `price_history.id` برای قیمتی که `feeAssetPriceToBase` از آن گرفته شده؛ فقط وقتی `feeCurrency` یک رمزارز است الزامی است)
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
 - `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه ارز پایه کاربر باشد؛ قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر، از `getLatestPrice(feeCurrency, baseCurrency)` — مثلاً اگر `baseCurrency=USDT`، قیمت BTC = ۶۵,۰۰۰ USDT)
 - `exchangeRateToBase` → decimal (نرخ تبدیل لحظه به ارز پایه کاربر — nullable؛ فقط وقتی `currency` یا `feeCurrency` برابر IRR باشد و ارز پایه IRR نباشد کاربرد دارد. در معامله رمزارز-به-رمزارز که نه ارز اصلی و نه کارمزد ریالی نیستند، `null` می‌ماند و تبدیل از طریق `getLatestPrice()` فیچر `19-Price-Fetching` انجام می‌شود)
+- `exchangeRateHistoryId` → UUID (nullable — لینک به `cur_exchange_rates.id` (یا رکورد تاریخچه نرخ ارز) که `exchangeRateToBase` از آن گرفته شده؛ برای audit مالی نرخ‌های ریالی)
 - `currency` → string (ارز طرف مقابل معامله: IRR، USDT، یا سیمبل یک رمزارز دیگر برای معاملات رمزارز-به-رمزارز)
 - `tradeId` → UUID (نال مگر برای معامله رمزارز-به-رمزارز طبق قاعده ۲a — UUID مشترک بین رکورد `sell` رمزارز پرداختی و رکورد `buy` رمزارز دریافتی همان معامله)
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
@@ -338,11 +380,13 @@ holding.totalFeesPaidBase += feeBase
     fromSymbol: string,             // ETH
     fromQuantity: Decimal,          // مقدار ETH که پرداخت می‌شود
     fromPriceBase: Decimal,         // قیمت ۱ واحد ETH به baseCurrency در لحظه معامله
+    fromPriceHistoryId: UUID,       // id رکورد price_history که fromPriceBase از آن آمده
 
     // رمزارز دریافتی (مثلاً BTC که می‌خریم)
     toSymbol: string,               // BTC
     toQuantity: Decimal,            // مقدار BTC که دریافت می‌شود
     toPriceBase: Decimal,           // قیمت ۱ واحد BTC به baseCurrency در لحظه معامله
+    toPriceHistoryId: UUID,         // id رکورد price_history که toPriceBase از آن آمده
 
     // کارمزد
     feeAmount: Decimal,
