@@ -106,7 +106,15 @@ export type RelatedFeature =
   | 'physical_assets'
   | 'budget'
   | 'tax'
-  | 'goals';
+  | 'goals'
+  | 'bills'
+  | 'documents'
+  | 'price'           // لینک به price_history / sync در صورت نیاز
+  | 'accounts';        // انتقال/تعدیل مستقیم حساب
+
+// BUG-023: این Union منبع حقیقت TypeScript است.
+// افزودن فیچر جدید با polymorphic link = (1) افزودن literal اینجا (2) ثبت در جدول registry زیر در db.md
+// هیچ فایل فیچری حق ندارد string آزاد برای relatedFeature بنویسد.
 ```
 
 ---
@@ -252,5 +260,5 @@ export type ReconcileScope =
 2. از `any` پرهیز شود — به‌جای آن `unknown` با type guard.
 3. مبالغ مالی در Types به‌صورت `string` (نه `number`) تعریف شوند تا با Decimal.js سازگار باشند و floating-point error ایجاد نشود.
 4. `TransactionType` باید همیشه با enum فیلد `type` در `acc_transactions` یکی باشد.
-5. تمام جداول با ارتباط چندریختی (Polymorphic) دقیقاً از `relatedFeature: RelatedFeature` و `relatedId: UUID` استفاده کنند — نام دیگری مجاز نیست.
+5. تمام جداول با ارتباط چندریختی دقیقاً از `relatedFeature: RelatedFeature` و `relatedId: UUID` استفاده کنند (BUG-023). مقدار خارج از Union در compile-time خطا و در runtime validate رد می‌شود.
 6. هر رویداد جدید در `AppEvent` باید در `core/services/services.md` (بخش Event Bus) هم مستند شود.

@@ -675,3 +675,38 @@ actorId, source, reason, payloadSummary, createdAt
 2. Reversal باید `reversalOf` / `relatedTransactionId` پر کند.
 3. Import انبوه `source='import'` می‌گیرد.
 4. حذف فیزیکی ردیف audit ممنوع.
+
+---
+
+## تقویت Integrity لینک Polymorphic (BUG-024)
+
+FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
+
+1. **Validate همزمان با INSERT** (داخل همان BEGIN atomic): وجود ردیف هدف؛ وگرنه COMMIT نشود.
+2. **جدول `ref_integrity_queue` (اختیاری v1 / Should Have)**: اگر حذف منطقی parent لازم شد، قبل از archive، child links بررسی شوند (RESTRICT منطقی).
+3. **Reconcile اجباری در مسیرهای حساس**: قبل از Backup و بعد از Restore، `reconcileOrphanLinks()` برای `acc_transactions` و سایر polymorphic tables.
+4. **ممنوع DELETE فیزیکی** parent تا وقتی child link دارد (هم‌راستا با ON DELETE RESTRICT روی FKهای واقعی).
+5. تست integration: حذف/void والد نباید child را بی‌سرپرست رها کند بدون گزارش.
+
+این همچنان Weak Integrity نسبت به FK واقعی است، ولی پنجره orphan بدون تشخیص تا «فقط وقتی کاربر reconcile بزند» نباید باز بماند — حداقل در Backup/Restore و `reconcileAll` اجباری است.
+
+---
+
+## قرارداد Snapshot در برابر Ledger (BUG-025)
+
+| لایه | نقش | mutable؟ |
+|------|-----|----------|
+| Ledger (`*_transactions`, `acc_transactions`) | منبع حقیقت رویدادها | append-only / void+reversal |
+| Snapshot (holding quantity, cashBalance, currentBalance, totalInvested, averages, remaining loan, …) | کش مشتق برای سرعت | mutable ولی **فقط** از مسیر atomic رسمی |
+
+### قوانین
+1. **Ledger authoritative است**؛ Snapshot هرگز منبع حقیقت برای Repair نیست (هم‌راستا با BUG-018).
+2. هر Feature که Snapshot دارد باید `rebuildXFromLedger(id)` داشته باشد (یا از helper مشترک).
+3. `runAtomicFinancialOperation` باید در یک COMMIT هم ledger و هم snapshot را بنویسد؛ به‌روزرسانی snapshot بیرون از آن مسیر ممنوع است.
+4. بعد از کشف اختلاف reconcile: فقط **Repair صریح** (`rebuild*FromLedger` با تأیید کاربر) snapshot را اصلاح می‌کند — نه نوشتن معکوس از snapshot روی ledger.
+5. لیست حداقل rebuildها: Account balance، Crypto/Stock/FIF/Metals holdings، Brokerage/Platform cash، Loan remaining.
+
+```text
+Ledger correct + Snapshot wrong  → rebuild snapshot from ledger
+Ledger wrong                     → reversal/corrective transactions (never silent snapshot edit as truth)
+```

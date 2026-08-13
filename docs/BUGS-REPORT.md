@@ -9,6 +9,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-021 — Tax payment double ledger
+**راه‌حل:** فقط یک acc_transactions با type اختصاصی Tax داخل markAsPaid/payTax؛ ممنوع Expense عمومی + Tax جدا.
+
+### BUG-022 — taxYear بدون تقویم
+**راه‌حل:** جفت taxYear + taxCalendar (jalali|gregorian) اجباری.
+
+### BUG-023 — RelatedFeature ناقص
+**راه‌حل:** گسترش Union + قانون افزودن فقط از types.md؛ bills/documents/price/accounts اضافه شد.
+
+### BUG-024 — Polymorphic weak integrity
+**راه‌حل:** validate در BEGIN؛ reconcile orphan در Backup/Restore و reconcileAll؛ بدون DELETE parent دارای child.
+
+### BUG-025 — Snapshot vs immutable ledger
+**راه‌حل:** ledger authoritative؛ rebuild*FromLedger؛ snapshot فقط از atomic path؛ repair صریح.
+
+
 ### BUG-009 — Crypto price path must use assetId/mapping
 **راه‌حل:** ساخت PriceAssetRef از Holding شامل assetKey+assetId+priceProviderId.
 

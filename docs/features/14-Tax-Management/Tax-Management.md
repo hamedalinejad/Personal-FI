@@ -38,11 +38,14 @@
 
 1. هر رکورد مالیاتی باید نوع مشخصی داشته باشد.
 2. وضعیت مالیات می‌تواند `pending`, `paid`, `overdue`, `cancelled` باشد.
-3. هنگام پرداخت مالیات:
-   - **مرحله ۱**: تراکنش Expense/Income باید ابتدا ثبت شود (با نوع مناسب)
-   - **مرحله ۲**: `markAsPaid()` این تراکنش را به مالیات لینک می‌کند (از طریق `accountTransactionId`)
-   - تراکنش در `acc_transactions` با نوع `withdrawal-expense-tax` (یا `deposit-income-tax` در صورت بازگشت مالیات) ثبت می‌شود — از انواع اختصاصی مالیات استفاده می‌شود، نه انواع عمومی `withdrawal-expense`/`deposit-income`، تا در گزارش‌ها و فیلترها قابل تفکیک باشد.
-   - موجودی حساب کاهش (یا افزایش) می‌یابد.
+3. هنگام پرداخت مالیات (**یک بار ورود به Ledger — BUG-021**):
+   - **فقط یک** ردیف `acc_transactions` ساخته می‌شود با `type = 'withdrawal-expense-tax'` (یا `deposit-income-tax` برای بازگشت).
+   - **ممنوع**: ساختن Expense عمومی (`withdrawal-expense`) و سپس یک تراکنش Tax جدا — باعث double-count در Ledger می‌شود.
+   - جریان اتمیک پیشنهادی داخل `markAsPaid` / `payTax`:
+     1. `runAtomicFinancialOperation`: INSERT همان یک `acc_transactions` با type اختصاصی Tax + به‌روز balance حساب
+     2. UPDATE `tax_records`: `status=paid`, `paidDate`, `accountId`, `accountTransactionId` = id همان تراکنش
+   - اگر UI از مسیر Expense عمومی استفاده کند، باید همان type Tax را بنویسد یا به `payTax` делеگیت کند — نه دو API پشت‌سرهم که هر کدام INSERT جدا بزنند.
+   - موجودی حساب فقط یک بار تغییر می‌کند.
 4. مالیات‌های معوق باید در یادآوری‌ها و داشبورد نمایش داده شوند.
 5. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت.
 6. محاسبات پیچیده مالیاتی (اظهارنامه رسمی) خارج از محدوده این فیچر است.
@@ -62,7 +65,9 @@
 - `dueDate` → datetime
 - `paidDate` → datetime (nullable)
 - `status` → string (`pending`, `paid`, `overdue`, `cancelled`)
-- `year` → number (سال مالیاتی)
+- `taxYear` → number (عدد سال مالیاتی — مثلاً 1404 یا 2026)
+- `taxCalendar` → string (`jalali` | `gregorian`) — **اجباری با taxYear (BUG-022)**؛ بدون تقویم، عدد سال تفسیرپذیر نیست
+- `year` → number (deprecated alias؛ در پیاده‌سازی فقط `taxYear` + `taxCalendar` نوشته شود)
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)
@@ -70,7 +75,7 @@
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
 - `attachmentPath` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه پرداخت — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ ارز پرداخت → baseCurrency کاربر — BUG-003)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -91,17 +96,16 @@
 - `updateTaxRecord(taxRecordId, data)` → ویرایش مالیات
 - `getAllTaxRecords(filters)` → فیلتر بر اساس سال، نوع، وضعیت
 - `getTaxRecordById(taxRecordId)` → دریافت جزئیات مالیات
-- `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, relatedFeature?, relatedId?)`  
-  → لینک پرداخت به مالیات (با فرض اینکه تراکنش Expense/Income قبلاً ایجاد شده)  
-  → این API فقط `accountTransactionId` را به مالیات لینک می‌کند (تراکنش Expense باید پیش‌تر ثبت شده باشد)
-- `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled)
-- `getPendingTaxes()` → مالیات‌های در انتظار
-- `getOverdueTaxes()` → مالیات‌های معوق
+- `payTax(taxRecordId, { paidDate, accountId, amount?, relatedFeature?, relatedId? })` → **مسیر اصلی (BUG-021)**  
+  یک atomic op: یک `acc_transactions` با `withdrawal-expense-tax`/`deposit-income-tax` + لینک به tax_record + status=paid. **دو بار INSERT ممنوع.**
+- `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, ...)` → فقط وقتی تراکنش Tax **از قبل** با type صحیح ساخته شده (مثلاً import)؛ اگر type عمومی expense باشد باید reject شود تا double-count نشود.
+- `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled) بدون ساخت ledger مگر از مسیر payTax
+- `getPendingTaxes()` / `getOverdueTaxes()`
 
 ### Summary APIs
-- `getTaxSummary(year?)` → مجموع مالیات‌های پرداخت‌شده و در انتظار
-- `getTaxesByType(year?)` → تفکیک بر اساس نوع
-- `getAnnualTaxReport(year)` → گزارش سالانه
+- `getTaxSummary(taxYear?, taxCalendar?)` → مجموع پرداخت‌شده و در انتظار
+- `getTaxesByType(taxYear?, taxCalendar?)`
+- `getAnnualTaxReport(taxYear, taxCalendar)` → سال بدون تقویم ناقص است (BUG-022)
 
 ---
 
@@ -173,3 +177,8 @@ Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بع
 ### API پل
 - `tax.getTaxableEvents(filters)` → خواندن از تراکنش‌های Investment با `isTaxableEvent=true`
 - `tax.attachTaxRecord(transactionRef, taxRecordId)` → پر کردن `linkedTaxRecordId`
+
+### قواعد سال مالیاتی (BUG-022)
+- همیشه جفت `(taxYear, taxCalendar)` ذخیره و فیلتر شود.
+- گزارش سالانه: `getAnnualTaxReport(taxYear, taxCalendar)`.
+- پیش‌فرض UI از تنظیمات `dateFormat` کاربر (`jalali`/`gregorian`) می‌آید ولی در رکورد snapshot می‌شود.
