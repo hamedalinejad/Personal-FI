@@ -64,9 +64,39 @@
 
 1. هر منبع قیمت (Provider) به‌صورت مستقل در `price_sources` تعریف می‌شود؛ هر نماد می‌تواند از چند منبع قیمت بگیرد (مثلاً BTC هم از منبع A هم از منبع B).
 2. دریافت از API همیشه با اراده کاربر شروع می‌شود — یا با کلیک دستی، یا (در صورت فعال بودن) با تایمر Auto-Sync که خودِ کاربر روشنش کرده. **هیچ حالت سومی وجود ندارد.**
-3. هر بار دریافت موفق (چه دستی، چه Auto-Sync، چه ثبت دستی کاربر)، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی هرگز overwrite/حذف نمی‌شوند تا امکان نمودار تاریخچه قیمت حفظ شود.
-4. آخرین قیمت هر نماد از طریق `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود؛ این تابع همیشه جدیدترین رکورد `price_history` را برمی‌گرداند (فارغ از این‌که منبعش `manual` بوده یا `api`)، نه میانگین.
-5. **قبل از هر تلاش برای اتصال (چه دستی چه Auto-Sync)**، سیستم ابتدا `navigator.onLine` را چک می‌کند؛ اگر `false` باشد، حتی تلاش برای Request هم نمی‌شود — مستقیم پیام «آفلاین هستید» نشان داده می‌شود (نه Timeout و نه Retry بی‌مورد که باتری/داده هدر بدهد). اگر `navigator.onLine = true` بود ولی Request واقعاً شکست خورد (سرور در دسترس نیست)، همان رفتار قاعده ۷ (Partial/Full Failure) اجرا می‌شود.
+3. هر بار دریافت **معتبر** (پس از Domain Validation — باگ ۳۹)، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی overwrite/حذف نمی‌شوند.
+4. آخرین قیمت از `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود: جدیدترین رکورد معتبر `price_history` (نه میانگین). خروجی **همیشه** شامل `fetchedAt`, `priceAgeMs`, `isStale`, `staleAfterMs` است (باگ ۴۰) — هرگز «قیمت ۳ روزه» را بدون برچسب stale به‌عنوان current خام ارائه ندهد.
+4b. **Domain Validation قبل از ذخیره (باگ ۳۹) — اجباری در Application، نه فقط در Adapter**:
+   قبل از INSERT در `price_history` همه این‌ها باید پاس شوند؛ در غیر این صورت نماد در `failed[]` با `failureKind='validation_error'` می‌رود و **چیزی نوشته نمی‌شود**:
+   - `symbol` غیرخالی و مطابق شناسه داخلی دسته
+   - `price` عدد معتبر با `decimal.js` و **`price > 0`** (صفر، منفی، null، NaN رد)
+   - `priceCurrency` در مجموعه مجاز پروژه
+   - `fetchedAt` تاریخ/زمان parseپذیر و نه در آیندهٔ نامعقول (مثلاً بیش از ۵ دقیقه جلوتر)
+   - `sourceId` برای مسیر api معتبر و `isActive`
+   - اختیاری ولی توصیه‌شده: اگر `|price - lastPrice| / lastPrice` از آستانه غیرعادی (مثلاً ۹۰٪ در یک بازه کوتاه) بیشتر بود → رد یا علامت `anomaly` (نسخه ۱: رد با `validation_error` کافی است مگر تنظیم خلاف)
+4c. **Idempotency / جلوگیری از duplicate بی‌مورد (باگ ۴۲)**:
+   - هر فراخوانی `fetchAndStorePrices` یک `fetchRequestId` (UUID) می‌گیرد؛ همه رکوردهای همان اجرا همان `fetchRequestId` را دارند.
+   - **Dedupe قبل از INSERT**: اگر برای همان `(symbol, sourceId, price, priceCurrency)` آخرین رکورد موجود با `fetchedAt` در پنجرهٔ کوتاه (مثلاً ۶۰ ثانیه) و همان قیمت باشد، INSERT جدید **انجام نمی‌شود** (no-op موفق در `succeeded[]` با پرچم `deduped: true`).
+   - دوبار کلیک سریع کاربر دو Request شبکه ممکن است بسازد، ولی تاریخچه با ده‌ها ردیف یکسان پر نمی‌شود.
+   - Append-Only برای تغییر واقعی قیمت یا فاصله زمانی بیش از پنجره dedupe همچنان برقرار است (نمودار تاریخچه حفظ می‌شود).
+4d. **اولویت منبع (باگ ۴۱)**: روی `price_sources` فیلدهای `priority` (عدد؛ کمتر = بالاتر) و `isDefault` (boolean per assetCategory) اجباری‌اند.
+   - `getLatestPrice` وقتی چند منبع برای یک نماد رکورد دارند، به‌ترتیب: جدیدترین `fetchedAt` بین منابع فعال؛ در صورت تساوی زمانی، منبع با `priority` بهتر.
+   - `fetchAndStorePrices` بدون `sourceId` صریح از منبع `isDefault=true` همان `assetCategory` استفاده می‌کند.
+   - Fallback خودکار چندمنبعی کامل = مسیر آینده؛ v1 حداقل priority + isDefault را دارد تا انتخاب Provider بخشی از correctness باشد.
+5. **تشخیص شبکه (باگ ۳۸)**: `navigator.onLine === true` فقط پیش‌شرط اولیه است و **تضمین دسترسی واقعی به API نیست**.
+   - اگر `navigator.onLine === false` → هیچ Request ای زده نمی‌شود؛ `{ skipped: true, reason: 'offline' }`.
+   - اگر `onLine === true` ولی درخواست شکست بخورد، خطا باید در یکی از این کلاس‌ها طبقه‌بندی شود (نه یک `failed` مبهم):
+     | `failureKind` | معنی |
+     |---------------|------|
+     | `network_error` | DNS / اتصال قطع / failed to fetch |
+     | `timeout` | فراتر از مهلت (مثلاً ۱۰–۱۵ ثانیه) |
+     | `http_error` | وضعیت HTTP غیر ۲xx (۴۰۱، ۴۲۹، ۵xx، ...) + `httpStatus` |
+     | `invalid_payload` | JSON نامعتبر یا شکل پاسخ غیرمنتظره |
+     | `validation_error` | پاسخ parse شد ولی از Domain Validation رد شد (باگ ۳۹) |
+     | `rate_limit` | محدودیت نرخ (اغلب زیرمجموعه http 429) |
+     | `not_found` | نماد در Provider نیست |
+   - Partial Success حفظ می‌شود: شکست یک نماد/Batch بقیه را متوقف نمی‌کند.
+   - UI می‌تواند برای `timeout`/`network_error` پیام «سرور در دسترس نیست» و برای `validation_error` پیام «داده نامعتبر از منبع» نشان دهد.
 6. اگر اتصال اینترنت یا API در دسترس نباشد، آخرین قیمت کش‌شده (آخرین رکورد `price_history`، صرف‌نظر از `manual`/`api` بودنش) همراه با برچسب «قیمت قدیمی — آخرین به‌روزرسانی: [تاریخ/ساعت]» نمایش داده می‌شود؛ خطای دریافت هرگز نباید مانع کارکرد بقیه اپ (دیدن پرتفوی، ثبت تراکنش جدید و ...) شود.
 7. **سیاست API Key — تصمیم صریح نسخه ۱ (باگ ۳۷)**:
    - کلید API **هرگز** در SQLite / `price_sources` / هر جدول دیگری ذخیره نمی‌شود.
@@ -82,7 +112,7 @@
      - «Remember on this device» با رمزنگاری Web Crypto (AES-GCM) در LocalStorage
      - Credential Vault / اتصال به قفل اپ (PIN/biometrics) برای باز کردن کلید
    - دلیل انتخاب Session-only در v1: سادگی، هم‌خوانی با Privacy-First، و اجتناب از ذخیره بلندمدت راز در مرورگر بدون زیرساخت رمزنگاری کامل. هزینه UX (ورود مجدد پس از بستن tab) برای Providerهای اختیاری قیمت قابل‌قبول است؛ بسیاری از منابع نسخه ۱ اصلاً کلید نمی‌خواهند.
-8. اگر دریافت قیمت یک نماد شکست بخورد (Network Error، Rate Limit، نماد ناموجود در API)، فقط همان نماد Skip می‌شود و خطا در نتیجه نهایی گزارش می‌شود؛ بقیه نمادهای درخواستی در همان دسته باید دریافت شوند (Partial Success مجاز است) — این قانون برای دسته‌های بزرگ (صدها نماد) هم صدق می‌کند، به بخش «دریافت انبوه» پایین نگاه کنید.
+8. اگر دریافت قیمت یک نماد شکست بخورد، فقط همان نماد در `failed[]` با `failureKind` مشخص می‌رود؛ بقیه نمادها ادامه می‌یابند (Partial Success). برای دسته‌های بزرگ به بخش «دریافت انبوه» مراجعه شود.
 9. تبدیل قیمت به ارز پایه کاربر (`cur_currency_preferences.baseCurrency`) در لحظه دریافت انجام **نمی‌شود**؛ `price_history` قیمت را دقیقاً در همان ارزی که API برگردانده ذخیره می‌کند (`priceCurrency`) و تبدیل به ارز پایه در لایه Domain هنگام مصرف (مثل `getPortfolioValue`) با `cur_exchange_rates` انجام می‌شود — تا اگر نرخ ارز پایه بعداً عوض شود، نیازی به واکشی دوباره قیمت‌ها نباشد.
 10. ثبت دستی قیمت (`source = 'manual'`) هیچ محدودیت شبکه‌ای ندارد و همیشه، حتی کاملاً آفلاین، ممکن است؛ اما فقط برای نمادهایی مجاز است که کاربر واقعاً در `inv_*_holdings` دارد (نمی‌توان برای نماد ناموجود قیمت دستی ثبت کرد چون معنایی ندارد).
 
@@ -106,10 +136,13 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `id` → UUID (Primary Key)
 - `name` → string (نام منبع، مثلاً «Nobitex»، «CoinGecko»)
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — دسته دارایی‌ای که این منبع پوشش می‌دهد
-- `adapterKey` → string (**اجباری** — کلید registry Adapter، مثلاً `coingecko`، `nobitex`، `tsetmc`؛ به بخش Provider Adapter Contract مراجعه شود)
+- `adapterKey` → string (**اجباری** — کلید registry Adapter؛ بخش Provider Adapter Contract)
 - `baseUrl` → string (آدرس پایه API — در صورت نیاز Adapter)
 - `requiresApiKey` → boolean
+- `priority` → integer (**اجباری — باگ ۴۱**؛ عدد کوچک‌تر = اولویت بالاتر؛ پیش‌فرض مثلاً ۱۰۰)
+- `isDefault` → boolean (**اجباری — باگ ۴۱**؛ حداکثر یک `isDefault=true` فعال per `assetCategory`)
 - `isActive` → boolean
+- `staleAfterMinutes` → integer (nullable — آستانه کهنگی اختصاصی این منبع؛ اگر null از پیش‌فرض سراسری مثلاً ۲۴×۶۰ دقیقه)
 - `notes` → string (nullable)
 - `createdAt` → datetime
 - `updatedAt` → datetime
@@ -122,12 +155,16 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `assetCategory` → enum (`crypto`, `stock`, `housing`, `metal`)
 - `price` → decimal (قیمت — با `decimal.js`)
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
-- `source` → enum (`manual`, `api`) — منشأ این رکورد؛ فیلد اصلی برای تفکیک دو مسیر بخش «دو مسیر دریافت قیمت»
-- `triggeredBy` → enum (`user_click`, `auto_sync`, `manual_entry`) — دقیقاً چه چیزی این رکورد را ایجاد کرده (برای UI و لاگ شفافیت بیشتر از `source` می‌دهد: مثلاً `source='api'` می‌تواند هم از `user_click` باشد هم از `auto_sync`)
+- `source` → enum (`manual`, `api`)
+- `triggeredBy` → enum (`user_click`, `auto_sync`, `manual_entry`)
+- `fetchRequestId` → UUID (nullable — باگ ۴۲؛ برای رکوردهای یک اجرای fetch مشترک؛ manual می‌تواند null باشد)
 - `fetchedAt` → datetime (لحظه دریافت/ثبت واقعی)
 - `createdAt` → datetime
 
-> **نکته**: `price_history` هرگز توسط فیچرهای سرمایه‌گذاری مستقیماً نوشته نمی‌شود؛ فقط از طریق APIهای همین فیچر (`fetchAndStorePrices` یا `setManualPrice`) پر می‌شود. فیچرهای دیگر فقط Read دارند (`getLatestPrice`).
+> **نکته**: `price_history` فقط از طریق `fetchAndStorePrices` / `setManualPrice` نوشته می‌شود. قبل از هر INSERT، Domain Validation (باگ ۳۹) اجباری است. فیچرهای دیگر فقط Read دارند.
+
+> **Stale (باگ ۴۰)**: فیلد جدا برای `isStale` در جدول لازم نیست — در `getLatestPrice` محاسبه می‌شود:
+> `priceAgeMs = now - fetchedAt`؛ `staleAfterMs` از `price_sources.staleAfterMinutes` یا پیش‌فرض سراسری؛ `isStale = priceAgeMs > staleAfterMs`.
 
 ### ۳. Price Sync Settings (جدول: `price_sync_settings`) — تنظیمات Auto-Sync
 
@@ -274,21 +311,23 @@ UI / Auto-Sync
 ### مدیریت منبع و تاریخچه
 - `getAllSources(assetCategory?)`
 - `createSource(data)` / `updateSource(id, data)`
-- `getLatestPrice(symbol, targetCurrency?)` → آخرین قیمت کش‌شده یک نماد (از هر دو منبع `manual`/`api`)
+- `getLatestPrice(symbol, targetCurrency?)` → آخرین قیمت معتبر + `{ price, priceCurrency, fetchedAt, priceAgeMs, staleAfterMs, isStale, sourceId, source }` (باگ ۴۰). UI موظف است اگر `isStale` بود برچسب «قیمت قدیمی» نشان دهد.
 - `getPriceHistory(symbol, dateRange?)` → برای نمودار تاریخچه قیمت
 
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
-- `fetchAndStorePrices(symbols[], sourceId, triggeredBy: 'user_click' | 'auto_sync')`:
-  1. چک `navigator.onLine` — اگر `false`، بلافاصله برمی‌گردد با `{ skipped: true, reason: 'offline' }` و هیچ Request ای نمی‌رود.
-  2. ردیف `price_sources` را می‌خواند؛ بدون `adapterKey` معتبر خطا می‌دهد و شبکه را صدا نمی‌زند.
-  3. اگر `requiresApiKey=true`: کلید را از `sessionStorageService.getPriceApiKey(sourceId)` بخواند.
-     - نبود کلید + `user_click` → برگرداندن `{ skipped: true, reason: 'api_key_required' }` تا UI مودال ورود را نشان دهد (باگ ۳۷).
-     - نبود کلید + `auto_sync` → Skip همان منبع بدون پرامپت؛ وضعیت در UI.
-  4. Adapter را از registry با `getAdapter(adapterKey)` می‌گیرد (فقط `PriceProviderAdapter` — نه SDK اختصاصی).
-  5. نمادها را طبق «دریافت انبوه» و `adapter.maxBatchSize` به Batch تقسیم می‌کند.
-  6. برای هر Batch: `adapter.fetchPrices(batch, { apiKey })` → فقط `NormalizedPriceQuote`؛ سپس ذخیره در `price_history` با `source='api'` و `triggeredBy`.
-  7. اگر `triggeredBy='auto_sync'` بود، `price_sync_settings.lastSyncAt` را آپدیت می‌کند.
-  8. خروجی `ProviderFetchResult` / ساختار `succeeded[]`/`failed[]`/`skipped[]`.
+- `fetchAndStorePrices(symbols[], sourceId?, triggeredBy: 'user_click' | 'auto_sync')`:
+  1. تولید `fetchRequestId` (UUID) برای این اجرا (باگ ۴۲).
+  2. چک `navigator.onLine` — اگر `false` → `{ skipped: true, reason: 'offline' }` (باگ ۳۸؛ این فقط پیش‌فیلتر است).
+  3. اگر `sourceId` نبود → منبع `isDefault=true` همان دسته (باگ ۴۱).
+  4. ردیف `price_sources`؛ بدون `adapterKey` / غیرفعال → خطا بدون شبکه.
+  5. اگر `requiresApiKey=true`: کلید از Session Storage (باگ ۳۷) — نبود کلید طبق همان سیاست.
+  6. `getAdapter(adapterKey)` → `adapter.fetchPrices(...)`.
+  7. خطاهای Adapter/HTTP را به `failureKind` نگاشت کن (باگ ۳۸).
+  8. برای هر quote موفق Adapter: **Domain Validation** (باگ ۳۹)؛ رد → `failed` با `validation_error`.
+  9. **Dedupe** (باگ ۴۲): اگر قیمت یکسان در پنجره ۶۰ثانیه موجود است → `deduped: true` بدون INSERT.
+  10. INSERT با `fetchRequestId` + `triggeredBy` + `source='api'`.
+  11. Auto-Sync → به‌روز کردن `lastSyncAt`.
+  12. خروجی با `succeeded[]` / `failed[]` (همراه `failureKind`) / `skipped[]`.
 
 ### ثبت دستی (کاملاً آفلاین)
 - `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.
@@ -323,5 +362,5 @@ UI / Auto-Sync
 ## مسیر ارتقا (آینده)
 
 - **زیرفیچرهای بعدی**: Stock Prices، Housing Prices، Metals Prices — هرکدام با همان جداول مشترک (`price_sources`, `price_history`, `price_sync_settings`) و فقط منطق Fetch/Parse مخصوص به خودشان، طبق الگوی `19-01-Crypto-Prices`.
-- **چند منبع همزمان با اولویت‌بندی**: امکان تعریف منبع «اصلی» و «پشتیبان» برای هر نماد و Fallback خودکار در صورت شکست منبع اصلی.
+- **Fallback خودکار چندمنبعی**: v1 فقط `priority` + `isDefault` دارد (باگ ۴۱)؛ Fallback زنجیره‌ای خودکار هنگام شکست منبع اصلی مسیر آینده است.
 - **Background Sync واقعی**: در صورت نیاز به دریافت حتی وقتی تب بسته است، از Periodic Background Sync سرویس‌ورکر استفاده شود؛ این هم‌چنان باید Opt-in و تابع همان سه قانون Offline-First بالا باشد (هیچ اتصال بی‌اجازه کاربر).

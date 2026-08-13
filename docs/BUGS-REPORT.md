@@ -9,6 +9,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۳۸ — طبقه‌بندی خطای شبکه ناقص بود (فقط navigator.onLine)
+**راه‌حل:** `navigator.onLine` فقط پیش‌فیلتر؛ `failureKind`: network_error / timeout / http_error / invalid_payload / validation_error / rate_limit / not_found.
+
+### باگ ۳۹ — Validation دامنه قبل از ذخیره قیمت نبود
+**راه‌حل:** قبل از INSERT: price > 0، timestamp معتبر، currency معتبر، symbol معتبر، source فعال؛ رد → `validation_error` بدون نوشتن.
+
+### باگ ۴۰ — Stale Price تشخیص داده نمی‌شد
+**راه‌حل:** `getLatestPrice` همیشه `priceAgeMs`, `staleAfterMs`, `isStale` برمی‌گرداند؛ UI برچسب قیمت قدیمی اجباری.
+
+### باگ ۴۱ — اولویت/منبع پیش‌فرض Provider نبود
+**راه‌حل:** فیلدهای `priority` و `isDefault` روی `price_sources`؛ انتخاب default و tie-break در getLatestPrice.
+
+### باگ ۴۲ — Fetch تکراری تاریخچه را پر از duplicate می‌کرد
+**راه‌حل:** `fetchRequestId` per run؛ dedupe در پنجره ۶۰ثانیه برای `(symbol, sourceId, price, priceCurrency)`؛ `deduped: true` بدون INSERT اضافه.
+
+
 ### باگ ۳۷ — سیاست ذخیره API Key مبهم بود (SessionStorage / UX / امنیت)
 **محل:** `Price-Fetching.md`, `db.md`, `services.md`, `Security-Privacy.md`
 **شرح:** معماری فقط می‌گفت کلید در Session Storage باشد؛ مشخص نبود بعد از بستن tab چه می‌شود، آیا LocalStorage رمزنگاری‌شده مجاز است، و Auto-Sync بدون کلید چه رفتاری دارد.

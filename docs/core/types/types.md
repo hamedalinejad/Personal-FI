@@ -117,24 +117,40 @@ export type RelatedFeature =
 // دسته‌بندی دارایی در price_history و price_sources
 export type AssetCategory = 'crypto' | 'stock' | 'fif' | 'metal';
 
+// طبقه‌بندی خطای شبکه/پاسخ (باگ ۳۸)
+export type PriceFailureKind =
+  | 'network_error'
+  | 'timeout'
+  | 'http_error'
+  | 'invalid_payload'
+  | 'validation_error'
+  | 'rate_limit'
+  | 'not_found'
+  | 'api_key_required'
+  | 'offline';
+
 // خروجی عملیات دریافت قیمت از API
 export interface PriceFetchResult {
-  succeeded: { symbol: string; price: string }[]; // string برای Decimal-safe
-  failed: { symbol: string; reason: string }[];
-  skipped?: { reason: 'offline' };
+  fetchRequestId: string; // باگ ۴۲
+  succeeded: Array<{ symbol: string; price: string; deduped?: boolean }>;
+  failed: Array<{ symbol: string; reason: string; failureKind: PriceFailureKind; httpStatus?: number }>;
+  skipped?: Array<{ symbol?: string; reason: PriceFailureKind | string }>;
   fetchedAt: Timestamp;
   triggeredBy: 'user_click' | 'auto_sync';
 }
 
-// آخرین قیمت کش‌شده یک نماد
+// آخرین قیمت کش‌شده یک نماد (باگ ۴۰)
 export interface CachedPrice {
   symbol: string;
   assetCategory: AssetCategory;
   price: string; // decimal string — نه number
   priceCurrency: PriceCurrency;
   source: 'manual' | 'api';
+  sourceId?: string;
   fetchedAt: Timestamp;
-  isStale: boolean; // اگر بیش از یک حد مشخص (مثلاً ۲۴ ساعت) از fetchedAt گذشته باشد
+  priceAgeMs: number;
+  staleAfterMs: number;
+  isStale: boolean; // priceAgeMs > staleAfterMs
 }
 
 // --- Provider Adapter Contract (باگ ۳۶) — تعریف کامل رفتاری در Price-Fetching.md ---
@@ -148,7 +164,7 @@ export interface NormalizedPriceQuote {
 
 export interface ProviderFetchResult {
   succeeded: NormalizedPriceQuote[];
-  failed: Array<{ symbol: string; reason: string }>;
+  failed: Array<{ symbol: string; reason: string; failureKind?: PriceFailureKind; httpStatus?: number }>;
   skipped: Array<{ symbol: string; reason: string }>;
 }
 
