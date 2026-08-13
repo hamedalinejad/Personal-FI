@@ -14,8 +14,10 @@
 ### ۱. ریسک بازنویسی کامل Blob در هر ذخیره‌سازی
 چون sql.js افزایشی نیست، هر `save()` باید کل دیتابیس را دوباره سریالایز و در IndexedDB بازنویسی کند. اگر اپ حین این نوشتن (مثلاً به‌خاطر رفتن به پس‌زمینه یا قطع ناگهانی روی موبایل) متوقف شود، ریسک خرابی (corruption) فایل دیتابیس وجود دارد.
 - **راه‌حل الزامی**: نوشتن باید به روش **Write-to-temp-then-swap** انجام شود: ابتدا Blob جدید با کلید موقت (`db_pending`) نوشته شود، سپس در یک تراکنش IndexedDB atomic، کلید اصلی (`db_main`) با آن جایگزین شود. هرگز مستقیم روی کلید اصلی overwrite نشود.
-- نوشتن‌ها باید **Debounce** شوند (مثلاً حداکثر هر ۲-۳ ثانیه یا بعد از هر تراکنش مالی کامل)، نه به ازای هر تغییر جزئی UI.
-- علاوه بر IndexedDB، برای پنجره Beforeunload/Visibilitychange (وقتی کاربر اپ را می‌بندد یا به پس‌زمینه می‌برد) باید یک flush اجباری و همزمان (synchronous-as-possible) اجرا شود.
+- نوشتن‌ها باید **Debounce** شوند برای تغییرات غیرمالی UI؛ برای **عملیات مالی کامل** مسیر جداست (پایین).
+- `visibilitychange` / `beforeunload` فقط **best-effort flush** هستند — **هرگز تضمین persist نیستند** (باگ ۴۳، Critical).
+  - روی موبایل (به‌ویژه iOS Safari) `beforeunload` اغلب اجرا نمی‌شود یا فرصت serialize کامل ندارد.
+  - بنابراین اعتماد به این رویدادها برای «آخرین تغییر حتماً ذخیره شد» **ممنوع** است.
 
 ### ۲. عدم تضمین ماندگاری Storage روی موبایل (خصوصاً iOS Safari)
 مرورگرها (به‌خصوص Safari) می‌توانند در شرایط کمبود فضا، داده‌های IndexedDB اپ‌هایی که Persistent Storage درخواست نکرده‌اند را حذف کنند. برای یک اپ حسابداری مالی این ریسک غیرقابل قبول است.
@@ -357,5 +359,150 @@ core/db/
 - LocalStorage فقط برای تنظیمات UI و داده‌های غیرحساس استفاده شود.
 - داده‌های حساس (مثلاً API keys) هرگز ذخیره نشوند.
 - تمام مبالغ باید بر اساس قانون "Minor Unit Storage" ذخیره شوند (بخش ۱۱ Project-Blueprint).
+
+
+---
+
+## قرارداد ماندگاری مالی (باگ ۴۳ — Critical)
+
+برای سیستم حسابداری، کاربر فقط وقتی باید «ثبت شد» ببیند که داده **واقعاً persist** شده باشد.
+
+### مسیر اجباری هر عملیات مالی موفق
+
+```text
+BEGIN (SQLite transaction)
+  → validate
+  → write all related rows
+COMMIT (SQLite)
+  → serialize DB → Write-to-temp-then-swap در IndexedDB  (await کامل)
+  → فقط بعد از resolve موفق swap → UI «ثبت شد»
+```
+
+قوانین:
+1. **UI Success فقط بعد از persist موفق IndexedDB** — نه بعد از COMMIT درون‌حافظه‌ای sql.js به‌تنهایی.
+2. اگر swap شکست بخورد → UI خطا؛ کاربر نباید فکر کند داده ذخیره شده؛ در صورت امکان rollback منطقی یا علامت «unsaved».
+3. `beforeunload` / `visibilitychange` فقط برای تلاش اضافی flush پس‌زمینه؛ **جایگزین مسیر بالا نیستند**.
+4. دکمه‌های ثبت تا پایان persist غیرفعال/loading بمانند تا double-submit و حس کاذب موفقیت پیش نیاید.
+
+---
+
+## صف ماندگاری و محدودیت حجم sql.js (باگ ۴۴)
+
+sql.js کل DB را در RAM نگه می‌دارد و هر persist کل فایل را serialize می‌کند. برای نسخه ۱ قابل‌قبول است، ولی این قراردادها **الزامی**اند:
+
+### Persistence Queue
+- یک صف سریال (`persistenceQueue`) فقط یک serialize/swap در هر لحظه.
+- عملیات مالی await همان job صف را می‌کنند (تا UI Success درست باشد).
+- debounce فقط برای flushهای غیربحرانی (تنظیمات UI، نه خرید/فروش/قسط).
+
+### محدودیت‌های شناخته‌شده v1
+| ریسک | mitigation نسخه ۱ |
+|------|-------------------|
+| RAM بالا با ده‌ها هزار تراکنش + price_history | هشدار در Settings وقتی تخمین حجم از آستانه گذشت؛ تشویق به Backup |
+| Freeze هنگام serialize | serialize سنگین ترجیحاً در Worker (باگ ۴۵)؛ UI با progress «در حال ذخیره…» |
+| kill موبایل وسط نوشتن | Write-to-temp-then-swap؛ هرگز overwrite مستقیم `db_main` |
+| رشد بی‌رویه price_history | dedupe (باگ ۴۲) + امکان پاک‌سازی قدیمی در آینده |
+
+### مسیر ارتقا (نه v1)
+OPFS / SQLite WASM با نوشتن افزایشی — فقط به‌عنوان مسیر شناخته‌شده؛ بازطراحی از صفر لازم نباشد.
+
+---
+
+## Worker Strategy (باگ ۴۵ — High)
+
+| کار | Thread |
+|-----|--------|
+| UI / React | Main |
+| sql.js queries سبک (CRUD تک‌تراکنش) | Main یا Worker — در v1 Main مجاز اگر < ~50ms |
+| serialize کامل DB برای persist | **Worker ترجیحی**؛ اگر Worker نبود، Main با UI blocking کوتاه + indicator |
+| گزارش‌ها / P&L / Portfolio روی حجم بالا | **اجباری Worker** (یا حداقل chunked async با yield به UI) |
+| Adapter شبکه قیمت | async روی Main قابل‌قبول؛ CPU parse سنگین → Worker |
+
+قوانین:
+1. هیچ گزارش سنگینی نباید Main Thread را بیش از یک فریم طولانی منجمد کند.
+2. API لایه Domain می‌تواند `runInWorker: true` برای queryهای تحلیلی داشته باشد.
+3. Service Worker ≠ SQL Worker: SW فقط App Shell + WASM cache؛ محاسبات SQL در Dedicated Worker جدا.
+
+---
+
+## قرارداد Migration (باگ ۴۶ — Critical برای implementation)
+
+مستندات به‌تنهایی migration را enforce نمی‌کند. در implementation این‌ها الزامی‌اند:
+
+### جدول `schema_version`
+- تک‌ردیفی یا key-value: `version INTEGER NOT NULL`, `appliedAt`
+- هر تغییر schema = یک فایل migration شماره‌دار در `db/migrations/`
+
+### جریان Startup
+```text
+open DB from IndexedDB
+→ read schema_version
+→ if version < app.expectedVersion → run migrations in order inside SQLite TRANSACTION
+→ each migration idempotent یا با ثبت version فقط بعد از موفقیت
+→ persist (temp-then-swap)
+→ app ready
+```
+
+### قوانین
+1. بدون `schema_version` معتبر، اپ نباید بنویسد (یا نسخه ۰ فرض و migration از ابتدا).
+2. Migration شکست → اپ در حالت safe mode؛ overwrite روی DB اصلی نکند.
+3. Backup باید `schemaVersion` را در متادیتا نگه دارد (باگ ۴۷).
+4. تا قبل از implementation واقعی `migrations.ts`، این بخش «قرارداد لازم‌الاجرا» است نه «انجام‌شده».
+
+---
+
+## قرارداد Backup / Restore (باگ‌های ۴۷ و ۴۸ — Critical)
+
+### Export (Backup)
+فایل backup حداقل شامل:
+- بایت‌های SQLite (یا archive)
+- متادیتا JSON: `schemaVersion`, `appVersion`, `exportedAt`, `checksum` (مثلاً SHA-256 از بایت DB), `tableCounts` اختیاری
+
+### Restore — Data Integrity Contract (قبل از پذیرش)
+ترتیب اجباری؛ هر شکست → **abort بدون دست زدن به DB فعلی**:
+
+```text
+1. خواندن فایل + متادیتا
+2. checksum match
+3. schemaVersion خوانده/قابل‌فهم بودن (≤ app version یا migration-path موجود)
+4. load در DB موقت (حافظه / کلید IndexedDB جدا: db_restore_temp)
+5. PRAGMA integrity_check = ok
+6. PRAGMA foreign_key_check خالی
+7. وجود جداول ضروری (لیست سفید از schema)
+8. اجرای migration روی temp تا رسیدن به version فعلی اپ (اگر لازم)
+9. فقط پس از موفقیت همه مراحل → atomic swap: db_restore_temp جایگزین db_main
+10. دور انداختن temp؛ UI موفقیت
+```
+
+### Atomic Restore (باگ ۴۸)
+- DB قبلی تا لحظه swap نهایی دست‌نخورده می‌ماند.
+- اگر هر مرحله از ۱–۸ شکست بخورد، کاربر همان داده قبلی را دارد.
+- Restore نصفه هرگز `db_main` را overwrite نمی‌کند.
+
+---
+
+## قرارداد عملیات مالی اتمیک (باگ ۵۰ — Critical)
+
+هر عملیات مالی چندمرحله‌ای (خرید کریپتو، فروش، تبدیل، پرداخت قسط، خرید سهام، ابطال صندوق، انتقال، reversal، …) باید از این قالب پیروی کند:
+
+```text
+BEGIN;
+  validate inputs + balances + business rules;
+  insert/update domain rows (holdings, loans, …);
+  update snapshots (balances, averages, cashBalance, …);
+  insert acc_transactions (+ لینک relatedFeature/relatedId);
+  — هیچ COMMIT جزئی مجاز نیست —
+COMMIT;
+→ await persistToIndexedDB (Write-to-temp-then-swap);
+→ UI success / emit domain events;
+```
+
+قوانین:
+1. Feature حق ندارد فقط یکی از جداول را بدون بقیه بنویسد.
+2. Reversal = تراکنش معکوس جدید، نه حذف خام تاریخچه (طبق قوانین موجود void).
+3. اگر persist بعد از COMMIT حافظه شکست بخورد، طبق باگ ۴۳ رفتار خطا — نه «ثبت شد» کاذب.
+4. پیاده‌سازی‌ها در Featureهای مختلف باید از یک helper مشترک `runAtomicFinancialOperation(fn)` در `db/` یا `core` استفاده کنند تا رفتار یکسان بماند.
+
+
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
 - در اولین اجرا، `navigator.storage.persist()` باید درخواست شود.

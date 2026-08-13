@@ -39,7 +39,7 @@ hooks/
 ## قوانین
 
 1. فقط Hookهایی که در **بیش از یک فیچر** استفاده می‌شوند اینجا قرار می‌گیرند.
-2. هیچ Hook ای نباید مستقیماً به لایه دیتابیس (sql.js) دسترسی داشته باشد — فقط از Storeها یا API لایه Domain استفاده کند.
+2. هیچ Hook ای نباید مستقیماً به لایه دیتابیس (sql.js) دسترسی داشته باشد — فقط از Storeها یا API لایه Domain استفاده کند. (باگ ۴۹: UI/Hook → Feature API → Domain → DB؛ هرگز SQL مستقیم.)
 3. هیچ Hook ای نباید مستقیماً `window.localStorage` یا `window.sessionStorage` صدا بزند — همیشه از `localStorageService` / `sessionStorageService` استفاده شود.
 4. هر Hook که با شبکه کار می‌کند باید ابتدا `useOnlineStatus` را چک کند و طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` رفتار کند.
 5. تمام Hookها باید cleanup (unsubscribe، removeEventListener) مناسب داشته باشند.

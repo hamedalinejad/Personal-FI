@@ -9,6 +9,31 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۴۳ — beforeunload تضمین Save نیست (Critical)
+**راه‌حل:** UI Success فقط بعد از COMMIT + await Write-to-temp-then-swap؛ beforeunload فقط best-effort.
+
+### باگ ۴۴ — ریسک حجم sql.js
+**راه‌حل:** persistenceQueue سریال؛ محدودیت‌ها و mitigation در db.md؛ مسیر ارتقا OPFS مستند.
+
+### باگ ۴۵ — Worker برای SQL سنگین
+**راه‌حل:** Worker Strategy — گزارش/P&L/serialize ترجیحاً یا اجباری در Dedicated Worker.
+
+### باگ ۴۶ — Migration فقط روی کاغذ
+**راه‌حل:** قرارداد schema_version + جریان Startup + migrations شماره‌دار؛ صراحت که تا implementation تضمین عملی نیست.
+
+### باگ ۴۷ — Backup بدون Integrity Contract
+**راه‌حل:** checksum، schemaVersion، integrity_check، FK check، required tables قبل از پذیرش.
+
+### باگ ۴۸ — Restore باید Atomic باشد
+**راه‌حل:** load temp → validate → migrate → swap؛ شکست = حفظ DB قبلی.
+
+### باگ ۴۹ — دسترسی مستقیم به DB بین Featureها
+**راه‌حل:** فقط Feature Public API؛ ممنوع UI→SQL و Feature A→جداول B.
+
+### باگ ۵۰ — Atomic Financial Operation Contract
+**راه‌حل:** قالب مرکزی BEGIN→validate→writes→accounting→COMMIT→persist؛ helper مشترک الزامی.
+
+
 ### باگ ۳۸ — طبقه‌بندی خطای شبکه ناقص بود (فقط navigator.onLine)
 **راه‌حل:** `navigator.onLine` فقط پیش‌فیلتر؛ `failureKind`: network_error / timeout / http_error / invalid_payload / validation_error / rate_limit / not_found.
 

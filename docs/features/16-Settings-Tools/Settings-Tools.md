@@ -147,11 +147,18 @@
 - `reorderCategories(type, orderedIds)` → تغییر ترتیب نمایش دسته‌ها
 
 ### Backup APIs
-- `createBackup()` → تولید فایل پشتیبان + ثبت رکورد در `stg_backup_logs`
-- `restoreBackup(file, backupLogId)` → بازیابی با تأیید کاربر
+- `createBackup()` → Export SQLite + متادیتا (`schemaVersion`, `appVersion`, `exportedAt`, `checksum`) + ثبت `stg_backup_logs`
+- `restoreBackup(file)` → **Atomic Restore** با Integrity Contract (باگ‌های ۴۷–۴۸):
+  1. تأیید کاربر
+  2. checksum + schemaVersion + load temp
+  3. `integrity_check` + `foreign_key_check` + required tables
+  4. migration روی temp در صورت نیاز
+  5. فقط در موفقیت کامل → swap با `db_main` (DB قبلی تا آن لحظه سالم می‌ماند)
+  6. هر شکست → abort بدون overwrite
 - `listBackups()` → دریافت لیست با `backupType` و `backupDate`
 - `deleteBackup(backupLogId)` → حذف رکورد + فایل
-- `getBackupInfo(backupLogId)` → دریافت جزئیات پشتیبان
+- `getBackupInfo(backupLogId)` → جزئیات + schemaVersion + checksum
+- `validateBackupFile(file)` → اجرای مراحل ۲–۳ بدون swap (پیش‌نمایش سلامت فایل)
 
 ### Tools APIs
 - `clearCache()`
@@ -188,12 +195,11 @@
 ## پشتیبان‌گیری
 
 ### محتوای پیشنهادی فایل Backup
-- حساب‌ها و تراکنش‌ها
-- درآمد و هزینه
-- چک‌ها، وام‌ها، بودجه، اهداف
-- سرمایه‌گذاری‌ها و دارایی‌ها
-- اسناد (یا مسیر آن‌ها)
-- تنظیمات و دسته‌بندی‌ها
+
+- `database` — بایت‌های SQLite
+- `meta.json` — `{ schemaVersion, appVersion, exportedAt, checksum, tableCounts? }`
+- checksum باید قبل از Restore مطابقت کند (باگ ۴۷)
+
 
 ### نکات
 - فرمت پیشنهادی: JSON فشرده‌شده یا SQLite export
@@ -209,3 +215,9 @@
 - پشتیبان‌گیری یکی از مهم‌ترین بخش‌هاست و باید در دسترس و قابل اعتماد باشد.
 - از شلوغ کردن صفحه تنظیمات با گزینه‌های پیشرفته غیرضروری خودداری شود.
 - در نسخه‌های بعدی می‌توان Import/Export پیشرفته‌تر و همگام‌سازی ابری اختیاری اضافه کرد.
+
+### قوانین Backup/Restore (باگ ۴۷–۴۸)
+
+1. Backup بدون `schemaVersion` و `checksum` ناقص است و در v1 نباید به‌عنوان backup کامل پذیرفته شود.
+2. Restore هرگز مستقیماً روی `db_main` نمی‌نویسد مگر پس از validate کامل روی temp.
+3. جزئیات جریان در `core/db/db.md` بخش «قرارداد Backup / Restore».

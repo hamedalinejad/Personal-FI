@@ -52,10 +52,14 @@ IndexedDB
 
 sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال افزایشی به IndexedDB ندارد؛ برای اجرای پایدار به‌عنوان PWA نصب‌شده روی موبایل، موارد زیر **الزامی** است (جزئیات کامل در `core/db/db.md`):
 
-- نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی (رفتن اپ به پس‌زمینه) رخ ندهد.
-- نوشتن‌ها Debounce شوند و روی رویداد `visibilitychange`/`beforeunload` یک flush اجباری انجام شود.
-- در اولین اجرا `navigator.storage.persist()` فراخوانی شود تا مرورگر (خصوصاً Safari/iOS) داده‌ها را در کمبود فضا حذف نکند.
-- **Service Worker** برای Cache کردن App Shell و فایل WASM سنگین sql.js الزامی است (بدون آن، اپ نصب‌شده روی موبایل بدون اینترنت لود نمی‌شود).
+- نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی رخ ندهد.
+- **Persist مالی (باگ ۴۳)**: UI «ثبت شد» فقط بعد از COMMIT + await موفق IndexedDB swap؛ `beforeunload`/`visibilitychange` فقط best-effort هستند و روی موبایل تضمین نیستند.
+- **Persistence queue + Worker (باگ‌های ۴۴–۴۵)**: serialize سنگین و گزارش‌های حجیم نباید Main Thread را قفل کنند؛ جزئیات در `core/db/db.md`.
+- در اولین اجرا `navigator.storage.persist()` فراخوانی شود.
+- **Service Worker** برای Cache کردن App Shell و WASM sql.js الزامی است.
+- **Migration / Backup-Restore atomic (باگ‌های ۴۶–۴۸)**: قرارداد در `db.md` و `Settings-Tools.md` — بدون integrity check، Restore مجاز نیست.
+- **Internal API (باگ ۴۹)**: UI و Feature A هرگز مستقیماً به جداول Feature B یا sql.js خام دسترسی ندارند؛ فقط از طریق API عمومی همان Feature.
+- **Atomic Financial Operation (باگ ۵۰)**: قالب مشترک BEGIN→validate→writes→COMMIT→persist در `db.md`.
 - **Web App Manifest** (`manifest.json`) با آیکون، `display: standalone` و `start_url` باید تعریف شود.
 - یادآوری پشتیبان‌گیری دوره‌ای (Export فایل SQLite) در Dashboard نمایش داده شود، چون ماندگاری IndexedDB روی موبایل تضمین‌شده نیست.
 - مسیر ارتقای آینده در صورت رشد حجم داده: **wa-sqlite با OPFS**.
@@ -112,7 +116,7 @@ src/
 │   ├── migrations.ts      # مدیریت مایگRATION‌ها
 │   └── queries/           # کوئری‌های SQL
 ├── stores/                # Zustand stores
-├── api/                   # Internal API بین فیچرها
+├── api/                   # Internal API بین فیچرها (باگ ۴۹: تنها دروازه cross-feature؛ بدون SQL مستقیم)
 ├── assets/
 ├── styles/
 public/
@@ -120,3 +124,23 @@ public/
 ├── sw.ts                  # Service Worker (Cache App Shell + WASM sql.js)
 └── icons/                 # آیکون‌های PWA
 ```
+
+---
+
+## قرارداد دسترسی بین لایه‌ها (باگ ۴۹)
+
+```text
+UI / Hooks
+  → Feature Public API  (مثلاً createCryptoBuy, repayLoan)
+    → Domain Service
+      → db layer (sql.js)  — فقط داخل همان Feature یا core shared helpers
+```
+
+ممنوع:
+- `UI → SQL` مستقیم
+- `Feature A → UPDATE جدول Feature B` مستقیم
+- Share کردن connection sql.js برای queryهای ad-hoc از Presentation
+
+مجاز:
+- Feature A از **API عمومی** Feature B صداد (مثلاً `accounts.getBalance`)
+- Event Bus برای اطلاع‌رسانی بعد از commit (نه برای نوشتن داده)
