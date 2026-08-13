@@ -9,6 +9,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### باگ ۵۱ — Reconciliation مرکزی نبود (Critical)
+**راه‌حل:** APIهای reconcileAccount/Crypto/Brokerage/Fund/Metals/Loan/Portfolio/All؛ مقایسه snapshot با ledger؛ خروجی ReconcileResult؛ بدون auto-repair در v1.
+
+### باگ ۵۲ — CHECK constraints ناکافی
+**راه‌حل:** حداقل CHECK برای quantity/amount/fee/rate/price در schema.sql؛ Domain + DB دفاع دولایه؛ PRAGMA foreign_keys=ON.
+
+### باگ ۵۳ — سیاست ON DELETE مبهم
+**راه‌حل:** پیش‌فرض RESTRICT برای FKهای مالی/تاریخچه‌ای؛ CASCADE فقط برای تنظیمات غیرمالی؛ هر FK صریح در schema.
+
+### باگ ۵۴ — Polymorphic relatedFeature/relatedId
+**راه‌حل:** validate Domain + reconcile orphan + enum بسته؛ محدودیت SQLite پذیرفته و مستند شد.
+
+### باگ ۵۵ — تاریخ/Timezone
+**راه‌حل:** UTC برای timestamp؛ businessDate/settlementDate/marketDate/dueDate جدا برای بازار ایران و سررسیدها.
+
+
 ### باگ ۴۳ — beforeunload تضمین Save نیست (Critical)
 **راه‌حل:** UI Success فقط بعد از COMMIT + await Write-to-temp-then-swap؛ beforeunload فقط best-effort.
 

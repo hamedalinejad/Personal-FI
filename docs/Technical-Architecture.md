@@ -144,3 +144,12 @@ UI / Hooks
 مجاز:
 - Feature A از **API عمومی** Feature B صداد (مثلاً `accounts.getBalance`)
 - Event Bus برای اطلاع‌رسانی بعد از commit (نه برای نوشتن داده)
+
+---
+
+## Integrity & Time (باگ‌های ۵۱–۵۵)
+
+- **Reconciliation**: APIهای مرکزی در `core/db/db.md` — snapshot در برابر ledger.
+- **CHECK + FK**: schema سطح SQLite با CHECK و ON DELETE صریح؛ پیش‌فرض مالی RESTRICT.
+- **Polymorphic links**: Domain validate + reconcile؛ SQLite enforce کامل ندارد.
+- **Time**: UTC timestamps + فیلدهای business/market/settlement/due جدا برای بازار ایران.

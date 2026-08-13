@@ -44,6 +44,8 @@ description → string (توضیحات)
 relatedFeature → string (نوع `RelatedFeature` — تعریف مرکزی در core/types/types.md؛ مقادیر: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals)
 
 relatedId → UUID (شناسه رکورد در فیچر مرتبط)
+
+> **Polymorphic FK (باگ ۵۴)**: SQLite این جفت را enforce نمی‌کند. وجود ردیف هدف باید در Domain validate شود؛ orphanها با `reconcileAccount` / `reconcileAll` قابل کشف‌اند. جزئیات در `core/db/db.md`.
 isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
 relatedTransactionId → UUID (nullable — برای تراکنش‌های reversed، لینک به تراکنش اصلی)
 createdAt → datetime

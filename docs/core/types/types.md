@@ -218,6 +218,34 @@ export type AppEvent =
 
 ---
 
+## `reconciliation.ts` (باگ ۵۱)
+
+```typescript
+export interface ReconcileResult {
+  target: string;
+  ok: boolean;
+  expected: string; // decimal string
+  actual: string;
+  delta: string;
+  details?: string;
+}
+
+export type ReconcileScope =
+  | 'account'
+  | 'crypto_holding'
+  | 'brokerage'
+  | 'fund'
+  | 'metals_holding'
+  | 'loan'
+  | 'portfolio'
+  | 'all';
+```
+
+### یادآوری تاریخ (باگ ۵۵)
+
+- `Timestamp` = لحظه UTC
+- تاریخ کسب‌وکار/بازار/سررسید = فیلد جدا `YYYY-MM-DD` در مدل فیچر مربوطه، نه فقط Timestamp
+
 ## قوانین
 
 1. Types مشترک **فقط** اینجا تعریف شوند؛ Types اختصاصی یک فیچر داخل همان فیچر بمانند.

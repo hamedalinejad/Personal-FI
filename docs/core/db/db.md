@@ -506,3 +506,138 @@ COMMIT;
 
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
 - در اولین اجرا، `navigator.storage.persist()` باید درخواست شود.
+
+
+---
+
+## قرارداد Reconciliation مرکزی (باگ ۵۱ — Critical)
+
+Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) ممکن است به‌خاطر باگ Domain از Ledger فاصله بگیرند. یک مکانیزم **مرکزی فقط‌خواندنی** برای تشخیص ناهماهنگی الزامی است.
+
+### APIهای مشترک (لایه Domain / `core` یا `db/reconciliation.ts`)
+
+| API | مقایسه |
+|-----|--------|
+| `reconcileAccount(accountId)` | `acc_accounts.currentBalance` ↔ Σ اثر `acc_transactions` غیرvoid روی همان حساب (با ترتیب تاریخ + `balanceAfterTransaction` در صورت وجود) |
+| `reconcileCryptoHolding(holdingId)` | `quantity` / `totalInvested` ↔ Σ `inv_crypto_transactions` |
+| `reconcileBrokerage(brokerageId)` | `cashBalance` ↔ Σ تراکنش‌های نقدی کارگزاری + لینک‌های `acc_transactions` |
+| `reconcileFund(holdingId)` | `units` / `totalInvested` ↔ Σ `inv_fif_transactions` (buy/sell/reinvest) |
+| `reconcileMetalsHolding(holdingId)` | `quantityMg` / `totalInvested` ↔ Σ `inv_metals_transactions` |
+| `reconcileLoan(loanId)` | مانده وام ↔ جدول اقساط / `ln_transactions` |
+| `reconcilePortfolio()` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
+| `reconcileAll()` | اجرای همه موارد بالا؛ خروجی گزارش یکپارچه |
+
+### خروجی استاندارد هر reconcile
+
+```typescript
+interface ReconcileResult {
+  target: string;           // e.g. 'account:uuid'
+  ok: boolean;
+  expected: string;         // decimal string از ledger
+  actual: string;           // decimal string از snapshot
+  delta: string;            // actual - expected
+  details?: string;
+}
+```
+
+### قوانین
+1. Reconciliation **هرگز خودکار snapshot را عوض نمی‌کند** مگر با عملیات صریح Repair (نسخه ۱: فقط گزارش؛ Repair = Should Have با تأیید کاربر).
+2. بعد از هر `runAtomicFinancialOperation` موفق، فراخوانی reconcile همان aggregate در dev/test توصیه‌شده است.
+3. Dashboard/Settings می‌تواند «سلامت داده» را از `reconcileAll()` نشان دهد (اختیاری v1).
+4. معیار مقایسه همیشه decimal.js؛ آستانه صفر مطلق برای پول (یا epsilon بسیار کوچک فقط برای نرخ‌های اعشاری اگر مستند شود).
+
+---
+
+## قرارداد CHECK Constraints در SQLite (باگ ۵۲)
+
+قوانین Domain لازم‌اند ولی کافی نیستند. Schema باید تا حد ممکن همان invariants را enforce کند تا باگ Domain نتواند `quantity = -1` را commit کند.
+
+### حداقل CHECKهای الزامی (نمونه — در `schema.sql` پیاده‌سازی)
+
+```sql
+-- مبالغ و موجودی‌ها
+CHECK (amount > 0)                    -- در جدول‌های تراکنش مبلغ مطلق، در صورت signed بودن: قوانین صریح per type
+CHECK (feeAmount IS NULL OR feeAmount >= 0)
+CHECK (quantity >= 0)                 -- holdings
+CHECK (quantityMg >= 0)
+CHECK (units >= 0)
+CHECK (currentBalance IS NOT NULL)    -- علامت می‌تواند منفی نباشد مگر overdraft صریح مجاز باشد
+CHECK (price > 0)                     -- price_history
+CHECK (averageBuyPrice >= 0)
+CHECK (purityRatio > 0 AND purityRatio <= 1)
+CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
+```
+
+### قوانین
+1. هر فیلد کمّی مالی که در Domain «نباید منفی/صفر باشد» باید در صورت امکان CHECK داشته باشد.
+2. اگر قانون پیچیده است (مثلاً amount علامت‌دار بر اساس type)، از CHECK ترکیبی `(type IN (...) AND amount > 0) OR ...` استفاده شود.
+3. Domain همچنان validate می‌کند (پیام خطای کاربرپسند)؛ DB آخرین خط دفاع است.
+4. `PRAGMA foreign_keys = ON` در هر اتصال sql.js **اجباری** است.
+
+---
+
+## سیاست Foreign Key کامل (باگ ۵۳)
+
+برای سیستم مالی تقریباً immutable، حذف parent نباید تاریخچه child را پاک کند مگر استثنای صریح.
+
+### پیش‌فرض پروژه
+
+| رابطه نوعی | ON DELETE | دلیل |
+|------------|-----------|------|
+| `acc_transactions.accountId` → accounts | **RESTRICT** | حذف حساب دارای تاریخچه ممنوع |
+| تراکنش‌های سرمایه‌گذاری → holding/fund/platform | **RESTRICT** | تاریخچه معاملات حفظ شود |
+| `*_transactions.accountTransactionId` → acc_transactions | **RESTRICT** یا SET NULL فقط اگر لینک اختیاری مستند شده | |
+| `price_history.sourceId` → price_sources | **SET NULL** | تاریخچه قیمت بعد از حذف منبع منطقی بماند |
+| `price_sync_settings` → sources/symbols | **CASCADE** قابل‌قبول برای تنظیمات غیرمالی | |
+| لاگ‌ها / reminders وابسته به رکورد عملیاتی | **CASCADE** یا RESTRICT طبق حساسیت | |
+| اسناد `docs_links` | **CASCADE** از document؛ **RESTRICT** از entity مالی اگر لازم | |
+
+### قوانین
+1. **هیچ FK به جدول تراکنش مالی نباید CASCADE از parent کسب‌وکاری داشته باشد** مگر سند صریح خلاف بگوید.
+2. حذف منطقی (archive / isActive=false / isVoided) بر حذف فیزیکی ترجیح داده می‌شود.
+3. هر FK در `schema.sql` باید صریحاً `ON DELETE` / `ON UPDATE` داشته باشد؛ پیش‌فرض خام SQLite (NO ACTION) بدون مستندسازی ممنوع است.
+4. فهرست کامل FKها هنگام implementation در `schema.sql` + این جدول سیاست نگهداری می‌شود.
+
+---
+
+## Polymorphic FK: `relatedFeature` + `relatedId` (باگ ۵۴)
+
+SQLite نمی‌تواند enforce کند که `relatedId` به جدول درست اشاره می‌کند.
+
+### mitigations الزامی
+
+1. **Enum بسته** `RelatedFeature` فقط از `core/types` (از قبل موجود).
+2. **Validate در Domain** داخل `runAtomicFinancialOperation`: وجود ردیف هدف قبل از INSERT در `acc_transactions`.
+3. **جدول اختیاری `acc_transaction_links` (Should Have / آماده‌سازی)**:  
+   `(transactionId, relatedFeature, relatedId)` با ایندکس یکتا — برای گزارش و reconcile، نه جایگزین enum.
+4. **Reconcile** (باگ ۵۱): برای هر `acc_transactions` با related غیرnull، بررسی وجود هدف؛ orphan = گزارش خطا.
+5. **ممنوع**: نوشتن `relatedFeature`/`relatedId` از UI بدون عبور از API فیچر مالک.
+
+> محدودیت intrinsic polymorphic FK پذیرفته شده است؛ correctness با Domain + Reconcile + تست integration جبران می‌شود.
+
+---
+
+## قرارداد تاریخ و زمان (باگ ۵۵)
+
+### ذخیره
+- همه timestampهای مطلق به‌صورت **ISO 8601 UTC** (`Timestamp` در types).
+- نمایش: timezone/تقویم کاربر (Jalali یا Gregorian) فقط در Presentation با dayjs.
+
+### تفکیک معنایی فیلدها (اجباری در مدل‌ها وقتی مصداق دارد)
+
+| مفهوم | معنی | مثال استفاده |
+|--------|------|----------------|
+| `eventAt` / `createdAt` | لحظه وقوع/ثبت در سیستم (UTC) | زمان کلیک ثبت، زمان دریافت قیمت |
+| `businessDate` | تاریخ کسب‌وکار بدون ساعت (تقویم محلی بازار) | روز معامله بورس ایران، روز تعلق سود صندوق |
+| `settlementDate` | تاریخ تسویه | T+n سهام |
+| `marketDate` | تاریخی که قیمت/NAV به آن روز اشاره دارد | NAV پایان روز، قیمت پایانی |
+| `dueDate` / `paymentDate` | سررسید و تاریخ پرداخت واقعی | اقساط، مالیات، چک |
+| `fetchedAt` | زمان دریافت قیمت | price_history |
+
+### قوانین
+1. برای بورس ایران، سود صندوق، قسط، مالیات: **`businessDate` (یا معادل نام‌گذاری‌شده)** جدا از `createdAt` ذخیره شود؛ نباید فقط UTC timestamp مبهم استفاده شود.
+2. `businessDate` به‌صورت `YYYY-MM-DD` (تقویم میلادی مبنا در DB) ذخیره می‌شود؛ تبدیل به جلالی فقط در UI.
+3. مقایسه «همان روز بازار» با `businessDate` انجام شود نه با تبدیل خام timezone روی `createdAt`.
+4. Price snapshot: `fetchedAt` (UTC) + در صورت نیاز `marketDate` برای NAV روزانه.
+5. هیچ محاسبه سود/جریمه دیرکرد صرفاً روی timezone محلی مرورگر بدون ذخیره businessDate انجام نشود.
+
