@@ -177,19 +177,132 @@
 
 ---
 
-## منطق کارمزد
+## منطق کارمزد — قانون واحد برای همه عملیات
 
-- هر کارمزد با `feeAmount` + `feeCurrency` ذخیره می‌شود؛ اگر `feeCurrency` نه ارز پایه کاربر و نه IRR باشد (یعنی خود یک رمزارز دیگر، مثلاً BTC، ETH)، فیلد `feeAssetPriceToBase` نیز الزامی است.
-- ارزش معادل کارمزد به ارز پایه کاربر (`baseCurrency`) به شرح زیر محاسبه می‌شود (همیشه با `decimal.js`، هرگز `Number`):
-  - اگر `feeCurrency = baseCurrency`: بدون تبدیل (ضریب ۱)
-  - اگر `feeCurrency = IRR` و `baseCurrency ≠ IRR`: `convertedToBase = feeAmount / exchangeRateToBase`
-  - اگر `feeCurrency` رمزارز دیگری باشد (BTC/ETH و ...):
-    ```
-    convertedToBase = feeAmount * feeAssetPriceToBase
-    ```
-    (`feeAssetPriceToBase` قیمت لحظه‌ای آن رمزارز به ارز پایه کاربر است — از `getLatestPrice(feeCurrency, baseCurrency)` فیچر `19-Price-Fetching` گرفته می‌شود. تقسیم مستقیم `feeAmount` بر `exchangeRateToBase` در این حالت **غلط** است، چون `exchangeRateToBase` فقط نرخ IRR-به-ارز‌پایه است و ربطی به قیمت BTC/ETH ندارد.)
-- مجموع کارمزدها در Holding به‌صورت تجمعی و همیشه به ارز پایه کاربر (`totalFeesPaidBase`) نگهداری می‌شود.
-- در انتقال بین صرافی‌ها، اگر کارمزد از خود ارز کسر شود، تفاوت بین `amountToSend` و `amountReceived = amountToSend - feeAmount` دقیقاً مقدار کارمزد است.
+### بخش ۱ — تبدیل کارمزد به ارز پایه (`feeBase`)
+
+این تابع در **همه** عملیات (خرید، فروش، انتقال، C2C) یکسان است:
+
+```typescript
+function convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase, exchangeRateToBase, baseCurrency): Decimal {
+  if (feeAmount.isZero()) return new Decimal(0);
+  if (feeCurrency === baseCurrency)  return feeAmount;                          // بدون تبدیل
+  if (feeCurrency === 'IRR')         return feeAmount.dividedBy(exchangeRateToBase); // IRR → base
+  /* feeCurrency = رمزارز دیگر (BTC, ETH, ...) — feeAssetPriceToBase الزامی */
+  return feeAmount.times(feeAssetPriceToBase);                                  // crypto → base
+}
+```
+
+> ❌ هرگز `feeAmount / exchangeRateToBase` برای `feeCurrency=BTC/ETH` استفاده نکنید —
+> `exchangeRateToBase` فقط نرخ IRR است، نه قیمت BTC/ETH.
+
+---
+
+### بخش ۲ — قانون واحد Fee Treatment روی `quantity` و `Cost Basis`
+
+> **اصل بنیادی**: کارمزد **هرگز** از `quantity` کسر نمی‌شود — حتی وقتی `feeCurrency = symbol` دارایی است.
+> کارمزد فقط روی **Cost Basis** (`totalInvested`) و **Realized P&L** تأثیر می‌گذارد.
+
+#### ۲-الف) خرید (BUY)
+
+```
+مثال: خرید ۱ BTC — fee = 0.001 BTC (feeCurrency = BTC)
+
+quantity ثبت‌شده در inv_crypto_transactions.quantity  = 1        ✅ (کل مقدار خریداری‌شده)
+quantity اضافه‌شده به inv_crypto_holdings.quantity    = 1        ✅
+
+feeBase = 0.001 × feeAssetPriceToBase  (قیمت BTC به baseCurrency)
+
+Cost Basis آپدیت:
+  newTotalInvested  = totalInvested + totalAmountBase + feeBase
+  newQuantity       = quantity + 1
+  newAverageBuyPrice = newTotalInvested / newQuantity
+```
+
+> **چرا `quantity = 1` نه `0.999`؟**
+> چون کارمزد بخشی از **هزینه تملک** آن ۱ BTC است، نه کسری از تعداد.
+> یعنی ما ۱ BTC داریم، اما هزینه‌ای که برای آن پرداختیم شامل کارمزد هم می‌شود.
+> این رویکرد Cost Basis را درست نگه می‌دارد و از undercosting جلوگیری می‌کند.
+
+#### ۲-ب) فروش (SELL)
+
+```
+مثال: فروش ۱ BTC — fee = 0.001 BTC (feeCurrency = BTC)
+
+quantity ثبت‌شده در inv_crypto_transactions.quantity  = 1        ✅ (کل مقدار فروخته‌شده)
+quantity کسرشده از inv_crypto_holdings.quantity       = 1        ✅
+
+feeBase = 0.001 × feeAssetPriceToBase
+
+soldPortionCost = 1 × averageBuyPrice
+realizedPL      = totalAmountBase(مبلغ دریافتی خالص) - soldPortionCost - feeBase
+totalInvested  -= soldPortionCost
+```
+
+> **توجه**: `totalAmountBase` در رکورد تراکنش فروش = مبلغ **قبل** از کسر کارمزد است (gross amount).
+> کارمزد جداگانه در `feeBase` از P&L کسر می‌شود.
+
+#### ۲-ج) انتقال (TRANSFER)
+
+```
+مثال: انتقال ۱ BTC — fee = 0.001 BTC (feeCurrency = BTC, کسر از ارز ارسالی)
+
+در صرافی مبدا (transfer_out):
+  quantity کسر می‌شود: holdings.quantity -= 1          (کل مقدار ارسالی)
+  totalInvested کاهش: -= 1 × averageBuyPrice_source
+  feeBase = 0.001 × feeAssetPriceToBase
+  totalFeesPaidBase += feeBase
+
+در صرافی مقصد (transfer_in):
+  quantity اضافه می‌شود: holdings.quantity += 0.999    (= amountToSend - feeAmount)
+  ⚠️ اینجا quantity کمتر است چون BTC واقعاً کمتر رسیده
+  Weighted Average مقصد با quantity=0.999 و cost=0.999×averageBuyPrice_source محاسبه شود
+```
+
+> **چرا در انتقال `quantity` کمتر می‌شود؟**
+> چون در transfer، کارمزد از **ارز ارسالی خودِ BTC** برداشته می‌شود —
+> مقصد واقعاً ۰.۹۹۹ BTC دریافت کرده، نه ۱ BTC.
+> این تفاوت اساسی با خرید/فروش است که کارمزد از موجودی دارایی کسر **نمی‌شود**.
+
+#### ۲-د) معامله رمزارز-به-رمزارز (C2C)
+
+```
+مثال: فروش ۱ ETH — خرید BTC — fee = 0.0001 BTC (feeCurrency = BTC)
+
+رکورد SELL (ETH):
+  quantity = 1 ETH  ✅
+  feeBase = 0.0001 × BTC_price_in_base
+  realizedPL_ETH = fromTotalBase - soldPortionCost_ETH - feeBase
+
+رکورد BUY (BTC):
+  quantity = مقدار BTC دریافتی  ✅
+  toTotalBase = fromTotalBase + feeBase  (Cost Basis BTC شامل کارمزد)
+  holdings.quantity += مقدار BTC دریافتی  ✅ (کامل، نه کسر کارمزد)
+```
+
+---
+
+### بخش ۳ — جدول خلاصه
+
+| عملیات | `feeCurrency = baseCurrency/IRR` | `feeCurrency = symbol دارایی` |
+|---------|----------------------------------|-------------------------------|
+| **BUY** | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه |
+| **SELL** | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر |
+| **TRANSFER** | `quantity` بدون تغییر در مبدا ✅ — `quantity` کامل در مقصد ✅ — `feeBase` به `totalFeesPaidBase` | `quantity` کامل در مبدا ✅ — `quantity` کاهش‌یافته در مقصد ⚠️ (چون ارز کمتری رسیده) |
+| **C2C** | `quantity` هر دو طرف بدون تغییر ✅ — `feeBase` در SELL از P&L کسر و در BUY به Cost Basis اضافه | همان قانون ✅ |
+
+> **قانون طلایی**: `feeCurrency = symbol` تنها در **TRANSFER** روی `quantity` مقصد تأثیر می‌گذارد —
+> در هر عملیات دیگری (BUY/SELL/C2C) فقط روی `Cost Basis` یا `realizedPL` اثر دارد.
+
+---
+
+### بخش ۴ — آپدیت `totalFeesPaidBase`
+
+در **همه** عملیات، پس از محاسبه `feeBase`:
+```
+holding.totalFeesPaidBase += feeBase
+```
+این فیلد تجمعی است و هرگز کاهش نمی‌یابد (حتی در فروش).
 
 ---
 
