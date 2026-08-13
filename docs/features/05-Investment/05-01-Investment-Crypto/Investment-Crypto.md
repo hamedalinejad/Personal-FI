@@ -246,6 +246,7 @@
 - **Currency & Multi-Currency**: نرخ تبدیل لحظه‌ای
 - **Reports** و **Dashboard**: ارزش پرتفوی و سود/زیان
 - **Portfolio & Wealth Overview**: تأمین داده رمزارز
+- **Price Fetching (فیچر ۱۹)**: دریافت قیمت لحظه‌ای رمزارزها — جداول `price_history` و `price_sources` (پوشه `05-05-Crypto-Price-Data` منسوخ شده و فقط برای رفرنس تاریخی نگه داشته شده است)
 
 ---
 
