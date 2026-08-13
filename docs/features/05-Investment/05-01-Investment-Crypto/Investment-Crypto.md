@@ -80,10 +80,32 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Crypto Holding (جدول: `inv_crypto_holdings`)
+### ۲. Crypto Wallet Network (جدول: `inv_crypto_wallet_networks`)
+
+> این جدول فقط برای wallet های نرم‌افزاری و سخت‌افزاری (`type = 'software_wallet' | 'hardware_wallet'`) کاربرد دارد؛ برای صرافی‌ها (`type = 'exchange'`) نیازی به این جدول نیست چون صرافی یک آدرس واحد مدیریت می‌کند.
 
 - `id` → UUID (Primary Key)
-- `exchangeId` → UUID
+- `exchangeId` → UUID (کلید خارجی به `inv_crypto_exchanges.id`)
+- `network` → string (نام شبکه بلاکچین — مثلاً `TRC20`, `ERC20`, `BEP20`, `SOL`, `BTC`, `TON`)
+- `custodyAccount` → string (nullable — نام یا برچسب توضیحی برای این آدرس، مثلاً «کیف پول اصلی» یا «آدرس سرد»)
+- `address` → string (nullable — آدرس عمومی کیف پول برای این شبکه)
+- `isActive` → boolean
+- `createdAt` → datetime
+- `updatedAt` → datetime
+
+> **چرا این جدول لازم است؟**  
+> یک رمزارز واحد (مثلاً USDT) می‌تواند روی شبکه‌های مختلف وجود داشته باشد: `USDT TRC20`، `USDT ERC20`، `USDT BEP20` — این‌ها از نظر آدرس والت و مسیر انتقال کاملاً متفاوت‌اند. اگر کاربر USDT را از شبکه اشتباه بفرستد، دارایی از دست می‌رود. بنابراین:
+> - هر والت می‌تواند چند شبکه داشته باشد (یک ردیف در `inv_crypto_wallet_networks` به ازای هر شبکه).
+> - هر Holding رمزارز در والت می‌تواند اختیاراً با یک شبکه مشخص لینک شود (فیلد `networkId` در `inv_crypto_holdings` — nullable).
+> - انتقال بین والت‌ها/صرافی‌ها باید شبکه را مشخص کند تا تاریخچه کامل باشد.
+
+> **نکته**: برای صرافی‌ها (`type = 'exchange'`)، شبکه در لحظه واریز/برداشت در فیلد `network` جدول `inv_crypto_exchange_transactions` ثبت می‌شود (ببینید بخش «۵. Crypto Exchange Transaction» — فیلد جدید اضافه‌شده) — نیازی به ردیف در `inv_crypto_wallet_networks` ندارد.
+
+### ۳. Crypto Holding (جدول: `inv_crypto_holdings`)
+
+- `id` → UUID (Primary Key)
+- `exchangeId` → UUID (کلید خارجی به `inv_crypto_exchanges.id`)
+- `networkId` → UUID (nullable — کلید خارجی به `inv_crypto_wallet_networks.id`؛ فقط برای wallet‌ها؛ برای صرافی null است)
 - `symbol` → string (BTC, ETH, USDT, IRR و ...)
 - `name` → string
 - `quantity` → decimal (موجودی فعلی)
@@ -94,6 +116,8 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
+> **نکته `networkId`**: این فیلد فقط برای والت‌ها معنی دارد. مثلاً کاربری که USDT دارد روی هر دو شبکه TRC20 و ERC20 در یک والت، **دو ردیف جداگانه** در `inv_crypto_holdings` خواهد داشت (هر کدام با `networkId` متفاوت)؛ این تفکیک برای محاسبه صحیح انتقال بین شبکه‌ها الزامی است.
+
 > **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند.  
 > **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**:  
 > - برای IRR و USDT:  
@@ -103,7 +127,7 @@
 > - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
 > - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
-### ۳. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
+### ۴. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
@@ -118,12 +142,13 @@
 - `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
+- `network` → string (nullable — شبکه بلاکچینی که انتقال از طریق آن انجام شده؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی، برای `buy`/`sell` null)
 - `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
 
-### ۴. Crypto Exchange Transaction (جدول: `inv_crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
+### ۵. Crypto Exchange Transaction (جدول: `inv_crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
@@ -135,6 +160,7 @@
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
 - `exchangeRateToBase` → decimal (نرخ ریال به ازای ۱ تتر در لحظه ثبت)
 - `accountId` → UUID (حساب بانکی مرتبط)
+- `network` → string (nullable — شبکه بلاکچینی که واریز/برداشت از طریق آن انجام شده؛ مثلاً `TRC20`، `ERC20`؛ برای واریز/برداشت ریالی null است)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
@@ -146,7 +172,7 @@
 > 
 > **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_crypto_exchange_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در صرافی) است.
 
-### ۵. acc_transactions
+### ۶. acc_transactions
 
 - فقط زمانی که پول واقعاً از/به حساب بانکی جابه‌جا شود ثبت می‌شود و با `inv_crypto_exchange_transactions` لینک می‌گردد.
 - لینک از طریق `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` انجام می‌شود.
