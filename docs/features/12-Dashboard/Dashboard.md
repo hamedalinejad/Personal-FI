@@ -147,47 +147,55 @@
 
 ## ساختار پیشنهادی داده خروجی `getDashboardData`
 
+> ⚠️ **قانون مالی پروژه**: تمام مقادیر مالی به صورت `string` (نه `number`) برگردانده می‌شوند تا از خطای floating-point در محاسبات مالی جلوگیری شود. در لایه UI، از `Decimal.js` برای نمایش استفاده کنید. درصدها هم `string` هستند.
+
 ```ts
 {
   accounts: {
-    totalBalance: number,
-    totalBalanceUSDT: number
+    totalBalance: string,        // ارز پایه کاربر
+    totalBalanceBase: string     // معادل ارز پایه (جایگزین totalBalanceUSDT)
   },
   cashFlow: {
-    income: number,
-    expense: number,
-    net: number
+    income: string,
+    expense: string,
+    net: string                  // income - expense
   },
   netWorth: {
-    current: number,
-    changePercent: number,
-    trend: Array<{ date: string, value: number }>
+    current: string,
+    changePercent: string,       // درصد تغییر نسبت به دوره قبل
+    trend: Array<{ date: string, value: string }>
   },
   budget: {
-    totalAssigned: number,
-    totalSpent: number,
-    percentUsed: number,
-    criticalEnvelopes: Array<...>
+    totalAssigned: string,
+    totalSpent: string,
+    percentUsed: string,         // رشته عددی مثل "84.5"
+    criticalEnvelopes: Array<{
+      id: string,
+      name: string,
+      percentUsed: string,
+      remainingAmount: string
+    }>
   },
   goals: Array<{
     id: string,
     name: string,
-    progressPercent: number,
-    remaining: number
+    progressPercent: string,     // رشته عددی مثل "45.2"
+    remaining: string            // مبلغ باقی‌مانده به ارز پایه
   }>,
   upcoming: Array<{
     type: 'bill' | 'loan' | 'cheque' | 'tax',
     title: string,
     dueDate: string,
-    amount: number,
+    amount: string,              // مبلغ به ارز پایه
+    currency: string,            // ارز اصلی رکورد
     status: string
   }>,
   investments: {
-    totalValue: number,
-    profitLoss: number
+    totalValue: string,
+    profitLoss: string
   },
   notifications: {
-    unreadCount: number
+    unreadCount: number          // استثنا: count عدد صحیح است — number مجاز
   }
 }
 ```
