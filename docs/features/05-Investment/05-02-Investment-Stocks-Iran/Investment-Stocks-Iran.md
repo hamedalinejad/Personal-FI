@@ -72,6 +72,36 @@
    - **Accounting Ledger میل شود**: بانک نقدی کارگزاری + موجودی Income
    - Dividend **نه** سهام محسوب نمی‌شود، **نه** در `calculateProfitLoss()` (realized/unrealized)
    - اما **یک درآمد محسوب می‌شود** و در Income بخش حسابداری ثبت می‌شود
+
+7b. **افزایش سرمایه از اندوخته — سهام جایزه (`capital_increase_reserve`)**:
+   - `quantity += newShares` در Holding
+   - `totalInvested` بدون تغییر می‌ماند (پولی پرداخت نشده)
+   - `averageBuyPrice = totalInvested / newQuantity` ← کاهش می‌یابد
+   - درآمد مالیاتی محسوب نمی‌شود؛ فقط Holding آپدیت می‌شود
+
+7c. **افزایش سرمایه از آورده نقدی — حق تقدم (`capital_increase_cash`)**:
+   - کاربر سه انتخاب دارد: (۱) خرید حق تقدم در بازار، (۲) فروش حق تقدم، (۳) اعمال حق تقدم (پرداخت ۱۰۰۰ ریال/سهم و تبدیل به سهم اصلی)
+   - برای هر انتخاب یک رکورد با نوع متناظر ثبت می‌شود (`rights_issue`, `rights_sold`, `rights_exercised`)
+   - `rights_exercised`: `totalAmount = quantity × 1000 (اسمی)` از `cashBalance` کارگزاری کسر و به Holding سهم اصلی اضافه می‌شود
+
+7d. **تجزیه سهم (`stock_split`) و ادغام سهم (`reverse_split`)**:
+   - `quantity *= splitRatio` (یا `/= splitRatio`)
+   - `averageBuyPrice /= splitRatio` (یا `*= splitRatio`)
+   - `totalInvested` بدون تغییر — این مهم‌ترین نکته است: ارزش سرمایه‌گذاری عوض نمی‌شود
+   - `realizedPL` تاریخی بدون تغییر می‌ماند
+
+7e. **تغییر نماد (`ticker_change`)**:
+   - Holding قدیمی با `isActive = false` و `closedAt = date` بسته می‌شود
+   - Holding جدید با نماد جدید، همان `totalInvested`، همان `averageBuyPrice`، همان `quantity` باز می‌شود
+   - `newSymbol` در رکورد تراکنش برای traceability ذخیره می‌شود
+
+7f. **انتقال سهم (`transfer_in` / `transfer_out`)**:
+   - `transfer_in`: فیلد `costBasis` اجباری است — بهای تمام‌شده تاریخی سهم در کارگزاری قبلی باید وارد شود تا `averageBuyPrice` و `totalInvested` صحیح باشد
+   - `transfer_out`: `realizedPL`ای ثبت نمی‌شود (انتقال است نه فروش)
+
+7g. **توقف/بازگشایی نماد (`halt`/`resume`)**:
+   - صرفاً لاگ رویداد؛ هیچ تأثیری روی Holding ندارد
+   - می‌توان در UI نماد‌های متوقف را با آیکون خاص نشان داد
 8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
 9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
 10. **ویرایش/حذف معاملات**: تراکنش‌های سهام پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
@@ -109,34 +139,59 @@
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
-- `symbol` → string (نماد سهم — مثلاً فولاد، شپنا)
+- `symbol` → string (نماد سهم — **نماد جاری**؛ در صورت `ticker_change`، Holding قدیمی بسته و جدید با نماد جدید ساخته می‌شود)
 - `name` → string (نام شرکت)
 - `quantity` → decimal (تعداد سهم)
 - `averageBuyPrice` → decimal (میانگین قیمت خرید — ریال)
 - `totalInvested` → decimal
 - `totalFeesPaidBase` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به **ارز پایه کاربر** (`baseCurrency`) با `exchangeRateToBase` همان تراکنش — صرف‌نظر از اینکه کارمزد به IRR یا USDT پرداخت شده)
+- `isActive` → boolean (پیش‌فرض: `true`؛ در `ticker_change` برای Holding قدیمی `false` می‌شود)
+- `closedAt` → datetime (nullable — تاریخ بسته‌شدن Holding در `ticker_change`)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
 > **نکته**: این جدول فقط برای خرید و فروش سهام است. موجودی نقدی کارگزاری در فیلد `cashBalance` از جدول `inv_stocks_iran_brokerages` نگهداری می‌شود (برای سرعت بالا). این موجودی **در `Portfolio & Wealth Overview` با `includeCashInWealth = false` به‌طور پیش‌فرض لحاظ نمی‌شود** تا از شمارش دوگانه (چون همان پول از حساب بانکی آمده) جلوگیری شود.
+> 
+> **کوئری پیشنهادی برای Holding فعال**: همیشه `WHERE isActive = true` فیلتر کنید تا Holdingهای بسته‌شده (ناشی از `ticker_change`) در محاسبات لحاظ نشوند.
 
-### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید و فروش
+### ۳. Stock Transaction (جدول: `inv_stocks_iran_transactions`) — لاگ خرید، فروش، و Corporate Actions
 
 - `id` → UUID (Primary Key)
 - `brokerageId` → UUID
-- `symbol` → string
-- `type` → string (`buy`, `sell`, `dividend`)
-- `quantity` → decimal (nullable برای `dividend`)
-- `price` → decimal (قیمت هر سهم — ریال — nullable برای `dividend`)
-- `totalAmount` → decimal (برای `dividend`: مبلغ کل سود نقدی دریافتی)
-- `feeAmount` → decimal
+- `symbol` → string (نماد سهم در **لحظه تراکنش** — اهمیت دارد چون با `ticker_change` تغییر می‌کند)
+- `type` → string (مقادیر مجاز — تعریف مرکزی در `core/types/types.md`):
+
+  | مقدار | توضیح | اثر روی quantity | اثر روی averageBuyPrice |
+  |---|---|---|---|
+  | `buy` | خرید سهام | `+= quantity` | Weighted Average |
+  | `sell` | فروش سهام | `-= quantity` | بدون تغییر |
+  | `dividend` | سود نقدی | بدون اثر | بدون تغییر |
+  | `capital_increase_cash` | افزایش سرمایه از محل آورده نقدی — کاربر حق تقدم دارد و می‌تواند بخرد یا بفروشد | در صورت خرید `+= quantity` | Weighted Average (قیمت خرید حق تقدم × quantity جدید) |
+  | `capital_increase_reserve` | افزایش سرمایه از محل اندوخته — سهام جایزه (Bonus Shares) — بدون پرداخت | `+= quantity` | `totalInvested` ثابت می‌ماند → `averageBuyPrice = totalInvested / newQuantity` |
+  | `rights_issue` | حق تقدم دریافت‌شده — ایجاد موقعیت حق تقدم در پرتفوی | `+= quantity` در نماد حق تقدم | Weighted Average با قیمت اعمال |
+  | `rights_sold` | فروش حق تقدم (بدون استفاده از آن) | `-= quantity` از نماد حق تقدم | — |
+  | `rights_exercised` | تبدیل حق تقدم به سهم اصلی | `-= quantity` از نماد حق تقدم + `+= quantity` در نماد اصلی | Weighted Average در نماد اصلی |
+  | `stock_split` | تجزیه سهم — تعداد ضرب، قیمت تقسیم می‌شود | `quantity *= splitRatio` | `averageBuyPrice /= splitRatio`، `totalInvested` بدون تغییر |
+  | `reverse_split` | ادغام سهم — تعداد تقسیم، قیمت ضرب | `quantity /= splitRatio` | `averageBuyPrice *= splitRatio`، `totalInvested` بدون تغییر |
+  | `ticker_change` | تغییر نماد شرکت | بدون تغییر در quantity | Holding قدیمی بسته، Holding جدید با همان `totalInvested`/`averageBuyPrice` باز می‌شود |
+  | `transfer_in` | انتقال سهم از کارگزاری دیگر به این کارگزاری | `+= quantity` | Weighted Average با `costBasis` اعلام‌شده |
+  | `transfer_out` | انتقال سهم به کارگزاری دیگر | `-= quantity` | بدون تغییر در averageBuyPrice باقیمانده |
+  | `halt` | توقف نماد | بدون اثر روی اعداد | صرفاً لاگ وضعیت |
+  | `resume` | بازگشایی نماد | بدون اثر روی اعداد | صرفاً لاگ وضعیت |
+  | `subscription` | پذیره‌نویسی (خرید سهام شرکت در مرحله عرضه اولیه یا پذیره‌نویسی ثانوی) | `+= quantity` | Weighted Average |
+
+- `quantity` → decimal (nullable — برای `dividend`, `halt`, `resume`, `ticker_change` مقدار `null`)
+- `price` → decimal (nullable — قیمت هر سهم در لحظه تراکنش؛ برای `capital_increase_reserve`, `halt`, `resume`, `ticker_change` مقدار `null`)
+- `totalAmount` → decimal (مبلغ کل — برای `dividend`: مبلغ سود نقدی؛ برای `buy`/`sell`: `quantity × price`)
+- `feeAmount` → decimal (پیش‌فرض: `0`)
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه معامله — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تتر لحظه معامله)
+- `splitRatio` → decimal (nullable — فقط برای `stock_split` و `reverse_split`؛ مثلاً `2` یعنی ۱ سهم → ۲ سهم)
+- `newSymbol` → string (nullable — فقط برای `ticker_change`؛ نماد جدید)
+- `costBasis` → decimal (nullable — فقط برای `transfer_in`؛ بهای تمام‌شده تاریخی سهام در کارگزاری قبلی)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
-
-> **نکته `dividend`**: سود نقدی سهام به‌صورت `type = 'dividend'` در همین جدول ثبت می‌شود (مشابه الگوی `inv_fif_transactions` در Fixed Income Funds)؛ `quantity` و `price` در این نوع `null` هستند و فقط `totalAmount` (مبلغ سود دریافتی) پر می‌شود. مبلغ به `cashBalance` کارگزاری در `inv_stocks_iran_brokerages` اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود؛ در `calculateProfitLoss()` لحاظ نمی‌شود (سود تقسیمی جزئی از Realized P&L معاملات خرید/فروش نیست).
 
 ### ۴. Brokerage Cash Transaction (جدول: `inv_stocks_iran_brokerage_transactions`) — لاگ واریز و برداشت
 
@@ -181,7 +236,7 @@
 - `getPortfolioValue()` → ارزش کل **سهام** پرتفوی ایران (ریال + معادل تتری) — **فقط** ارزش بازار holdings (quantity × currentPrice)؛ موجودی نقدی کارگزاری (`cashBalance`) را **شامل نمی‌شود** و جداگانه از طریق `getBrokerageCashBalance(brokerageId)` در اختیار Portfolio & Wealth Overview قرار می‌گیرد
 
 ### Transaction APIs
-- `createStockTransaction(data)` → خرید / فروش
+- `createStockTransaction(data)` → خرید / فروش (`type = 'buy'` یا `'sell'`)
 - `createBrokerageTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک به حساب بانکی
 - **`recordDividend(brokerageId, symbol, amount, date, description)` — NEW (CRITICAL)**
   ```typescript
@@ -229,6 +284,35 @@
   - ✅ Bank account لینک شود (شفاف کجا پول رفت)
   - ✅ NOT counted in Realized P&L (فقط درآمد، نه معامله)
 
+### Corporate Action APIs
+
+- `applyBonusShares(holdingId, newShares, date, description?)` → `capital_increase_reserve`
+  - `quantity += newShares`، `totalInvested` ثابت، `averageBuyPrice = totalInvested / newQuantity`
+
+- `applyStockSplit(holdingId, splitRatio, date, description?)` → `stock_split` (و `reverse_split` با `splitRatio < 1`)
+  - `quantity *= splitRatio`، `averageBuyPrice /= splitRatio`، `totalInvested` ثابت
+
+- `applyTickerChange(holdingId, newSymbol, newName, date, description?)` → `ticker_change`
+  - Holding قدیمی: `isActive = false`، `closedAt = date`
+  - Holding جدید با نماد جدید و همان `quantity`/`averageBuyPrice`/`totalInvested` ساخته می‌شود
+
+- `recordRightsIssue(brokerageId, symbol, rightsQuantity, exercisePrice, expiryDate, description?)` → `rights_issue`
+  - یک Holding موقت برای نماد حق تقدم (`symbol + 'ح'` در بورس ایران) ساخته می‌شود
+
+- `recordRightsSold(holdingId, quantity, price, date, description?)` → `rights_sold`
+  - فروش حق تقدم → Realized P&L محاسبه می‌شود (با `costBasis = 0` چون حق تقدم رایگان دریافت شده)
+
+- `recordRightsExercised(rightsHoldingId, stockHoldingId, quantity, date, description?)` → `rights_exercised`
+  - `quantity` از Holding حق تقدم کم می‌شود
+  - `quantity` به Holding سهم اصلی اضافه می‌شود با `price = 1000` (ارزش اسمی پرداخت‌شده)
+  - `totalAmount = quantity × 1000` از `cashBalance` کارگزاری کسر می‌شود
+
+- `recordTransferIn(brokerageId, symbol, quantity, costBasis, date, description?)` → `transfer_in`
+  - **`costBasis` اجباری است** — بدون بهای تمام‌شده تاریخی، `averageBuyPrice` نادرست خواهد بود
+
+- `recordTransferOut(holdingId, quantity, date, description?)` → `transfer_out`
+  - `realizedPL` صفر (انتقال نه فروش)، `quantity` کاهش می‌یابد
+
 - `getStockTransactions(filters)`
 - `getBrokerageTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, brokerageId?)`
@@ -266,9 +350,23 @@ quantity         -= quantitySold
 averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average فقط با خرید جدید تغییر می‌کند، نه با فروش
 ```
 
+**اثر Corporate Actions بر `averageBuyPrice` و `totalInvested`**:
+
+| رویداد | اثر روی `quantity` | اثر روی `totalInvested` | اثر روی `averageBuyPrice` |
+|---|---|---|---|
+| `capital_increase_reserve` (سهام جایزه) | `+= bonusShares` | **ثابت** | `= totalInvested / newQuantity` ← کاهش |
+| `stock_split` (تجزیه) | `*= splitRatio` | **ثابت** | `/ = splitRatio` ← کاهش |
+| `reverse_split` (ادغام) | `/= splitRatio` | **ثابت** | `*= splitRatio` ← افزایش |
+| `rights_exercised` (اعمال حق تقدم) | `+= quantity` (در نماد اصلی) | `+= quantity × 1000` | Weighted Average مجدد |
+| `transfer_in` | `+= quantity` | `+= costBasis` | Weighted Average با `costBasis` |
+| `ticker_change` | Holding قدیمی بسته، Holding جدید مساوی باز | Holding جدید: مساوی Holding قدیمی | Holding جدید: مساوی Holding قدیمی |
+
+> **قانون طلایی**: `totalInvested` در همه Corporate Actions که «سهام رایگان» می‌دهند (سهام جایزه، split) **ثابت** می‌ماند. فقط در رویدادهایی که پول واقعی جابه‌جا می‌شود (`rights_exercised`، `transfer_in`) تغییر می‌کند.
+
 > **نکات الزامی**:
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (از لاگ `inv_stocks_iran_transactions` با `type=sell`) را برمی‌گرداند؛ سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه و بر اساس `(getLatestPrice('stock', symbol, baseCurrency).price - averageBuyPrice) × quantity` محاسبه می‌شود (طبق فیچر `19-Price-Fetching` — به بخش «نکات طراحی» پایین همین فایل مراجعه شود) و نباید با Realized P&L مخلوط شود.
+> - `calculateProfitLoss(symbol?, brokerageId?)` مجموع `realizedPL` تمام تراکنش‌های فروش (`type=sell`) و فروش حق تقدم (`type=rights_sold`) را برمی‌گرداند؛ `dividend` و Corporate Actions دیگر هرگز در این مجموع نیستند.
+> - سود/زیان **تحقق‌نیافته** (Unrealized) جداگانه بر اساس `(getLatestPrice('stock', symbol, baseCurrency).price - averageBuyPrice) × quantity` محاسبه می‌شود (طبق فیچر `19-Price-Fetching`) و نباید با Realized P&L مخلوط شود.
 
 ---
 
