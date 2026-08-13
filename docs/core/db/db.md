@@ -284,3 +284,141 @@ core/db/
 - تمام مبالغ باید بر اساس قانون "Minor Unit Storage" ذخیره شوند (بخش ۱۱ Project-Blueprint).
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
 - در اولین اجرا، `navigator.storage.persist()` باید درخواست شود.
+---
+
+## Financial Architecture: Journal-Based Balance (Critical)
+
+### Problem Statement (مشکل قدیمی)
+
+اگر `currentBalance` در `acc_accounts` به عنوان **Snapshot** (نه Journal) نگهداری شود:
+- اگر transaction جا بیفتد → balance غلط
+- اگر rollback ناقص باشد → balance غلط
+- اگر migration خراب شود → balance غلط
+- اگر snapshot اشتباه update شود → balance غلط
+- **هیچ راهی نیست برای reconciliation**
+
+### Solution: Journal as Single Source of Truth
+
+**Architecture**:
+
+```
+acc_transactions (Journal/Log) = TRUTH
+         ↓ (Calculate when needed)
+acc_accounts.currentBalance = CACHE (for speed)
+```
+
+**True Balance Calculation**:
+
+```typescript
+calculateTrueBalance(accountId: UUID): Decimal {
+  const transactions = await db.query(`
+    SELECT amount, type, isVoided, relatedTransactionId 
+    FROM acc_transactions 
+    WHERE accountId = $1 
+      AND isVoided = false 
+      AND relatedTransactionId IS NULL
+  `, [accountId])
+  
+  let balance = initialBalance
+  for (const tx of transactions) {
+    const sign = ['deposit', 'transfer-in'].includes(tx.type) ? 1 : -1
+    balance = balance.plus(new Decimal(tx.amount).times(sign))
+  }
+  
+  return balance
+}
+```
+
+**Snapshot Update Pattern**:
+
+```
+BEGIN TRANSACTION
+  1. Calculate: newBalance = calculateTrueBalance(accountId) + transactionAmount
+  2. INSERT acc_transactions
+  3. UPDATE acc_accounts.currentBalance = newBalance
+COMMIT or ROLLBACK (atomic)
+```
+
+### Reconciliation API
+
+**Purpose**: Verify cached snapshot matches journal
+
+```typescript
+reconcileAccount(accountId: UUID): {
+  status: 'ok' | 'mismatch'
+  calculatedBalance: Decimal,
+  storedBalance: Decimal,
+  transactions_count: number
+}
+```
+
+**When to Use**:
+- User clicks "Reconcile Account" button
+- Nightly batch job (daily verification)
+- After migrations or data imports
+- After backup restoration
+- Audit/compliance checks
+
+**If Mismatch**:
+```
+1. Log to audit_log: {accountId, calculatedBalance, storedBalance, timestamp}
+2. Alert user: "Balance mismatch detected — review transactions"
+3. Option to auto-fix: currentBalance = calculateTrueBalance() (recalc from journal)
+```
+
+### Never Do This ❌
+
+```typescript
+// ❌ NEVER directly update balance without transaction
+db.update('acc_accounts', {currentBalance: 1000})
+
+// ❌ NEVER use cached balance as source of truth
+const balance = account.currentBalance  // Wrong for critical operations
+
+// ❌ NEVER assume snapshot is accurate (without reconciliation)
+```
+
+### Always Do This ✅
+
+```typescript
+// ✅ For read-heavy (UI/Dashboard): use cache
+const balance = account.currentBalance
+
+// ✅ For critical operations (transfer/withdrawal): recalculate
+const trueBalance = calculateTrueBalance(accountId)
+validate(trueBalance >= withdrawAmount)
+
+// ✅ For compliance/audit: reconcile regularly
+reconcileAccount(accountId)
+```
+
+### Immutable Transactions + Reversal
+
+**Edit/Correction Pattern**:
+
+```
+Original:  {id: tx1, amount: +100, isVoided: false}
+User corrects to +110
+
+Process:
+  1. Mark original: isVoided = true, relatedTransactionId = tx2
+  2. Create reversal: {id: tx2, amount: -100, isVoided: false, relatedTransactionId: tx1}
+  3. Create correction: {id: tx3, amount: +110, isVoided: false}
+  
+Note: Journal now has 3 records. true Balance counts only active ones (isVoided=false and leaf transactions)
+```
+
+### Precision: decimal.js Mandatory
+
+All balance calculations **must** use Decimal:
+
+```typescript
+// ❌ Don't
+let sum = 1000 + 0.1 + 0.1 + 0.1  // Result: 1000.3000000000001
+
+// ✅ Do
+let sum = new Decimal(1000)
+  .plus(new Decimal('0.1'))
+  .plus(new Decimal('0.1'))
+  .plus(new Decimal('0.1'))  // Result: 1000.3
+```

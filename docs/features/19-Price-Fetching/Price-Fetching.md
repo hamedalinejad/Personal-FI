@@ -142,6 +142,17 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `getAllSources(assetCategory?)`
 - `createSource(data)` / `updateSource(id, data)`
 - `getLatestPrice(symbol, targetCurrency?)` → آخرین قیمت کش‌شده یک نماد (از هر دو منبع `manual`/`api`)
+  ```typescript
+  interface LatestPrice {
+    price: Decimal,
+    priceCurrency: string,        // ارزی که قیمت در آن است (USDT, IRR, etc.)
+    timestamp: datetime,          // لحظه دریافت/ثبت قیمت
+    isStale: boolean,            // بر اساس TTL این asset category
+    source: 'manual' | 'api',    // منشأ قیمت
+    triggeredBy?: 'user_click' | 'auto_sync' | 'manual_entry'
+  }
+  ```
+  
 - `getPriceHistory(symbol, dateRange?)` → برای نمودار تاریخچه قیمت
 
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
