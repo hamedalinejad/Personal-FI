@@ -123,9 +123,17 @@
 - `filePath` → string (مسیر فایل پشتیبان در سیستم)
 - `fileSize` → number (اندازه فایل به بایت)
 - `backupType` → string (`local`, `encrypted`) — نوع پشتیبان
+- `status` → enum (`success`, `failed`, `restored`) — وضعیت عملیات پشتیبان
+- `errorMessage` → string (nullable — پیام خطا در صورت `status='failed'`)
 - `backupDate` → datetime (تاریخ ایجاد پشتیبان)
+- `restoredAt` → datetime (nullable — تاریخ بازیابی، فقط برای `status='restored'`)
 - `createdAt` → datetime
 - `note` → string (یادداشت اختیاری)
+
+> **قوانین `status`**:
+> - `createBackup()` پس از موفقیت `status='success'` و در صورت خطا `status='failed'` + `errorMessage` ثبت می‌کند.
+> - `restoreBackup()` پس از بازیابی موفق، `status` رکورد مربوطه را به `restored` و `restoredAt = now` آپدیت می‌کند.
+> - `listBackups()` فقط رکوردهای `status='success'` یا `status='restored'` را برمی‌گرداند (رکوردهای `failed` برای debug نگه داشته می‌شوند اما در UI نمایش داده نمی‌شوند).
 
 ---
 
