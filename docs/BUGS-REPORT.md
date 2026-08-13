@@ -73,3 +73,23 @@
 ---
 
 هیچ باگ منطقی/محاسباتی بزرگی در فرمول‌های حسابداری یا وام پیدا نشد. در بخش Investment-Crypto اما دو باگ محاسباتی واقعی (باگ‌های ۷ و ۸ بالا — عدم پشتیبانی درست از خرید/فروش با ارزهای مختلف و فرض هاردکد USDT در منطق کارمزد) در بررسی بعدی کشف و رفع شدند. باقی باگ‌های پیداشده از نوع «Drift بین اسناد» (نام جدول/فیلد که در یک‌جا به‌روز شده ولی در جای دیگر نه) بودند که رفع شدند، به‌علاوه یک فیچر کاملاً جدید (دریافت قیمت‌ها) که طبق درخواست شما اضافه شد.
+
+---
+
+## ✅ رفع‌شده در بررسی سوم
+
+### باگ ۱۵ — دو Source of Truth برای موجودی نقدی (Stocks cashBalance و Crypto IRR/USDT)
+**Severity: High**  
+**محل:** `Investment-Stocks-Iran.md` (جدول `inv_stocks_iran_brokerages.cashBalance`) و `Investment-Crypto.md` (موجودی `inv_crypto_holdings` با `symbol=IRR`/`USDT`)
+
+**شرح:** هر دو سند از الگوی Snapshot برای موجودی نقدی استفاده می‌کردند اما هیچ‌کدام:
+- الگوی Atomic Update (BEGIN → INSERT log → UPDATE snapshot → COMMIT) را الزامی نمی‌کردند
+- تابع `calculateTrueCashBalance()` برای محاسبه موجودی واقعی از Journal تعریف نکرده بودند
+- `reconcileBrokerage()` / `reconcileExchange()` API که انطباق snapshot با Journal را بررسی کند نداشتند
+
+نتیجه: اگر هر عملیاتی خارج از Transaction یا بدون INSERT در لاگ روی `cashBalance` می‌نوشت، موجودی snapshot با مجموع journal تفاوت می‌کرد و هیچ راهی برای تشخیص یا رفع اتوماتیک وجود نداشت.
+
+**راه‌حل اعمال‌شده:**
+- در `Investment-Stocks-Iran.md`: اضافه‌شدن معماری Journal=Truth/snapshot=Cache، الگوی Atomic UPDATE، `calculateTrueCashBalance()` با فرمول کامل، `reconcileBrokerage()` API با auto-fix و audit log.
+- در `Investment-Crypto.md`: اضافه‌شدن `calculateTrueCashBalance(exchangeId, symbol)` برای IRR/USDT، `reconcileExchange()` API، و مستندسازی معماری Journal/Cache در بخش نکات طراحی.
+- قوانین Never/Always مشخص شد: هرگز آپدیت مستقیم snapshot بدون Journal؛ برای UI از cache، برای validation عملیات حساس از True Balance.
