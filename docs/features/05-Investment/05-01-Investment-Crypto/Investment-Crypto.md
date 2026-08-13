@@ -364,3 +364,5 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 4. Reconcile: `Σ quantity effects` با holding؛ fee-in-asset باید در ledger quantity دیده شود.
 
 فرمول Average Buy فقط با quantity **خالص** و cost **سازگار با همان quantity** اجرا شود؛ در غیر این صورت Unrealized P&L منحرف می‌شود.
+
+> **BUG-009**: Fetch قیمت باید `assetId` و mapping Provider روی Holding را مصرف کند (از طریق PriceAssetRef)، نه فقط symbol.

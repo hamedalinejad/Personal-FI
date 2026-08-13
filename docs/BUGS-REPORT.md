@@ -9,6 +9,43 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-009 — Crypto price path must use assetId/mapping
+**راه‌حل:** ساخت PriceAssetRef از Holding شامل assetKey+assetId+priceProviderId.
+
+### BUG-010 — Crypto API Decimal vs string
+**راه‌حل:** خروجی API فقط decimal string.
+
+### BUG-011 — assetCategory housing حذف
+**راه‌حل:** فقط crypto|stock|fif|metal هم‌راستا با AssetCategory.
+
+### BUG-012 — PriceSyncSettings UNIQUE
+**راه‌حل:** UNIQUE(scope, assetCategory, symbol).
+
+### BUG-013 — isDefault در DB
+**راه‌حل:** partial unique index یک default فعال per category.
+
+### BUG-014 — Dedupe + assetCategory
+**راه‌حل:** کلید dedupe شامل assetCategory.
+
+### BUG-015 — Manual vs API priority
+**راه‌حل:** Manual با expiresAt؛ fetch پیش‌فرض Manual غیرمنقضی را override نمی‌کند.
+
+### BUG-016 — Future timestamp reject
+**راه‌حل:** fetchedAt بیش از ۲ دقیقه در آینده → validation_error.
+
+### BUG-017 — Unified PriceAssetRef
+**راه‌حل:** قرارداد هویت واحد برای Adapterها.
+
+### BUG-018 — Brokerage cashBalance authority
+**راه‌حل:** Ledger منبع حقیقت؛ snapshot فقط کش؛ repair صریح.
+
+### BUG-019 — FIF account on transactions
+**راه‌حل:** accountId اجباری روی تراکنش issuance؛ audit از ledger.
+
+### BUG-020 — Valuation triple
+**راه‌حل:** price + priceCurrency + asOf؛ نرخ تتر به‌تنهایی کافی نیست.
+
+
 ### BUG-002 — Decimal string در Events و ExchangeRate
 **راه‌حل:** همه payloadهای مالی Event و `ExchangeRate.rate` به `string` (decimal)؛ `number` فقط برای شمارنده‌های غیرمالی.
 

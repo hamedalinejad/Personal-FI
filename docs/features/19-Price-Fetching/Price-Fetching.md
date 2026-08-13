@@ -56,7 +56,12 @@
 - **دستی/On-Demand:** کاربر روی دکمه «دریافت قیمت‌ها» کلیک می‌کند → سیستم **فقط همان یک بار** به اینترنت وصل می‌شود، نتیجه را می‌گیرد، ذخیره می‌کند و تمام.
 - **خودکار/Auto-Sync (اختیاری، Opt-in):** اگر کاربر از تنظیمات فعالش کرده باشد، تا وقتی اپ **باز و در Foreground** است و مرورگر گزارش می‌دهد که آنلاین است (`navigator.onLine`)، هر `syncIntervalMinutes` دقیقه یک‌بار خودش Batch را صدا می‌زند. این حالت **پیش‌فرض خاموش** است؛ کاربر باید صریحاً روشنش کند (طبق قانون ۱ بالا). اپ بسته یا در پس‌زمینه یا آفلاین → auto-sync اصلاً اجرا نمی‌شود (نسخه ۱ از Background Sync واقعی سرویس‌ورکر استفاده نمی‌کند، فقط از یک تایمر سبک وقتی تب باز است — به همین دلیل مصرف باتری/داده کنترل‌شده می‌ماند).
 
-هر دو مسیر در همان جدول `price_history` ذخیره می‌شوند؛ تنها تفاوتشان فیلد `source` رکورد است (`manual` در برابر `api`، به بخش «Domain Entities» نگاه کنید) — از نظر بقیه سیستم (`getLatestPrice`) کاملاً یکسان مصرف می‌شوند.
+هر دو مسیر در `price_history` ذخیره می‌شوند (`source = manual | api`).
+
+**سیاست اولویت Manual در برابر API (BUG-015)**:
+- `getLatestPrice` به‌ترتیب: (1) اگر رکورد `manual` با `manualExpiresAt` خالی یا در آینده وجود دارد و از آخرین API جدیدتر یا مساوی است → Manual؛ (2) در غیر این صورت جدیدترین رکورد معتبر (API یا Manual منقضی‌شده) بر اساس `fetchedAt` و `priority` منبع.
+- `setManualPrice(..., { expiresAt?: ISO })` می‌تواند اعتبار محدود بدهد؛ بدون `expiresAt` = تا وقتی کاربر پاک کند یا API صریح با `overrideManual: true` در fetch (پیش‌فرض fetch **override نمی‌کند** Manual غیرمنقضی).
+- UI باید منبع (`manual`/`api`) و `isStale` را نشان دهد.
 
 ---
 
@@ -71,12 +76,12 @@
    - `symbol` غیرخالی و مطابق شناسه داخلی دسته
    - `price` عدد معتبر با `decimal.js` و **`price > 0`** (صفر، منفی، null، NaN رد)
    - `priceCurrency` در مجموعه مجاز پروژه
-   - `fetchedAt` تاریخ/زمان parseپذیر و نه در آیندهٔ نامعقول (مثلاً بیش از ۵ دقیقه جلوتر)
+   - `fetchedAt` تاریخ/زمان parseپذیر؛ **اگر بیش از ۲ دقیقه از now جلوتر باشد رد می‌شود** (BUG-016) — قیمت آینده نمی‌تواند latest/fresh شود
    - `sourceId` برای مسیر api معتبر و `isActive`
    - اختیاری ولی توصیه‌شده: اگر `|price - lastPrice| / lastPrice` از آستانه غیرعادی (مثلاً ۹۰٪ در یک بازه کوتاه) بیشتر بود → رد یا علامت `anomaly` (نسخه ۱: رد با `validation_error` کافی است مگر تنظیم خلاف)
 4c. **Idempotency / جلوگیری از duplicate بی‌مورد (باگ ۴۲)**:
    - هر فراخوانی `fetchAndStorePrices` یک `fetchRequestId` (UUID) می‌گیرد؛ همه رکوردهای همان اجرا همان `fetchRequestId` را دارند.
-   - **Dedupe قبل از INSERT**: اگر برای همان `(symbol, sourceId, price, priceCurrency)` آخرین رکورد موجود با `fetchedAt` در پنجرهٔ کوتاه (مثلاً ۶۰ ثانیه) و همان قیمت باشد، INSERT جدید **انجام نمی‌شود** (no-op موفق در `succeeded[]` با پرچم `deduped: true`).
+   - **Dedupe قبل از INSERT**: اگر برای همان `(assetCategory, symbol, sourceId, price, priceCurrency)` آخرین رکورد موجود با `fetchedAt` در پنجرهٔ کوتاه (مثلاً ۶۰ ثانیه) و همان قیمت باشد (BUG-014 — assetCategory در کلید dedupe الزامی است)، INSERT جدید **انجام نمی‌شود** (no-op موفق در `succeeded[]` با پرچم `deduped: true`).
    - دوبار کلیک سریع کاربر دو Request شبکه ممکن است بسازد، ولی تاریخچه با ده‌ها ردیف یکسان پر نمی‌شود.
    - Append-Only برای تغییر واقعی قیمت یا فاصله زمانی بیش از پنجره dedupe همچنان برقرار است (نمودار تاریخچه حفظ می‌شود).
 4d. **اولویت منبع (باگ ۴۱)**: روی `price_sources` فیلدهای `priority` (عدد؛ کمتر = بالاتر) و `isDefault` (boolean per assetCategory) اجباری‌اند.
@@ -140,7 +145,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `baseUrl` → string (آدرس پایه API — در صورت نیاز Adapter)
 - `requiresApiKey` → boolean
 - `priority` → integer (**اجباری — باگ ۴۱**؛ عدد کوچک‌تر = اولویت بالاتر؛ پیش‌فرض مثلاً ۱۰۰)
-- `isDefault` → boolean (**اجباری — باگ ۴۱**؛ حداکثر یک `isDefault=true` فعال per `assetCategory`)
+- `isDefault` → boolean (**اجباری — باگ ۴۱ / BUG-013**؛ حداکثر یک `isDefault=true` فعال per `assetCategory` — enforce با partial unique index یا trigger: فقط یک ردیف با `(assetCategory) WHERE isDefault=1 AND isActive=1`)
 - `isActive` → boolean
 - `staleAfterMinutes` → integer (nullable — آستانه کهنگی اختصاصی این منبع؛ اگر null از پیش‌فرض سراسری مثلاً ۲۴×۶۰ دقیقه)
 - `notes` → string (nullable)
@@ -152,7 +157,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `id` → UUID (Primary Key)
 - `sourceId` → UUID (nullable — لینک به `price_sources`؛ برای رکوردهای `source='manual'` مقدارش `null` است)
 - `symbol` → string (مثلاً `BTC`, `ETH`؛ برای زیرفیچرهای آینده: نماد سهام، کد ملک و ...)
-- `assetCategory` → enum (`crypto`, `stock`, `housing`, `metal`)
+- `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — فقط همین چهار مقدار؛ هم‌راستا با `AssetCategory` در types.md (BUG-011)
 - `price` → decimal (قیمت — با `decimal.js`)
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
 - `source` → enum (`manual`, `api`)
@@ -364,3 +369,52 @@ UI / Auto-Sync
 - **زیرفیچرهای بعدی**: Stock Prices، Housing Prices، Metals Prices — هرکدام با همان جداول مشترک (`price_sources`, `price_history`, `price_sync_settings`) و فقط منطق Fetch/Parse مخصوص به خودشان، طبق الگوی `19-01-Crypto-Prices`.
 - **Fallback خودکار چندمنبعی**: v1 فقط `priority` + `isDefault` دارد (باگ ۴۱)؛ Fallback زنجیره‌ای خودکار هنگام شکست منبع اصلی مسیر آینده است.
 - **Background Sync واقعی**: در صورت نیاز به دریافت حتی وقتی تب بسته است، از Periodic Background Sync سرویس‌ورکر استفاده شود؛ این هم‌چنان باید Opt-in و تابع همان سه قانون Offline-First بالا باشد (هیچ اتصال بی‌اجازه کاربر).
+
+
+### Price Sync Settings — یکتایی (BUG-012)
+
+`UNIQUE(scope, assetCategory, IFNULL(symbol, ''))` روی `price_sync_settings` اجباری است تا بیش از یک رکورد برای همان کلید ساخته نشود و Rule اولویت override deterministic بماند.
+
+
+---
+
+## قرارداد هویت دارایی برای قیمت (BUG-017)
+
+همه دسته‌ها قبل از Fetch به یک **PriceAssetRef** نرمال می‌شوند:
+
+```typescript
+interface PriceAssetRef {
+  assetCategory: AssetCategory; // crypto | stock | fif | metal
+  internalSymbol: string;       // کلید داخل price_history.symbol
+  priceProviderId?: string;     // FK price_sources
+  providerSymbol?: string;      // شناسه نزد Provider
+  market?: string;              // سهام
+  // crypto extras when needed by adapter:
+  chainId?: string;
+  contractAddress?: string;
+  assetId?: string;             // شناسه Provider اختصاصی holding
+}
+```
+
+| دسته | ساخت internalSymbol / mapping |
+|------|-------------------------------|
+| Crypto | `assetKey` از Holding (chain+contract یا exchange:symbol) + `assetId`/`priceProviderId` |
+| Stock | `symbol` داخلی + `priceProviderId` + `providerSymbol` + `market` |
+| FIF | `fundId` برای issuance؛ ETF مثل stock |
+| Metals | `metalType_purity` |
+
+Adapter فقط `PriceAssetRef` می‌گیرد — نه Holding خام متفاوت per feature.
+
+
+---
+
+## قرارداد ارزش‌گذاری تاریخی (BUG-020)
+
+هر قیمت قابل‌استفاده برای Snapshot/P&L باید سه‌تایی کامل داشته باشد:
+1. `price` (decimal string)
+2. `priceCurrency`
+3. `asOf` / `fetchedAt` (UTC)
+
+`exchangeRateToBase` روی **تراکنش** برای تبدیل تاریخی مبلغ معامله است؛ برای ارزش‌گذاری holding در زمان T:
+`valueInBase(T) = quantity × price(T) × rate(priceCurrency → base, at T)`  
+نرخ تتر جدا بدون `priceCurrency` و `asOf` کافی نیست.

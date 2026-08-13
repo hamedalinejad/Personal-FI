@@ -248,3 +248,15 @@ $  \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} 
 > **Tax metadata (باگ ۵۶)**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
 
 > **exchangeRateToBase (BUG-003)**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
+
+---
+
+## حساب منبع پول برای صدور/ابطال (BUG-019)
+
+`inv_fif_holdings` می‌تواند units را aggregate کند، ولی **منبع پول هر معامله** روی `inv_fif_transactions.accountId` (اجباری برای `fundType=issuance_redemption`) حفظ می‌شود.
+
+قوانین:
+1. خرید/ابطال issuance بدون `accountId` ممنوع است.
+2. اگر کاربر همان صندوق را از دو حساب بخرد، Holding می‌تواند یکی بماند؛ تاریخچه per-account از ledger تراکنش‌ها و `acc_transactions` بازیابی می‌شود.
+3. برای Audit/Report «از کدام حساب خرید شده» باید از transactions استفاده شود نه فقط Holding.
+4. Should Have: نمای تفکیک units per account از Σ تراکنش‌ها (بدون اجباری کردن Holding جدا per account در v1).

@@ -52,6 +52,8 @@
 
 `cashBalance` یک snapshot برای محاسبات سریع است و باید با تراکنش‌های مالی هماهنگ بماند.
 
+> **منبع حقیقت (BUG-018)**: **Ledger** (`inv_stocks_iran_brokerage_transactions` + لینک‌های `acc_transactions`) authoritative است. `cashBalance` مشتق/کش است. در صورت اختلاف `reconcileBrokerage`: گزارش delta؛ Repair صریح فقط با تأیید کاربر snapshot را از ledger بازمی‌سازد — سیستم به‌صورت خاموش ledger را از snapshot بازنویسی نمی‌کند.
+
 ### ۲. Stock Holding — `inv_stocks_iran_holdings`
 
 - `id` → UUID

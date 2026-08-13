@@ -26,7 +26,7 @@
 
 ## Business Rules
 
-1. دارایی‌هایی که قیمت‌گیری می‌شوند از `DISTINCT assetKey` (یا `chainId+contractAddress` / native) روی `inv_crypto_holdings` استخراج می‌شوند — **نه فقط `symbol`** (BUG-004). `IRR` و USDT داخلی صرافی بدون زنجیره قیمت ثابت ۱ دارند. USDT-ERC20 و USDT-TRC20 جدا قیمت‌گیری می‌شوند مگر کاربر/Provider خلاف بگوید.
+1. دارایی‌هایی که قیمت‌گیری می‌شوند از Holdingها به‌صورت `PriceAssetRef` ساخته می‌شوند: `assetKey` + `assetId` + `priceProviderId` در صورت وجود (BUG-004، **BUG-009** — مسیر Fetch دیگر `assetId`/mapping را دور نمی‌زند). `IRR` و USDT داخلی صرافی بدون زنجیره قیمت ثابت ۱ دارند. USDT-ERC20 و USDT-TRC20 جدا قیمت‌گیری می‌شوند مگر کاربر/Provider خلاف بگوید.
 2. هر دو نوع دریافت (دستی و Auto-Sync) از همان تابع مشترک `fetchAndStorePrices` فیچر پدر عبور می‌کنند؛ تنها تفاوتشان مقدار `triggeredBy` (`user_click` در برابر `auto_sync`) است — منطق Batch، آفلاین‌بودن، و Partial Success برای هر دو یکسان اجرا می‌شود.
 3. **دریافت انبوه**: اگر تعداد نمادهای درخواستی زیاد باشد (مثلاً کاربری با ده‌ها هولدینگ رمزارزی متفاوت)، درخواست‌ها طبق الگوریتم Batch در `Price-Fetching.md` (حداکثر ~۱۰۰ نماد در هر Request، پشت‌سرهم نه هم‌زمان) تقسیم می‌شوند؛ کاربر نوار پیشرفت می‌بیند، نه یک Loading بی‌بازخورد.
 4. قیمت هر نماد نسبت به **USDT** دریافت و ذخیره می‌شود (`priceCurrency = 'USDT'`)؛ تبدیل به ریال یا ارز پایه کاربر در لحظه مصرف با `cur_exchange_rates` (نرخ ریال/تتر) انجام می‌شود، طبق قاعده ۹ در سند اصلی فیچر.
@@ -43,7 +43,7 @@
 - `fetchCryptoPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → صرفاً یک Wrapper مخصوص کریپتو روی `fetchAndStorePrices` فیچر پدر (با `assetCategory='crypto'` ثابت)؛ دریافت از API خارجی + ذخیره Batch در `price_history` + برگرداندن خلاصه نتیجه:
   ```typescript
   {
-    succeeded: { symbol: string; price: Decimal }[],
+    succeeded: { symbol: string; price: string // decimal string — BUG-010؛ نه number و نه Decimal class در مرز API }[],
     failed: { symbol: string; reason: string }[],
     skipped?: { reason: 'offline' },   // وقتی navigator.onLine=false بوده
     fetchedAt: Timestamp,
