@@ -54,7 +54,24 @@
    - موجودی سهم کاهش می‌یابد.
    - مبلغ حاصل به موجودی نقدی کارگزاری اضافه می‌شود.
 7. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
-7a. **سود نقدی (Dividend)**: با `type = 'dividend'` در `inv_stocks_iran_transactions` ثبت می‌شود؛ مبلغ به `cashBalance` کارگزاری اضافه می‌شود و به‌عنوان درآمد ثبت می‌شود (تراکنش سهام محسوب نمی‌شود و در `calculateProfitLoss()` لحاظ نمی‌شود).
+7a. **سود نقدی (Dividend) — CRITICAL ACCOUNTING**:
+   - ثبت در `inv_stocks_iran_transactions` با `type = 'dividend'`
+   - **MUST** ایجاد Income Transaction در `acc_transactions`:
+     ```
+     acc_transactions {
+       type: 'deposit-income',
+       relatedFeature: 'stocks_iran',
+       relatedId: dividend_transaction_id,
+       amount: dividend_amount,
+       date: dividend_date,
+       description: "Dividend from [symbol]: [amount]",
+       accountId: brokerage_account  // کارگزاری حساب
+     }
+     ```
+   - مبلغ به `inv_stocks_iran_brokerages.cashBalance` اضافه می‌شود
+   - **Accounting Ledger میل شود**: بانک نقدی کارگزاری + موجودی Income
+   - Dividend **نه** سهام محسوب نمی‌شود، **نه** در `calculateProfitLoss()` (realized/unrealized)
+   - اما **یک درآمد محسوب می‌شود** و در Income بخش حسابداری ثبت می‌شود
 8. موجودی حساب بانکی و موجودی نقدی کارگزاری نمی‌توانند منفی شوند.
 9. تعداد سهم (`quantity`) نمی‌تواند منفی شود.
 10. **ویرایش/حذف معاملات**: تراکنش‌های سهام پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
@@ -166,6 +183,52 @@
 ### Transaction APIs
 - `createStockTransaction(data)` → خرید / فروش
 - `createBrokerageTransaction(data)` → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک به حساب بانکی
+- **`recordDividend(brokerageId, symbol, amount, date, description)` — NEW (CRITICAL)**
+  ```typescript
+  interface RecordDividendInput {
+    brokerageId: UUID
+    symbol: string     // نماد سهم (مثلاً فولاد)
+    amount: Decimal    // مبلغ سود نقدی (ریال)
+    date: datetime     // تاریخ دریافت سود
+    description: string // توضیح (مثلاً "Dividend from FOLAD - 1000 ریال/سهم")
+  }
+  ```
+  
+  **Process**:
+  ```
+  1. CREATE inv_stocks_iran_transactions {
+       type: 'dividend',
+       brokerageId,
+       symbol,
+       totalAmount: amount,
+       quantity: null,
+       price: null,
+       date
+     }
+  
+  2. CREATE acc_transactions {
+       type: 'deposit-income',
+       relatedFeature: 'stocks_iran',
+       relatedId: dividend_transaction.id,
+       amount,
+       date,
+       description: "Dividend: " + description,
+       accountId: brokerage.linkedBankAccountId  // کارگزاری کدام حساب بانکی لینک شده
+     }
+  
+  3. UPDATE inv_stocks_iran_brokerages {
+       cashBalance += amount
+     }
+  
+  4. RETURN { success: true, dividend_id, accounting_entry_id }
+  ```
+  
+  **Important**:
+  - ✅ Dividend میل شود `acc_transactions` (Income entry)
+  - ✅ Accounting Ledger یاد شود
+  - ✅ Bank account لینک شود (شفاف کجا پول رفت)
+  - ✅ NOT counted in Realized P&L (فقط درآمد، نه معامله)
+
 - `getStockTransactions(filters)`
 - `getBrokerageTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, brokerageId?)`

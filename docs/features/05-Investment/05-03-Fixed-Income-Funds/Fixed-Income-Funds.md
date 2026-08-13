@@ -54,9 +54,22 @@ Business Rules
   - `units` نمی‌تواند منفی شود.
   - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
 - تقسیم سود نقدی:
-  - مبلغ سود به عنوان درآمد ثبت می‌شود.
+  - **MUST ایجاد Income Transaction در `acc_transactions`**:
+    ```
+    acc_transactions {
+      type: 'deposit-income',
+      relatedFeature: 'fif',
+      relatedId: dividend_transaction_id,
+      amount: dividend_amount,
+      date: dividend_date,
+      description: "Dividend from [fundName]: [amount]",
+      accountId: linked_bank_account  // کجا پول رسید
+    }
+    ```
+  - مبلغ سود به عنوان درآمد ثبت می‌شود (Accounting Ledger میل شود)
   - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
   - `predictedProfit` در این تراکنش می‌تواند پر شود (برای مقایسه با سود واقعی).
+  - نه سهام محسوب نمی‌شود، نه در `calculateProfitLoss()` (realized/unrealized)
 - سرمایه‌گذاری مجدد سود:
   - به جای دریافت نقدی، تعداد واحد جدید خریداری و به Holding اضافه می‌شود.
   - `predictedProfit` در این تراکنش نیز می‌تواند پر شود.
