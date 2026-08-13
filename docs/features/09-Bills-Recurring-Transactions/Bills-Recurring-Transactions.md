@@ -75,7 +75,23 @@
 - `nextDueDate` → datetime (تاریخ سررسید بعدی)
 - `reminderDaysBefore` → number (چند روز قبل یادآوری شود)
 - `autoCreateTransaction` → boolean (ثبت خودکار تراکنش؟)
-- `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
+- `envelopeCategoryCode` → string (nullable — **کد دسته‌بندی پاکت** به جای `envelopeId` مستقیم؛ مثلاً `food`, `transport`)
+- `envelopeId` → UUID (nullable — **snapshot** آخرین envelope فعال با این `envelopeCategoryCode` در بودجه جاری — در زمان `markAsPaid()` به‌روزرسانی می‌شود، نه در زمان ایجاد `br_items`)
+
+> **چرا `envelopeCategoryCode` به جای `envelopeId` ثابت**:
+> - بودجه‌ها ماهانه بسته و دوباره ایجاد می‌شوند؛ هر دوره `bg_envelopes` جدید با `id` جدید ساخته می‌شود
+> - اگر `br_items.envelopeId` به envelope ماه قبل اشاره کند، `applyTransactionToBudget()` در ماه جدید روی envelope اشتباه اعمال می‌شود
+> - **راه‌حل**: `envelopeCategoryCode` به عنوان مرجع پایدار نگه داشته می‌شود؛ در زمان `markAsPaid()`، سیستم envelope فعال با این code را در بودجه جاری جستجو می‌کند:
+> ```
+> activeEnvelope = bg_envelopes WHERE categoryCode=envelopeCategoryCode AND budgetId=currentBudgetId AND isActive=true
+> if activeEnvelope exists:
+>   envelopeId = activeEnvelope.id  // snapshot آپدیت می‌شود
+>   applyTransactionToBudget(relatedId, relatedFeature, activeEnvelope.id, amount)
+> else:
+>   // پاکت برای ماه جاری تعریف نشده — بدون کسر بودجه، بدون خطا
+>   envelopeId = null
+> ```
+> - `envelopeId` snapshot است: برای lookup آپدیت می‌شود، اما هرگز به عنوان Foreign Key ثابت تکیه نمی‌شود
 - `isActive` → boolean
 - `description` → string
 - `createdAt` → datetime
