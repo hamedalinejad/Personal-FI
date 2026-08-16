@@ -804,3 +804,19 @@ interface EventBus {
 
 **۳. راه‌حل:** لیست مقادیر inline در `Accounts-Banking.md` کاملاً حذف شود و جای آن فقط به نوع مرکزی ارجاع داده شود («نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ مقادیر مجاز آنجا نگهداری می‌شود، اینجا تکرار نمی‌شود») — دقیقاً همان الگویی که در `Notification-Reminder-System.md` (خط ۶۲) به‌درستی به‌کار رفته و لیست را کپی نکرده است. این کار از drift مجدد در آینده (هر بار که مقدار جدیدی به `RelatedFeature` اضافه شود) جلوگیری می‌کند.
 
+
+### مورد ۵۷ — `Physical-Assets.md` مشخص نمی‌کند خرید/فروش دارایی فیزیکی با کدام مقدار `TransactionType` در `acc_transactions` ثبت می‌شود؛ برخلاف Metals/FIF/Crypto که صریحاً `deposit-investment`/`withdrawal-investment` را اعلام کرده‌اند
+
+**۱. باگ/ابهام:** طبق Business Rule ۳ و ۴ در `Physical-Assets.md`، خرید و فروش دارایی فیزیکی هر دو یک ردیف در `acc_transactions` ایجاد می‌کنند («تراکنش در `acc_transactions` ثبت می‌شود»)، اما هیچ‌جای این فایل مقدار `type` آن تراکنش (که باید یکی از ۱۲ مقدار enum مرکزی `TransactionType` در `types.md` باشد) را مشخص نمی‌کند. تنها اشاره‌های به `type = 'sale'` در این فایل (خط ۴۷، ۵۴) مربوط به فیلد داخلی جدول رویدادهای خودِ Physical Assets (مثلاً `pa_asset_events.type`) است، نه فیلد `acc_transactions.type`. این برخلاف الگوی سه فایل خواهر سرمایه‌گذاری است:
+- `Metals.md` (خط ۲۱۲): «واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`)»
+- `Fixed-Income-Funds.md` (خط ۸۴): «`type = 'deposit-investment'` یا `type = 'withdrawal-investment'`»
+- `Investment-Crypto.md` (خط ۲۳۸): همین دو مقدار برای واریز/برداشت صرافی
+
+چون `physical_assets` هم در enum مرکزی `RelatedFeature` وجود دارد و مفهوماً یک دسته سرمایه‌گذاری/دارایی است (نه Income/Expense معمولی)، منطقی‌ترین حدس این است که باید همان `deposit-investment`/`withdrawal-investment` استفاده شود — اما چون هیچ‌جا صریح نوشته نشده، پیاده‌سازی ممکن است به‌اشتباه از `withdrawal-expense` (برای خرید) و `deposit-income` (برای فروش) استفاده کند، که گزارش‌ها و آمار «هزینه» و «درآمد» را با خریدوفروش دارایی (که ماهیتاً سرمایه‌گذاری است، نه مصرف) قاطی می‌کند.
+
+**۲. محل:**
+- `docs/features/06-Physical-Assets/Physical-Assets.md` — Business Rule ۳ (خرید دارایی) و ۴ (فروش دارایی)
+- الگوی درست برای مقایسه: `docs/features/05-Investment/05-04-Metals/Metals.md` (خط ۲۱۲)، `docs/features/05-Investment/05-03-Fixed-Income-Funds/Fixed-Income-Funds.md` (خط ۸۴)، `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` (خط ۲۳۸)
+
+**۳. راه‌حل:** در Business Rule ۳ و ۴ صریحاً اضافه شود: «خرید دارایی فیزیکی → `acc_transactions.type = 'withdrawal-investment'`» و «فروش دارایی فیزیکی → `acc_transactions.type = 'deposit-investment'`» — هم‌راستا با سه فیچر سرمایه‌گذاری دیگر، تا `physical_assets` هم در آمارها و فیلترهای مبتنی‌بر `TransactionType` (مثلاً «مجموع واریز/برداشت سرمایه‌گذاری») به‌درستی لحاظ شود، نه به‌اشتباه در دسته درآمد/هزینه معمولی.
+
