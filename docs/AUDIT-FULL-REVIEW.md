@@ -27,7 +27,7 @@
 - [x] stores/stores.md
 - [x] styles/styles.md
 - [x] 00-Accounts-Banking
-- [ ] 01-Income
+- [x] 01-Income
 - [ ] 02-Expense
 - [ ] 03-Cheque-Management
 - [ ] 04-Debt-Loan-Management
@@ -317,3 +317,31 @@ interface EventBus {
 - منبع صحت: `docs/core/db/db.md` — بخش «قرارداد Snapshot در برابر Ledger (BUG-025)»
 
 **۳. راه‌حل:** امضای `getCurrentBalance` در `Accounts-Banking.md` صریح شود، مثلاً: «`getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')` — حالت `cached` مقدار `acc_accounts.currentBalance` (Snapshot سریع) را برمی‌گرداند؛ حالت `ledger` با فراخوانی معادل `rebuildAccountFromLedger` مقدار واقعی را از مجموع `acc_transactions` بازمحاسبه می‌کند (برای صفحاتی که نیاز به دقت کامل دارند، نه فقط نمایش سریع UI)».
+
+### مورد ۱۹ — مشخص نیست وقتی `correctIncome()` صدا زده می‌شود، خودِ رکورد `inc_transactions` (نه فقط `acc_transactions`) چطور اصلاح/Reversal می‌شود؛ ریسک ناهماهنگی `getTotalIncome()`
+
+**۱. باگ/ابهام:** Business Rule «ویرایش/حذف درآمد» در `Income.md` رفتار Reversal را فقط در سطح `acc_transactions` توضیح می‌دهد: «تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)، یک تراکنش معکوس ثبت می‌شود». اما `inc_transactions` (که جدول اختصاصیِ فیچر Income با فیلدهای `amount`, `date`, `category` است و مرجع واقعیِ `getTotalIncome()` محسوب می‌شود، نه `acc_transactions`) اصلاً در این توضیح ذکر نشده. API `correctIncome(id, data)` می‌گوید «یک تراکنش Reversal برای رکورد قبلی + یک تراکنش جدید با داده‌های اصلاح‌شده می‌سازد» اما مشخص نیست:
+- آیا رکورد `inc_transactions` قدیمی نگه داشته می‌شود و یک ردیف جدید در `inc_transactions` هم ساخته می‌شود (موازی با Reversal در `acc_transactions`)؟
+- یا `inc_transactions` مستقیماً UPDATE می‌شود (که با اصل Immutable Transactions کل پروژه در تناقض است)؟
+- اگر رکورد قدیمی `inc_transactions` دست‌نخورده بماند بدون نشانه Void، آنگاه `getTotalIncome(startDate, endDate)` که مستقیماً از `inc_transactions` جمع می‌زند (نه از `acc_transactions`)، مبلغ درآمد اصلاح‌شده (نادرست) را هم به همراه مبلغ جدید صحیح جمع می‌زند و مجموع نهایی غلط می‌شود — این دقیقاً همان کلاس باگ Snapshot/Ledush است که در `db.md` (BUG-025) به‌عنوان خطر Critical توصیف شده، ولی اینجا در سطح یک فیچر تکرار شده بدون راه‌حل مشخص.
+
+**۲. محل:**
+- `docs/features/01-Income/Income.md` — Business Rule «ویرایش/حذف درآمد» و API `correctIncome(id, data)`
+- وابسته: `docs/core/db/db.md` — بخش «قرارداد Snapshot در برابر Ledger (BUG-025)» و «Polymorphic FK»
+- وابسته احتمالی: تمام فیچرهای مشابه با الگوی Reversal دوسطحی (Expense، Cheque، Loan، Investment‌ها) که همین ابهام را ممکن است داشته باشند
+
+**۳. راه‌حل:** Business Rule صریح شود که رفتار در هر دو لایه هم‌زمان و atomic انجام می‌شود:
+1. ردیف قدیمی `inc_transactions` یک فیلد `isVoided`/`status` بگیرد (هم‌راستا با الگوی `acc_transactions`)
+2. یک ردیف **جدید** در `inc_transactions` برای داده اصلاح‌شده ساخته شود، با `accountTransactionId` اشاره به تراکنش جدید در `acc_transactions`
+3. `getTotalIncome()` و APIهای مشابه گزارش‌گیری صراحتاً مستند شود که فقط ردیف‌های `isVoided = false` را جمع می‌زنند
+این الگو باید یک‌بار به‌صورت عمومی در `db.md` (کنار BUG-025) مستند شود تا هر فیچر دوباره از صفر آن را تعریف نکند (نگاه کنید به مورد ۸ در همین سند که پیشنهاد مشابهی برای UI داده بود).
+
+---
+
+### مورد ۲۰ — استثنای «مگر از طریق درآمد تکرارشونده» برای قانون «درآمد نمی‌تواند در آینده ثبت شود» بلااستفاده/گمراه‌کننده به نظر می‌رسد
+
+**۱. باگ/ابهام:** Business Rule می‌گوید: «درآمد نمی‌تواند در آینده ثبت شود مگر اینکه از طریق درآمد تکرارشونده تولید شده باشد.» اما طبق API `generateRecurringIncomes() → تولید تراکنش‌های درآمد از روی قالب‌های فعال (Job روزانه)`، این Job **روزانه** اجرا می‌شود و فقط زمانی تراکنش تولید می‌کند که `nextOccurrence` رسیده باشد — یعنی طبیعتاً هرگز یک تاریخ آینده تولید نمی‌کند (تراکنش تولیدشده تاریخش «امروز» یا کمی گذشته است، نه آینده). پس این استثنا یا برای سناریویی است که مستند نشده (مثلاً پیش‌ثبت دستی چند ماه آینده)، یا صرفاً یک جمله اضافی/گمراه‌کننده است که فرض غلطی درباره رفتار Job روزانه ایجاد می‌کند.
+
+**۲. محل:** `docs/features/01-Income/Income.md` — Business Rules، و API `generateRecurringIncomes()`
+
+**۳. راه‌حل:** یا این استثنا حذف شود (چون طبق رفتار واقعی Job روزانه، تراکنش تکرارشونده هم هرگز در آینده ثبت نمی‌شود)، یا اگر منظور سناریوی دیگری است (مثلاً امکان مشاهده/پیش‌نمایش تراکنش‌های آتی بدون ثبت واقعی)، آن سناریو صریحاً توضیح داده شود.
