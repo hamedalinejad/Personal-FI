@@ -36,7 +36,7 @@
 - [x] 05-03-Fixed-Income-Funds
 - [x] 05-04-Metals
 - [x] 06-Physical-Assets
-- [ ] 07-Budget-Management
+- [x] 07-Budget-Management
 - [ ] 08-Financial-Goals
 - [ ] 09-Bills-Recurring-Transactions
 - [ ] 10-Notification-Reminder-System
@@ -508,3 +508,44 @@ interface EventBus {
 - `docs/features/06-Physical-Assets/Physical-Assets.md` — Business Rule #7، Domain Entity «۳. Physical Asset Transaction» (فیلد `type`)، API `changeAssetStatus`، API `calculateProfitLoss`
 
 **۳. راه‌حل:** مقدار `write_off` به enum فیلد `type` در `pa_transactions` اضافه شود (با `amount = -currentValue` یا فیلد مشخص برای زیان) و `changeAssetStatus(id, 'written_off')` صراحتاً موظف شود همزمان یک رکورد `pa_transactions` از نوع `write_off` بسازد؛ سپس `calculateProfitLoss()` توضیح دهد که هم `type=sale` و هم `type=write_off` را در جمع سود/زیان تحقق‌یافته لحاظ می‌کند.
+
+### مورد ۳۴ — بخش Rollover مقدار می‌دهد به `remainingAmount` که طبق «نکته طراحی» همین فایل یک فیلد محاسبه‌ای و ذخیره‌نشدنی است
+
+**۱. باگ/ابهام:** «نکته طراحی» زیر Domain Entity «۲. Budget Envelope» صراحتاً می‌گوید: «`remainingAmount` یک فیلد **محاسبه‌ای** است و در دیتابیس ذخیره نمی‌شود ... ذخیره این فیلد باعث out-of-sync با داده‌های واقعی می‌شود» و فرمولش `assignedAmount + rolloverAmount - spentAmount` است. اما در بخش «Rollover»، مراحل بستن بودجه این‌طور توصیف شده‌اند:
+```
+- rolloverAmount هر پاکت به مقدار remainingAmount آن به‌روزرسانی می‌شود.
+- remainingAmount هر پاکت صفر می‌شود.
+```
+جمله دوم («remainingAmount هر پاکت صفر می‌شود») یعنی مقداردهی مستقیم به یک فیلد که طبق تعریف رسمی همان فایل اصلاً در دیتابیس وجود ندارد و همیشه از سه فیلد دیگر محاسبه می‌شود — این از نظر فنی ناممکن است، مگر این‌که واقعاً منظور نویسنده تغییر `assignedAmount`/`spentAmount` به‌گونه‌ای باشد که نتیجه محاسبه صفر شود (که هیچ‌جا توضیح داده نشده کدام فیلد و چگونه).
+
+**۲. محل:**
+- `docs/features/07-Budget-Management/Budget-Management.md` — بخش «Rollover» در برابر «نکته طراحی» زیر Domain Entity «۲. Budget Envelope»
+
+**۳. راه‌حل:** جمله «`remainingAmount` هر پاکت صفر می‌شود» حذف شود (چون نتیجه‌ی خودکار محاسبه است، نه یک عملیات مجزا) و به‌جای آن صریحاً توضیح داده شود که در دوره جدید یک envelope تازه با `assignedAmount = 0`، `spentAmount = 0` و `rolloverAmount = <مقدار remainingAmount محاسبه‌شده در دوره قبل>` ساخته می‌شود — که خودبه‌خود `remainingAmount` دوره جدید را برابر `rolloverAmount` می‌کند (نه صفر).
+
+### مورد ۳۵ — هیچ API یا مکانیزمی برای انتقال `rolloverAmount` به بودجه/پاکت‌های **دوره بعدی** تعریف نشده (envelope به یک `budgetId` واحد محدود است)
+
+**۱. باگ/ابهام:** `bg_envelopes.budgetId` یک FK ثابت به یک رکورد مشخص در `bg_budgets` است (هر envelope متعلق به دقیقاً یک دوره بودجه). طبق بخش Rollover، هنگام `closeBudget()` مقدار `rolloverAmount` روی envelope‌های همان بودجه (بودجه‌ای که دارد بسته می‌شود) محاسبه می‌شود. اما بودجه دوره بعد (ماه/سال جدید) یک رکورد کاملاً جدید در `bg_budgets` با `id` جدید است (طبق `createBudget(data)`) که باید envelope‌های خودش را داشته باشد. هیچ‌جای این فایل توضیح نمی‌دهد:
+- چه چیزی envelope‌های دوره جدید را می‌سازد (کپی نام/دسته‌بندی از دوره قبل؟ یا کاربر باید دستی دوباره بسازد؟)
+- چگونه مقدار `rolloverAmount` محاسبه‌شده روی envelope دوره **قبل** (که بسته شده) به envelope **جدید** (با `budgetId` جدید و `id` جدید) منتقل می‌شود
+- API `createBudget(data)` هیچ پارامتری برای «کپی از بودجه قبلی + اعمال rollover» ندارد؛ `closeBudget(id)` هم فقط توضیح می‌دهد «بستن بودجه و اعمال Rollover» بدون اشاره به ساخت دوره بعد.
+این یک شکاف واقعی در APIهاست، نه فقط ابهام مستندسازی: بدون یک تابع مشخص (مثلاً `createNextPeriodBudget` یا پارامتر `copyFromBudgetId` در `createBudget`)، پیاده‌سازی Rollover عملاً ممکن نیست.
+
+**۲. محل:**
+- `docs/features/07-Budget-Management/Budget-Management.md` — بخش «Rollover»، API `createBudget(data)`، API `closeBudget(id)`
+
+**۳. راه‌حل:** یکی از دو مسیر مستند شود:
+- `closeBudget(id)` علاوه بر محاسبه Rollover، خودش بودجه دوره بعد را می‌سازد (envelope‌ها را از دوره قبل کپی می‌کند با `assignedAmount=0`, `spentAmount=0`, `rolloverAmount = remainingAmount محاسبه‌شده`) و `id` بودجه جدید را برمی‌گرداند.
+- یا `createBudget(data)` پارامتر اختیاری `copyFromBudgetId` می‌گیرد که envelope‌ها و مقادیر `rolloverAmount` را از بودجه مشخص‌شده منتقل می‌کند؛ در این صورت `closeBudget` فقط `status='closed'` می‌کند و ساخت دوره بعد جدا و صریح فراخوانی می‌شود.
+
+### مورد ۳۶ — رفتار `strictMode` هنگام کمبود موجودی پاکت بین «محدود شدن» و «رد شدن» مبهم رها شده
+
+**۱. باگ/ابهام:** Business Rule #4 می‌گوید: «اگر `strictMode = true`، ثبت هزینه محدود می‌شود (**یا** رد می‌شود)». این جمله دو رفتار فنی کاملاً متفاوت را با «یا» کنار هم گذاشته بدون انتخاب قطعی:
+- «محدود می‌شود» می‌تواند یعنی سقف در UI اعمال شود ولی ثبت نهایتاً انجام می‌شود (Soft Limit / هشدار سخت‌گیرانه‌تر)
+- «رد می‌شود» یعنی `createAssetTransaction`/معادل آن اصلاً خطا برمی‌گرداند و تراکنش هرگز ثبت نمی‌شود (Hard Block)
+این تفاوت مستقیماً روی UX و روی این‌که آیا هزینه واقعی کاربر (که مثلاً از حساب بانکی کسر شده) اصلاً قابل ثبت هست یا نه اثر می‌گذارد؛ اگر رد شود، تراکنش در `acc_transactions`/`exp_transactions` هم نباید ثبت شود که یعنی `strictMode` می‌تواند جلوی ثبت واقعی یک تراکنش مالی را بگیرد — این تصمیم باید قطعی باشد، نه یک «یا» باز.
+
+**۲. محل:**
+- `docs/features/07-Budget-Management/Budget-Management.md` — Business Rule #4، بخش «نکات طراحی» (تکرار همین ابهام: «اگر `remainingAmount <= 0`، ثبت هزینه محدود می‌شود»)
+
+**۳. راه‌حل:** یکی از دو رفتار به‌عنوان مرجع قطعی انتخاب شود. با توجه به این‌که بودجه صرفاً یک لایه مدیریتی روی هزینه‌های واقعی است (نه یک قید حسابداری مثل «موجودی حساب نمی‌تواند منفی شود»)، پیشنهاد می‌شود: حتی در `strictMode=true`، ثبت هزینه واقعی (`exp_transactions`/`acc_transactions`) هرگز رد نشود؛ فقط `applyTransactionToBudget` یک خطای اعتبارسنجی/هشدار قوی برمی‌گرداند که UI باید تأیید صریح کاربر را قبل از ادامه بگیرد — تا بودجه هرگز مانع ثبت واقعیت مالی نشود.
