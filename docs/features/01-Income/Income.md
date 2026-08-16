@@ -29,10 +29,17 @@ Business Rules
 ارزش تاریخی درآمد با نرخ زمان ثبت حفظ می‌شود.
 درآمد تکرارشونده در جدول جدا نگهداری می‌شود و از روی آن تراکنش واقعی تولید می‌شود.
 درآمد نمی‌تواند در آینده ثبت شود مگر اینکه از طریق درآمد تکرارشونده تولید شده باشد.
-**ویرایش/حذف درآمد**: تراکنش درآمد پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف:
-  - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
+**ویرایش/حذف درآمد**: تراکنش درآمد پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف، الگوی **دولایه Atomic** اجرا می‌شود (همه مراحل در یک BEGIN/COMMIT):
+
+  **لایه ۱ — `inc_transactions`**:
+  - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
+  - یک رکورد جدید در `inc_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
+
+  **لایه ۲ — `acc_transactions`**:
+  - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
   - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
-  - این رویکرد تاریخچه مالی را حفظ می‌کند و با اصل Immutable Transactions سازگار است.
+
+  > ⚠️ **قانون `getTotalIncome`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `inc_transactions` را جمع می‌زنند. در غیر این صورت مبلغ رکورد void‌شده و رکورد جدید هر دو در جمع می‌آیند و نتیجه غلط می‌شود.
 
 
 Domain Entities
@@ -50,6 +57,8 @@ Domain Entities
 - `attachmentPath` → string
 - `recurringId` → UUID (nullable — اگر از درآمد تکرارشونده تولید شده باشد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
+- `isVoided` → boolean (پیش‌فرض `false` — اگر `true`، این رکورد توسط `correctIncome`/`deleteIncome` باطل شده و در همه گزارش‌ها نادیده گرفته می‌شود)
+- `reversedIncomeId` → UUID (nullable — اگر این رکورد یک اصلاح است، id رکورد `inc_transactions` قبلی که void شده)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -93,11 +102,15 @@ APIهای داخلی (Internal APIs)
 Income Transaction APIs:
 
 createIncome(data) → ثبت درآمد + گرفتن نرخ تبدیل + ایجاد تراکنش + به‌روزرسانی مانده حساب
-correctIncome(id, data) → اصلاح درآمد؛ به‌صورت داخلی یک تراکنش Reversal برای رکورد قبلی + یک تراکنش جدید با داده‌های اصلاح‌شده می‌سازد (مطابق اصل Immutable Transactions — بخش ۱۱ Project-Blueprint). مبلغ/تاریخ/حساب هرگز مستقیم تغییر داده نمی‌شوند.
+correctIncome(id, data) → اصلاح درآمد — **الزاماً Atomic (BEGIN/COMMIT)**:
+  1. `inc_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
+  2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
+  3. INSERT رکورد جدید در `inc_transactions` با داده اصلاح‌شده، `reversedIncomeId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
+  4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
 updateIncomeMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllIncomes(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getIncomeById(id)
-getTotalIncome(startDate, endDate, accountId?, targetCurrency?) → مجموع درآمد با نرخ تاریخی
+getTotalIncome(startDate, endDate, accountId?, targetCurrency?) → مجموع درآمد با نرخ تاریخی — **فقط ردیف‌های `isVoided = false` از `inc_transactions`**
 
 Recurring Income APIs:
 
