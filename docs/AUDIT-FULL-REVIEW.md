@@ -793,3 +793,14 @@ interface EventBus {
 - **گزینه ۱**: `api_key_required` هم به جدول `failureKind` در `Price-Fetching.md` اضافه شود (با توضیح: «کلید API لازم برای این منبع تنظیم نشده») و صریحاً گفته شود در چه مسیری (دستی/Auto-Sync) این مقدار در `failed[]` ثبت می‌شود.
 - **گزینه ۲**: اگر منطق واقعی این است که کمبود کلید API همیشه مثل `offline` در `skipped[]` می‌رود (نه `failed[]`)، آنگاه `api_key_required` باید از enum `PriceFailureKind` در `types.md` حذف و جای آن یک مقدار مجاز برای `reason` در `skipped[]` (شبیه `'offline'`) تعریف شود، تا Union مرکزی TypeScript دقیقاً منعکس‌کننده رفتار واقعی مستندشده باشد.
 
+
+### مورد ۵۶ — فهرست مقادیر `RelatedFeature` که به‌صورت inline در `Accounts-Banking.md` تکرار شده، با تعریف مرکزی در `types.md` ناهماهنگ و ناقص است (۴ مقدار جا افتاده)
+
+**۱. باگ/ابهام:** فیلد `relatedFeature` در Domain Entity اصلی `acc_transactions` (`Accounts-Banking.md`) این‌طور مستند شده: «نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ مقادیر: `income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals`» — یعنی نویسنده لیست مقادیر را هم به‌صورت inline کپی کرده، نه فقط ارجاع به نوع مرکزی. اما نوع واقعی `RelatedFeature` در `core/types/types.md` **۱۶ مقدار** دارد، نه ۱۲ مورد ذکرشده در `Accounts-Banking.md`؛ چهار مقدار زیر در نسخه کپی‌شده جا افتاده‌اند: `bills`, `documents`, `price`, `accounts`. خودِ کامنت بالای تعریف `RelatedFeature` در `types.md` صراحتاً هشدار می‌دهد: «هیچ فایل دیگری نباید مقادیر ناسازگار ... تعریف کند» (BUG-023) — و این دقیقاً همان الگوی خطایی است که آن هشدار قرار بود جلوی آن را بگیرد: یک کپی دستی و ناقص از enum مرکزی، دقیقاً در مهم‌ترین جدول سیستم (`acc_transactions`). اگر توسعه‌دهنده‌ای طبق همین متن `Accounts-Banking.md` (بدون رجوع به `types.md`) پیاده‌سازی کند، فکر می‌کند مثلاً `relatedFeature='bills'` یا `relatedFeature='accounts'` مقدار نامعتبری است.
+
+**۲. محل:**
+- `docs/features/00-Accounts-Banking/Accounts-Banking.md` — خط ۴۴، تعریف فیلد `relatedFeature`
+- منبع صحت: `docs/core/types/types.md` — تعریف `RelatedFeature` (خط ۹۷ تا ۱۱۳)
+
+**۳. راه‌حل:** لیست مقادیر inline در `Accounts-Banking.md` کاملاً حذف شود و جای آن فقط به نوع مرکزی ارجاع داده شود («نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`؛ مقادیر مجاز آنجا نگهداری می‌شود، اینجا تکرار نمی‌شود») — دقیقاً همان الگویی که در `Notification-Reminder-System.md` (خط ۶۲) به‌درستی به‌کار رفته و لیست را کپی نکرده است. این کار از drift مجدد در آینده (هر بار که مقدار جدیدی به `RelatedFeature` اضافه شود) جلوگیری می‌کند.
+
