@@ -187,6 +187,9 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `price_sources` | Price Fetching | منابع/Providerهای قیمت |
 | `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only؛ دستی یا از API) |
 | `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
+| `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — Should Have |
+| `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی برای void/reversal/repair — Should Have |
+| `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف بررسی یکپارچگی قبل از archive والد — Should Have |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 
