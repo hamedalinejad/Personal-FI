@@ -35,7 +35,7 @@
 - [x] 05-02-Investment-Stocks-Iran
 - [x] 05-03-Fixed-Income-Funds
 - [x] 05-04-Metals
-- [ ] 06-Physical-Assets
+- [x] 06-Physical-Assets
 - [ ] 07-Budget-Management
 - [ ] 08-Financial-Goals
 - [ ] 09-Bills-Recurring-Transactions
@@ -475,3 +475,36 @@ interface EventBus {
 - `docs/features/05-Investment/05-04-Metals/Metals.md` — «نکته طراحی» زیر Domain Entity «۱. Metals Platform» (منبع صحت رفتار `cashBalance`)
 
 **۳. راه‌حل:** ردیف `reconcileMetalsPlatformCash(platformId)` به جدول APIهای Reconciliation در `db.md` اضافه شود که `cashBalance` را در برابر مجموع اثر هر دو منبع — Σ `inv_metals_platform_transactions` (deposit/withdraw) + Σ اثر نقدی `inv_metals_transactions` (خرید کسر می‌کند، فروش اضافه می‌کند، `deliveryFee` کسر می‌کند) — بررسی کند؛ همچنین به `reconcileAll()` اضافه شود.
+
+### مورد ۳۱ — Business Rule #5 می‌گوید `averageBuyPrice` هنگام **فروش** با Weighted Average به‌روزرسانی می‌شود؛ برخلاف الگوی رسمی پروژه در Metals/Crypto
+
+**۱. باگ/ابهام:** در Business Rules، بند ۵ («فروش جزئی در برابر فروش کامل») می‌گوید: «`averageBuyPrice` با Weighted Average به‌روزرسانی می‌شود (در فروش کامل بدون تأثیر عملی، چون دارایی بسته می‌شود)». اما Weighted Average طبق تعریف فقط برای **خرید** معنا دارد (میانگین‌گیری بین موجودی قبلی و مقدار تازه خریداری‌شده)؛ در فروش، الگوی رسمی و تکرارشونده در تمام فیچرهای مشابه پروژه (`Metals.md`: «averageBuyPricePerMg بدون تغییر می‌ماند»، `Investment-Crypto.md`: «averageBuyPrice استفاده‌شده = میانگین خرید قبل از این فروش») این است که میانگین خرید هنگام فروش **بدون تغییر** باقی می‌ماند و فقط `quantity`/`totalInvested` کاهش می‌یابند. جمله فعلی در این فایل یا اشتباه تایپی/مفهومی است (باید «بدون تغییر می‌ماند» باشد، نه «به‌روزرسانی می‌شود») یا اگر واقعاً منظور به‌روزرسانی است، با معماری تثبیت‌شده پروژه در تناقض است و باید دلیلش توضیح داده شود.
+
+**۲. محل:**
+- `docs/features/06-Physical-Assets/Physical-Assets.md` — Business Rules، بند ۵
+- در برابر (منبع صحت الگو): `docs/features/05-Investment/05-04-Metals/Metals.md` بخش «منطق محاسبه سود/زیان» و `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` بخش مشابه
+
+**۳. راه‌حل:** عبارت به «`averageBuyPrice` بدون تغییر باقی می‌ماند (فقط `quantity` به اندازه `quantitySold` کاهش می‌یابد؛ در فروش کامل که `quantity` به صفر می‌رسد، مقدار `averageBuyPrice` صرفاً بی‌اثر می‌شود نه این‌که واقعاً محاسبه جدیدی رخ دهد)» اصلاح شود تا با الگوی رسمی سایر فیچرهای سرمایه‌گذاری پروژه یکسان باشد.
+
+### مورد ۳۲ — طبقه‌بندی `electronics` بین «قابل‌تفکیک» و «غیرقابل‌تفکیک» در همین فایل ناسازگار است
+
+**۱. باگ/ابهام:** Business Rule #2 صراحتاً `electronics` را در گروه دسته‌های **غیرقابل‌تفکیک** قرار می‌دهد («برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است» — یعنی هرگز دو خرید روی یک asset ادغام نمی‌شوند، پس هرگز بیش از یک تراکنش خرید برای یک asset از این دسته‌ها وجود ندارد). اما در دو جای دیگر همین فایل، فرض می‌شود `electronics` می‌تواند **چند خرید روی یک asset** داشته باشد و نیازمند Weighted Average است:
+- توضیح فیلد `averageBuyPrice`: «فقط برای `gold`, `coin`, `electronics`» (در کنار دسته‌های قابل‌تفکیک، نه در کنار vehicle/real_estate)
+- یادداشت زیر جدول Domain Entity: «برای `electronics`: `averageBuyPrice` میانگین قیمت خرید به ازای هر قطعه است (**اگر چند قطعه خریده شود**)»
+این دو جمله فرض می‌کنند یک asset از نوع `electronics` می‌تواند چند بار خریداری/افزوده شود (مثلاً چند لپ‌تاپ زیر یک asset)، درحالی‌که Business Rule #2 دقیقاً همین رفتار را برای `electronics` رد کرده و آن را هم‌ردیف `vehicle`/`real_estate` (asset جدید مستقل برای هر خرید) قرار داده است.
+
+**۲. محل:**
+- `docs/features/06-Physical-Assets/Physical-Assets.md` — Business Rules بند ۲ (در برابر) Domain Entity «۱. Physical Asset»، فیلد `averageBuyPrice` و یادداشت زیر جدول
+
+**۳. راه‌حل:** یکی از دو رفتار به‌عنوان مرجع انتخاب شود:
+- اگر `electronics` واقعاً غیرقابل‌تفکیک است (مطابق Business Rule #2): توضیح فیلد `averageBuyPrice` و یادداشت «اگر چند قطعه خریده شود» حذف/اصلاح شوند تا `electronics` را از لیست دسته‌های Weighted-Average خارج کنند.
+- اگر منظور این است که چند *قطعه مشابه* در یک خرید واحد (نه چند خرید جداگانه) خریداری می‌شوند (مثلاً ۳ عدد موبایل مشابه در یک فاکتور): این باید صریحاً به‌عنوان استثنا در Business Rule #2 نوشته شود، نه این‌که در یک بخش نادیده گرفته شود.
+
+### مورد ۳۳ — وضعیت `written_off` هیچ رکورد تراکنش (`pa_transactions`) تولید نمی‌کند؛ زیان تحقق‌یافته بدون ثبت Immutable
+
+**۱. باگ/ابهام:** Business Rule #7 می‌گوید وقتی دارایی به `written_off` تغییر وضعیت می‌دهد، «زیان تحقق‌یافته به اندازه `currentValue` ثبت می‌شود» و `currentValue` صفر می‌شود. اما enum فیلد `type` در جدول `pa_transactions` فقط شامل `purchase`, `sale`, `expense` است — هیچ مقدار `write_off` یا مشابه آن وجود ندارد. API مربوطه هم `changeAssetStatus(id, status)` است که در توضیحش فقط می‌گوید «شامل تغییر به `written_off` با ثبت زیان» بدون مشخص‌کردن این‌که این «ثبت زیان» در کدام جدول و با چه ساختاری رخ می‌دهد. با توجه به الگوی Immutable Transactions پروژه (هر رویداد مالی باید یک رکورد تراکنش داشته باشد که در `calculateProfitLoss()` قابل جمع‌زدن باشد — دقیقاً مثل `type=sell` در Metals/Crypto)، نبود یک نوع تراکنش مشخص برای `write_off` یعنی این زیان یا اصلاً جایی لاگ نمی‌شود (فقط یک فیلد `status` تغییر می‌کند)، یا `calculateProfitLoss()` باید علاوه بر جمع‌زدن تراکنش‌های `type=sale`، جداگانه دارایی‌های `written_off` را هم اسکن کند — که این منطق دوگانه (هم بر مبنای Transaction Log و هم بر مبنای Asset Status) جایی مستند نشده.
+
+**۲. محل:**
+- `docs/features/06-Physical-Assets/Physical-Assets.md` — Business Rule #7، Domain Entity «۳. Physical Asset Transaction» (فیلد `type`)، API `changeAssetStatus`، API `calculateProfitLoss`
+
+**۳. راه‌حل:** مقدار `write_off` به enum فیلد `type` در `pa_transactions` اضافه شود (با `amount = -currentValue` یا فیلد مشخص برای زیان) و `changeAssetStatus(id, 'written_off')` صراحتاً موظف شود همزمان یک رکورد `pa_transactions` از نوع `write_off` بسازد؛ سپس `calculateProfitLoss()` توضیح دهد که هم `type=sale` و هم `type=write_off` را در جمع سود/زیان تحقق‌یافته لحاظ می‌کند.
