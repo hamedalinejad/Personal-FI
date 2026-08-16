@@ -70,7 +70,7 @@ stores/
 |------|-----|-------|
 | `isFetching` | `boolean` | آیا الان fetch در حال اجراست |
 | `fetchProgress` | `{ done: number; total: number } \| null` | برای نوار پیشرفت Bulk Fetch |
-| `lastFetchResult` | `FetchResult \| null` | خلاصه آخرین fetch (succeeded/failed) — فقط برای نمایش در UI؛ داده واقعی در `price_history` است |
+| `lastFetchResult` | `PriceFetchResult \| null` | خلاصه آخرین fetch (succeeded/failed) — فقط برای نمایش در UI؛ داده واقعی در `price_history` است |
 | `autoSyncActive` | `boolean` | آیا تایمر Auto-Sync الان در حال اجرا است |
 
 > این Store هیچ‌وقت قیمت‌های واقعی را کش نمی‌کند — فقط وضعیت UI عملیات fetch را نگه می‌دارد. آخرین قیمت واقعی همیشه از `price_history` (SQLite) از طریق `getLatestPrice()` خوانده می‌شود.
