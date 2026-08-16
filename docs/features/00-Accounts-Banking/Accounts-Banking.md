@@ -64,7 +64,11 @@ updateAccount(id, data)   // فقط ویرایش اطلاعات حساب
 getAllAccounts(includeArchived = false)
 getAccountById(id)
 archiveAccount(id)
-getCurrentBalance(accountId)
+getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')
+> - **`cached`** (پیش‌فرض): مقدار `acc_accounts.currentBalance` (Snapshot — سریع، برای نمایش UI)
+> - **`ledger`**: بازمحاسبه از مجموع `acc_transactions` با فراخوانی معادل `rebuildAccountFromLedger` (کند ولی همیشه دقیق — برای عملیات حساس مثل برداشت، انتقال، یا Reconciliation)
+>
+> ⚠️ **BUG-025**: `currentBalance` Snapshot است نه Ledger. برای هر عملیاتی که روی صحت موجودی حساس است (برداشت، انتقال)، حتماً `mode='ledger'` استفاده شود — جزئیات در `core/db/db.md → BUG-025`.
 
 Transaction:
 
