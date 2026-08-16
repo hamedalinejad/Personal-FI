@@ -539,11 +539,12 @@ Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) م
 | `reconcileAccount(accountId)` | `acc_accounts.currentBalance` ↔ Σ اثر `acc_transactions` غیرvoid روی همان حساب (با ترتیب تاریخ + `balanceAfterTransaction` در صورت وجود) |
 | `reconcileCryptoHolding(holdingId)` | `quantity` / `totalInvested` ↔ Σ `inv_crypto_transactions` |
 | `reconcileBrokerage(brokerageId)` | `cashBalance` ↔ Σ تراکنش‌های نقدی کارگزاری + لینک‌های `acc_transactions` |
+| `reconcileStockHolding(holdingId)` | `quantity` / `totalInvested` / `averageBuyPrice` ↔ Σ `inv_stocks_iran_transactions` (buy/sell) — محاسبه با Weighted Average از صفر |
 | `reconcileFund(holdingId)` | `units` / `totalInvested` ↔ Σ `inv_fif_transactions` (buy/sell/reinvest) |
 | `reconcileMetalsHolding(holdingId)` | `quantityMg` / `totalInvested` ↔ Σ `inv_metals_transactions` |
 | `reconcileLoan(loanId)` | مانده وام ↔ جدول اقساط / `ln_transactions` |
 | `reconcilePortfolio()` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
-| `reconcileAll()` | اجرای همه موارد بالا؛ خروجی گزارش یکپارچه |
+| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها)؛ خروجی گزارش یکپارچه |
 
 ### خروجی استاندارد هر reconcile
 
