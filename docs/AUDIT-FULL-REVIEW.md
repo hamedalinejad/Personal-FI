@@ -838,3 +838,23 @@ interface EventBus {
 - **گزینه ۱ (ساده‌تر)**: enum `category` را دقیقاً با نام‌های `RelatedFeature` هماهنگ کرد — یعنی `bill` → `bills` و `goal` → `goals` — تا `category` عملاً یک زیرمجموعه از `RelatedFeature` (به‌علاوه دو مقدار اضافه `system`/`custom` که ماهیتاً فیچر خاصی ندارند) باشد و بتوان مستقیم مقایسه‌شان کرد.
 - **گزینه ۲**: اگر `category` عمداً یک enum مستقل و UI-محور است (نه لزوماً هم‌ارز `RelatedFeature`)، یک جدول نگاشت صریح `category → relatedFeature` در همین سند مستند شود تا وابستگی بین این دو فیلد در سطح کد و منطق تولید اعلان روشن باشد.
 
+
+### مورد ۵۹ — دو محاسبه مستقل و ناهماهنگ برای «ثروت خالص» در دو فیچر جدا: `Reports-Analytics.getNetWorth()` و `Portfolio-Wealth-Overview.getPortfolioOverview()` (فیلد `netWealth`)؛ بدون هیچ توضیحی که این دو باید عدد یکسانی بدهند یا عمداً متفاوت‌اند
+
+**۱. باگ/ابهام:** دو فیچر جداگانه، دو API مستقل برای اساساً همان مفهوم («ثروت خالص کاربر») تعریف کرده‌اند:
+- `Reports-Analytics.md`: `getNetWorth(date?)` → طبق بخش «ساختار پیشنهادی Net Worth» (که موضوع موارد ۴۲، ۴۳، ۴۶ همین سند هم بوده)، دارایی‌ها منهای بدهی‌ها را در یک تاریخ مشخص برمی‌گرداند.
+- `Portfolio-Wealth-Overview.md`: `getPortfolioOverview()` → خروجی شامل `totalWealth`, `netWealth`, `totalWealthUSDT`, `netWealthUSDT` است؛ طبق Business Rule ۳ همین فایل، «بدهی‌ها و وام‌ها برای محاسبه ثروت خالص (Net Wealth) کسر می‌شوند» — یعنی همان تعریف مفهومی (دارایی منهای بدهی).
+
+بخش «توضیح کلی» `Portfolio-Wealth-Overview.md` این دو فیچر را «مکمل» معرفی می‌کند («Reports → گزارش‌های تحلیلی و خروجی»، «Portfolio → تمرکز عمیق روی ثروت و سرمایه‌گذاری‌ها») و در «روابط با سایر فیچرها» به Reports هم اشاره می‌کند («گزارش‌های تحلیلی عمیق‌تر»)، اما **هیچ‌جا مشخص نمی‌کند**:
+- آیا `netWealth` در `getPortfolioOverview()` باید دقیقاً همان عدد `getNetWorth()` در Reports را برگرداند (یعنی یکی Wrapper دیگری است یا هر دو از یک تابع Domain مشترک می‌خوانند)، یا
+- این دو عمداً متفاوت‌اند (مثلاً `getNetWorth` شامل موجودی نقدی بانکی همیشه است ولی `getPortfolioOverview.netWealth` طبق `includeCashInWealth` این پیش‌فرض `false` دارد — خط ۱۳۸ — و این‌طور کمتر است)؟
+
+اگر دو تابع مستقل هرکدام منطق محاسبه خودشان را (احتمالاً هر کدام توسط توسعه‌دهنده جدا) پیاده‌سازی کنند، ریسک واقعی این است که در UI کاربر دو عدد «ثروت خالص» متفاوت در Dashboard/Reports و در صفحه Portfolio ببیند بدون هیچ توضیحی برای این تفاوت — که برای یک اپ حسابداری مالی مستقیماً اعتماد کاربر را خدشه‌دار می‌کند.
+
+**۲. محل:**
+- `docs/features/11-Reports-Analytics/Reports-Analytics.md` — API `getNetWorth(date?)`، بخش «ساختار پیشنهادی Net Worth»
+- `docs/features/13-Portfolio-Wealth-Overview/Portfolio-Wealth-Overview.md` — API `getPortfolioOverview()`، Business Rule ۳، فیلدهای `netWealth`/`totalWealth`
+- وابسته: موارد ۴۲، ۴۳، ۴۶ همین سند (درباره ابهامات داخلی خودِ محاسبه Net Worth)
+
+**۳. راه‌حل:** یک تابع Domain واحد (مثلاً `calculateNetWorth(date, options)` در یک لایه مشترک، شاید `core/services`) تعریف شود که منبع حقیقت واحد محاسبه ثروت خالص باشد؛ هم `Reports-Analytics.getNetWorth()` و هم `Portfolio-Wealth-Overview.getPortfolioOverview()` باید این تابع مشترک را صدا بزنند (با پارامترهای متفاوت در صورت نیاز، مثلاً `includeCashInWealth`) به‌جای پیاده‌سازی مستقل و موازی. اگر عمداً قرار است دو عدد متفاوت باشند، این تفاوت (و دلیلش) باید صریحاً در هر دو سند مستند شود، مثلاً: «`netWealth` در Portfolio همیشه طبق `includeCashInWealth` پرتفوی محاسبه می‌شود و ممکن است با `getNetWorth` گزارش‌ها که همیشه موجودی بانکی را لحاظ می‌کند متفاوت باشد.»
+
