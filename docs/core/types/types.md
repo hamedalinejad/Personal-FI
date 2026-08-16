@@ -226,6 +226,29 @@ export type AppEvent =
   | { type: 'PriceFetchStarted'; payload: { symbols: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
   // نسخه برنامه
   | { type: 'VersionUpdateAvailable'; payload: { currentVersion: string; latestVersion: string; releaseNotesUrl: string } };
+
+export interface EventBus {
+  /**
+   * انتشار یک رویداد — sync و بلاکینگ:
+   * همه handlerهای ثبت‌شده برای این type به‌ترتیب ثبت فراخوانی می‌شوند.
+   * خروجی: void
+   */
+  emit<T extends AppEvent['type']>(
+    type: T,
+    payload: Extract<AppEvent, { type: T }>['payload']
+  ): void;
+
+  /**
+   * ثبت یک handler برای یک نوع رویداد.
+   * خروجی: تابع unsubscribe — فراخوانی آن handler را از لیست حذف می‌کند.
+   * الگوی استفاده: const unsub = eventBus.subscribe('TransactionCreated', handler)
+   *               // هنگام cleanup: unsub()
+   */
+  subscribe<T extends AppEvent['type']>(
+    type: T,
+    handler: (payload: Extract<AppEvent, { type: T }>['payload']) => void
+  ): () => void;
+}
 ```
 
 ---
