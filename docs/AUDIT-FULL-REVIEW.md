@@ -41,7 +41,7 @@
 - [x] 09-Bills-Recurring-Transactions
 - [x] 10-Notification-Reminder-System
 - [x] 11-Reports-Analytics
-- [ ] 12-Dashboard
+- [x] 12-Dashboard
 - [ ] 13-Portfolio-Wealth-Overview
 - [ ] 14-Tax-Management
 - [ ] 15-Document-Management
@@ -623,3 +623,22 @@ interface EventBus {
 - وابسته: مورد ۲۱ (همین سند)، `docs/features/03-Cheque-Management/Cheque-Management.md`
 
 **۳. راه‌حل:** پس از قطعی‌شدن راه‌حل مورد ۲۱ (پیشنهادشده: تابع `getAvailableBalance`)، یک سطر اختیاری «چک‌های پرداختی معلق (تعهد آتی)» به بخش بدهی‌ها یا یک نمای جایگزین «Net Worth بر مبنای موجودی در دسترس» اضافه شود تا کاربر بتواند بین «ثروت خالص بر مبنای موجودی فعلی» و «ثروت خالص بر مبنای موجودی در دسترس پس از تعهدات معلق» انتخاب کند.
+
+### مورد ۴۴ — ویجت «پرتفوی سرمایه‌گذاری» و خروجی `getDashboardData` یک `profitLoss` واحد نمایش می‌دهند؛ برخلاف قاعده تثبیت‌شده «عدم اختلاط Realized/Unrealized P&L»
+
+**۱. باگ/ابهام:** در تمام زیرفیچرهای سرمایه‌گذاری (`Investment-Crypto.md`, `Metals.md` و مشابه) به‌صراحت قاعده‌ای تکرار شده: «سود/زیان تحقق‌نیافته (Unrealized) جداگانه محاسبه می‌شود و **نباید** با Realized P&L مخلوط شود». اما در این فایل، هم ویجت «۶. پرتفوی سرمایه‌گذاری (خلاصه)» می‌گوید «سود/زیان **تقریبی**» (یک عدد واحد و مبهم)، و هم ساختار خروجی `getDashboardData` صریحاً `investments: { totalValue: number, profitLoss: number }` را با یک فیلد تکی `profitLoss` تعریف کرده — بدون تفکیک `realizedPL` و `unrealizedPL`. این هم با قاعده رسمی پروژه در تناقض است و هم از نظر محاسباتی گمراه‌کننده است، چون جمع‌کردن سود تحقق‌یافته (که واقعاً در حساب بانکی نشسته) با سود تحقق‌نیافته (که فقط روی کاغذ است و ممکن است نوسان کند) عددی می‌سازد که هیچ تصمیم مالی درستی نمی‌توان بر اساسش گرفت.
+
+**۲. محل:**
+- `docs/features/12-Dashboard/Dashboard.md` — ویجت «۶. پرتفوی سرمایه‌گذاری (خلاصه)»، ساختار خروجی `getDashboardData` (فیلد `investments.profitLoss`)
+- منبع صحت: `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md`، `docs/features/05-Investment/05-04-Metals/Metals.md` (قاعده عدم اختلاط Realized/Unrealized)
+
+**۳. راه‌حل:** فیلد `investments.profitLoss` به دو فیلد جدا تقسیم شود: `investments: { totalValue, realizedPL, unrealizedPL }`؛ ویجت هم می‌تواند یک عدد ترکیبی («سود/زیان کل») را در UI نمایش دهد اما باید در tooltip یا زیرمتن تفکیک Realized/Unrealized را نشان دهد، نه این‌که داده منبع را از ابتدا ترکیب کند.
+
+### مورد ۴۵ — محل ذخیره‌سازی «تنظیمات هر ویجت» بین «درون JSON» یا «جدول جدا» به‌صورت تصمیم‌نگرفته رها شده
+
+**۱. باگ/ابهام:** Domain Entity «۲. Dashboard Widget Config» با عنوان «(درون JSON یا جدول جدا)» معرفی شده — دقیقاً یک تصمیم معماری حل‌نشده که به‌جای انتخاب قطعی، هر دو گزینه را کنار هم گذاشته است. این با Domain Entity «۱. Dashboard Layout» هم همپوشانی دارد، چون `dash_layouts.widgets` از قبل یک فیلد JSON است که «لیست ویجت‌ها + ترتیب + تنظیمات هر ویجت» را در خودش نگه می‌دارد — یعنی به نظر می‌رسد Entity #2 صرفاً شِمای منطقی همان چیزی است که باید داخل JSON فیلد #1 قرار بگیرد، نه یک جدول SQL مجزا؛ اما عنوان «یا جدول جدا» این را نامشخص باقی می‌گذارد.
+
+**۲. محل:**
+- `docs/features/12-Dashboard/Dashboard.md` — Domain Entity «۱. Dashboard Layout» و «۲. Dashboard Widget Config»
+
+**۳. راه‌حل:** با توجه به این‌که Business Rule ۱ می‌گوید «داشبورد ... منطق کسب‌وکار ندارد» و پیچیدگی چیدمان ویجت نیازی به Query رابطه‌ای ندارد، پیشنهاد می‌شود Entity #2 صرفاً به‌عنوان **schema داخل فیلد JSON** `dash_layouts.widgets` مستند شود (نه جدول SQL مجزا) و عنوان «(درون JSON یا جدول جدا)» به «(ساختار هر آیتم درون فیلد JSON `dash_layouts.widgets`)» تغییر کند.
