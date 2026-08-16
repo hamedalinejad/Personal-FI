@@ -47,6 +47,21 @@ services/
 ### Event Bus
 ارتباط بین فیچرها بدون وابستگی مستقیم (`import`). فهرست کامل و به‌روز رویدادها همیشه در `types.md → events.ts` (تعریف `AppEvent`) است؛ جدول زیر باید با هر تغییر در `AppEvent` به‌روز شود (قانون ۶ در `types.md`).
 
+**قرارداد سرویس (interface کامل در `types.md → EventBus`):**
+
+| متد | امضا | توضیح |
+|-----|------|-------|
+| `emit` | `emit<T>(type, payload): void` | انتشار رویداد به همه handlerهای ثبت‌شده |
+| `subscribe` | `subscribe<T>(type, handler): () => void` | ثبت handler؛ خروجی تابع unsubscribe است |
+
+**قوانین رفتاری (الزامی در هر implementation):**
+
+1. **Sync — نه Async**: `emit` همیشه synchronous است؛ همه handlerها در همان call stack فراخوانی می‌شوند. هیچ Promise یا microtask queue وسط نیست.
+2. **Error Isolation**: اگر یک handler خطا پرتاب کند، handler باید آن را با `try/catch` ایزوله کند تا سایر handlerها اجرا شوند — یک handler بد کل Event Bus را متوقف نمی‌کند. خطا در `logger` ثبت می‌شود.
+3. **Unsubscribe الزامی**: هر component/service پس از unmount یا destroy باید تابع برگشتی `subscribe` را فراخوانی کند تا memory leak نداشته باشیم.
+4. **بدون wildcard**: subscribe فقط برای یک `type` مشخص از `AppEvent` است — بدون `subscribe('*', handler)`.
+5. **بدون persistence**: رویدادها در حافظه زنده‌اند؛ هیچ رویدادی در SQLite یا LocalStorage ذخیره نمی‌شود.
+
 | رویداد | دسته | توضیح |
 |--------|------|-------|
 | `TransactionCreated` | حساب | هر بار که یک تراکنش مالی ثبت می‌شود |
