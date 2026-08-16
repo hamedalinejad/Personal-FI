@@ -31,7 +31,7 @@
 - [x] 02-Expense
 - [x] 03-Cheque-Management
 - [x] 04-Debt-Loan-Management
-- [ ] 05-01-Investment-Crypto
+- [x] 05-01-Investment-Crypto
 - [ ] 05-02-Investment-Stocks-Iran
 - [ ] 05-03-Fixed-Income-Funds
 - [ ] 05-04-Metals
@@ -397,3 +397,25 @@ interface EventBus {
 - **گزینه ۱ (محدود)**: `cancelLoan` فقط روی وام‌هایی مجاز باشد که هنوز هیچ پرداختی (`installment_payment`) ثبت نکرده‌اند — مشابه دقیق محدودیت `updateLoan` — و اگر پرداختی وجود دارد، خطا برگرداند و کاربر را به `voidTransaction`/Reversal دستی راهنمایی کند
 - **گزینه ۲ (کامل)**: `cancelLoan` به‌صورت خودکار تمام تراکنش‌های مرتبط (`disbursement` + همه پرداخت‌ها) را در `acc_transactions` reversal کند تا موجودی حساب کاملاً به حالت قبل از وام برگردد، سپس `status = 'cancelled'` شود
 با توجه به الگوی «Immutable Transactions» پروژه، گزینه ۱ ساده‌تر و کم‌ریسک‌تر است و پیشنهاد می‌شود.
+
+### مورد ۲۵ — تعریف فیلد `network` در Domain Entities (بخش‌های ۴ و ۵) با تصمیمات BUG-005 و BUG-006 در همان فایل هماهنگ نشده (تناقض درون‌فایلی)
+
+**۱. باگ/ابهام:** در انتهای `Investment-Crypto.md`، دو بخش اصلاحی صریح وجود دارد:
+- **BUG-006** («networkId روی Transaction»): می‌گوید صراحتاً «**ممنوع**: فیلد متنی آزاد `network` با مقادیر `TRC20`/`TRON`/`tron`» و باید از `networkId` (FK به `inv_crypto_wallet_networks`) استفاده شود.
+- **BUG-005** («تفکیک Cash Movement و On-chain Transfer»): می‌گوید «فیلدهای `network`/`txHash` روی جدول exchange cash **deprecate** می‌شوند اگر هنوز در متن باشند».
+
+اما تعریف واقعی Domain Entities در بالای همان فایل (که این دو بخش اصلاحی قرار است روی آن اعمال شوند) هنوز اصلاح نشده:
+- بخش «۴. Crypto Transaction (`inv_crypto_transactions`)» هنوز `network → string (nullable...)` را به‌عنوان نوع فیلد لیست کرده — نه `networkId` (UUID، FK)، دقیقاً همان چیزی که BUG-006 «ممنوع» اعلام کرده.
+- بخش «۵. Crypto Exchange Transaction (`inv_crypto_exchange_transactions`)» هم هنوز `network → string (nullable...)` را دارد — دقیقاً همان فیلدی که BUG-005 گفته «deprecate می‌شود اگر هنوز در متن باشد» (که هست).
+
+این یعنی هرکسی که فقط بخش «Domain Entities» را بخواند (بدون رسیدن به بخش‌های BUG در انتهای فایل)، فیلد اشتباه (`network: string`) را پیاده‌سازی می‌کند.
+
+**۲. محل:**
+- `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` — بخش «۴. Crypto Transaction» (فیلد `network`) و بخش «۵. Crypto Exchange Transaction» (فیلد `network`)
+- در برابر: همان فایل — بخش‌های «networkId روی Transaction (BUG-006)» و «تفکیک Cash Movement و On-chain Transfer (BUG-005)»
+- وابسته: `docs/core/db/db.md` — در صورتی‌که ساختار جدول آنجا هم تکرار شده باشد
+
+**۳. راه‌حل:**
+- در بخش «۴»، فیلد `network → string` به `networkId → UUID (nullable — FK به inv_crypto_wallet_networks؛ الزامی برای type=transfer_in/transfer_out بین والت‌ها)` تغییر کند و متن قدیمی حذف شود.
+- در بخش «۵»، طبق تصمیم صریح BUG-005 که این فیلد را برای جدول cash-movement اساساً نامربوط می‌داند، فیلد `network` (و به همراه آن `txHash`, `blockNumber`, `confirmations` که همگی طبق جدول BUG-005 فقط باید در `inv_crypto_transactions` باشند نه در جدول cash) کاملاً از تعریف `inv_crypto_exchange_transactions` حذف شوند.
+- به‌طور کلی، وقتی یک بخش BUG در انتهای فایل، فیلدی در Domain Entities را اصلاح/ممنوع می‌کند، تعریف اصلی همان لحظه به‌روزرسانی شود، نه این‌که هر دو نسخه (قدیمی در بالا، تصمیم جدید در پایین) هم‌زمان در فایل باقی بمانند.
