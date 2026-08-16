@@ -820,3 +820,21 @@ interface EventBus {
 
 **۳. راه‌حل:** در Business Rule ۳ و ۴ صریحاً اضافه شود: «خرید دارایی فیزیکی → `acc_transactions.type = 'withdrawal-investment'`» و «فروش دارایی فیزیکی → `acc_transactions.type = 'deposit-investment'`» — هم‌راستا با سه فیچر سرمایه‌گذاری دیگر، تا `physical_assets` هم در آمارها و فیلترهای مبتنی‌بر `TransactionType` (مثلاً «مجموع واریز/برداشت سرمایه‌گذاری») به‌درستی لحاظ شود، نه به‌اشتباه در دسته درآمد/هزینه معمولی.
 
+
+### مورد ۵۸ — enum `category` در `Notification-Reminder-System.md` با enum مرکزی `RelatedFeature` هم‌پوشانی مفهومی دارد ولی نام‌گذاری دو مقدار مشترک (`bill` در برابر `bills`، `goal` در برابر `goals`) ناهماهنگ است
+
+**۱. باگ/ابهام:** جدول `notif_notifications` و `notif_settings` هر دو فیلد `category` را با مقادیر `bill, loan, cheque, budget, goal, tax, system, custom` تعریف کرده‌اند. همزمان، `notif_notifications` فیلد جداگانه `relatedFeature` هم دارد که «نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`» است (مقادیر: `..., bills, ..., goals, ...` — به‌صورت جمع). یعنی یک رکورد اعلان هم‌زمان دو فیلد مرتبط‌به‌دسته دارد (`category` و `relatedFeature`) که برای همان مفهوم (مثلاً «این اعلان درباره قبض است») باید مقدار هماهنگ داشته باشند، اما نام‌گذاری‌شان دقیقاً یکی نیست:
+- `category = 'bill'` (مفرد) در برابر `relatedFeature = 'bills'` (جمع)
+- `category = 'goal'` (مفرد) در برابر `relatedFeature = 'goals'` (جمع)
+- (`loan`, `cheque`, `budget`, `tax` در هر دو enum یکسان و مفرد هستند — فقط همین دو مورد ناهماهنگ‌اند)
+
+این عدم‌تطابق رشته‌ای دقیقاً همان کلاس خطایی است که در موارد قبلی این سند (مثلاً موارد ۵۴ و ۵۶ درباره enum های drift‌کرده) دیده شد: اگر منطق `generateDueReminders()` یا هر تابع دیگری بخواهد بین `category` و `relatedFeature` نگاشت یا مقایسه بزند (مثلاً «برای اعلان‌های `category='bill'`، `relatedFeature` باید `'bills'` ست شود»)، بدون یک جدول نگاشت صریح، به‌راحتی می‌تواند این دو مقدار را به‌اشتباه یکسان فرض کند (`category === relatedFeature`) که برای این دو مورد کار نمی‌کند.
+
+**۲. محل:**
+- `docs/features/10-Notification-Reminder-System/Notification-Reminder-System.md` — Domain Entity «۱. Notification» (فیلدهای `category` و `relatedFeature`) و «۲. Notification Setting» (فیلد `category`)
+- منبع صحت: `docs/core/types/types.md` — تعریف `RelatedFeature`
+
+**۳. راه‌حل:** یکی از دو مسیر انتخاب شود:
+- **گزینه ۱ (ساده‌تر)**: enum `category` را دقیقاً با نام‌های `RelatedFeature` هماهنگ کرد — یعنی `bill` → `bills` و `goal` → `goals` — تا `category` عملاً یک زیرمجموعه از `RelatedFeature` (به‌علاوه دو مقدار اضافه `system`/`custom` که ماهیتاً فیچر خاصی ندارند) باشد و بتوان مستقیم مقایسه‌شان کرد.
+- **گزینه ۲**: اگر `category` عمداً یک enum مستقل و UI-محور است (نه لزوماً هم‌ارز `RelatedFeature`)، یک جدول نگاشت صریح `category → relatedFeature` در همین سند مستند شود تا وابستگی بین این دو فیلد در سطح کد و منطق تولید اعلان روشن باشد.
+
