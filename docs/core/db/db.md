@@ -728,6 +728,29 @@ Ledger correct + Snapshot wrong  → rebuild snapshot from ledger
 Ledger wrong                     → reversal/corrective transactions (never silent snapshot edit as truth)
 ```
 
+### الگوی عمومی اصلاح تراکنش دولایه (Two-Layer Atomic Correction)
+
+هر فیچری که جدول اختصاصی تراکنش دارد (`inc_transactions`، `exp_transactions`، `chk_cheques`، ...) **و** این تراکنش‌ها در `acc_transactions` هم ثبت می‌شوند، باید برای اصلاح/حذف از این الگو پیروی کند — نه فقط از یک لایه:
+
+```
+BEGIN TRANSACTION;
+
+── لایه ۱: جدول اختصاصی فیچر ──────────────────────────────────────
+  feature_table[id].isVoided = true       -- علامت‌گذاری رکورد قدیمی
+  INSERT new_feature_row (data_corrected, reversedId=id, ...)  -- رکورد جدید
+
+── لایه ۲: acc_transactions ────────────────────────────────────────
+  acc_transactions[accountTransactionId].isVoided = true   -- void تراکنش اصلی
+  INSERT reversal_acc_tx (type=reversal, amount=-original)  -- معکوس موجودی
+  INSERT new_acc_tx (type=original_type, amount=corrected)  -- تراکنش صحیح جدید
+
+COMMIT;
+```
+
+> **قانون فیلتر گزارش‌گیری**: هر API که از جدول اختصاصی فیچر جمع می‌زند (`getTotalIncome`، `getTotalExpense`، ...) **باید** `WHERE isVoided = false` داشته باشد. در غیر این صورت رکورد void‌شده و رکورد جدید هر دو در جمع می‌آیند و نتیجه غلط می‌شود.
+>
+> **فیلد `isVoided`**: باید در جدول اختصاصی هر فیچر (نه فقط `acc_transactions`) وجود داشته باشد — این الزامی است، نه اختیاری.
+
 ---
 
 ## Multi-Tab Concurrency (BUG-031)
