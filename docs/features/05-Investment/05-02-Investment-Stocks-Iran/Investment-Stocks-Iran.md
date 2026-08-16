@@ -139,6 +139,37 @@ feeAmount =
 - `getHoldings(brokerageId?)`
 - `getHoldingBySymbol(symbol, brokerageId?)`
 - `getPortfolioValue()`
+- **`reconcileStockHolding(holdingId)`** → مقایسه `quantity` / `totalInvested` / `averageBuyPrice` snapshot با محاسبه از صفر از روی لاگ تراکنش‌ها
+
+  ```typescript
+  reconcileStockHolding(holdingId: UUID): ReconcileResult & {
+    fields: {
+      quantity:        { stored: Decimal; calculated: Decimal; match: boolean }
+      totalInvested:   { stored: Decimal; calculated: Decimal; match: boolean }
+      averageBuyPrice: { stored: Decimal; calculated: Decimal; match: boolean }
+    }
+  }
+  ```
+
+  **الگوریتم محاسبه** (Weighted Average از صفر از `inv_stocks_iran_transactions` غیر‌void، به‌ترتیب `date ASC`):
+  ```
+  qty = 0 | totalInvested = 0
+
+  برای هر تراکنش:
+    buy:  totalInvested += (quantity × price) + feeAmount
+          qty           += quantity
+    sell: soldCost       = quantity × (totalInvested / qty)
+          totalInvested -= soldCost
+          qty           -= quantity
+
+  averageBuyPrice = qty > 0 ? totalInvested / qty : 0
+  ```
+
+  **در صورت Mismatch**: ثبت در `fin_audit_log` + هشدار به کاربر + گزینه Repair (بازسازی snapshot از لاگ با تأیید کاربر).
+
+- **`rebuildStockHolding(holdingId)`** → بازسازی کامل `quantity` / `totalInvested` / `averageBuyPrice` از لاگ تراکنش‌ها و آپدیت atomic در `inv_stocks_iran_holdings`
+
+  **زمان استفاده الزامی**: پس از هر Reversal (void) تراکنش سهام، پس از Migration، پس از Import/Restore.
 
 ### Transaction
 - `createStockTransaction(data)`
