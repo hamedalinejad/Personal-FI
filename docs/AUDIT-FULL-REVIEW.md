@@ -38,7 +38,7 @@
 - [x] 06-Physical-Assets
 - [x] 07-Budget-Management
 - [x] 08-Financial-Goals
-- [ ] 09-Bills-Recurring-Transactions
+- [x] 09-Bills-Recurring-Transactions
 - [ ] 10-Notification-Reminder-System
 - [ ] 11-Reports-Analytics
 - [ ] 12-Dashboard
@@ -562,3 +562,25 @@ interface EventBus {
 - اگر مبلغ برداشتی از کمک‌های `source ∈ {manual, transfer}` تأمین شود: مجاز به ایجاد تراکنش واقعی در `acc_transactions` برای `accountId` است.
 - اگر از کمک‌های `source ∈ {budget, income}` تأمین شود: برداشت فقط باید `currentAmount` را کاهش دهد و رکورد `fg_contributions` با `type='withdraw'`, `source` متناظر و `accountTransactionId = null` بسازد — **بدون** ایجاد تراکنش بانکی واقعی، چون پولی که باید برگردد از ابتدا در همان حساب بانکی باقی مانده بود.
 همچنین اگر `accountId` در فراخوانی `withdrawFromGoal` پاس داده شود ولی مبلغ (یا بخشی از آن) از کمک‌های بدون پول واقعی تأمین می‌شود، API باید خطای اعتبارسنجی برگرداند یا صراحتاً مستند شود که فقط بخش «واقعی» مبلغ به حساب واریز می‌شود.
+
+### مورد ۳۸ — «نکات طراحی» ادعا می‌کند نرخ تتر در `br_occurrences`/زمان پرداخت ذخیره می‌شود، اما هیچ فیلد `exchangeRateToBase` در Domain Entities این فیچر تعریف نشده
+
+**۱. باگ/ابهام:** در بخش «نکات طراحی» آمده: «نرخ تتر در زمان ایجاد Occurrence یا پرداخت ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند.» این جمله دقیقاً همان الگوی تثبیت‌شده در تمام فیچرهای دیگر پروژه است (`exchangeRateToBase` روی هر رویداد مالی). اما در تعریف واقعی جداول این فیچر — نه `br_items` و نه `br_occurrences` — هیچ فیلدی به نام `exchangeRateToBase` (یا مشابه) وجود ندارد. بدون این فیلد، جمله «نکات طراحی» عملاً قابل‌اجرا نیست: هیچ‌جایی برای ذخیره نرخ تتر لحظه‌ای Occurrence یا پرداخت پیش‌بینی نشده، و گزارش‌های تاریخی نسبت به دلار/تتر که سایر فیچرها (Metals, Physical Assets, Investment و ...) به‌طور مستمر پشتیبانی می‌کنند، برای قبوض/تکرارشونده‌ها اصلاً ممکن نخواهد بود.
+
+**۲. محل:**
+- `docs/features/09-Bills-Recurring-Transactions/Bills-Recurring-Transactions.md` — بخش «نکات طراحی» در برابر Domain Entity «۱. Bill/Recurring Item» و «۲. Bill/Recurring Occurrence»
+
+**۳. راه‌حل:** فیلد `exchangeRateToBase → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر)` به جدول `br_occurrences` اضافه شود (در لحظه `markAsPaid()` پر می‌شود، مشابه سایر فیچرها) و در API `markAsPaid(brOccurrenceId, amount, date, accountId?)` نیز پارامتر یا رفتار پرکردن این فیلد صراحتاً ذکر شود.
+
+### مورد ۳۹ — رفتار سیستم هنگام رسیدن `nextDueDate` به بعد از `endDate` مشخص نشده
+
+**۱. باگ/ابهام:** فیلد `endDate` روی `br_items` به‌عنوان «در صورت محدود بودن» تعریف شده (یعنی تاریخ پایان تکرار). اما هیچ Business Rule یا توضیح API‌ای مشخص نمی‌کند وقتی `generateUpcomingOccurrences()` (Job دوره‌ای) محاسبه می‌کند که `nextDueDate` بعد از `endDate` قرار می‌گیرد چه اتفاقی باید بیفتد:
+- آیا Occurrence جدید اصلاً تولید نمی‌شود؟
+- آیا `isActive` به‌صورت خودکار `false` می‌شود؟
+- آیا صرفاً یادآوری متوقف می‌شود ولی رکورد فعال باقی می‌ماند؟
+بدون این مشخصات، پیاده‌سازی ممکن است بی‌نهایت Occurrence بعد از تاریخ پایان مورد نظر کاربر تولید کند (باگ واقعی، نه فقط ابهام مستندسازی) چون هیچ شرط توقفی در «منطق محاسبه تاریخ سررسید بعدی» یا در `generateUpcomingOccurrences()` ذکر نشده است.
+
+**۲. محل:**
+- `docs/features/09-Bills-Recurring-Transactions/Bills-Recurring-Transactions.md` — Domain Entity «۱. Bill/Recurring Item» (فیلد `endDate`)، بخش «منطق محاسبه تاریخ سررسید بعدی»، API `generateUpcomingOccurrences()`
+
+**۳. راه‌حل:** یک قاعده صریح اضافه شود: «اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، Occurrence جدید تولید نمی‌شود و `isActive` این مورد به‌صورت خودکار `false` می‌شود» — و این رفتار هم در Business Rules و هم در توضیح `generateUpcomingOccurrences()` ذکر شود.
