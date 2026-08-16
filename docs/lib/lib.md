@@ -19,7 +19,7 @@ lib/
 > TanStack Query/React Query برای کش‌کردن نتیجه fetch از API خارجی طراحی شده؛ در این پروژه هیچ API خارجی‌ای برای داده مالی وجود ندارد — همه داده‌ها از SQLite محلی می‌آیند. بنابراین TanStack Query **جزء وابستگی‌های این پروژه نیست** و هیچ `react-query.ts` یا `QueryClient` در این پوشه یا هیچ‌جای پروژه وجود ندارد. State ناشی از کوئری‌های دیتابیس در Zustand Storeها نگه‌داری می‌شود (به `docs/stores/stores.md` مراجعه کنید).
 
 > **چرا `storage.ts` در این پوشه نیست؟**  
-> لایه انتزاعی روی LocalStorage به‌صورت `localStorageService.ts` در `core/services/storage/` تعریف شده (به `docs/core/services/services.md` مراجعه کنید) تا در کنار سایر سرویس‌های زیرساختی مثل IndexedDB Service باشد. **دو فایل جداگانه برای یک مسئولیت ایجاد نشود** — هر کدی که با LocalStorage/Session Storage کار دارد از `core/services/storage/localStorageService.ts` استفاده می‌کند.
+> لایه انتزاعی روی LocalStorage به‌صورت `localStorageService.ts` در `core/services/storage/` تعریف شده (به `docs/core/services/services.md` مراجعه کنید) تا در کنار سایر سرویس‌های زیرساختی مشابه (مثل `sessionStorageService`) باشد. توجه: `indexedDbService` عمداً در پروژه وجود ندارد — نوشتن/خواندن IndexedDB مستقیماً در `core/db/db.ts` با الگوی Write-to-temp-then-swap انجام می‌شود (به بخش «چرا `indexedDbService.ts` از پروژه حذف شد؟» در `services.md` مراجعه کنید). **دو فایل جداگانه برای یک مسئولیت ایجاد نشود** — هر کدی که با LocalStorage/Session Storage کار دارد از `core/services/storage/localStorageService.ts` استفاده می‌کند.
 
 ---
 
