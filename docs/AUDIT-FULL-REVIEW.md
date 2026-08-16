@@ -212,5 +212,21 @@ src/
 
 **۳. راه‌حل:** یک ردیف/دسته جدید به جدول قوانین نام‌گذاری اضافه شود، مثلاً: «`fin_` / `ref_` → Core مشترک (نه مختص یک فیچر) — برای جداول زیرساختی مثل Audit Trail و Integrity Queue که به همه فیچرها خدمت می‌کنند».
 
+---
+
+### مورد ۱۱ — فقدان `reconcileStockHolding` برای دارایی سهام؛ `ReconcileScope` سهام را پوشش نمی‌دهد
+
+**۱. باگ/ابهام:** جدول APIهای Reconciliation در `db.md` برای هر نوع دارایی سرمایه‌گذاری یک تابع اختصاصی دارد: `reconcileCryptoHolding`، `reconcileFund`، `reconcileMetalsHolding` — که هرکدام `quantity`/`units`/`totalInvested` را با مجموع تراکنش‌های همان Holding می‌سنجند. اما برای سهام ایران فقط `reconcileBrokerage` تعریف شده که طبق توضیح خودش فقط `cashBalance` (موجودی نقدی کارگزاری) را در برابر تراکنش‌های نقدی می‌سنجد — هیچ تابعی برای مقایسه `quantity`/`averageBuyPrice` خودِ `inv_stocks_iran_holdings` با مجموع تراکنش‌های خرید/فروش سهام وجود ندارد. همچنین `ReconcileScope` (union type در `types.md`) مقدار `'crypto_holding'`, `'fund'`, `'metals_holding'` دارد اما معادل سهام (`'stock_holding'`) در این Union نیست.
+
+**۲. محل:**
+- `docs/core/types/types.md` — بخش `reconciliation.ts`، تعریف `ReconcileScope`
+- `docs/core/db/db.md` — بخش «قرارداد Reconciliation مرکزی»، جدول APIهای مشترک
+- وابسته: `docs/features/05-Investment/05-02-Investment-Stocks-Iran/Investment-Stocks-Iran.md`
+
+**۳. راه‌حل:**
+- افزودن مقدار `'stock_holding'` به `ReconcileScope` در `types.md`
+- افزودن ردیف `reconcileStockHolding(holdingId)` به جدول APIهای Reconciliation در `db.md`، با همان الگوی سایر Holdingها: `quantity` / `totalInvested` ↔ Σ `inv_stocks_iran_transactions` (buy/sell)
+- به‌روزرسانی `reconcileAll()` تا این تابع جدید را هم شامل شود
+
 
 
