@@ -39,7 +39,7 @@
 - [x] 07-Budget-Management
 - [x] 08-Financial-Goals
 - [x] 09-Bills-Recurring-Transactions
-- [ ] 10-Notification-Reminder-System
+- [x] 10-Notification-Reminder-System
 - [ ] 11-Reports-Analytics
 - [ ] 12-Dashboard
 - [ ] 13-Portfolio-Wealth-Overview
@@ -584,3 +584,22 @@ interface EventBus {
 - `docs/features/09-Bills-Recurring-Transactions/Bills-Recurring-Transactions.md` — Domain Entity «۱. Bill/Recurring Item» (فیلد `endDate`)، بخش «منطق محاسبه تاریخ سررسید بعدی»، API `generateUpcomingOccurrences()`
 
 **۳. راه‌حل:** یک قاعده صریح اضافه شود: «اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، Occurrence جدید تولید نمی‌شود و `isActive` این مورد به‌صورت خودکار `false` می‌شود» — و این رفتار هم در Business Rules و هم در توضیح `generateUpcomingOccurrences()` ذکر شود.
+
+### مورد ۴۰ — قاعده «بدون اعلان تکراری برای رویداد یکسان» بدون هیچ مکانیزم Uniqueness یا فیلد کمکی برای تشخیص تکرار مستند نشده
+
+**۱. باگ/ابهام:** Business Rule ۷ و بخش «نکات طراحی» هر دو تأکید می‌کنند: «سیستم نباید اعلان تکراری برای یک رویداد یکسان ایجاد کند». اما `generateDueReminders()` طبق «نکات طراحی» یک **Job دوره‌ای** است که «هر چند ساعت یک‌بار» اجرا می‌شود. هیچ‌جای سند (نه در Domain Entity `notif_notifications`، نه در توضیح API `createNotification`/`generateDueReminders`) مشخص نمی‌کند این Job چگونه تشخیص می‌دهد که برای یک رویداد مشخص (مثلاً همان `relatedFeature`+`relatedId` با همان سررسید) قبلاً اعلان ساخته شده یا نه — نه Unique Constraint‌ای مثل `UNIQUE(relatedFeature, relatedId, category, scheduledAt)` تعریف شده، نه فیلدی مثل `dedupeKey` وجود دارد. بدون این مکانیزم، هر بار اجرای Job (مثلاً هر ۳-۶ ساعت) می‌تواند برای همان قبض/قسط/چک معوق دوباره اعلان جدید بسازد — دقیقاً همان چیزی که قاعده ۷ ممنوع کرده.
+
+**۲. محل:**
+- `docs/features/10-Notification-Reminder-System/Notification-Reminder-System.md` — Business Rule ۷، «نکات طراحی»، Domain Entity «۱. Notification»، API `generateDueReminders()`
+
+**۳. راه‌حل:** یک قید یکتایی منطقی تعریف شود، مثلاً: قبل از ایجاد اعلان جدید در `generateDueReminders()`، بررسی شود که آیا اعلان دیگری با همان `(relatedFeature, relatedId, category)` که هنوز مربوط به همان دوره سررسید است (`scheduledAt` در همان بازه، یا هنوز `isRead=false` و برای همان رویداد) از قبل وجود دارد؛ اگر بله، اعلان جدید ساخته نشود (یا فقط `scheduledAt`/محتوای موجود به‌روزرسانی شود). این منطق باید صریحاً در توضیح `generateDueReminders()` نوشته شود.
+
+### مورد ۴۱ — دو منبع مستقل و ناهماهنگ برای «چند روز قبل یادآوری» قبوض وجود دارد: `br_items.reminderDaysBefore` و `notif_settings.daysBefore`
+
+**۱. باگ/ابهام:** در `Bills-Recurring-Transactions.md`، هر `br_items` فیلد مستقل `reminderDaysBefore` دارد (تنظیم به ازای هر قبض/مورد تکرارشونده). اما در `Notification-Reminder-System.md`، جدول `notif_settings` هم یک `daysBefore` **سراسری به‌ازای هر دسته** (`category`, از جمله `category='bill'`) تعریف کرده است. این یعنی برای یک قبض مشخص دو مقدار ممکن است هم‌زمان وجود داشته باشد (مثلاً `br_items.reminderDaysBefore = 3` ولی `notif_settings` برای `category='bill'` می‌گوید ۷ روز) بدون این‌که هیچ‌جا مشخص شود کدام‌یک اولویت دارد، یا آیا `notif_settings.daysBefore` فقط برای مواردی است که `reminderDaysBefore` در سطح آیتم تنظیم نشده (fallback)، یا این‌که این دو اصلاً برای دو منظور متفاوت‌اند و باید هر دو به‌طور هم‌زمان اعمال شوند (که غیرمنطقی است).
+
+**۲. محل:**
+- `docs/features/09-Bills-Recurring-Transactions/Bills-Recurring-Transactions.md` — Domain Entity «۱. Bill/Recurring Item»، فیلد `reminderDaysBefore`
+- `docs/features/10-Notification-Reminder-System/Notification-Reminder-System.md` — Domain Entity «۲. Notification Setting»، فیلد `daysBefore`
+
+**۳. راه‌حل:** رابطه این دو فیلد صریح شود؛ پیشنهاد: `notif_settings.daysBefore` به‌عنوان **مقدار پیش‌فرض سراسری** هر دسته عمل کند و `br_items.reminderDaysBefore` (در صورت پرشدن، غیر null) آن را override کند — یعنی `generateDueReminders()` ابتدا بررسی می‌کند آیا رکورد سطح‌آیتم مقدار خاصی تنظیم کرده، در غیر این صورت از `notif_settings` دسته مربوطه استفاده می‌کند. این منطق باید در بخش «نکات طراحی» یا توضیح `generateDueReminders()` صریحاً نوشته شود.
