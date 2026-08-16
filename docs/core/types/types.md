@@ -246,6 +246,7 @@ export type ReconcileScope =
   | 'account'
   | 'crypto_holding'
   | 'brokerage'
+  | 'stock_holding'
   | 'fund'
   | 'metals_holding'
   | 'loan'
