@@ -44,7 +44,7 @@
 - [x] 12-Dashboard
 - [x] 13-Portfolio-Wealth-Overview
 - [x] 14-Tax-Management
-- [ ] 15-Document-Management
+- [x] 15-Document-Management
 - [ ] 16-Settings-Tools
 - [ ] 17-Currency-CrossRate
 - [ ] 18-Security-Privacy
@@ -666,3 +666,18 @@ interface EventBus {
 **۳. راه‌حل:** یکی از دو مسیر صریح شود:
 - **گزینه ۱**: پارامترهای `relatedFeature?`/`relatedId?` از امضای `payTax` حذف شوند؛ این مقادیر فقط در `createTaxRecord`/`updateTaxRecord` قابل تنظیم باشند (چون به منشأ مالیاتی رکورد اشاره دارند، نه به عملیات پرداخت).
 - **گزینه ۲**: اگر واقعاً منظور از این پارامترها چیز دیگری است (مثلاً منبع تأمین مالی پرداخت)، نام آن‌ها به چیزی مجزا مثل `paymentSourceFeature`/`paymentSourceId` تغییر کند تا با فیلدهای اصلی `tax_records` اشتباه گرفته نشود.
+
+### مورد ۴۸ — دو مسیر همزمان برای اتصال سند به رکورد (`docs_documents.relatedFeature/relatedId` مستقیم و جدول `docs_links`) مشخص نمی‌کند `getDocumentsByRelated()` هر دو منبع را می‌خواند یا نه
+
+**۱. باگ/ابهام:** طبق طراحی، یک سند می‌تواند از **دو مسیر مستقل** به یک رکورد متصل شود:
+- مسیر ساده: فیلدهای `relatedFeature`/`relatedId` مستقیماً روی خود `docs_documents` (برای اتصال یک‌به‌یک)
+- مسیر چندبه‌چند: رکورد جداگانه در `docs_links` (وقتی یک سند به چند رکورد متصل است)
+
+سند صراحتاً می‌گوید: «در حالت ساده‌تر ... می‌توان از `docs_links` صرف‌نظر کرد» — یعنی هر دو مسیر هم‌زمان و به‌صورت مجاز در سیستم وجود دارند. اما API `getDocumentsByRelated(feature, relatedId)` که قرار است «اسناد متصل به یک رکورد» را برگرداند، هیچ توضیحی ندارد که آیا این کوئری هر دو منبع (هم `docs_documents` مستقیم، هم JOIN با `docs_links`) را با هم ترکیب می‌کند یا فقط یکی را می‌خواند. اگر پیاده‌سازی فقط یکی از این دو منبع را Query کند (که محتمل‌ترین اشتباه است، چون هیچ‌کدام به‌عنوان «منبع اصلی» مشخص نشده)، اسنادی که از مسیر دیگر متصل شده‌اند در نتیجه گم می‌شوند — مثلاً یک فاکتور که فقط با `docs_documents.relatedFeature='loan'` ثبت شده، وقتی صفحه وام آن سند را با فراخوانی مبتنی‌بر `docs_links` می‌خواهد بگیرد، اصلاً دیده نمی‌شود.
+
+**۲. محل:**
+- `docs/features/15-Document-Management/Document-Management.md` — Domain Entity «۱. Document» (فیلدهای `relatedFeature`/`relatedId`)، Domain Entity «۲. Document Link»، API `getDocumentsByRelated(feature, relatedId)`
+
+**۳. راه‌حل:** یکی از دو مسیر انتخاب شود:
+- **گزینه ۱ (ساده‌تر)**: مسیر مستقیم روی `docs_documents` کاملاً حذف شود و همیشه از `docs_links` استفاده شود (حتی برای اتصال یک‌به‌یک، فقط یک رکورد در `docs_links` ساخته می‌شود) — این باعث می‌شود همیشه یک منبع واحد و قابل Query وجود داشته باشد.
+- **گزینه ۲**: هر دو مسیر نگه داشته شوند ولی `getDocumentsByRelated()` صراحتاً مستند شود که همیشه UNION هر دو منبع (`docs_documents` مستقیم + JOIN با `docs_links`) را برمی‌گرداند، و همین قرارداد در `linkDocument()`/`unlinkDocument()` هم رعایت شود (تا مشخص باشد این توابع کدام جدول را دستکاری می‌کنند).
