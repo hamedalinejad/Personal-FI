@@ -37,7 +37,7 @@
 - [x] 05-04-Metals
 - [x] 06-Physical-Assets
 - [x] 07-Budget-Management
-- [ ] 08-Financial-Goals
+- [x] 08-Financial-Goals
 - [ ] 09-Bills-Recurring-Transactions
 - [ ] 10-Notification-Reminder-System
 - [ ] 11-Reports-Analytics
@@ -549,3 +549,16 @@ interface EventBus {
 - `docs/features/07-Budget-Management/Budget-Management.md` — Business Rule #4، بخش «نکات طراحی» (تکرار همین ابهام: «اگر `remainingAmount <= 0`، ثبت هزینه محدود می‌شود»)
 
 **۳. راه‌حل:** یکی از دو رفتار به‌عنوان مرجع قطعی انتخاب شود. با توجه به این‌که بودجه صرفاً یک لایه مدیریتی روی هزینه‌های واقعی است (نه یک قید حسابداری مثل «موجودی حساب نمی‌تواند منفی شود»)، پیشنهاد می‌شود: حتی در `strictMode=true`، ثبت هزینه واقعی (`exp_transactions`/`acc_transactions`) هرگز رد نشود؛ فقط `applyTransactionToBudget` یک خطای اعتبارسنجی/هشدار قوی برمی‌گرداند که UI باید تأیید صریح کاربر را قبل از ادامه بگیرد — تا بودجه هرگز مانع ثبت واقعیت مالی نشود.
+
+### مورد ۳۷ — `withdrawFromGoal(goalId, amount, accountId?)` بین برداشت‌های با پول واقعی (`manual`/`transfer`) و برچسب‌گذاری‌های بدون پول واقعی (`budget`/`income`) تمایز قائل نمی‌شود؛ ریسک تولید پول از هیچ
+
+**۱. باگ/ابهام:** طبق قاعده ۱۰ و ۱۰a، وقتی یک کمک (`fg_contributions`) با `source='budget'` یا `source='income'` ثبت می‌شود، **هیچ پول واقعی جابه‌جا نمی‌شود** — فقط یک برچسب داخلی است و `accountTransactionId = null` می‌ماند (پول از قبل در حساب بانکی کاربر هست و فقط از نظر مفهومی به هدف اختصاص یافته). اما API برداشت، `withdrawFromGoal(goalId, amount, accountId?)`، هیچ پارامتر `source` یا هیچ منطقی برای تشخیص این‌که مبلغ در حال برداشت از کدام نوع کمک(ها) تأمین می‌شود ندارد. اگر کاربر مثلاً ۱۰ میلیون ریال با `source='budget'` (بدون تراکنش بانکی واقعی) به یک هدف اختصاص داده باشد و سپس `withdrawFromGoal(goalId, 10_000_000, accountId=X)` را صدا بزند، طبق توضیح API («برداشت از هدف + آپدیت `currentAmount`») این تابع باید یک تراکنش واریز واقعی در `acc_transactions` برای حساب `X` ایجاد کند — یعنی ۱۰ میلیون ریال واقعی به حساب بانکی کاربر اضافه می‌شود درحالی‌که هرگز پول واقعی از جایی کسر نشده بود (چون کمک اولیه فقط برچسب بود). این دقیقاً همان کلاس خطای «دوبار شمارش / تولید پول از هیچ» است که قاعده ۱۰a صریحاً برای سمت *واریز* هشدار داده («ایجاد یک تراکنش بانکی واقعی جداگانه برای این حالت ممنوع است»)، اما برای سمت *برداشت* هیچ قاعده مشابهی نوشته نشده.
+
+**۲. محل:**
+- `docs/features/08-Financial-Goals/Financial-Goals.md` — Business Rule ۵، API `withdrawFromGoal(goalId, amount, accountId?)`
+- وابسته: قاعده ۱۰ و ۱۰a (منبع صحت رفتار «برچسب‌گذاری بدون پول واقعی»)، Domain Entity «۲. Goal Contribution» (فیلد `source`)
+
+**۳. راه‌حل:** `withdrawFromGoal` باید منطق FIFO یا مشابه روی `fg_contributions` همان هدف اعمال کند تا مشخص شود مبلغ در حال برداشت از کدام کمک‌ها تأمین می‌شود:
+- اگر مبلغ برداشتی از کمک‌های `source ∈ {manual, transfer}` تأمین شود: مجاز به ایجاد تراکنش واقعی در `acc_transactions` برای `accountId` است.
+- اگر از کمک‌های `source ∈ {budget, income}` تأمین شود: برداشت فقط باید `currentAmount` را کاهش دهد و رکورد `fg_contributions` با `type='withdraw'`, `source` متناظر و `accountTransactionId = null` بسازد — **بدون** ایجاد تراکنش بانکی واقعی، چون پولی که باید برگردد از ابتدا در همان حساب بانکی باقی مانده بود.
+همچنین اگر `accountId` در فراخوانی `withdrawFromGoal` پاس داده شود ولی مبلغ (یا بخشی از آن) از کمک‌های بدون پول واقعی تأمین می‌شود، API باید خطای اعتبارسنجی برگرداند یا صراحتاً مستند شود که فقط بخش «واقعی» مبلغ به حساب واریز می‌شود.
