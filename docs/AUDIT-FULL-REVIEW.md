@@ -43,7 +43,7 @@
 - [x] 11-Reports-Analytics
 - [x] 12-Dashboard
 - [x] 13-Portfolio-Wealth-Overview
-- [ ] 14-Tax-Management
+- [x] 14-Tax-Management
 - [ ] 15-Document-Management
 - [ ] 16-Settings-Tools
 - [ ] 17-Currency-CrossRate
@@ -651,3 +651,18 @@ interface EventBus {
 - `docs/features/13-Portfolio-Wealth-Overview/Portfolio-Wealth-Overview.md` — Business Rule ۲ (در برابر) «نکته مهم - جلوگیری از تکرار در محاسبه موجودی نقدی» و Domain Entity «۲. Portfolio Setting» (فیلد `includeCashInWealth`) و بخش «ساختار ثروت و پرتفوی»
 
 **۳. راه‌حل:** Business Rule ۲ اصلاح شود تا با تعریف واقعی سوییچ هماهنگ باشد، مثلاً: «حساب‌های بانکی همیشه و بدون قید در محاسبه ثروت کل لحاظ می‌شوند (طبق ساختار ثروت). سوییچ `includeCashInWealth` صرفاً کنترل می‌کند موجودی نقدی ریال/تتر نگهداری‌شده در صرافی‌های رمزارز و کارگزاری‌های سهام ایران (که در جداول Investment مربوطه ذخیره می‌شود، نه در `acc_accounts`) در محاسبه ثروت کل لحاظ شود یا نه.»
+
+### مورد ۴۷ — پارامترهای `relatedFeature?`/`relatedId?` در API `payTax()` با فیلدهای هم‌نام روی خودِ `tax_records` (که در `createTaxRecord` تنظیم می‌شوند) همپوشانی دارند بدون توضیح رابطه‌شان
+
+**۱. باگ/ابهام:** جدول `tax_records` از قبل دو فیلد `relatedFeature` و `relatedId` دارد که در زمان ایجاد رکورد (`createTaxRecord`) پر می‌شوند و طبق توضیح صریح فایل، برای «مالیات مرتبط با یک زیرفیچر خاص» (مثلاً مالیات سود سرمایه‌گذاری کریپتو) استفاده می‌شوند. اما امضای API `payTax(taxRecordId, { paidDate, accountId, amount?, relatedFeature?, relatedId? })` دوباره همین دو پارامتر را (این‌بار اختیاری، در زمان پرداخت) می‌پذیرد، بدون این‌که مشخص شود:
+- آیا این‌ها همان مقدار اولیه `tax_records.relatedFeature/relatedId` را override می‌کنند؟
+- یا مفهوم کاملاً متفاوتی دارند (مثلاً این‌که پرداخت مالیات از طریق کدام مکانیزم دیگر — مثل یک وام یا چک — تأمین مالی شده)؟
+- اگر override می‌کنند، آیا این باعث نمی‌شود پیوند اصلی رکورد مالیاتی به رویداد سرمایه‌گذاری مبدأ (که برای `tax.getTaxableEvents`/`linkedTaxRecordId` حیاتی است) گم شود؟
+این ابهام مهم است چون `relatedFeature`/`relatedId` در معماری پروژه (طبق `db.md`) نقش کلیدی در ردیابی و Reconciliation دارند و داشتن دو منبع بالقوه برای یک مقدار (یکی روی خود رکورد، یکی به‌عنوان پارامتر تابع پرداخت) دقیقاً همان کلاس ریسکی است که در سایر بخش‌های این سند (مثلاً enum ناسازگار در Metals، یا فیلدهای تعریف‌نشده در Physical Assets) پیش‌تر باعث ابهام شده بود.
+
+**۲. محل:**
+- `docs/features/14-Tax-Management/Tax-Management.md` — Domain Entity «۱. Tax Record» (فیلدهای `relatedFeature`, `relatedId`)، API `payTax(...)`
+
+**۳. راه‌حل:** یکی از دو مسیر صریح شود:
+- **گزینه ۱**: پارامترهای `relatedFeature?`/`relatedId?` از امضای `payTax` حذف شوند؛ این مقادیر فقط در `createTaxRecord`/`updateTaxRecord` قابل تنظیم باشند (چون به منشأ مالیاتی رکورد اشاره دارند، نه به عملیات پرداخت).
+- **گزینه ۲**: اگر واقعاً منظور از این پارامترها چیز دیگری است (مثلاً منبع تأمین مالی پرداخت)، نام آن‌ها به چیزی مجزا مثل `paymentSourceFeature`/`paymentSourceId` تغییر کند تا با فیلدهای اصلی `tax_records` اشتباه گرفته نشود.
