@@ -394,18 +394,51 @@ IndexedDB
 
 # 16. Documentation Structure
 
-ساختار مستندات پروژه به صورت زیر خواهد بود.
+ساختار واقعی مستندات پروژه (پس از اعمال ADR-001 — تاریخ: ۱۴۰۴/۰۵/۲۵):
 
 ```text
 docs/
-
-00-Product/
-01-Business/
-02-Design/
-03-Technical/
-04-Project/
-99-Future-Ideas/
+  00-Product/                   # نقشه محصول، IA صفحات
+  core/                         # معماری هسته مشترک
+    db/                         # اسکیمای پایگاه داده و الگوهای نوشتن
+    hooks/                      # React Hooks مشترک
+    rounding/                   # سیاست گرد کردن اعداد مالی
+    services/                   # سرویس‌های دامین مشترک
+    types/                      # تعریف مرکزی تمام نوع‌ها و enum ها (منبع حقیقت)
+    utils/                      # توابع کمکی مشترک
+  features/                     # یک پوشه به ازای هر فیچر، با پیشوند عددی
+    00-Accounts-Banking/
+    01-Income/
+    02-Expense/
+    03-Cheque-Management/
+    04-Debt-Loan-Management/
+    05-Investment/               # شامل ۴ زیرفیچر (Crypto, Stocks-Iran, FIF, Metals)
+    06-Physical-Assets/
+    07-Budget-Management/
+    08-Financial-Goals/
+    09-Bills-Recurring-Transactions/
+    10-Notification-Reminder-System/
+    11-Reports-Analytics/
+    12-Dashboard/
+    13-Portfolio-Wealth-Overview/
+    14-Tax-Management/
+    15-Document-Management/
+    16-Settings-Tools/
+    17-Currency-CrossRate/
+    18-Security-Privacy/
+    19-Price-Fetching/           # شامل ۴ زیرفیچر (Crypto, Stock, FIF, Metals Prices)
+    99-Common-Categories/
+  lib/                          # وابستگی‌های خارجی و wrapper ها
+  stores/                       # مدیریت وضعیت (State Management)
+  styles/                       # تعریف‌های سبک و تم
+  Product-Map-FA.md             # نقشه محصول (فارسی)
+  Product-Map-EN.md             # نقشه محصول (انگلیسی)
+  Project-Blueprint.md          # همین سند — مرجع رسمی معماری
+  Technical-Architecture.md     # معماری فنی کامل
+  AUDIT-FULL-REVIEW.md          # گزارش ممیزی مستمر مستندات
 ```
+
+> **تغییر از ساختار اولیه:** ساختار اولیه پیشنهادی (`01-Business/`, `02-Design/`, `03-Technical/`, `04-Project/`, `99-Future-Ideas/`) در عمل جایگزین شد با ساختار فوق که بین لایه‌های فنی (`core/`, `lib/`, `stores/`, `styles/`) و فیچرهای محصولی (`features/`) تفکیک می‌کند. این تصمیم به‌عنوان ADR-001 ثبت شده است (بخش ۱۸).
 
 جزئیات هر بخش در فایل‌های اختصاصی همان پوشه تعریف می‌شود.
 
@@ -452,6 +485,61 @@ docs/
 * تغییرات مهم قوانین سیستم
 
 هیچ تصمیم مهمی نباید فقط در کد اعمال شود.
+
+---
+
+## ADR-001 — تغییر ساختار پوشه‌بندی مستندات
+
+| فیلد | مقدار |
+|---|---|
+| **شناسه** | ADR-001 |
+| **تاریخ** | ۱۴۰۴/۰۵/۲۵ |
+| **وضعیت** | Accepted |
+| **تصمیم‌گیرنده** | hamedalinejad |
+
+### زمینه
+
+ساختار اولیه پیشنهادی در بخش ۱۶ این سند (`01-Business/`, `02-Design/`, `03-Technical/`, `04-Project/`, `99-Future-Ideas/`) بر اساس تفکیک نوع مخاطب (بیزنس، طراحی، فنی، پروژه) طراحی شده بود. در عمل، مستندات پروژه حول دو محور اصلی رشد کردند:
+- لایه‌های فنی مشترک (پایگاه داده، نوع‌ها، سرویس‌ها، State)
+- فیچرهای محصولی که هر کدام منطق، اسکیما، و APIهای مستقل خود را دارند
+
+### تصمیم
+
+ساختار پوشه‌بندی مستندات از ساختار مخاطب‌محور به ساختار لایه‌محور تغییر یافت:
+
+**قبل:**
+```text
+docs/
+  00-Product/
+  01-Business/
+  02-Design/
+  03-Technical/
+  04-Project/
+  99-Future-Ideas/
+```
+
+**بعد:**
+```text
+docs/
+  00-Product/
+  core/
+  features/
+  lib/
+  stores/
+  styles/
+```
+
+### دلایل
+
+1. **یکپارچگی فیچر**: همه مستندات یک فیچر (اسکیما، Business Rules، API، روابط) در یک پوشه است — نه پراکنده بین `02-Design/` و `03-Technical/`.
+2. **منبع حقیقت واحد برای هر لایه**: `core/types/` منبع مرکزی همه enum ها و نوع‌هاست؛ `core/db/` منبع مرکزی اسکیماست — بدون تکرار در پوشه‌های مجزا.
+3. **مقیاس‌پذیری**: اضافه کردن فیچر جدید = اضافه کردن یک پوشه زیر `features/` بدون تغییر ساختار کلی.
+
+### پیامدها
+
+- پوشه‌های `01-Business/`, `02-Design/`, `03-Technical/`, `04-Project/`, `99-Future-Ideas/` هرگز ساخته نخواهند شد.
+- مستندات طراحی (UX/UI)، بیزنس، و فنی هر فیچر در پوشه همان فیچر زیر `features/` نگهداری می‌شوند.
+- بخش ۱۶ این سند به‌روزرسانی شد تا ساختار واقعی را منعکس کند.
 
 ---
 
