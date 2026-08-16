@@ -68,7 +68,8 @@
 /transactions/new         ← فرم ثبت تراکنش جدید (Sheet — نوع اولیه انتخاب می‌شود)
 /transactions/new/income  ← فرم ثبت درآمد (Sheet)
 /transactions/new/expense ← فرم ثبت هزینه (Sheet)
-/transactions/:id         ← جزئیات یک تراکنش
+/transactions/:id         ← جزئیات یک تراکنش (دکمه «اصلاح» — نه ویرایش مستقیم)
+/transactions/:id/correct ← Sheet اصلاح: Reversal خودکار + فرم تراکنش جدید اصلاح‌شده
 /transactions/recurring   ← مدیریت تراکنش‌های تکرارشونده و قبوض
 /transactions/recurring/new  ← فرم تعریف تراکنش تکرارشونده جدید (Sheet)
 /transactions/recurring/:id  ← جزئیات و تاریخچه یک آیتم تکرارشونده
@@ -87,6 +88,7 @@
 /investments/crypto/:exchangeId/sell      ← فرم فروش رمزارز (Sheet)
 /investments/crypto/:exchangeId/deposit   ← فرم واریز نقدی به صرافی (Sheet)
 /investments/crypto/:exchangeId/withdraw  ← فرم برداشت نقدی از صرافی (Sheet)
+/investments/crypto/:exchangeId/tx/:txId/correct  ← Sheet اصلاح تراکنش کریپتو
 
 ── تب سهام ایران ──
 /investments/stocks                       ← لیست کارگزاری‌ها + خلاصه پرتفوی
@@ -97,6 +99,7 @@
 /investments/stocks/:brokerageId/sell     ← فرم فروش سهام (Sheet)
 /investments/stocks/:brokerageId/deposit  ← فرم واریز به کارگزاری (Sheet)
 /investments/stocks/:brokerageId/withdraw ← فرم برداشت از کارگزاری (Sheet)
+/investments/stocks/:brokerageId/tx/:txId/correct  ← Sheet اصلاح تراکنش سهام
 
 ── تب صندوق‌ها ──
 /investments/fif                          ← لیست صندوق‌ها + خلاصه
@@ -107,6 +110,7 @@
 /investments/fif/:fundId/nav              ← فرم ثبت دستی NAV (Sheet)
                                              + دکمه «دریافت NAV» (فقط برای صندوق‌هایی که price_sources اختصاصی دارند)
                                              + سوییچ Auto-Sync per-fund
+/investments/fif/:fundId/tx/:txId/correct  ← Sheet اصلاح تراکنش صندوق
 
 ── تب فلزات ──
 /investments/metals                       ← لیست پلتفرم‌ها + خلاصه پرتفوی
@@ -118,9 +122,12 @@
 /investments/metals/:platformId/deposit   ← فرم واریز نقدی (Sheet)
 /investments/metals/:platformId/withdraw  ← فرم برداشت نقدی (Sheet)
 /investments/metals/:platformId/delivery  ← فرم درخواست تحویل فیزیکی (Sheet)
+/investments/metals/:platformId/tx/:txId/correct  ← Sheet اصلاح تراکنش فلزات
 ```
 
 > **فیچر ۲۰ (Price Fetching) در این صفحه**: دکمه «دریافت قیمت» و سوییچ «به‌روزرسانی خودکار» فقط به‌صورت کنترل داخل هر تب نمایش داده می‌شوند. هیچ Route مستقلی ندارند.
+
+> **الگوی اصلاح تراکنش (Immutable Correction Pattern)**: هیچ تراکنش مالی‌ای پس از ثبت با UPDATE مستقیم ویرایش نمی‌شود (طبق اصل Immutable Transactions در Blueprint). در صفحه جزئیات هر تراکنش، به‌جای دکمه «ویرایش» یک دکمه **«اصلاح»** نمایش داده می‌شود. کلیک روی آن یک Sheet باز می‌کند که به‌طور خودکار: (۱) یک تراکنش Reversal برای لغو تراکنش اصلی ایجاد می‌کند و (۲) فرم ثبت تراکنش جدید را با مقادیر پیش‌پر از تراکنش اصلی نمایش می‌دهد. این الگو در همه route‌های `/:id/correct` یکسان است.
 
 ### صفحه ۵ — وام و بدهی (`/loans`)
 ```
@@ -128,6 +135,7 @@
 /loans/new                ← فرم ثبت وام جدید (Sheet)
 /loans/:id                ← جزئیات یک وام (جدول اقساط، تاریخچه پرداخت، سود باقیمانده)
 /loans/:id/payment        ← فرم ثبت پرداخت قسط (Sheet)
+/loans/:id/correct        ← Sheet اصلاح پرداخت: Reversal + ثبت پرداخت جدید
 ```
 
 ### صفحه ۶ — دارایی‌های فیزیکی (`/assets`)
@@ -136,6 +144,7 @@
 /assets/new               ← فرم ثبت دارایی جدید (Sheet)
 /assets/:id               ← جزئیات یک دارایی (تاریخچه ارزش‌گذاری، اسناد مرتبط)
 /assets/:id/valuation     ← فرم ثبت ارزش‌گذاری جدید (Sheet)
+/assets/:id/correct        ← Sheet اصلاح رویداد دارایی: Reversal + ثبت جدید
 ```
 
 ### صفحه ۷ — بودجه و اهداف (`/planning`)
