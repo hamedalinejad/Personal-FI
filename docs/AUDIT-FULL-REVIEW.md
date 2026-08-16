@@ -33,7 +33,7 @@
 - [x] 04-Debt-Loan-Management
 - [x] 05-01-Investment-Crypto
 - [x] 05-02-Investment-Stocks-Iran
-- [ ] 05-03-Fixed-Income-Funds
+- [x] 05-03-Fixed-Income-Funds
 - [ ] 05-04-Metals
 - [ ] 06-Physical-Assets
 - [ ] 07-Budget-Management
@@ -429,3 +429,14 @@ interface EventBus {
 - منبع صحت/الگو: `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md`, `05-03-Fixed-Income-Funds/Fixed-Income-Funds.md`, `05-04-Metals/Metals.md` (هر سه با توضیح کامل)
 
 **۳. راه‌حل:** همان توضیح پرانتزی استاندارد به `Investment-Stocks-Iran.md` اضافه شود، با تصریح این‌که مبنای تبدیل، **`feeAmount` کل** (مجموع هر ۴ جزء کارمزد طبق Invariant تعریف‌شده در همین فایل) است، نه فقط یکی از اجزا — مثلاً: «مجموع تجمیعی `feeAmount` کل (شامل هر ۴ جزء کارمزد) تمام تراکنش‌ها، پس از تبدیل به USDT با `exchangeRateToBase` همان تراکنش».
+
+### مورد ۲۷ — مشخص نیست فیلد `actualProfit` روی `inv_fif_transactions` توسط چه فرایندی و در چه لحظه‌ای پر می‌شود
+
+**۱. باگ/ابهام:** فیلد `actualProfit → decimal (nullable — فقط در nav_update و dividend)` به‌عنوان یک ستون ذخیره‌شده در `inv_fif_transactions` تعریف شده، در کنار `predictedProfit` که طبیعتاً توسط کاربر هنگام ثبت تراکنش وارد می‌شود. اما برخلاف `predictedProfit`، هیچ‌جای سند مشخص نمی‌کند «سود واقعی» از کجا محاسبه و در این فیلد نوشته می‌شود — نه در APIهای داخلی (`createTransaction`, `updateNAV`) نامی از پرکردن `actualProfit` نیست، و نه فرمولی برای آن در بخش «منطق محاسبه سود/زیان» آمده. تنها API مرتبط، `getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (بر اساس تراکنش‌ها)` است که توضیحش («بر اساس تراکنش‌ها») نشان می‌دهد سود واقعی را احتمالاً در لحظه محاسبه می‌کند (Derived، نه Stored) — که در این صورت وجود ستون `actualProfit` در خودِ جدول Transaction (که قرار است فقط لاگ باشد، طبق «این جدول فقط لاگ تراکنش‌های واقعی است» در فایل‌های مشابه) اضافی و گمراه‌کننده است.
+
+**۲. محل:**
+- `docs/features/05-Investment/05-03-Fixed-Income-Funds/Fixed-Income-Funds.md` — تعریف فیلد `actualProfit` در `inv_fif_transactions`، و API `getProfitComparison`
+
+**۳. راه‌حل:** یکی از دو مسیر صریح شود:
+- **اگر Derived است**: فیلد `actualProfit` از تعریف جدول `inv_fif_transactions` حذف شود و `getProfitComparison()` توضیح دهد که چطور «سود واقعی» را از تفاضل NAVها/تراکنش‌های `dividend` در بازه محاسبه می‌کند.
+- **اگر Stored است**: مشخص شود چه فرایندی (مثلاً یک Job دوره‌ای که پس از هر `nav_update` سود واقعی بازه قبلی را محاسبه و در رکورد `nav_update` مربوطه ذخیره می‌کند) این فیلد را پر می‌کند، و این فرایند به بخش APIهای داخلی اضافه شود.
