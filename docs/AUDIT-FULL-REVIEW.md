@@ -26,7 +26,7 @@
 - [x] lib/lib.md
 - [x] stores/stores.md
 - [x] styles/styles.md
-- [ ] 00-Accounts-Banking
+- [x] 00-Accounts-Banking
 - [ ] 01-Income
 - [ ] 02-Expense
 - [ ] 03-Cheque-Management
@@ -293,3 +293,27 @@ interface EventBus {
 - `docs/core/rounding/Rounding-Policy.md` — بخش «لایه پیاده‌سازی: `utils/money/round.ts`» و جدول تناظر با `utils.md`
 
 **۳. راه‌حل:** یکی از دو مسیر به‌عنوان مسیر رسمی انتخاب و در هر سه محل یکسان شود. با توجه به این‌که round کردن اساساً یک عملیات مالی حساس است (نه یک ابزار عمومی عدد)، پیشنهاد می‌شود فایل واقعاً به `money/round.ts` منتقل شود (هماهنگ با اکثریت ارجاعات) و ساختار پوشه در `utils.md` اصلاح شود تا `round.ts` زیر `money/` نمایش داده شود، نه `number/`.
+
+### مورد ۱۷ — لیست `RelatedFeature` در توضیح فیلد `relatedFeature` در `Accounts-Banking.md` قدیمی است (۱۲ از ۱۶ مقدار واقعی)؛ مقدار `'accounts'` هم هیچ‌جا در همین فیچر استفاده نشده
+
+**۱. باگ/ابهام:** در `Accounts-Banking.md`، توضیح فیلد `relatedFeature` روی `acc_transactions` می‌گوید مقادیر معتبر عبارت‌اند از: «income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals» (۱۲ مقدار). اما نوع مرجع `RelatedFeature` در `core/types/types.md` صراحتاً ۱۶ مقدار دارد و ۴ مقدار دیگر را هم شامل می‌شود: `'bills'`, `'documents'`, `'price'`, `'accounts'`. ازآنجا‌که `Accounts-Banking.md` خودش می‌گوید این نوع «تعریف مرکزی و تنها enum معتبر در core/types/types.md» است، کپی ناقص آن در همین فایل باعث می‌شود خواننده تصور کند فقط ۱۲ مقدار وجود دارد. به‌طور خاص، مقدار `'accounts'` که طبق کامنت خودِ `types.md` برای «انتقال/تعدیل مستقیم حساب» تعریف شده، دقیقاً باید در همین فیچر (Accounts & Banking، در تابع `transferBetweenAccounts`) استفاده شود، اما هیچ‌جای `Accounts-Banking.md` مشخص نمی‌کند دو تراکنش ساخته‌شده توسط `transferBetweenAccounts` چه `relatedFeature`ای می‌گیرند (`'accounts'` یا مقدار دیگر) — این خودش یک نقص جداگانه در مشخصات API است.
+
+**۲. محل:**
+- `docs/features/00-Accounts-Banking/Accounts-Banking.md` — توضیح فیلد `relatedFeature` روی `Transaction`، و تابع `transferBetweenAccounts`
+- منبع صحت: `docs/core/types/types.md` — بخش `transaction.ts`، تعریف `RelatedFeature`
+
+**۳. راه‌حل:**
+- لیست مقادیر در کامنت `relatedFeature` در `Accounts-Banking.md` با تمام ۱۶ مقدار `types.md` هماهنگ شود (یا بهتر: صرفاً بنویسد «به `types.md → RelatedFeature` مراجعه کنید» تا از drift آینده جلوگیری شود، طبق همان الگوی پیشنهادی مورد ۱۲)
+- مشخص شود تراکنش‌های حاصل از `transferBetweenAccounts` چه مقدار `relatedFeature` می‌گیرند — پیشنهاد: `'accounts'`، چون این دقیقاً همان مورد استفاده‌ای است که برای این مقدار در `types.md` تعریف شده
+
+---
+
+### مورد ۱۸ — رفتار `getCurrentBalance(accountId)` (کش/Snapshot در برابر بازمحاسبه از Ledger) در `Accounts-Banking.md` مشخص نشده، برخلاف تأکید صریح `db.md` روی این تمایز (BUG-025)
+
+**۱. باگ/ابهام:** `db.md` در بخش «قرارداد Snapshot در برابر Ledger (BUG-025)» تأکید می‌کند که `currentBalance` روی `acc_accounts` یک **Snapshot مشتق‌شده** (کش برای سرعت) است، نه Ledger authoritative، و برای رفع اختلاف باید از `rebuildAccountFromLedger` استفاده شود، نه خواندن مستقیم snapshot به‌عنوان حقیقت مطلق در همه شرایط. اما `Accounts-Banking.md` تابع `getCurrentBalance(accountId)` را بدون هیچ توضیحی دراین‌باره لیست کرده — معلوم نیست این تابع مقدار کش‌شده (`acc_accounts.currentBalance`، سریع ولی بالقوه ناهماهنگ) را برمی‌گرداند یا همیشه از Ledger بازمحاسبه می‌کند (کند ولی همیشه دقیق). با توجه به این‌که خودِ `db.md` این تمایز را «حیاتی» توصیف کرده (چون قبلاً منشأ یک باگ Critical در تاریخچه پروژه بوده)، سکوت `Accounts-Banking.md` در این مورد خطرناک است.
+
+**۲. محل:**
+- `docs/features/00-Accounts-Banking/Accounts-Banking.md` — بخش «APIهای داخلی → Account → `getCurrentBalance(accountId)`»
+- منبع صحت: `docs/core/db/db.md` — بخش «قرارداد Snapshot در برابر Ledger (BUG-025)»
+
+**۳. راه‌حل:** امضای `getCurrentBalance` در `Accounts-Banking.md` صریح شود، مثلاً: «`getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')` — حالت `cached` مقدار `acc_accounts.currentBalance` (Snapshot سریع) را برمی‌گرداند؛ حالت `ledger` با فراخوانی معادل `rebuildAccountFromLedger` مقدار واقعی را از مجموع `acc_transactions` بازمحاسبه می‌کند (برای صفحاتی که نیاز به دقت کامل دارند، نه فقط نمایش سریع UI)».
