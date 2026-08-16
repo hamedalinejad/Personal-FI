@@ -105,6 +105,8 @@
 /investments/fif/:fundId/buy              ← فرم خرید/صدور واحد (Sheet)
 /investments/fif/:fundId/sell             ← فرم فروش/ابطال واحد (Sheet)
 /investments/fif/:fundId/nav              ← فرم ثبت دستی NAV (Sheet)
+                                             + دکمه «دریافت NAV» (فقط برای صندوق‌هایی که price_sources اختصاصی دارند)
+                                             + سوییچ Auto-Sync per-fund
 
 ── تب فلزات ──
 /investments/metals                       ← لیست پلتفرم‌ها + خلاصه پرتفوی
