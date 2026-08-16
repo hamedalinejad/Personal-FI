@@ -15,9 +15,9 @@ utils/
 ├── number/
 │   ├── formatNumber.ts        # فرمت اعداد با جداکننده هزار
 │   ├── toPersianDigits.ts     # تبدیل ارقام ۰-۹ به ۰-۹ فارسی
-│   ├── toEnglishDigits.ts     # تبدیل ارقام فارسی به لاتین
-│   └── round.ts               # گرد کردن اعشار (Decimal-safe)
+│   └── toEnglishDigits.ts     # تبدیل ارقام فارسی به لاتین
 ├── money/
+│   ├── round.ts               # گرد کردن مبالغ مالی (Decimal-safe) — تنها نقطه رسمی rounding در کل پروژه
 │   ├── formatMoney.ts         # فرمت مبلغ با واحد ارز برای نمایش
 │   ├── minorUnit.ts           # تبدیل بین Minor Unit و Decimal — مرکز Minor Unit کل پروژه
 │   ├── calculateWeightedAverage.ts # میانگین وزنی خرید (Crypto/Stocks/Metals)
