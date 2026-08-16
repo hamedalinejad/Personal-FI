@@ -46,10 +46,10 @@
 - [x] 14-Tax-Management
 - [x] 15-Document-Management
 - [x] 16-Settings-Tools
-- [ ] 17-Currency-CrossRate
-- [ ] 18-Security-Privacy
-- [ ] 19-Price-Fetching (+ ۴ زیرفیچر)
-- [ ] 99-Common-Categories
+- [x] 17-Currency-CrossRate (بدون یافته جدید قابل‌ثبت؛ قرارداد exchangeRateToBase از قبل در BUG-003 پوشش داده شده)
+- [x] 18-Security-Privacy
+- [x] 19-Price-Fetching (+ ۴ زیرفیچر)
+- [x] 99-Common-Categories
 - [ ] بررسی نهایی روابط بین فیچرها (Cross-Feature Consistency)
 
 ---
@@ -690,3 +690,43 @@ interface EventBus {
 - `docs/features/16-Settings-Tools/Settings-Tools.md` — بخش «۳. حساب‌ها و پیش‌فرض‌ها» در برابر جدول «تنظیمات پیشنهادی پیش‌فرض»
 
 **۳. راه‌حل:** ردیف `default_transfer_account | null` به جدول «تنظیمات پیشنهادی پیش‌فرض» اضافه شود تا با فهرست بخش‌های تنظیمات هماهنگ باشد.
+
+
+### مورد ۵۰ — `Security-Privacy.md` می‌گوید داده‌ها در «IndexedDB با رمزنگاری» ذخیره شوند؛ درحالی‌که طبق `db.md` کل دیتابیس یک فایل SQLite سریالایزشده است که به‌صورت یک Blob کامل در IndexedDB نوشته می‌شود
+
+**۱. باگ/ابهام:** بخش «نکات طراحی» در `Security-Privacy.md` صراحتاً می‌گوید: «از IndexedDB با رمزنگاری استفاده شود؛ کلید رمزنگاری در صورت پشتیبانی سیستم‌عامل می‌تواند از Secure Enclave/TEE استفاده کند» — که تلویحاً IndexedDB را یک محل ذخیره‌سازی مستقل و ساختاریافته (شبیه NoSQL معمول) فرض می‌کند که باید رمزنگاری شود. اما طبق معماری مستندشده در `db.md`، IndexedDB اصلاً محل ذخیره داده ساختاریافته نیست: کل دیتابیس یک فایل **SQLite** است (از طریق `sql.js`، در حافظه RAM نگه داشته می‌شود) که هر بار با الگوی Write-to-temp-then-swap به‌صورت یک `Uint8Array`/Blob کامل در IndexedDB بازنویسی می‌شود. Business Rule ۱ در همین فایل («تمام داده‌های مالی حساس باید در دیتابیس رمزنگاری شده ذخیره شوند») و بخش Encryption APIs (`encryptData`, `decryptData`, `generateKey`) هیچ‌کدام مشخص نمی‌کنند رمزنگاری در کدام لایه اعمال می‌شود:
+- رمزنگاری کل فایل SQLite قبل از سریالایز/نوشتن در IndexedDB (رمزنگاری در سطح Blob)، یا
+- رمزنگاری فیلد-به-فیلد داخل جداول SQLite (مثل SQLCipher یا رمزنگاری دستی ستون‌های حساس)، یا
+- رمزنگاری خودِ IndexedDB به‌عنوان یک key-value store مستقل (که با معماری واقعی sql.js/SQLite همخوانی ندارد و صرفاً یک محل ذخیره Blob است، نه محل ذخیره «داده»)
+
+بدون این تفکیک، جمله «IndexedDB با رمزنگاری» می‌تواند تیم پیاده‌سازی را به‌اشتباه به سمت رمزنگاری IndexedDB API (که فقط حامل یک Blob باینری است) ببرد، درحالی‌که تصمیم واقعی معماری باید درباره رمزنگاری خودِ فایل SQLite یا محتوای داخل آن باشد.
+
+**۲. محل:**
+- `docs/features/18-Security-Privacy/Security-Privacy.md` — Business Rule ۱، بخش «نکات طراحی» (خط «از IndexedDB با رمزنگاری استفاده شود»)، بخش Encryption APIs
+- وابسته: `docs/core/db/db.md` — بخش‌های معماری SQLite/sql.js و الگوی Write-to-temp-then-swap در IndexedDB
+
+**۳. راه‌حل:** جمله اصلاح شود به چیزی مثل: «فایل دیتابیس SQLite قبل از سریالایز و نوشتن در IndexedDB (طبق الگوی Write-to-temp-then-swap مستندشده در `db.md`) با کلید مشتق‌شده از PIN/بیومتریک/Secure Enclave رمزنگاری می‌شود؛ IndexedDB صرفاً حامل Blob رمزنگاری‌شده نهایی است، نه محل اعمال رمزنگاری فیلد-به-فیلد.» و `encryptData`/`decryptData` صریحاً مستند شوند که ورودی/خروجی‌شان کل Blob دیتابیس است، نه رکوردهای تکی.
+
+### مورد ۵۱ — Domain Entity «Price History» در `Price-Fetching.md` هنوز فیلدهای `instrumentId`، `marketDate` و `quoteType` را ندارد؛ درحالی‌که بخش‌های BUG-036 و BUG-037/038 در همان سند این فیلدها را الزامی اعلام کرده‌اند
+
+**۱. باگ/ابهام:** جدول Domain Entity «۲. Price History (جدول: `price_history`)» (بخش «Domain Entities (مشترک)») فقط این ستون‌ها را فهرست می‌کند: `id, sourceId, symbol, assetCategory, price, priceCurrency, source, triggeredBy, fetchRequestId, fetchedAt, createdAt`. اما دو بخش پایین‌تر در همان فایل به‌صراحت فیلدهای دیگری را الزامی می‌دانند که در این جدول Entity غایب‌اند:
+- بخش «شناسه قیمت در `price_history` (BUG-036)» می‌گوید ستون `symbol` **deprecated** است و باید ستون جدید `instrumentId` (شناسه پایدار داخلی) اضافه شود؛ APIهای جدید باید با `{ assetCategory, instrumentId }` کوئری بزنند.
+- بخش «Quote کامل‌تر (BUG-037 / BUG-038)» می‌گوید `marketDate` («بله برای stock/fif NAV روزانه») و `quoteType` (`last | nav | close | manual | indicative`) از فیلدهای الزامی Quote مالی هستند.
+
+چون این دو بخش اصلاحی بعداً به انتهای سند اضافه شده‌اند ولی جدول اصلی Domain Entity به‌روزرسانی نشده، هر کسی که فقط بخش «Domain Entities» را بخواند (که معمولاً منبع مرجع schema است) اسکیمای قدیمی و ناقص را پیاده می‌کند و ممکن است اصلاً متوجه وجود BUG-036/037/038 در پایین سند نشود.
+
+**۲. محل:**
+- `docs/features/19-Price-Fetching/Price-Fetching.md` — بخش «Domain Entities (مشترک)» → «۲. Price History»، در برابر بخش‌های «شناسه قیمت در `price_history` (BUG-036)» و «Quote کامل‌تر (BUG-037 / BUG-038)» در انتهای همان فایل
+- وابسته: تمام ۴ زیرفیچر (`19-01` تا `19-04`) که از همین جدول مشترک استفاده می‌کنند
+
+**۳. راه‌حل:** جدول Domain Entity «Price History» مستقیماً به‌روزرسانی شود تا شامل `instrumentId` (الزامی)، `marketDate` (nullable)، `quoteType` (الزامی) هم باشد و توضیح `symbol` به «deprecated — فقط برای سازگاری/نمایش legacy» تغییر کند؛ سپس بخش‌های BUG-036/037/038 می‌توانند به «این فیلدها از قبل در جدول بالا لحاظ شده‌اند» ارجاع دهند به‌جای این‌که به‌صورت پچ جداگانه در انتهای سند باقی بمانند.
+
+### مورد ۵۲ — بخش «استاندارد مشترک بین دسته‌های دارایی» در ابتدای `Price-Fetching.md` هنوز ستون `symbol` را به‌عنوان شناسه اصلی معرفی می‌کند؛ درست برخلاف تصمیم بعدی BUG-036 که `symbol` را deprecated اعلام کرده
+
+**۱. باگ/ابهام:** در همان فایل، بخش ابتدایی «استاندارد مشترک بین دسته‌های دارایی» می‌گوید: «ستون `symbol` در `price_history` باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` ... و برای Metals مقدار آن `{metalType}_{purity}` ... خواهد بود؛ این‌ها همچنان یک رشته یکتا در ستون `symbol` هستند». یعنی این بخش صراحتاً `symbol` را همچنان شناسه اصلی/یکتای هر دسته دارایی معرفی می‌کند. اما بخش «شناسه قیمت در `price_history` (BUG-036)» در انتهای همان سند می‌گوید دقیقاً همین overload شدنِ `symbol` (BTC در برابر UUID صندوق) خودِ باگ بوده و راه‌حل، جایگزینی آن با ستون مجزای `instrumentId` + `assetCategory` است و `symbol` را «deprecated به‌عنوان شناسه اصلی» اعلام می‌کند. دو بخش از یک سند دو تصمیم متناقض درباره همان ستون می‌دهند و بخش اول (که زودتر خوانده می‌شود) اصلاح نشده است.
+
+**۲. محل:**
+- `docs/features/19-Price-Fetching/Price-Fetching.md` — بخش «استاندارد مشترک بین دسته‌های دارایی» (نزدیک ابتدای فایل) در برابر بخش «شناسه قیمت در `price_history` (BUG-036)» (انتهای فایل)
+
+**۳. راه‌حل:** پاراگراف مربوطه در بخش «استاندارد مشترک» بازنویسی شود تا از ابتدا `instrumentId` را به‌عنوان شناسه اصلی معرفی کند (نه `symbol`)، مثلاً: «ستون `instrumentId` در `price_history` باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` و برای Metals مقدار آن `{metalType}_{purity}` است؛ ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته می‌شود (به بخش BUG-036 مراجعه شود).»
+
