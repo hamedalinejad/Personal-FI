@@ -18,7 +18,7 @@
 - [x] Product-Map-FA.md / Product-Map-EN.md
 - [x] Pages-IA.md
 - [x] core/db/db.md
-- [ ] core/types/types.md
+- [x] core/types/types.md
 - [ ] core/services/services.md
 - [ ] core/hooks/hooks.md
 - [ ] core/utils/utils.md
