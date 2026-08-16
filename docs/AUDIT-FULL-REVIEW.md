@@ -746,3 +746,33 @@ interface EventBus {
 
 **۳. راه‌حل:** هر دو تعریف در `Metals.md` به فرمت هماهنگ با سه فایل خواهر تغییر کند، مثلاً: «`exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)» و ارجاع «(BUG-003)» به هر دو محل اضافه شود تا با Crypto/Stocks-Iran/FIF هم‌راستا باشد.
 
+
+### مورد ۵۴ — تعریف نادرست/قدیمی `exchangeRateToBase` («ریال به ازای ۱ تتر») در واقع در ۷ فایل دیگر هم تکرار شده، نه فقط `Metals.md` (تکمیل و گسترش مورد ۵۳)
+
+**۱. باگ/ابهام:** بررسی سیستماتیک همه فایل‌هایی که فیلد `exchangeRateToBase` را تعریف کرده‌اند نشان می‌دهد که اصلاح BUG-003 (تعریف صحیح: «چند واحد **ارز پایه کاربر**، نه الزاماً ریال/تتر، به ازای ۱ واحد ارز تراکنش» — طبق `Currency-CrossRate.md`) فقط در **سه فایل** واقعاً و کامل اعمال شده: `Investment-Crypto.md`، `Investment-Stocks-Iran.md`، `Fixed-Income-Funds.md`، و به‌شکل درست‌تری در `Debt-Loan-Management.md` (که صریحاً می‌گوید «نه الزاماً ریال/تتر» و به BUG-029/BUG-003 ارجاع می‌دهد). اما تعریف قدیمی و نادرست («نرخ تتر لحظه — ریال به ازای ۱ تتر») یا نسخه‌های مشابه آن («نرخ تبدیل لحظه ثبت نسبت به دلار/تتر») بدون هیچ ارجاعی به BUG-003 در فایل‌های زیر باقی مانده است:
+
+| فایل | خط(ها) | متن فعلی |
+|---|---|---|
+| `Accounts-Banking.md` (جدول مرکزی تراکنش‌ها!) | ۴۰ | «نرخ تتر لحظه تراکنش» |
+| `Metals.md` (قبلاً در مورد ۵۳ ثبت شد) | ۱۵۰, ۱۷۳ | «نرخ تتر لحظه — ریال به ازای ۱ تتر» |
+| `Physical-Assets.md` | ۹۵, ۱۱۲, ۱۲۶ | «نرخ تتر لحظه (خرید) — ریال به ازای ۱ تتر» |
+| `Financial-Goals.md` | ۷۱, ۸۷ | «نرخ تتر لحظه (ایجاد) — ریال به ازای ۱ تتر» |
+| `Income.md` | ۴۵ | «نرخ تبدیل لحظه ثبت نسبت به دلار/تتر» |
+| `Expense.md` | ۴۷ | «نرخ تبدیل لحظه ثبت نسبت به دلار/تتر» |
+| `Cheque-Management.md` | ۵۵ | «نرخ تبدیل لحظه ثبت نسبت به دلار/تتر — ریال به ازای ۱ تتر» |
+
+از ۹ فایلی که این فیلد را دارند، ۷ تای آن (شامل خودِ جدول مرکزی `acc_transactions` در `Accounts-Banking.md` که همه فیچرهای دیگر معاملات‌شان را نهایتاً از طریق آن ثبت می‌کنند) تعریف اشتباه/قدیمی را حفظ کرده‌اند. این یعنی برای اکثریت قریب‌به‌اتفاق تراکنش‌های سیستم (درآمد، هزینه، چک، طلا/فلزات، اموال فیزیکی، اهداف مالی)، طبق مستندات فعلی، `exchangeRateToBase` باید همیشه «ریال به ازای ۱ تتر» تفسیر شود — که برای کاربری با `baseCurrency ≠ IRR` (مثلاً USD) کاملاً نادرست است و مستقیماً با تعریف رسمی و صریح BUG-003 در تناقض است.
+
+**۲. محل:**
+- `docs/features/00-Accounts-Banking/Accounts-Banking.md` — خط ۴۰
+- `docs/features/05-Investment/05-04-Metals/Metals.md` — خط ۱۵۰ و ۱۷۳ (مورد ۵۳)
+- `docs/features/06-Physical-Assets/Physical-Assets.md` — خط ۹۵، ۱۱۲، ۱۲۶
+- `docs/features/08-Financial-Goals/Financial-Goals.md` — خط ۷۱ و ۸۷
+- `docs/features/01-Income/Income.md` — خط ۴۵
+- `docs/features/02-Expense/Expense.md` — خط ۴۷
+- `docs/features/03-Cheque-Management/Cheque-Management.md` — خط ۵۵
+- منبع صحت: `docs/features/17-Currency-CrossRate/Currency-CrossRate.md` (بخش BUG-003)
+- الگوی درست برای مقایسه: `docs/features/04-Debt-Loan-Management/Debt-Loan-Management.md` (خط ۸۸، با ارجاع صریح BUG-003/BUG-029)
+
+**۳. راه‌حل:** در هر ۷ فایل، تعریف `exchangeRateToBase` یکسان‌سازی شود به الگوی `Debt-Loan-Management.md`: «نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`)». چون `Accounts-Banking.md` جدول مرکزی و منبع نهایی همه تراکنش‌هاست، اصلاح آن فایل بالاترین اولویت را دارد. توصیه می‌شود به‌جای تکرار تعریف در ۹ فایل جدا (که دقیقاً همین سناریوی «drift» را تکرار می‌کند)، تعریف `exchangeRateToBase` فقط **یک‌بار** در `Currency-CrossRate.md` یا `core/types/types.md` نوشته شود و همه فایل‌های دیگر فقط با «طبق قرارداد `exchangeRateToBase` در `Currency-CrossRate.md` (BUG-003)» به آن ارجاع دهند، بدون بازنویسی متن تعریف.
+
