@@ -29,7 +29,7 @@
 - [x] 00-Accounts-Banking
 - [x] 01-Income
 - [x] 02-Expense
-- [ ] 03-Cheque-Management
+- [x] 03-Cheque-Management
 - [ ] 04-Debt-Loan-Management
 - [ ] 05-01-Investment-Crypto
 - [ ] 05-02-Investment-Stocks-Iran
@@ -346,3 +346,26 @@ interface EventBus {
 **۲. محل:** `docs/features/01-Income/Income.md` — Business Rules، و API `generateRecurringIncomes()`. **همان جمله دقیق (فقط با «هزینه» به‌جای «درآمد») در `docs/features/02-Expense/Expense.md` هم تکرار شده** — همان ابهام درباره `generateRecurringExpenses()` صادق است.
 
 **۳. راه‌حل:** یا این استثنا از هر دو فایل حذف شود (چون طبق رفتار واقعی Job روزانه، تراکنش تکرارشونده هم هرگز در آینده ثبت نمی‌شود)، یا اگر منظور سناریوی دیگری است (مثلاً امکان مشاهده/پیش‌نمایش تراکنش‌های آتی بدون ثبت واقعی)، آن سناریو صریحاً و یکسان در هر دو فایل توضیح داده شود.
+
+### مورد ۲۱ — تصمیم «قفل/رزرو موجودی برای چک‌های پرداختی صادرشده» به‌صراحت در خودِ سند به‌عنوان تصمیم‌نگرفته باقی مانده
+
+**۱. باگ/ابهام:** در بخش «نکات طراحی» آمده: «برای چک‌های پرداختی، موجودی حساب در زمان صدور چک قفل یا رزرو نمی‌شود (**مگر تصمیم دیگری گرفته شود**)». این جمله به‌وضوح یک تصمیم محصولی حل‌نشده را در سند باقی گذاشته، نه یک مشخصات قطعی. این تصمیم اثر مستقیم روی UX دارد: اگر کاربر ۵ میلیون تومان موجودی داشته باشد و ۳ چک پرداختی هرکدام ۲ میلیون تومان صادر کرده باشد (که هنوز `pending`اند)، `getCurrentBalance` مقدار ۵ میلیون را نشان می‌دهد درحالی‌که عملاً کاربر تعهد ۶ میلیونی دارد — بدون مفهوم «موجودی در دسترس» (Available Balance) در برابر «موجودی واقعی» (Actual Balance)، کاربر ممکن است هزینه/چک جدیدی ثبت کند که باعث Overdraft واقعی هنگام وصول چک‌های قبلی شود. ازآنجا‌که Business Rule دیگری هم می‌گوید «موجودی حساب نمی‌تواند منفی شود»، این ابهام مستقیماً با آن قانون در تعارض بالقوه است: اگر رزرو نشود، هیچ‌چیز جلوی صدور چک بیش از موجودی واقعی را نمی‌گیرد.
+
+**۲. محل:**
+- `docs/features/03-Cheque-Management/Cheque-Management.md` — بخش «نکات طراحی»
+- وابسته: `docs/features/00-Accounts-Banking/Accounts-Banking.md` — Business Rule «موجودی حساب نمی‌تواند منفی شود»، تابع `getCurrentBalance`
+- وابسته: `docs/features/12-Dashboard/Dashboard.md` و `docs/features/13-Portfolio-Wealth-Overview/Portfolio-Wealth-Overview.md` (در صورت نمایش موجودی — باید مشخص شود کدام مفهوم موجودی نمایش داده می‌شود)
+
+**۳. راه‌حل:** این تصمیم قطعی شود و از حالت «مگر تصمیم دیگری گرفته شود» خارج شود. برای نسخه ۱ پیشنهاد می‌شود: **بدون رزرو واقعی موجودی** (چون رزرو نیازمند منطق پیچیده‌تری است) ولی با افزودن یک تابع صرفاً محاسباتی و فقط‌خواندنی مثل `getAvailableBalance(accountId)` که `currentBalance - Σ(مبلغ چک‌های pending پرداختی روی این حساب)` را برمی‌گرداند و در UI به‌عنوان هشدار (نه قید سخت) نمایش داده شود — تا کاربر از تعهدات آتی خود آگاه باشد بدون این‌که سیستم مانع ثبت تراکنش شود.
+
+---
+
+### مورد ۲۲ — هیچ تابع Reconciliation مرکزی برای هماهنگی `chk_cheques.status`/`reversalTransactionId` با وضعیت واقعی `acc_transactions` تعریف نشده
+
+**۱. باگ/ابهام:** طبق الگوی «قرارداد Reconciliation مرکزی» در `db.md`، هر Snapshot مشتق‌شده (موجودی حساب، holding سرمایه‌گذاری، مانده وام) باید یک تابع Reconciliation اختصاصی داشته باشد که بتواند ناهماهنگی بین Ledger (`acc_transactions`) و Snapshot را کشف کند (`reconcileAccount`, `reconcileBrokerage`, `reconcileCryptoHolding`, `reconcileFund`, `reconcileMetalsHolding`). اما `chk_cheques` هم دقیقاً یک همین نوع Snapshot دارد: فیلدهای `status`, `accountTransactionId`, `reversalTransactionId` باید همیشه با وجود/عدم‌وجود رکوردهای متناظر و غیرVoid در `acc_transactions` سازگار باشند (مثلاً یک چک با `status='bounced'` باید هم یک تراکنش اصلی `isVoided=true` و هم یک تراکنش reversal معتبر داشته باشد؛ یک چک با `status='cleared'` باید دقیقاً یک تراکنش غیرVoid مرتبط داشته باشد). این تابع (`reconcileCheque` یا مشابه) در جدول APIهای Reconciliation در `db.md` وجود ندارد.
+
+**۲. محل:**
+- `docs/core/db/db.md` — بخش «قرارداد Reconciliation مرکزی»، جدول APIهای Reconciliation
+- `docs/features/03-Cheque-Management/Cheque-Management.md` — فیلدهای `status`, `accountTransactionId`, `reversalTransactionId`
+
+**۳. راه‌حل:** ردیف `reconcileCheque(chequeId)` به جدول APIهای Reconciliation در `db.md` اضافه شود که سازگاری `status` ↔ وجود/تعداد/جهت تراکنش‌های مرتبط در `acc_transactions` را بررسی می‌کند؛ همچنین به `reconcileAll()` اضافه شود. (نکته: این یافته باید هنگام بررسی `04-Debt-Loan-Management` هم دوباره چک شود، چون وام هم می‌تواند همین کلاس ابهام را داشته باشد.)
