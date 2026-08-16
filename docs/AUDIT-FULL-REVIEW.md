@@ -32,7 +32,7 @@
 - [x] 03-Cheque-Management
 - [x] 04-Debt-Loan-Management
 - [x] 05-01-Investment-Crypto
-- [ ] 05-02-Investment-Stocks-Iran
+- [x] 05-02-Investment-Stocks-Iran
 - [ ] 05-03-Fixed-Income-Funds
 - [ ] 05-04-Metals
 - [ ] 06-Physical-Assets
@@ -419,3 +419,13 @@ interface EventBus {
 - در بخش «۴»، فیلد `network → string` به `networkId → UUID (nullable — FK به inv_crypto_wallet_networks؛ الزامی برای type=transfer_in/transfer_out بین والت‌ها)` تغییر کند و متن قدیمی حذف شود.
 - در بخش «۵»، طبق تصمیم صریح BUG-005 که این فیلد را برای جدول cash-movement اساساً نامربوط می‌داند، فیلد `network` (و به همراه آن `txHash`, `blockNumber`, `confirmations` که همگی طبق جدول BUG-005 فقط باید در `inv_crypto_transactions` باشند نه در جدول cash) کاملاً از تعریف `inv_crypto_exchange_transactions` حذف شوند.
 - به‌طور کلی، وقتی یک بخش BUG در انتهای فایل، فیلدی در Domain Entities را اصلاح/ممنوع می‌کند، تعریف اصلی همان لحظه به‌روزرسانی شود، نه این‌که هر دو نسخه (قدیمی در بالا، تصمیم جدید در پایین) هم‌زمان در فایل باقی بمانند.
+
+### مورد ۲۶ — فیلد `totalFeesPaidUSDT` در `Investment-Stocks-Iran.md` بدون توضیح تعریف شده، برخلاف سه فایل خواهر دیگر (Crypto/FIF/Metals)
+
+**۱. باگ/ابهام:** فیلد `totalFeesPaidUSDT` یک تصمیم طراحی هماهنگ و عمدی در تمام زیرفیچرهای سرمایه‌گذاری است (تأیید شده در `Currency-CrossRate.md`: «Investment (همه زیر‌فیچرها): ... محاسبه `totalFeesPaidUSDT`») تا کارمزدها در یک واحد مشترک (USDT) برای مقایسه بین دارایی‌های مختلف قابل‌جمع باشند — پس خودِ وجود این فیلد باگ نیست. اما در سه فایل `Investment-Crypto.md`، `Fixed-Income-Funds.md`، و `Metals.md`، این فیلد همیشه با یک توضیح پرانتزی کامل تعریف شده («مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش»)، درحالی‌که در `Investment-Stocks-Iran.md` (خط ۶۹) فقط `totalFeesPaidUSDT → decimal` بدون هیچ توضیحی نوشته شده است. این عدم‌یکنواختی مستندسازی باعث می‌شود این فایل به‌تنهایی روشن نکند که آیا دقیقاً همان فرمول (تبدیل با `exchangeRateToBase` تراکنش) اینجا هم صدق می‌کند یا نه — با توجه به این‌که کارمزدهای سهام ایران در `Investment-Stocks-Iran.md` به ۴ جزء (`feeBrokerCommission`, `feeExchange`, `feeTax`, `feeOther`) تفکیک شده‌اند، ممکن است خواننده مطمئن نباشد `totalFeesPaidUSDT` مجموع کدام یک از این اجزا را منعکس می‌کند (فقط `feeBrokerCommission` یا کل `feeAmount`).
+
+**۲. محل:**
+- `docs/features/05-Investment/05-02-Investment-Stocks-Iran/Investment-Stocks-Iran.md` — تعریف فیلد `totalFeesPaidUSDT` در `inv_stocks_iran_holdings`
+- منبع صحت/الگو: `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md`, `05-03-Fixed-Income-Funds/Fixed-Income-Funds.md`, `05-04-Metals/Metals.md` (هر سه با توضیح کامل)
+
+**۳. راه‌حل:** همان توضیح پرانتزی استاندارد به `Investment-Stocks-Iran.md` اضافه شود، با تصریح این‌که مبنای تبدیل، **`feeAmount` کل** (مجموع هر ۴ جزء کارمزد طبق Invariant تعریف‌شده در همین فایل) است، نه فقط یکی از اجزا — مثلاً: «مجموع تجمیعی `feeAmount` کل (شامل هر ۴ جزء کارمزد) تمام تراکنش‌ها، پس از تبدیل به USDT با `exchangeRateToBase` همان تراکنش».
