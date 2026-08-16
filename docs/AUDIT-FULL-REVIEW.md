@@ -50,7 +50,7 @@
 - [x] 18-Security-Privacy
 - [x] 19-Price-Fetching (+ ۴ زیرفیچر)
 - [x] 99-Common-Categories
-- [ ] بررسی نهایی روابط بین فیچرها (Cross-Feature Consistency)
+- [x] بررسی نهایی روابط بین فیچرها (Cross-Feature Consistency) — یک ناسازگاری مهم یافت شد (مورد ۵۳)؛ می‌تواند در نشست‌های بعدی عمیق‌تر ادامه یابد
 
 ---
 
@@ -729,4 +729,20 @@ interface EventBus {
 - `docs/features/19-Price-Fetching/Price-Fetching.md` — بخش «استاندارد مشترک بین دسته‌های دارایی» (نزدیک ابتدای فایل) در برابر بخش «شناسه قیمت در `price_history` (BUG-036)» (انتهای فایل)
 
 **۳. راه‌حل:** پاراگراف مربوطه در بخش «استاندارد مشترک» بازنویسی شود تا از ابتدا `instrumentId` را به‌عنوان شناسه اصلی معرفی کند (نه `symbol`)، مثلاً: «ستون `instrumentId` در `price_history` باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` و برای Metals مقدار آن `{metalType}_{purity}` است؛ ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته می‌شود (به بخش BUG-036 مراجعه شود).»
+
+
+---
+
+## بررسی نهایی روابط بین فیچرها (Cross-Feature Consistency)
+
+### مورد ۵۳ — `Metals.md` هنوز از تعریف قدیمی و نادرست `exchangeRateToBase` («ریال به ازای ۱ تتر») استفاده می‌کند؛ درحالی‌که BUG-003 همین فیلد را در سه فایل خواهر دیگر (Crypto، Stocks-Iran، FIF) اصلاح کرده است
+
+**۱. باگ/ابهام:** طبق قرارداد رسمی `exchangeRateToBase` (بخش «قرارداد `exchangeRateToBase` واقعی — BUG-003» در `Currency-CrossRate.md`)، این فیلد باید همیشه «چند واحد **ارز پایه کاربر**» به ازای ۱ واحد ارز تراکنش تعریف شود، نه ثابتاً «ریال به ازای ۱ تتر» — چون اگر `baseCurrency` کاربر برابر IRR نباشد (مثلاً USD)، این تعریف کاملاً غلط از آب درمی‌آید. سه فایل `Investment-Crypto.md`، `Investment-Stocks-Iran.md`، و `Fixed-Income-Funds.md` همگی این تصحیح را اعمال کرده‌اند: یا تعریف را عمومی نوشته‌اند («نرخ تبدیل ارز تراکنش → baseCurrency کاربر») یا صریحاً ارجاع «(BUG-003)» را کنار فیلد آورده‌اند. اما در `Metals.md`، هر دو محل تعریف `exchangeRateToBase` (در `inv_metals_transactions` و در `inv_metals_platform_transactions`) هنوز عین همان متن قدیمی و اشتباه را دارند: «نرخ تتر لحظه — ریال به ازای ۱ تتر» / «ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰» — بدون هیچ ارجاعی به BUG-003 یا تعریف عمومی صحیح. این دقیقاً همان کلاس اشتباهی است که BUG-003 قرار بود در کل پروژه رفع کند و اینجا جا افتاده است؛ اگر پیاده‌سازی دقیقاً طبق متن `Metals.md` باشد، برای کاربری با `baseCurrency=USD`، مقدار `exchangeRateToBase` تراکنش‌های فلزات به‌اشتباه به‌عنوان «ریال به ازای یک تتر» تفسیر/محاسبه می‌شود.
+
+**۲. محل:**
+- `docs/features/05-Investment/05-04-Metals/Metals.md` — Domain Entity «۳. Metals Transaction» (فیلد `exchangeRateToBase`) و Domain Entity «۴. Metals Platform Cash Transaction» (فیلد `exchangeRateToBase`)
+- منبع صحت: `docs/features/17-Currency-CrossRate/Currency-CrossRate.md` — بخش «قرارداد `exchangeRateToBase` واقعی (BUG-003)»
+- الگوی درست برای مقایسه: `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` (خط‌های تعریف `exchangeRateToBase`)، `docs/features/05-Investment/05-02-Investment-Stocks-Iran/Investment-Stocks-Iran.md` (خط ۲۱۵)، `docs/features/05-Investment/05-03-Fixed-Income-Funds/Fixed-Income-Funds.md` (خط ۲۵۰)
+
+**۳. راه‌حل:** هر دو تعریف در `Metals.md` به فرمت هماهنگ با سه فایل خواهر تغییر کند، مثلاً: «`exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)» و ارجاع «(BUG-003)» به هر دو محل اضافه شود تا با Crypto/Stocks-Iran/FIF هم‌راستا باشد.
 
