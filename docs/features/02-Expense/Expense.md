@@ -32,10 +32,17 @@ Business Rules
 ارزش تاریخی هزینه با نرخ زمان ثبت حفظ می‌شود.
 هزینه تکرارشونده در جدول جدا نگهداری می‌شود و از روی آن تراکنش واقعی تولید می‌شود.
 هزینه نمی‌تواند در آینده ثبت شود مگر اینکه از طریق هزینه تکرارشونده تولید شده باشد.
-**ویرایش/حذف هزینه**: تراکنش هزینه پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف:
-  - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
+**ویرایش/حذف هزینه**: تراکنش هزینه پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف، الگوی **دولایه Atomic** اجرا می‌شود (همه مراحل در یک BEGIN/COMMIT):
+
+  **لایه ۱ — `exp_transactions`**:
+  - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
+  - یک رکورد جدید در `exp_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
+
+  **لایه ۲ — `acc_transactions`**:
+  - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
   - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
-  - این رویکرد تاریخچه مالی را حفظ می‌کند و با اصل Immutable Transactions سازگار است.
+
+  > ⚠️ **قانون `getTotalExpense`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `exp_transactions` را جمع می‌زنند.
 
 
 ### ۱. Expense Transaction (جدول: exp_transactions)
@@ -52,6 +59,8 @@ hasAttachment → boolean
 attachmentPath → string
 recurringId → UUID (nullable — اگر از هزینه تکرارشونده تولید شده باشد)
 accountTransactionId → UUID (لینک به `acc_transactions`)
+isVoided → boolean (پیش‌فرض `false` — اگر `true`، این رکورد توسط `correctExpense`/`deleteExpense` باطل شده و در همه گزارش‌ها نادیده گرفته می‌شود)
+reversedExpenseId → UUID (nullable — اگر این رکورد یک اصلاح است، id رکورد `exp_transactions` قبلی که void شده)
 createdAt → datetime
 updatedAt → datetime
 
@@ -95,11 +104,15 @@ APIهای داخلی (Internal APIs)
 Expense Transaction APIs:
 
 createExpense(data) → ثبت هزینه + گرفتن نرخ تبدیل + ایجاد تراکنش + کاهش مانده حساب
-correctExpense(id, data) → اصلاح هزینه؛ به‌صورت داخلی یک تراکنش Reversal برای رکورد قبلی + یک تراکنش جدید با داده‌های اصلاح‌شده می‌سازد (مطابق اصل Immutable Transactions — بخش ۱۱ Project-Blueprint). مبلغ/تاریخ/حساب هرگز مستقیم تغییر داده نمی‌شوند.
+correctExpense(id, data) → اصلاح هزینه — **الزاماً Atomic (BEGIN/COMMIT)**:
+  1. `exp_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
+  2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
+  3. INSERT رکورد جدید در `exp_transactions` با داده اصلاح‌شده، `reversedExpenseId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
+  4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
 updateExpenseMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllExpenses(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getExpenseById(id)
-getTotalExpense(startDate, endDate, accountId?, targetCurrency?) → مجموع هزینه با نرخ تاریخی
+getTotalExpense(startDate, endDate, accountId?, targetCurrency?) → مجموع هزینه با نرخ تاریخی — **فقط ردیف‌های `isVoided = false` از `exp_transactions`**
 
 Recurring Expense APIs:
 
