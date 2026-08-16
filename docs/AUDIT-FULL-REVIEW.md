@@ -40,7 +40,7 @@
 - [x] 08-Financial-Goals
 - [x] 09-Bills-Recurring-Transactions
 - [x] 10-Notification-Reminder-System
-- [ ] 11-Reports-Analytics
+- [x] 11-Reports-Analytics
 - [ ] 12-Dashboard
 - [ ] 13-Portfolio-Wealth-Overview
 - [ ] 14-Tax-Management
@@ -603,3 +603,23 @@ interface EventBus {
 - `docs/features/10-Notification-Reminder-System/Notification-Reminder-System.md` — Domain Entity «۲. Notification Setting»، فیلد `daysBefore`
 
 **۳. راه‌حل:** رابطه این دو فیلد صریح شود؛ پیشنهاد: `notif_settings.daysBefore` به‌عنوان **مقدار پیش‌فرض سراسری** هر دسته عمل کند و `br_items.reminderDaysBefore` (در صورت پرشدن، غیر null) آن را override کند — یعنی `generateDueReminders()` ابتدا بررسی می‌کند آیا رکورد سطح‌آیتم مقدار خاصی تنظیم کرده، در غیر این صورت از `notif_settings` دسته مربوطه استفاده می‌کند. این منطق باید در بخش «نکات طراحی» یا توضیح `generateDueReminders()` صریحاً نوشته شود.
+
+### مورد ۴۲ — ساختار پیشنهادی Net Worth موجودی نقدی پلتفرم‌ها/کارگزاری‌ها (`cashBalance`) را که در فیچرهای مبدأ صراحتاً بخشی از محاسبه ثروت است، ذکر نمی‌کند
+
+**۱. باگ/ابهام:** طبق «نکته طراحی» در `Metals.md`، موجودی نقدی هر پلتفرم فلزات (`inv_metals_platforms.cashBalance`) «در محاسبه ثروت در Portfolio & Wealth Overview با کنترل `includeCashInWealth` لحاظ می‌شود» — یعنی این مبلغ یک سطر جداگانه و شرطی (قابل روشن/خاموش‌کردن) در Net Worth است، جدا از «ارزش فلزات (holding)». اما بخش «ساختار پیشنهادی Net Worth» در این فایل، تحت «دارایی‌ها»، فقط «ارزش فلزات (پلتفرم‌ها)» را فهرست کرده و هیچ اشاره‌ای به `cashBalance` پلتفرم‌ها یا سوییچ `includeCashInWealth` ندارد. همین موضوع احتمالاً برای موجودی نقدی کارگزاری‌های سهام ایران (`inv_stocks_iran_brokerages.cashBalance`، طبق الگوی مشابه در `05-02-Investment-Stocks-Iran.md`) هم صدق می‌کند. بدون ذکر صریح این سطرهای نقدی جداگانه، پیاده‌سازی `getNetWorth()` ممکن است این مبالغ را کلاً فراموش کند (کم‌نمایی ثروت واقعی کاربر) یا بسته به تفسیر هرکس، دوباره‌شمرده شود.
+
+**۲. محل:**
+- `docs/features/11-Reports-Analytics/Reports-Analytics.md` — بخش «ساختار پیشنهادی Net Worth»، API `getNetWorth(date?)`
+- منبع صحت: `docs/features/05-Investment/05-04-Metals/Metals.md` («نکته طراحی» زیر Domain Entity ۱، سوییچ `includeCashInWealth`)، و به‌احتمال `05-02-Investment-Stocks-Iran.md` (نیازمند بررسی مجدد هنگام رسیدن به آن فیچر برای تأیید وجود سوییچ مشابه)
+
+**۳. راه‌حل:** در بخش «ساختار پیشنهادی Net Worth»، یک سطر مجزا با عنوان «موجودی نقدی پلتفرم‌ها/کارگزاری‌های سرمایه‌گذاری (طبق `includeCashInWealth`)» به لیست دارایی‌ها اضافه شود و `getNetWorth()` صریحاً توضیح دهد این مبالغ را از کدام جداول (`inv_metals_platforms.cashBalance`, `inv_stocks_iran_brokerages.cashBalance` و مشابه) و با چه شرطی جمع می‌زند.
+
+### مورد ۴۳ — Net Worth «بدهی‌ها» شامل مانده وام است ولی چک‌های پرداختی صادرشده و هنوز وصول‌نشده (تعهد آتی) را لحاظ نمی‌کند
+
+**۱. باگ/ابهام:** بخش «ساختار پیشنهادی Net Worth» زیر «بدهی‌ها» فقط «مانده وام‌های دریافتی» و «بدهی‌ها و اقساط معوق» را می‌آورد. اما طبق مورد ۲۱ (ثبت‌شده پیش‌تر در همین سند هنگام بررسی `Cheque-Management.md`)، چک‌های پرداختی صادرشده و هنوز `pending` یک تعهد مالی آتی واقعی‌اند که در `getCurrentBalance` حساب بانکی لحاظ نمی‌شوند (چون موجودی حساب هنوز کم نشده). اگر گزارش Net Worth این چک‌های معلق را نادیده بگیرد، ثروت خالص کاربر را بیش از واقعیت نشان می‌دهد — دقیقاً همان ریسکی که مورد ۲۱ برای صفحه حساب‌ها هشدار داده بود، اینجا در سطح گزارش کلی Net Worth هم تکرار می‌شود و هیچ اشاره‌ای به آن نشده است.
+
+**۲. محل:**
+- `docs/features/11-Reports-Analytics/Reports-Analytics.md` — بخش «ساختار پیشنهادی Net Worth»، بدهی‌ها
+- وابسته: مورد ۲۱ (همین سند)، `docs/features/03-Cheque-Management/Cheque-Management.md`
+
+**۳. راه‌حل:** پس از قطعی‌شدن راه‌حل مورد ۲۱ (پیشنهادشده: تابع `getAvailableBalance`)، یک سطر اختیاری «چک‌های پرداختی معلق (تعهد آتی)» به بخش بدهی‌ها یا یک نمای جایگزین «Net Worth بر مبنای موجودی در دسترس» اضافه شود تا کاربر بتواند بین «ثروت خالص بر مبنای موجودی فعلی» و «ثروت خالص بر مبنای موجودی در دسترس پس از تعهدات معلق» انتخاب کند.
