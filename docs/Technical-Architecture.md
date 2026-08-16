@@ -99,6 +99,8 @@ src/
 │
 ├── features/              # هر فیچر به صورت مستقل
 │   ├── accounts/
+│   │   ├── public-api.ts  # تنها نقطه ورود مجاز برای سایر فیچرها و UI
+│   │   └── ...            # منطق داخلی، db queries، domain services
 │   ├── income/
 │   ├── expense/
 │   ├── cheque/
@@ -109,6 +111,7 @@ src/
 │   ├── goals/
 │   ├── bills/
 │   └── settings/
+│   # هر پوشه فیچر یک فایل public-api.ts دارد (همین ساختار accounts/ برای همه)
 │
 ├── components/            # کامپوننت‌های UI مشترک
 ├── lib/                   # کتابخانه‌های کمکی
@@ -119,7 +122,9 @@ src/
 │   ├── migrations.ts      # مدیریت مایگRATION‌ها
 │   └── queries/           # کوئری‌های SQL
 ├── stores/                # Zustand stores
-├── api/                   # Internal API بین فیچرها (باگ ۴۹: تنها دروازه cross-feature؛ بدون SQL مستقیم)
+├── api/                   # Re-export/Facade اختیاری از public-api هر فیچر (باگ ۴۹)
+│   │                      # هیچ منطقی اینجا نوشته نمی‌شود — فقط re-export برای راحتی import در UI
+│   │                      # مثال: api/accounts.ts → export * from '../features/accounts/public-api'
 ├── assets/
 ├── styles/
 public/
@@ -145,7 +150,8 @@ UI / Hooks
 - Share کردن connection sql.js برای queryهای ad-hoc از Presentation
 
 مجاز:
-- Feature A از **API عمومی** Feature B صداد (مثلاً `accounts.getBalance`)
+- Feature A از **`features/B/public-api.ts`** صدا می‌زند (مثلاً `accounts.getBalance`) — نه مستقیم از فایل‌های داخلی B
+- `src/api/` فقط Re-export همین public-api هاست و هیچ منطقی ندارد
 - Event Bus برای اطلاع‌رسانی بعد از commit (نه برای نوشتن داده)
 
 ---
@@ -193,7 +199,8 @@ UI / Hooks
 
 قرارداد `UI → Feature API → Domain → DB` باید در implementation قابل enforce باشد:
 
-1. **Import boundary**: `features/A` نباید از `features/B/db` یا SQL خام B import کند؛ فقط از `features/B/public-api` (یا `api/`).
-2. **ESLint** `no-restricted-imports` / dependency-cruiser / arch unit test در CI.
-3. تست نمونه: هیچ فایلی خارج از `db/` نباید `sql.js` یا `runQuery` مستقیم صدا بزند مگر از طریق API فیچر.
-4. تا قبل از وجود این ruleها در repo، مرز فقط مستند است — در checklist پیاده‌سازی v1 این item باید tick شود.
+1. **Import boundary**: `features/A` نباید از `features/B/db`، `features/B/services`، یا SQL خام B import کند؛ فقط از `features/B/public-api.ts` (یا معادل re-export آن در `src/api/`).
+2. **`src/api/`** صرفاً یک لایه re-export است — هیچ منطقی (query، validation، computation) اینجا نوشته نمی‌شود؛ تمام پیاده‌سازی داخل `features/*/public-api.ts` است.
+3. **ESLint** `no-restricted-imports` / dependency-cruiser / arch unit test در CI — rule نمونه: هر import از `features/*/!(public-api)` خارج از پوشه خودِ همان فیچر باید error باشد.
+4. تست نمونه: هیچ فایلی خارج از `features/*/db/` نباید `sql.js` یا `runQuery` مستقیم صدا بزند مگر از طریق `public-api.ts` همان فیچر.
+5. تا قبل از وجود این ruleها در repo، مرز فقط مستند است — در checklist پیاده‌سازی v1 این item باید tick شود.
