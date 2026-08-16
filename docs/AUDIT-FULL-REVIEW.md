@@ -17,7 +17,7 @@
 - [x] Technical-Architecture.md
 - [x] Product-Map-FA.md / Product-Map-EN.md
 - [x] Pages-IA.md
-- [ ] core/db/db.md
+- [x] core/db/db.md
 - [ ] core/types/types.md
 - [ ] core/services/services.md
 - [ ] core/hooks/hooks.md
