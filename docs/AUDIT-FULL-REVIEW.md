@@ -776,3 +776,20 @@ interface EventBus {
 
 **۳. راه‌حل:** در هر ۷ فایل، تعریف `exchangeRateToBase` یکسان‌سازی شود به الگوی `Debt-Loan-Management.md`: «نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`)». چون `Accounts-Banking.md` جدول مرکزی و منبع نهایی همه تراکنش‌هاست، اصلاح آن فایل بالاترین اولویت را دارد. توصیه می‌شود به‌جای تکرار تعریف در ۹ فایل جدا (که دقیقاً همین سناریوی «drift» را تکرار می‌کند)، تعریف `exchangeRateToBase` فقط **یک‌بار** در `Currency-CrossRate.md` یا `core/types/types.md` نوشته شود و همه فایل‌های دیگر فقط با «طبق قرارداد `exchangeRateToBase` در `Currency-CrossRate.md` (BUG-003)» به آن ارجاع دهند، بدون بازنویسی متن تعریف.
 
+
+### مورد ۵۵ — مقدار `api_key_required` در enum مرکزی `PriceFailureKind` تعریف شده ولی هیچ‌جای `Price-Fetching.md` (نه در جدول `failureKind`، نه در منطق Auto-Sync) به آن اشاره یا نگاشته نمی‌شود
+
+**۱. باگ/ابهام:** `core/types/types.md` نوع `PriceFailureKind` را با ۹ مقدار تعریف کرده: `network_error, timeout, http_error, invalid_payload, validation_error, rate_limit, not_found, api_key_required, offline`. اما جدول رسمی `failureKind` در `Price-Fetching.md` (بخش «تشخیص شبکه — باگ ۳۸») فقط ۷ مورد اول را فهرست کرده و `api_key_required` را کلاً ندارد. مورد `offline` هم در آن جدول نیست، اما توضیح داده شده که `offline` در واقع نتیجه `{skipped: true, reason: 'offline'}` است، نه یک `failureKind` در `failed[]` — یعنی حذفش از جدول عمدی و قابل‌توضیح است. برای `api_key_required` چنین توضیحی وجود ندارد: بخش «سیاست API Key (باگ ۳۷)» رفتار موردنیاز را توصیف می‌کند («دکمه Fetch → مودال ورود کلید»، «Auto-Sync → آن منبع Skip می‌شود؛ وضعیت UI: کلید API وارد نشده») اما هرگز مشخص نمی‌کند این رفتار در سطح داده چگونه نمایش داده می‌شود:
+- آیا نماد بدون کلید API در `failed[]` با `failureKind='api_key_required'` قرار می‌گیرد (چون نوع مرکزی این مقدار را به‌عنوان یک failureKind تعریف کرده)، یا
+- در `skipped[]` با یک `reason` مشابه الگوی `offline` قرار می‌گیرد (چون متن Auto-Sync دقیقاً از کلمه «Skip می‌شود» استفاده کرده، نه «Fail می‌شود»)؟
+
+این ابهام مستقیماً روی رفتار UI/Retry اثر می‌گذارد: اگر پیاده‌سازی این مورد را `failed` حساب کند ولی UI فقط `skipped` را جدا نمایش دهد (یا برعکس)، کاربر پیام گمراه‌کننده می‌بیند (مثلاً «شکست دریافت» به‌جای «کلید API لازم است»).
+
+**۲. محل:**
+- `docs/core/types/types.md` — تعریف `PriceFailureKind` (شامل مقدار `api_key_required`)
+- `docs/features/19-Price-Fetching/Price-Fetching.md` — جدول `failureKind` در بخش «تشخیص شبکه (باگ ۳۸)»، و بخش «سیاست API Key (باگ ۳۷)»
+
+**۳. راه‌حل:** یکی از دو مسیر صریح شود و مستند گردد:
+- **گزینه ۱**: `api_key_required` هم به جدول `failureKind` در `Price-Fetching.md` اضافه شود (با توضیح: «کلید API لازم برای این منبع تنظیم نشده») و صریحاً گفته شود در چه مسیری (دستی/Auto-Sync) این مقدار در `failed[]` ثبت می‌شود.
+- **گزینه ۲**: اگر منطق واقعی این است که کمبود کلید API همیشه مثل `offline` در `skipped[]` می‌رود (نه `failed[]`)، آنگاه `api_key_required` باید از enum `PriceFailureKind` در `types.md` حذف و جای آن یک مقدار مجاز برای `reason` در `skipped[]` (شبیه `'offline'`) تعریف شود، تا Union مرکزی TypeScript دقیقاً منعکس‌کننده رفتار واقعی مستندشده باشد.
+
