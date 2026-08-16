@@ -42,7 +42,7 @@
 - [x] 10-Notification-Reminder-System
 - [x] 11-Reports-Analytics
 - [x] 12-Dashboard
-- [ ] 13-Portfolio-Wealth-Overview
+- [x] 13-Portfolio-Wealth-Overview
 - [ ] 14-Tax-Management
 - [ ] 15-Document-Management
 - [ ] 16-Settings-Tools
@@ -642,3 +642,12 @@ interface EventBus {
 - `docs/features/12-Dashboard/Dashboard.md` — Domain Entity «۱. Dashboard Layout» و «۲. Dashboard Widget Config»
 
 **۳. راه‌حل:** با توجه به این‌که Business Rule ۱ می‌گوید «داشبورد ... منطق کسب‌وکار ندارد» و پیچیدگی چیدمان ویجت نیازی به Query رابطه‌ای ندارد، پیشنهاد می‌شود Entity #2 صرفاً به‌عنوان **schema داخل فیلد JSON** `dash_layouts.widgets` مستند شود (نه جدول SQL مجزا) و عنوان «(درون JSON یا جدول جدا)» به «(ساختار هر آیتم درون فیلد JSON `dash_layouts.widgets`)» تغییر کند.
+
+### مورد ۴۶ — Business Rule ۲ می‌گوید سوییچ `includeCashInWealth` مربوط به «حساب‌های بانکی» است؛ درحالی‌که همان فایل چند خط پایین‌تر و `port_settings` صراحتاً می‌گویند این سوییچ فقط برای موجودی نقدی صرافی/کارگزاری سرمایه‌گذاری است
+
+**۱. باگ/ابهام:** Business Rule ۲ می‌نویسد: «حساب‌های بانکی نقدی می‌توانند به صورت اختیاری در محاسبه ثروت کل لحاظ شوند (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)». اما بلافاصله پایین‌تر، «نکته مهم - جلوگیری از تکرار در محاسبه موجودی نقدی» و همچنین توضیح فیلد `port_settings.includeCashInWealth` هر دو صراحتاً می‌گویند این سوییچ برای چیز دیگری است: کنترل لحاظ‌شدن **موجودی نقدی صرافی‌های رمزارز و کارگزاری‌های سهام** (`inv_crypto_holdings` با `symbol=IRR/USDT`، `inv_stocks_iran_brokerages.cashBalance`) — نه حساب‌های بانکی. علاوه بر این، در بخش «ساختار ثروت و پرتفوی»، «دارایی‌های نقدی (حساب‌های بانکی)» به‌عنوان یک شاخه همیشگی و بدون قید-و-شرط زیر «ثروت کل» فهرست شده، بدون هیچ اشاره‌ای به این‌که اختیاری یا وابسته به یک سوییچ باشد. یعنی سه بخش از همین فایل درباره یک موضوع (آیا حساب‌های بانکی همیشه لحاظ می‌شوند یا اختیاری‌اند، و `includeCashInWealth` دقیقاً چه چیزی را کنترل می‌کند) با هم ناسازگارند.
+
+**۲. محل:**
+- `docs/features/13-Portfolio-Wealth-Overview/Portfolio-Wealth-Overview.md` — Business Rule ۲ (در برابر) «نکته مهم - جلوگیری از تکرار در محاسبه موجودی نقدی» و Domain Entity «۲. Portfolio Setting» (فیلد `includeCashInWealth`) و بخش «ساختار ثروت و پرتفوی»
+
+**۳. راه‌حل:** Business Rule ۲ اصلاح شود تا با تعریف واقعی سوییچ هماهنگ باشد، مثلاً: «حساب‌های بانکی همیشه و بدون قید در محاسبه ثروت کل لحاظ می‌شوند (طبق ساختار ثروت). سوییچ `includeCashInWealth` صرفاً کنترل می‌کند موجودی نقدی ریال/تتر نگهداری‌شده در صرافی‌های رمزارز و کارگزاری‌های سهام ایران (که در جداول Investment مربوطه ذخیره می‌شود، نه در `acc_accounts`) در محاسبه ثروت کل لحاظ شود یا نه.»
