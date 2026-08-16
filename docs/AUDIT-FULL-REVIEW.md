@@ -19,7 +19,7 @@
 - [x] Pages-IA.md
 - [x] core/db/db.md
 - [x] core/types/types.md
-- [ ] core/services/services.md
+- [x] core/services/services.md
 - [ ] core/hooks/hooks.md
 - [ ] core/utils/utils.md
 - [ ] core/rounding/Rounding-Policy.md
@@ -230,3 +230,32 @@ src/
 
 
 
+
+### مورد ۱۲ — جدول رویدادهای Event Bus در `services.md` فقط ۶ از ۱۶ رویداد واقعیِ تعریف‌شده در `AppEvent` را پوشش می‌دهد
+
+**۱. باگ/ابهام:** بخش «Event Bus» در `services.md` یک جدول با ۶ ردیف ارائه می‌دهد (`TransactionCreated`, `AccountBalanceUpdated`, `BudgetExceeded`, `LoanPaymentDue`, `PriceFetchCompleted`, `VersionUpdateAvailable`) و آن را به‌عنوان «رویدادهای تعریف‌شده» معرفی می‌کند. اما نوع واقعی `AppEvent` در `types.md` (بخش `events.ts`) شامل ۱۶ رویداد است؛ ۱۰ رویداد دیگر اصلاً در جدول `services.md` نیامده‌اند: `BudgetUpdated`، `InvestmentValueUpdated`، `PortfolioSnapshotCreated`، `LoanPaymentMade`، `ChequeDue`، `ChequeStatusChanged`، `MetalsDeliveryStatusChanged`، `TaxDue`، `TaxPaid`، `PriceFetchStarted`. از آنجا که `services.md` تنها سند توصیفیِ لایه Event Bus است (نه صرفاً تعریف نوع)، این عدم‌هم‌خوانی باعث می‌شود توسعه‌دهنده‌ای که فقط `services.md` را می‌خواند تصور کند فقط ۶ رویداد در سیستم وجود دارد، درحالی‌که فیچرهایی مثل چک، فلزات، مالیات، سرمایه‌گذاری و بودجه هرکدام رویداد اختصاصی خودشان را منتشر می‌کنند.
+
+**۲. محل:**
+- `docs/core/services/services.md` — بخش «Event Bus» (جدول رویدادها)
+- منبع صحت: `docs/core/types/types.md` — بخش `events.ts`، تعریف `AppEvent` (۱۶ عضو Union)
+
+**۳. راه‌حل:** جدول Event Bus در `services.md` با تمام ۱۶ رویداد `AppEvent` همگام شود (یا حداقل یک یادداشت اضافه شود: «فهرست کامل و به‌روز رویدادها همیشه در `types.md → events.ts` است؛ این جدول فقط نمونه‌ای از دسته‌های اصلی است»)، تا از drift مستندات در آینده (با اضافه‌شدن رویداد جدید به `AppEvent` بدون به‌روزرسانی این جدول) جلوگیری شود.
+
+---
+
+### مورد ۱۳ — سرویس Event Bus فاقد قرارداد/امضای متد (Interface) مشخص است؛ فقط نوع Payload (`AppEvent`) تعریف شده، نه خودِ سرویس
+
+**۱. باگ/ابهام:** هم `services.md` و هم `types.md` فقط *محتوای* رویدادها (`AppEvent` Union) و *هدف* Event Bus را توضیح می‌دهند، اما هیچ‌جا امضای واقعی متدهای خودِ سرویس (`emit`/`publish`، `on`/`subscribe`، `off`/`unsubscribe`) تعریف نشده — نه به‌صورت TypeScript interface در `types.md`، نه به‌صورت جدول API در `services.md` (برخلاف الگوی سایر سرویس‌ها/جداول مرکزی که همیشه امضای دقیق API را می‌آورند، مثل جدول APIهای Reconciliation در `db.md`). بدون این قرارداد، هر فیچری که بخواهد `PriceFetchCompleted` یا `TransactionCreated` را subscribe کند، امضای دقیق فراخوانی (sync/async بودن `emit`، نوع بازگشتی `subscribe` برای unsubscribe کردن، رفتار در صورت throw شدن خطا در یک listener) را نمی‌داند.
+
+**۲. محل:**
+- `docs/core/services/services.md` — بخش «Event Bus» (نیازمند جدول/بلوک API)
+- `docs/core/types/types.md` — بخش `events.ts` (نیازمند تعریف Interface سرویس، نه فقط نوع Payload)
+
+**۳. راه‌حل:** یک بلوک کد TypeScript به یکی از این دو فایل (ترجیحاً `types.md` کنار تعریف `AppEvent`) اضافه شود، مثلاً:
+```typescript
+interface EventBus {
+  emit<T extends AppEvent['type']>(type: T, payload: Extract<AppEvent, { type: T }>['payload']): void;
+  subscribe<T extends AppEvent['type']>(type: T, handler: (payload: Extract<AppEvent, { type: T }>['payload']) => void): () => void; // برمی‌گرداند: تابع unsubscribe
+}
+```
+و در `services.md` رفتار خطا (isolate کردن exception هر listener تا listenerهای دیگر متوقف نشوند) و sync/async بودن `emit` صراحتاً مستند شود.
