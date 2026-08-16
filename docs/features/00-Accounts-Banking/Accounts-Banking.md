@@ -41,7 +41,7 @@ exchangeRateToBase → decimal (nullable — نرخ تتر لحظه تراکنش
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)
-relatedFeature → string (نوع `RelatedFeature` — تعریف مرکزی در core/types/types.md؛ مقادیر: income, expense, cheque, loan, crypto_exchange, stocks_iran, fif, metals, physical_assets, budget, tax, goals)
+relatedFeature → string (نوع `RelatedFeature` — **فهرست کامل و تنها مرجع معتبر**: `core/types/types.md → RelatedFeature`؛ کپی لیست اینجا نگه داشته نمی‌شود تا از drift جلوگیری شود)
 
 relatedId → UUID (شناسه رکورد در فیچر مرتبط)
 
@@ -77,3 +77,9 @@ getTransactionById(id)
 Transfer:
 
 transferBetweenAccounts(sourceAccountId, targetAccountId, amount, description)
+> **الزاماً Atomic (BEGIN/COMMIT)**:
+> 1. INSERT تراکنش مبدا: `type='transfer-out'`، `relatedFeature='accounts'`، `relatedId=targetAccountId`
+> 2. INSERT تراکنش مقصد: `type='transfer-in'`، `relatedFeature='accounts'`، `relatedId=sourceAccountId`
+> 3. آپدیت `currentBalance` هر دو حساب
+>
+> `relatedFeature='accounts'` برای هر دو رکورد — طبق تعریف `types.md`: «انتقال/تعدیل مستقیم بین حساب‌ها».
