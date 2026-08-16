@@ -30,7 +30,7 @@
 - [x] 01-Income
 - [x] 02-Expense
 - [x] 03-Cheque-Management
-- [ ] 04-Debt-Loan-Management
+- [x] 04-Debt-Loan-Management
 - [ ] 05-01-Investment-Crypto
 - [ ] 05-02-Investment-Stocks-Iran
 - [ ] 05-03-Fixed-Income-Funds
@@ -369,3 +369,31 @@ interface EventBus {
 - `docs/features/03-Cheque-Management/Cheque-Management.md` — فیلدهای `status`, `accountTransactionId`, `reversalTransactionId`
 
 **۳. راه‌حل:** ردیف `reconcileCheque(chequeId)` به جدول APIهای Reconciliation در `db.md` اضافه شود که سازگاری `status` ↔ وجود/تعداد/جهت تراکنش‌های مرتبط در `acc_transactions` را بررسی می‌کند؛ همچنین به `reconcileAll()` اضافه شود. (نکته: این یافته باید هنگام بررسی `04-Debt-Loan-Management` هم دوباره چک شود، چون وام هم می‌تواند همین کلاس ابهام را داشته باشد.)
+
+### مورد ۲۳ — جدول `ln_loan_fee_tiers` در فهرست مرکزی جداول `db.md` ثبت نشده (تکرار الگوی مورد ۹)
+
+**۱. باگ/ابهام:** در `Debt-Loan-Management.md`، برای پیاده‌سازی کارمزد پلکانی (`feeType = 'tiered'`) صراحتاً گفته شده: «برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers` (BUG-030)» — یعنی این جدول یک جدول واقعی و لازم برای نسخه ۱ است (نه صرفاً پیشنهاد آینده)، چون فیلد قدیمی‌تر `tiers` (JSON) در `ln_loan_fees` صراحتاً «deprecated برای داده جدید؛ فقط مهاجرت» اعلام شده — یعنی `ln_loan_fee_tiers` جایگزین رسمی و فعلی است. با این حال این جدول اصلاً در فهرست مرکزی جداول `db.md` (که مدعی است «همه جداول تمام فیچرها در اینجا لیست شده‌اند») وجود ندارد — دقیقاً همان کلاس مشکلی که در مورد ۹ همین سند (برای `acc_transaction_links`, `fin_audit_log`, `ref_integrity_queue`) قبلاً ثبت شده بود.
+
+**۲. محل:**
+- `docs/core/db/db.md` — بخش «لیست مرکزی همه‌ی جدول‌ها» (جای خالی برای `ln_loan_fee_tiers`)
+- منبع صحت: `docs/features/04-Debt-Loan-Management/Debt-Loan-Management.md` — بخش «Loan Fees»، فیلد `tiers` (deprecated) و ارجاع BUG-030
+
+**۳. راه‌حل:** ردیف `ln_loan_fee_tiers | Debt & Loan | ردیف‌های پلکانی کارمزد وام (جایگزین فیلد deprecated شده `tiers`)` به جدول «لیست مرکزی همه‌ی جدول‌ها» در `db.md` اضافه شود. همچنین ساختار فیلدهای این جدول (که در `Debt-Loan-Management.md` هم فقط با یک اشاره کوتاه ذکر شده، بدون تعریف کامل ستون‌ها) باید حداقل یک‌بار به‌صورت کامل (مثلاً `loanFeeId`, `thresholdFrom`, `thresholdTo`, `rate` یا `amount`) در یکی از این دو سند مستند شود.
+
+---
+
+### مورد ۲۴ — `cancelLoan(id)` هیچ محدودیتی درباره وجود پرداخت‌های قبلی ندارد، برخلاف `updateLoan` که صریحاً «فقط قبل از اولین پرداخت» است
+
+**۱. باگ/ابهام:** Business Rule صریح می‌گوید: «ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است» و API `updateLoan(id, data)` هم همین محدودیت را در توضیح خودش تکرار می‌کند. اما `cancelLoan(id)` هیچ محدودیت مشابهی ندارد و توضیحش فقط یک خط («لغو وام») است. این باعث ابهام جدی می‌شود: اگر وامی ۵ قسط از ۲۴ قسط را پرداخت کرده باشد (یعنی `remainingBalance` کمتر از `principalAmount` و چندین رکورد در `ln_transactions` و `acc_transactions` وجود دارد) و کاربر `cancelLoan` را صدا بزند، چه اتفاقی می‌افتد؟
+- آیا پرداخت‌های قبلی reversal می‌شوند (یعنی موجودی حساب به حالت قبل از وام برمی‌گردد)؟
+- یا وام فقط `status = 'cancelled'` می‌شود درحالی‌که پرداخت‌های واقعی و `remainingBalance` دست‌نخورده باقی می‌مانند (که باعث می‌شود یک وام «لغوشده» همچنان مانده بدهی داشته باشد — از نظر مفهومی متناقض)؟
+این تفاوت رفتاری حیاتی است چون مستقیماً موجودی حساب‌های بانکی واقعی و تاریخچه مالی کاربر را تحت تأثیر قرار می‌دهد.
+
+**۲. محل:**
+- `docs/features/04-Debt-Loan-Management/Debt-Loan-Management.md` — بخش «Loan APIs»، تابع `cancelLoan(id)`
+- وابسته: Business Rule «ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است»، جدول `ln_transactions`
+
+**۳. راه‌حل:** رفتار `cancelLoan` صریح شود، مثلاً با یکی از این دو مسیر مستند:
+- **گزینه ۱ (محدود)**: `cancelLoan` فقط روی وام‌هایی مجاز باشد که هنوز هیچ پرداختی (`installment_payment`) ثبت نکرده‌اند — مشابه دقیق محدودیت `updateLoan` — و اگر پرداختی وجود دارد، خطا برگرداند و کاربر را به `voidTransaction`/Reversal دستی راهنمایی کند
+- **گزینه ۲ (کامل)**: `cancelLoan` به‌صورت خودکار تمام تراکنش‌های مرتبط (`disbursement` + همه پرداخت‌ها) را در `acc_transactions` reversal کند تا موجودی حساب کاملاً به حالت قبل از وام برگردد، سپس `status = 'cancelled'` شود
+با توجه به الگوی «Immutable Transactions» پروژه، گزینه ۱ ساده‌تر و کم‌ریسک‌تر است و پیشنهاد می‌شود.
