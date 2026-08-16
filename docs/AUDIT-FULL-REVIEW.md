@@ -28,7 +28,7 @@
 - [x] styles/styles.md
 - [x] 00-Accounts-Banking
 - [x] 01-Income
-- [ ] 02-Expense
+- [x] 02-Expense
 - [ ] 03-Cheque-Management
 - [ ] 04-Debt-Loan-Management
 - [ ] 05-01-Investment-Crypto
@@ -328,7 +328,8 @@ interface EventBus {
 **۲. محل:**
 - `docs/features/01-Income/Income.md` — Business Rule «ویرایش/حذف درآمد» و API `correctIncome(id, data)`
 - وابسته: `docs/core/db/db.md` — بخش «قرارداد Snapshot در برابر Ledger (BUG-025)» و «Polymorphic FK»
-- وابسته احتمالی: تمام فیچرهای مشابه با الگوی Reversal دوسطحی (Expense، Cheque، Loan، Investment‌ها) که همین ابهام را ممکن است داشته باشند
+- **تأیید شد در `docs/features/02-Expense/Expense.md`**: همان الگوی دقیق («تراکنش اصل ذخیره می‌ماند... یک تراکنش معکوس ثبت می‌شود» فقط در سطح `acc_transactions`) و همان API مبهم (`correctExpense(id, data)`) عیناً تکرار شده — یعنی همان خطر برای `exp_transactions` و `getTotalExpense()` هم صادق است
+- وابسته احتمالی: سایر فیچرهای مشابه با الگوی Reversal دوسطحی (Cheque، Loan، Investment‌ها) که هنوز بررسی نشده‌اند و باید هنگام بررسی چک شوند
 
 **۳. راه‌حل:** Business Rule صریح شود که رفتار در هر دو لایه هم‌زمان و atomic انجام می‌شود:
 1. ردیف قدیمی `inc_transactions` یک فیلد `isVoided`/`status` بگیرد (هم‌راستا با الگوی `acc_transactions`)
@@ -342,6 +343,6 @@ interface EventBus {
 
 **۱. باگ/ابهام:** Business Rule می‌گوید: «درآمد نمی‌تواند در آینده ثبت شود مگر اینکه از طریق درآمد تکرارشونده تولید شده باشد.» اما طبق API `generateRecurringIncomes() → تولید تراکنش‌های درآمد از روی قالب‌های فعال (Job روزانه)`، این Job **روزانه** اجرا می‌شود و فقط زمانی تراکنش تولید می‌کند که `nextOccurrence` رسیده باشد — یعنی طبیعتاً هرگز یک تاریخ آینده تولید نمی‌کند (تراکنش تولیدشده تاریخش «امروز» یا کمی گذشته است، نه آینده). پس این استثنا یا برای سناریویی است که مستند نشده (مثلاً پیش‌ثبت دستی چند ماه آینده)، یا صرفاً یک جمله اضافی/گمراه‌کننده است که فرض غلطی درباره رفتار Job روزانه ایجاد می‌کند.
 
-**۲. محل:** `docs/features/01-Income/Income.md` — Business Rules، و API `generateRecurringIncomes()`
+**۲. محل:** `docs/features/01-Income/Income.md` — Business Rules، و API `generateRecurringIncomes()`. **همان جمله دقیق (فقط با «هزینه» به‌جای «درآمد») در `docs/features/02-Expense/Expense.md` هم تکرار شده** — همان ابهام درباره `generateRecurringExpenses()` صادق است.
 
-**۳. راه‌حل:** یا این استثنا حذف شود (چون طبق رفتار واقعی Job روزانه، تراکنش تکرارشونده هم هرگز در آینده ثبت نمی‌شود)، یا اگر منظور سناریوی دیگری است (مثلاً امکان مشاهده/پیش‌نمایش تراکنش‌های آتی بدون ثبت واقعی)، آن سناریو صریحاً توضیح داده شود.
+**۳. راه‌حل:** یا این استثنا از هر دو فایل حذف شود (چون طبق رفتار واقعی Job روزانه، تراکنش تکرارشونده هم هرگز در آینده ثبت نمی‌شود)، یا اگر منظور سناریوی دیگری است (مثلاً امکان مشاهده/پیش‌نمایش تراکنش‌های آتی بدون ثبت واقعی)، آن سناریو صریحاً و یکسان در هر دو فایل توضیح داده شود.
