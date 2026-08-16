@@ -20,12 +20,12 @@
 - [x] core/db/db.md
 - [x] core/types/types.md
 - [x] core/services/services.md
-- [ ] core/hooks/hooks.md
-- [ ] core/utils/utils.md
-- [ ] core/rounding/Rounding-Policy.md
-- [ ] lib/lib.md
-- [ ] stores/stores.md
-- [ ] styles/styles.md
+- [x] core/hooks/hooks.md
+- [x] core/utils/utils.md
+- [x] core/rounding/Rounding-Policy.md
+- [x] lib/lib.md
+- [x] stores/stores.md
+- [x] styles/styles.md
 - [ ] 00-Accounts-Banking
 - [ ] 01-Income
 - [ ] 02-Expense
@@ -259,3 +259,37 @@ interface EventBus {
 }
 ```
 و در `services.md` رفتار خطا (isolate کردن exception هر listener تا listenerهای دیگر متوقف نشوند) و sync/async بودن `emit` صراحتاً مستند شود.
+
+### مورد ۱۴ — `lib.md` به «IndexedDB Service» به‌عنوان یک سرویس هنوز موجود اشاره می‌کند، درحالی‌که `services.md` صراحتاً حذف آن را مستند کرده
+
+**۱. باگ/ابهام:** در `lib/lib.md`، بخش «چرا `storage.ts` در این پوشه نیست؟» می‌گوید لایه LocalStorage «در کنار سایر سرویس‌های زیرساختی مثل **IndexedDB Service** باشد» — یعنی به وجود یک `indexedDbService` در `core/services/` اشاره می‌کند. اما `core/services/services.md` (بخشی که در همین بررسی قبلاً چک شد) دقیقاً برعکس این را می‌گوید: یک یادداشت مجزا با عنوان «چرا `indexedDbService.ts` از پروژه حذف شد؟» توضیح می‌دهد که این سرویس عمداً حذف شده و منطق نوشتن/خواندن IndexedDB مستقیماً در `core/db/db.ts` (با الگوی Write-to-temp-then-swap) پیاده می‌شود. این دو سند مستقیماً با هم در تناقض‌اند — یکی فرض می‌کند IndexedDB Service وجود دارد، دیگری صراحتاً می‌گوید وجود ندارد.
+
+**۲. محل:**
+- `docs/lib/lib.md` — بخش «چرا `storage.ts` در این پوشه نیست؟»
+- منبع صحت: `docs/core/services/services.md` — بخش «چرا `indexedDbService.ts` از پروژه حذف شد؟»
+
+**۳. راه‌حل:** عبارت «سایر سرویس‌های زیرساختی مثل IndexedDB Service» در `lib.md` حذف یا اصلاح شود، مثلاً: «... در کنار سایر سرویس‌های زیرساختی مشابه (مثل `sessionStorageService`) باشد؛ توجه: `indexedDbService` عمداً در پروژه وجود ندارد، چون نوشتن/خواندن IndexedDB مستقیماً در `core/db/db.ts` انجام می‌شود (به `services.md` مراجعه کنید).»
+
+---
+
+### مورد ۱۵ — نام نوع بازگشتی `usePriceSyncStore.lastFetchResult` (`FetchResult`) با نام واقعی نوع در `types.md` (`PriceFetchResult`) یکی نیست
+
+**۱. باگ/ابهام:** جدول `usePriceSyncStore` در `stores.md` فیلد `lastFetchResult` را با نوع `FetchResult | null` تعریف کرده. اما نوع واقعی که در `types.md` (بخش `events.ts`، درون `PriceFetchCompleted`) تعریف و استفاده شده `PriceFetchResult` است، نه `FetchResult`. این یا یک typo در نام‌گذاری است یا اشاره به یک نوع کاملاً متفاوت که هیچ‌جای دیگری تعریف نشده — در هر دو حالت، پیاده‌سازی واقعی گیج‌کننده می‌شود چون معلوم نیست باید از همان `PriceFetchResult` مشترک استفاده شود یا یک نوع جدید و مجزا برای Store ساخته شود.
+
+**۲. محل:**
+- `docs/stores/stores.md` — جدول `usePriceSyncStore`، فیلد `lastFetchResult`
+- منبع صحت: `docs/core/types/types.md` — بخش `events.ts`، نوع `PriceFetchResult`
+
+**۳. راه‌حل:** نام نوع در `stores.md` به `PriceFetchResult | null` اصلاح شود تا با `types.md` یکسان باشد (یا اگر واقعاً قرار است شکل متفاوتی داشته باشد، آن نوع به‌صراحت در `types.md` تعریف و نام‌گذاری شود).
+
+---
+
+### مورد ۱۶ — مسیر فایل `round.ts` بین ساختار پوشه و توضیح متنی در `utils.md` و `Rounding-Policy.md` ناسازگار است (`number/round.ts` در برابر `money/round.ts`)
+
+**۱. باگ/ابهام:** در بخش «ساختار پوشه» در `core/utils/utils.md`، فایل `round.ts` زیر پوشه‌ی **`number/`** لیست شده (`number/round.ts — گرد کردن اعشار`). اما بلافاصله بعد از همان بلوک کد، یک یادداشت صریح می‌گوید: «فایل **`money/round.ts`** تنها نقطه رسمی برای round کردن مبالغ مالی در کل پروژه است». همین مسیر اشتباه (`money/round.ts`) دوباره در `docs/core/rounding/Rounding-Policy.md` (هم در عنوان بخش «لایه پیاده‌سازی» و هم در جدول تناظر با `utils.md`) تکرار شده. یعنی سه اشاره از چهار اشاره به این فایل، مسیر `money/round.ts` را به کار برده‌اند و فقط ساختار پوشه آن را زیر `number/` گذاشته — یک ناسازگاری مسیر فایل بین خودِ سند و اسنادی که به آن ارجاع می‌دهند.
+
+**۲. محل:**
+- `docs/core/utils/utils.md` — ساختار پوشه (`number/round.ts`) در برابر یادداشت زیر آن (`money/round.ts`)
+- `docs/core/rounding/Rounding-Policy.md` — بخش «لایه پیاده‌سازی: `utils/money/round.ts`» و جدول تناظر با `utils.md`
+
+**۳. راه‌حل:** یکی از دو مسیر به‌عنوان مسیر رسمی انتخاب و در هر سه محل یکسان شود. با توجه به این‌که round کردن اساساً یک عملیات مالی حساس است (نه یک ابزار عمومی عدد)، پیشنهاد می‌شود فایل واقعاً به `money/round.ts` منتقل شود (هماهنگ با اکثریت ارجاعات) و ساختار پوشه در `utils.md` اصلاح شود تا `round.ts` زیر `money/` نمایش داده شود، نه `number/`.
