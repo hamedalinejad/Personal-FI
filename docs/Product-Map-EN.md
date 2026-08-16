@@ -47,4 +47,4 @@ General settings, themes, language, backup, and utility tools.
 19. Security & Privacy
 Data encryption, authentication, PIN, biometric, and audit logging.
 20. Price Fetching
-Manual on-demand fetching of live asset prices (crypto in v1; stocks, housing, and metals in future) from external APIs, with full offline caching. No dedicated page — accessed from within the Investments and Settings pages.
+Live price fetching for all investment asset types in v1 (crypto, Iran stocks, fixed-income fund NAV, metals) — via manual entry or optional Auto-Sync from external APIs, with full offline caching in price_history. No dedicated page — accessed from within the Investments and Settings pages.
