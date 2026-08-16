@@ -34,7 +34,7 @@
 - [x] 05-01-Investment-Crypto
 - [x] 05-02-Investment-Stocks-Iran
 - [x] 05-03-Fixed-Income-Funds
-- [ ] 05-04-Metals
+- [x] 05-04-Metals
 - [ ] 06-Physical-Assets
 - [ ] 07-Budget-Management
 - [ ] 08-Financial-Goals
@@ -440,3 +440,38 @@ interface EventBus {
 **۳. راه‌حل:** یکی از دو مسیر صریح شود:
 - **اگر Derived است**: فیلد `actualProfit` از تعریف جدول `inv_fif_transactions` حذف شود و `getProfitComparison()` توضیح دهد که چطور «سود واقعی» را از تفاضل NAVها/تراکنش‌های `dividend` در بازه محاسبه می‌کند.
 - **اگر Stored است**: مشخص شود چه فرایندی (مثلاً یک Job دوره‌ای که پس از هر `nav_update` سود واقعی بازه قبلی را محاسبه و در رکورد `nav_update` مربوطه ذخیره می‌کند) این فیلد را پر می‌کند، و این فرایند به بخش APIهای داخلی اضافه شود.
+
+### مورد ۲۸ — enum مقدار `type` در `Metals Platform Cash Transaction` بین تعریف Domain Entity و توضیح API ناسازگار است
+
+**۱. باگ/ابهام:** در بخش «Domain Entities» — «۴. Metals Platform Cash Transaction» — فیلد `type` به‌صراحت `string (deposit, withdraw)` تعریف شده. اما در بخش «APIهای داخلی» همان مقادیر متفاوت نوشته شده‌اند: `createPlatformCashTransaction(data) → واریز (type='deposit-investment') / برداشت (type='withdrawal-investment')`. این دو مجموعه مقدار (`deposit`/`withdraw` در برابر `deposit-investment`/`withdrawal-investment`) دقیقاً مثل هم نیستند — پیاده‌سازی بر اساس تعریف جدول باید `deposit`/`withdraw` ذخیره کند، درحالی‌که API صراحتاً مقدار دیگری را نام می‌برد. این نوع تناقض enum دقیقاً همان کلاس مشکلی است که پیش‌تر برای فیلد `network` در `Investment-Crypto.md` (مورد ۲۵) ثبت شد.
+
+**۲. محل:**
+- `docs/features/05-Investment/05-04-Metals/Metals.md` — Domain Entity «۴. Metals Platform Cash Transaction» (فیلد `type`)
+- همان فایل — بخش «APIهای داخلی» → `createPlatformCashTransaction(data)`
+
+**۳. راه‌حل:** یکی از دو مقدار به‌عنوان مرجع رسمی انتخاب و در هر دو محل یکسان شود. با توجه به این‌که سایر فیچرهای سرمایه‌گذاری (مثلاً واریز/برداشت صرافی) معمولاً از الگوی ساده `deposit`/`withdraw` استفاده می‌کنند و `-investment` صرفاً برای تمایز از انواع دیگر تراکنش در `acc_transactions` لازم است نه در این جدول داخلی، پیشنهاد می‌شود مقدار جدول `deposit`/`withdraw` باقی بماند و توضیح API اصلاح شود تا از همین دو مقدار استفاده کند (مگر این‌که مقدار `-investment` برای لینک به `relatedFeature`/`relatedId` در `acc_transactions` لازم باشد، که در این صورت باید صراحتاً توضیح داده شود این پسوند فقط روی رکورد `acc_transactions` اعمال می‌شود، نه روی `inv_metals_platform_transactions.type`).
+
+### مورد ۲۹ — فرمول «وزن خالص» در Business Rules از فیلدهای تعریف‌نشده (`karat`, `purityPermille`) استفاده می‌کند که با فیلد واقعی جدول (`purityRatio`) یکی نیست
+
+**۱. باگ/ابهام:** در Business Rules (زیرِ «واحد، عیار و وزن خالص باید همیشه مستقل بمانند — باگ ۳۵») دو فرمول جداگانه برای وزن خالص آمده:
+- طلای عیاری: `fineWeightMg = quantityMg × (karat / 24)`
+- نقره/مس: `fineWeightMg = quantityMg × (purityPermille / 1000)`
+
+اما در تعریف واقعی جدول `inv_metals_holdings` و `inv_metals_transactions` (Domain Entities) و در جدول «تمایز حیاتی» پایین‌تر در همان فایل، تنها فیلد موجود برای این محاسبه `purityRatio` (decimal بین ۰ و ۱، مثلاً ۱۸ عیار = `0.750`) است و فرمول رسمی آنجا `fineWeightMg = quantityMg × purityRatio` نوشته شده — که با هیچ‌کدام از دو فرمول بالا (`karat/24` یا `purityPermille/1000`) از نظر نام متغیر یکی نیست. نه `karat` (به‌صورت عدد صحیح ۱ تا ۲۴) و نه `purityPermille` هرگز به‌عنوان فیلد مستقل در جدول تعریف نشده‌اند — این یعنی یا این دو فرمول باقی‌مانده از یک طراحی قدیمی‌تر (قبل از یکسان‌سازی روی `purityRatio`) هستند و باید حذف/به‌روزرسانی شوند، یا پیاده‌سازی باید این تبدیل‌ها را به‌صورت جداگانه (و نه از `purityRatio` ذخیره‌شده) انجام دهد که با «وزن خالص محاسبه می‌شود و ذخیره نمی‌شود» تناقض دارد.
+
+**۲. محل:**
+- `docs/features/05-Investment/05-04-Metals/Metals.md` — Business Rules (فرمول‌های `karat/24` و `purityPermille/1000`)
+- همان فایل — Domain Entity «۲. Metals Holding» و جدول «تمایز حیاتی واحد/عیار/وزن خالص» (فرمول `quantityMg × purityRatio`)
+- همان فایل — بخش «منطق محاسبه سود/زیان» (بخش «وزن خالص») که هم فقط `purityRatio` را به‌کار می‌برد
+
+**۳. راه‌حل:** هر دو فرمول در Business Rules با فرمول واحد و رسمی `fineWeightMg = quantityMg × purityRatio` جایگزین شوند (چون `purityRatio` همان مقدار عیار/خلوص به‌صورت نرمال‌شده ۰ تا ۱ است و برای طلای عیاری = `karat/24` و برای خلوص permille = `purityPermille/1000` از پیش محاسبه و در همان فیلد ذخیره می‌شود). ذکر `karat` و `purityPermille` فقط باید به‌صورت توضیحی («یعنی چگونه `purityRatio` از عیار/permille مبدأ محاسبه شده») بماند، نه به‌عنوان فرمول مستقل با نام متغیر متفاوت از فیلد واقعی جدول.
+
+### مورد ۳۰ — برای Snapshot `inv_metals_platforms.cashBalance` هیچ تابع Reconciliation در `db.md` تعریف نشده (تکرار الگوی مورد ۲۲)
+
+**۱. باگ/ابهام:** طبق «قرارداد Reconciliation مرکزی» در `db.md`، هر Snapshot مشتق‌شده باید یک تابع Reconciliation اختصاصی داشته باشد. برای `inv_metals_holdings` این تابع وجود دارد (`reconcileMetalsHolding(holdingId)` → `quantityMg`/`totalInvested` ↔ Σ `inv_metals_transactions`)، اما `inv_metals_platforms.cashBalance` — که خودش دقیقاً یک Snapshot مشتق‌شده دیگر است (طبق «نکته طراحی» در `Metals.md`: با واریز/برداشت/خرید/فروش/تحویل فیزیکی تغییر می‌کند و `inv_metals_platform_transactions` «فقط لاگ» است) — هیچ تابع Reconciliation مستقلی در جدول APIهای Reconciliation در `db.md` ندارد. این دقیقاً همان کلاس مشکلی است که پیش‌تر برای `chk_cheques` (مورد ۲۲) ثبت شد؛ نکته مهم‌تر اینجا این است که `cashBalance` پلتفرم فلزات از **دو منبع** تغذیه می‌شود (هم `inv_metals_platform_transactions` برای واریز/برداشت، هم `inv_metals_transactions` برای خرید/فروش/تحویل)، بنابراین ریسک ناهماهنگی حتی بیشتر از یک Snapshot تک‌منبعی مثل `reconcileBrokerage` است.
+
+**۲. محل:**
+- `docs/core/db/db.md` — بخش «قرارداد Reconciliation مرکزی»، جدول APIهای Reconciliation (جای خالی برای پلتفرم فلزات)
+- `docs/features/05-Investment/05-04-Metals/Metals.md` — «نکته طراحی» زیر Domain Entity «۱. Metals Platform» (منبع صحت رفتار `cashBalance`)
+
+**۳. راه‌حل:** ردیف `reconcileMetalsPlatformCash(platformId)` به جدول APIهای Reconciliation در `db.md` اضافه شود که `cashBalance` را در برابر مجموع اثر هر دو منبع — Σ `inv_metals_platform_transactions` (deposit/withdraw) + Σ اثر نقدی `inv_metals_transactions` (خرید کسر می‌کند، فروش اضافه می‌کند، `deliveryFee` کسر می‌کند) — بررسی کند؛ همچنین به `reconcileAll()` اضافه شود.
