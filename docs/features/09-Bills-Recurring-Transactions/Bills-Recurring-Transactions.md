@@ -173,3 +173,11 @@
 - در Dashboard بخش «سررسیدهای نزدیک» و «معوق‌ها» باید برجسته نمایش داده شود.
 - این فیچر فقط قالب و زمان‌بندی را مدیریت می‌کند؛ تراکنش مالی واقعی همیشه از طریق Expense یا Income ثبت می‌شود.
 - نرخ تتر در زمان پرداخت در فیلد `br_occurrences.exchangeRateToBase` ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند (مشابه الگوی یکسان در سایر فیچرها مثل Physical Assets، Metals، Investments).
+
+---
+
+## راهنمای پیاده‌سازی
+- `br_items` قالب یادآوری؛ `br_occurrences` نمونه دوره
+- پرداخت occurrence → ساخت income/expense یا فقط mark paid طبق type
+- با `inc_recurring`/`exp_recurring` تداخل نکند (قانون انتخاب در Income/Expense)
+- Job: تولید occurrenceهای due؛ Notification سررسید

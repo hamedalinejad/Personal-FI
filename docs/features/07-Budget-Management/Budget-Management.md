@@ -200,3 +200,11 @@
  - `loan` → `ln_transactions`
 - در حالت `strictMode = true`، اگر `remainingAmount <= 0`: `applyTransactionToBudget` خطای اعتبارسنجی برمی‌گرداند و UI باید تأیید صریح کاربر را بگیرد — اما ثبت هزینه واقعی در `exp_transactions`/`acc_transactions` هرگز رد نمی‌شود (بودجه Soft Limit است، نه Hard Block).
 - برای Zero-Based کامل، مبلغ پاکت "آماده تخصیص" باید صفر شود.
+
+---
+
+## راهنمای پیاده‌سازی
+- Envelopeها snapshot مصرف از مجموع `exp_transactions` غیرvoid در بازه بودجه
+- انتقال بین envelopeها تراکنش بانکی نمی‌سازد (accountTransactionId null)
+- هشدار BudgetExceeded فقط Event + Notification؛ قفل اجباری خرج v1 اختیاری
+- تست: ثبت هزینه → remaining کاهش؛ void هزینه → remaining برمی‌گردد
