@@ -72,7 +72,7 @@
 - `id` → UUID
 - `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
 - `isEnabled` → boolean
-- `daysBefore` → number (چند روز قبل یادآوری شود)
+- `daysBefore` → number (مقدار پیش‌فرض سراسری: چند روز قبل از سررسید یادآوری شود؛ برای قبوض/تکرارشونده‌ها (`category='bill'`) این مقدار fallback است و توسط `br_items.reminderDaysBefore` در سطح آیتم override می‌شود اگر آن فیلد non-null باشد)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -112,7 +112,7 @@
 - `deactivateCustomReminder(notifReminderId)`
 
 ### Scheduler APIs
-- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود) — این تضمین می‌کند هر بار اجرای Job اعلان تکراری تولید نکند
+- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق اولویت `daysBefore`**: برای هر رکورد، ابتدا مقدار سطح‌آیتم بررسی می‌شود (مثلاً `br_items.reminderDaysBefore`)؛ اگر non-null بود از آن استفاده می‌شود، در غیر این صورت از `notif_settings.daysBefore` برای `category` مربوطه به‌عنوان fallback استفاده می‌شود؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود)
 - `checkBudgetAlerts()` → بررسی وضعیت بودجه‌ها
 - `checkGoalProgress()` → بررسی پیشرفت اهداف
 
@@ -159,7 +159,7 @@
 
 - اعلان‌ها باید سبک و غیرمزاحم باشند.
 - در حالت Offline، اعلان‌ها به صورت محلی ذخیره و نمایش داده می‌شوند.
-- Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند.
+- Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند؛ **اولویت `daysBefore`**: مقدار سطح‌آیتم (مثلاً `br_items.reminderDaysBefore`) بر مقدار سراسری `notif_settings.daysBefore` اولویت دارد؛ `notif_settings.daysBefore` فقط زمانی استفاده می‌شود که مقدار سطح‌آیتم `null` باشد.
 - از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders()` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
 - در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
 - تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.
