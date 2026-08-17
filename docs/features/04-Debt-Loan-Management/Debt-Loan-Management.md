@@ -1072,3 +1072,57 @@ ln_loan_fees:
 2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_liability` صریح (نادر).
 3. هر fee → `ln_transactions type=fee_payment` + `fin_journal_entries` با entryKind=fee.
 4. `capitalized_cost` فقط اگر محصولاً به cost of borrowing اضافه شود و در گزارش جداگانه مستند باشد.
+
+---
+
+## راهنمای پیاده‌سازی (برای توسعه‌دهنده)
+
+### توابع اجباری Domain
+| API | نقش |
+|-----|------|
+| `getPeriodRate(loan)` | تنها منبع `r` — هرگز `/12` ثابت |
+| `getTotalPeriods(loan)` | `n = totalInstallments` |
+| `getUpcomingPayments(loanId)` | جدول اقساط آینده بر اساس method + grace |
+| `createLoan(data)` | ایجاد وام + disbursement atomic |
+| `payLoan(loanId, payload)` | قسط / بهره / early / fee |
+| `addLoanFee` / `calculateFeeAmount` | قبل از اولین پرداخت قابل‌تعریف |
+| `reconcileLoan` / `rebuildLoanFromLedger` | snapshot vs ledger |
+
+### `createLoan` — ترتیب Atomic
+```text
+BEGIN
+  INSERT ln_loans (remainingBalance = principalAmount)
+  INSERT ln_loan_fees (+ tiers rows if tiered)
+  if qarz: compute serviceFeeAmount; INSERT fee_payment (expense)
+  INSERT ln_transactions type=disbursement
+  if borrowed: acc deposit-loan | if lent: acc withdrawal-loan
+  fin_journal_entries (loan + optional fee)
+  update account snapshots
+COMMIT → persist
+```
+
+### `payLoan` — قسط معمولی
+```text
+BEGIN
+  compute interestPortion / principalPortion with getPeriodRate (+ variable rate from ln_rate_history if needed)
+  INSERT ln_transactions installment_payment
+  remainingBalance -= principalPortion
+  optional monthly_management / per_transaction fees as fee_payment rows
+  acc_transactions (withdrawal-loan or deposit-loan per borrowed/lent)
+  journal entries
+COMMIT → persist
+```
+
+### Invariants
+- `remainingBalance >= 0`؛ قسط آخر principalPortion = remainingBalance دقیق
+- همه مبالغ decimal string + Rounding-Policy
+- `exchangeRateToBase` روی هر ln_transaction و acc مرتبط
+- fee پیش‌فرض **remainingBalance را عوض نمی‌کند**
+- variable rate: r از آخرین `ln_rate_history.effectiveDate <= dueDate`
+
+### تست‌های حداقل
+1. Declining monthly + weekly + custom interval  
+2. Qarz: remaining = full principal؛ fee جدا  
+3. Grace: interest-only vs payment holiday  
+4. Early payment با/بدون re-amortize  
+5. reconcileLoan بعد از payLoan → ok  
