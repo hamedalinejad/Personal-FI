@@ -479,9 +479,10 @@ holding.totalFeesPaidBase += feeBase
 
 ### Holding APIs
 - `getHoldings(exchangeId?)`
-- `getHoldingBySymbol(symbol, exchangeId?)`
+- `getHoldingByAssetKey(assetKey, exchangeId?)` / `getHoldingById(holdingId)`
+- `getHoldingBySymbol` فقط برای UI جستجو — هویت اصلی `assetKey` است
 - `getPortfolioValue(targetCurrency?)`
-- **`rebuildHolding(exchangeId, symbol)`** → بازسازی کامل یک Holding از لاگ تراکنش‌ها (بدون استفاده از مقادیر فعلی cache)
+- **`rebuildHolding(holdingId)`** یا `rebuildHolding({ exchangeId, assetKey })` → بازسازی از ledger (نه label `symbol`)
 
  ```typescript
  rebuildHolding(exchangeId: UUID, symbol: string): {
@@ -537,7 +538,7 @@ holding.totalFeesPaidBase += feeBase
 
  > **نکته**: برای رمزارزهایی که از IRR/USDT خریداری شده‌اند، `totalAmountBase` رکورد تراکنش مستقیماً هزینه به ارز پایه را دارد (طبق «ارز پایه محاسبات»). این تابع فقط از آن فیلد استفاده می‌کند — نیازی به نرخ ارز تاریخی در زمان Rebuild نیست.
 
-- **`reconcileHolding(exchangeId, symbol)`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
+- **`reconcileHolding(holdingId | { exchangeId, assetKey })`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
 
  ```typescript
  reconcileHolding(exchangeId: UUID, symbol: string): {
@@ -936,3 +937,40 @@ assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
 1. اگر فقط «quantity = مقدار دریافتی» ذخیره شود بدون gross/fee جدا، **بازسازی trade خام ناقص است** — هر سه فیلد وقتی fee روی leg مربوطه است الزامی‌اند.
 2. `netQuantity` مبنای holding؛ `grossQuantity` و `feeQuantity` برای audit و reconcile.
 3. `feeBase` و journal entry fee برای هر leg که fee دارد.
+
+---
+
+## راهنمای پیاده‌سازی
+
+### APIهای معامله (همه Atomic + journal + persist)
+| API | اثر |
+|-----|------|
+| `executeBuy` / `executeSell` | یک `inv_crypto_transactions` + به‌روز holding + optional cash holding IRR/USDT + optional `acc_transactions` اگر از بانک |
+| `executeC2C` | دو رکورد با `tradeGroupId` + gross/net/fee هر leg |
+| `executeTransfer` | transfer_out + transfer_in با `transferId`؛ fee network طبق `feePresence` |
+| `depositCash` / `withdrawCash` | فقط Bank↔Exchange در `inv_crypto_exchange_transactions` + `acc_transactions` |
+
+### ترتیب مشترک
+```text
+validate holdings / balances / feePresence fields
+BEGIN
+  write domain txs (with assetKey, quoteAsset, gross/net/fee quantities)
+  update holdings by netQuantity
+  totalFeesPaidBase += feeBase
+  fin_journal_entries
+  optional acc_transactions
+COMMIT → persist → UI success
+```
+
+### Invariants
+- `assetKey` NOT NULL + UNIQUE rules per exchange/network/contract
+- Holding quantity هرگز از net effects منفی نشود
+- Price fetch فقط با instrumentId/assetKey
+- rebuild/reconcile با holdingId یا assetKey — نه symbol تنها
+
+### تست حداقل
+1. BUY با fee_in_quote و fee_from_base_asset  
+2. SELL + realized PL  
+3. Transfer با fee 0.001 از asset (کل موجودی کاربر کم می‌شود)  
+4. C2C با gross/net روی BUY leg  
+5. USDT-ERC20 vs USDT-TRC20 دو holding جدا  
