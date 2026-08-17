@@ -88,4 +88,4 @@
 | `setManualCryptoPrice` | `instrumentId` + price |
 
 `instrumentId` = `assetKey` پایدار Holding (مثلاً `1:0xdac1…` یا `exchange:binance:USDT`). 
-امضای قدیمی بر پایه `symbol` **deprecated** و نباید در implementation جدید استفاده شود.
+امضای مبتنی بر `symbol` خام در implementation استفاده نشود؛ فقط `instrumentId` / `PriceAssetRef`.

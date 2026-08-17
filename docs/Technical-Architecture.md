@@ -54,10 +54,10 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 
 - نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی رخ ندهد.
 - **Persist مالی**: UI «ثبت شد» فقط بعد از COMMIT + await موفق IndexedDB swap؛ `beforeunload`/`visibilitychange` فقط best-effort هستند و روی موبایل تضمین نیستند.
-- **Persistence queue + Worker (باگ‌های ۴۴–۴۵)**: serialize سنگین و گزارش‌های حجیم نباید Main Thread را قفل کنند؛ جزئیات در `core/db/db.md`.
+- **Persistence queue + Worker **: serialize سنگین و گزارش‌های حجیم نباید Main Thread را قفل کنند؛ جزئیات در `core/db/db.md`.
 - در اولین اجرا `navigator.storage.persist` فراخوانی شود.
 - **Service Worker** برای Cache کردن App Shell و WASM sql.js الزامی است.
-- **Migration / Backup-Restore atomic (باگ‌های ۴۶–۴۸)**: قرارداد در `db.md` و `Settings-Tools.md` — بدون integrity check، Restore مجاز نیست.
+- **Migration / Backup-Restore atomic **: قرارداد در `db.md` و `Settings-Tools.md` — بدون integrity check، Restore مجاز نیست.
 - **Internal API**: UI و Feature A هرگز مستقیماً به جداول Feature B یا sql.js خام دسترسی ندارند؛ فقط از طریق API عمومی همان Feature.
 - **Atomic Financial Operation**: قالب مشترک BEGIN→validate→writes→COMMIT→persist در `db.md`.
 - **Web App Manifest** (`manifest.json`) با آیکون، `display: standalone` و `start_url` باید تعریف شود.
@@ -163,7 +163,7 @@ UI / Hooks
 
 ---
 
-## Integrity & Time (باگ‌های ۵۱–۵۵)
+## Integrity & Time 
 
 - **Reconciliation**: APIهای مرکزی در `core/db/db.md` — snapshot در برابر ledger.
 - **CHECK + FK**: schema سطح SQLite با CHECK و ON DELETE صریح؛ پیش‌فرض مالی RESTRICT.

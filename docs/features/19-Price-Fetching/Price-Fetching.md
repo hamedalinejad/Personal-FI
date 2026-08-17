@@ -21,7 +21,7 @@
 | FIF (صندوق) | `fundId` (نه symbol — چون issuance_redemption نماد بورسی ندارد) | NAV به ریال | **هیچ API عمومی یکپارچه‌ای وجود ندارد** — هر صندوق NAV را در سایت خودش منتشر می‌کند | **دستی، Fetch به‌صورت اختیاری per-fund در آینده** |
 | Metals | `metalType + purity` (نه symbol تکی) | ریال به ازای هر گرم | منابع نیمه‌رسمی قیمت طلا/سکه ایران (چند منبع رایج) | خودکار/دستی هر دو عملی |
 
-نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto همان `assetKey` یا `symbol` بورسی، و برای Stocks نماد داخلی سیستم است؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش ).
+نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto همان `assetKey` یا `symbol` بورسی، و برای Stocks نماد داخلی سیستم است؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش شناسه قیمت.
 
 ---
 
@@ -69,7 +69,7 @@
 
 1. هر منبع قیمت (Provider) به‌صورت مستقل در `price_sources` تعریف می‌شود؛ هر نماد می‌تواند از چند منبع قیمت بگیرد (مثلاً BTC هم از منبع A هم از منبع B).
 2. دریافت از API همیشه با اراده کاربر شروع می‌شود — یا با کلیک دستی، یا (در صورت فعال بودن) با تایمر Auto-Sync که خودِ کاربر روشنش کرده. **هیچ حالت سومی وجود ندارد.**
-3. هر بار دریافت **معتبر** (پس از Domain Validation — )، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی overwrite/حذف نمی‌شوند.
+3. هر بار دریافت **معتبر** (پس از Domain Validation )، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی overwrite/حذف نمی‌شوند.
 4. آخرین قیمت از `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود: جدیدترین رکورد معتبر `price_history` (نه میانگین). خروجی **همیشه** شامل `fetchedAt`, `priceAgeMs`, `isStale`, `staleAfterMs` است — هرگز «قیمت ۳ روزه» را بدون برچسب stale به‌عنوان current خام ارائه ندهد.
 4b. **Domain Validation قبل از ذخیره — اجباری در Application، نه فقط در Adapter**:
  قبل از INSERT در `price_history` همه این‌ها باید پاس شوند؛ در غیر این صورت نماد در `failed[]` با `failureKind='validation_error'` می‌رود و **چیزی نوشته نمی‌شود**:
@@ -160,7 +160,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 - `id` → UUID (Primary Key)
 - `sourceId` → UUID (nullable — لینک به `price_sources`؛ برای رکوردهای `source='manual'` مقدارش `null` است)
 - `instrumentId` → string (**الزامی** — شناسه پایدار داخلی دارایی؛ برای FIF = `fundId`، crypto = `assetKey`، stock = نماد داخلی، metal = `{metalType}_{purity}` — ؛ کوئری‌ها با `assetCategory + instrumentId` فیلتر می‌شوند نه فقط symbol)
-- `symbol` → string (**deprecated به‌عنوان شناسه اصلی** — فقط برای سازگاری/نمایش legacy؛ می‌تواند برابر `instrumentId` باشد — )
+- `symbol` → string (**deprecated به‌عنوان شناسه اصلی** — فقط برای سازگاری/نمایش legacy؛ می‌تواند برابر `instrumentId` باشد.
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — فقط همین چهار مقدار؛ هم‌راستا با `AssetCategory` در types.md
 - `price` → decimal (قیمت — با `decimal.js`)
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
@@ -429,7 +429,6 @@ Adapter فقط `PriceAssetRef` می‌گیرد — نه Holding خام متفا�
 
 ## شناسه قیمت در `price_history`
 
-> **✅ اعمال‌شده در Domain Entity بالا**: فیلد `instrumentId` الزامی شد و `symbol` به deprecated تغییر یافت. این بخش برای توضیح دلیل تصمیم نگه داشته شده است.
 
 ستون تاریخی `symbol` برای چند معنی overload شده بود (BTC در برابر UUID صندوق). قرارداد واحد:
 
@@ -446,7 +445,6 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 
 ## Quote کامل‌تر 
 
-> **✅ اعمال‌شده در Domain Entity بالا**: فیلدهای `quoteType` (الزامی) و `marketDate` (nullable) به جدول `price_history` اضافه شدند. این بخش برای توضیح دلیل تصمیم و قوانین تکمیلی نگه داشته شده است.
 
 حداقل فیلدهای `price_history` برای Quote مالی:
 

@@ -207,7 +207,7 @@
 - `averageBuyPrice` → decimal
 - `currency` → string
 - `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (مجموع تجمیعی کارمزدها به **baseCurrency کاربر** — ؛ جایگزین `totalFeesPaidUSDT`)
+- `totalFeesPaidBase` → decimal (مجموع تجمیعی کارمزدها به **baseCurrency کاربر** )
 - `createdAt` → datetime
 - `updatedAt` → datetime
 

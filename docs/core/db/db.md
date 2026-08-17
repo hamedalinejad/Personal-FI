@@ -147,7 +147,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `chk_cheques` | Cheque Management | چک‌ها |
 | `ln_loans` | Debt & Loan | وام‌ها |
 | `ln_loan_fees` | Debt & Loan | کارمزدهای وام (صدور، پیش‌پرداخت، ماهانه، پلکانی و ...) |
-| `ln_loan_fee_tiers` | Debt & Loan | ردیف‌های پلکانی کارمزد وام (جایگزین فیلد deprecated `tiers` در `ln_loan_fees`) |
+| `ln_loan_fee_tiers` | Debt & Loan | ردیف‌های پلکانی کارمزد وام (جایگزین فیلد قدیمی `tiers` در `ln_loan_fees`) |
 | `ln_transactions` | Debt & Loan | تراکنش‌های وام |
 | `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
@@ -251,7 +251,7 @@ export interface InvFifHolding {
  units: Decimal;
  averageBuyPrice: Decimal; // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
  totalInvested: Decimal;
- totalFeesPaidBase: Decimal; // was totalFeesPaidUSDT
+ totalFeesPaidBase: Decimal;
  currentNAV: Decimal; // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
  lastSubscriptionPrice?: Decimal;
  lastRedemptionPrice?: Decimal;
@@ -291,7 +291,7 @@ export interface InvMetalsHolding {
  quantityMg: Decimal; // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
  averageBuyPricePerMg: Decimal; // میانگین همان purity (نه طلای خالص)
  totalInvested: Decimal;
- totalFeesPaidBase: Decimal; // was totalFeesPaidUSDT
+ totalFeesPaidBase: Decimal;
 }
 
 export interface InvMetalsTransaction {
@@ -470,7 +470,7 @@ open DB from IndexedDB
 
 ---
 
-## قرارداد Backup / Restore (باگ‌های ۴۷ و ۴۸ — Critical)
+## قرارداد Backup / Restore
 
 ### Export (Backup)
 فایل backup حداقل شامل:

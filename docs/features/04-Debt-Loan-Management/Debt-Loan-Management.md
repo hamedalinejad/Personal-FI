@@ -210,12 +210,12 @@
 - `rate` → decimal (nullable — نرخ درصدی برای `feeType` های percentage-based — مثلاً 1.5)
 - `minAmount` → decimal (nullable — حداقل کارمزد — برای همه انواع)
 - `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
-- `tiers` → JSON (nullable — **deprecated برای داده جدید**؛ فقط مهاجرت)
+- `tiers` → JSON (nullable — فقط برای مهاجرت داده قدیمی؛ داده جدید از `ln_loan_fee_tiers`)
 - برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers`
 
 ### ۵-الف. Loan Fee Tiers (جدول: `ln_loan_fee_tiers`)
 
-جایگزین رسمی فیلد deprecated شده `tiers` (JSON) در `ln_loan_fees`. هر ردیف یک بازه از پلکان کارمزد است.
+جایگزین رسمی فیلد قدیمی `tiers` (JSON) در `ln_loan_fees`. هر ردیف یک بازه از پلکان کارمزد است.
 
 - `id` → UUID (Primary Key)
 - `loanFeeId` → UUID (FK به `ln_loan_fees.id`)

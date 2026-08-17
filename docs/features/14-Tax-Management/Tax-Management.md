@@ -67,7 +67,7 @@
 - `status` → string (`pending`, `paid`, `overdue`, `cancelled`)
 - `taxYear` → number (عدد سال مالیاتی — مثلاً 1404 یا 2026)
 - `taxCalendar` → string (`jalali` | `gregorian`) — **اجباری با taxYear**؛ بدون تقویم، عدد سال تفسیرپذیر نیست
-- `year` → number (deprecated alias؛ در پیاده‌سازی فقط `taxYear` + `taxCalendar` نوشته شود)
+- در پیاده‌سازی فقط `taxYear` + `taxCalendar` نوشته شود (فیلد `year` به‌تنهایی استفاده نشود)
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions` — nullable)

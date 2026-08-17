@@ -148,7 +148,7 @@
 
 ### Backup APIs
 - `createBackup` → Export SQLite + متادیتا (`schemaVersion`, `appVersion`, `exportedAt`, `checksum`) + ثبت `stg_backup_logs`
-- `restoreBackup(file)` → **Atomic Restore** با Integrity Contract (باگ‌های ۴۷–۴۸):
+- `restoreBackup(file)` → **Atomic Restore** با Integrity Contract :
  1. تأیید کاربر
  2. checksum + schemaVersion + load temp
  3. `integrity_check` + `foreign_key_check` + required tables
