@@ -146,6 +146,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `chk_cheques` | Cheque Management | چک‌ها |
 | `ln_loans` | Debt & Loan | وام‌ها |
 | `ln_loan_fees` | Debt & Loan | کارمزدهای وام (صدور، پیش‌پرداخت، ماهانه، پلکانی و ...) |
+| `ln_loan_fee_tiers` | Debt & Loan | ردیف‌های پلکانی کارمزد وام (جایگزین فیلد deprecated `tiers` در `ln_loan_fees`) |
 | `ln_transactions` | Debt & Loan | تراکنش‌های وام |
 | `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
