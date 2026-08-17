@@ -91,6 +91,17 @@ getPendingCheques() → چک‌های در انتظار
 getTotalChequesByStatus(status, startDate?, endDate?) → مجموع چک‌ها بر اساس وضعیت
 getUpcomingDueCheques(days) → چک‌های نزدیک به سررسید (برای یادآوری)
 getPendingPayableChequesByAccount(accountId) → مجموع و لیست چک‌های پرداختی pending یک حساب — ورودی `getAvailableBalance` در Accounts & Banking
+**reconcileCheque(chequeId)** → بررسی سازگاری `status`/`accountTransactionId`/`reversalTransactionId` در `chk_cheques` با وضعیت واقعی تراکنش‌های مرتبط در `acc_transactions` — بر اساس ماتریس state machine در `db.md`
+
+```typescript
+reconcileCheque(chequeId: UUID): {
+  status: 'ok' | 'mismatch'
+  chequeStatus: string
+  issues: string[]  // توضیح هر ناهماهنگی یافت‌شده
+}
+```
+
+**زمان استفاده**: پس از Migration، پس از Import/Restore، در `reconcileAll()`.
 
 
 روابط با سایر فیچرها
