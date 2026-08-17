@@ -9,11 +9,11 @@ Must Have:
 
 ثبت هزینه جدید (مبلغ، تاریخ، حساب مبدأ، توضیحات)
 ارز هزینه = ارز حساب مبدأ
-ذخیره نرخ تبدیل لحظه ثبت (نسبت به دلار/تتر)
+ذخیره نرخ تبدیل لحظه ثبت (نسبت به baseCurrency کاربر)
 ویرایش هزینه
 مشاهده لیست هزینه‌ها با فیلتر (تاریخ، حساب، دسته‌بندی)
 ثبت و مدیریت هزینه تکرارشونده (جدول جدا)
-مشاهده مجموع هزینه در بازه‌های زمانی مختلف (به ریال و دلار/تتر با نرخ تاریخی)
+مشاهده مجموع هزینه در بازه‌های زمانی مختلف (به ارز حساب و baseCurrency با نرخ تاریخی)
 
 Should Have:
 
@@ -26,7 +26,7 @@ Business Rules
 
 هر هزینه باید از یک حساب بانکی پرداخت شود.
 ارز هزینه حتماً با ارز حساب مبدأ یکی است.
-هنگام ثبت هزینه، نرخ تبدیل لحظه ثبت (نسبت به دلار/تتر) ذخیره می‌شود.
+هنگام ثبت هزینه، نرخ تبدیل لحظه ثبت (نسبت به baseCurrency کاربر) ذخیره می‌شود.
 ثبت هزینه باعث کاهش currentBalance حساب مبدأ می‌شود.
 موجودی حساب نمی‌تواند منفی شود (مگر حساب اعتباری در آینده).
 ارزش تاریخی هزینه با نرخ زمان ثبت حفظ می‌شود.
@@ -51,7 +51,7 @@ id → UUID (Primary Key)
 date → datetime (تاریخ هزینه)
 amount → decimal (مبلغ هزینه — به ارز حساب)
 currency → string (ارز هزینه = ارز حساب مبدأ)
-exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 accountId → UUID (حساب مبدأ)
 description → string (توضیحات)
 category → string (دسته‌بندی: خوراک، حمل‌ونقل، مسکن، سرگرمی و ...)
@@ -132,3 +132,20 @@ Reports و Dashboard: گزارش هزینه با نرخ تاریخی
 Budget: تأثیر روی بودجه ماهانه
 
 > **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Loan و Cheque).
+
+## قرارداد ثبت (پیاده‌سازی)
+
+`createExpense` داخل یک `runAtomicFinancialOperation`:
+
+1. validate: amount > 0، currency == account.currency، date ≤ today، موجودی کافی (ledger mode)
+2. INSERT `exp_transactions` (isVoided=false)
+3. INSERT `acc_transactions` با `type='withdrawal-expense'`، relatedFeature=`expense`، relatedId=exp id
+4. INSERT `fin_journal_entries` (entryKind=expense)
+5. به‌روز snapshot حساب
+6. COMMIT → persist
+
+`correctExpense`: همان الگوی دولایه void+reversal+insert جدید.
+
+`getTotalExpense` / گزارش‌ها: فقط `isVoided = false`.
+
+دسته‌ها: فقط از `99-Common-Categories/Categories.md` (لیست هزینه).

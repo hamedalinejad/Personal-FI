@@ -8,11 +8,11 @@ Must Have:
 
 ثبت درآمد جدید (مبلغ، تاریخ، حساب مقصد، توضیحات)
 ارز درآمد = ارز حساب مقصد
-ذخیره نرخ تبدیل لحظه ثبت (نسبت به دلار/تتر)
+ذخیره نرخ تبدیل لحظه ثبت (نسبت به baseCurrency کاربر)
 ویرایش درآمد
 مشاهده لیست درآمدها با فیلتر (تاریخ، حساب، دسته‌بندی)
 ثبت و مدیریت درآمد تکرارشونده (جدول جدا)
-مشاهده مجموع درآمد در بازه‌های زمانی مختلف (به ریال و دلار/تتر با نرخ تاریخی)
+مشاهده مجموع درآمد در بازه‌های زمانی مختلف (به ارز حساب و baseCurrency با نرخ تاریخی)
 
 Should Have:
 
@@ -24,7 +24,7 @@ Business Rules
 
 هر درآمد باید به یک حساب بانکی واریز شود.
 ارز درآمد حتماً با ارز حساب مقصد یکی است.
-هنگام ثبت درآمد، نرخ تبدیل لحظه ثبت (نسبت به دلار/تتر) ذخیره می‌شود.
+هنگام ثبت درآمد، نرخ تبدیل لحظه ثبت (نسبت به baseCurrency کاربر) ذخیره می‌شود.
 ثبت درآمد باعث افزایش currentBalance حساب مقصد می‌شود.
 ارزش تاریخی درآمد با نرخ زمان ثبت حفظ می‌شود.
 درآمد تکرارشونده در جدول جدا نگهداری می‌شود و از روی آن تراکنش واقعی تولید می‌شود.
@@ -49,7 +49,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
@@ -131,3 +131,20 @@ Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 > **نکته مهم**: برای یکسان‌سازی دسته‌بندی‌ها و جلوگیری از typo، لیست استاندارد دسته‌ها در فایل `99-Common-Categories/Categories.md` تعریف شده است. برای درآمدها باید از دسته‌های لیست درآمد استفاده شود.
 
 > **نکته نام‌گذاری**: فیلد `accountTransactionId` لینک به `acc_transactions` است.
+
+## قرارداد ثبت (پیاده‌سازی)
+
+`createIncome` داخل یک `runAtomicFinancialOperation`:
+
+1. validate: amount > 0، currency == account.currency، date ≤ today، account not archived
+2. INSERT `inc_transactions` (isVoided=false)
+3. INSERT `acc_transactions` با `type='deposit-income'`، relatedFeature=`income`، relatedId=inc id
+4. INSERT `fin_journal_entries` (entryKind=income)
+5. به‌روز `acc_accounts.currentBalance` و `balanceAfterTransaction`
+6. COMMIT → persist
+
+`correctIncome`: void هر دو لایه + reversal acc + رکوردهای جدید؛ یک operationId مشترک.
+
+`getTotalIncome` / گزارش‌ها: فقط `isVoided = false`.
+
+دسته‌ها: فقط از `99-Common-Categories/Categories.md` (لیست درآمد).
