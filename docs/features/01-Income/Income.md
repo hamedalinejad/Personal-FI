@@ -49,7 +49,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToBase` → decimal (نرخ تبدیل لحظه ثبت نسبت به دلار/تتر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
