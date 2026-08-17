@@ -306,3 +306,26 @@ fineWeightMg = quantityMg × purityRatio
 
 ### تست
 خرید 1g 18K؛ delivery؛ platform cash vs bank؛ purity اشتباه نپذیرد
+
+### مثال عددی عیار و وزن (تست)
+
+```
+خرید: 1 گرم طلای ۱۸ عیار
+quantityMg = 1000
+purity = 18k
+purityRatio = 18/24 = 0.75
+fineWeightMg (محاسبه‌ای) = 1000 × 0.75 = 750
+
+قیمت روز طلای ۱۸ عیار: 3,000,000 IRR per gram → pricePerMg = 3,000
+totalAmount = 1000 × 3000 = 3,000,000
+
+اشتباه ممنوع:
+  ارزش‌گذاری با قیمت ۲۴ عیار روی quantityMg=1000
+  یا فرض fineWeightMg=1000 برای ۱۸ عیار
+
+خرید دوم همان holding (همان metalType+purity):
+  +500mg @ 3,200 per mg
+  qty=1500, weighted average از totalInvested
+```
+
+Holding جدا برای `gold`+`24k` در برابر `gold`+`18k`.
