@@ -70,6 +70,14 @@ getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')
 >
 > ⚠️ **BUG-025**: `currentBalance` Snapshot است نه Ledger. برای هر عملیاتی که روی صحت موجودی حساس است (برداشت، انتقال)، حتماً `mode='ledger'` استفاده شود — جزئیات در `core/db/db.md → BUG-025`.
 
+getAvailableBalance(accountId) → موجودی در دسترس (فقط‌خواندنی — برای نمایش هشدار در UI)
+> ```
+> getAvailableBalance(accountId) =
+>   currentBalance
+>   − Σ (amount of pending پرداختی cheques روی این حساب)
+> ```
+> این مقدار **کمتر یا مساوی** `currentBalance` است. در UI کنار موجودی واقعی نمایش داده می‌شود تا کاربر از تعهدات چک‌های صادرشده‌ی هنوز وصول‌نشده آگاه باشد. این یک **هشدار اطلاعاتی** است، نه قید سخت — سیستم مانع ثبت تراکنش جدید نمی‌شود.
+
 Transaction:
 
 createTransaction(data)
