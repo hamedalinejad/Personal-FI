@@ -8,14 +8,14 @@
 
 ```bash
 stores/
-├── useAppStore.ts           # تنظیمات UI اپ (تم، زبان، فرمت‌ها)
-├── useCurrencyStore.ts      # نرخ ارز جاری + تابع convert()
-├── useUiStore.ts            # State رابط کاربری (سایدبار، مودال، loading)
-├── usePriceSyncStore.ts     # وضعیت دریافت قیمت‌ها (در حال fetch، آخرین نتیجه)
-└── index.ts                 # re-export مرکزی
+├── useAppStore.ts # تنظیمات UI اپ (تم، زبان، فرمت‌ها)
+├── useCurrencyStore.ts # نرخ ارز جاری + تابع convert()
+├── useUiStore.ts # State رابط کاربری (سایدبار، مودال، loading)
+├── usePriceSyncStore.ts # وضعیت دریافت قیمت‌ها (در حال fetch، آخرین نتیجه)
+└── index.ts # re-export مرکزی
 ```
 
-> **چرا `useAccountStore` در این پوشه نیست؟**  
+> **چرا `useAccountStore` در این پوشه نیست؟** 
 > لیست حساب‌ها داده مالی اصلی است و باید مستقیماً از SQLite خوانده شود، نه در یک Store سراسری cached بماند. هر کامپوننتی که به لیست حساب‌ها نیاز دارد، از API لایه Domain مستقیم کوئری می‌زند. Store فقط برای State‌ای است که واقعاً بین صفحات مختلف بدون کوئری مجدد لازم است.
 
 ---

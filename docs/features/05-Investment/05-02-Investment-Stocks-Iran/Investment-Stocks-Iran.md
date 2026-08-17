@@ -14,25 +14,25 @@
 4. خرید از cashBalance کارگزاری کسر و به Holding اضافه می‌شود.
 5. فروش از Holding کسر و خالص مبلغ به cashBalance کارگزاری اضافه می‌شود.
 6. **کارمزد و مالیات**:
-   - `feeAmount` فیلد Total و برای سازگاری با مدل قبلی **حذف نمی‌شود**.
-   - `feeBrokerCommission` = کارمزد کارگزار.
-   - `feeExchange` = کارمزد/هزینه بورس و ارکان بازار.
-   - `feeTax` = مالیات.
-   - `feeOther` = سایر هزینه‌ها و کارمزدهای قابل گزارش.
-   - برای تراکنش‌های جدید: `feeAmount = feeBrokerCommission + feeExchange + feeTax + feeOther`.
-   - برای داده‌های قدیمی که Breakdown ندارند، `feeAmount` اصلی بدون تغییر حفظ می‌شود و اجزای Breakdown می‌توانند null/0 باشند؛ هیچ داده‌ای نباید حذف یا بازنویسی شود.
+ - `feeAmount` فیلد Total و برای سازگاری با مدل قبلی **حذف نمی‌شود**.
+ - `feeBrokerCommission` = کارمزد کارگزار.
+ - `feeExchange` = کارمزد/هزینه بورس و ارکان بازار.
+ - `feeTax` = مالیات.
+ - `feeOther` = سایر هزینه‌ها و کارمزدهای قابل گزارش.
+ - برای تراکنش‌های جدید: `feeAmount = feeBrokerCommission + feeExchange + feeTax + feeOther`.
+ - برای داده‌های قدیمی که Breakdown ندارند، `feeAmount` اصلی بدون تغییر حفظ می‌شود و اجزای Breakdown می‌توانند null/0 باشند؛ هیچ داده‌ای نباید حذف یا بازنویسی شود.
 7. سود نقدی با `type = 'dividend'` ثبت می‌شود و جزو Realized P&L خرید/فروش نیست.
 8. موجودی حساب بانکی، cashBalance کارگزاری و quantity سهم نمی‌توانند منفی شوند.
 9. تراکنش ثبت‌شده قابل ویرایش/حذف مستقیم نیست و اصلاح با void/reversal انجام می‌شود.
 10. **Price Mapping**:
-    - `symbol` فقط شناسه داخلی و قابل نمایش سیستم است.
-    - `priceProviderId` به `price_sources.id` اشاره می‌کند و Provider قیمت را مشخص می‌کند.
-    - `providerSymbol` شناسه دقیق همان نماد در همان Provider است.
-    - `market` context بازار است و در صورت نیاز Provider ارسال می‌شود.
-    - Price Fetching باید از ترکیب `priceProviderId + providerSymbol + market` استفاده کند.
-    - استفاده مستقیم از `symbol` فقط fallback موقت هنگام نبود Mapping است و نباید به‌عنوان Mapping قطعی ذخیره شود.
-    - Mapping ناقص باید قابل تشخیص و گزارش در UI/API باشد.
-    - `price_history.sourceId` باید Provider واقعی قیمت ذخیره‌شده را حفظ کند.
+ - `symbol` فقط شناسه داخلی و قابل نمایش سیستم است.
+ - `priceProviderId` به `price_sources.id` اشاره می‌کند و Provider قیمت را مشخص می‌کند.
+ - `providerSymbol` شناسه دقیق همان نماد در همان Provider است.
+ - `market` context بازار است و در صورت نیاز Provider ارسال می‌شود.
+ - Price Fetching باید از ترکیب `priceProviderId + providerSymbol + market` استفاده کند.
+ - استفاده مستقیم از `symbol` فقط fallback موقت هنگام نبود Mapping است و نباید به‌عنوان Mapping قطعی ذخیره شود.
+ - Mapping ناقص باید قابل تشخیص و گزارش در UI/API باشد.
+ - `price_history.sourceId` باید Provider واقعی قیمت ذخیره‌شده را حفظ کند.
 
 ---
 
@@ -52,13 +52,13 @@
 
 `cashBalance` یک snapshot برای محاسبات سریع است و باید با تراکنش‌های مالی هماهنگ بماند.
 
-> **منبع حقیقت (BUG-018)**: **Ledger** (`inv_stocks_iran_brokerage_transactions` + لینک‌های `acc_transactions`) authoritative است. `cashBalance` مشتق/کش است. در صورت اختلاف `reconcileBrokerage`: گزارش delta؛ Repair صریح فقط با تأیید کاربر snapshot را از ledger بازمی‌سازد — سیستم به‌صورت خاموش ledger را از snapshot بازنویسی نمی‌کند.
+> **منبع حقیقت**: **Ledger** (`inv_stocks_iran_brokerage_transactions` + لینک‌های `acc_transactions`) authoritative است. `cashBalance` مشتق/کش است. در صورت اختلاف `reconcileBrokerage`: گزارش delta؛ Repair صریح فقط با تأیید کاربر snapshot را از ledger بازمی‌سازد — سیستم به‌صورت خاموش ledger را از snapshot بازنویسی نمی‌کند.
 
 ### ۲. Stock Holding — `inv_stocks_iran_holdings`
 
 - `id` → UUID
 - `brokerageId` → UUID
-- `instrumentId` → string (**اجباری — BUG-H05**؛ هویت پایدار داخلی، ترجیحاً ISIN یا UUID ثابت سیستم؛ با تغییر نماد عوض **نمی‌شود**)
+- `instrumentId` → string (**اجباری — **؛ هویت پایدار داخلی، ترجیحاً ISIN یا UUID ثابت سیستم؛ با تغییر نماد عوض **نمی‌شود**)
 - `isin` → string nullable — ISIN رسمی وقتی شناخته شده
 - `symbol` → string — **نماد نمایشی فعلی** (فولاد، …)؛ با corporate action قابل تغییر است
 - `name` → string
@@ -68,12 +68,11 @@
 - `quantity` → decimal
 - `averageBuyPrice` → decimal ریال
 - `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (به baseCurrency — BUG-C04)
-- `totalFeesPaidUSDT` → deprecated
+- `totalFeesPaidBase` → decimal (به baseCurrency — )
 - `createdAt` / `updatedAt` → datetime
 
-> **هویت (BUG-H05)**: کلید منطقی Holding = `brokerageId + instrumentId` (نه `brokerageId + symbol`).  
-> `symbol` / `market` / `providerSymbol` metadata قابل‌تغییرند. تاریخچه تغییر نماد در `inv_stocks_iran_symbol_history` یا event corporate action ثبت می‌شود.  
+> **هویت**: کلید منطقی Holding = `brokerageId + instrumentId` (نه `brokerageId + symbol`). 
+> `symbol` / `market` / `providerSymbol` metadata قابل‌تغییرند. تاریخچه تغییر نماد در `inv_stocks_iran_symbol_history` یا event corporate action ثبت می‌شود. 
 > Mapping قیمت: `priceProviderId + providerSymbol + market`؛ Provider هرگز `symbol` داخلی را هویت فرض نکند.
 
 ### ۳. Stock Transaction — `inv_stocks_iran_transactions`
@@ -81,19 +80,19 @@
 - `id` → UUID
 - `brokerageId` → UUID
 - `symbol` → string
-- `type` → enum گسترده (BUG-H04):
-  - `buy` | `sell` | `dividend`
-  - `capital_increase` — افزایش سرمایه (نقدی/از محل مطالبات)
-  - `rights_issue` — تخصیص حق تقدم
-  - `rights_exercise` — تبدیل/استفاده حق تقدم
-  - `rights_sell` — فروش حق تقدم
-  - `bonus_share` — سهام جایزه
-  - `split` — تجزیه سهم
-  - `reverse_split` — تجمیع سهم
-  - `symbol_change` — تغییر نماد (quantity ثابت؛ metadata)
-  - `isin_change` — تغییر ISIN/شناسه
-  - `transfer_ca` — انتقال ناشی از corporate action بین instrumentها
-  - `suspension_note` — اختیاری ثبت توقف/بازگشایی (معمولاً بدون اثر quantity)
+- `type` → enum گسترده:
+ - `buy` | `sell` | `dividend`
+ - `capital_increase` — افزایش سرمایه (نقدی/از محل مطالبات)
+ - `rights_issue` — تخصیص حق تقدم
+ - `rights_exercise` — تبدیل/استفاده حق تقدم
+ - `rights_sell` — فروش حق تقدم
+ - `bonus_share` — سهام جایزه
+ - `split` — تجزیه سهم
+ - `reverse_split` — تجمیع سهم
+ - `symbol_change` — تغییر نماد (quantity ثابت؛ metadata)
+ - `isin_change` — تغییر ISIN/شناسه
+ - `transfer_ca` — انتقال ناشی از corporate action بین instrumentها
+ - `suspension_note` — اختیاری ثبت توقف/بازگشایی (معمولاً بدون اثر quantity)
 - `quantity` → decimal nullable برای dividend
 - `price` → decimal nullable برای dividend
 - `totalAmount` → decimal
@@ -107,16 +106,16 @@
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
-- **Tax metadata (باگ ۵۶)**: `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount` (هم‌راستا با `feeTax`), `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — قرارداد کامل در `Tax-Management.md`
+- **Tax metadata**: `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount` (هم‌راستا با `feeTax`), `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — قرارداد کامل در `Tax-Management.md`
 
 **Invariant جدید:**
 
 ```text
 feeAmount =
-    feeBrokerCommission
-  + feeExchange
-  + feeTax
-  + feeOther
+ feeBrokerCommission
+ + feeExchange
+ + feeTax
+ + feeOther
 ```
 
 این invariant برای تراکنش‌های جدید الزامی است. داده‌های legacy که فقط `feeAmount` دارند باید بدون تغییر باقی بمانند.
@@ -157,35 +156,35 @@ feeAmount =
 - `getPortfolioValue()`
 - **`reconcileStockHolding(holdingId)`** → مقایسه `quantity` / `totalInvested` / `averageBuyPrice` snapshot با محاسبه از صفر از روی لاگ تراکنش‌ها
 
-  ```typescript
-  reconcileStockHolding(holdingId: UUID): ReconcileResult & {
-    fields: {
-      quantity:        { stored: Decimal; calculated: Decimal; match: boolean }
-      totalInvested:   { stored: Decimal; calculated: Decimal; match: boolean }
-      averageBuyPrice: { stored: Decimal; calculated: Decimal; match: boolean }
-    }
-  }
-  ```
+ ```typescript
+ reconcileStockHolding(holdingId: UUID): ReconcileResult & {
+ fields: {
+ quantity: { stored: Decimal; calculated: Decimal; match: boolean }
+ totalInvested: { stored: Decimal; calculated: Decimal; match: boolean }
+ averageBuyPrice: { stored: Decimal; calculated: Decimal; match: boolean }
+ }
+ }
+ ```
 
-  **الگوریتم محاسبه** (Weighted Average از صفر از `inv_stocks_iran_transactions` غیر‌void، به‌ترتیب `date ASC`):
-  ```
-  qty = 0 | totalInvested = 0
+ **الگوریتم محاسبه** (Weighted Average از صفر از `inv_stocks_iran_transactions` غیر‌void، به‌ترتیب `date ASC`):
+ ```
+ qty = 0 | totalInvested = 0
 
-  برای هر تراکنش:
-    buy:  totalInvested += (quantity × price) + feeAmount
-          qty           += quantity
-    sell: soldCost       = quantity × (totalInvested / qty)
-          totalInvested -= soldCost
-          qty           -= quantity
+ برای هر تراکنش:
+ buy: totalInvested += (quantity × price) + feeAmount
+ qty += quantity
+ sell: soldCost = quantity × (totalInvested / qty)
+ totalInvested -= soldCost
+ qty -= quantity
 
-  averageBuyPrice = qty > 0 ? totalInvested / qty : 0
-  ```
+ averageBuyPrice = qty > 0 ? totalInvested / qty : 0
+ ```
 
-  **در صورت Mismatch**: ثبت در `fin_audit_log` + هشدار به کاربر + گزینه Repair (بازسازی snapshot از لاگ با تأیید کاربر).
+ **در صورت Mismatch**: ثبت در `fin_audit_log` + هشدار به کاربر + گزینه Repair (بازسازی snapshot از لاگ با تأیید کاربر).
 
 - **`rebuildStockHolding(holdingId)`** → بازسازی کامل `quantity` / `totalInvested` / `averageBuyPrice` از لاگ تراکنش‌ها و آپدیت atomic در `inv_stocks_iran_holdings`
 
-  **زمان استفاده الزامی**: پس از هر Reversal (void) تراکنش سهام، پس از Migration، پس از Import/Restore.
+ **زمان استفاده الزامی**: پس از هر Reversal (void) تراکنش سهام، پس از Migration، پس از Import/Restore.
 
 ### Transaction
 - `createStockTransaction(data)`
@@ -259,11 +258,11 @@ Realized و Unrealized نباید با یکدیگر مخلوط شوند.
 - موجودی نقدی کارگزاری از موجودی سهام جداست.
 - ساختار باید ساده، ماژولار، Offline-First و قابل استفاده توسط APIهای مستقل باقی بماند.
 
-> **exchangeRateToBase (BUG-003)**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
+> **exchangeRateToBase**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
 
 ---
 
-## Corporate Actions سهام ایران (BUG-H04)
+## Corporate Actions سهام ایران
 
 بدون این رویدادها `quantity` / `averageBuyPrice` / cost basis در زمان غلط می‌شود.
 
@@ -289,7 +288,7 @@ Realized و Unrealized نباید با یکدیگر مخلوط شوند.
 
 ---
 
-## هویت پایدار Holding (BUG-H05)
+## هویت پایدار Holding
 
 ```text
 UNIQUE(brokerageId, instrumentId)
@@ -297,5 +296,5 @@ symbol = mutable label
 isin / instrumentId = stable identity
 ```
 
-تغییر نماد ≠ Holding جدید.  
+تغییر نماد ≠ Holding جدید. 
 Provider mapping جدا از identity است و با `setStockPriceMapping` عوض می‌شود.

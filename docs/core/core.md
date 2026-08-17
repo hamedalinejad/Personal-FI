@@ -29,7 +29,7 @@
 | **Event Bus** | `mitt` یا پیاده‌سازی ساده | ارتباط بین فیچرها بدون coupling مستقیم |
 | **Styling** | `tailwindcss` | کلاس‌های utility؛ متغیرهای رنگ مالی در `styles/themes.css` |
 
-> **چرا TanStack Query/React Query در لیست نیست؟**  
+> **چرا TanStack Query/React Query در لیست نیست؟** 
 > این کتابخانه برای کش‌کردن نتایج fetch از API خارجی طراحی شده. در این پروژه هیچ API خارجی برای داده مالی وجود ندارد — همه داده‌ها از SQLite محلی می‌آیند. State کوئری‌های دیتابیس در Zustand Storeها نگه‌داری می‌شود.
 
 ---

@@ -2,10 +2,10 @@
 
 ## توضیح کلی
 
-این فیچر به کاربر امکان می‌دهد اهداف مالی مشخصی تعریف کند و پیشرفت آن‌ها را پیگیری کند.  
+این فیچر به کاربر امکان می‌دهد اهداف مالی مشخصی تعریف کند و پیشرفت آن‌ها را پیگیری کند. 
 اهداف می‌توانند شامل پس‌انداز برای خرید خانه، سفر، اضطراری، بازنشستگی، خرید خودرو یا هر هدف شخصی دیگر باشند.
 
-هر هدف دارای مبلغ هدف، تاریخ هدف (اختیاری) و پیشرفت فعلی است.  
+هر هدف دارای مبلغ هدف، تاریخ هدف (اختیاری) و پیشرفت فعلی است. 
 کاربر می‌تواند به صورت دستی یا خودکار (از طریق بودجه یا درآمد) به هدف پول اختصاص دهد.
 
 ---
@@ -43,9 +43,9 @@
 10. وقتی `source=budget` (انتقال از پاکت به هدف)، پول واقعاً بین حساب‌ها جابه‌جا نمی‌شود؛ `accountTransactionId` باید `null` بماند (فقط یک برچسب‌گذاری داخلی است).
 10a. وقتی `source=income` (اختصاص بخشی از یک درآمد ثبت‌شده به هدف)، این نیز مانند `source=budget` صرفاً یک **برچسب‌گذاری داخلی** است، نه جابه‌جایی پول جدید: مبلغ درآمد از قبل طی تراکنش اصلی در `acc_transactions`/`inc_transactions` به حساب بانکی واریز شده؛ اختصاص آن به هدف فقط یک `fg_contributions` با `source='income'` و `accountTransactionId = null` ایجاد می‌کند (بدون رکورد جدید در `acc_transactions`). ایجاد یک تراکنش بانکی واقعی جداگانه برای این حالت **ممنوع است**، چون باعث دوبار شمارش همان مبلغ درآمد (یک‌بار در واریز اصلی، یک‌بار در تخصیص به هدف) می‌شود. تنها `source`هایی که مجازند `accountTransactionId` واقعی داشته باشند `manual` و `transfer` هستند (پول واقعاً و مستقیماً به‌خاطر همین هدف جابه‌جا می‌شود).
 11. `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد:
-   - وقتی `addContribution()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
-   - وقتی `withdrawFromGoal()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
-   - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن/حذف `fg_contributions` در یک transaction انجام می‌شود
+ - وقتی `addContribution()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
+ - وقتی `withdrawFromGoal()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
+ - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن/حذف `fg_contributions` در یک transaction انجام می‌شود
 
 ---
 
@@ -68,7 +68,7 @@
 - `color` → string (اختیاری)
 - `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
 - `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -84,14 +84,14 @@
 - `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 
 ---
 
 ## منطق پیشرفت هدف
 
-**درصد پیشرفت** = `(currentAmount / targetAmount) × 100`  
+**درصد پیشرفت** = `(currentAmount / targetAmount) × 100` 
 **مبلغ باقی‌مانده** = `targetAmount - currentAmount`
 
 اگر `targetDate` مشخص باشد:
@@ -128,17 +128,17 @@
 ### Contribution APIs
 - `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
 - `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف + آپدیت `currentAmount` در `fg_goals` (atomic)؛ منطق اجرا بسته به ترکیب کمک‌های موجود (FIFO روی `fg_contributions` با `type='deposit'`):
-  - اگر مبلغ برداشت از کمک‌های `source ∈ {manual, transfer}` تأمین شود: یک رکورد `fg_contributions` با `type='withdraw'` و یک تراکنش واقعی در `acc_transactions` برای `accountId` می‌سازد.
-  - اگر مبلغ برداشت از کمک‌های `source ∈ {budget, income}` تأمین شود (برچسب‌گذاری بدون پول واقعی): فقط یک رکورد `fg_contributions` با `type='withdraw'` و `accountTransactionId = null` می‌سازد — بدون تراکنش بانکی (پول هرگز از حساب واقعی خارج نشده بود). اگر `accountId` پاس داده شود در این حالت، **خطای اعتبارسنجی** برمی‌گرداند.
-  - اگر مبلغ از هر دو نوع کمک تأمین شود: بخش «واقعی» تراکنش بانکی می‌گیرد، بخش «برچسب» `accountTransactionId = null` می‌ماند — دو رکورد جداگانه در `fg_contributions` ثبت می‌شود.
+ - اگر مبلغ برداشت از کمک‌های `source ∈ {manual, transfer}` تأمین شود: یک رکورد `fg_contributions` با `type='withdraw'` و یک تراکنش واقعی در `acc_transactions` برای `accountId` می‌سازد.
+ - اگر مبلغ برداشت از کمک‌های `source ∈ {budget, income}` تأمین شود (برچسب‌گذاری بدون پول واقعی): فقط یک رکورد `fg_contributions` با `type='withdraw'` و `accountTransactionId = null` می‌سازد — بدون تراکنش بانکی (پول هرگز از حساب واقعی خارج نشده بود). اگر `accountId` پاس داده شود در این حالت، **خطای اعتبارسنجی** برمی‌گرداند.
+ - اگر مبلغ از هر دو نوع کمک تأمین شود: بخش «واقعی» تراکنش بانکی می‌گیرد، بخش «برچسب» `accountTransactionId = null` می‌ماند — دو رکورد جداگانه در `fg_contributions` ثبت می‌شود.
 - `getContributions(goalId)` → تاریخچه کمک‌ها
 - `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
 
-> **نکته مهم - مکانیزم sync `currentAmount`**:  
-> - `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد  
-> - وقتی `addContribution()` یا `withdrawFromGoal()` صدا زده می‌شود، تغییر `currentAmount` **atomic** انجام می‌شود (در یک transaction با `fg_contributions` اضافه شدن)  
-> - فرمول: `currentAmount = SUM(amount WHERE type='deposit') - SUM(amount WHERE type='withdraw')`  
-> - این تصمیم یکسان با `cashBalance` در `inv_stocks_iran_brokerages` و `inv_metals_platforms` است  
+> **نکته مهم - مکانیزم sync `currentAmount`**: 
+> - `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد 
+> - وقتی `addContribution()` یا `withdrawFromGoal()` صدا زده می‌شود، تغییر `currentAmount` **atomic** انجام می‌شود (در یک transaction با `fg_contributions` اضافه شدن) 
+> - فرمول: `currentAmount = SUM(amount WHERE type='deposit') - SUM(amount WHERE type='withdraw')` 
+> - این تصمیم یکسان با `cashBalance` در `inv_stocks_iran_brokerages` و `inv_metals_platforms` است 
 > - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن `fg_contributions` در یک transaction انجام می‌شود
 
 ### Calculation APIs

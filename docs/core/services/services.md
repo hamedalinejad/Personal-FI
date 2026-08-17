@@ -9,27 +9,27 @@
 ```bash
 services/
 ├── currency/
-│   ├── currencyService.ts      # تبدیل ارز، کش نرخ‌ها برای آفلاین
-│   ├── exchangeRateProvider.ts # واسط دریافت نرخ از cur_exchange_rates (SQLite)
-│   └── types.ts
+│ ├── currencyService.ts # تبدیل ارز، کش نرخ‌ها برای آفلاین
+│ ├── exchangeRateProvider.ts # واسط دریافت نرخ از cur_exchange_rates (SQLite)
+│ └── types.ts
 ├── eventBus/
-│   └── eventBus.ts             # ارتباط بین فیچرها بدون وابستگی مستقیم
+│ └── eventBus.ts # ارتباط بین فیچرها بدون وابستگی مستقیم
 ├── storage/
-│   ├── localStorageService.ts  # خواندن/نوشتن امن در LocalStorage
-│   └── sessionStorageService.ts# داده‌های موقت سشن (مثل API Key دریافت قیمت)
+│ ├── localStorageService.ts # خواندن/نوشتن امن در LocalStorage
+│ └── sessionStorageService.ts# داده‌های موقت سشن (مثل API Key دریافت قیمت)
 ├── versionCheck/
-│   └── versionCheckService.ts  # بررسی نسخه برنامه (استثنای مجاز Network Access Policy)
+│ └── versionCheckService.ts # بررسی نسخه برنامه (استثنای مجاز Network Access Policy)
 ├── notification/
-│   └── notificationService.ts  # اعلان‌های درون‌برنامه‌ای
+│ └── notificationService.ts # اعلان‌های درون‌برنامه‌ای
 ├── logger/
-│   └── logger.ts               # ثبت خطاها و رویدادهای مهم (فقط local، بدون ارسال بیرون)
+│ └── logger.ts # ثبت خطاها و رویدادهای مهم (فقط local، بدون ارسال بیرون)
 └── index.ts
 ```
 
-> **Providerهای قیمت کجا هستند؟**  
-> Adapterهای API قیمت (`PriceProviderAdapter`) داخل فیچر `19-Price-Fetching/infrastructure/providers/` زندگی می‌کنند، نه در `core/services`. دلیل: وابسته به دامنه قیمت‌اند و قراردادشان در `Price-Fetching.md` (باگ ۳۶) تعریف شده. `core/services` فقط زیرساخت عمومی (storage برای API Key، eventBus برای `PriceFetchCompleted`) را می‌دهد.
+> **Providerهای قیمت کجا هستند؟** 
+> Adapterهای API قیمت (`PriceProviderAdapter`) داخل فیچر `19-Price-Fetching/infrastructure/providers/` زندگی می‌کنند، نه در `core/services`. دلیل: وابسته به دامنه قیمت‌اند و قراردادشان در `Price-Fetching.md` تعریف شده. `core/services` فقط زیرساخت عمومی (storage برای API Key، eventBus برای `PriceFetchCompleted`) را می‌دهد.
 
-> **چرا `indexedDbService.ts` از پروژه حذف شد؟**  
+> **چرا `indexedDbService.ts` از پروژه حذف شد؟** 
 > IndexedDB در این پروژه صرفاً به‌عنوان ذخیره‌گاه فیزیکی فایل SQLite (از طریق sql.js) استفاده می‌شود — یعنی فقط یک Blob کامل در آن نوشته/خوانده می‌شود. این عملیات مستقیماً در لایه db (فایل `db/db.ts`) و با الگوی `Write-to-temp-then-swap` (مستند در `core/db/db.md`) انجام می‌شود؛ یک سرویس جداگانه برای آن ارزش افزوده‌ای ندارد و فقط پیچیدگی غیرضروری ایجاد می‌کند.
 
 ---
@@ -91,11 +91,11 @@ services/
 
 **`sessionStorageService.ts`** — داده‌های موقت سشن:
 - فقط برای داده‌هایی که بعد از بستن tab باید از بین بروند
-- **API Key قیمت (باگ ۳۷ — تصمیم v1)**:
-  - کلید فقط اینجا نگه داشته می‌شود (نه SQLite، نه LocalStorage plaintext)
-  - API پیشنهادی: `setPriceApiKey(sourceId, key)` / `getPriceApiKey(sourceId)` / `clearPriceApiKey(sourceId)`
-  - با بستن tab کلید پاک است؛ caller (Price Fetching) باید نبود کلید را با UX مشخص مدیریت کند (مودال ورود یا Skip در Auto-Sync)
-  - جزئیات سیاست در `Price-Fetching.md`
+- **API Key قیمت**:
+ - کلید فقط اینجا نگه داشته می‌شود (نه SQLite، نه LocalStorage plaintext)
+ - API پیشنهادی: `setPriceApiKey(sourceId, key)` / `getPriceApiKey(sourceId)` / `clearPriceApiKey(sourceId)`
+ - با بستن tab کلید پاک است؛ caller (Price Fetching) باید نبود کلید را با UX مشخص مدیریت کند (مودال ورود یا Skip در Auto-Sync)
+ - جزئیات سیاست در `Price-Fetching.md`
 - فرم‌های ناتمام (Draft state) در صورت نیاز
 
 ### Version Check Service

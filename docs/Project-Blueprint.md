@@ -118,7 +118,7 @@
 
 ## Single User (Version 1)
 
-> **License (باگ ۵۸)**: لایسنس بیرون از مدل داده مالی می‌ماند؛ هر کاربر یک SQLite مستقل؛ جزئیات مرز در Technical-Architecture.
+> **License**: لایسنس بیرون از مدل داده مالی می‌ماند؛ هر کاربر یک SQLite مستقل؛ جزئیات مرز در Technical-Architecture.
 
 نسخه اول برای یک کاربر طراحی می‌شود.
 
@@ -315,7 +315,7 @@ IndexedDB
 
 نمایش بر اساس منطقه زمانی و تقویم کاربر (جلالی/میلادی) در لایه Presentation است.
 
-برای رویدادهای وابسته به بازار/سررسید ایران، فیلدهای معنایی جدا (`businessDate`, `settlementDate`, `marketDate`, `dueDate`, …) طبق قرارداد باگ ۵۵ در `core/db/db.md` الزامی‌اند — فقط یک UTC timestamp کافی نیست.
+برای رویدادهای وابسته به بازار/سررسید ایران، فیلدهای معنایی جدا (`businessDate`, `settlementDate`, `marketDate`, `dueDate`, …) طبق قرارداد در `core/db/db.md` الزامی‌اند — فقط یک UTC timestamp کافی نیست.
 
 ---
 
@@ -397,44 +397,44 @@ IndexedDB
 
 ```text
 docs/
-  00-Product/                   # نقشه محصول، IA صفحات
-  core/                         # معماری هسته مشترک
-    db/                         # اسکیمای پایگاه داده و الگوهای نوشتن
-    hooks/                      # React Hooks مشترک
-    rounding/                   # سیاست گرد کردن اعداد مالی
-    services/                   # سرویس‌های دامین مشترک
-    types/                      # تعریف مرکزی تمام نوع‌ها و enum ها (منبع حقیقت)
-    utils/                      # توابع کمکی مشترک
-  features/                     # یک پوشه به ازای هر فیچر، با پیشوند عددی
-    00-Accounts-Banking/
-    01-Income/
-    02-Expense/
-    03-Cheque-Management/
-    04-Debt-Loan-Management/
-    05-Investment/               # شامل ۴ زیرفیچر (Crypto, Stocks-Iran, FIF, Metals)
-    06-Physical-Assets/
-    07-Budget-Management/
-    08-Financial-Goals/
-    09-Bills-Recurring-Transactions/
-    10-Notification-Reminder-System/
-    11-Reports-Analytics/
-    12-Dashboard/
-    13-Portfolio-Wealth-Overview/
-    14-Tax-Management/
-    15-Document-Management/
-    16-Settings-Tools/
-    17-Currency-CrossRate/
-    18-Security-Privacy/
-    19-Price-Fetching/           # شامل ۴ زیرفیچر (Crypto, Stock, FIF, Metals Prices)
-    99-Common-Categories/
-  lib/                          # وابستگی‌های خارجی و wrapper ها
-  stores/                       # مدیریت وضعیت (State Management)
-  styles/                       # تعریف‌های سبک و تم
-  Product-Map-FA.md             # نقشه محصول (فارسی)
-  Product-Map-EN.md             # نقشه محصول (انگلیسی)
-  Project-Blueprint.md          # همین سند — مرجع رسمی معماری
-  Technical-Architecture.md     # معماری فنی کامل
-  AUDIT-FULL-REVIEW.md          # گزارش ممیزی مستمر مستندات
+ 00-Product/ # نقشه محصول، IA صفحات
+ core/ # معماری هسته مشترک
+ db/ # اسکیمای پایگاه داده و الگوهای نوشتن
+ hooks/ # React Hooks مشترک
+ rounding/ # سیاست گرد کردن اعداد مالی
+ services/ # سرویس‌های دامین مشترک
+ types/ # تعریف مرکزی تمام نوع‌ها و enum ها (منبع حقیقت)
+ utils/ # توابع کمکی مشترک
+ features/ # یک پوشه به ازای هر فیچر، با پیشوند عددی
+ 00-Accounts-Banking/
+ 01-Income/
+ 02-Expense/
+ 03-Cheque-Management/
+ 04-Debt-Loan-Management/
+ 05-Investment/ # شامل ۴ زیرفیچر (Crypto, Stocks-Iran, FIF, Metals)
+ 06-Physical-Assets/
+ 07-Budget-Management/
+ 08-Financial-Goals/
+ 09-Bills-Recurring-Transactions/
+ 10-Notification-Reminder-System/
+ 11-Reports-Analytics/
+ 12-Dashboard/
+ 13-Portfolio-Wealth-Overview/
+ 14-Tax-Management/
+ 15-Document-Management/
+ 16-Settings-Tools/
+ 17-Currency-CrossRate/
+ 18-Security-Privacy/
+ 19-Price-Fetching/ # شامل ۴ زیرفیچر (Crypto, Stock, FIF, Metals Prices)
+ 99-Common-Categories/
+ lib/ # وابستگی‌های خارجی و wrapper ها
+ stores/ # مدیریت وضعیت (State Management)
+ styles/ # تعریف‌های سبک و تم
+ Product-Map-FA.md # نقشه محصول (فارسی)
+ Product-Map-EN.md # نقشه محصول (انگلیسی)
+ Project-Blueprint.md # همین سند — مرجع رسمی معماری
+ Technical-Architecture.md # معماری فنی کامل
+ AUDIT-FULL-REVIEW.md # گزارش ممیزی مستمر مستندات
 ```
 
 > **تغییر از ساختار اولیه:** ساختار اولیه پیشنهادی (`01-Business/`, `02-Design/`, `03-Technical/`, `04-Project/`, `99-Future-Ideas/`) در عمل جایگزین شد با ساختار فوق که بین لایه‌های فنی (`core/`, `lib/`, `stores/`, `styles/`) و فیچرهای محصولی (`features/`) تفکیک می‌کند. این تصمیم به‌عنوان ADR-001 ثبت شده است (بخش ۱۸).
@@ -509,23 +509,23 @@ docs/
 **قبل:**
 ```text
 docs/
-  00-Product/
-  01-Business/
-  02-Design/
-  03-Technical/
-  04-Project/
-  99-Future-Ideas/
+ 00-Product/
+ 01-Business/
+ 02-Design/
+ 03-Technical/
+ 04-Project/
+ 99-Future-Ideas/
 ```
 
 **بعد:**
 ```text
 docs/
-  00-Product/
-  core/
-  features/
-  lib/
-  stores/
-  styles/
+ 00-Product/
+ core/
+ features/
+ lib/
+ stores/
+ styles/
 ```
 
 ### دلایل

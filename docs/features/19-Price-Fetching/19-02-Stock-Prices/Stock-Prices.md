@@ -1,7 +1,7 @@
 # زیر‌فیچر: Price Fetching - Stock Prices (دریافت قیمت سهام بورس ایران)
 
 ## توضیح کلی
-دریافت و ذخیره قیمت لحظه‌ای/پایانی نمادهای بورس ایران در `price_history` با `assetCategory = 'stock'`.  
+دریافت و ذخیره قیمت لحظه‌ای/پایانی نمادهای بورس ایران در `price_history` با `assetCategory = 'stock'`. 
 خروجی این زیرفیچر مستقیماً توسط `Investment-Stocks-Iran` (`getPortfolioValue`, `calculateProfitLoss` بخش Unrealized) و توسط زیرفیچر ETF داخل `Fixed-Income-Funds` (چون ETFها هم نماد بورسی دارند) مصرف می‌شود.
 
 از همان سه مسیر فیچر پدر پیروی می‌کند: **دستی/On-Demand**، **خودکار/Auto-Sync اختیاری**، و **ثبت دستی بدون شبکه** — هر سه هم‌زمان در نسخه ۱.
@@ -51,4 +51,4 @@
 - ستون `priceCurrency` همیشه `IRR` است برای این زیرفیچر (بر خلاف کریپتو که `USDT` است) — این تفاوت باید در پیاده‌سازی `fetchAndStorePrices` به‌عنوان پارامتر (نه فرض ثابت در فیچر پدر) لحاظ شود.
 - انتخاب Provider نهایی (TSETMC مستقیم یا یک سرویس واسط) به تصمیم فنی جدا موکول است؛ این سند فقط قرارداد رفتار را قفل می‌کند.
 
-> **Adapter (باگ ۳۶)**: هر منبع بیرونی این زیرفیچر باید `PriceProviderAdapter` را پیاده کند. قرارداد واحد در `Price-Fetching.md`.
+> **Adapter**: هر منبع بیرونی این زیرفیچر باید `PriceProviderAdapter` را پیاده کند. قرارداد واحد در `Price-Fetching.md`.

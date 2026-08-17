@@ -75,13 +75,13 @@ Decimal.set({ precision: 28, rounding: Decimal.ROUND_HALF_UP });
 
 ```typescript
 // ✅ درست — round فقط در لحظه ذخیره
-const interest = remainingBalance.times(r);         // کامل
-const principal = installment.minus(interest);       // کامل
+const interest = remainingBalance.times(r); // کامل
+const principal = installment.minus(interest); // کامل
 const principalToStore = principal.toDecimalPlaces(0, Decimal.ROUND_DOWN); // فقط اینجا
 
 // ❌ غلط — round در میانه محاسبه
 const interest = remainingBalance.times(r).toFixed(0); // بعد از این principal اشتباه است
-const principal = installment - interest;               // خطای float + round bias
+const principal = installment - interest; // خطای float + round bias
 ```
 
 ### قانون ۲ — اصل + سود = قسط (Installment Integrity)
@@ -94,7 +94,7 @@ principalPortion + interestPortion = installmentAmount (مبلغ واقعی پر
 روش تضمین این رابطه:
 ```typescript
 const interestPortion = remainingBalance.times(r)
-  .toDecimalPlaces(0, Decimal.ROUND_HALF_UP);  // سود را round کن
+ .toDecimalPlaces(0, Decimal.ROUND_HALF_UP); // سود را round کن
 const principalPortion = installmentAmount.minus(interestPortion); // اصل = باقیمانده
 // principalPortion هرگز مستقل round نمی‌شود — مگر در آخرین قسط (تسویه کامل)
 ```
@@ -106,7 +106,7 @@ const principalPortion = installmentAmount.minus(interestPortion); // اصل = �
 ```typescript
 // ✅ درست
 holding.quantity = holding.quantity.plus(trx.quantity); // Decimal کامل
-displayQty = holding.quantity.toDecimalPlaces(8);        // فقط برای نمایش
+displayQty = holding.quantity.toDecimalPlaces(8); // فقط برای نمایش
 
 // ❌ غلط
 holding.quantity = parseFloat(holding.quantity + trx.quantity); // float + loss
@@ -131,9 +131,9 @@ averageBuyPrice = (totalInvested / totalQuantity).toFixed(4); // بعد از چ�
 ```typescript
 // ✅ درست
 function convertForDisplay(amount: Decimal, from: string, to: string): Decimal {
-  const rate = getRate(from, to);                           // بدون round
-  const result = amount.dividedBy(rate);                    // بدون round
-  return result.toDecimalPlaces(displayDecimals(to), Decimal.ROUND_HALF_UP); // فقط اینجا
+ const rate = getRate(from, to); // بدون round
+ const result = amount.dividedBy(rate); // بدون round
+ return result.toDecimalPlaces(displayDecimals(to), Decimal.ROUND_HALF_UP); // فقط اینجا
 }
 
 // برای ذخیره در exchangeRateToBase (snapshot):
@@ -149,7 +149,7 @@ const rounded = amountDecimal.toDecimalPlaces(2, Decimal.ROUND_HALF_UP); // ۱۲
 const minorUnit = toMinorUnit(rounded, 'USD'); // ۱۲۳۴۵۷ سنت
 
 // ❌ غلط — تبدیل اول، round بعد (ممکن است رفتار متفاوت در edge case)
-const minorUnit = toMinorUnit(amountDecimal, 'USD');        // ۱۲۳۴۵۶ (floor)
+const minorUnit = toMinorUnit(amountDecimal, 'USD'); // ۱۲۳۴۵۶ (floor)
 ```
 
 ---
@@ -160,34 +160,34 @@ const minorUnit = toMinorUnit(amountDecimal, 'USD');        // ۱۲۳۴۵۶ (flo
 
 ```typescript
 // محاسبه قسط Declining Balance
-const r = new Decimal(annualRate).dividedBy(1200);          // نرخ ماهانه — کامل
+const r = new Decimal(annualRate).dividedBy(1200); // نرخ ماهانه — کامل
 const n = totalInstallments;
 const P = new Decimal(principalAmount);
 
 // ۱. مبلغ قسط — ROUND_HALF_UP به ۰ اعشار IRR
 const rawInstallment = P.times(r.times(r.plus(1).pow(n)))
-                        .dividedBy(r.plus(1).pow(n).minus(1));
+ .dividedBy(r.plus(1).pow(n).minus(1));
 const installment = rawInstallment.toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
 // ← این مقدار در ln_loans.calculatedInstallment ذخیره می‌شود
 
 // ۲. هر قسط — سود را round کن، اصل = باقیمانده
 const interest = remainingBalance.times(r)
-  .toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
-const principal = installment.minus(interest);              // نه round مستقل
+ .toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+const principal = installment.minus(interest); // نه round مستقل
 
 // ۳. آخرین قسط — تسویه کامل
-const lastPrincipal = remainingBalance;                     // دقیق
-const lastInstallment = lastPrincipal.plus(interest);       // ممکن است ≠ installment
+const lastPrincipal = remainingBalance; // دقیق
+const lastInstallment = lastPrincipal.plus(interest); // ممکن است ≠ installment
 ```
 
 ### کریپتو (Crypto)
 
 ```typescript
 // خرید: quantity کامل ذخیره می‌شود
-const quantity = new Decimal(rawQuantity);                  // هرگز round نشود
+const quantity = new Decimal(rawQuantity); // هرگز round نشود
 
 // Weighted Average: کامل ذخیره می‌شود
-const newAvg = totalInvested.dividedBy(totalQty);           // هرگز round نشود
+const newAvg = totalInvested.dividedBy(totalQty); // هرگز round نشود
 // → ذخیره به‌صورت string در inv_crypto_holdings.averageBuyPrice
 
 // Unrealized P&L — فقط برای نمایش
@@ -195,7 +195,7 @@ const unrealized = currentPrice.minus(averageBuyPrice).times(quantity);
 const unrealizedDisplay = unrealized.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
 // کارمزد رمزارز — تبدیل به baseCurrency برای totalFeesPaidBase
-const feeInBase = feeAmount.times(feeAssetPriceToUSDT);    // کامل در محاسبه
+const feeInBase = feeAmount.times(feeAssetPriceToUSDT); // کامل در محاسبه
 // totalFeesPaidBase = Σ feeInBase — با ROUND_HALF_UP آخر
 ```
 
@@ -210,7 +210,7 @@ const quantity = new Decimal(rawQty).toDecimalPlaces(0, Decimal.ROUND_DOWN);
 // ROUND_DOWN برای تعداد سهم چون نمی‌توان کسری از سهم خرید/فروخت
 
 // Weighted Average — کامل ذخیره
-const avgPrice = totalInvested.dividedBy(totalQty);         // هرگز round نشود
+const avgPrice = totalInvested.dividedBy(totalQty); // هرگز round نشود
 ```
 
 ### صندوق درآمد ثابت (FIF)
@@ -218,7 +218,7 @@ const avgPrice = totalInvested.dividedBy(totalQty);         // هرگز round ن
 ```typescript
 // NAV — معمولاً ۲ اعشار، اما از مقدار اعلامی صندوق پیروی می‌شود
 // اگر صندوق ۰ اعشار اعلام کند، همان ۰ اعشار ذخیره شود
-const nav = new Decimal(announcedNAV);                      // دقیقاً همان‌طور که صندوق اعلام کرده
+const nav = new Decimal(announcedNAV); // دقیقاً همان‌طور که صندوق اعلام کرده
 // → ذخیره بدون تغییر در price_history.price
 
 // تعداد واحد — ۴ اعشار (بازار صدور/ابطال معمولاً ۴ رقم اعشار)
@@ -226,7 +226,7 @@ const units = new Decimal(rawUnits).toDecimalPlaces(4, Decimal.ROUND_DOWN);
 // ROUND_DOWN: تعداد واحد صادر/ابطال‌شده رسمی معمولاً به نفع صندوق گرد می‌شود
 
 // ارزش کل — NAV × تعداد واحد
-const totalValue = nav.times(units);                        // کامل در محاسبه
+const totalValue = nav.times(units); // کامل در محاسبه
 const totalValueDisplay = totalValue.toDecimalPlaces(0, Decimal.ROUND_HALF_UP); // فقط نمایش
 ```
 
@@ -242,7 +242,7 @@ const pricePerGram = new Decimal(rawPrice).toDecimalPlaces(0, Decimal.ROUND_HALF
 const displayGrams = fromMinorUnit(quantityMg, 'gram').toDecimalPlaces(3);
 
 // Weighted Average — کامل ذخیره
-const avgBuyPrice = totalInvested.dividedBy(totalGrams);    // هرگز round نشود
+const avgBuyPrice = totalInvested.dividedBy(totalGrams); // هرگز round نشود
 ```
 
 ### تبدیل ارز (Currency)
@@ -254,15 +254,15 @@ const rateSnapshot = await getExchangeRate('IRR', 'USDT'); // e.g. 62345.6789012
 
 // تبدیل برای نمایش — round در آخر
 function displayInUSDT(amountIRR: Decimal, rate: Decimal): string {
-  return amountIRR.dividedBy(rate)
-    .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
-    .toString();
+ return amountIRR.dividedBy(rate)
+ .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
+ .toString();
 }
 
 // تبدیل زنجیره‌ای (BTC → USDT → IRR) — round فقط در انتهای زنجیره
-const btcInUSDT = btcAmount.times(btcPriceUSDT);           // کامل
-const btcInIRR  = btcInUSDT.times(usdtRateIRR);            // کامل
-const display   = btcInIRR.toDecimalPlaces(0, Decimal.ROUND_HALF_UP); // فقط اینجا
+const btcInUSDT = btcAmount.times(btcPriceUSDT); // کامل
+const btcInIRR = btcInUSDT.times(usdtRateIRR); // کامل
+const display = btcInIRR.toDecimalPlaces(0, Decimal.ROUND_HALF_UP); // فقط اینجا
 ```
 
 ### مالیات (Tax)
@@ -274,9 +274,9 @@ const taxAmount = rawTaxAmount.toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
 
 // جریمه دیرکرد مالیات (مشابه وام)
 const penalty = overdueAmount
-  .times(penaltyRate).dividedBy(100)
-  .times(new Decimal(days).dividedBy(365))
-  .toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
+ .times(penaltyRate).dividedBy(100)
+ .times(new Decimal(days).dividedBy(365))
+ .toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
 ```
 
 ### بودجه (Budget)
@@ -290,7 +290,7 @@ const remainingDisplay = remaining.toDecimalPlaces(0, Decimal.ROUND_HALF_UP);
 
 // درصد مصرف — ۱ اعشار
 const percentUsed = spentAmount.dividedBy(assignedAmount).times(100)
-  .toDecimalPlaces(1, Decimal.ROUND_HALF_UP);
+ .toDecimalPlaces(1, Decimal.ROUND_HALF_UP);
 ```
 
 ---
@@ -327,47 +327,47 @@ import Decimal from 'decimal.js';
  * هر تابع محاسباتی که نیاز به round دارد، فقط از این تابع استفاده کند.
  */
 export function roundMoney(
-  amount: Decimal,
-  decimals: number,
-  mode: Decimal.Rounding = Decimal.ROUND_HALF_UP,
+ amount: Decimal,
+ decimals: number,
+ mode: Decimal.Rounding = Decimal.ROUND_HALF_UP,
 ): Decimal {
-  return amount.toDecimalPlaces(decimals, mode);
+ return amount.toDecimalPlaces(decimals, mode);
 }
 
 /** تعداد اعشار نمایشی استاندارد برای هر ارز */
 export const DISPLAY_DECIMALS: Record<string, number> = {
-  IRR:  0,
-  IRT:  0,   // تومان
-  USD:  2,
-  EUR:  2,
-  AED:  2,
-  GBP:  2,
-  USDT: 2,
-  BTC:  8,
-  ETH:  6,
-  BNB:  4,
-  XRP:  4,
-  SOL:  4,
+ IRR: 0,
+ IRT: 0, // تومان
+ USD: 2,
+ EUR: 2,
+ AED: 2,
+ GBP: 2,
+ USDT: 2,
+ BTC: 8,
+ ETH: 6,
+ BNB: 4,
+ XRP: 4,
+ SOL: 4,
 };
 export const DEFAULT_DISPLAY_DECIMALS = 4;
 
 /** Round برای نمایش به کاربر */
 export function roundForDisplay(amount: Decimal, currency: string): Decimal {
-  const d = DISPLAY_DECIMALS[currency] ?? DEFAULT_DISPLAY_DECIMALS;
-  return roundMoney(amount, d, Decimal.ROUND_HALF_UP);
+ const d = DISPLAY_DECIMALS[currency] ?? DEFAULT_DISPLAY_DECIMALS;
+ return roundMoney(amount, d, Decimal.ROUND_HALF_UP);
 }
 
 /** Round برای ذخیره مبلغ تراکنش (همیشه HALF_UP، به واحد پولی) */
 export function roundForStorage(amount: Decimal, currency: string): Decimal {
-  // برای ارزهایی که به Minor Unit ذخیره می‌شوند، این فقط round اعشار اضافه را حذف می‌کند
-  // تبدیل واقعی به Minor Unit از طریق utils/money/minorUnit.ts انجام می‌شود
-  const d = DISPLAY_DECIMALS[currency] ?? 2;
-  return roundMoney(amount, d, Decimal.ROUND_HALF_UP);
+ // برای ارزهایی که به Minor Unit ذخیره می‌شوند، این فقط round اعشار اضافه را حذف می‌کند
+ // تبدیل واقعی به Minor Unit از طریق utils/money/minorUnit.ts انجام می‌شود
+ const d = DISPLAY_DECIMALS[currency] ?? 2;
+ return roundMoney(amount, d, Decimal.ROUND_HALF_UP);
 }
 
 /** ذخیره کامل (بدون round) — برای quantity، averageBuyPrice، exchangeRate */
 export function preserveFull(amount: Decimal): string {
-  return amount.toFixed(); // بدون تغییر، به‌صورت string
+ return amount.toFixed(); // بدون تغییر، به‌صورت string
 }
 ```
 

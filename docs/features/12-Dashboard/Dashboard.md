@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-داشبورد صفحه اصلی نرم‌افزار است و خلاصه‌ای سریع و بصری از وضعیت مالی کاربر را نمایش می‌دهد.  
+داشبورد صفحه اصلی نرم‌افزار است و خلاصه‌ای سریع و بصری از وضعیت مالی کاربر را نمایش می‌دهد. 
 هدف آن این است که کاربر بلافاصله پس از ورود، مهم‌ترین اطلاعات مالی خود را ببیند بدون نیاز به رفتن به بخش‌های مختلف.
 
 داشبورد داده‌ای تولید نمی‌کند؛ بلکه از API فیچرهای دیگر (Reports، Accounts، Budget، Goals و ...) استفاده می‌کند و اطلاعات را در قالب **ویجت‌های قابل تنظیم** نمایش می‌دهد.
@@ -90,7 +90,7 @@
 
 ## Domain Entities
 
-> داشبورد عمدتاً بدون داده پایدار است.  
+> داشبورد عمدتاً بدون داده پایدار است. 
 > فقط تنظیمات شخصی‌سازی کاربر ذخیره می‌شود.
 
 ### ۱. Dashboard Layout (جدول: `dash_layouts`)
@@ -151,47 +151,47 @@
 
 ```ts
 {
-  accounts: {
-    totalBalance: number,
-    totalBalanceUSDT: number
-  },
-  cashFlow: {
-    income: number,
-    expense: number,
-    net: number
-  },
-  netWorth: {
-    current: number,
-    changePercent: number,
-    trend: Array<{ date: string, value: number }>
-  },
-  budget: {
-    totalAssigned: number,
-    totalSpent: number,
-    percentUsed: number,
-    criticalEnvelopes: Array<...>
-  },
-  goals: Array<{
-    id: string,
-    name: string,
-    progressPercent: number,
-    remaining: number
-  }>,
-  upcoming: Array<{
-    type: 'bill' | 'loan' | 'cheque' | 'tax',
-    title: string,
-    dueDate: string,
-    amount: number,
-    status: string
-  }>,
-  investments: {
-    totalValue: number,
-    realizedPL: number,       // سود/زیان تحقق‌یافته — جداگانه نگه داشته شود
-    unrealizedPL: number      // سود/زیان تحقق‌نیافته — جداگانه نگه داشته شود
-    // ممنوع: ترکیب این دو در یک فیلد profitLoss واحد (طبق قاعده سرتاسری پروژه)
-  },
-  notifications: {
-    unreadCount: number
-  }
+ accounts: {
+ totalBalance: number,
+ totalBalanceUSDT: number
+ },
+ cashFlow: {
+ income: number,
+ expense: number,
+ net: number
+ },
+ netWorth: {
+ current: number,
+ changePercent: number,
+ trend: Array<{ date: string, value: number }>
+ },
+ budget: {
+ totalAssigned: number,
+ totalSpent: number,
+ percentUsed: number,
+ criticalEnvelopes: Array<...>
+ },
+ goals: Array<{
+ id: string,
+ name: string,
+ progressPercent: number,
+ remaining: number
+ }>,
+ upcoming: Array<{
+ type: 'bill' | 'loan' | 'cheque' | 'tax',
+ title: string,
+ dueDate: string,
+ amount: number,
+ status: string
+ }>,
+ investments: {
+ totalValue: number,
+ realizedPL: number, // سود/زیان تحقق‌یافته — جداگانه نگه داشته شود
+ unrealizedPL: number // سود/زیان تحقق‌نیافته — جداگانه نگه داشته شود
+ // ممنوع: ترکیب این دو در یک فیلد profitLoss واحد (طبق قاعده سرتاسری پروژه)
+ },
+ notifications: {
+ unreadCount: number
+ }
 }
 ```

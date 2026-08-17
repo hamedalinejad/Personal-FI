@@ -10,7 +10,7 @@
 - کارمزد شفاف (معمولاً ۰.۵٪ تا ۱.۵٪)
 - واریز و برداشت ریالی از/به حساب بانکی
 
-تمام مبالغ می‌توانند در هر ارزی باشند و در هر معامله `exchangeRateToBase` (نرخ تبدیل به `baseCurrency` کاربر — BUG-003) ذخیره می‌شود تا بتوان عملکرد را در ارز پایه کاربر مقایسه کرد.
+تمام مبالغ می‌توانند در هر ارزی باشند و در هر معامله `exchangeRateToBase` (نرخ تبدیل به `baseCurrency` کاربر — ) ذخیره می‌شود تا بتوان عملکرد را در ارز پایه کاربر مقایسه کرد.
 
 User Stories
 Must Have:
@@ -37,54 +37,54 @@ Should Have:
 
 Business Rules
 
-- `exchangeRateToBase` در هر رکورد ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — BUG-003).
-- **واحد، عیار و وزن خالص باید همیشه مستقل بمانند (باگ ۳۵ — High)**:
-  - واحد پایه ذخیره‌سازی موجودی: **میلی‌گرم (`quantityMg`)** — هرگز گرم/اونس در دیتابیس ذخیره نمی‌شود.
-  - نمایش به کاربر می‌تواند میلی‌گرم / گرم / کیلو / اونس باشد؛ تبدیل فقط در Presentation Layer.
-  - `purity` (عیار/خلوص) فیلد اجباری و مستقل از وزن است؛ `1g Gold 18K` هرگز معادل `1g pure gold` نیست.
-  - **وزن خالص (Fine Weight)** محاسبه می‌شود و ذخیره نمی‌شود:
-    - فرمول واحد برای همه فلزات: `fineWeightMg = quantityMg × purityRatio`
-    - `purityRatio` نسبت خلوص نرمال‌شده (۰ تا ۱) است که هنگام ثبت دارایی از عیار اصلی محاسبه و در دیتابیس ذخیره می‌شود — فرمول تبدیل (فقط در UI/ورود ورودی، نه ستون جداگانه در جدول):
-      - طلای عیاری: `purityRatio = karat / 24` (مثلاً ۱۸ عیار → `0.750`)
-      - خلوص permille: `purityRatio = purityPermille / 1000` (مثلاً ۹۹۹ → `0.999`)
-    - سکه (`gold_coin`): `purityRatio` از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
-  - قیمت و میانگین خرید همیشه **به ازای همان purity همان holding** است.
-  - جدول تبدیل واحد (فقط نمایش/ورود):
-    | واحد نمایش | به میلی‌گرم |
-    |------------|-------------|
-    | ۱ میلی‌گرم | ۱ |
-    | ۱ گرم | ۱٬۰۰۰ |
-    | ۱ کیلوگرم | ۱٬۰۰۰٬۰۰۰ |
-    | ۱ اونس تروی (troy oz) | ۳۱٬۱۰۳٫۴۷۶۸ |
+- `exchangeRateToBase` در هر رکورد ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — ).
+- **واحد، عیار و وزن خالص باید همیشه مستقل بمانند**:
+ - واحد پایه ذخیره‌سازی موجودی: **میلی‌گرم (`quantityMg`)** — هرگز گرم/اونس در دیتابیس ذخیره نمی‌شود.
+ - نمایش به کاربر می‌تواند میلی‌گرم / گرم / کیلو / اونس باشد؛ تبدیل فقط در Presentation Layer.
+ - `purity` (عیار/خلوص) فیلد اجباری و مستقل از وزن است؛ `1g Gold 18K` هرگز معادل `1g pure gold` نیست.
+ - **وزن خالص (Fine Weight)** محاسبه می‌شود و ذخیره نمی‌شود:
+ - فرمول واحد برای همه فلزات: `fineWeightMg = quantityMg × purityRatio`
+ - `purityRatio` نسبت خلوص نرمال‌شده (۰ تا ۱) است که هنگام ثبت دارایی از عیار اصلی محاسبه و در دیتابیس ذخیره می‌شود — فرمول تبدیل (فقط در UI/ورود ورودی، نه ستون جداگانه در جدول):
+ - طلای عیاری: `purityRatio = karat / 24` (مثلاً ۱۸ عیار → `0.750`)
+ - خلوص permille: `purityRatio = purityPermille / 1000` (مثلاً ۹۹۹ → `0.999`)
+ - سکه (`gold_coin`): `purityRatio` از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
+ - قیمت و میانگین خرید همیشه **به ازای همان purity همان holding** است.
+ - جدول تبدیل واحد (فقط نمایش/ورود):
+ | واحد نمایش | به میلی‌گرم |
+ |------------|-------------|
+ | ۱ میلی‌گرم | ۱ |
+ | ۱ گرم | ۱٬۰۰۰ |
+ | ۱ کیلوگرم | ۱٬۰۰۰٬۰۰۰ |
+ | ۱ اونس تروی (troy oz) | ۳۱٬۱۰۳٫۴۷۶۸ |
 - واریز از حساب بانکی به پلتفرم:
-  - موجودی حساب بانکی کاهش می‌یابد.
-  - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` افزایش می‌یابد.
-  - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
+ - موجودی حساب بانکی کاهش می‌یابد.
+ - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` افزایش می‌یابد.
+ - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
 - برداشت به حساب بانکی:
-  - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` کاهش می‌یابد و موجودی حساب بانکی افزایش می‌یابد.
-  - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
+ - موجودی نقدی پلتفرم در `inv_metals_platforms.cashBalance` کاهش می‌یابد و موجودی حساب بانکی افزایش می‌یابد.
+ - تراکنش در `acc_transactions` + جدول `inv_metals_platform_transactions` ثبت و لینک می‌شود.
 - خرید فلز:
-  - از موجودی نقدی پلتفرم کسر می‌شود.
-  - موجودی فلز همان `(metalType, purity)` افزایش و میانگین خرید به‌روزرسانی می‌شود.
-  - `purity` و `quantityMg` (وزن ناخالص) اجباری‌اند؛ `pricePerMg` باید قیمت همان عیار باشد.
-  - `quantityMg` نمی‌تواند منفی شود.
+ - از موجودی نقدی پلتفرم کسر می‌شود.
+ - موجودی فلز همان `(metalType, purity)` افزایش و میانگین خرید به‌روزرسانی می‌شود.
+ - `purity` و `quantityMg` (وزن ناخالص) اجباری‌اند؛ `pricePerMg` باید قیمت همان عیار باشد.
+ - `quantityMg` نمی‌تواند منفی شود.
 - فروش فلز:
-  - موجودی فلز همان `(metalType, purity)` کاهش می‌یابد.
-  - مبلغ حاصل به موجودی نقدی پلتفرم اضافه می‌شود.
-  - `quantityMg` نمی‌تواند منفی شود.
+ - موجودی فلز همان `(metalType, purity)` کاهش می‌یابد.
+ - مبلغ حاصل به موجودی نقدی پلتفرم اضافه می‌شود.
+ - `quantityMg` نمی‌تواند منفی شود.
 - تحویل فیزیکی:
-  - یک تراکنش جدید با `type: physical_delivery` در `inv_metals_transactions` ثبت می‌شود.
-  - `quantityMg` فلز کاهش می‌یابد (از موجودی دیجیتال خارج می‌شود).
-  - `deliveryFee` (در فیلد مخصوص) از موجودی نقدی پلتفرم کسر می‌شود.
-  - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `inv_metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
-  - وضعیت درخواست پیگیری می‌شود (requested, processing, delivered, cancelled).
-  - `feeAmount` فقط کارمزد معامله (خرید/فروش) است، نه هزینه تحویل.
+ - یک تراکنش جدید با `type: physical_delivery` در `inv_metals_transactions` ثبت می‌شود.
+ - `quantityMg` فلز کاهش می‌یابد (از موجودی دیجیتال خارج می‌شود).
+ - `deliveryFee` (در فیلد مخصوص) از موجودی نقدی پلتفرم کسر می‌شود.
+ - جزئیات لجستیک (آدرس، فاکتور، وضعیت) در `inv_metals_physical_deliveries` نگهداری می‌شود و به تراکنش لینک می‌شود.
+ - وضعیت درخواست پیگیری می‌شود (requested, processing, delivered, cancelled).
+ - `feeAmount` فقط کارمزد معامله (خرید/فروش) است، نه هزینه تحویل.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - موجودی حساب بانکی و موجودی نقدی پلتفرم نمی‌توانند منفی شوند.
 - **ویرایش/حذف معاملات**: تراکنش‌های فلزات پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
-  - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
-  - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها و میانگین خرید درست شوند
-  - این رویکرد تاریخچه معاملات و محاسبات سود/زیان را حفظ می‌کند
+ - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
+ - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها و میانگین خرید درست شوند
+ - این رویکرد تاریخچه معاملات و محاسبات سود/زیان را حفظ می‌کند
 
 
 Domain Entities
@@ -112,7 +112,7 @@ Domain Entities
 > - هنگام فروش فلز: `cashBalance += totalAmount` (لاگ در `inv_metals_transactions`)
 > - هنگام تحویل فیزیکی: `cashBalance -= deliveryFee` (لاگ در `inv_metals_transactions`)
 >
-> برای بررسی انطباق Snapshot با لاگ: `reconcileMetalsPlatformCash(platformId)` — جزئیات در `db.md`.  
+> برای بررسی انطباق Snapshot با لاگ: `reconcileMetalsPlatformCash(platformId)` — جزئیات در `db.md`. 
 > - این موجودی در محاسبه ثروت در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth` لحاظ می‌شود
 
 ۲. Metals Holding (جدول: `inv_metals_holdings`)
@@ -125,12 +125,11 @@ Domain Entities
 - `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم — واحد پایه ذخیره‌سازی؛ هرگز گرم/اونس)
 - `averageBuyPricePerMg` → decimal (میانگین قیمت خرید به ازای **هر میلی‌گرم از همین purity** — ریال؛ نه قیمت طلای خالص)
 - `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — BUG-C04)
-- `totalFeesPaidUSDT` → deprecated
+- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — )
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **تمایز حیاتی واحد / عیار / وزن خالص (باگ ۳۵)**:
+> **تمایز حیاتی واحد / عیار / وزن خالص**:
 > | مفهوم | فیلد / محاسبه | مثال ۱ گرم طلای ۱۸ عیار |
 > |--------|----------------|---------------------------|
 > | وزن ناخالص (Gross) | `quantityMg` | ۱٬۰۰۰ mg |
@@ -155,7 +154,7 @@ Domain Entities
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — ؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
 - `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
 - `description` → string
 - `date` → datetime
@@ -178,7 +177,7 @@ type → string (deposit, withdraw)
 amount → decimal (ریال)
 feeAmount → decimal
 feeCurrency → string
-exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
+exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — ؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
 accountId → UUID
 accountTransactionId → UUID (لینک به `acc_transactions`)
 description → string
@@ -229,7 +228,7 @@ calculateProfitLoss(metalType?, platformId?)
 روابط با سایر فیچرها
 
 Accounts & Banking: واریز و برداشت
-Currency & Multi-Currency: قرارداد `exchangeRateToBase` (BUG-003) — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر
+Currency & Multi-Currency: قرارداد `exchangeRateToBase` — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر
 Reports / Dashboard / Portfolio: ارزش پرتفوی فلزات و سود/زیان
 Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می‌توان به دارایی فیزیکی منتقل کرد
 
@@ -242,25 +241,25 @@ Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می
 
 **هنگام خرید** (Weighted Average):
 ```
-cost                      = (quantityMgBought × pricePerMg) + feeAmount
-newTotalInvested          = totalInvested + cost
-newQuantityMg             = quantityMg + quantityMgBought
-newAverageBuyPricePerMg   = newTotalInvested / newQuantityMg
+cost = (quantityMgBought × pricePerMg) + feeAmount
+newTotalInvested = totalInvested + cost
+newQuantityMg = quantityMg + quantityMgBought
+newAverageBuyPricePerMg = newTotalInvested / newQuantityMg
 ```
 
 **هنگام فروش** (`averageBuyPricePerMg` = میانگین خرید **قبل از این فروش**):
 ```
 soldPortionCost = quantityMgSold × averageBuyPricePerMg
-realizedPL      = saleProceeds - soldPortionCost - feeAmount
-totalInvested  -= soldPortionCost
-quantityMg     -= quantityMgSold
+realizedPL = saleProceeds - soldPortionCost - feeAmount
+totalInvested -= soldPortionCost
+quantityMg -= quantityMgSold
 averageBuyPricePerMg بدون تغییر می‌ماند
 ```
 
 **Unrealized P&L**:
 ```
-currentPricePerMg = getLatestMetalPrice(metalType, purity) / 1000   // قیمت گرمی → per-mg
-unrealizedPL      = (currentPricePerMg - averageBuyPricePerMg) × quantityMg
+currentPricePerMg = getLatestMetalPrice(metalType, purity) / 1000 // قیمت گرمی → per-mg
+unrealizedPL = (currentPricePerMg - averageBuyPricePerMg) × quantityMg
 ```
 قیمت لحظه‌ای **همان `metalType_purity`** از `price_history` خوانده می‌شود؛ هرگز قیمت ۲۴ عیار جایگزین ۱۸ عیار نمی‌شود.
 
@@ -288,4 +287,4 @@ fineWeightMg = quantityMg × purityRatio
 - `deliveryFee` همیشه از موجودی نقدی پلتفرم کسر می‌شود.
 - این زیر‌فیچر مخصوص پلتفرم‌های ایران است (طلا، نقره، مس، سکه).
 
-> **Tax metadata (باگ ۵۶)**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
+> **Tax metadata**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.

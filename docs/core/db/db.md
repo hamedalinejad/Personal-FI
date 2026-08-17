@@ -2,7 +2,7 @@
 
 ## Overview
 
-لایه دیتابیس اصلی پروژه بر اساس **SQLite** با کتابخانه **sql.js** پیاده‌سازی می‌شود.  
+لایه دیتابیس اصلی پروژه بر اساس **SQLite** با کتابخانه **sql.js** پیاده‌سازی می‌شود. 
 این کتابخانه یک SQL engine کامل را در محیط WASM فراهم می‌کند و به IndexedDB متصل می‌شود.
 
 > **نکته حیاتی درباره sql.js**: sql.js کل دیتابیس را **در حافظه (RAM)** نگه می‌دارد و اتصال مستقیم و افزایشی (incremental) به IndexedDB ندارد. برای ذخیره‌سازی دائمی باید کل فایل دیتابیس به‌صورت `Uint8Array` سریالایز و به‌عنوان یک Blob کامل در IndexedDB بازنویسی شود. این موضوع در بخش «سازگاری با PWA و موبایل آفلاین» زیر با جزئیت پوشش داده می‌شود.
@@ -15,9 +15,9 @@
 چون sql.js افزایشی نیست، هر `save()` باید کل دیتابیس را دوباره سریالایز و در IndexedDB بازنویسی کند. اگر اپ حین این نوشتن (مثلاً به‌خاطر رفتن به پس‌زمینه یا قطع ناگهانی روی موبایل) متوقف شود، ریسک خرابی (corruption) فایل دیتابیس وجود دارد.
 - **راه‌حل الزامی**: نوشتن باید به روش **Write-to-temp-then-swap** انجام شود: ابتدا Blob جدید با کلید موقت (`db_pending`) نوشته شود، سپس در یک تراکنش IndexedDB atomic، کلید اصلی (`db_main`) با آن جایگزین شود. هرگز مستقیم روی کلید اصلی overwrite نشود.
 - نوشتن‌ها باید **Debounce** شوند برای تغییرات غیرمالی UI؛ برای **عملیات مالی کامل** مسیر جداست (پایین).
-- `visibilitychange` / `beforeunload` فقط **best-effort flush** هستند — **هرگز تضمین persist نیستند** (باگ ۴۳، Critical).
-  - روی موبایل (به‌ویژه iOS Safari) `beforeunload` اغلب اجرا نمی‌شود یا فرصت serialize کامل ندارد.
-  - بنابراین اعتماد به این رویدادها برای «آخرین تغییر حتماً ذخیره شد» **ممنوع** است.
+- `visibilitychange` / `beforeunload` فقط **best-effort flush** هستند — **هرگز تضمین persist نیستند**.
+ - روی موبایل (به‌ویژه iOS Safari) `beforeunload` اغلب اجرا نمی‌شود یا فرصت serialize کامل ندارد.
+ - بنابراین اعتماد به این رویدادها برای «آخرین تغییر حتماً ذخیره شد» **ممنوع** است.
 
 ### ۲. عدم تضمین ماندگاری Storage روی موبایل (خصوصاً iOS Safari)
 مرورگرها (به‌خصوص Safari) می‌توانند در شرایط کمبود فضا، داده‌های IndexedDB اپ‌هایی که Persistent Storage درخواست نکرده‌اند را حذف کنند. برای یک اپ حسابداری مالی این ریسک غیرقابل قبول است.
@@ -54,10 +54,10 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 ### Session Storage
 - فقط برای داده‌های موقت در حین سشن کاربر استفاده شود.
 - مثال‌ها: API Key سرویس دریافت قیمت، فرم‌های در حال پر کردن.
-- **API Key قیمت (تصمیم v1 — باگ ۳۷)**:
-  - محل ذخیره: **فقط** Session Storage via `sessionStorageService` (هرگز SQLite، هرگز LocalStorage plaintext).
-  - عمر: تا بستن tab / پایان سشن مرورگر؛ بعد از آن کاربر باید دوباره وارد کند.
-  - جزئیات UX و مسیر آینده (encrypted remember / vault) در `Price-Fetching.md` بخش سیاست API Key.
+- **API Key قیمت (تصمیم v1 — )**:
+ - محل ذخیره: **فقط** Session Storage via `sessionStorageService` (هرگز SQLite، هرگز LocalStorage plaintext).
+ - عمر: تا بستن tab / پایان سشن مرورگر؛ بعد از آن کاربر باید دوباره وارد کند.
+ - جزئیات UX و مسیر آینده (encrypted remember / vault) در `Price-Fetching.md` بخش سیاست API Key.
 
 ### تنظیمات ذخیره‌شده در `stg_settings` (کلیدهای شناخته‌شده)
 
@@ -67,7 +67,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `theme` | `'light' \| 'dark' \| 'system'` | `'system'` | تم |
 | `dateFormat` | `'jalali' \| 'gregorian'` | `'jalali'` | فرمت تاریخ |
 | `numberFormat` | `'fa' \| 'en'` | `'fa'` | فرمت اعداد |
-| `autoVersionCheckEnabled` | `boolean` | **`false`** | بررسی خودکار نسخه در Startup — **پیش‌فرض خاموش (BUG-C02 / Offline-by-default)**؛ فقط با opt-in صریح کاربر روشن می‌شود |
+| `autoVersionCheckEnabled` | `boolean` | **`false`** | بررسی خودکار نسخه در Startup — **پیش‌فرض خاموش ( / Offline-by-default)**؛ فقط با opt-in صریح کاربر روشن می‌شود |
 | `defaultAccountId` | `UUID \| null` | `null` | حساب پیش‌فرض در فرم ثبت تراکنش |
 | `dashboardLayout` | `string` | `'default'` | چیدمان داشبورد (به `dash_layouts` مراجعه کنید) |
 
@@ -75,10 +75,10 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 
 ### SQLite (sql.js)
 - ذخیره‌سازی اصلی داده‌های مالی با تمام قابلیت‌های SQL:
-  - **Foreign Keys**: امنیت روابط بین جداول
-  - **Transactions**: تضمین اتمیسیت تغییرات
-  - **Views**: ساخت نمایه‌های پیچیده برای گزارش‌ها
-  - **Indexes**: سرعت بالای جستجو
+ - **Foreign Keys**: امنیت روابط بین جداول
+ - **Transactions**: تضمین اتمیسیت تغییرات
+ - **Views**: ساخت نمایه‌های پیچیده برای گزارش‌ها
+ - **Indexes**: سرعت بالای جستجو
 - پشتیبانی از قید کردن و روابط بین جداول
 - قابلیت Offline-First کامل
 - پشتیبانی از اپراتورهای SQL کامل (JOIN, GROUP BY, HAVING, window functions و ...)
@@ -139,7 +139,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
 | `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
-| `fin_journal_entries` | Core Accounting | **دفتر روزنامه یکپارچه همه رویدادهای مالی (BUG-C03)** |
+| `fin_journal_entries` | Core Accounting | **دفتر روزنامه یکپارچه همه رویدادهای مالی** |
 | `inc_transactions` | Income | تراکنش‌های درآمد |
 | `inc_recurring` | Income | درآمدهای تکرارشونده |
 | `exp_transactions` | Expense | تراکنش‌های هزینه |
@@ -152,7 +152,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
 | `inv_crypto_wallet_networks` | Investment Crypto | شبکه‌های بلاکچین هر والت |
-| `inv_crypto_wallet_addresses` | Investment Crypto | چند آدرس/derivation per شبکه (BUG-H10) |
+| `inv_crypto_wallet_addresses` | Investment Crypto | چند آدرس/derivation per شبکه |
 | `inv_crypto_holdings` | Investment Crypto | دارایی‌های رمزارز |
 | `inv_crypto_transactions` | Investment Crypto | تراکنش‌های رمزارز |
 | `inv_crypto_exchange_transactions` | Investment Crypto | تراکنش‌های نقدی صرافی |
@@ -221,94 +221,94 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 ```typescript
 // db/models.ts
 export interface AccAccount {
-  id: string;
-  name: string;
-  accountNumber: string;
-  iban: string;
-  currency: string;
-  currentBalance: Decimal; // استفاده از decimal.js
-  isArchived: boolean;
+ id: string;
+ name: string;
+ accountNumber: string;
+ iban: string;
+ currency: string;
+ currentBalance: Decimal; // استفاده از decimal.js
+ isArchived: boolean;
 }
 
 export interface AccTransaction {
-  id: string;
-  date: string;
-  type: string;
-  amount: Decimal; // استفاده از decimal.js — صفاف و دقیق
-  feeAmount?: Decimal;
-  feeCurrency?: string;
-  exchangeRateToBase?: Decimal; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
-  balanceAfterTransaction: Decimal; // derived snapshot only (BUG-H13) — ledger authoritative
-  accountId: string;
-  isVoided: boolean;
+ id: string;
+ date: string;
+ type: string;
+ amount: Decimal; // استفاده از decimal.js — صفاف و دقیق
+ feeAmount?: Decimal;
+ feeCurrency?: string;
+ exchangeRateToBase?: Decimal; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
+ balanceAfterTransaction: Decimal; // derived snapshot only — ledger authoritative
+ accountId: string;
+ isVoided: boolean;
 }
 
-// --- نمونه مفهومی صندوق درآمد ثابت (تمایز NAV و قیمت معامله — باگ ۳۴) ---
+// --- نمونه مفهومی صندوق درآمد ثابت (تمایز NAV و قیمت معامله — ) ---
 export interface InvFifHolding {
-  id: string;
-  fundId: string;
-  brokerageId?: string;
-  units: Decimal;
-  averageBuyPrice: Decimal;      // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
-  totalInvested: Decimal;
-  totalFeesPaidBase: Decimal; // BUG-C04 was totalFeesPaidUSDT
-  currentNAV: Decimal;           // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
-  lastSubscriptionPrice?: Decimal;
-  lastRedemptionPrice?: Decimal;
+ id: string;
+ fundId: string;
+ brokerageId?: string;
+ units: Decimal;
+ averageBuyPrice: Decimal; // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
+ totalInvested: Decimal;
+ totalFeesPaidBase: Decimal; // was totalFeesPaidUSDT
+ currentNAV: Decimal; // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
+ lastSubscriptionPrice?: Decimal;
+ lastRedemptionPrice?: Decimal;
 }
 
 export interface InvFifTransaction {
-  id: string;
-  fundId: string;
-  brokerageId?: string;
-  type: 'buy' | 'sell' | 'dividend' | 'reinvest' | 'nav_update';
-  units?: Decimal;
-  nav?: Decimal;                 // NAV در تاریخ تراکنش
-  transactionPrice?: Decimal;    // قیمت واقعی معامله (صدور در buy، ابطال در sell)
-  amount?: Decimal;
-  feeAmount?: Decimal;
-  feeCurrency?: string;
-  exchangeRateToBase?: Decimal;
-  predictedProfit?: Decimal;
-  actualProfit?: Decimal;
-  accountId?: string;
-  accountTransactionId?: string;
-  description?: string;
-  date: string;
+ id: string;
+ fundId: string;
+ brokerageId?: string;
+ type: 'buy' | 'sell' | 'dividend' | 'reinvest' | 'nav_update';
+ units?: Decimal;
+ nav?: Decimal; // NAV در تاریخ تراکنش
+ transactionPrice?: Decimal; // قیمت واقعی معامله (صدور در buy، ابطال در sell)
+ amount?: Decimal;
+ feeAmount?: Decimal;
+ feeCurrency?: string;
+ exchangeRateToBase?: Decimal;
+ predictedProfit?: Decimal;
+ actualProfit?: Decimal;
+ accountId?: string;
+ accountTransactionId?: string;
+ description?: string;
+ date: string;
 }
 ```
 
 > **تمایز حیاتی در FIF**: `nav` / `currentNAV` هرگز با `transactionPrice` یکی فرض نمی‌شوند. جزئیات کامل و قوانین پر کردن در `Fixed-Income-Funds.md`.
 
 ```typescript
-// --- نمونه مفهومی فلزات (تمایز واحد / عیار / وزن خالص — باگ ۳۵) ---
+// --- نمونه مفهومی فلزات (تمایز واحد / عیار / وزن خالص — ) ---
 export interface InvMetalsHolding {
-  id: string;
-  platformId: string;
-  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
-  purity: string;                 // کد استاندارد: 18k, 24k, 999, emami, ...
-  purityRatio: Decimal;           // 0..1 — fineWeightMg = quantityMg × purityRatio
-  quantityMg: Decimal;            // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
-  averageBuyPricePerMg: Decimal;  // میانگین همان purity (نه طلای خالص)
-  totalInvested: Decimal;
-  totalFeesPaidBase: Decimal; // BUG-C04 was totalFeesPaidUSDT
+ id: string;
+ platformId: string;
+ metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
+ purity: string; // کد استاندارد: 18k, 24k, 999, emami, ...
+ purityRatio: Decimal; // 0..1 — fineWeightMg = quantityMg × purityRatio
+ quantityMg: Decimal; // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
+ averageBuyPricePerMg: Decimal; // میانگین همان purity (نه طلای خالص)
+ totalInvested: Decimal;
+ totalFeesPaidBase: Decimal; // was totalFeesPaidUSDT
 }
 
 export interface InvMetalsTransaction {
-  id: string;
-  platformId: string;
-  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
-  purity: string;                 // اجباری
-  purityRatio: Decimal;           // snapshot
-  type: 'buy' | 'sell' | 'physical_delivery';
-  quantityMg: Decimal;            // وزن ناخالص
-  pricePerMg: Decimal;            // قیمت همان purity
-  totalAmount?: Decimal;
-  feeAmount?: Decimal;
-  feeCurrency?: string;
-  exchangeRateToBase?: Decimal;
-  deliveryFee?: Decimal;
-  date: string;
+ id: string;
+ platformId: string;
+ metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
+ purity: string; // اجباری
+ purityRatio: Decimal; // snapshot
+ type: 'buy' | 'sell' | 'physical_delivery';
+ quantityMg: Decimal; // وزن ناخالص
+ pricePerMg: Decimal; // قیمت همان purity
+ totalAmount?: Decimal;
+ feeAmount?: Decimal;
+ feeCurrency?: string;
+ exchangeRateToBase?: Decimal;
+ deliveryFee?: Decimal;
+ date: string;
 }
 ```
 
@@ -362,14 +362,14 @@ const displayAmount = storedAmount.dividedBy(100); // 1234.56
 
 ```bash
 core/db/
-├── db.ts              # تعریف دیتابیس و اتصال
-├── schema.sql         # تعریف جداول با SQL
-├── models.ts          # TypeScript types برای هر جدول
-├── migrations.ts      # مدیریت مایگRATION‌های SQLite
-├── queries/           # کوئری‌های SQL تجمیع شده
-│   ├── reports.ts     # کوئری‌های گزارش‌گیری
-│   └── analytics.ts   # کوئری‌های تحلیلی
-└── index.ts           # Export اصلی
+├── db.ts # تعریف دیتابیس و اتصال
+├── schema.sql # تعریف جداول با SQL
+├── models.ts # TypeScript types برای هر جدول
+├── migrations.ts # مدیریت مایگRATION‌های SQLite
+├── queries/ # کوئری‌های SQL تجمیع شده
+│ ├── reports.ts # کوئری‌های گزارش‌گیری
+│ └── analytics.ts # کوئری‌های تحلیلی
+└── index.ts # Export اصلی
 ```
 
 ## قوانین
@@ -382,7 +382,7 @@ core/db/
 
 ---
 
-## قرارداد ماندگاری مالی (باگ ۴۳ — Critical)
+## قرارداد ماندگاری مالی
 
 برای سیستم حسابداری، کاربر فقط وقتی باید «ثبت شد» ببیند که داده **واقعاً persist** شده باشد.
 
@@ -390,11 +390,11 @@ core/db/
 
 ```text
 BEGIN (SQLite transaction)
-  → validate
-  → write all related rows
+ → validate
+ → write all related rows
 COMMIT (SQLite)
-  → serialize DB → Write-to-temp-then-swap در IndexedDB  (await کامل)
-  → فقط بعد از resolve موفق swap → UI «ثبت شد»
+ → serialize DB → Write-to-temp-then-swap در IndexedDB (await کامل)
+ → فقط بعد از resolve موفق swap → UI «ثبت شد»
 ```
 
 قوانین:
@@ -405,7 +405,7 @@ COMMIT (SQLite)
 
 ---
 
-## صف ماندگاری و محدودیت حجم sql.js (باگ ۴۴)
+## صف ماندگاری و محدودیت حجم sql.js
 
 sql.js کل DB را در RAM نگه می‌دارد و هر persist کل فایل را serialize می‌کند. برای نسخه ۱ قابل‌قبول است، ولی این قراردادها **الزامی**اند:
 
@@ -418,16 +418,16 @@ sql.js کل DB را در RAM نگه می‌دارد و هر persist کل فای�
 | ریسک | mitigation نسخه ۱ |
 |------|-------------------|
 | RAM بالا با ده‌ها هزار تراکنش + price_history | هشدار در Settings وقتی تخمین حجم از آستانه گذشت؛ تشویق به Backup |
-| Freeze هنگام serialize | serialize سنگین ترجیحاً در Worker (باگ ۴۵)؛ UI با progress «در حال ذخیره…» |
+| Freeze هنگام serialize | serialize سنگین ترجیحاً در Worker؛ UI با progress «در حال ذخیره…» |
 | kill موبایل وسط نوشتن | Write-to-temp-then-swap؛ هرگز overwrite مستقیم `db_main` |
-| رشد بی‌رویه price_history | dedupe (باگ ۴۲) + امکان پاک‌سازی قدیمی در آینده |
+| رشد بی‌رویه price_history | dedupe + امکان پاک‌سازی قدیمی در آینده |
 
 ### مسیر ارتقا (نه v1)
 OPFS / SQLite WASM با نوشتن افزایشی — فقط به‌عنوان مسیر شناخته‌شده؛ بازطراحی از صفر لازم نباشد.
 
 ---
 
-## Worker Strategy (باگ ۴۵ — High)
+## Worker Strategy
 
 | کار | Thread |
 |-----|--------|
@@ -444,7 +444,7 @@ OPFS / SQLite WASM با نوشتن افزایشی — فقط به‌عنوان �
 
 ---
 
-## قرارداد Migration (باگ ۴۶ — Critical برای implementation)
+## قرارداد Migration
 
 مستندات به‌تنهایی migration را enforce نمی‌کند. در implementation این‌ها الزامی‌اند:
 
@@ -465,7 +465,7 @@ open DB from IndexedDB
 ### قوانین
 1. بدون `schema_version` معتبر، اپ نباید بنویسد (یا نسخه ۰ فرض و migration از ابتدا).
 2. Migration شکست → اپ در حالت safe mode؛ overwrite روی DB اصلی نکند.
-3. Backup باید `schemaVersion` را در متادیتا نگه دارد (باگ ۴۷).
+3. Backup باید `schemaVersion` را در متادیتا نگه دارد.
 4. تا قبل از implementation واقعی `migrations.ts`، این بخش «قرارداد لازم‌الاجرا» است نه «انجام‌شده».
 
 ---
@@ -493,24 +493,24 @@ open DB from IndexedDB
 10. دور انداختن temp؛ UI موفقیت
 ```
 
-### Atomic Restore (باگ ۴۸)
+### Atomic Restore
 - DB قبلی تا لحظه swap نهایی دست‌نخورده می‌ماند.
 - اگر هر مرحله از ۱–۸ شکست بخورد، کاربر همان داده قبلی را دارد.
 - Restore نصفه هرگز `db_main` را overwrite نمی‌کند.
 
 ---
 
-## قرارداد عملیات مالی اتمیک (باگ ۵۰ — Critical)
+## قرارداد عملیات مالی اتمیک
 
 هر عملیات مالی چندمرحله‌ای (خرید کریپتو، فروش، تبدیل، پرداخت قسط، خرید سهام، ابطال صندوق، انتقال، reversal، …) باید از این قالب پیروی کند:
 
 ```text
 BEGIN;
-  validate inputs + balances + business rules;
-  insert/update domain rows (holdings, loans, …);
-  update snapshots (balances, averages, cashBalance, …);
-  insert acc_transactions (+ لینک relatedFeature/relatedId);
-  — هیچ COMMIT جزئی مجاز نیست —
+ validate inputs + balances + business rules;
+ insert/update domain rows (holdings, loans, …);
+ update snapshots (balances, averages, cashBalance, …);
+ insert acc_transactions (+ لینک relatedFeature/relatedId);
+ — هیچ COMMIT جزئی مجاز نیست —
 COMMIT;
 → await persistToIndexedDB (Write-to-temp-then-swap);
 → UI success / emit domain events;
@@ -519,10 +519,10 @@ COMMIT;
 قوانین:
 1. Feature حق ندارد فقط یکی از جداول را بدون بقیه بنویسد.
 2. Reversal = تراکنش معکوس جدید، نه حذف خام تاریخچه (طبق قوانین موجود void).
-3. اگر persist بعد از COMMIT حافظه شکست بخورد، طبق باگ ۴۳ رفتار خطا — نه «ثبت شد» کاذب.
+3. اگر persist بعد از COMMIT حافظه شکست بخورد، طبق رفتار خطا — نه «ثبت شد» کاذب.
 4. پیاده‌سازی‌ها در Featureهای مختلف باید از یک helper مشترک `runAtomicFinancialOperation(fn)` در `db/` یا `core` استفاده کنند تا رفتار یکسان بماند.
-5. هر فراخوانی یک `operationId` تولید و روی تمام ردیف‌های همان COMMIT می‌نویسد (باگ ۵۷ Audit).
-6. در فروش/سود مشمول مالیات، tax metadata (باگ ۵۶) در همان COMMIT پر می‌شود.
+5. هر فراخوانی یک `operationId` تولید و روی تمام ردیف‌های همان COMMIT می‌نویسد.
+6. در فروش/سود مشمول مالیات، tax metadata در همان COMMIT پر می‌شود.
 
 
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
@@ -531,7 +531,7 @@ COMMIT;
 
 ---
 
-## قرارداد Reconciliation مرکزی (باگ ۵۱ — Critical)
+## قرارداد Reconciliation مرکزی
 
 Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) ممکن است به‌خاطر باگ Domain از Ledger فاصله بگیرند. یک مکانیزم **مرکزی فقط‌خواندنی** برای تشخیص ناهماهنگی الزامی است.
 
@@ -567,12 +567,12 @@ Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) م
 
 ```typescript
 interface ReconcileResult {
-  target: string;           // e.g. 'account:uuid'
-  ok: boolean;
-  expected: string;         // decimal string از ledger
-  actual: string;           // decimal string از snapshot
-  delta: string;            // actual - expected
-  details?: string;
+ target: string; // e.g. 'account:uuid'
+ ok: boolean;
+ expected: string; // decimal string از ledger
+ actual: string; // decimal string از snapshot
+ delta: string; // actual - expected
+ details?: string;
 }
 ```
 
@@ -584,7 +584,7 @@ interface ReconcileResult {
 
 ---
 
-## قرارداد CHECK Constraints در SQLite (باگ ۵۲)
+## قرارداد CHECK Constraints در SQLite
 
 قوانین Domain لازم‌اند ولی کافی نیستند. Schema باید تا حد ممکن همان invariants را enforce کند تا باگ Domain نتواند `quantity = -1` را commit کند.
 
@@ -592,13 +592,13 @@ interface ReconcileResult {
 
 ```sql
 -- مبالغ و موجودی‌ها
-CHECK (amount > 0)                    -- در جدول‌های تراکنش مبلغ مطلق، در صورت signed بودن: قوانین صریح per type
+CHECK (amount > 0) -- در جدول‌های تراکنش مبلغ مطلق، در صورت signed بودن: قوانین صریح per type
 CHECK (feeAmount IS NULL OR feeAmount >= 0)
-CHECK (quantity >= 0)                 -- holdings
+CHECK (quantity >= 0) -- holdings
 CHECK (quantityMg >= 0)
 CHECK (units >= 0)
-CHECK (currentBalance IS NOT NULL)    -- علامت می‌تواند منفی نباشد مگر overdraft صریح مجاز باشد
-CHECK (price > 0)                     -- price_history
+CHECK (currentBalance IS NOT NULL) -- علامت می‌تواند منفی نباشد مگر overdraft صریح مجاز باشد
+CHECK (price > 0) -- price_history
 CHECK (averageBuyPrice >= 0)
 CHECK (purityRatio > 0 AND purityRatio <= 1)
 CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
@@ -612,7 +612,7 @@ CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
 
 ---
 
-## سیاست Foreign Key کامل (باگ ۵۳)
+## سیاست Foreign Key کامل
 
 برای سیستم مالی تقریباً immutable، حذف parent نباید تاریخچه child را پاک کند مگر استثنای صریح.
 
@@ -636,7 +636,7 @@ CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
 
 ---
 
-## Polymorphic FK: `relatedFeature` + `relatedId` (باگ ۵۴)
+## Polymorphic FK: `relatedFeature` + `relatedId`
 
 SQLite نمی‌تواند enforce کند که `relatedId` به جدول درست اشاره می‌کند.
 
@@ -644,16 +644,16 @@ SQLite نمی‌تواند enforce کند که `relatedId` به جدول درس�
 
 1. **Enum بسته** `RelatedFeature` فقط از `core/types` (از قبل موجود).
 2. **Validate در Domain** داخل `runAtomicFinancialOperation`: وجود ردیف هدف قبل از INSERT در `acc_transactions`.
-3. **جدول اختیاری `acc_transaction_links` (Should Have / آماده‌سازی)**:  
-   `(transactionId, relatedFeature, relatedId)` با ایندکس یکتا — برای گزارش و reconcile، نه جایگزین enum.
-4. **Reconcile** (باگ ۵۱): برای هر `acc_transactions` با related غیرnull، بررسی وجود هدف؛ orphan = گزارش خطا.
+3. **جدول اختیاری `acc_transaction_links` (Should Have / آماده‌سازی)**: 
+ `(transactionId, relatedFeature, relatedId)` با ایندکس یکتا — برای گزارش و reconcile، نه جایگزین enum.
+4. **Reconcile**: برای هر `acc_transactions` با related غیرnull، بررسی وجود هدف؛ orphan = گزارش خطا.
 5. **ممنوع**: نوشتن `relatedFeature`/`relatedId` از UI بدون عبور از API فیچر مالک.
 
 > محدودیت intrinsic polymorphic FK پذیرفته شده است؛ correctness با Domain + Reconcile + تست integration جبران می‌شود.
 
 ---
 
-## قرارداد تاریخ و زمان (باگ ۵۵)
+## قرارداد تاریخ و زمان
 
 ### ذخیره
 - همه timestampهای مطلق به‌صورت **ISO 8601 UTC** (`Timestamp` در types).
@@ -679,7 +679,7 @@ SQLite نمی‌تواند enforce کند که `relatedId` به جدول درس�
 
 ---
 
-## قرارداد Audit Trail مالی (باگ ۵۷)
+## قرارداد Audit Trail مالی
 
 Immutable transaction کافی نیست؛ برای عملیات حساس باید ردپای عملیاتی مشخص باشد (آینده multi-user / license).
 
@@ -712,7 +712,7 @@ actorId, source, reason, payloadSummary, createdAt
 
 ---
 
-## تقویت Integrity لینک Polymorphic (BUG-024)
+## تقویت Integrity لینک Polymorphic
 
 FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 
@@ -722,7 +722,7 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 4. **ممنوع DELETE فیزیکی** parent تا وقتی child link دارد (هم‌راستا با ON DELETE RESTRICT روی FKهای واقعی).
 5. تست integration: حذف/void والد نباید child را بی‌سرپرست رها کند بدون گزارش.
 
-این همچنان Weak Integrity نسبت به FK واقعی است (BUG-H14)، ولی mitigations **الزامی در runtime**اند:
+این همچنان Weak Integrity نسبت به FK واقعی است، ولی mitigations **الزامی در runtime**اند:
 1. CHECK `relatedFeature` ∈ enum بسته (لیست در types) در صورت امکان + validate Domain.
 2. قبل از COMMIT: SELECT وجود `relatedId` در جدول map[relatedFeature].
 3. `reconcileOrphanLinks` در Backup/Restore و دوره‌ای در Settings «سلامت داده».
@@ -731,7 +731,7 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 
 ---
 
-## قرارداد Snapshot در برابر Ledger (BUG-025)
+## قرارداد Snapshot در برابر Ledger
 
 | لایه | نقش | mutable؟ |
 |------|-----|----------|
@@ -739,15 +739,15 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 | Snapshot (holding quantity, cashBalance, currentBalance, totalInvested, averages, remaining loan, …) | کش مشتق برای سرعت | mutable ولی **فقط** از مسیر atomic رسمی |
 
 ### قوانین
-1. **Ledger authoritative است**؛ Snapshot هرگز منبع حقیقت برای Repair نیست (هم‌راستا با BUG-018).
+1. **Ledger authoritative است**؛ Snapshot هرگز منبع حقیقت برای Repair نیست (هم‌راستا با ).
 2. هر Feature که Snapshot دارد باید `rebuildXFromLedger(id)` داشته باشد (یا از helper مشترک).
 3. `runAtomicFinancialOperation` باید در یک COMMIT هم ledger و هم snapshot را بنویسد؛ به‌روزرسانی snapshot بیرون از آن مسیر ممنوع است.
 4. بعد از کشف اختلاف reconcile: فقط **Repair صریح** (`rebuild*FromLedger` با تأیید کاربر) snapshot را اصلاح می‌کند — نه نوشتن معکوس از snapshot روی ledger.
 5. لیست حداقل rebuildها: Account balance، Crypto/Stock/FIF/Metals holdings، Brokerage/Platform cash، Loan remaining.
 
 ```text
-Ledger correct + Snapshot wrong  → rebuild snapshot from ledger
-Ledger wrong                     → reversal/corrective transactions (never silent snapshot edit as truth)
+Ledger correct + Snapshot wrong → rebuild snapshot from ledger
+Ledger wrong → reversal/corrective transactions (never silent snapshot edit as truth)
 ```
 
 ### الگوی عمومی اصلاح تراکنش دولایه (Two-Layer Atomic Correction)
@@ -758,13 +758,13 @@ Ledger wrong                     → reversal/corrective transactions (never sil
 BEGIN TRANSACTION;
 
 ── لایه ۱: جدول اختصاصی فیچر ──────────────────────────────────────
-  feature_table[id].isVoided = true       -- علامت‌گذاری رکورد قدیمی
-  INSERT new_feature_row (data_corrected, reversedId=id, ...)  -- رکورد جدید
+ feature_table[id].isVoided = true -- علامت‌گذاری رکورد قدیمی
+ INSERT new_feature_row (data_corrected, reversedId=id, ...) -- رکورد جدید
 
 ── لایه ۲: acc_transactions ────────────────────────────────────────
-  acc_transactions[accountTransactionId].isVoided = true   -- void تراکنش اصلی
-  INSERT reversal_acc_tx (type=reversal, amount=-original)  -- معکوس موجودی
-  INSERT new_acc_tx (type=original_type, amount=corrected)  -- تراکنش صحیح جدید
+ acc_transactions[accountTransactionId].isVoided = true -- void تراکنش اصلی
+ INSERT reversal_acc_tx (type=reversal, amount=-original) -- معکوس موجودی
+ INSERT new_acc_tx (type=original_type, amount=corrected) -- تراکنش صحیح جدید
 
 COMMIT;
 ```
@@ -775,7 +775,7 @@ COMMIT;
 
 ---
 
-## Multi-Tab Concurrency (BUG-031)
+## Multi-Tab Concurrency
 
 sql.js در هر Tab یک کپی در RAM دارد. بدون هماهنگی، Last-Write-Wins می‌تواند تراکنش Tab دیگر را در IndexedDB overwrite کند.
 
@@ -790,7 +790,7 @@ v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از
 
 ---
 
-## دفتر روزنامه یکپارچه — `fin_journal_entries` (BUG-C03)
+## دفتر روزنامه یکپارچه — `fin_journal_entries`
 
 ### مشکل
 جدول‌های `inc_*`, `exp_*`, `ln_*`, `inv_*`, `pa_*` و `acc_transactions` لاگ‌های دامنه‌ای جدا هستند. `acc_transactions` فقط **Cash/Bank ledger** است، نه Journal عمومی. گزارش‌ها و Reconciliation اگر فقط یکی را ببینند ناقص می‌مانند.
@@ -825,33 +825,33 @@ v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از
 
 ```text
 Feature domain row(s)
-  + fin_journal_entries (الزامی)
-  + acc_transactions (فقط اگر cash بانکی)
-  + snapshots
+ + fin_journal_entries (الزامی)
+ + acc_transactions (فقط اگر cash بانکی)
+ + snapshots
 → COMMIT → persist
 ```
 
 ---
 
-## مکانیزم واقعی Reconciliation (BUG-M02)
+## مکانیزم واقعی Reconciliation
 
 APIهای `reconcile*` / `rebuild*` فقط مشخصات نیستند؛ در implementation باید **قابل اثبات** کنند `snapshot == ledger`.
 
 ### قرارداد اجرایی
 1. **ماژول** `core/reconciliation/` (یا `db/reconciliation.ts`):
-   - `reconcileX(id): Promise<ReconcileResult>`
-   - `rebuildXFromLedger(id): Promise<void>` فقط پس از تأیید کاربر
+ - `reconcileX(id): Promise<ReconcileResult>`
+ - `rebuildXFromLedger(id): Promise<void>` فقط پس از تأیید کاربر
 2. **الگوریتم مشترک**:
 ```text
 expected = pure function over non-voided ledger rows (decimal.js)
-actual   = current snapshot column(s)
-delta    = actual - expected
-ok       = delta.isZero()
+actual = current snapshot column(s)
+delta = actual - expected
+ok = delta.isZero()
 ```
 3. **اثبات در تست**: unit/integration با fixture — بعد از atomic op، `reconcileX` → `ok:true`؛ بعد از فساد عمدی snapshot → `ok:false` و rebuild جبران می‌کند.
 4. **Runtime**:
-   - Dev/Test: بعد از هر `runAtomicFinancialOperation` روی aggregate همان op
-   - Production v1: `reconcileAll` از Settings «سلامت داده» + قبل از Backup + بعد از Restore
+ - Dev/Test: بعد از هر `runAtomicFinancialOperation` روی aggregate همان op
+ - Production v1: `reconcileAll` از Settings «سلامت داده» + قبل از Backup + بعد از Restore
 5. **خروجی پایدار** در جدول اختیاری `fin_reconcile_runs` (Should Have): `{ ranAt, scope, ok, deltaSummary }` برای audit.
 6. تا وقتی کد و تست fixture وجود ندارد، checklist پیاده‌سازی این باگ را **باز** می‌داند — مستند به‌تنهایی «حل‌شده در runtime» نیست.
 

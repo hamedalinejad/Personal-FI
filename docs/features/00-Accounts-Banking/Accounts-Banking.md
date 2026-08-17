@@ -9,7 +9,7 @@ Business Rules
 - نام حساب باید منحصر به فرد باشد.
 - حذف حساب وجود ندارد — فقط آرشیو (Soft Archive).
 - تراکنش‌ها پس از ثبت تغییرناپذیر هستند؛ برای اصلاح، تراکنش reversed/voided ثبت می‌شود.
-- `balanceAfterTransaction` یک **derived snapshot** روی هر ردیف تراکنش است (BUG-H13) — برای نمایش/دیباگ سریع. **منبع حقیقت مانده = Ledger** (`Σ acc_transactions` / `rebuildAccountFromLedger`). هیچ Report یا API تعمیری نباید این فیلد را authoritative فرض کند.
+- `balanceAfterTransaction` یک **derived snapshot** روی هر ردیف تراکنش است — برای نمایش/دیباگ سریع. **منبع حقیقت مانده = Ledger** (`Σ acc_transactions` / `rebuildAccountFromLedger`). هیچ Report یا API تعمیری نباید این فیلد را authoritative فرض کند.
 
 Domain Entities
 1. Account (جدول: acc_accounts)
@@ -37,7 +37,7 @@ type → string (نوع `TransactionType` — تعریف مرکزی و تنها 
 amount → decimal (مبلغ)
 feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
 feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
-exchangeRateToBase → decimal (nullable — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+exchangeRateToBase → decimal (nullable — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)
@@ -45,7 +45,7 @@ relatedFeature → string (نوع `RelatedFeature` — **فهرست کامل و 
 
 relatedId → UUID (شناسه رکورد در فیچر مرتبط)
 
-> **Polymorphic FK (باگ ۵۴)**: SQLite این جفت را enforce نمی‌کند. وجود ردیف هدف باید در Domain validate شود؛ orphanها با `reconcileAccount` / `reconcileAll` قابل کشف‌اند. جزئیات در `core/db/db.md`.
+> **Polymorphic FK**: SQLite این جفت را enforce نمی‌کند. وجود ردیف هدف باید در Domain validate شود؛ orphanها با `reconcileAccount` / `reconcileAll` قابل کشف‌اند. جزئیات در `core/db/db.md`.
 isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
 relatedTransactionId → UUID (nullable — برای تراکنش‌های reversed، لینک به تراکنش اصلی)
 createdAt → datetime
@@ -60,7 +60,7 @@ APIهای داخلی
 Account:
 
 createAccount(data)
-updateAccount(id, data)   // فقط ویرایش اطلاعات حساب
+updateAccount(id, data) // فقط ویرایش اطلاعات حساب
 getAllAccounts(includeArchived = false)
 getAccountById(id)
 archiveAccount(id)
@@ -68,21 +68,21 @@ getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')
 > - **`cached`** (پیش‌فرض): مقدار `acc_accounts.currentBalance` (Snapshot — سریع، برای نمایش UI)
 > - **`ledger`**: بازمحاسبه از مجموع `acc_transactions` با فراخوانی معادل `rebuildAccountFromLedger` (کند ولی همیشه دقیق — برای عملیات حساس مثل برداشت، انتقال، یا Reconciliation)
 >
-> ⚠️ **BUG-025**: `currentBalance` Snapshot است نه Ledger. برای هر عملیاتی که روی صحت موجودی حساس است (برداشت، انتقال)، حتماً `mode='ledger'` استفاده شود — جزئیات در `core/db/db.md → BUG-025`.
+> ⚠️ `currentBalance` Snapshot است نه Ledger. برای هر عملیاتی که روی صحت موجودی حساس است (برداشت، انتقال)، حتماً `mode='ledger'` استفاده شود — جزئیات در `core/db/db.md → `.
 
 getAvailableBalance(accountId) → موجودی در دسترس (فقط‌خواندنی — برای نمایش هشدار در UI)
 > ```
 > getAvailableBalance(accountId) =
->   currentBalance
->   − Σ (amount of pending پرداختی cheques روی این حساب)
+> currentBalance
+> − Σ (amount of pending پرداختی cheques روی این حساب)
 > ```
 > این مقدار **کمتر یا مساوی** `currentBalance` است. در UI کنار موجودی واقعی نمایش داده می‌شود تا کاربر از تعهدات چک‌های صادرشده‌ی هنوز وصول‌نشده آگاه باشد. این یک **هشدار اطلاعاتی** است، نه قید سخت — سیستم مانع ثبت تراکنش جدید نمی‌شود.
 
 Transaction:
 
 createTransaction(data)
-updateTransaction(id, data)   // فقط برای update متنی (description و ...)
-voidTransaction(id, reason, relatedTransactionId?)   // لغو تراکنش و ثبت reversed
+updateTransaction(id, data) // فقط برای update متنی (description و ...)
+voidTransaction(id, reason, relatedTransactionId?) // لغو تراکنش و ثبت reversed
 getTransactionsByAccount(accountId, filters)
 getTransactionById(id)
 

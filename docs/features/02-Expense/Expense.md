@@ -34,15 +34,15 @@ Business Rules
 هزینه نمی‌تواند در آینده ثبت شود — تاریخ تراکنش باید ≤ امروز باشد (Job روزانه `generateRecurringExpenses` هم فقط زمانی تراکنش می‌سازد که `nextOccurrence` رسیده باشد، نه از پیش).
 **ویرایش/حذف هزینه**: تراکنش هزینه پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف، الگوی **دولایه Atomic** اجرا می‌شود (همه مراحل در یک BEGIN/COMMIT):
 
-  **لایه ۱ — `exp_transactions`**:
-  - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
-  - یک رکورد جدید در `exp_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
+ **لایه ۱ — `exp_transactions`**:
+ - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
+ - یک رکورد جدید در `exp_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
 
-  **لایه ۲ — `acc_transactions`**:
-  - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
-  - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
+ **لایه ۲ — `acc_transactions`**:
+ - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
+ - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
 
-  > ⚠️ **قانون `getTotalExpense`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `exp_transactions` را جمع می‌زنند.
+ > ⚠️ **قانون `getTotalExpense`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `exp_transactions` را جمع می‌زنند.
 
 
 ### ۱. Expense Transaction (جدول: exp_transactions)
@@ -51,7 +51,7 @@ id → UUID (Primary Key)
 date → datetime (تاریخ هزینه)
 amount → decimal (مبلغ هزینه — به ارز حساب)
 currency → string (ارز هزینه = ارز حساب مبدأ)
-exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 accountId → UUID (حساب مبدأ)
 description → string (توضیحات)
 category → string (دسته‌بندی: خوراک، حمل‌ونقل، مسکن، سرگرمی و ...)
@@ -105,10 +105,10 @@ Expense Transaction APIs:
 
 createExpense(data) → ثبت هزینه + گرفتن نرخ تبدیل + ایجاد تراکنش + کاهش مانده حساب
 correctExpense(id, data) → اصلاح هزینه — **الزاماً Atomic (BEGIN/COMMIT)**:
-  1. `exp_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
-  2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
-  3. INSERT رکورد جدید در `exp_transactions` با داده اصلاح‌شده، `reversedExpenseId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
-  4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
+ 1. `exp_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
+ 2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
+ 3. INSERT رکورد جدید در `exp_transactions` با داده اصلاح‌شده، `reversedExpenseId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
+ 4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
 updateExpenseMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllExpenses(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getExpenseById(id)

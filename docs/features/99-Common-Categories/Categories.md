@@ -51,15 +51,15 @@
 ### روش ۱: جدول جدید (توصیه شده برای آینده)
 ```sql
 CREATE TABLE cat_categories (
-  id → UUID (Primary Key)
-  type → enum (income, expense)
-  code → string (مثلاً salary, food, etc.)
-  name_fa → string (نام فارسی)
-  name_en → string (نام انگلیسی)
-  description → text
-  isActive → boolean
-  createdAt → datetime,
-  UNIQUE(type, code)  -- نه UNIQUE(code) به‌تنهایی؛ کد gift هم در income و هم در expense تکرار شده (رجوع به جدول بالا)
+ id → UUID (Primary Key)
+ type → enum (income, expense)
+ code → string (مثلاً salary, food, etc.)
+ name_fa → string (نام فارسی)
+ name_en → string (نام انگلیسی)
+ description → text
+ isActive → boolean
+ createdAt → datetime,
+ UNIQUE(type, code) -- نه UNIQUE(code) به‌تنهایی؛ کد gift هم در income و هم در expense تکرار شده (رجوع به جدول بالا)
 );
 ```
 
@@ -67,31 +67,31 @@ CREATE TABLE cat_categories (
 ```typescript
 // incomeCategories.ts / expenseCategories.ts
 export const INCOME_CATEGORIES = {
-  salary: 'salary',
-  freelance: 'freelance',
-  business: 'business',
-  investment: 'investment',
-  rental: 'rental',
-  gift: 'gift',
-  sale: 'sale',
-  other: 'other',
+ salary: 'salary',
+ freelance: 'freelance',
+ business: 'business',
+ investment: 'investment',
+ rental: 'rental',
+ gift: 'gift',
+ sale: 'sale',
+ other: 'other',
 } as const;
 
 export const EXPENSE_CATEGORIES = {
-  food: 'food',
-  transport: 'transport',
-  housing: 'housing',
-  utilities: 'utilities',
-  healthcare: 'healthcare',
-  entertainment: 'entertainment',
-  shopping: 'shopping',
-  education: 'education',
-  communication: 'communication',
-  insurance: 'insurance',
-  tax: 'tax',
-  debt: 'debt',
-  gift: 'gift',
-  other: 'other',
+ food: 'food',
+ transport: 'transport',
+ housing: 'housing',
+ utilities: 'utilities',
+ healthcare: 'healthcare',
+ entertainment: 'entertainment',
+ shopping: 'shopping',
+ education: 'education',
+ communication: 'communication',
+ insurance: 'insurance',
+ tax: 'tax',
+ debt: 'debt',
+ gift: 'gift',
+ other: 'other',
 } as const;
 ```
 

@@ -47,9 +47,9 @@
 2. دوره تکرار می‌تواند `weekly`, `monthly`, `yearly` یا `custom` باشد.
 3. در تاریخ سررسید (یا چند روز قبل)، سیستم یادآوری ارسال می‌کند.
 4. هنگام ثبت پرداخت/دریافت:
-   - یک تراکنش واقعی در فیچر Expense یا Income ایجاد می‌شود.
-   - وضعیت آن دوره به `paid` تغییر می‌کند.
-   - تاریخ سررسید بعدی محاسبه می‌شود.
+ - یک تراکنش واقعی در فیچر Expense یا Income ایجاد می‌شود.
+ - وضعیت آن دوره به `paid` تغییر می‌کند.
+ - تاریخ سررسید بعدی محاسبه می‌شود.
 5. اگر تا بعد از سررسید پرداخت نشود، وضعیت `overdue` می‌شود.
 6. مبلغ می‌تواند ثابت یا متغیر باشد.
 7. حذف فیزیکی وجود ندارد — فقط غیرفعال‌سازی (`isActive = false`).
@@ -119,7 +119,7 @@
 - `getPendingOccurrences()`
 - `getOverdueOccurrences()`
 - `markAsPaid(brOccurrenceId, amount, date, accountId?, exchangeRateToBase?)`
-  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + ذخیره `exchangeRateToBase` روی Occurrence + به‌روزرسانی `nextDueDate`؛ اگر `nextDueDate` جدید بعد از `endDate` باشد → `isActive = false` (طبق Business Rule 8)
+ → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + ذخیره `exchangeRateToBase` روی Occurrence + به‌روزرسانی `nextDueDate`؛ اگر `nextDueDate` جدید بعد از `endDate` باشد → `isActive = false` (طبق Business Rule 8)
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 

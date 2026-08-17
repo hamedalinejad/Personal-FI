@@ -35,8 +35,8 @@ Business Rules
 - اگر چک هنوز pending بوده و مستقیماً bounced شده → هیچ تراکنشی ثبت نشده، پس نیازی به معکوس نیست.
 - اگر چک قبلاً cleared شده بوده (پول جابه‌جا شده) و بعداً واقعاً برگشت خورده → حتماً باید تراکنش معکوس (reversal) ثبت شود.
 - سیستم باید به صورت خودکار تراکنش reversal ایجاد کند:
-  - در `acc_transactions`: `isVoided = true` و `relatedTransactionId` به تراکنش اصلی تنظیم می‌شود
-  - در `chk_cheques`: `reversalTransactionId` به تراکنش reversal تنظیم می‌شود
+ - در `acc_transactions`: `isVoided = true` و `relatedTransactionId` به تراکنش اصلی تنظیم می‌شود
+ - در `chk_cheques`: `reversalTransactionId` به تراکنش reversal تنظیم می‌شود
 - اگر چک به cancelled تغییر وضعیت دهد (حذف قبل از وصول) → فقط `status` تغییر می‌کند و هیچ تراکنشی ثبت نمی‌شود.
 موجودی حساب نمی‌تواند منفی شود.
 ویرایش چک فقط در وضعیت pending مجاز است.
@@ -52,7 +52,7 @@ Domain Entities
 - `sayadiTrackingCode` → string (شناسه رهگیری صیادی — nullable)
 - `amount` → decimal (مبلغ چک)
 - `currency` → string (ارز چک = ارز حساب)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (حساب مرتبط)
 - `bankName` → string (بانک صادرکننده)
 - `issueDate` → datetime (تاریخ صدور)
@@ -68,10 +68,10 @@ Domain Entities
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی**:  
-> - وقتی چک برمی‌گردد (bounced)، سیستم یک تراکنش reversal ایجاد می‌کند  
-> - این تراکنش در `acc_transactions` با `isVoided = true` ثبت می‌شود  
-> - `reversalTransactionId` در `chk_cheques` به این تراکنش reversal لینک می‌شود  
+> **نکته طراحی**: 
+> - وقتی چک برمی‌گردد (bounced)، سیستم یک تراکنش reversal ایجاد می‌کند 
+> - این تراکنش در `acc_transactions` با `isVoided = true` ثبت می‌شود 
+> - `reversalTransactionId` در `chk_cheques` به این تراکنش reversal لینک می‌شود 
 > - `relatedTransactionId` در تراکنش reversal به تراکنش اصلی لینک می‌شود
 
 ۲. Transaction (جدول مشترک acc_transactions)
@@ -95,9 +95,9 @@ getPendingPayableChequesByAccount(accountId) → مجموع و لیست چک‌�
 
 ```typescript
 reconcileCheque(chequeId: UUID): {
-  status: 'ok' | 'mismatch'
-  chequeStatus: string
-  issues: string[]  // توضیح هر ناهماهنگی یافت‌شده
+ status: 'ok' | 'mismatch'
+ chequeStatus: string
+ issues: string[] // توضیح هر ناهماهنگی یافت‌شده
 }
 ```
 
@@ -123,8 +123,8 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 >
 > ```
 > getAvailableBalance(accountId) =
->   currentBalance
->   − Σ (amount of pending پرداختی cheques on this account)
+> currentBalance
+> − Σ (amount of pending پرداختی cheques on this account)
 > ```
 >
 > این مقدار در UI به‌عنوان **هشدار** (نه قید سخت) کنار `currentBalance` نمایش داده می‌شود تا کاربر از تعهدات آتی خود آگاه باشد.

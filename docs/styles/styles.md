@@ -8,11 +8,11 @@
 
 ```bash
 styles/
-├── globals.css              # استایل‌های سراسری، reset و box-sizing
-├── fonts.css                # تعریف @font-face فارسی و لاتین
-├── themes.css               # CSS Variables رنگ‌ها برای تم روشن/تیره
-├── financial.css            # CSS Variables و کلاس‌های مخصوص نمایش مالی
-└── tailwind.css             # @tailwind base/components/utilities (نقطه ورود Tailwind)
+├── globals.css # استایل‌های سراسری، reset و box-sizing
+├── fonts.css # تعریف @font-face فارسی و لاتین
+├── themes.css # CSS Variables رنگ‌ها برای تم روشن/تیره
+├── financial.css # CSS Variables و کلاس‌های مخصوص نمایش مالی
+└── tailwind.css # @tailwind base/components/utilities (نقطه ورود Tailwind)
 ```
 
 ---
@@ -46,20 +46,20 @@ styles/
 --color-border-strong
 
 /* تم‌های عملکردی */
---color-accent           /* رنگ اصلی برند */
+--color-accent /* رنگ اصلی برند */
 --color-accent-hover
---color-destructive      /* حذف، خطا */
---color-warning          /* هشدار */
---color-success          /* موفقیت */
+--color-destructive /* حذف، خطا */
+--color-warning /* هشدار */
+--color-success /* موفقیت */
 
 /* رنگ‌های مالی (تعریف شده در themes.css، استفاده در financial.css) */
---color-financial-positive   /* سود، دریافتی — سبز */
---color-financial-negative   /* زیان، پرداختی — قرمز */
---color-financial-neutral    /* انتقال، خنثی */
---color-financial-crypto     /* ارز دیجیتال */
---color-financial-stock      /* سهام */
---color-financial-metal      /* فلزات/طلا */
---color-financial-fund       /* صندوق */
+--color-financial-positive /* سود، دریافتی — سبز */
+--color-financial-negative /* زیان، پرداختی — قرمز */
+--color-financial-neutral /* انتقال، خنثی */
+--color-financial-crypto /* ارز دیجیتال */
+--color-financial-stock /* سهام */
+--color-financial-metal /* فلزات/طلا */
+--color-financial-fund /* صندوق */
 ```
 
 > **قانون رنگ مالی:** هیچ‌جای کد نباید رنگ سبز/قرمز به‌صورت مستقیم (`text-green-500`) نوشته شود؛ همیشه از `--color-financial-positive` و `--color-financial-negative` استفاده شود تا در تم تیره رنگ‌ها به درستی جایگزین شوند.
@@ -69,22 +69,22 @@ styles/
 
 ```css
 /* مقدار مثبت/منفی/خنثی */
-.amount-positive   { color: var(--color-financial-positive); }
-.amount-negative   { color: var(--color-financial-negative); }
-.amount-neutral    { color: var(--color-financial-neutral); }
+.amount-positive { color: var(--color-financial-positive); }
+.amount-negative { color: var(--color-financial-negative); }
+.amount-neutral { color: var(--color-financial-neutral); }
 
 /* نمایش اعداد مالی — monospace + لاتین برای ارقام حتی در تم RTL */
 .amount-display {
-  font-variant-numeric: tabular-nums;
-  direction: ltr;
-  text-align: right;   /* راست‌چین در RTL */
+ font-variant-numeric: tabular-nums;
+ direction: ltr;
+ text-align: right; /* راست‌چین در RTL */
 }
 
 /* badge دسته دارایی */
-.badge-crypto  { ... }
-.badge-stock   { ... }
-.badge-metal   { ... }
-.badge-fund    { ... }
+.badge-crypto { ... }
+.badge-stock { ... }
+.badge-metal { ... }
+.badge-fund { ... }
 ```
 
 ### `tailwind.css`

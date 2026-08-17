@@ -37,7 +37,7 @@
 
 جمع: **۹ صفحه اصلی** برای ۲۰ فیچر.
 
-> **چرا Document Management (فیچر ۱۷) در تنظیمات است نه صفحه مستقل؟**  
+> **چرا Document Management (فیچر ۱۷) در تنظیمات است نه صفحه مستقل؟** 
 > Document Management یک کتابخانه اسناد ضمیمه‌ای است — هر سند همیشه به یک تراکنش، وام، سرمایه‌گذاری یا دارایی دیگری لینک است. کاربر به‌ندرت مستقیماً «به اسناد» می‌رود؛ بیشتر از داخل همان فیچر (مثلاً صفحه جزئیات یک وام) به اسناد مرتبط دسترسی دارد. بخش `/settings/documents` برای مدیریت کلی (حذف، دسته‌بندی، جستجوی سراسری) است.
 
 ---
@@ -46,83 +46,83 @@
 
 ### صفحه ۱ — داشبورد (`/`)
 ```
-/                         ← داشبورد اصلی (ویجت‌ها، خلاصه تراکنش‌های اخیر، هشدار بکاپ)
-/wealth                   ← Portfolio & Wealth Overview کامل (نمودار Net Worth، همه دارایی‌ها)
+/ ← داشبورد اصلی (ویجت‌ها، خلاصه تراکنش‌های اخیر، هشدار بکاپ)
+/wealth ← Portfolio & Wealth Overview کامل (نمودار Net Worth، همه دارایی‌ها)
 ```
 
 ### صفحه ۲ — حساب‌ها (`/accounts`)
 ```
-/accounts                 ← لیست حساب‌ها + خلاصه چک‌های اخیر
-/accounts/:id             ← جزئیات و تراکنش‌های یک حساب
-/accounts/:id/edit        ← ویرایش اطلاعات حساب (Sheet)
-/accounts/new             ← فرم ثبت حساب جدید (Sheet)
-/accounts/transfer        ← فرم انتقال بین حساب‌ها (Sheet)
-/accounts/cheques         ← مدیریت کامل چک‌ها (لیست + فیلتر وضعیت)
-/accounts/cheques/new     ← فرم ثبت چک جدید (Sheet)
-/accounts/cheques/:id     ← جزئیات یک چک
+/accounts ← لیست حساب‌ها + خلاصه چک‌های اخیر
+/accounts/:id ← جزئیات و تراکنش‌های یک حساب
+/accounts/:id/edit ← ویرایش اطلاعات حساب (Sheet)
+/accounts/new ← فرم ثبت حساب جدید (Sheet)
+/accounts/transfer ← فرم انتقال بین حساب‌ها (Sheet)
+/accounts/cheques ← مدیریت کامل چک‌ها (لیست + فیلتر وضعیت)
+/accounts/cheques/new ← فرم ثبت چک جدید (Sheet)
+/accounts/cheques/:id ← جزئیات یک چک
 ```
 
 ### صفحه ۳ — تراکنش‌ها (`/transactions`)
 ```
-/transactions             ← لیست همه تراکنش‌ها (فیلتر: همه / درآمد / هزینه)
-/transactions/new         ← فرم ثبت تراکنش جدید (Sheet — نوع اولیه انتخاب می‌شود)
-/transactions/new/income  ← فرم ثبت درآمد (Sheet)
+/transactions ← لیست همه تراکنش‌ها (فیلتر: همه / درآمد / هزینه)
+/transactions/new ← فرم ثبت تراکنش جدید (Sheet — نوع اولیه انتخاب می‌شود)
+/transactions/new/income ← فرم ثبت درآمد (Sheet)
 /transactions/new/expense ← فرم ثبت هزینه (Sheet)
-/transactions/:id         ← جزئیات یک تراکنش (دکمه «اصلاح» — نه ویرایش مستقیم)
+/transactions/:id ← جزئیات یک تراکنش (دکمه «اصلاح» — نه ویرایش مستقیم)
 /transactions/:id/correct ← Sheet اصلاح: Reversal خودکار + فرم تراکنش جدید اصلاح‌شده
-/transactions/recurring   ← مدیریت تراکنش‌های تکرارشونده و قبوض
-/transactions/recurring/new  ← فرم تعریف تراکنش تکرارشونده جدید (Sheet)
-/transactions/recurring/:id  ← جزئیات و تاریخچه یک آیتم تکرارشونده
+/transactions/recurring ← مدیریت تراکنش‌های تکرارشونده و قبوض
+/transactions/recurring/new ← فرم تعریف تراکنش تکرارشونده جدید (Sheet)
+/transactions/recurring/:id ← جزئیات و تاریخچه یک آیتم تکرارشونده
 ```
 
 ### صفحه ۴ — سرمایه‌گذاری (`/investments`)
 ```
-/investments                              ← تب پیش‌فرض (آخرین تب انتخاب‌شده)
+/investments ← تب پیش‌فرض (آخرین تب انتخاب‌شده)
 
 ── تب رمزارز ──
-/investments/crypto                       ← لیست صرافی‌ها/والت‌ها + خلاصه پرتفوی
-                                             + دکمه «دریافت قیمت» + سوییچ Auto-Sync
-/investments/crypto/new-exchange          ← فرم ثبت صرافی/والت جدید (Sheet)
-/investments/crypto/:exchangeId           ← جزئیات یک صرافی/والت + لیست هولدینگ‌ها
-/investments/crypto/:exchangeId/buy       ← فرم خرید رمزارز (Sheet)
-/investments/crypto/:exchangeId/sell      ← فرم فروش رمزارز (Sheet)
-/investments/crypto/:exchangeId/deposit   ← فرم واریز نقدی به صرافی (Sheet)
-/investments/crypto/:exchangeId/withdraw  ← فرم برداشت نقدی از صرافی (Sheet)
-/investments/crypto/:exchangeId/tx/:txId/correct  ← Sheet اصلاح تراکنش کریپتو
+/investments/crypto ← لیست صرافی‌ها/والت‌ها + خلاصه پرتفوی
+ + دکمه «دریافت قیمت» + سوییچ Auto-Sync
+/investments/crypto/new-exchange ← فرم ثبت صرافی/والت جدید (Sheet)
+/investments/crypto/:exchangeId ← جزئیات یک صرافی/والت + لیست هولدینگ‌ها
+/investments/crypto/:exchangeId/buy ← فرم خرید رمزارز (Sheet)
+/investments/crypto/:exchangeId/sell ← فرم فروش رمزارز (Sheet)
+/investments/crypto/:exchangeId/deposit ← فرم واریز نقدی به صرافی (Sheet)
+/investments/crypto/:exchangeId/withdraw ← فرم برداشت نقدی از صرافی (Sheet)
+/investments/crypto/:exchangeId/tx/:txId/correct ← Sheet اصلاح تراکنش کریپتو
 
 ── تب سهام ایران ──
-/investments/stocks                       ← لیست کارگزاری‌ها + خلاصه پرتفوی
-                                             + دکمه «دریافت قیمت»
-/investments/stocks/new-brokerage         ← فرم ثبت کارگزاری جدید (Sheet)
-/investments/stocks/:brokerageId          ← جزئیات کارگزاری + لیست سهام
-/investments/stocks/:brokerageId/buy      ← فرم خرید سهام (Sheet)
-/investments/stocks/:brokerageId/sell     ← فرم فروش سهام (Sheet)
-/investments/stocks/:brokerageId/deposit  ← فرم واریز به کارگزاری (Sheet)
+/investments/stocks ← لیست کارگزاری‌ها + خلاصه پرتفوی
+ + دکمه «دریافت قیمت»
+/investments/stocks/new-brokerage ← فرم ثبت کارگزاری جدید (Sheet)
+/investments/stocks/:brokerageId ← جزئیات کارگزاری + لیست سهام
+/investments/stocks/:brokerageId/buy ← فرم خرید سهام (Sheet)
+/investments/stocks/:brokerageId/sell ← فرم فروش سهام (Sheet)
+/investments/stocks/:brokerageId/deposit ← فرم واریز به کارگزاری (Sheet)
 /investments/stocks/:brokerageId/withdraw ← فرم برداشت از کارگزاری (Sheet)
-/investments/stocks/:brokerageId/tx/:txId/correct  ← Sheet اصلاح تراکنش سهام
+/investments/stocks/:brokerageId/tx/:txId/correct ← Sheet اصلاح تراکنش سهام
 
 ── تب صندوق‌ها ──
-/investments/fif                          ← لیست صندوق‌ها + خلاصه
-/investments/fif/new                      ← فرم تعریف صندوق جدید (Sheet)
-/investments/fif/:fundId                  ← جزئیات صندوق + تاریخچه NAV
-/investments/fif/:fundId/buy              ← فرم خرید/صدور واحد (Sheet)
-/investments/fif/:fundId/sell             ← فرم فروش/ابطال واحد (Sheet)
-/investments/fif/:fundId/nav              ← فرم ثبت دستی NAV (Sheet)
-                                             + دکمه «دریافت NAV» (فقط برای صندوق‌هایی که price_sources اختصاصی دارند)
-                                             + سوییچ Auto-Sync per-fund
-/investments/fif/:fundId/tx/:txId/correct  ← Sheet اصلاح تراکنش صندوق
+/investments/fif ← لیست صندوق‌ها + خلاصه
+/investments/fif/new ← فرم تعریف صندوق جدید (Sheet)
+/investments/fif/:fundId ← جزئیات صندوق + تاریخچه NAV
+/investments/fif/:fundId/buy ← فرم خرید/صدور واحد (Sheet)
+/investments/fif/:fundId/sell ← فرم فروش/ابطال واحد (Sheet)
+/investments/fif/:fundId/nav ← فرم ثبت دستی NAV (Sheet)
+ + دکمه «دریافت NAV» (فقط برای صندوق‌هایی که price_sources اختصاصی دارند)
+ + سوییچ Auto-Sync per-fund
+/investments/fif/:fundId/tx/:txId/correct ← Sheet اصلاح تراکنش صندوق
 
 ── تب فلزات ──
-/investments/metals                       ← لیست پلتفرم‌ها + خلاصه پرتفوی
-                                             + دکمه «دریافت قیمت»
-/investments/metals/new-platform          ← فرم ثبت پلتفرم جدید (Sheet)
-/investments/metals/:platformId           ← جزئیات پلتفرم + لیست هولدینگ‌ها
-/investments/metals/:platformId/buy       ← فرم خرید فلز (Sheet)
-/investments/metals/:platformId/sell      ← فرم فروش فلز (Sheet)
-/investments/metals/:platformId/deposit   ← فرم واریز نقدی (Sheet)
-/investments/metals/:platformId/withdraw  ← فرم برداشت نقدی (Sheet)
-/investments/metals/:platformId/delivery  ← فرم درخواست تحویل فیزیکی (Sheet)
-/investments/metals/:platformId/tx/:txId/correct  ← Sheet اصلاح تراکنش فلزات
+/investments/metals ← لیست پلتفرم‌ها + خلاصه پرتفوی
+ + دکمه «دریافت قیمت»
+/investments/metals/new-platform ← فرم ثبت پلتفرم جدید (Sheet)
+/investments/metals/:platformId ← جزئیات پلتفرم + لیست هولدینگ‌ها
+/investments/metals/:platformId/buy ← فرم خرید فلز (Sheet)
+/investments/metals/:platformId/sell ← فرم فروش فلز (Sheet)
+/investments/metals/:platformId/deposit ← فرم واریز نقدی (Sheet)
+/investments/metals/:platformId/withdraw ← فرم برداشت نقدی (Sheet)
+/investments/metals/:platformId/delivery ← فرم درخواست تحویل فیزیکی (Sheet)
+/investments/metals/:platformId/tx/:txId/correct ← Sheet اصلاح تراکنش فلزات
 ```
 
 > **فیچر ۲۰ (Price Fetching) در این صفحه**: دکمه «دریافت قیمت» و سوییچ «به‌روزرسانی خودکار» فقط به‌صورت کنترل داخل هر تب نمایش داده می‌شوند. هیچ Route مستقلی ندارند.
@@ -131,60 +131,60 @@
 
 ### صفحه ۵ — وام و بدهی (`/loans`)
 ```
-/loans                    ← لیست همه وام‌ها (فیلتر: وام گرفته / داده، وضعیت)
-/loans/new                ← فرم ثبت وام جدید (Sheet)
-/loans/:id                ← جزئیات یک وام (جدول اقساط، تاریخچه پرداخت، سود باقیمانده)
-/loans/:id/payment        ← فرم ثبت پرداخت قسط (Sheet)
-/loans/:id/correct        ← Sheet اصلاح پرداخت: Reversal + ثبت پرداخت جدید
+/loans ← لیست همه وام‌ها (فیلتر: وام گرفته / داده، وضعیت)
+/loans/new ← فرم ثبت وام جدید (Sheet)
+/loans/:id ← جزئیات یک وام (جدول اقساط، تاریخچه پرداخت، سود باقیمانده)
+/loans/:id/payment ← فرم ثبت پرداخت قسط (Sheet)
+/loans/:id/correct ← Sheet اصلاح پرداخت: Reversal + ثبت پرداخت جدید
 ```
 
 ### صفحه ۶ — دارایی‌های فیزیکی (`/assets`)
 ```
-/assets                   ← لیست دارایی‌های فیزیکی (خودرو، ملک، تجهیزات و ...)
-/assets/new               ← فرم ثبت دارایی جدید (Sheet)
-/assets/:id               ← جزئیات یک دارایی (تاریخچه ارزش‌گذاری، اسناد مرتبط)
-/assets/:id/valuation     ← فرم ثبت ارزش‌گذاری جدید (Sheet)
-/assets/:id/correct        ← Sheet اصلاح رویداد دارایی: Reversal + ثبت جدید
+/assets ← لیست دارایی‌های فیزیکی (خودرو، ملک، تجهیزات و ...)
+/assets/new ← فرم ثبت دارایی جدید (Sheet)
+/assets/:id ← جزئیات یک دارایی (تاریخچه ارزش‌گذاری، اسناد مرتبط)
+/assets/:id/valuation ← فرم ثبت ارزش‌گذاری جدید (Sheet)
+/assets/:id/correct ← Sheet اصلاح رویداد دارایی: Reversal + ثبت جدید
 ```
 
 ### صفحه ۷ — بودجه و اهداف (`/planning`)
 ```
-/planning                 ← نمای ترکیبی (خلاصه بودجه ماه جاری + اهداف فعال)
-/planning/budget          ← مدیریت پاکت‌های بودجه ماه جاری
-/planning/budget/new      ← فرم تعریف بودجه/پاکت جدید (Sheet)
-/planning/budget/:id      ← جزئیات یک پاکت (تراکنش‌های مرتبط، باقیمانده)
-/planning/goals           ← لیست اهداف مالی (فعال، تکمیل‌شده)
-/planning/goals/new       ← فرم تعریف هدف جدید (Sheet)
-/planning/goals/:id       ← جزئیات یک هدف (نمودار پیشرفت، تاریخچه واریزها)
-/planning/goals/:id/contribute  ← فرم ثبت کمک جدید به هدف (Sheet)
+/planning ← نمای ترکیبی (خلاصه بودجه ماه جاری + اهداف فعال)
+/planning/budget ← مدیریت پاکت‌های بودجه ماه جاری
+/planning/budget/new ← فرم تعریف بودجه/پاکت جدید (Sheet)
+/planning/budget/:id ← جزئیات یک پاکت (تراکنش‌های مرتبط، باقیمانده)
+/planning/goals ← لیست اهداف مالی (فعال، تکمیل‌شده)
+/planning/goals/new ← فرم تعریف هدف جدید (Sheet)
+/planning/goals/:id ← جزئیات یک هدف (نمودار پیشرفت، تاریخچه واریزها)
+/planning/goals/:id/contribute ← فرم ثبت کمک جدید به هدف (Sheet)
 ```
 
 ### صفحه ۸ — گزارش‌ها (`/reports`)
 ```
-/reports                  ← داشبورد گزارش‌ها (پیش‌تنظیم‌ها + گزارش‌های اخیر)
-/reports/cashflow         ← گزارش جریان نقدی (درآمد/هزینه در بازه زمانی)
-/reports/networth         ← گزارش Net Worth تاریخی (نمودار روند)
-/reports/investments      ← گزارش عملکرد سرمایه‌گذاری‌ها (Realized/Unrealized P&L)
-/reports/tax              ← مدیریت مالیات: لیست رکوردهای مالیاتی، گزارش مالیاتی
-/reports/tax/new          ← فرم ثبت رکورد مالیاتی جدید (Sheet)
-/reports/tax/:id          ← جزئیات یک رکورد مالیاتی
-/reports/custom           ← گزارش سفارشی (انتخاب فیلتر + بازه)
+/reports ← داشبورد گزارش‌ها (پیش‌تنظیم‌ها + گزارش‌های اخیر)
+/reports/cashflow ← گزارش جریان نقدی (درآمد/هزینه در بازه زمانی)
+/reports/networth ← گزارش Net Worth تاریخی (نمودار روند)
+/reports/investments ← گزارش عملکرد سرمایه‌گذاری‌ها (Realized/Unrealized P&L)
+/reports/tax ← مدیریت مالیات: لیست رکوردهای مالیاتی، گزارش مالیاتی
+/reports/tax/new ← فرم ثبت رکورد مالیاتی جدید (Sheet)
+/reports/tax/:id ← جزئیات یک رکورد مالیاتی
+/reports/custom ← گزارش سفارشی (انتخاب فیلتر + بازه)
 ```
 
 ### صفحه ۹ — تنظیمات (`/settings`)
 ```
-/settings                         ← فهرست بخش‌های تنظیمات
-/settings/general                 ← تنظیمات عمومی (زبان، تم، فرمت تاریخ/عدد)
-/settings/currency                ← مدیریت ارزها، نرخ تبدیل، ارز پایه (فیچر ۲)
-/settings/currency/new-rate       ← فرم ثبت نرخ ارز جدید (Sheet)
-/settings/notifications           ← تنظیمات اعلان‌ها (فیچر ۱۲)
-/settings/documents               ← کتابخانه اسناد + جستجوی سراسری (فیچر ۱۷)
-/settings/documents/:id           ← جزئیات یک سند + فایل پیوست
-/settings/security                ← امنیت: PIN، بیومتریک، لاگ نشست‌ها (فیچر ۱۹)
-/settings/backup                  ← پشتیبان‌گیری: Export دیتابیس، تاریخچه بکاپ‌ها
-/settings/price-sources           ← منابع قیمت + Auto-Sync per-category/symbol (فیچر ۲۰)
-/settings/about                   ← درباره اپ: شماره نسخه، «بررسی به‌روزرسانی» (دستی)،
-                                     وضعیت `autoVersionCheckEnabled`
+/settings ← فهرست بخش‌های تنظیمات
+/settings/general ← تنظیمات عمومی (زبان، تم، فرمت تاریخ/عدد)
+/settings/currency ← مدیریت ارزها، نرخ تبدیل، ارز پایه (فیچر ۲)
+/settings/currency/new-rate ← فرم ثبت نرخ ارز جدید (Sheet)
+/settings/notifications ← تنظیمات اعلان‌ها (فیچر ۱۲)
+/settings/documents ← کتابخانه اسناد + جستجوی سراسری (فیچر ۱۷)
+/settings/documents/:id ← جزئیات یک سند + فایل پیوست
+/settings/security ← امنیت: PIN، بیومتریک، لاگ نشست‌ها (فیچر ۱۹)
+/settings/backup ← پشتیبان‌گیری: Export دیتابیس، تاریخچه بکاپ‌ها
+/settings/price-sources ← منابع قیمت + Auto-Sync per-category/symbol (فیچر ۲۰)
+/settings/about ← درباره اپ: شماره نسخه، «بررسی به‌روزرسانی» (دستی)،
+ وضعیت `autoVersionCheckEnabled`
 ```
 
 ---
@@ -215,7 +215,7 @@
 
 ---
 
-## Domain زیاد، صفحه کم (باگ ۵۹ — خطر معماری، نه باگ منطقی)
+## Domain زیاد، صفحه کم
 
 تعداد **Feature/Domain** زیاد است (Accounts, Income, Expense, Cheque, Loans, Investment, Assets, Budget, Goals, Bills, Notifications, Reports, Dashboard, Portfolio, Tax, Documents, Settings, Currency, Security, Price Fetching، …). این برای modularity خوب است.
 
@@ -241,7 +241,7 @@
 
 ---
 
-## پیچیدگی Route در برابر Navigation (BUG-039)
+## پیچیدگی Route در برابر Navigation
 
 ۹ صفحه ناوبری حفظ می‌شود، ولی انفجار sub-route/sheet می‌تواند همان پیچیدگی را پنهان کند.
 
@@ -253,7 +253,7 @@
 
 ---
 
-## Route در برابر UI State (BUG-M04)
+## Route در برابر UI State
 
 فهرست‌های طولانی شبیه:
 
@@ -267,14 +267,14 @@
 
 ### قرارداد implementation
 1. **Route واقعی (bookmarkپذیر)** فقط:
-   - ۹ صفحه اصلی
-   - جزئیات entity مهم: `/investments/crypto/:exchangeId`, `/investments/stocks/:symbol` یا `:holdingId`, …
-   - چند گزارش کلیدی زیر `/reports/...`
+ - ۹ صفحه اصلی
+ - جزئیات entity مهم: `/investments/crypto/:exchangeId`, `/investments/stocks/:symbol` یا `:holdingId`, …
+ - چند گزارش کلیدی زیر `/reports/...`
 2. **اعمال buy/sell/deposit/withdraw/nav/...** → **یک Sheet جنریک** با state:
-   `{ assetClass, action, entityId }` از همان صفحه جزئیات — نه لزوماً path جدا در router.
-3. اگر deep-link برای فرم لازم شد، query مجاز است:  
-   `/investments/crypto/:id?action=buy` به‌جای ده‌ها path ثابت.
+ `{ assetClass, action, entityId }` از همان صفحه جزئیات — نه لزوماً path جدا در router.
+3. اگر deep-link برای فرم لازم شد، query مجاز است: 
+ `/investments/crypto/:id?action=buy` به‌جای ده‌ها path ثابت.
 4. PR که path جدید در `react-router` اضافه می‌کند باید توجیه کند چرا query/state کافی نبود.
 5. هدف: **کم‌صفحه‌بودن در UI و در درخت route** — نه فقط در Bottom Nav.
 
-این بخش بر BUG-039 اولویت اجرایی می‌دهد: Sheets بیش از nested routes.
+این بخش بر اولویت اجرایی می‌دهد: Sheets بیش از nested routes.

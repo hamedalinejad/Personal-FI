@@ -1,7 +1,7 @@
 # زیر‌فیچر: Price Fetching - Crypto Prices (دریافت قیمت ارز دیجیتال)
 
 ## توضیح کلی
-اولین زیرفیچر از `19-Price-Fetching`. مسئول دریافت قیمت رمزارزها (نسبت به USDT) و ذخیره آن در `price_history` با `assetCategory = 'crypto'`، از سه راه: **دستی (کلیک کاربر)**، **خودکار (Auto-Sync اختیاری)** و **ثبت دستی بدون شبکه**.  
+اولین زیرفیچر از `19-Price-Fetching`. مسئول دریافت قیمت رمزارزها (نسبت به USDT) و ذخیره آن در `price_history` با `assetCategory = 'crypto'`، از سه راه: **دستی (کلیک کاربر)**، **خودکار (Auto-Sync اختیاری)** و **ثبت دستی بدون شبکه**. 
 خروجی این زیرفیچر مستقیماً توسط `Investment-Crypto` (`getPortfolioValue`, `calculateProfitLoss` بخش Unrealized) مصرف می‌شود.
 
 سیستم پیش‌فرض کاملاً آفلاین است؛ این زیرفیچر تنها با اجازه صریح کاربر (کلیک یا فعال‌سازی Auto-Sync) آنلاین می‌شود — به بخش «اصل پایه: Offline-First واقعی» در `Price-Fetching.md` مراجعه کنید.
@@ -26,10 +26,10 @@
 
 ## Business Rules
 
-1. دارایی‌هایی که قیمت‌گیری می‌شوند از Holdingها به‌صورت `PriceAssetRef` ساخته می‌شوند: `assetKey` + `assetId` + `priceProviderId` در صورت وجود (BUG-004، **BUG-009** — مسیر Fetch دیگر `assetId`/mapping را دور نمی‌زند). `IRR` و USDT داخلی صرافی بدون زنجیره قیمت ثابت ۱ دارند. USDT-ERC20 و USDT-TRC20 جدا قیمت‌گیری می‌شوند مگر کاربر/Provider خلاف بگوید.
+1. دارایی‌هایی که قیمت‌گیری می‌شوند از Holdingها به‌صورت `PriceAssetRef` ساخته می‌شوند: `assetKey` + `assetId` + `priceProviderId` در صورت وجود (، مسیر Fetch دیگر `assetId`/mapping را دور نمی‌زند). `IRR` و USDT داخلی صرافی بدون زنجیره قیمت ثابت ۱ دارند. USDT-ERC20 و USDT-TRC20 جدا قیمت‌گیری می‌شوند مگر کاربر/Provider خلاف بگوید.
 2. هر دو نوع دریافت (دستی و Auto-Sync) از همان تابع مشترک `fetchAndStorePrices` فیچر پدر عبور می‌کنند؛ تنها تفاوتشان مقدار `triggeredBy` (`user_click` در برابر `auto_sync`) است — منطق Batch، آفلاین‌بودن، و Partial Success برای هر دو یکسان اجرا می‌شود.
 3. **دریافت انبوه**: اگر تعداد نمادهای درخواستی زیاد باشد (مثلاً کاربری با ده‌ها هولدینگ رمزارزی متفاوت)، درخواست‌ها طبق الگوریتم Batch در `Price-Fetching.md` (حداکثر ~۱۰۰ نماد در هر Request، پشت‌سرهم نه هم‌زمان) تقسیم می‌شوند؛ کاربر نوار پیشرفت می‌بیند، نه یک Loading بی‌بازخورد.
-4. قیمت **valuation** پیش‌فرض نسبت به USDT ذخیره می‌شود (`priceCurrency = 'USDT'`) — این **Market Trade Model نیست** (BUG-C05). معاملات با هر quoteAsset در Investment-Crypto ثبت می‌شوند؛ USDT فقط لنگر رایج قیمت‌گذاری پرتفوی است؛ تبدیل به ریال یا ارز پایه کاربر در لحظه مصرف با `cur_exchange_rates` (نرخ ریال/تتر) انجام می‌شود، طبق قاعده ۹ در سند اصلی فیچر.
+4. قیمت **valuation** پیش‌فرض نسبت به USDT ذخیره می‌شود (`priceCurrency = 'USDT'`) — این **Market Trade Model نیست**. معاملات با هر quoteAsset در Investment-Crypto ثبت می‌شوند؛ USDT فقط لنگر رایج قیمت‌گذاری پرتفوی است؛ تبدیل به ریال یا ارز پایه کاربر در لحظه مصرف با `cur_exchange_rates` (نرخ ریال/تتر) انجام می‌شود، طبق قاعده ۹ در سند اصلی فیچر.
 5. اگر یک نماد در پاسخ API نباشد (مثلاً توکن خیلی جدید یا کم‌شناخته)، آن نماد Skip می‌شود و در UI با پیام «قیمت این نماد یافت نشد — می‌توانید دستی وارد کنید» نمایش داده می‌شود؛ باقی نمادها دریافت می‌شوند (Partial Success).
 6. اگر کاربر آفلاین باشد (چه هنگام کلیک دستی، چه در لحظه‌ای که تایمر Auto-Sync قرار است اجرا شود)، هیچ Request ای ارسال نمی‌شود؛ آخرین قیمت کش‌شده (دستی یا API، هرکدام جدیدتر بود) بدون تغییر باقی می‌ماند و فقط پیام وضعیت آفلاین/برچسب «قیمت قدیمی» نشان داده می‌شود.
 7. منبع قیمت پیش‌فرض نسخه ۱ در `price_sources` با `assetCategory = 'crypto'` ثبت می‌شود؛ انتخاب Provider مشخص (مثلاً CoinGecko یا Nobitex) در پیاده‌سازی نهایی تعیین و در همان جدول `baseUrl` می‌شود — این سند فقط قرارداد داده و رفتار را مشخص می‌کند، یک Provider خاص را قفل نمی‌کند.
@@ -41,18 +41,18 @@
 ## APIهای داخلی
 
 - `fetchCryptoPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → صرفاً یک Wrapper مخصوص کریپتو روی `fetchAndStorePrices` فیچر پدر (با `assetCategory='crypto'` ثابت)؛ دریافت از API خارجی + ذخیره Batch در `price_history` + برگرداندن خلاصه نتیجه:
-  ```typescript
-  {
-    succeeded: { instrumentId: string; price: string }[], // BUG-010 decimal string; BUG-H01 identity
-    failed: { instrumentId: string; reason: string }[],
-    skipped?: { reason: 'offline' },   // وقتی navigator.onLine=false بوده
-    fetchedAt: Timestamp,
-    triggeredBy: 'user_click' | 'auto_sync'
-  }
-  ```
-- `getLatestCryptoPrice(instrumentId | PriceAssetRef)` → میانبر روی `getLatestPrice({ assetCategory:'crypto', instrumentId })` — **نه symbol خام (BUG-H01)**
+ ```typescript
+ {
+ succeeded: { instrumentId: string; price: string }[], // decimal string; identity
+ failed: { instrumentId: string; reason: string }[],
+ skipped?: { reason: 'offline' }, // وقتی navigator.onLine=false بوده
+ fetchedAt: Timestamp,
+ triggeredBy: 'user_click' | 'auto_sync'
+ }
+ ```
+- `getLatestCryptoPrice(instrumentId | PriceAssetRef)` → میانبر روی `getLatestPrice({ assetCategory:'crypto', instrumentId })` — **نه symbol خام**
 - `setManualCryptoPrice(instrumentId, price, priceCurrency?)` → میانبر روی `setManualPrice` با instrumentId؛ کاملاً آفلاین
-- `fetchCryptoPrices(refs: PriceAssetRef[], triggeredBy)` → Wrapper روی `fetchAndStorePrices`؛ ورودی لیست `PriceAssetRef`/`instrumentId` است نه `string[]` symbol (BUG-H01)
+- `fetchCryptoPrices(refs: PriceAssetRef[], triggeredBy)` → Wrapper روی `fetchAndStorePrices`؛ ورودی لیست `PriceAssetRef`/`instrumentId` است نه `string[]` symbol
 - `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
 
 ---
@@ -71,13 +71,13 @@
 - هر سه مسیر (دستی، خودکار، ثبت دستی بدون شبکه) هم‌زمان از نسخه ۱ پشتیبانی می‌شوند — هیچ‌کدام «آینده» نیستند.
 - الگوی این فایل (استفاده از جداول مشترک `price_sources`/`price_history`/`price_sync_settings` + منطق Fetch/Parse مخصوص هر دسته دارایی) باید برای زیرفیچرهای بعدی (`19-02-Stock-Prices`, `19-03-Housing-Prices`, `19-04-Metals-Prices`) بدون تغییر در `Price-Fetching.md` یا فیچرهای دیگر تکرار شود.
 
-> **Adapter (باگ ۳۶)**: هر Provider کریپتو (CoinGecko، Nobitex، ...) باید `PriceProviderAdapter` را implement کند (`fetchPrices`, `normalizeSymbol`, `normalizePrice`, `validateTimestamp`, `validateCurrency`). جزئیات قرارداد در `Price-Fetching.md` بخش Provider Adapter Contract.
+> **Adapter**: هر Provider کریپتو (CoinGecko، Nobitex، ...) باید `PriceProviderAdapter` را implement کند (`fetchPrices`, `normalizeSymbol`, `normalizePrice`, `validateTimestamp`, `validateCurrency`). جزئیات قرارداد در `Price-Fetching.md` بخش Provider Adapter Contract.
 
-> **BUG-C05**: Provider می‌تواند جفت‌های دیگر را هم support کند؛ `priceCurrency` روی history همان quote همان quote است نه همیشه USDT.
+> Provider می‌تواند جفت‌های دیگر را هم support کند؛ `priceCurrency` روی history همان quote همان quote است نه همیشه USDT.
 
 ---
 
-## هویت API کریپتو (BUG-H01)
+## هویت API کریپتو
 
 `symbol` به‌تنهایی برای USDT-ERC20 / USDT-TRC20 / توکن‌های همنام **کافی نیست**.
 
@@ -87,5 +87,5 @@
 | `getLatestCryptoPrice` | `instrumentId` |
 | `setManualCryptoPrice` | `instrumentId` + price |
 
-`instrumentId` = `assetKey` پایدار Holding (مثلاً `1:0xdac1…` یا `exchange:binance:USDT`).  
+`instrumentId` = `assetKey` پایدار Holding (مثلاً `1:0xdac1…` یا `exchange:binance:USDT`). 
 امضای قدیمی بر پایه `symbol` **deprecated** و نباید در implementation جدید استفاده شود.

@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-این فیچر نمای یکپارچه و تخصصی از **کل دارایی‌ها و سرمایه‌گذاری‌های** کاربر را ارائه می‌دهد.  
+این فیچر نمای یکپارچه و تخصصی از **کل دارایی‌ها و سرمایه‌گذاری‌های** کاربر را ارائه می‌دهد. 
 تمرکز اصلی آن روی پرتفوی سرمایه‌گذاری و ثروت است، نه جریان نقدی روزمره.
 
 شامل:
@@ -48,13 +48,13 @@
 6. تمام مقادیر قابلیت نمایش با نرخ تتر تاریخی را دارند.
 7. داده‌های اصلی در فیچرهای تخصصی نگهداری می‌شوند؛ این فیچر فقط تجمیع و نمایش می‌دهد.
 
-> **نکته مهم - جلوگیری از تکرار در محاسبه موجودی نقدی**:  
-> - موجودی نقدی ریال/تتر در صرافی‌ها و کارگزاری‌ها از طریق فیچرهای Investment مدیریت می‌شود  
-> - برای جلوگیری از تکرار در محاسبه ثروت:  
->   - در Investment-Crypto: برای IRR/USDT، `totalInvested = 0` و `totalFeesPaidBase = 0` در `inv_crypto_holdings`  
->   - در Investment-Stocks-Iran: موجودی نقدی کارگزاری به‌صورت Snapshot در `inv_stocks_iran_brokerages.cashBalance` نگهداری می‌شود (جدول `inv_stocks_iran_brokerage_transactions` فقط لاگ تراکنش‌های نقدی است، نه محل نگهداری موجودی)  
->   - در Accounts & Banking: موجودی واقعی در `acc_accounts.currentBalance` ذخیره می‌شود  
-> - تابع `getPortfolioOverview()` با کنترل `includeCashInWealth` امکان انتخاب لحاظ نکردن این موجودی‌ها را فراهم می‌کند  
+> **نکته مهم - جلوگیری از تکرار در محاسبه موجودی نقدی**: 
+> - موجودی نقدی ریال/تتر در صرافی‌ها و کارگزاری‌ها از طریق فیچرهای Investment مدیریت می‌شود 
+> - برای جلوگیری از تکرار در محاسبه ثروت: 
+> - در Investment-Crypto: برای IRR/USDT، `totalInvested = 0` و `totalFeesPaidBase = 0` در `inv_crypto_holdings` 
+> - در Investment-Stocks-Iran: موجودی نقدی کارگزاری به‌صورت Snapshot در `inv_stocks_iran_brokerages.cashBalance` نگهداری می‌شود (جدول `inv_stocks_iran_brokerage_transactions` فقط لاگ تراکنش‌های نقدی است، نه محل نگهداری موجودی) 
+> - در Accounts & Banking: موجودی واقعی در `acc_accounts.currentBalance` ذخیره می‌شود 
+> - تابع `getPortfolioOverview()` با کنترل `includeCashInWealth` امکان انتخاب لحاظ نکردن این موجودی‌ها را فراهم می‌کند 
 > - اگر `includeCashInWealth = false` (پیش‌فرض)، فقط سرمایه‌گذاری‌ها (سهام، رمزارز و ...) در محاسبه ثروت لحاظ می‌شوند
 
 ---
@@ -64,17 +64,17 @@
 **ثروت کل (Total Wealth)**
 ├── دارایی‌های نقدی (حساب‌های بانکی)
 ├── پرتفوی سرمایه‌گذاری
-│   ├── کریپتو
-│   ├── سهام ایران
-│   ├── صندوق‌های درآمد ثابت
-│   │   ├── ETF (معامله در بورس)
-│   │   └── issuance_redemption (صدور/ابطال مستقیم)
-│   └── فلزات (طلا، نقره، مس)
+│ ├── کریپتو
+│ ├── سهام ایران
+│ ├── صندوق‌های درآمد ثابت
+│ │ ├── ETF (معامله در بورس)
+│ │ └── issuance_redemption (صدور/ابطال مستقیم)
+│ └── فلزات (طلا، نقره، مس)
 └── دارایی‌های فیزیکی
-    ├── طلا و سکه فیزیکی
-    ├── خودرو
-    ├── املاک
-    └── سایر
+ ├── طلا و سکه فیزیکی
+ ├── خودرو
+ ├── املاک
+ └── سایر
 بدهی‌ها
 └── وام‌ها و مطالبات منفی
 
@@ -98,38 +98,38 @@
 - `totalWealthUSDT` → decimal
 - `netWealthUSDT` → decimal
 - `breakdown` → JSON (جزئیات هر بخش — هم‌ساختار با خروجی `getPortfolioOverview()`)
-  ```json
-  {
-    "investments": {
-      "total": number,
-      "profitLoss": number,
-      "unrealized": number,
-      "realized": number,
-      "sections": {
-        "crypto": { "value": number, "profitLoss": number },
-        "stocksIran": { "value": number, "profitLoss": number },
-        "fixedIncome": { "value": number, "profitLoss": number },
-        "metals": { "value": number, "profitLoss": number }
-      }
-    },
-    "physicalAssets": {
-      "total": number,
-      "profitLoss": number
-    },
-    "cash": {
-      "total": number
-    },
-    "liabilities": {
-      "total": number
-    },
-    "allocation": Array<{
-      "key": string,
-      "label": string,
-      "value": number,
-      "percent": number
-    }>
-  }
-  ```
+ ```json
+ {
+ "investments": {
+ "total": number,
+ "profitLoss": number,
+ "unrealized": number,
+ "realized": number,
+ "sections": {
+ "crypto": { "value": number, "profitLoss": number },
+ "stocksIran": { "value": number, "profitLoss": number },
+ "fixedIncome": { "value": number, "profitLoss": number },
+ "metals": { "value": number, "profitLoss": number }
+ }
+ },
+ "physicalAssets": {
+ "total": number,
+ "profitLoss": number
+ },
+ "cash": {
+ "total": number
+ },
+ "liabilities": {
+ "total": number
+ },
+ "allocation": Array<{
+ "key": string,
+ "label": string,
+ "value": number,
+ "percent": number
+ }>
+ }
+ ```
 - `createdAt` → datetime
 
 ### ۲. Portfolio Setting (جدول: `port_settings`)
@@ -170,39 +170,39 @@
 
 ```ts
 {
-  totalWealth: number,
-  netWealth: number,
-  totalWealthUSDT: number,
-  netWealthUSDT: number,
-  changePercent: number,          // نسبت به دوره قبل
-  investments: {
-    total: number,
-    profitLoss: number,
-    unrealized: number,
-    realized: number,
-    sections: {
-      crypto: { value: number, profitLoss: number },
-      stocksIran: { value: number, profitLoss: number },
-      fixedIncome: { value: number, profitLoss: number },
-      metals: { value: number, profitLoss: number }
-    }
-  },
-  physicalAssets: {
-    total: number,
-    profitLoss: number
-  },
-  cash: {
-    total: number
-  },
-  liabilities: {
-    total: number
-  },
-  allocation: Array<{
-    key: string,
-    label: string,
-    value: number,
-    percent: number
-  }>
+ totalWealth: number,
+ netWealth: number,
+ totalWealthUSDT: number,
+ netWealthUSDT: number,
+ changePercent: number, // نسبت به دوره قبل
+ investments: {
+ total: number,
+ profitLoss: number,
+ unrealized: number,
+ realized: number,
+ sections: {
+ crypto: { value: number, profitLoss: number },
+ stocksIran: { value: number, profitLoss: number },
+ fixedIncome: { value: number, profitLoss: number },
+ metals: { value: number, profitLoss: number }
+ }
+ },
+ physicalAssets: {
+ total: number,
+ profitLoss: number
+ },
+ cash: {
+ total: number
+ },
+ liabilities: {
+ total: number
+ },
+ allocation: Array<{
+ key: string,
+ label: string,
+ value: number,
+ percent: number
+ }>
 }
 ```
 

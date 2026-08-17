@@ -16,7 +16,7 @@
 - برخی صندوق‌ها امکان سرمایه‌گذاری مجدد سود (خرید واحد جدید از محل سود) را می‌دهند.
 - دو روش معامله: صدور و ابطالی و ETF (قابل معامله در بورس).
 
-مبالغ به **ارز معامله** (معمولاً IRR برای صندوق‌های ایران) ثبت می‌شوند؛ `exchangeRateToBase` نرخ تبدیل به **baseCurrency کاربر** است — نه hard-code ریال/تتر (BUG-H06).
+مبالغ به **ارز معامله** (معمولاً IRR برای صندوق‌های ایران) ثبت می‌شوند؛ `exchangeRateToBase` نرخ تبدیل به **baseCurrency کاربر** است — نه hard-code ریال/تتر.
 
 User Stories
 Must Have:
@@ -41,34 +41,34 @@ Should Have:
 
 Business Rules
 
-- ارز معامله روی تراکنش (`currency`)؛ `exchangeRateToBase` → baseCurrency کاربر (BUG-H06). پیش‌فرض صندوق‌های ایران اغلب IRR است ولی مدل multi-currency است.
+- ارز معامله روی تراکنش (`currency`)؛ `exchangeRateToBase` → baseCurrency کاربر. پیش‌فرض صندوق‌های ایران اغلب IRR است ولی مدل multi-currency است.
 - خرید واحد:
-  - موجودی نقدی (حساب بانکی یا کارگزاری) کاهش می‌یابد.
-  - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید بر اساس `transactionPrice` (قیمت صدور) به‌روزرسانی می‌شود.
-  - فیلد `nav` (NAV همان روز) برای snapshot تاریخی توصیه می‌شود ولی مبنای میانگین خرید نیست.
-  - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
-  - `units` نمی‌تواند منفی شود.
-  - در صورت خرید از کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` کاهش می‌یابد.
+ - موجودی نقدی (حساب بانکی یا کارگزاری) کاهش می‌یابد.
+ - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید بر اساس `transactionPrice` (قیمت صدور) به‌روزرسانی می‌شود.
+ - فیلد `nav` (NAV همان روز) برای snapshot تاریخی توصیه می‌شود ولی مبنای میانگین خرید نیست.
+ - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
+ - `units` نمی‌تواند منفی شود.
+ - در صورت خرید از کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` کاهش می‌یابد.
 - فروش/ابطال واحد:
-  - تعداد واحد کاهش می‌یابد.
-  - مبلغ حاصل بر اساس `transactionPrice` (قیمت ابطال) به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
-  - Realized P&L با مقایسه `transactionPrice` فروش و `averageBuyPrice` محاسبه می‌شود.
-  - `units` نمی‌تواند منفی شود.
-  - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
+ - تعداد واحد کاهش می‌یابد.
+ - مبلغ حاصل بر اساس `transactionPrice` (قیمت ابطال) به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
+ - Realized P&L با مقایسه `transactionPrice` فروش و `averageBuyPrice` محاسبه می‌شود.
+ - `units` نمی‌تواند منفی شود.
+ - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
 - تقسیم سود نقدی:
-  - مبلغ سود به عنوان درآمد ثبت می‌شود.
-  - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
-  - `predictedProfit` در این تراکنش می‌تواند پر شود (برای مقایسه با سود واقعی).
+ - مبلغ سود به عنوان درآمد ثبت می‌شود.
+ - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
+ - `predictedProfit` در این تراکنش می‌تواند پر شود (برای مقایسه با سود واقعی).
 - سرمایه‌گذاری مجدد سود:
-  - به جای دریافت نقدی، تعداد واحد جدید خریداری و به Holding اضافه می‌شود.
-  - `predictedProfit` در این تراکنش نیز می‌تواند پر شود.
+ - به جای دریافت نقدی، تعداد واحد جدید خریداری و به Holding اضافه می‌شود.
+ - `predictedProfit` در این تراکنش نیز می‌تواند پر شود.
 - سود پیش‌بینی‌شده فقط برای نمایش و مقایسه است؛ سود واقعی از طریق تراکنش‌ها و تغییرات NAV پیگیری می‌شود.
 - کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` ثبت می‌شوند.
 - موجودی حساب بانکی نمی‌تواند منفی شود.
 - **ویرایش/حذف معاملات**: تراکنش‌های صندوق پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف:
-  - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
-  - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها و میانگین خرید درست شوند
-  - این رویکرد تاریخچه معاملات و محاسبات سود/زیان را حفظ می‌کند
+ - تراکنش اصل ذخیره می‌ماند (`isVoided = true` در `acc_transactions`)
+ - تراکنش‌های معکوس (Reversal) ثبت می‌شوند تا موجودی‌ها و میانگین خرید درست شوند
+ - این رویکرد تاریخچه معاملات و محاسبات سود/زیان را حفظ می‌کند
 
 > **نکته طراحی**: برای ETFها، تمام واریز/برداشت‌ها از طریق کارگزاری انجام می‌شوند. بنابراین:
 > - در `inv_fif_holdings`, `brokerageId` لینک به کارگزاری است
@@ -121,8 +121,7 @@ Domain Entities
 - `units` → decimal (تعداد واحد فعلی)
 - `averageBuyPrice` → decimal (میانگین قیمت **خرید/صدور** بر اساس `transactionPrice` تراکنش‌های buy/reinvest)
 - `totalInvested` → decimal (مجموع سرمایه‌گذاری بر اساس قیمت واقعی خرید)
-- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — BUG-C04)
-- `totalFeesPaidUSDT` → deprecated
+- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — )
 - `currentNAV` → decimal (آخرین **NAV** ثبت‌شده — فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با قیمت صدور/ابطال قاطی نشود)
 - `lastSubscriptionPrice` → decimal (nullable — آخرین قیمت صدور دیده‌شده)
 - `lastRedemptionPrice` → decimal (nullable — آخرین قیمت ابطال دیده‌شده)
@@ -162,7 +161,7 @@ Domain Entities
 - `date` → datetime
 - `createdAt` → datetime
 
-> **تمایز قطعی فیلدهای قیمت (باگ ۳۴ — رفع‌شده)**:
+> **تمایز قطعی فیلدهای قیمت**:
 > | فیلد | نقش | استفاده |
 > |------|-----|---------|
 > | `nav` | ارزش خالص دارایی هر واحد | ارزش‌گذاری، Unrealized P&L، nav_update |
@@ -195,20 +194,20 @@ getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری
 getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (Derived — محاسبه در لحظه، نه Stored)
 
-  **فرمول سود واقعی در بازه `period`**:
-  ```
-  سود واقعی =
-    Σ amount تراکنش‌های dividend در بازه
-    + (currentNAV × currentUnits) - (avgBuyNAV × currentUnits)  ← Unrealized component
-    + realizedPL تراکنش‌های sell در بازه
-  ```
-  **فرمول سود پیش‌بینی‌شده در بازه `period`**:
-  ```
-  Σ predictedProfit تراکنش‌های nav_update و dividend در بازه
-  ```
-  خروجی: `{ predicted: Decimal, actual: Decimal, delta: Decimal, period }`
+ **فرمول سود واقعی در بازه `period`**:
+ ```
+ سود واقعی =
+ Σ amount تراکنش‌های dividend در بازه
+ + (currentNAV × currentUnits) - (avgBuyNAV × currentUnits) ← Unrealized component
+ + realizedPL تراکنش‌های sell در بازه
+ ```
+ **فرمول سود پیش‌بینی‌شده در بازه `period`**:
+ ```
+ Σ predictedProfit تراکنش‌های nav_update و dividend در بازه
+ ```
+ خروجی: `{ predicted: Decimal, actual: Decimal, delta: Decimal, period }`
 
-  > `actualProfit` به‌صورت ستون ذخیره‌شده در `inv_fif_transactions` وجود **ندارد** — سود واقعی همیشه در لحظه از تراکنش‌های `dividend`، تغییرات NAV، و `sell`ها محاسبه می‌شود. این جدول فقط لاگ است.
+ > `actualProfit` به‌صورت ستون ذخیره‌شده در `inv_fif_transactions` وجود **ندارد** — سود واقعی همیشه در لحظه از تراکنش‌های `dividend`، تغییرات NAV، و `sell`ها محاسبه می‌شود. این جدول فقط لاگ است.
 calculateProfitLoss(fundId?) → سود/زیان تحقق‌یافته از فروش/ابطال واحد (جدا از سود تقسیمی — به بخش «منطق محاسبه سود/زیان تحقق‌یافته» مراجعه شود)
 
 
@@ -227,9 +226,9 @@ Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
 
 **هنگام خرید/صدور واحد یا سرمایه‌گذاری مجدد سود** (Weighted Average):
 ```
-cost               = (unitsBought × transactionPrice) + feeAmount
-newTotalInvested   = totalInvested + cost
-newUnits           = units + unitsBought
+cost = (unitsBought × transactionPrice) + feeAmount
+newTotalInvested = totalInvested + cost
+newUnits = units + unitsBought
 newAverageBuyPrice = newTotalInvested / newUnits
 ```
 (در صورت وجود، `lastSubscriptionPrice` را با `transactionPrice` به‌روز کنید.)
@@ -237,11 +236,11 @@ newAverageBuyPrice = newTotalInvested / newUnits
 **هنگام فروش/ابطال واحد** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
 ```
 soldPortionCost = unitsSold × averageBuyPrice
-saleProceeds    = unitsSold × transactionPrice          // قیمت ابطال واقعی
-realizedPL      = saleProceeds - soldPortionCost - feeAmount
-totalInvested  -= soldPortionCost                       // کاهش متناسب با بخش فروخته‌شده
-units          -= unitsSold
-averageBuyPrice بدون تغییر می‌ماند                      // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند
+saleProceeds = unitsSold × transactionPrice // قیمت ابطال واقعی
+realizedPL = saleProceeds - soldPortionCost - feeAmount
+totalInvested -= soldPortionCost // کاهش متناسب با بخش فروخته‌شده
+units -= unitsSold
+averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند
 ```
 (در صورت وجود، `lastRedemptionPrice` را با `transactionPrice` به‌روز کنید.)
 
@@ -255,19 +254,19 @@ averageBuyPrice بدون تغییر می‌ماند                      // Weig
 نکات طراحی
 
 سود روزشمار با فرمول تقریبی:
-$  \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} \times \text{تعداد روز}}{365}  $
+$ \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} \times \text{تعداد روز}}{365} $
 
 در صندوق‌های Distribution پس از تقسیم سود، امکان ثبت بازگشت NAV به قیمت پایه وجود دارد.
 سرمایه‌گذاری مجدد سود به صورت تراکنش reinvest ثبت و واحد جدید به Holding اضافه می‌شود.
 این زیر‌فیچر مخصوص صندوق‌های درآمد ثابت ایران است.
 
-> **Tax metadata (باگ ۵۶)**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
+> **Tax metadata**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
 
-> **exchangeRateToBase (BUG-003)**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
+> **exchangeRateToBase**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
 
 ---
 
-## حساب منبع پول برای صدور/ابطال (BUG-019)
+## حساب منبع پول برای صدور/ابطال
 
 `inv_fif_holdings` می‌تواند units را aggregate کند، ولی **منبع پول هر معامله** روی `inv_fif_transactions.accountId` (اجباری برای `fundType=issuance_redemption`) حفظ می‌شود.
 
@@ -279,7 +278,7 @@ $  \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} 
 
 ---
 
-## Cost Basis و کارمزد صندوق (BUG-H07)
+## Cost Basis و کارمزد صندوق
 
 `transactionPrice` = قیمت واحد (صدور/ابطال). **Cost basis تحصیل** ممکن است fee داشته باشد.
 
@@ -294,16 +293,16 @@ $  \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} 
 ### فرمول
 ```text
 buy/reinvest:
-  unitsCost = units × transactionPrice
-  feesInBasis = Σ feeAmount (where includeInCostBasis=true)  // به همان currency یا تبدیل‌شده
-  totalInvested += unitsCost + feesInBasis
-  averageBuyPrice = totalInvested / units   // یا فقط unitsCost/units اگر سیاست «قیمت واحد خالص» انتخاب شود — پیش‌فرض پروژه: totalInvested شامل feeهای includeInCostBasis
+ unitsCost = units × transactionPrice
+ feesInBasis = Σ feeAmount (where includeInCostBasis=true) // به همان currency یا تبدیل‌شده
+ totalInvested += unitsCost + feesInBasis
+ averageBuyPrice = totalInvested / units // یا فقط unitsCost/units اگر سیاست «قیمت واحد خالص» انتخاب شود — پیش‌فرض پروژه: totalInvested شامل feeهای includeInCostBasis
 
 sell:
-  grossProceeds = units × transactionPrice
-  netProceeds = grossProceeds - redemptionFees
-  costRemoved = averageBuyPrice × units   // بر اساس basis قبلی
-  realizedPL = netProceeds - costRemoved
+ grossProceeds = units × transactionPrice
+ netProceeds = grossProceeds - redemptionFees
+ costRemoved = averageBuyPrice × units // بر اساس basis قبلی
+ realizedPL = netProceeds - costRemoved
 ```
 
 - روی `inv_fif_transactions`: `feeAmount`, `feeCurrency`, **`includeInCostBasis` boolean**

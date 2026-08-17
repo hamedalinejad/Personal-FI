@@ -1,8 +1,8 @@
 # فیچر: Debt & Loan Management (بدهی، طلب و وام)
 
 ## توضیح کلی
-این فیچر مدیریت کامل بدهی‌ها، مطالبات و وام‌ها را بر عهده دارد.  
-اطلاعات اصلی وام در جدول `ln_loans` نگهداری می‌شود.  
+این فیچر مدیریت کامل بدهی‌ها، مطالبات و وام‌ها را بر عهده دارد. 
+اطلاعات اصلی وام در جدول `ln_loans` نگهداری می‌شود. 
 تمام جابه‌جایی‌های مالی واقعی مرتبط با وام در جدول `ln_transactions` به صورت **لاگ** ثبت می‌شوند و همزمان در جدول `acc_transactions` نیز ثبت شده و موجودی حساب را تغییر می‌دهد.
 
 ---
@@ -14,7 +14,7 @@
 **1. Declining Balance (تناژل سود):**
 - نرخ سود روی مانده باقیمانده محاسبه می‌شود
 - کاربرد: وام‌های بانکی رسمی
-- فرمول: `installment = P × r(1+r)^n / [(1+r)^n - 1]` که **`r = getPeriodRate(loan)`** — نه همیشه `/12` (BUG-026)
+- فرمول: `installment = P × r(1+r)^n / [(1+r)^n - 1]` که **`r = getPeriodRate(loan)`** — نه همیشه `/12`
 - `r` از `interestRate` + `interestRatePeriod` + `installmentFrequency` (+ `customIntervalDays`) به‌صورت deterministic محاسبه می‌شود (بخش «پیش‌نیاز: نرخ دوره‌ای»)
 - weekly → `/52`، quarterly → `/4`، monthly → `/12`، custom → `× days/365`
 - نیاز: `calculationMethod = 'declining_balance'` و سیستم `calculatedInstallment` را محاسبه می‌کند
@@ -29,17 +29,17 @@
 **3. Qarz Al-Hasaneh (قرض‌الحسنه):**
 - سود = ۰؛ کارمزد خدمات معمولاً ۴٪ یک‌بار در disbursement
 - `serviceFeeAmount = principalAmount × serviceFeeRate / 100`
-- **قرارداد اصل بدهی (BUG-H11)**:
-  - `principalAmount` = اصل تعهد بازپرداخت (مثلاً ۱۰۰m) — مبنای اقساط و `remainingBalance` اولیه
-  - `serviceFeeAmount` = کارمزد جدا (مثلاً ۴m) — **expense** در disbursement؛ از اصل بدهی کم **نمی‌شود**
-  - مبلغ نقدی خالص دریافتی کاربر اغلب `principalAmount - serviceFeeAmount` است (اگر fee از محل پرداخت کسر شود)
-  - `installment = principalAmount / totalInstallments` (نه 96m)
+- **قرارداد اصل بدهی**:
+ - `principalAmount` = اصل تعهد بازپرداخت (مثلاً ۱۰۰m) — مبنای اقساط و `remainingBalance` اولیه
+ - `serviceFeeAmount` = کارمزد جدا (مثلاً ۴m) — **expense** در disbursement؛ از اصل بدهی کم **نمی‌شود**
+ - مبلغ نقدی خالص دریافتی کاربر اغلب `principalAmount - serviceFeeAmount` است (اگر fee از محل پرداخت کسر شود)
+ - `installment = principalAmount / totalInstallments` (نه 96m)
 - **ممنوع**: `P = principal - serviceFee` در فرمول اقساط (تناقض قبلی حذف شد)
 
 **4. Bullet:**
 - اصل کل در پایان، سود ماهانه
 - نیاز: `calculationMethod = 'bullet'` و `calculatedInstallment` برای سود ماهانه
-- هر قسط تا دوره آخر: اصل = ۰، سود = `remainingBalance × r` با همان `getPeriodRate`؛ دوره آخر: کل اصل باقیمانده یک‌جا (BUG-026)
+- هر قسط تا دوره آخر: اصل = ۰، سود = `remainingBalance × r` با همان `getPeriodRate`؛ دوره آخر: کل اصل باقیمانده یک‌جا
 
 **برنامه اقساط:**
 - `getUpcomingPayments()` باید `calculationMethod` را چک کند
@@ -54,17 +54,17 @@
 3. `loanType` باید یکی از انواع تعریف‌شده باشد (bank_installment, qarz_al_hasaneh, facility, ...)
 4. `interestRate` واحد: درصد کامل (18 برای ۱۸٪، نه 0.18)
 5. هنگام ثبت وام **دریافتی (borrowed)**:
-   - مبلغ اصلی به حساب مرتبط واریز می‌شود.
-   - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
-   - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
-   - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
-   - موجودی حساب افزایش می‌یابد.
+ - مبلغ اصلی به حساب مرتبط واریز می‌شود.
+ - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
+ - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
+ - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
+ - موجودی حساب افزایش می‌یابد.
 6. هنگام ثبت وام **پرداختی (lent)**:
-   - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
-   - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
-   - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
-   - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
-   - موجودی حساب کاهش می‌یابد.
+ - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
+ - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
+ - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
+ - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
+ - موجودی حساب کاهش می‌یابد.
 7. تمام پرداخت‌های بعدی (قسط، سود، جریمه، کارمزد پیش‌پرداخت، کارمزد صدور) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
 8. کارمزدهای وام (صدور، پیش‌پرداخت، تأخیر) مستقل از سود ثبت می‌شوند و تنها موجودی حساب را تغییر می‌دهند، نه `remainingBalance`.
 9. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
@@ -72,7 +72,7 @@
 11. ویرایش اطلاعات اصلی وام فقط قبل از ثبت اولین پرداخت مجاز است.
 12. برای هر پرداخت، `principalPortion` و `interestPortion` مستقیماً در `ln_transactions` ذخیره شود (حداقل nullable برای وام‌های بدون سود).
 13. مانده باقی‌مانده (`remainingBalance`) فقط با کاهش `principalPortion` کاهش می‌یابد، نه با سود.
-14. برای هر پرداخت، `exchangeRateToBase` (ارز قسط → baseCurrency کاربر) ذخیره شود تا ارزش تاریخی به base حفظ شود (BUG-029).
+14. برای هر پرداخت، `exchangeRateToBase` (ارز قسط → baseCurrency کاربر) ذخیره شود تا ارزش تاریخی به base حفظ شود.
 
 ---
 
@@ -89,7 +89,7 @@
 **مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `exchangeRateToBase` → decimal (نرخ ارز وام/قسط → **baseCurrency کاربر** در لحظه ثبت — BUG-029 / BUG-003؛ نه الزاماً ریال/تتر)
+- `exchangeRateToBase` → decimal (نرخ ارز وام/قسط → **baseCurrency کاربر** در لحظه ثبت — / ؛ نه الزاماً ریال/تتر)
 
 **تاریخ‌ها:**
 - `disbursementDate` → datetime (تاریخ دریافت/واریز وام) ✅ **جدید**
@@ -104,11 +104,11 @@
 - `calculationMethod` → enum (declining_balance | flat_rate | bullet | qarz_al_hasaneh) ✅ **جدید — حتمی**
 - `interestType` → string (`none`, `fixed`, `variable`)
 - `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18)
-- `interestRatePeriod` → string (`annual`, `monthly`) — **فقط از طریق `getPeriodRate` وارد فرمول می‌شود (BUG-027)**؛ هیچ فرمولی نباید `interestRate/12` را مستقیم فرض کند
+- `interestRatePeriod` → string (`annual`, `monthly`) — **فقط از طریق `getPeriodRate` وارد فرمول می‌شود**؛ هیچ فرمولی نباید `interestRate/12` را مستقیم فرض کند
 - `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`)
 - `customIntervalDays` → integer (nullable — اجباری اگر frequency=custom)
 - `totalInstallments` → integer (تعداد کل اقساط)
-- `gracePeriodMonths` → integer (nullable — طول تنفس به **ماه تقویمی**؛ برای تبدیل به تعداد period از `gracePeriods = gracePeriodMonths × periodsPerYear / 12` — BUG-028)
+- `gracePeriodMonths` → integer (nullable — طول تنفس به **ماه تقویمی**؛ برای تبدیل به تعداد period از `gracePeriods = gracePeriodMonths × periodsPerYear / 12` — )
 - `gracePeriodCount` → integer (nullable — **جایگزین صریح**: تعداد periodهای تنفس هم‌فرکانس با `installmentFrequency`؛ اگر پر باشد بر `gracePeriodMonths` مقدم است)
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
@@ -124,21 +124,15 @@
 - `penaltyMaxCapRate` → decimal (nullable — سقف جریمه به درصد از اصل — مثلاً 10) ✅ **جدید**
 - `penaltyGraceDays` → integer (nullable, default: 0 — روزهای معافیت قبل از شروع جریمه) ✅ **جدید**
 - `serviceFeeRate` → decimal (nullable — کارمزد قرض‌الحسنه — مثلاً 4) ✅ **جدید**
-- `serviceFeeAmount` → decimal (nullable — مبلغ کارمزد محاسبه‌شده) ✅ **جدید**
-
-**وضعیت:**
+- `serviceFeeAmount` → decimal (nullable — مبلغ کارمزد محاسبه‌شده) ✅ **جدیدوضعیت:**
 - `status` → enum (`active` | `completed` | `cancelled` | `overdue`) ✅ **overdue اضافه شد**
 - `remainingBalance` → decimal (مانده باقی‌مانده)
 
 **اسنپ‌شات برای Dashboard:**
 - `totalPaidPrincipal` → decimal (مجموع اصل پرداخت‌شده) ✅ **جدید**
-- `totalPaidInterest` → decimal (مجموع سود پرداخت‌شده) ✅ **جدید**
-
-**شرایط:**
+- `totalPaidInterest` → decimal (مجموع سود پرداخت‌شده) ✅ **جدیدشرایط:**
 - `disbursementType` → enum (`lump_sum`) — **در نسخه ۱ فقط `lump_sum` پشتیبانی می‌شود.** مقدار `phased` (واریز چندمرحله‌ای) از enum حذف شد چون پیاده‌سازی متناظری (چند رکورد `disbursement` و چند `disbursementDate`) وجود ندارد؛ ساختار فعلی (`disbursementDate` و `accountTransactionId` واحد در `ln_loans`) فقط از یک واریز یک‌باره پشتیبانی می‌کند. افزودن `phased` به نسخه‌های بعدی موکول شد و نیازمند API جداگانه (مثلاً `disburseLoanPhase()`) و مدل داده چندواریزی خواهد بود.
-- `collateralNote` → string (nullable — وثیقه/ضامن) ✅ **جدید**
-
-**طرف مقابل:**
+- `collateralNote` → string (nullable — وثیقه/ضامن) ✅ **جدیدطرف مقابل:**
 - `contactName` → string (نام)
 - `contactPhone` → string (nullable — شماره تماس) ✅ **جدید**
 - `description` → string
@@ -168,12 +162,12 @@
 - `penaltyDays` → integer (nullable — تعداد روزهای دیرکرد برای محاسبه جریمه) ✅ **جدید**
 - `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
-- `exchangeRateToBase` → decimal (نرخ ارز قسط → baseCurrency کاربر — BUG-029)
+- `exchangeRateToBase` → decimal (نرخ ارز قسط → baseCurrency کاربر — )
 - `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
 - `createdAt` → datetime
 
-> این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود.  
-> برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط سود، کارمزد و جریمه بر روی `remainingBalance` تأثیری ندارند).  
+> این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود. 
+> برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط سود، کارمزد و جریمه بر روی `remainingBalance` تأثیری ندارند). 
 > **نکته**: `type = 'fee_payment'` برای کارمزدهای پیش‌پرداخت یا دیگر کارمزدهای جانبی است. کارمزد صدور وام نیز به‌صورت تراکنش جدا ثبت می‌شود.
 
 ### ۳. acc_transactions (جدول مشترک تراکنش‌های حساب)
@@ -200,24 +194,24 @@
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
 - `feeCategory` → enum:
-  - `origination` — کارمزد صدور/ثبت (یک‌بار، در disbursement)
-  - `early_payment` — کارمزد پیش‌پرداخت (هنگام early_payment)
-  - `monthly_management` — کارمزد مدیریت ماهانه (هر دوره قسط)
-  - `per_transaction` — به‌ازای هر تراکنش پرداخت
-  - `insurance` — حق بیمه وام (ماهانه یا یک‌بار)
-  - `other` — سایر کارمزدها با توضیح دستی
+ - `origination` — کارمزد صدور/ثبت (یک‌بار، در disbursement)
+ - `early_payment` — کارمزد پیش‌پرداخت (هنگام early_payment)
+ - `monthly_management` — کارمزد مدیریت ماهانه (هر دوره قسط)
+ - `per_transaction` — به‌ازای هر تراکنش پرداخت
+ - `insurance` — حق بیمه وام (ماهانه یا یک‌بار)
+ - `other` — سایر کارمزدها با توضیح دستی
 - `feeType` → enum:
-  - `fixed` — مبلغ ثابت (مثلاً ۵۰۰,۰۰۰ ریال)
-  - `percentage_of_principal` — درصدی از اصل وام (`principalAmount`)
-  - `percentage_of_installment` — درصدی از مبلغ هر قسط (`calculatedInstallment` یا `fixedInstallmentAmount`)
-  - `percentage_of_remaining_balance` — درصدی از مانده وام (برای کارمزدهای ماهانه مثل بعضی وام‌های مسکن)
-  - `tiered` — پلکانی (مثلاً: اگر پیش‌پرداخت ≤ ۳۰٪ → ۲٪؛ اگر > ۳۰٪ → ۴٪)
+ - `fixed` — مبلغ ثابت (مثلاً ۵۰۰,۰۰۰ ریال)
+ - `percentage_of_principal` — درصدی از اصل وام (`principalAmount`)
+ - `percentage_of_installment` — درصدی از مبلغ هر قسط (`calculatedInstallment` یا `fixedInstallmentAmount`)
+ - `percentage_of_remaining_balance` — درصدی از مانده وام (برای کارمزدهای ماهانه مثل بعضی وام‌های مسکن)
+ - `tiered` — پلکانی (مثلاً: اگر پیش‌پرداخت ≤ ۳۰٪ → ۲٪؛ اگر > ۳۰٪ → ۴٪)
 - `amount` → decimal (nullable — مبلغ ثابت برای `feeType = 'fixed'`)
 - `rate` → decimal (nullable — نرخ درصدی برای `feeType` های percentage-based — مثلاً 1.5)
 - `minAmount` → decimal (nullable — حداقل کارمزد — برای همه انواع)
 - `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
 - `tiers` → JSON (nullable — **deprecated برای داده جدید**؛ فقط مهاجرت)
-- برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers` (BUG-030)
+- برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers`
 
 ### ۵-الف. Loan Fee Tiers (جدول: `ln_loan_fee_tiers`)
 
@@ -235,9 +229,9 @@
 
 **مثال** (کارمزد پیش‌پرداخت پلکانی):
 ```
-thresholdFrom=null, thresholdTo=30,  thresholdUnit=percent_of_principal, rate=1.0  → تا ۳۰٪: ۱٪
-thresholdFrom=30,   thresholdTo=60,  thresholdUnit=percent_of_principal, rate=2.0  → ۳۰٪ تا ۶۰٪: ۲٪
-thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0  → بالای ۶۰٪: ۳٪
+thresholdFrom=null, thresholdTo=30, thresholdUnit=percent_of_principal, rate=1.0 → تا ۳۰٪: ۱٪
+thresholdFrom=30, thresholdTo=60, thresholdUnit=percent_of_principal, rate=2.0 → ۳۰٪ تا ۶۰٪: ۲٪
+thresholdFrom=60, thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0 → بالای ۶۰٪: ۳٪
 ```
 
 > **قانون**: `ln_loan_fee_tiers` فقط برای `feeType = 'tiered'` در `ln_loan_fees` استفاده می‌شود. برای سایر `feeType`ها، این جدول خالی است و `amount`/`rate` در خود `ln_loan_fees` کافی است.
@@ -250,66 +244,64 @@ thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.
 ---
 
 ### Loan APIs
-- `createLoan(data)`  
-  → ثبت وام در `ln_loans` (شامل `accountTransactionId`)  
-  → ثبت لاگ در `ln_transactions` با `type = 'disbursement'`  
-  → ثبت در `acc_transactions` با نوع مناسب (`deposit-loan` یا `withdrawal-loan`)  
-  → به‌روزرسانی موجودی حساب
+- `createLoan(data)` 
+ → ثبت وام در `ln_loans` (شامل `accountTransactionId`) 
+ → ثبت لاگ در `ln_transactions` با `type = 'disbursement'` 
+ → ثبت در `acc_transactions` با نوع مناسب (`deposit-loan` یا `withdrawal-loan`) 
+ → به‌روزرسانی موجودی حساب
 - `updateLoan(id, data)` → ویرایش (فقط قبل از اولین پرداخت)
 - `getAllLoans(filters)`
 - `getLoanById(id)`
 - `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
-- `cancelLoan(id)` → لغو وام — **فقط قبل از ثبت اولین پرداخت مجاز است**
+- `cancelLoan(id)` → لغو وام — **فقط قبل از ثبت اولین پرداخت مجاز استقرارداد (الزاماً Atomic — BEGIN/COMMIT)**:
+ ```
+ BEGIN TRANSACTION;
+ 1. Guard: بررسی وجود هر رکورد غیر‌void در ln_transactions با type='installment_payment'
+ روی این loanId — اگر وجود دارد → ROLLBACK + خطا «لغو وام پس از پرداخت مجاز نیست»
+ 2. disbursementTx = SELECT * FROM ln_transactions WHERE loanId=? AND type='disbursement' AND isVoided=false
+ 3. IF disbursementTx EXISTS:
+ disbursementTx.isVoided = true (در ln_transactions)
+ acc_transactions[disbursementTx.accTxId].isVoided = true
+ INSERT reversal_acc_tx (amount=disbursementAmount، به‌طور معکوس — موجودی حساب برمی‌گردد)
+ 4. UPDATE ln_loans SET status='cancelled'
+ COMMIT;
+ ```
 
-  **قرارداد (الزاماً Atomic — BEGIN/COMMIT)**:
-  ```
-  BEGIN TRANSACTION;
-    1. Guard: بررسی وجود هر رکورد غیر‌void در ln_transactions با type='installment_payment'
-              روی این loanId — اگر وجود دارد → ROLLBACK + خطا «لغو وام پس از پرداخت مجاز نیست»
-    2. disbursementTx = SELECT * FROM ln_transactions WHERE loanId=? AND type='disbursement' AND isVoided=false
-    3. IF disbursementTx EXISTS:
-         disbursementTx.isVoided = true  (در ln_transactions)
-         acc_transactions[disbursementTx.accTxId].isVoided = true
-         INSERT reversal_acc_tx (amount=disbursementAmount، به‌طور معکوس — موجودی حساب برمی‌گردد)
-    4. UPDATE ln_loans SET status='cancelled'
-  COMMIT;
-  ```
-
-  > **اگر پرداخت قبلی وجود دارد**: `cancelLoan` خطا برمی‌گرداند. کاربر باید اقساط را به‌صورت دستی با `voidTransaction`/Reversal اصلاح کند — reversal خودکار تراکنش‌های متعدد خارج از scope این تابع است.
-  >
-  > **چرا گزینه ۱ (محدود) انتخاب شد؟** طبق اصل Immutable Transactions پروژه، reversal خودکار چند تراکنش پیچیده و پرریسک است. سادگی و قابلیت پیش‌بینی ترجیح دارد.
+ > **اگر پرداخت قبلی وجود دارد**: `cancelLoan` خطا برمی‌گرداند. کاربر باید اقساط را به‌صورت دستی با `voidTransaction`/Reversal اصلاح کند — reversal خودکار تراکنش‌های متعدد خارج از scope این تابع است.
+ >
+ > **چرا گزینه ۱ (محدود) انتخاب شد؟** طبق اصل Immutable Transactions پروژه، reversal خودکار چند تراکنش پیچیده و پرریسک است. سادگی و قابلیت پیش‌بینی ترجیح دارد.
 - `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'` و `calculationMethod = 'declining_balance'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه اقساط آینده — الگوریتم کامل در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate»
 - `addLoanFee(loanId, feeData)` → افزودن رکورد کارمزد به `ln_loan_fees`؛ فقط قبل از اولین پرداخت مجاز است (بعد از آن `updateLoanFee` ممنوع)
 - `getLoanFees(loanId)` → دریافت تمام کارمزدهای یک وام از `ln_loan_fees`
 - `calculateFeeAmount(loanId, feeId, context?)` → محاسبه مبلغ یک کارمزد بر اساس نوعش (برای نمایش پیش از ثبت پرداخت)
 
 ### Payment APIs
-- `payLoan(loanId, amount, type, date, description)`  
-  → ثبت پرداخت (قسط / سود / جریمه / زودهنگام)  
-  → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToBase`)  
-  → ثبت در `acc_transactions`  
-  → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب  
-  → برای `type = 'early_payment'` با پیش‌پرداخت جزئی روی وام `declining_balance`: طبق `recalculateOnEarlyPayment` یا `calculatedInstallment`/`totalInstallments` به‌روزرسانی می‌شود (بازمحاسبه) یا فقط تعداد اقساط باقیمانده کم می‌شود (بدون بازمحاسبه) — فرمول کامل در بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی»
+- `payLoan(loanId, amount, type, date, description)` 
+ → ثبت پرداخت (قسط / سود / جریمه / زودهنگام) 
+ → ثبت در `ln_transactions` (با `principalPortion` و `interestPortion` و `exchangeRateToBase`) 
+ → ثبت در `acc_transactions` 
+ → به‌روزرسانی `remainingBalance` (فقط با `principalPortion`) و موجودی حساب 
+ → برای `type = 'early_payment'` با پیش‌پرداخت جزئی روی وام `declining_balance`: طبق `recalculateOnEarlyPayment` یا `calculatedInstallment`/`totalInstallments` به‌روزرسانی می‌شود (بازمحاسبه) یا فقط تعداد اقساط باقیمانده کم می‌شود (بدون بازمحاسبه) — فرمول کامل در بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی»
 - `getLoanTransactions(loanId)` → دریافت لاگ تراکنش‌های یک وام
 - `getUpcomingPayments(loanId)` → محاسبه اقساط آینده (بر اساس `calculationMethod` و `installmentFrequency`)
-  - **خروجی**: آرایه‌ای از اقساط آینده:
-    ```typescript
-    {
-      installmentNumber: number,
-      dueDate: datetime,
-      principalAmount: Decimal,
-      interestAmount: Decimal,
-      totalAmount: Decimal,
-      remainingBalanceAfter: Decimal
-    }
-    ```
-  - **منطق**:
-    - اگر `calculationMethod = 'declining_balance'`: از فرمول amortization استفاده (سود روی مانده)
-    - اگر `calculationMethod = 'flat_rate'`: اصل ثابت، سود ثابت
-    - اگر `calculationMethod = 'qarz_al_hasaneh'`: اصل ثابت، سود = 0
-    - اگر `calculationMethod = 'bullet'`: سود ماهانه، اصل صفر (غیر از ماه آخر)
-    - اگر `gracePeriodMonths > 0`: رفتار به روش محاسبه بستگی دارد — Declining Balance: Interest-Only (فقط سود، اصل دست‌نخورده)؛ Qarz Al-Hasaneh: Payment Holiday (هیچ پرداختی)؛ Flat Rate و Bullet: مجاز نیست (خطا می‌دهد). جزئیات کامل در بخش «ز) دوره تنفس».
-    - شروع از `firstPaymentDate` + `installmentFrequency`
+ - **خروجی**: آرایه‌ای از اقساط آینده:
+ ```typescript
+ {
+ installmentNumber: number,
+ dueDate: datetime,
+ principalAmount: Decimal,
+ interestAmount: Decimal,
+ totalAmount: Decimal,
+ remainingBalanceAfter: Decimal
+ }
+ ```
+ - **منطق**:
+ - اگر `calculationMethod = 'declining_balance'`: از فرمول amortization استفاده (سود روی مانده)
+ - اگر `calculationMethod = 'flat_rate'`: اصل ثابت، سود ثابت
+ - اگر `calculationMethod = 'qarz_al_hasaneh'`: اصل ثابت، سود = 0
+ - اگر `calculationMethod = 'bullet'`: سود ماهانه، اصل صفر (غیر از ماه آخر)
+ - اگر `gracePeriodMonths > 0`: رفتار به روش محاسبه بستگی دارد — Declining Balance: Interest-Only (فقط سود، اصل دست‌نخورده)؛ Qarz Al-Hasaneh: Payment Holiday (هیچ پرداختی)؛ Flat Rate و Bullet: مجاز نیست (خطا می‌دهد). جزئیات کامل در بخش «ز) دوره تنفس».
+ - شروع از `firstPaymentDate` + `installmentFrequency`
 - `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
 
 ---
@@ -342,7 +334,7 @@ thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.
 
 ### پیش‌نیاز: محاسبه نرخ دوره‌ای (Period Rate) و تعداد دوره‌ها
 
-**این بخش اساسی‌ترین مفهوم در تمام فرمول‌های وام است.**  
+**این بخش اساسی‌ترین مفهوم در تمام فرمول‌های وام است.** 
 همه فرمول‌های زیر (Declining Balance، Bullet، Re-amortization) به یک `r` (نرخ دوره‌ای) و `n` (تعداد کل دوره‌ها) نیاز دارند. این دو مقدار از `installmentFrequency`، `interestRate`، `interestRatePeriod` و (برای `custom`) `customIntervalDays` محاسبه می‌شوند.
 
 #### قرارداد تبدیل نرخ سالانه به نرخ دوره‌ای
@@ -350,16 +342,16 @@ thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.
 برای همه روش‌های محاسبه از **Simple Division** (تقسیم خطی) استفاده می‌شود، نه Compounding. دلیل: بانک‌ها و مؤسسات مالی ایران نرخ سالانه را به‌صورت خطی تقسیم می‌کنند (Nominal Rate)، نه Effective APR. این قرارداد با استاندارد وام‌های بانکی ایران سازگار است.
 
 ```
-annualRate = interestRate / 100           // تبدیل درصد به کسر — e.g. 18% → 0.18
+annualRate = interestRate / 100 // تبدیل درصد به کسر — e.g. 18% → 0.18
 
 // نرخ دوره‌ای (r) بر اساس فرکانس:
 r = annualRate / periodsPerYear
 
 // تعداد دوره‌ها در سال (periodsPerYear) بر اساس installmentFrequency:
-monthly   → periodsPerYear = 12          // هر ماه یک قسط
-weekly    → periodsPerYear = 52          // هر هفته یک قسط
-quarterly → periodsPerYear = 4           // هر سه ماه یک قسط
-custom    → periodsPerYear = 365 / customIntervalDays   // مثلاً هر ۴۵ روز → 365/45 ≈ 8.111
+monthly → periodsPerYear = 12 // هر ماه یک قسط
+weekly → periodsPerYear = 52 // هر هفته یک قسط
+quarterly → periodsPerYear = 4 // هر سه ماه یک قسط
+custom → periodsPerYear = 365 / customIntervalDays // مثلاً هر ۴۵ روز → 365/45 ≈ 8.111
 ```
 
 #### Day Count Convention برای `interestRatePeriod = 'annual'`
@@ -371,13 +363,13 @@ custom    → periodsPerYear = 365 / customIntervalDays   // مثلاً هر ۴�
 | `quarterly` | ۴ | `annualRate / 4` | استاندارد — ۴ فصل در سال |
 | `custom` | `365 / customIntervalDays` | `annualRate × customIntervalDays / 365` | Day Count = Actual/365 — مناسب برای اکثر وام‌های ایرانی |
 
-> **چرا Actual/365 و نه Actual/360؟**  
+> **چرا Actual/365 و نه Actual/360؟** 
 > در ایران تقویم شمسی ۳۶۵ یا ۳۶۶ روز دارد. برای سادگی و سازگاری با محاسبات بانکی رایج، از ۳۶۵ روز به‌عنوان پایه ثابت استفاده می‌شود (نه ۳۶۶ در سال کبیسه و نه ۳۶۰). اگر وام‌دهنده قرارداد صریحی با پایه متفاوت داشت، می‌توان `customIntervalDays` را با دقت بیشتر تعریف کرد.
 
 #### اگر `interestRatePeriod = 'monthly'` باشد
 
 ```
-r = interestRate / 100                    // نرخ ماهانه مستقیم — بدون تقسیم بر ۱۲
+r = interestRate / 100 // نرخ ماهانه مستقیم — بدون تقسیم بر ۱۲
 // در این حالت frequency باید monthly باشد؛ برای weekly/quarterly/custom:
 // ابتدا annualRate = r × 12 محاسبه، سپس همان جدول بالا
 ```
@@ -416,27 +408,27 @@ r = interestRate / 100                    // نرخ ماهانه مستقیم �
  * هیچ فرمولی نباید r را مستقیم با annual/12 محاسبه کند.
  */
 function getPeriodRate(loan: Loan): Decimal {
-  const annualRate = new Decimal(loan.interestRate).dividedBy(100);
+ const annualRate = new Decimal(loan.interestRate).dividedBy(100);
 
-  // اگر نرخ ماهانه مستقیم ثبت شده، ابتدا به سالانه تبدیل می‌شود
-  const annualRateNormalized =
-    loan.interestRatePeriod === 'monthly'
-      ? annualRate.times(12)
-      : annualRate;
+ // اگر نرخ ماهانه مستقیم ثبت شده، ابتدا به سالانه تبدیل می‌شود
+ const annualRateNormalized =
+ loan.interestRatePeriod === 'monthly'
+ ? annualRate.times(12)
+ : annualRate;
 
-  switch (loan.installmentFrequency) {
-    case 'monthly':   return annualRateNormalized.dividedBy(12);
-    case 'weekly':    return annualRateNormalized.dividedBy(52);
-    case 'quarterly': return annualRateNormalized.dividedBy(4);
-    case 'custom':
-      if (!loan.customIntervalDays || loan.customIntervalDays <= 0)
-        throw new Error('customIntervalDays برای فرکانس custom الزامی است');
-      return annualRateNormalized
-        .times(loan.customIntervalDays)
-        .dividedBy(365);
-    default:
-      throw new Error(`installmentFrequency نامعتبر: ${loan.installmentFrequency}`);
-  }
+ switch (loan.installmentFrequency) {
+ case 'monthly': return annualRateNormalized.dividedBy(12);
+ case 'weekly': return annualRateNormalized.dividedBy(52);
+ case 'quarterly': return annualRateNormalized.dividedBy(4);
+ case 'custom':
+ if (!loan.customIntervalDays || loan.customIntervalDays <= 0)
+ throw new Error('customIntervalDays برای فرکانس custom الزامی است');
+ return annualRateNormalized
+ .times(loan.customIntervalDays)
+ .dividedBy(365);
+ default:
+ throw new Error(`installmentFrequency نامعتبر: ${loan.installmentFrequency}`);
+ }
 }
 
 /**
@@ -444,7 +436,7 @@ function getPeriodRate(loan: Loan): Decimal {
  * برای همه روش‌های محاسبه یکسان است.
  */
 function getTotalPeriods(loan: Loan): number {
-  return loan.totalInstallments;
+ return loan.totalInstallments;
 }
 ```
 
@@ -456,25 +448,25 @@ function getTotalPeriods(loan: Loan): number {
 
 **محاسبه مبلغ قسط:**
 ```
-r = getPeriodRate(loan)                        // نرخ دوره‌ای (ماهانه / هفتگی / فصلی / custom)
-n = getTotalPeriods(loan)                      // تعداد کل اقساط
-P = principalAmount                            // فقط Declining — قرض‌الحسنه از بخش «ج»؛ هرگز serviceFee از P کم نشود اینجا
+r = getPeriodRate(loan) // نرخ دوره‌ای (ماهانه / هفتگی / فصلی / custom)
+n = getTotalPeriods(loan) // تعداد کل اقساط
+P = principalAmount // فقط Declining — قرض‌الحسنه از بخش «ج»؛ هرگز serviceFee از P کم نشود اینجا
 
 calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
 ```
 
 **تقسیم هر قسط i (از ۱ تا n):**
 ```
-interestPortion_i  = remainingBalance × r          // ROUND_HALF_UP به ۰ اعشار
-principalPortion_i = installment - interestPortion_i  // بدون round مستقل
-remainingBalance  -= principalPortion_i
+interestPortion_i = remainingBalance × r // ROUND_HALF_UP به ۰ اعشار
+principalPortion_i = installment - interestPortion_i // بدون round مستقل
+remainingBalance -= principalPortion_i
 ```
 
 **آخرین قسط (i = n):**
 ```
-principalPortion_n = remainingBalance              // دقیق — تسویه کامل
-interestPortion_n  = remainingBalance × r          // ROUND_HALF_UP
-installment_n      = principalPortion_n + interestPortion_n  // ممکن است با اقساط قبلی کمی متفاوت باشد
+principalPortion_n = remainingBalance // دقیق — تسویه کامل
+interestPortion_n = remainingBalance × r // ROUND_HALF_UP
+installment_n = principalPortion_n + interestPortion_n // ممکن است با اقساط قبلی کمی متفاوت باشد
 ```
 
 **مثال ماهانه:**
@@ -501,14 +493,14 @@ installment_n      = principalPortion_n + interestPortion_n  // ممکن است 
 
 **محاسبه:**
 ```
-r        = getPeriodRate(loan)                        // نرخ دوره‌ای
-n        = getTotalPeriods(loan)                      // تعداد اقساط
-yearsTotal = n / periodsPerYear(loan)                 // مدت کل وام به سال
+r = getPeriodRate(loan) // نرخ دوره‌ای
+n = getTotalPeriods(loan) // تعداد اقساط
+yearsTotal = n / periodsPerYear(loan) // مدت کل وام به سال
 
-totalInterest        = principalAmount × (interestRate/100) × yearsTotal
+totalInterest = principalAmount × (interestRate/100) × yearsTotal
 fixedInstallmentAmount = (principalAmount + totalInterest) / n
-principalPortion     = principalAmount / n            // ثابت برای تمام اقساط
-interestPortion      = totalInterest / n              // ثابت برای تمام اقساط
+principalPortion = principalAmount / n // ثابت برای تمام اقساط
+interestPortion = totalInterest / n // ثابت برای تمام اقساط
 ```
 
 > `periodsPerYear(loan)` همان مخرج تقسیم در `getPeriodRate` است: 12، 52، 4، یا `365/customIntervalDays`.
@@ -532,12 +524,12 @@ interestPortion      = totalInterest / n              // ثابت برای تم�
 فرکانس تأثیری بر سود ندارد (سود = صفر). فقط تعداد اقساط تغییر می‌کند:
 
 ```
-serviceFeeAmount = principalAmount × (serviceFeeRate / 100)  // fee جدا — expense
-remainingBalance0 = principalAmount                          // اصل بدهی کامل (BUG-H11)
-installment       = principalAmount / totalInstallments
-principalPortion  = installment
-interestPortion   = 0
-// netCashAtDisbursement (اغلب) = principalAmount - serviceFeeAmount  وقتی fee از پرداخت کسر شود
+serviceFeeAmount = principalAmount × (serviceFeeRate / 100) // fee جدا — expense
+remainingBalance0 = principalAmount // اصل بدهی کامل
+installment = principalAmount / totalInstallments
+principalPortion = installment
+interestPortion = 0
+// netCashAtDisbursement (اغلب) = principalAmount - serviceFeeAmount وقتی fee از پرداخت کسر شود
 ```
 
 **مثال هفتگی:**
@@ -551,15 +543,15 @@ interestPortion   = 0
 ### د) Bullet (اصل یک‌جا در پایان)
 
 ```
-r = getPeriodRate(loan)                        // نرخ دوره‌ای
+r = getPeriodRate(loan) // نرخ دوره‌ای
 
 // دوره‌های ۱ تا n-1:
-interestPortion_i = remainingBalance × r       // remainingBalance ثابت = principalAmount
+interestPortion_i = remainingBalance × r // remainingBalance ثابت = principalAmount
 principalPortion_i = 0
 
 // دوره آخر (n):
-interestPortion_n  = remainingBalance × r
-principalPortion_n = remainingBalance          // کل اصل یک‌جا
+interestPortion_n = remainingBalance × r
+principalPortion_n = remainingBalance // کل اصل یک‌جا
 ```
 
 **مثال هفتگی:**
@@ -630,22 +622,22 @@ firstAffectedDueDate = MIN(dueDate) WHERE dueDate ≥ effectiveDate AND status �
 // اگر همه اقساط پرداخت شده → هیچ بازمحاسبه‌ای لازم نیست (نرخ صرفاً تاریخی ثبت می‌شود)
 
 // ۴. محاسبه وضعیت در لحظه effectiveDate
-remainingBalance_atChange   = آخرین remainingBalance از ln_transactions (بعد از آخرین قسط پرداخت‌شده)
+remainingBalance_atChange = آخرین remainingBalance از ln_transactions (بعد از آخرین قسط پرداخت‌شده)
 remainingInstallments_atChange = totalInstallments - installmentsPaidSoFar
 
 // ۵. بازمحاسبه قسط با نرخ جدید
 r_new = getNewPeriodRate(newRate, loan.installmentFrequency, loan.customIntervalDays)
 
 if loan.recalculateOnEarlyPayment = true (حالت: تعداد ثابت، مبلغ تغییر می‌کند):
-    calculatedInstallment = remainingBalance_atChange × [r_new(1+r_new)^n] / [(1+r_new)^n - 1]
-    // که در آن n = remainingInstallments_atChange
-    UPDATE ln_loans SET calculatedInstallment = ...
+ calculatedInstallment = remainingBalance_atChange × [r_new(1+r_new)^n] / [(1+r_new)^n - 1]
+ // که در آن n = remainingInstallments_atChange
+ UPDATE ln_loans SET calculatedInstallment = ...
 
 else (حالت: مبلغ قسط ثابت — recalculateOnEarlyPayment = false):
-    // مبلغ قسط دست‌نخورده می‌ماند (کاربر یا همان مبلغ قسط قبلی یا مبلغ توافق‌شده با بانک)
-    // تعداد اقساط باقیمانده بازمحاسبه می‌شود:
-    newRemainingInstallments = ceil( -ln(1 - (remainingBalance_atChange × r_new) / calculatedInstallment) / ln(1 + r_new) )
-    UPDATE ln_loans SET totalInstallments = installmentsPaidSoFar + newRemainingInstallments
+ // مبلغ قسط دست‌نخورده می‌ماند (کاربر یا همان مبلغ قسط قبلی یا مبلغ توافق‌شده با بانک)
+ // تعداد اقساط باقیمانده بازمحاسبه می‌شود:
+ newRemainingInstallments = ceil( -ln(1 - (remainingBalance_atChange × r_new) / calculatedInstallment) / ln(1 + r_new) )
+ UPDATE ln_loans SET totalInstallments = installmentsPaidSoFar + newRemainingInstallments
 ```
 
 #### accrued interest — دقیقاً چه اتفاقی می‌افتد؟
@@ -664,18 +656,18 @@ interestPortion_i = remainingBalance × r_effective(dueDate_i)
 وام: ۱۲۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه Declining Balance، نرخ اولیه ۱۸٪
 
 قسط ۱ (فروردین): r = 0.18/12 = 0.015 → سود = 1,800,000، اصل = 4,218,000
-قسط ۲ (اردیبهشت): r = 0.015   → سود = 1,736,730، اصل = 4,281,270
+قسط ۲ (اردیبهشت): r = 0.015 → سود = 1,736,730، اصل = 4,281,270
 
 → در اردیبهشت: بانک نرخ را به ۲۴٪ تغییر می‌دهد، effectiveDate = ابتدای خرداد
 
 → updateLoanRate(loanId, 24, '1404-03-01')
-   remainingBalance_atChange = 111,500,730
-   r_new = 0.24/12 = 0.02
-   remainingInstallments = 10
+ remainingBalance_atChange = 111,500,730
+ r_new = 0.24/12 = 0.02
+ remainingInstallments = 10
 
-   if recalculateOnEarlyPayment = true:
-       calculatedInstallment = 111,500,730 × [0.02(1.02)^10] / [(1.02)^10 - 1]
-                             ≈ 12,373,000 ریال (بالاتر از قسط اولیه ~6,095,000)
+ if recalculateOnEarlyPayment = true:
+ calculatedInstallment = 111,500,730 × [0.02(1.02)^10] / [(1.02)^10 - 1]
+ ≈ 12,373,000 ریال (بالاتر از قسط اولیه ~6,095,000)
 
 قسط ۳ (خرداد): r = 0.02 → سود = 2,230,015، اصل = 10,142,985
 // قسط‌های ۱ و ۲ دست‌نخورده؛ سودِ بین قسط ۲ و effectiveDate صفر است (daily accrual نداریم)
@@ -708,10 +700,10 @@ interestPortion_i = remainingBalance × r_effective(dueDate_i)
 
 ```
 // هر قسط که dueDate آن گذشته و status آن 'unpaid' است:
-overdueInstallmentAmount = principalPortion + interestPortion   // مبلغ معوق همان قسط (نه کل وام)
+overdueInstallmentAmount = principalPortion + interestPortion // مبلغ معوق همان قسط (نه کل وام)
 
 // اگر چند قسط همزمان عقب باشند، جریمه هر قسط جداگانه با penaltyDays مختص خودش محاسبه می‌شود
-penaltyDays_i = (today - dueDate_i).days   // تعداد روزهای دیرکرد قسط i
+penaltyDays_i = (today - dueDate_i).days // تعداد روزهای دیرکرد قسط i
 ```
 
 #### فرمول جریمه (Simple Interest — Actual/365)
@@ -723,16 +715,16 @@ penaltyPortion_i = overdueInstallmentAmount_i × (penaltyRate / 100) × (penalty
 **سقف جریمه (اگر تعریف شده باشد):**
 ```
 if penaltyMaxCapAmount is not null:
-    penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
+ penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
 
 if penaltyMaxCapRate is not null:
-    maxByRate = principalAmount × (penaltyMaxCapRate / 100)   // سقف درصدی از اصل وام
-    penaltyPortion_i = MIN(penaltyPortion_i, maxByRate)
+ maxByRate = principalAmount × (penaltyMaxCapRate / 100) // سقف درصدی از اصل وام
+ penaltyPortion_i = MIN(penaltyPortion_i, maxByRate)
 ```
 
 **جمع جریمه کل (چند قسط معوق):**
 ```
-totalPenalty = Σ penaltyPortion_i     // برای هر قسط معوق جداگانه
+totalPenalty = Σ penaltyPortion_i // برای هر قسط معوق جداگانه
 ```
 
 > **قانون مهم**: جریمه روی جریمه (Compound Penalty) ممنوع است — `penaltyPortion` قبلاً پرداخت‌نشده هرگز به `overdueInstallmentAmount` اضافه نمی‌شود.
@@ -740,15 +732,15 @@ totalPenalty = Σ penaltyPortion_i     // برای هر قسط معوق جداگ
 #### فیلدهای جدید در `ln_loans`
 
 ```
-penaltyRate           → decimal (nullable — نرخ سالانه جریمه، درصد — مثلاً 6)
-penaltyBasis          → enum ('overdue_installment' | 'remaining_balance')
-                        // پیش‌فرض: 'overdue_installment' (توصیه‌شده برای ایران)
-                        // 'remaining_balance': برخی وام‌های تجاری/خاص — جریمه روی کل مانده
-penaltyMaxCapAmount   → decimal (nullable — سقف مطلق جریمه — مثلاً ۵,۰۰۰,۰۰۰ ریال)
-penaltyMaxCapRate     → decimal (nullable — سقف جریمه به‌عنوان درصد از اصل — مثلاً 10 یعنی حداکثر ۱۰٪ اصل)
-penaltyGraceDays      → integer (nullable, default: 0 — روزهای تأخیر قبل از شروع جریمه)
-                        // اگر penaltyGraceDays = 3: تا ۳ روز تأخیر جریمه تعلق نمی‌گیرد؛ از روز ۴ به بعد
-                        // penaltyDays_effective = MAX(0, penaltyDays - penaltyGraceDays)
+penaltyRate → decimal (nullable — نرخ سالانه جریمه، درصد — مثلاً 6)
+penaltyBasis → enum ('overdue_installment' | 'remaining_balance')
+ // پیش‌فرض: 'overdue_installment' (توصیه‌شده برای ایران)
+ // 'remaining_balance': برخی وام‌های تجاری/خاص — جریمه روی کل مانده
+penaltyMaxCapAmount → decimal (nullable — سقف مطلق جریمه — مثلاً ۵,۰۰۰,۰۰۰ ریال)
+penaltyMaxCapRate → decimal (nullable — سقف جریمه به‌عنوان درصد از اصل — مثلاً 10 یعنی حداکثر ۱۰٪ اصل)
+penaltyGraceDays → integer (nullable, default: 0 — روزهای تأخیر قبل از شروع جریمه)
+ // اگر penaltyGraceDays = 3: تا ۳ روز تأخیر جریمه تعلق نمی‌گیرد؛ از روز ۴ به بعد
+ // penaltyDays_effective = MAX(0, penaltyDays - penaltyGraceDays)
 ```
 
 #### فرمول نهایی با `penaltyGraceDays` و `penaltyBasis`
@@ -757,17 +749,17 @@ penaltyGraceDays      → integer (nullable, default: 0 — روزهای تأخ�
 penaltyDays_effective = MAX(0, penaltyDays_i - (penaltyGraceDays ?? 0))
 
 if penaltyBasis = 'overdue_installment':
-    base = overdueInstallmentAmount_i    // اصل + سود همان قسط معوق
-else:  // 'remaining_balance'
-    base = remainingBalance              // کل مانده وام (برای وام‌های خاص)
+ base = overdueInstallmentAmount_i // اصل + سود همان قسط معوق
+else: // 'remaining_balance'
+ base = remainingBalance // کل مانده وام (برای وام‌های خاص)
 
 penaltyPortion_i = base × (penaltyRate / 100) × (penaltyDays_effective / 365)
 
 // اعمال سقف:
 if penaltyMaxCapAmount is not null:
-    penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
+ penaltyPortion_i = MIN(penaltyPortion_i, penaltyMaxCapAmount)
 if penaltyMaxCapRate is not null:
-    penaltyPortion_i = MIN(penaltyPortion_i, principalAmount × penaltyMaxCapRate / 100)
+ penaltyPortion_i = MIN(penaltyPortion_i, principalAmount × penaltyMaxCapRate / 100)
 ```
 
 #### مثال‌های عددی
@@ -808,12 +800,12 @@ totalPenalty = 54,247 ریال
 #### ثبت جریمه در `ln_transactions`
 
 ```
-type:           'penalty'
-amount:         penaltyPortion (مجموع همه قسط‌های معوق در این پرداخت)
+type: 'penalty'
+amount: penaltyPortion (مجموع همه قسط‌های معوق در این پرداخت)
 penaltyPortion: penaltyPortion
-penaltyDays:    penaltyDays_i (برای قسط جداگانه — اگر چند قسط معوق است، یک رکورد penalty جداگانه برای هر قسط)
+penaltyDays: penaltyDays_i (برای قسط جداگانه — اگر چند قسط معوق است، یک رکورد penalty جداگانه برای هر قسط)
 principalPortion: 0
-interestPortion:  0
+interestPortion: 0
 // جریمه remainingBalance را تغییر نمی‌دهد
 ```
 
@@ -831,20 +823,20 @@ interestPortion:  0
 
 ```
 gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
-// monthly:   gracePeriods = gracePeriodMonths × 1
-// weekly:    gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
-//            → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
+// monthly: gracePeriods = gracePeriodMonths × 1
+// weekly: gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
+// → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
 // quarterly: gracePeriods = gracePeriodMonths / 3
-//            → اگر نتیجه کسری شود، ROUND_DOWN
-// custom:    gracePeriods = gracePeriodMonths × 30 / customIntervalDays
+// → اگر نتیجه کسری شود، ROUND_DOWN
+// custom: gracePeriods = gracePeriodMonths × 30 / customIntervalDays
 
 
-> **BUG-028 — قرارداد تنفس**:
+> **قرارداد تنفس**:
 > 1. اگر `gracePeriodCount` مقدار داشته باشد → همان تعداد period با فرکانس وام (هفتگی/فصلی/…) اعمال می‌شود.
 > 2. وگرنه `gracePeriodMonths` به period تبدیل می‌شود: `gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12` (همان جدول موجود).
 > 3. تاریخ واقعی پایان تنفس از `firstPaymentDate` و تعداد period محاسبه می‌شود، نه فقط جمع ماه‌های خام روی تقویم وقتی frequency هفتگی است.
 
-//            → ROUND_DOWN
+// → ROUND_DOWN
 ```
 
 ---
@@ -854,8 +846,8 @@ gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
 در طول دوره تنفس (دوره‌های ۱ تا `gracePeriods`):
 ```
 principalPortion = 0
-interestPortion  = remainingBalance × r      // remainingBalance = principalAmount (دست‌نخورده)
-installment      = interestPortion
+interestPortion = remainingBalance × r // remainingBalance = principalAmount (دست‌نخورده)
+installment = interestPortion
 ```
 
 پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `gracePeriods+totalInstallments`):
@@ -903,15 +895,15 @@ Error: "دوره تنفس برای وام‌های Flat Rate پشتیبانی ن
 در طول دوره تنفس (دوره‌های ۱ تا `gracePeriods`):
 ```
 principalPortion = 0
-interestPortion  = 0
-installment      = 0      // قسط صفر — هیچ پرداختی ثبت نمی‌شود
+interestPortion = 0
+installment = 0 // قسط صفر — هیچ پرداختی ثبت نمی‌شود
 ```
 
 پس از دوره تنفس (دوره‌های `gracePeriods+1` تا `gracePeriods+totalInstallments`):
 ```
-installment      = principalAmount / totalInstallments    // همان فرمول معمول Qarz
+installment = principalAmount / totalInstallments // همان فرمول معمول Qarz
 principalPortion = installment
-interestPortion  = 0
+interestPortion = 0
 ```
 
 > **نکته**: کارمزد خدمات (`serviceFeeAmount`) در روز واریز وام (disbursement) کسر می‌شود و ربطی به دوره تنفس ندارد.
@@ -1001,9 +993,9 @@ if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
 ```json
 // fee.tiers نمونه (برای کارمزد پیش‌پرداخت):
 [
-  { "upToPercent": 30, "rate": 1.0 },
-  { "upToPercent": 60, "rate": 2.0 },
-  { "upToPercent": 100, "rate": 3.0 }
+ { "upToPercent": 30, "rate": 1.0 },
+ { "upToPercent": 60, "rate": 2.0 },
+ { "upToPercent": 100, "rate": 3.0 }
 ]
 ```
 
@@ -1047,22 +1039,22 @@ if fee.maxAmount: calculatedAmount = MIN(calculatedAmount, fee.maxAmount)
 وام: ۵۰۰,۰۰۰,۰۰۰ ریال، ۶۰ قسط ماهانه Declining Balance
 
 ln_loan_fees:
-  1. origination / percentage_of_principal / rate=1.5 / max=5,000,000
-     → calculatedAmount = 500,000,000 × 1.5% = 7,500,000 → MIN(7,500,000, 5,000,000) = 5,000,000 ریال
-     → ثبت یک‌بار در disbursement
+ 1. origination / percentage_of_principal / rate=1.5 / max=5,000,000
+ → calculatedAmount = 500,000,000 × 1.5% = 7,500,000 → MIN(7,500,000, 5,000,000) = 5,000,000 ریال
+ → ثبت یک‌بار در disbursement
 
-  2. monthly_management / percentage_of_installment / rate=0.3
-     → calculatedAmount per month = 9,500,000 × 0.3% ≈ 28,500 ریال
-     → ثبت همراه هر یک از ۶۰ قسط
+ 2. monthly_management / percentage_of_installment / rate=0.3
+ → calculatedAmount per month = 9,500,000 × 0.3% ≈ 28,500 ریال
+ → ثبت همراه هر یک از ۶۰ قسط
 
-  3. early_payment / tiered
-     → tiers: [{upToPercent:50, rate:1}, {upToPercent:100, rate:2}]
-     → فقط اگر پیش‌پرداخت انجام شود محاسبه می‌شود
+ 3. early_payment / tiered
+ → tiers: [{upToPercent:50, rate:1}, {upToPercent:100, rate:2}]
+ → فقط اگر پیش‌پرداخت انجام شود محاسبه می‌شود
 ```
 
 ---
 
-## Accounting Treatment کارمزد وام (BUG-H12)
+## Accounting Treatment کارمزد وام
 
 علاوه بر محاسبه مبلغ، هر `ln_loan_fees.feeCategory` باید `accountingTreatment` داشته باشد:
 

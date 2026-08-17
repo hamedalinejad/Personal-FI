@@ -31,15 +31,15 @@ Business Rules
 درآمد نمی‌تواند در آینده ثبت شود — تاریخ تراکنش باید ≤ امروز باشد (Job روزانه `generateRecurringIncomes` هم فقط زمانی تراکنش می‌سازد که `nextOccurrence` رسیده باشد، نه از پیش).
 **ویرایش/حذف درآمد**: تراکنش درآمد پس از ثبت غیرقابل ویرایش است. برای اصلاح یا حذف، الگوی **دولایه Atomic** اجرا می‌شود (همه مراحل در یک BEGIN/COMMIT):
 
-  **لایه ۱ — `inc_transactions`**:
-  - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
-  - یک رکورد جدید در `inc_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
+ **لایه ۱ — `inc_transactions`**:
+ - رکورد قدیمی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — audit trail)
+ - یک رکورد جدید در `inc_transactions` با داده‌های اصلاح‌شده و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions` ساخته می‌شود
 
-  **لایه ۲ — `acc_transactions`**:
-  - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
-  - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
+ **لایه ۲ — `acc_transactions`**:
+ - تراکنش اصل با `isVoided = true` علامت‌گذاری می‌شود
+ - یک تراکنش معکوس (Reversal) ثبت می‌شود تا موجودی حساب درست شود
 
-  > ⚠️ **قانون `getTotalIncome`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `inc_transactions` را جمع می‌زنند. در غیر این صورت مبلغ رکورد void‌شده و رکورد جدید هر دو در جمع می‌آیند و نتیجه غلط می‌شود.
+ > ⚠️ **قانون `getTotalIncome`**: این تابع و همه APIهای گزارش‌گیری فقط ردیف‌های `isVoided = false` از `inc_transactions` را جمع می‌زنند. در غیر این صورت مبلغ رکورد void‌شده و رکورد جدید هر دو در جمع می‌آیند و نتیجه غلط می‌شود.
 
 
 Domain Entities
@@ -49,7 +49,7 @@ Domain Entities
 - `date` → datetime (تاریخ درآمد)
 - `amount` → decimal (مبلغ درآمد — به ارز حساب)
 - `currency` → string (ارز درآمد = ارز حساب مقصد)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (حساب مقصد)
 - `description` → string (توضیحات)
 - `category` → string (دسته‌بندی: حقوق، فریلنس، اجاره، سرمایه‌گذاری و ...)
@@ -103,10 +103,10 @@ Income Transaction APIs:
 
 createIncome(data) → ثبت درآمد + گرفتن نرخ تبدیل + ایجاد تراکنش + به‌روزرسانی مانده حساب
 correctIncome(id, data) → اصلاح درآمد — **الزاماً Atomic (BEGIN/COMMIT)**:
-  1. `inc_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
-  2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
-  3. INSERT رکورد جدید در `inc_transactions` با داده اصلاح‌شده، `reversedIncomeId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
-  4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
+ 1. `inc_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
+ 2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
+ 3. INSERT رکورد جدید در `inc_transactions` با داده اصلاح‌شده، `reversedIncomeId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
+ 4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
 updateIncomeMetadata(id, data) → ویرایش فقط فیلدهای غیرمالی (توضیحات، دسته‌بندی، پیوست‌ها)؛ تراکنش مالی و مانده حساب دست‌نخورده باقی می‌مانند
 getAllIncomes(filters) → لیست با فیلتر (تاریخ، حساب، دسته)
 getIncomeById(id)

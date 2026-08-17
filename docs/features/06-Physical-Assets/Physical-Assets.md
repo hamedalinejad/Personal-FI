@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-این فیچر مسئولیت مدیریت **دارایی‌های فیزیکی** کاربر را بر عهده دارد.  
+این فیچر مسئولیت مدیریت **دارایی‌های فیزیکی** کاربر را بر عهده دارد. 
 شامل طلا و سکه فیزیکی، خودرو، املاک، لوازم گران‌قیمت و سایر دارایی‌هایی است که کاربر واقعاً مالک آن‌هاست و نزد خود نگهداری می‌کند.
 
 تفاوت مهم با زیر‌فیچر Metals:
@@ -36,31 +36,31 @@
 
 ## Business Rules
 
-1. `exchangeRateToBase` در هر رکورد تراکنش ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — BUG-003؛ قرارداد کامل در `Currency-CrossRate.md`).
+1. `exchangeRateToBase` در هر رکورد تراکنش ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — ؛ قرارداد کامل در `Currency-CrossRate.md`).
 2. **الگوی نگهداری دارایی‌ها:**
-   - برای دسته‌های `gold` و `coin` (قابل‌تفکیک و هم‌ارز): خرید بیشتر همان نوع دارایی، `quantity` و `averageBuyPrice` (Weighted Average) را روی همان asset آپدیت می‌کند.
-   - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است.
+ - برای دسته‌های `gold` و `coin` (قابل‌تفکیک و هم‌ارز): خرید بیشتر همان نوع دارایی، `quantity` و `averageBuyPrice` (Weighted Average) را روی همان asset آپدیت می‌کند.
+ - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است.
 3. هنگام **خرید دارایی**:
-   - موجودی حساب بانکی کاهش می‌یابد.
-   - تراکنش در `acc_transactions` با `type = 'withdrawal-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — خرید دارایی سرمایه‌گذاری است، نه هزینه معمولی).
-   - دارایی جدید (یا به‌روزرسانی موجود) با قیمت خرید ثبت می‌گردد.
+ - موجودی حساب بانکی کاهش می‌یابد.
+ - تراکنش در `acc_transactions` با `type = 'withdrawal-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — خرید دارایی سرمایه‌گذاری است، نه هزینه معمولی).
+ - دارایی جدید (یا به‌روزرسانی موجود) با قیمت خرید ثبت می‌گردد.
 4. هنگام **فروش دارایی** (`type = 'sale'`):
-   - موجودی حساب بانکی افزایش می‌یابد.
-   - تراکنش در `acc_transactions` با `type = 'deposit-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — فروش دارایی درآمد معمولی نیست).
-   - سود/زیان تحقق‌یافته محاسبه می‌شود.
-   - `quantity` دارایی به اندازه `quantitySold` کاهش می‌یابد.
-   - `quantity` نمی‌تواند منفی شود (یعنی `quantitySold` نمی‌تواند از `quantity` فعلی بیشتر باشد).
-   - اگر پس از کاهش `quantity = 0` شود (یعنی `quantitySold` برابر کل موجودی قبل از فروش بود)، وضعیت دارایی به `sold` تغییر می‌کند؛ در غیر این صورت دارایی `active` می‌ماند (فروش جزئی).
+ - موجودی حساب بانکی افزایش می‌یابد.
+ - تراکنش در `acc_transactions` با `type = 'deposit-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — فروش دارایی درآمد معمولی نیست).
+ - سود/زیان تحقق‌یافته محاسبه می‌شود.
+ - `quantity` دارایی به اندازه `quantitySold` کاهش می‌یابد.
+ - `quantity` نمی‌تواند منفی شود (یعنی `quantitySold` نمی‌تواند از `quantity` فعلی بیشتر باشد).
+ - اگر پس از کاهش `quantity = 0` شود (یعنی `quantitySold` برابر کل موجودی قبل از فروش بود)، وضعیت دارایی به `sold` تغییر می‌کند؛ در غیر این صورت دارایی `active` می‌ماند (فروش جزئی).
 5. **فروش جزئی در برابر فروش کامل:**
-   - هیچ نوع تراکنش جداگانه‌ای وجود ندارد؛ هر دو حالت با همان `type = 'sale'` ثبت می‌شوند و تنها با مقایسه `quantitySold` نسبت به `quantity` پیش از فروش (فروش کامل) یا کمتر از آن (فروش جزئی) تشخیص داده می‌شوند.
-   - `averageBuyPrice` بدون تغییر باقی می‌ماند؛ فقط `quantity` به اندازه `quantitySold` کاهش می‌یابد (در فروش کامل که `quantity` به صفر می‌رسد، مقدار `averageBuyPrice` بی‌اثر می‌شود — هم‌راستا با الگوی Metals/Crypto پروژه).
-   - `purchasePrice` (کل هزینه اولیه) تغییر نمی‌کند.
+ - هیچ نوع تراکنش جداگانه‌ای وجود ندارد؛ هر دو حالت با همان `type = 'sale'` ثبت می‌شوند و تنها با مقایسه `quantitySold` نسبت به `quantity` پیش از فروش (فروش کامل) یا کمتر از آن (فروش جزئی) تشخیص داده می‌شوند.
+ - `averageBuyPrice` بدون تغییر باقی می‌ماند؛ فقط `quantity` به اندازه `quantitySold` کاهش می‌یابد (در فروش کامل که `quantity` به صفر می‌رسد، مقدار `averageBuyPrice` بی‌اثر می‌شود — هم‌راستا با الگوی Metals/Crypto پروژه).
+ - `purchasePrice` (کل هزینه اولیه) تغییر نمی‌کند.
 6. **ارزش‌گذاری دوره‌ای:**
-   - کاربر می‌تواند قیمت روز دارایی را ثبت کند.
-   - ارزش فعلی پرتفوی بر اساس آخرین ارزش‌گذاری محاسبه می‌شود.
+ - کاربر می‌تواند قیمت روز دارایی را ثبت کند.
+ - ارزش فعلی پرتفوی بر اساس آخرین ارزش‌گذاری محاسبه می‌شود.
 7. **وضعیت `written_off` (از دست رفته/سوخته):**
-   - اگر دارایی به `written_off` تغییر وضعیت دهد، زیان تحقق‌یافته به اندازه `currentValue` ثبت می‌شود.
-   - `currentValue` به `0` تنظیم می‌شود.
+ - اگر دارایی به `written_off` تغییر وضعیت دهد، زیان تحقق‌یافته به اندازه `currentValue` ثبت می‌شود.
+ - `currentValue` به `0` تنظیم می‌شود.
 8. هزینه‌های نگهداری (بیمه، تعمیر، مالیات) قابل ثبت هستند و در محاسبه بازده واقعی لحاظ می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 10. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت (`active`, `sold`, `written_off`).
@@ -82,8 +82,8 @@
 - `currentValue` → decimal (آخرین ارزش‌گذاری — ریال)
 - `currentValueDate` → datetime
 - `averageBuyPrice` → decimal (قیمت خرید به ازای واحد):
-  - **Weighted Average (چند خرید روی یک asset):** فقط برای `gold` و `coin` — هر خرید بعدی این مقدار را با فرمول Weighted Average به‌روز می‌کند
-  - **قیمت خرید ثابت اولیه (یک خرید = یک asset):** برای `vehicle`, `real_estate`, `electronics`, `other` — چون هر خرید یک asset مستقل است (Business Rule #2)، این فیلد برابر `totalCost / quantity` همان خرید اولیه است و هرگز با خرید بعدی به‌روز نمی‌شود
+ - **Weighted Average (چند خرید روی یک asset):** فقط برای `gold` و `coin` — هر خرید بعدی این مقدار را با فرمول Weighted Average به‌روز می‌کند
+ - **قیمت خرید ثابت اولیه (یک خرید = یک asset):** برای `vehicle`, `real_estate`, `electronics`, `other` — چون هر خرید یک asset مستقل است (Business Rule #2)، این فیلد برابر `totalCost / quantity` همان خرید اولیه است و هرگز با خرید بعدی به‌روز نمی‌شود
 - `status` → string (`active`, `sold`, `written_off`)
 - `location` → string (محل نگهداری — اختیاری)
 - `description` → string
@@ -95,15 +95,15 @@
 > - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است، پس `accountId` همیشه همان حساب خرید آن asset است.
 > - برای دسته‌های `gold` و `coin` (قابل‌تفکیک): چند خرید روی همان asset انجام می‌شود. `accountId` در `pa_assets` **ثابت می‌ماند** و نشان‌دهنده حساب اولین خرید است. خریدهای بعدی `accountId` خود را در `pa_transactions.accountId` ذخیره می‌کنند.
 > - برای دریافت همه حساب‌های مرتبط با یک asset: از `pa_transactions` با `assetId` استفاده کنید.
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:  
-> - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود  
-> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): `averageBuyPrice` برابر `totalCost / quantity` همان خرید اولیه است و هرگز با Weighted Average به‌روز نمی‌شود، چون هر خرید یک asset جدید مستقل است (Business Rule #2)  
-> - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟)  
-> - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید  
+> **نکته مهم - فیلد `purchaseTransactionId` حذف شد**: 
+> - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود 
+> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): `averageBuyPrice` برابر `totalCost / quantity` همان خرید اولیه است و هرگز با Weighted Average به‌روز نمی‌شود، چون هر خرید یک asset جدید مستقل است (Business Rule #2) 
+> - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟) 
+> - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید 
 > - در صورت نیاز به لینک به تراکنش خرید اصلی، می‌توانید از `pa_transactions` با `assetId` استفاده کنید
 
 ### ۲. Physical Asset Valuation (جدول: `pa_valuations`)
@@ -111,7 +111,7 @@
 - `id` → UUID
 - `assetId` → UUID
 - `value` → decimal (ارزش ثبت‌شده — ریال)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `note` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -121,12 +121,12 @@
 - `id` → UUID
 - `assetId` → UUID
 - `type` → string (`purchase`, `sale`, `expense`, `write_off`)
-  - `write_off`: هنگامی که دارایی به وضعیت `written_off` تغییر می‌کند؛ `amount` برابر با ارزش جاری دارایی (`currentValue`) در لحظه رونویسی است و جهت آن منفی (زیان) ثبت می‌شود
+ - `write_off`: هنگامی که دارایی به وضعیت `written_off` تغییر می‌کند؛ `amount` برابر با ارزش جاری دارایی (`currentValue`) در لحظه رونویسی است و جهت آن منفی (زیان) ثبت می‌شود
 - `amount` → decimal
 - `quantitySold` → decimal (nullable — فقط برای `type = 'sale'`؛ مقدار فروخته‌شده. اگر برابر با کل `quantity` دارایی قبل از این فروش باشد، فروش کامل محسوب می‌شود، در غیر این صورت فروش جزئی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string

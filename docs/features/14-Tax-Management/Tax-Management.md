@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-این فیچر به کاربر کمک می‌کند مالیات‌ها و عوارض مرتبط با فعالیت‌های مالی و سرمایه‌گذاری خود را پیگیری، محاسبه و مدیریت کند.  
+این فیچر به کاربر کمک می‌کند مالیات‌ها و عوارض مرتبط با فعالیت‌های مالی و سرمایه‌گذاری خود را پیگیری، محاسبه و مدیریت کند. 
 تمرکز آن روی نیازهای یک کاربر شخصی ایرانی است (نه حسابداری شرکتی کامل).
 
 موارد قابل پوشش:
@@ -38,14 +38,14 @@
 
 1. هر رکورد مالیاتی باید نوع مشخصی داشته باشد.
 2. وضعیت مالیات می‌تواند `pending`, `paid`, `overdue`, `cancelled` باشد.
-3. هنگام پرداخت مالیات (**یک بار ورود به Ledger — BUG-021**):
-   - **فقط یک** ردیف `acc_transactions` ساخته می‌شود با `type = 'withdrawal-expense-tax'` (یا `deposit-income-tax` برای بازگشت).
-   - **ممنوع**: ساختن Expense عمومی (`withdrawal-expense`) و سپس یک تراکنش Tax جدا — باعث double-count در Ledger می‌شود.
-   - جریان اتمیک پیشنهادی داخل `markAsPaid` / `payTax`:
-     1. `runAtomicFinancialOperation`: INSERT همان یک `acc_transactions` با type اختصاصی Tax + به‌روز balance حساب
-     2. UPDATE `tax_records`: `status=paid`, `paidDate`, `accountId`, `accountTransactionId` = id همان تراکنش
-   - اگر UI از مسیر Expense عمومی استفاده کند، باید همان type Tax را بنویسد یا به `payTax` делеگیت کند — نه دو API پشت‌سرهم که هر کدام INSERT جدا بزنند.
-   - موجودی حساب فقط یک بار تغییر می‌کند.
+3. هنگام پرداخت مالیات (**یک بار ورود به Ledger — **):
+ - **فقط یک** ردیف `acc_transactions` ساخته می‌شود با `type = 'withdrawal-expense-tax'` (یا `deposit-income-tax` برای بازگشت).
+ - **ممنوع**: ساختن Expense عمومی (`withdrawal-expense`) و سپس یک تراکنش Tax جدا — باعث double-count در Ledger می‌شود.
+ - جریان اتمیک پیشنهادی داخل `markAsPaid` / `payTax`:
+ 1. `runAtomicFinancialOperation`: INSERT همان یک `acc_transactions` با type اختصاصی Tax + به‌روز balance حساب
+ 2. UPDATE `tax_records`: `status=paid`, `paidDate`, `accountId`, `accountTransactionId` = id همان تراکنش
+ - اگر UI از مسیر Expense عمومی استفاده کند، باید همان type Tax را بنویسد یا به `payTax` делеگیت کند — نه دو API پشت‌سرهم که هر کدام INSERT جدا بزنند.
+ - موجودی حساب فقط یک بار تغییر می‌کند.
 4. مالیات‌های معوق باید در یادآوری‌ها و داشبورد نمایش داده شوند.
 5. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت.
 6. محاسبات پیچیده مالیاتی (اظهارنامه رسمی) خارج از محدوده این فیچر است.
@@ -66,7 +66,7 @@
 - `paidDate` → datetime (nullable)
 - `status` → string (`pending`, `paid`, `overdue`, `cancelled`)
 - `taxYear` → number (عدد سال مالیاتی — مثلاً 1404 یا 2026)
-- `taxCalendar` → string (`jalali` | `gregorian`) — **اجباری با taxYear (BUG-022)**؛ بدون تقویم، عدد سال تفسیرپذیر نیست
+- `taxCalendar` → string (`jalali` | `gregorian`) — **اجباری با taxYear**؛ بدون تقویم، عدد سال تفسیرپذیر نیست
 - `year` → number (deprecated alias؛ در پیاده‌سازی فقط `taxYear` + `taxCalendar` نوشته شود)
 - `description` → string
 - `accountId` → UUID (حساب پرداخت‌کننده — nullable)
@@ -75,7 +75,7 @@
 - `relatedId` → UUID (nullable)
 - `hasAttachment` → boolean
 - `attachmentPath` → string
-- `exchangeRateToBase` → decimal (نرخ ارز پرداخت → baseCurrency کاربر — BUG-003)
+- `exchangeRateToBase` → decimal (نرخ ارز پرداخت → baseCurrency کاربر — )
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -96,9 +96,9 @@
 - `updateTaxRecord(taxRecordId, data)` → ویرایش مالیات
 - `getAllTaxRecords(filters)` → فیلتر بر اساس سال، نوع، وضعیت
 - `getTaxRecordById(taxRecordId)` → دریافت جزئیات مالیات
-- `payTax(taxRecordId, { paidDate, accountId, amount? })` → **مسیر اصلی (BUG-021)**  
-  یک atomic op: یک `acc_transactions` با `withdrawal-expense-tax`/`deposit-income-tax` + لینک به tax_record + status=paid. **دو بار INSERT ممنوع.**  
-  > **توجه**: پارامترهای `relatedFeature`/`relatedId` از امضای این تابع حذف شده‌اند — این فیلدها فقط در زمان ایجاد رکورد (`createTaxRecord`) یا ویرایش (`updateTaxRecord`) قابل تنظیم‌اند و به منشأ مالیاتی رکورد اشاره دارند، نه به عملیات پرداخت. تنظیم آن‌ها در `payTax` باعث می‌شد با مقادیر اولیه رکورد تداخل ایجاد شود و پیوند audit trail گم شود.
+- `payTax(taxRecordId, { paidDate, accountId, amount? })` → **مسیر اصلی** 
+ یک atomic op: یک `acc_transactions` با `withdrawal-expense-tax`/`deposit-income-tax` + لینک به tax_record + status=paid. **دو بار INSERT ممنوع.** 
+ > **توجه**: پارامترهای `relatedFeature`/`relatedId` از امضای این تابع حذف شده‌اند — این فیلدها فقط در زمان ایجاد رکورد (`createTaxRecord`) یا ویرایش (`updateTaxRecord`) قابل تنظیم‌اند و به منشأ مالیاتی رکورد اشاره دارند، نه به عملیات پرداخت. تنظیم آن‌ها در `payTax` باعث می‌شد با مقادیر اولیه رکورد تداخل ایجاد شود و پیوند audit trail گم شود.
 - `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, ...)` → فقط وقتی تراکنش Tax **از قبل** با type صحیح ساخته شده (مثلاً import)؛ اگر type عمومی expense باشد باید reject شود تا double-count نشود.
 - `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled) بدون ساخت ledger مگر از مسیر payTax
 - `getPendingTaxes()` / `getOverdueTaxes()`
@@ -106,7 +106,7 @@
 ### Summary APIs
 - `getTaxSummary(taxYear?, taxCalendar?)` → مجموع پرداخت‌شده و در انتظار
 - `getTaxesByType(taxYear?, taxCalendar?)`
-- `getAnnualTaxReport(taxYear, taxCalendar)` → سال بدون تقویم ناقص است (BUG-022)
+- `getAnnualTaxReport(taxYear, taxCalendar)` → سال بدون تقویم ناقص است
 
 ---
 
@@ -147,7 +147,7 @@
 
 ---
 
-## قرارداد Tax Metadata روی تراکنش‌های سرمایه‌گذاری (باگ ۵۶)
+## قرارداد Tax Metadata روی تراکنش‌های سرمایه‌گذاری
 
 Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بعدی مالیات باید از همان لحظه ثبت معامله حفظ شود** — بعداً قابل بازیابی از هیچ‌جا نیست («هیچ فیلدی از بین نره»).
 
@@ -179,7 +179,7 @@ Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بع
 - `tax.getTaxableEvents(filters)` → خواندن از تراکنش‌های Investment با `isTaxableEvent=true`
 - `tax.attachTaxRecord(transactionRef, taxRecordId)` → پر کردن `linkedTaxRecordId`
 
-### قواعد سال مالیاتی (BUG-022)
+### قواعد سال مالیاتی
 - همیشه جفت `(taxYear, taxCalendar)` ذخیره و فیلتر شود.
 - گزارش سالانه: `getAnnualTaxReport(taxYear, taxCalendar)`.
 - پیش‌فرض UI از تنظیمات `dateFormat` کاربر (`jalali`/`gregorian`) می‌آید ولی در رکورد snapshot می‌شود.

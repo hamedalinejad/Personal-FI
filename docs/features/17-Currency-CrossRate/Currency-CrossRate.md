@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 
-این فیچر مسئولیت مدیریت **نرخ‌های تبدیل بین ارزها** را بر عهده دارد.  
+این فیچر مسئولیت مدیریت **نرخ‌های تبدیل بین ارزها** را بر عهده دارد. 
 سیستم اجازه می‌دهد کاربر یک ارز پایه (مثلاً IRR) و ارز مقصد (مثلاً USDT) را انتخاب کند و نرخ تبدیل لحظه‌ای را دریافت کند.
 
 این فیچر پایه‌ای برای سایر فیچرهاست که به دو ارز نیاز دارند:
@@ -58,16 +58,16 @@
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
 - `rate` → decimal (نرخ تبدیل عمومی: `amountTo = amountFrom / rate`)
-  - برای IRR → USDT: ریال به ازای ۱ تتر (مثال: ۶۰,۰۰۰)
-  - برای EUR → USD: یورو به ازای ۱ دلار
-  - برای هر جفت ارز: مقدار ارز From به ازای ۱ واحد ارز To
+ - برای IRR → USDT: ریال به ازای ۱ تتر (مثال: ۶۰,۰۰۰)
+ - برای EUR → USD: یورو به ازای ۱ دلار
+ - برای هر جفت ارز: مقدار ارز From به ازای ۱ واحد ارز To
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
-> **نکته توضیحی**: این جدول **عمومی** برای هر جفت‌ارزی است.  
-> برای محاسبه: `amountTo = amountFrom / rate` (یا `amountFrom = amountTo * rate`).  
+> **نکته توضیحی**: این جدول **عمومی** برای هر جفت‌ارزی است. 
+> برای محاسبه: `amountTo = amountFrom / rate` (یا `amountFrom = amountTo * rate`). 
 > **یکسان‌سازی**: در تراکنش‌های واقعی (Income, Expense, Loan, Stocks, Crypto و غیره)، نرخ تبدیل لحظه‌ای نسبت به **ارز پایه کاربر** (`baseCurrency` در `cur_currency_preferences`) ثبت می‌شود (فیلد `exchangeRateToBase` در جداول مربوطه)، نه صرفاً نسبت به تتر. این جدول (`cur_exchange_rates`) برای ذخیره تمام نرخ‌های ارزی بین هر جفت ارز دلخواه است و نام‌گذاری عمومی `rate` آن را روشن‌تر می‌کند.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
@@ -78,7 +78,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته**:  
+> **نکته**: 
 > طبق مدل چندکاربری مستندشده در `db.md` (هر کاربر = یک فایل دیتابیس SQLite مستقل)، نیازی به فیلد `userId` در این جدول یا هیچ جدول دیگری نیست؛ هر کاربر دیتابیس و به تبع آن تنظیمات ارز مستقل خودش را دارد.
 
 ---
@@ -110,7 +110,7 @@
 
 - **Accounts & Banking**: ذخیره `currency` در Account و `exchangeRateToBase` در تراکنش‌ها
 - **Income / Expense**: ذخیره `currency` در تراکنش و تبدیل به نرخ لحظه
-- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToBase` برای هر تراکنش و محاسبه `totalFeesPaidBase` (BUG-C04؛ نه USDT سخت‌کد)
+- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToBase` برای هر تراکنش و محاسبه `totalFeesPaidBase` (؛ نه USDT سخت‌کد)
 - **Physical Assets**: ذخیره `currency` و `exchangeRateToBase` در خرید و فروش
 - **Budget**: نمایش مبالغ در ارز پیش‌فرض کاربر
 - **Financial Goals**: نمایش پیشرفت اهداف به ارز پیش‌فرض
@@ -135,34 +135,34 @@ import Decimal from 'decimal.js';
 // یعنی: amountTo = amountFrom / rate
 
 async function convert(
-  amount: Decimal,
-  fromCurrency: string,
-  toCurrency: string
+ amount: Decimal,
+ fromCurrency: string,
+ toCurrency: string
 ): Promise<Decimal> {
-  if (fromCurrency === toCurrency) return amount;
+ if (fromCurrency === toCurrency) return amount;
 
-  // ۱. تلاش برای نرخ مستقیم
-  const directRate = await getExchangeRate(fromCurrency, toCurrency);
-  if (directRate) {
-    return amount.dividedBy(directRate.rate);
-  }
+ // ۱. تلاش برای نرخ مستقیم
+ const directRate = await getExchangeRate(fromCurrency, toCurrency);
+ if (directRate) {
+ return amount.dividedBy(directRate.rate);
+ }
 
-  // ۲. تلاش برای نرخ معکوس مستقیم (toCurrency → fromCurrency)
-  const inverseRate = await getExchangeRate(toCurrency, fromCurrency);
-  if (inverseRate) {
-    return amount.times(inverseRate.rate);
-  }
+ // ۲. تلاش برای نرخ معکوس مستقیم (toCurrency → fromCurrency)
+ const inverseRate = await getExchangeRate(toCurrency, fromCurrency);
+ if (inverseRate) {
+ return amount.times(inverseRate.rate);
+ }
 
-  // ۳. تبدیل چندمرحله‌ای از طریق USDT به‌عنوان ارز واسط
-  //    مثال: BTC → USDT → IRR
-  if (fromCurrency !== 'USDT' && toCurrency !== 'USDT') {
-    const toUSDT = await convert(amount, fromCurrency, 'USDT');
-    return convert(toUSDT, 'USDT', toCurrency);
-  }
+ // ۳. تبدیل چندمرحله‌ای از طریق USDT به‌عنوان ارز واسط
+ // مثال: BTC → USDT → IRR
+ if (fromCurrency !== 'USDT' && toCurrency !== 'USDT') {
+ const toUSDT = await convert(amount, fromCurrency, 'USDT');
+ return convert(toUSDT, 'USDT', toCurrency);
+ }
 
-  throw new Error(
-    `مسیر تبدیل بین ${fromCurrency} و ${toCurrency} یافت نشد — نرخ دستی وارد کنید`
-  );
+ throw new Error(
+ `مسیر تبدیل بین ${fromCurrency} و ${toCurrency} یافت نشد — نرخ دستی وارد کنید`
+ );
 }
 ```
 
@@ -181,7 +181,7 @@ async function convert(
 
 ---
 
-## قرارداد `exchangeRateToBase` واقعی (BUG-003)
+## قرارداد `exchangeRateToBase` واقعی
 
 ### تعریف صحیح
 `exchangeRateToBase` = چند واحد **ارز پایه کاربر** (`cur_currency_preferences.baseCurrency`) به ازای **۱ واحد ارز تراکنش** در لحظه ثبت.

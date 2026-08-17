@@ -53,13 +53,13 @@ IndexedDB
 sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال افزایشی به IndexedDB ندارد؛ برای اجرای پایدار به‌عنوان PWA نصب‌شده روی موبایل، موارد زیر **الزامی** است (جزئیات کامل در `core/db/db.md`):
 
 - نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی رخ ندهد.
-- **Persist مالی (باگ ۴۳)**: UI «ثبت شد» فقط بعد از COMMIT + await موفق IndexedDB swap؛ `beforeunload`/`visibilitychange` فقط best-effort هستند و روی موبایل تضمین نیستند.
+- **Persist مالی**: UI «ثبت شد» فقط بعد از COMMIT + await موفق IndexedDB swap؛ `beforeunload`/`visibilitychange` فقط best-effort هستند و روی موبایل تضمین نیستند.
 - **Persistence queue + Worker (باگ‌های ۴۴–۴۵)**: serialize سنگین و گزارش‌های حجیم نباید Main Thread را قفل کنند؛ جزئیات در `core/db/db.md`.
 - در اولین اجرا `navigator.storage.persist()` فراخوانی شود.
 - **Service Worker** برای Cache کردن App Shell و WASM sql.js الزامی است.
 - **Migration / Backup-Restore atomic (باگ‌های ۴۶–۴۸)**: قرارداد در `db.md` و `Settings-Tools.md` — بدون integrity check، Restore مجاز نیست.
-- **Internal API (باگ ۴۹)**: UI و Feature A هرگز مستقیماً به جداول Feature B یا sql.js خام دسترسی ندارند؛ فقط از طریق API عمومی همان Feature.
-- **Atomic Financial Operation (باگ ۵۰)**: قالب مشترک BEGIN→validate→writes→COMMIT→persist در `db.md`.
+- **Internal API**: UI و Feature A هرگز مستقیماً به جداول Feature B یا sql.js خام دسترسی ندارند؛ فقط از طریق API عمومی همان Feature.
+- **Atomic Financial Operation**: قالب مشترک BEGIN→validate→writes→COMMIT→persist در `db.md`.
 - **Web App Manifest** (`manifest.json`) با آیکون، `display: standalone` و `start_url` باید تعریف شود.
 - یادآوری پشتیبان‌گیری دوره‌ای (Export فایل SQLite) در Dashboard نمایش داده شود، چون ماندگاری IndexedDB روی موبایل تضمین‌شده نیست.
 - مسیر ارتقای آینده در صورت رشد حجم داده: **wa-sqlite با OPFS**.
@@ -72,24 +72,24 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 
 **استثناهای مجاز** (فقط همین سه مورد؛ هر مورد جدید باید صریحاً به همین لیست اضافه شود، نه به‌صورت پیش‌فرض مجاز فرض شود):
 
-1. **بررسی نسخه (Version Check)** — **استثنای صریح Offline-first (BUG-032)**: هر بار باز شدن اپ، در پس‌زمینه و بدون مسدود کردن UI، یک درخواست سبک به Endpoint استاتیک نسخه ممکن است زده شود. این Network **فقط وقتی کاربر opt-in کرده** (`autoVersionCheckEnabled=true`) اجرا می‌شود — **پیش‌فرض نصب تازه = false (BUG-C02 Offline-by-default)**.
-   - پیش‌فرض نصب تازه: `autoVersionCheckEnabled=false` (کاملاً آفلاین تا opt-in). با روشن کردن دستی در Settings، Startup می‌تواند یک درخواست نسخه بزند.
-   - در Onboarding/Settings/Install docs باید نوشته شود: «با روشن بودن بررسی نسخه، در Startup یک درخواست شبکه زده می‌شود».
-   - بدون این شفافیت، ادعای «کاملاً آفلاین» گمراه‌کننده است.
-   - این درخواست **هیچ داده مالی یا شخصی کاربر را ارسال نمی‌کند** — فقط شماره نسخه فعلی اپ (برای مقایسه) و هیچ شناسه‌ای که بتواند به کاربر خاصی نسبت داده شود.
-   - شکست این درخواست (آفلاین بودن، سرور در دسترس نبودن) **کاملاً بی‌صدا** مدیریت می‌شود؛ هیچ خطا یا پیامی به کاربر نشان داده نمی‌شود و اپ دقیقاً مثل قبل کار می‌کند.
-   - پیش‌فرض خاموش است (BUG-C02). اگر کاربر opt-in کند، Startup درخواست نسخه می‌زند؛ در غیر این صورت فقط دکمه دستی «بررسی به‌روزرسانی» در Settings.
+1. **بررسی نسخه (Version Check)** — **استثنای صریح Offline-first**: هر بار باز شدن اپ، در پس‌زمینه و بدون مسدود کردن UI، یک درخواست سبک به Endpoint استاتیک نسخه ممکن است زده شود. این Network **فقط وقتی کاربر opt-in کرده** (`autoVersionCheckEnabled=true`) اجرا می‌شود — **پیش‌فرض نصب تازه = false ( Offline-by-default)**.
+ - پیش‌فرض نصب تازه: `autoVersionCheckEnabled=false` (کاملاً آفلاین تا opt-in). با روشن کردن دستی در Settings، Startup می‌تواند یک درخواست نسخه بزند.
+ - در Onboarding/Settings/Install docs باید نوشته شود: «با روشن بودن بررسی نسخه، در Startup یک درخواست شبکه زده می‌شود».
+ - بدون این شفافیت، ادعای «کاملاً آفلاین» گمراه‌کننده است.
+ - این درخواست **هیچ داده مالی یا شخصی کاربر را ارسال نمی‌کند** — فقط شماره نسخه فعلی اپ (برای مقایسه) و هیچ شناسه‌ای که بتواند به کاربر خاصی نسبت داده شود.
+ - شکست این درخواست (آفلاین بودن، سرور در دسترس نبودن) **کاملاً بی‌صدا** مدیریت می‌شود؛ هیچ خطا یا پیامی به کاربر نشان داده نمی‌شود و اپ دقیقاً مثل قبل کار می‌کند.
+ - پیش‌فرض خاموش است. اگر کاربر opt-in کند، Startup درخواست نسخه می‌زند؛ در غیر این صورت فقط دکمه دستی «بررسی به‌روزرسانی» در Settings.
 2. **اعتبارسنجی لایسنس (License Validation)** — **در نسخه ۱ اصلاً وجود ندارد** (سیستم فعلاً تک‌کاربره و بدون لایسنس است، طبق مدل «هر کاربر = یک فایل دیتابیس مستقل» در `db.md`). وقتی در نسخه‌های بعدی قابلیت اشتراک/لایسنس‌دهی اضافه شد، اعتبارسنجی لایسنس هم مثل بررسی نسخه رفتار می‌کند:
-   - فقط در Startup اپ (و اختیاراً با یک تلاش مجدد دوره‌ای طولانی، مثلاً هر ۲۴ ساعت یک‌بار، نه بیشتر) یک Request سبک برای تأیید اعتبار کلید لایسنس زده می‌شود.
-   - **Grace Period اجباری**: اگر سرور لایسنس در دسترس نبود (کاربر آفلاین یا سرور Down)، اپ هرگز بلافاصله قفل نمی‌شود؛ آخرین وضعیت معتبر لایسنس (کش‌شده محلی، همراه با `lastValidatedAt`) تا حداقل یک بازه Grace مشخص (مثلاً ۱۴ روز از آخرین اعتبارسنجی موفق) معتبر فرض می‌شود — دقیقاً برای این‌که کاربری که واقعاً می‌خواهد آفلاین کار کند، هرگز به‌خاطر لایسنس قفل نشود.
-   - این بخش باید در همان زمان طراحی نسخه لایسنس‌دار، به‌عنوان سند جدا (`Licensing.md`) با جزئیات کامل مستند شود؛ این پاراگراف فقط اصل «چطور با اصل Offline-First سازگار بماند» را از حالا قفل می‌کند تا در طراحی نهایی فراموش نشود.
+ - فقط در Startup اپ (و اختیاراً با یک تلاش مجدد دوره‌ای طولانی، مثلاً هر ۲۴ ساعت یک‌بار، نه بیشتر) یک Request سبک برای تأیید اعتبار کلید لایسنس زده می‌شود.
+ - **Grace Period اجباری**: اگر سرور لایسنس در دسترس نبود (کاربر آفلاین یا سرور Down)، اپ هرگز بلافاصله قفل نمی‌شود؛ آخرین وضعیت معتبر لایسنس (کش‌شده محلی، همراه با `lastValidatedAt`) تا حداقل یک بازه Grace مشخص (مثلاً ۱۴ روز از آخرین اعتبارسنجی موفق) معتبر فرض می‌شود — دقیقاً برای این‌که کاربری که واقعاً می‌خواهد آفلاین کار کند، هرگز به‌خاطر لایسنس قفل نشود.
+ - این بخش باید در همان زمان طراحی نسخه لایسنس‌دار، به‌عنوان سند جدا (`Licensing.md`) با جزئیات کامل مستند شود؛ این پاراگراف فقط اصل «چطور با اصل Offline-First سازگار بماند» را از حالا قفل می‌کند تا در طراحی نهایی فراموش نشود.
 
 3. **به‌روزرسانی Service Worker (App Shell Update)** — رفتار استاندارد PWA (W3C): مرورگر به‌صورت خودکار و دوره‌ای (`navigator.serviceWorker.register` / `updatefound`) فایل `sw.js` را برای یافتن نسخه جدید App Shell چک می‌کند. این از قانون کلی مستثناست چون:
-   - بخشی از چرخه عمر عادی PWA است، نه یک ویژگی محصول قابل خاموش کردن.
-   - هیچ داده مالی یا شخصی کاربر رد و بدل نمی‌شود — فقط فایل‌های استاتیک اپ (JS، CSS، WASM).
-   - رفتار کاملاً استاندارد W3C است و توسط مرورگر کنترل می‌شود، نه کد اپ.
-   - **تفاوت با استثنای ۱ (Version Check)**: Version Check یک درخواست اپ‌محور برای نمایش شماره نسخه به کاربر است؛ App Shell Update یک درخواست مرورگر‌محور برای بارگذاری فایل‌های جدید کد است — دو مکانیزم جداگانه با هدف جداگانه.
-   - نصب نسخه جدید بعد از دانلود، طبق رفتار استاندارد Service Worker، تا بسته/باز شدن مجدد Tab توسط کاربر به تعویق می‌افتد (`skipWaiting` فقط با تأیید کاربر استفاده شود).
+ - بخشی از چرخه عمر عادی PWA است، نه یک ویژگی محصول قابل خاموش کردن.
+ - هیچ داده مالی یا شخصی کاربر رد و بدل نمی‌شود — فقط فایل‌های استاتیک اپ (JS، CSS، WASM).
+ - رفتار کاملاً استاندارد W3C است و توسط مرورگر کنترل می‌شود، نه کد اپ.
+ - **تفاوت با استثنای ۱ (Version Check)**: Version Check یک درخواست اپ‌محور برای نمایش شماره نسخه به کاربر است؛ App Shell Update یک درخواست مرورگر‌محور برای بارگذاری فایل‌های جدید کد است — دو مکانیزم جداگانه با هدف جداگانه.
+ - نصب نسخه جدید بعد از دانلود، طبق رفتار استاندارد Service Worker، تا بسته/باز شدن مجدد Tab توسط کاربر به تعویق می‌افتد (`skipWaiting` فقط با تأیید کاربر استفاده شود).
 
 > **نکته مهم**: `19-Price-Fetching` **جزو این استثناها نیست**. دریافت قیمت دارایی‌ها (کریپتو، سهام، صندوق، فلزات) طبق `Price-Fetching.md` همیشه یا با کلیک صریح کاربر یا با Auto-Sync که خودِ کاربر روشن کرده انجام می‌شود — نه به‌صورت خودکار در Startup مثل بررسی نسخه. تفاوت کلیدی: بررسی نسخه هیچ دادهٔ کاربر را لمس نمی‌کند و صرفاً یک عدد ثابت را می‌خواند؛ دریافت قیمت به تعداد و نوع دارایی‌های واقعی کاربر (اطلاعات مالی حساس) وابسته است و به همین دلیل استاندارد سخت‌گیرانه‌تری دارد.
 
@@ -98,57 +98,57 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 
 ```bash
 src/
-├── core/                  # هسته مشترک
-│   ├── utils/             # Utilities (تاریخ شمسی، فرمت اعداد و ...)
-│   ├── hooks/             # Hookهای مشترک
-│   ├── services/          # سرویس‌های پایه (Currency, Event Bus و ...)
-│   └── types/             # TypeScript Types مشترک
+├── core/ # هسته مشترک
+│ ├── utils/ # Utilities (تاریخ شمسی، فرمت اعداد و ...)
+│ ├── hooks/ # Hookهای مشترک
+│ ├── services/ # سرویس‌های پایه (Currency, Event Bus و ...)
+│ └── types/ # TypeScript Types مشترک
 │
-├── features/              # هر فیچر به صورت مستقل
-│   ├── accounts/
-│   │   ├── public-api.ts  # تنها نقطه ورود مجاز برای سایر فیچرها و UI
-│   │   └── ...            # منطق داخلی، db queries، domain services
-│   ├── income/
-│   ├── expense/
-│   ├── cheque/
-│   ├── debt-loan/
-│   ├── investment/
-│   ├── physical-assets/
-│   ├── budget/
-│   ├── goals/
-│   ├── bills/
-│   └── settings/
-│   # هر پوشه فیچر یک فایل public-api.ts دارد (همین ساختار accounts/ برای همه)
+├── features/ # هر فیچر به صورت مستقل
+│ ├── accounts/
+│ │ ├── public-api.ts # تنها نقطه ورود مجاز برای سایر فیچرها و UI
+│ │ └── ... # منطق داخلی، db queries، domain services
+│ ├── income/
+│ ├── expense/
+│ ├── cheque/
+│ ├── debt-loan/
+│ ├── investment/
+│ ├── physical-assets/
+│ ├── budget/
+│ ├── goals/
+│ ├── bills/
+│ └── settings/
+│ # هر پوشه فیچر یک فایل public-api.ts دارد (همین ساختار accounts/ برای همه)
 │
-├── components/            # کامپوننت‌های UI مشترک
-├── lib/                   # کتابخانه‌های کمکی
-├── db/                    # تنظیمات دیتابیس (sql.js + SQLite)
-│   ├── db.ts              # اتصال به دیتابیس
-│   ├── schema.sql         # تعریف جداول با SQL
-│   ├── models.ts          # TypeScript types
-│   ├── migrations.ts      # مدیریت مایگRATION‌ها
-│   └── queries/           # کوئری‌های SQL
-├── stores/                # Zustand stores
-├── api/                   # Re-export/Facade اختیاری از public-api هر فیچر (باگ ۴۹)
-│   │                      # هیچ منطقی اینجا نوشته نمی‌شود — فقط re-export برای راحتی import در UI
-│   │                      # مثال: api/accounts.ts → export * from '../features/accounts/public-api'
+├── components/ # کامپوننت‌های UI مشترک
+├── lib/ # کتابخانه‌های کمکی
+├── db/ # تنظیمات دیتابیس (sql.js + SQLite)
+│ ├── db.ts # اتصال به دیتابیس
+│ ├── schema.sql # تعریف جداول با SQL
+│ ├── models.ts # TypeScript types
+│ ├── migrations.ts # مدیریت مایگRATION‌ها
+│ └── queries/ # کوئری‌های SQL
+├── stores/ # Zustand stores
+├── api/ # Re-export/Facade اختیاری از public-api هر فیچر
+│ │ # هیچ منطقی اینجا نوشته نمی‌شود — فقط re-export برای راحتی import در UI
+│ │ # مثال: api/accounts.ts → export * from '../features/accounts/public-api'
 ├── assets/
 ├── styles/
 public/
-├── manifest.json          # Web App Manifest (نصب PWA روی موبایل)
-├── sw.ts                  # Service Worker (Cache App Shell + WASM sql.js)
-└── icons/                 # آیکون‌های PWA
+├── manifest.json # Web App Manifest (نصب PWA روی موبایل)
+├── sw.ts # Service Worker (Cache App Shell + WASM sql.js)
+└── icons/ # آیکون‌های PWA
 ```
 
 ---
 
-## قرارداد دسترسی بین لایه‌ها (باگ ۴۹)
+## قرارداد دسترسی بین لایه‌ها
 
 ```text
 UI / Hooks
-  → Feature Public API  (مثلاً createCryptoBuy, repayLoan)
-    → Domain Service
-      → db layer (sql.js)  — فقط داخل همان Feature یا core shared helpers
+ → Feature Public API (مثلاً createCryptoBuy, repayLoan)
+ → Domain Service
+ → db layer (sql.js) — فقط داخل همان Feature یا core shared helpers
 ```
 
 ممنوع:
@@ -172,7 +172,7 @@ UI / Hooks
 
 ---
 
-## مرز License و داده مالی (باگ ۵۸)
+## مرز License و داده مالی
 
 مدل v1: **هر کاربر منطقی = یک فایل SQLite مستقل** (مناسب offline).
 
@@ -185,9 +185,9 @@ UI / Hooks
 
 ---
 
-## API Key Secret Lifecycle (BUG-033)
+## API Key Secret Lifecycle
 
-علاوه بر UX Session Storage (باگ ۳۷):
+علاوه بر UX Session Storage:
 
 | رویداد | رفتار |
 |--------|--------|
@@ -202,7 +202,7 @@ UI / Hooks
 
 ---
 
-## Enforce مرز Feature (BUG-040)
+## Enforce مرز Feature
 
 قرارداد `UI → Feature API → Domain → DB` باید در implementation قابل enforce باشد:
 

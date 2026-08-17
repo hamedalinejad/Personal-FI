@@ -149,12 +149,12 @@
 ### Backup APIs
 - `createBackup()` → Export SQLite + متادیتا (`schemaVersion`, `appVersion`, `exportedAt`, `checksum`) + ثبت `stg_backup_logs`
 - `restoreBackup(file)` → **Atomic Restore** با Integrity Contract (باگ‌های ۴۷–۴۸):
-  1. تأیید کاربر
-  2. checksum + schemaVersion + load temp
-  3. `integrity_check` + `foreign_key_check` + required tables
-  4. migration روی temp در صورت نیاز
-  5. فقط در موفقیت کامل → swap با `db_main` (DB قبلی تا آن لحظه سالم می‌ماند)
-  6. هر شکست → abort بدون overwrite
+ 1. تأیید کاربر
+ 2. checksum + schemaVersion + load temp
+ 3. `integrity_check` + `foreign_key_check` + required tables
+ 4. migration روی temp در صورت نیاز
+ 5. فقط در موفقیت کامل → swap با `db_main` (DB قبلی تا آن لحظه سالم می‌ماند)
+ 6. هر شکست → abort بدون overwrite
 - `listBackups()` → دریافت لیست با `backupType` و `backupDate`
 - `deleteBackup(backupLogId)` → حذف رکورد + فایل
 - `getBackupInfo(backupLogId)` → جزئیات + schemaVersion + checksum
@@ -180,7 +180,7 @@
 ## تنظیمات پیشنهادی پیش‌فرض
 
 | کلید | مقدار پیش‌فرض |
-| `autoVersionCheckEnabled` | `false` (BUG-C02 Offline-by-default) |
+| `autoVersionCheckEnabled` | `false` ( Offline-by-default) |
 |------|----------------|
 | `language` | `fa` |
 | `theme` | `system` |
@@ -200,7 +200,7 @@
 
 - `database` — بایت‌های SQLite
 - `meta.json` — `{ schemaVersion, appVersion, exportedAt, checksum, tableCounts? }`
-- checksum باید قبل از Restore مطابقت کند (باگ ۴۷)
+- checksum باید قبل از Restore مطابقت کند
 
 
 ### نکات
@@ -218,7 +218,7 @@
 - از شلوغ کردن صفحه تنظیمات با گزینه‌های پیشرفته غیرضروری خودداری شود.
 - در نسخه‌های بعدی می‌توان Import/Export پیشرفته‌تر و همگام‌سازی ابری اختیاری اضافه کرد.
 
-### قوانین Backup/Restore (باگ ۴۷–۴۸)
+### قوانین Backup/Restore
 
 1. Backup بدون `schemaVersion` و `checksum` ناقص است و در v1 نباید به‌عنوان backup کامل پذیرفته شود.
 2. Restore هرگز مستقیماً روی `db_main` نمی‌نویسد مگر پس از validate کامل روی temp.
