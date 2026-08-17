@@ -869,3 +869,22 @@ ok = delta.isZero
 4. `navigator.storage.persist()` یک‌بار؛ نتیجه را در settings نشان بده
 5. هر write: mutate memory DB → enqueue persist (temp key → swap)
 6. قبل از unload: تلاش برای flush queue (موبایل تضمین نیست — موفقیت فقط بعد از persist صریح)
+
+---
+
+### Fixtureهای تست Reconciliation (حداقل)
+
+| Fixture | Arrange | Assert |
+|---------|---------|--------|
+| `account_ok` | deposit 100 + expense 40 | `reconcileAccount` ok؛ balance=60 |
+| `account_corrupt_snapshot` | ledger صحیح؛ snapshot دستی غلط | ok=false؛ rebuild → ok |
+| `crypto_buy_sell` | buy 1 + sell 0.4 | holding qty/cost match rebuild |
+| `crypto_transfer_fee` | transfer 1 fee 0.001 | Σ qty کاهش 0.001؛ reconcile ok |
+| `cheque_cleared` | pending→cleared | ماتریس status/tx ids |
+| `cheque_bounce_after_clear` | cleared→bounced | original void + reversal id |
+| `loan_two_installments` | create + 2 pays | remainingBalance = rebuild |
+| `fif_nav_vs_buy` | buy at subscription ≠ NAV | units/totalInvested از trades نه NAV |
+| `metals_purity` | 1000mg 18k | fineWeight calc؛ holding key type+purity |
+
+همه assertها با decimal string و `delta === '0'`.
+Repair فقط API صریح با flag کاربر؛ تست‌ها Repair را جدا از reconcile بخوانند.
