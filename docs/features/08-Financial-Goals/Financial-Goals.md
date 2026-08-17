@@ -68,7 +68,7 @@
 - `color` → string (اختیاری)
 - `accountId` → UUID (حساب مرتبط برای واریز/برداشت — nullable)
 - `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه ایجاد — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -84,7 +84,7 @@
 - `envelopeId` → UUID (nullable)
 - `note` → string
 - `date` → datetime
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 
 ---
