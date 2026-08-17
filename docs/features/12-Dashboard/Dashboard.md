@@ -195,3 +195,10 @@
  }
 }
 ```
+
+---
+
+## راهنمای پیاده‌سازی
+- Dashboard فقط aggregate از Feature APIs (Accounts, Portfolio, Notifications, …)
+- بدون business logic مالی جدید
+- layout از `stg_settings` / dash_layouts

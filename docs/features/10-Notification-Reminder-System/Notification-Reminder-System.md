@@ -165,3 +165,11 @@
 - از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
 - در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
 - تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.
+
+---
+
+## راهنمای پیاده‌سازی
+- فقط local؛ بدون push سرور در v1
+- `relatedFeature` + `relatedId` از enum مرکزی
+- category با RelatedFeature هم‌نقشه (جدول نگاشت در همین سند)
+- مصرف‌کننده: Cheque due، Budget، Loan installment، Bills

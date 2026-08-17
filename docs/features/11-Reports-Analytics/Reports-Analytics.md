@@ -179,3 +179,11 @@
 - **چک‌های پرداختی معلق (اختیاری)**: چک‌های صادرشده با وضعیت `pending` که هنوز از حساب کسر نشده‌اند یک تعهد مالی آتی واقعی‌اند. `getNetWorth` می‌تواند این مبلغ را (از طریق `getPendingPayableChequesByAccount`) به‌عنوان بدهی احتمالی نمایش دهد تا کاربر بین «Net Worth فعلی» و «Net Worth پس از تسویه تعهدات معلق» تمایز قائل شود. (مرتبط با مورد ۲۱ — `getAvailableBalance`)
 
 ### Net Worth = دارایی‌ها − بدهی‌ها
+
+---
+
+## راهنمای پیاده‌سازی
+- گزارش‌ها **read-only**؛ از ledger/journal و API فیچرها — بدون SQL خام به جداول دیگران در لایه UI
+- `getNetWorth` Wrapper روی `Portfolio.calculateNetWorth`
+- فیلتر تاریخ روی businessDate/date؛ فقط isVoided=false
+- مبالغ خروجی decimal string + تبدیل اختیاری به base
