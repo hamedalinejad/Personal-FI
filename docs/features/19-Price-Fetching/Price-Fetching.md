@@ -91,15 +91,18 @@
 5. **تشخیص شبکه (باگ ۳۸)**: `navigator.onLine === true` فقط پیش‌شرط اولیه است و **تضمین دسترسی واقعی به API نیست**.
    - اگر `navigator.onLine === false` → هیچ Request ای زده نمی‌شود؛ `{ skipped: true, reason: 'offline' }`.
    - اگر `onLine === true` ولی درخواست شکست بخورد، خطا باید در یکی از این کلاس‌ها طبقه‌بندی شود (نه یک `failed` مبهم):
-     | `failureKind` | معنی |
-     |---------------|------|
-     | `network_error` | DNS / اتصال قطع / failed to fetch |
-     | `timeout` | فراتر از مهلت (مثلاً ۱۰–۱۵ ثانیه) |
-     | `http_error` | وضعیت HTTP غیر ۲xx (۴۰۱، ۴۲۹، ۵xx، ...) + `httpStatus` |
-     | `invalid_payload` | JSON نامعتبر یا شکل پاسخ غیرمنتظره |
-     | `validation_error` | پاسخ parse شد ولی از Domain Validation رد شد (باگ ۳۹) |
-     | `rate_limit` | محدودیت نرخ (اغلب زیرمجموعه http 429) |
-     | `not_found` | نماد در Provider نیست |
+     | `failureKind` | معنی | جایگاه در خروجی |
+     |---------------|------|-----------------|
+     | `network_error` | DNS / اتصال قطع / failed to fetch | `failed[]` |
+     | `timeout` | فراتر از مهلت (مثلاً ۱۰–۱۵ ثانیه) | `failed[]` |
+     | `http_error` | وضعیت HTTP غیر ۲xx (۴۰۱، ۴۲۹، ۵xx، ...) + `httpStatus` | `failed[]` |
+     | `invalid_payload` | JSON نامعتبر یا شکل پاسخ غیرمنتظره | `failed[]` |
+     | `validation_error` | پاسخ parse شد ولی از Domain Validation رد شد (باگ ۳۹) | `failed[]` |
+     | `rate_limit` | محدودیت نرخ (اغلب زیرمجموعه http 429) | `failed[]` |
+     | `not_found` | نماد در Provider نیست | `failed[]` |
+     | `offline` | `navigator.onLine === false` — بدون Request | `skipped[]` با `reason: 'offline'` |
+     | `api_key_required` | منبع `requiresApiKey=true` ولی کلید API در Session Storage نیست (باگ ۳۷) | `skipped[]` با `reason: 'api_key_required'` — **نه** `failed[]` |
+   > **تفکیک failed/skipped**: `failed[]` فقط برای خطاهایی است که Request واقعاً زده شد و شکست خورد؛ `skipped[]` برای مواردی که عمداً بدون Request رد شدند (`offline`, `api_key_required`). این تمایز در UI هم باید حفظ شود: skipped = «نیاز به اقدام کاربر»، failed = «خطای فنی — Retry مفید است».
    - Partial Success حفظ می‌شود: شکست یک نماد/Batch بقیه را متوقف نمی‌کند.
    - UI می‌تواند برای `timeout`/`network_error` پیام «سرور در دسترس نیست» و برای `validation_error` پیام «داده نامعتبر از منبع» نشان دهد.
 6. اگر اتصال اینترنت یا API در دسترس نباشد، آخرین قیمت کش‌شده (آخرین رکورد `price_history`، صرف‌نظر از `manual`/`api` بودنش) همراه با برچسب «قیمت قدیمی — آخرین به‌روزرسانی: [تاریخ/ساعت]» نمایش داده می‌شود؛ خطای دریافت هرگز نباید مانع کارکرد بقیه اپ (دیدن پرتفوی، ثبت تراکنش جدید و ...) شود.
@@ -112,7 +115,7 @@
      - کاربر در اولین `fetch` یا وقتی Auto-Sync به منبع `requiresApiKey=true` برسد و کلید نباشد، باید دوباره وارد کند (پرامپت در Settings یا مودال دریافت قیمت).
    - **UX الزامی وقتی کلید نیست**:
      - دکمه «دریافت قیمت‌ها» → مودال «API Key لازم است» با فیلد ورود + لینک به محل دریافت کلید Provider؛ پس از ورود، فقط در Session Storage ذخیره و همان لحظه Fetch ادامه می‌یابد.
-     - Auto-Sync → آن منبع Skip می‌شود؛ در UI وضعیت «کلید API وارد نشده — Sync انجام نشد»؛ **هیچ** Request بی‌کلید و **هیچ** پرامپت مزاحم تکراری در پس‌زمینه.
+     - Auto-Sync → آن منبع Skip می‌شود؛ در خروجی `PriceFetchResult`، نمادهای آن منبع در `skipped[]` با `reason: 'api_key_required'` می‌روند (**نه** در `failed[]`)؛ در UI وضعیت «کلید API وارد نشده — Sync انجام نشد»؛ **هیچ** Request بی‌کلید و **هیچ** پرامپت مزاحم تکراری در پس‌زمینه.
    - **عمداً خارج از نسخه ۱** (مسیر آینده، نه پیاده‌سازی الان):
      - «Remember on this device» با رمزنگاری Web Crypto (AES-GCM) در LocalStorage
      - Credential Vault / اتصال به قفل اپ (PIN/biometrics) برای باز کردن کلید
