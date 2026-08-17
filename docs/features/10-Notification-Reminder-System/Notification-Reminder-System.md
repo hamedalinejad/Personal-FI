@@ -61,6 +61,7 @@
 - `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
 - `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`)
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
+- `dedupeKey` → string (nullable — کلید یکتایی منطقی برای جلوگیری از اعلان تکراری؛ فرمت پیشنهادی: `{category}:{relatedFeature}:{relatedId}:{dueDate-YYYY-MM}`؛ قبل از ساخت اعلان جدید در `generateDueReminders()` بررسی می‌شود که اعلان فعالی با همین `dedupeKey` وجود نداشته باشد)
 - `isRead` → boolean
 - `scheduledAt` → datetime (زمان برنامه‌ریزی‌شده برای نمایش)
 - `createdAt` → datetime
@@ -111,7 +112,7 @@
 - `deactivateCustomReminder(notifReminderId)`
 
 ### Scheduler APIs
-- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)
+- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود) — این تضمین می‌کند هر بار اجرای Job اعلان تکراری تولید نکند
 - `checkBudgetAlerts()` → بررسی وضعیت بودجه‌ها
 - `checkGoalProgress()` → بررسی پیشرفت اهداف
 
@@ -159,6 +160,6 @@
 - اعلان‌ها باید سبک و غیرمزاحم باشند.
 - در حالت Offline، اعلان‌ها به صورت محلی ذخیره و نمایش داده می‌شوند.
 - Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند.
-- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود.
+- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders()` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
 - در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
 - تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.
