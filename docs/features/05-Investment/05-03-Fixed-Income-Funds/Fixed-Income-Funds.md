@@ -153,8 +153,7 @@ Domain Entities
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal
-- `predictedProfit` → decimal (nullable — فقط در nav_update و dividend)
-- `actualProfit` → decimal (nullable — فقط در nav_update و dividend)
+- `predictedProfit` → decimal (nullable — فقط در nav_update و dividend؛ توسط کاربر هنگام ثبت وارد می‌شود برای مقایسه با سود واقعی محاسبه‌شده توسط `getProfitComparison`)
 - `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی — issuance_redemption)
 - `accountTransactionId` → UUID (لینک به acc_transactions)
 - `description` → string
@@ -192,7 +191,22 @@ createTransaction(data) → خرید، فروش، واریز/برداشت مست
 updateNAV(fundId, nav, date) → ثبت NAV جدید (از نسخه ۱، این تابع یک Wrapper نازک روی `setManualFundNAV` فیچر `19-Price-Fetching` است تا NAV هم در `price_history` مرکزی و هم در `inv_fif_holdings.currentNAV` ثبت شود؛ جزئیات کامل در `19-03-Fund-NAV/Fund-NAV.md`)
 getHoldings() / getHoldingByFund(fundId)
 getPortfolioValue() → ارزش کل + معادل تتری
-getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (بر اساس تراکنش‌ها)
+getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (Derived — محاسبه در لحظه، نه Stored)
+
+  **فرمول سود واقعی در بازه `period`**:
+  ```
+  سود واقعی =
+    Σ amount تراکنش‌های dividend در بازه
+    + (currentNAV × currentUnits) - (avgBuyNAV × currentUnits)  ← Unrealized component
+    + realizedPL تراکنش‌های sell در بازه
+  ```
+  **فرمول سود پیش‌بینی‌شده در بازه `period`**:
+  ```
+  Σ predictedProfit تراکنش‌های nav_update و dividend در بازه
+  ```
+  خروجی: `{ predicted: Decimal, actual: Decimal, delta: Decimal, period }`
+
+  > `actualProfit` به‌صورت ستون ذخیره‌شده در `inv_fif_transactions` وجود **ندارد** — سود واقعی همیشه در لحظه از تراکنش‌های `dividend`، تغییرات NAV، و `sell`ها محاسبه می‌شود. این جدول فقط لاگ است.
 calculateProfitLoss(fundId?) → سود/زیان تحقق‌یافته از فروش/ابطال واحد (جدا از سود تقسیمی — به بخش «منطق محاسبه سود/زیان تحقق‌یافته» مراجعه شود)
 
 
