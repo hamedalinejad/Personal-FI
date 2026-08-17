@@ -48,6 +48,8 @@
 - `maxFailedAttempts` → number (حداکثر تلاش ناموفق قبل از فعال‌شدن Backoff — **نه پاک‌سازی**)
 - `biometricEnabled` → boolean (آیا FaceID/TouchID مجاز است؟)
 - `pinEnabled` → boolean (آیا PIN مجاز است؟)
+- `pinHash` → string (nullable — هش PIN با PBKDF2/bcrypt؛ فقط وقتی `pinEnabled=true` پر می‌شود)
+- `pinSalt` → string (nullable — نمک تصادفی؛ اگر bcrypt استفاده شود salt داخلی الگوریتم کافی است)
 - `hasBackup` → boolean (آیا کاربر پشتیبان تهیه کرده؟)
 - `createdAt` → datetime
 - `updatedAt` → datetime

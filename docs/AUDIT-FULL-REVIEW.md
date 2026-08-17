@@ -858,3 +858,39 @@ interface EventBus {
 
 **۳. راه‌حل:** یک تابع Domain واحد (مثلاً `calculateNetWorth(date, options)` در یک لایه مشترک، شاید `core/services`) تعریف شود که منبع حقیقت واحد محاسبه ثروت خالص باشد؛ هم `Reports-Analytics.getNetWorth()` و هم `Portfolio-Wealth-Overview.getPortfolioOverview()` باید این تابع مشترک را صدا بزنند (با پارامترهای متفاوت در صورت نیاز، مثلاً `includeCashInWealth`) به‌جای پیاده‌سازی مستقل و موازی. اگر عمداً قرار است دو عدد متفاوت باشند، این تفاوت (و دلیلش) باید صریحاً در هر دو سند مستند شود، مثلاً: «`netWealth` در Portfolio همیشه طبق `includeCashInWealth` پرتفوی محاسبه می‌شود و ممکن است با `getNetWorth` گزارش‌ها که همیشه موجودی بانکی را لحاظ می‌کند متفاوت باشد.»
 
+### مورد ۵۰ — فرمول `amountInBase = amount × exchangeRateToBase` در قرارداد BUG-003 (فایل Currency-CrossRate.md) برای حالتی که ارز تراکنش = IRR باشد نادرست است
+
+**۱. باگ/ابهام:** در انتهای `Currency-CrossRate.md`، بخش «قرارداد `exchangeRateToBase` واقعی (BUG-003)»، فرمول کلی به‌صورت `amountInBase = amount × exchangeRateToBase` نوشته شده. این فرمول برای حالت عادی (مثلاً `feeCurrency=USDT`, `baseCurrency=IRR`, `exchangeRateToBase=600000`) درست است: `1 USDT × 600000 = 600000 IRR`. اما وقتی ارز تراکنش خودش IRR است (و `baseCurrency=USDT`)، `exchangeRateToBase` طبق تعریف «چند واحد USDT به ازای ۱ IRR» است — یعنی یک عدد بسیار کوچک (~۰.۰۰۰۰۰۱۷). در این حالت `convertFeeToBase` در `Investment-Crypto.md` از `feeAmount.dividedBy(exchangeRateToBase)` استفاده می‌کند — نه `×`. تناقض: `amount × exchangeRateToBase` (برای IRR→USDT) جواب غلط می‌دهد (عددی بسیار کوچک)، نه درست. فرمول صحیح در این حالت `amount / exchangeRateToBase` است. خلاصه: فرمول کلی `amount × rate` فقط وقتی ارز تراکنش **غیر از** ارز پایه است و نرخ به صورت «base per 1 unit of transaction currency» بیان شده صحیح است.
+
+**۲. محل:**
+- `docs/features/17-Currency-CrossRate/Currency-CrossRate.md` — بخش «قرارداد `exchangeRateToBase` واقعی (BUG-003)»، آخرین سطر فرمول: `amountInBase = amount × exchangeRateToBase`
+- منبع صحت: `docs/features/05-Investment/05-01-Investment-Crypto/Investment-Crypto.md` — تابع `convertFeeToBase`، خط `if (feeCurrency === 'IRR') return feeAmount.dividedBy(exchangeRateToBase)`
+
+**۳. راه‌حل:** فرمول به صورت دقیق‌تر بازنویسی شود تا هر دو حالت را پوشش دهد:
+- اگر ارز تراکنش ≠ `baseCurrency`: `amountInBase = amount × exchangeRateToBase` (مثال: USDT → IRR)
+- اگر ارز تراکنش = `baseCurrency`: `amountInBase = amount` (بدون تبدیل)
+- اگر ارز تراکنش = IRR و `baseCurrency = USDT`: `amountInBase = amount / exchangeRateToBase`
+و یک یادداشت اضافه شود که `convertFeeToBase` در Crypto این سه حالت را صریحاً مدیریت می‌کند و همان تابع باید به‌عنوان الگوی مرجع در نظر گرفته شود.
+
+### مورد ۵۱ — فیلد ذخیره هش PIN/رمزعبور در جدول `sec_settings` وجود ندارد
+
+**۱. باگ/ابهام:** Business Rule 5 در `Security-Privacy.md` صریحاً می‌گوید: «رمز عبور یا PIN هرگز در حافظه یا لوگ ذخیره نشوند - فقط هش ذخیره شود.» اما تعریف جدول `sec_settings` (Domain Entity #1) هیچ فیلدی برای نگهداری این هش ندارد — `pinEnabled`/`biometricEnabled` (بولین فعال/غیرفعال) هستند ولی `pinHash`/`pinSalt` (خودِ هش برای تأیید هویت) کلاً غایب است. این یعنی API `verifyLock(credential)` از کجا باید مقدار را برای مقایسه بگیرد؟ نه جدول دیگری تعریف شده، نه فیلد دیگری ذکر شده — این یک شکاف واقعی در Schema است، نه فقط ابهام مستندسازی: بدون فیلد هش، `verifyLock` قابل پیاده‌سازی نیست.
+
+**۲. محل:**
+- `docs/features/18-Security-Privacy/Security-Privacy.md` — Domain Entity «۱. Security Settings» (جدول `sec_settings`)، Business Rule 5، API `verifyLock(credential)`
+
+**۳. راه‌حل:** فیلدهای زیر به جدول `sec_settings` اضافه شوند:
+- `pinHash` → string (nullable — هش PIN، فقط در صورت `pinEnabled=true` پر می‌شود)
+- `pinSalt` → string (nullable — نمک تصادفی برای هش؛ مثلاً با PBKDF2 یا bcrypt که salt داخلی دارد می‌توان salt را حذف کرد ولی الگوریتم باید مشخص شود)
+- در بخش «نکات طراحی» الگوریتم هش پیشنهادی برای محیط‌های مرورگر/موبایل (مثلاً PBKDF2 با Web Crypto API یا bcrypt) صریحاً ذکر شود.
+
+### مورد ۵۲ — دسته‌های `utilities` (قبوض: برق، آب، گاز، **اینترنت، تلفن**) و `communication` (ارتباطات: **موبایل، اینترنت**) در `Categories.md` همپوشانی مستقیم دارند
+
+**۱. باگ/ابهام:** در لیست دسته‌های هزینه، `utilities` شامل «اینترنت، تلفن» است و `communication` شامل «موبایل، اینترنت» — «اینترنت» در هر دو دسته به‌صراحت ذکر شده. این یعنی کاربری که قبض اینترنت را ثبت می‌کند با ابهام واقعی روبروست: آیا این هزینه زیر `utilities` (چون قبض است) یا زیر `communication` (چون ارتباطی است) ثبت کند؟ و گزارش‌ها مثلاً «کل قبوض» یا «کل هزینه ارتباطات» را چطور باید تفسیر کرد اگر هزینه یکسان در دو دسته مختلف ثبت شده باشد؟ این دقیقاً همان مشکلی است که این فایل در توضیح «هدف» وعده داده بود جلوگیری از آن: «جلوگیری از typo و دسته‌های تکراری».
+
+**۲. محل:**
+- `docs/features/99-Common-Categories/Categories.md` — جدول دسته‌های هزینه، ردیف‌های `utilities` و `communication`
+
+**۳. راه‌حل:** دو گزینه:
+- **گزینه ۱ (حذف communication):** دسته `communication` حذف شود و محتوایش (موبایل، اشتراک‌های ارتباطی) به `utilities` منتقل شود — چون از نظر کاربر ایرانی، اینترنت و موبایل معمولاً «قبوض» محسوب می‌شوند.
+- **گزینه ۲ (تفکیک واضح):** توضیح `utilities` از «اینترنت، تلفن» پاک شود (فقط «برق، آب، گاز» بماند) و `communication` به وضوح «اینترنت، موبایل، تلفن، اشتراک‌های ارتباطی» تعریف شود — با یادداشت صریح که «اگر قبض برق+اینترنت یک فاکتور هستند، هر آیتم جداگانه ثبت شود».

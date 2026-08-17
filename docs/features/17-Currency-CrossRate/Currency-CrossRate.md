@@ -205,6 +205,10 @@ async function convert(
 | `quoteCurrency` | ارز مبلغ تراکنش (مثلاً USDT) |
 | `rateQuoteToIrr` | nullable — اگر UI ایران بخواهد معادل ریالی تاریخی جدا از base |
 
-محاسبه ارزش به base: `amountInBase = amount × exchangeRateToBase` (با decimal.js).
+محاسبه ارزش به base (با decimal.js) — سه حالت:
+- ارز تراکنش = baseCurrency: `amountInBase = amount` (بدون تبدیل)
+- ارز تراکنش ≠ baseCurrency و نرخ به‌صورت «base per 1 unit tx»: `amountInBase = amount × exchangeRateToBase` (مثال: USDT→IRR)
+- ارز تراکنش = IRR و baseCurrency = USDT: `amountInBase = amount / exchangeRateToBase` (تقسیم، نه ضرب)
+> الگوی مرجع: تابع `convertFeeToBase` در `Investment-Crypto.md` هر سه حالت را صریحاً مدیریت می‌کند.
 
 همه فیچرها (Crypto, Stocks, FIF, Loans, Tax, Metals) باید از همین تعریف استفاده کنند؛ متن‌های قدیمی «ریال به ازای ۱ تتر» فقط مثال وقتی base=IRR هستند.

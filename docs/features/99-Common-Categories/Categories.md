@@ -32,12 +32,12 @@
 | food | غذا و سوپرمارکت | Food & Groceries | خرید غذا، میوه، نان و ... |
 | transport | حمل‌ونقل | Transport | بنزین، اتوبوس، تاکسی، پارکینگ |
 | housing | اجاره و مسکن | Housing | اجاره خانه، اسکناس، بارگذاری |
-| utilities | قبوض | Utilities | برق، آب، گاز، اینترنت، تلفن |
+| utilities | قبوض | Utilities | برق، آب، گاز (قبوض شهری خانگی — **نه** اینترنت یا موبایل) |
 | healthcare | بهداشت و درمان | Healthcare | دارو، پزشک، بیمه و ... |
 | entertainment | تفریح | Entertainment | سینما، تئاتر، رستوران، سفر |
 | shopping | خرید | Shopping | لباس، اقلام خانگی، الکترونیک |
 | education | آموزش | Education | کلاس، کتاب، دوره و ... |
-| communication | ارتباطات | Communication | موبایل، اینترنت و ... |
+| communication | ارتباطات | Communication | موبایل، اینترنت، تلفن، اشتراک‌های ارتباطی — **نه** قبوض برق/آب/گاز |
 | insurance | بیمه | Insurance | بیمه عمر، سلامت، خودرو و ... |
 | tax | مالیات | Tax | مالیات، کسر از حقوق و ... |
 | debt | پرداخت بدهی | Debt | پرداخت قسط وام، کارت اعتباری و ... |
