@@ -25,7 +25,7 @@ Business Rules
 
 چک می‌تواند از نوع پرداختی (صادر شده توسط کاربر) یا دریافتی (دریافت‌شده از دیگران) باشد.
 ارز چک همیشه با ارز حساب مرتبط یکی است.
-هنگام ثبت چک، نرخ تبدیل لحظه ثبت (نسبت به دلار/تتر) ذخیره می‌شود.
+هنگام ثبت چک، نرخ تبدیل لحظه ثبت (نسبت به baseCurrency کاربر) ذخیره می‌شود.
 چک در ابتدا با وضعیت pending ثبت می‌شود.
 هنگام وصول چک:
 اگر دریافتی باشد → تراکنش deposit-cheque ایجاد و مانده حساب افزایش می‌یابد.
@@ -52,7 +52,7 @@ Domain Entities
 - `sayadiTrackingCode` → string (شناسه رهگیری صیادی — nullable)
 - `amount` → decimal (مبلغ چک)
 - `currency` → string (ارز چک = ارز حساب)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (حساب مرتبط)
 - `bankName` → string (بانک صادرکننده)
 - `issueDate` → datetime (تاریخ صدور)
@@ -132,3 +132,21 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 > **چرا رزرو واقعی نه؟** رزرو واقعی نیازمند rollback خودکار در صورت `bounced`/`cancelled` است و معماری را پیچیده می‌کند — این برای v2 در نظر گرفته شود.
 
 > **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
+
+## ماشین وضعیت و اثر Ledger
+
+| از → به | تراکنش |
+|---------|--------|
+| → `pending` (ایجاد) | هیچ |
+| `pending` → `cleared` | INSERT `acc_transactions` (`deposit-cheque` یا `withdrawal-cheque`) + journal + لینک `accountTransactionId` |
+| `pending` → `bounced` | هیچ تراکنشی |
+| `pending` → `cancelled` | هیچ تراکنشی |
+| `cleared` → `bounced` | void تراکنش clear + INSERT reversal؛ `reversalTransactionId` پر شود |
+| سایر انتقال‌ها | در v1 ممنوع مگر مستندسازی صریح |
+
+`changeChequeStatus` همیشه Atomic + persist. ویرایش فیلدهای مالی فقط در `pending`.
+
+## پیاده‌سازی
+- `operationId` روی تراکنش‌های ساخته‌شده از چک
+- `reconcileCheque` طبق ماتریس `core/db/db.md`
+- یادآوری سررسید از Notification با `relatedFeature='cheque'`
