@@ -42,7 +42,7 @@
 
 1. ارزش پرتفوی از جمع ارزش روز دارایی‌های سرمایه‌گذاری و فیزیکی محاسبه می‌شود.
 2. حساب‌های بانکی نقدی **همیشه** در محاسبه ثروت کل لحاظ می‌شوند (بدون قید و شرط). سوییچ `includeCashInWealth` صرفاً کنترل می‌کند که **موجودی نقدی ریال/تتر نگهداری‌شده در صرافی‌های رمزارز و کارگزاری‌های سهام ایران** (که در جداول Investment مربوطه ذخیره می‌شود، نه در `acc_accounts`) در محاسبه ثروت کل لحاظ شود یا نه — تا از دوباره‌شماری جلوگیری شود.
-3. بدهی‌ها و وام‌ها برای محاسبه **ثروت خالص (Net Wealth)** کسر می‌شوند.
+3. بدهی‌ها و وام‌ها برای محاسبه **ثروت خالص (Net Wealth)** کسر می‌شوند. منطق این محاسبه در تابع `calculateNetWorth()` همین فیچر متمرکز شده — `Reports-Analytics.getNetWorth()` نیز از همین تابع استفاده می‌کند تا از دو پیاده‌سازی موازی و ناهماهنگ جلوگیری شود.
 4. سود و زیان تحقق‌نیافته بر اساس قیمت/ارزش فعلی در مقابل میانگین خرید محاسبه می‌شود.
 5. سود و زیان تحقق‌یافته از تراکنش‌های فروش استخراج می‌شود.
 6. تمام مقادیر قابلیت نمایش با نرخ تتر تاریخی را دارند.
@@ -141,13 +141,15 @@
 - `updatedAt` → datetime
 
 > **نکته**: پیش‌فرض `includeCashInWealth = false` است تا از تکرار در محاسبه موجودی نقدی جلوگیری شود. موجودی نقدی ریال/تتر در صرافی‌ها (Crypto) و کارگزاری‌ها (Stocks) به صورت جداگانه در جداول آن‌ها ذخیره می‌شود.
+> **تفاوت عمدی با `getNetWorth` گزارش‌ها**: `getPortfolioOverview()` با `includeCashInWealth = false` فراخوانی می‌کند (تمرکز بر پرتفوی سرمایه‌گذاری)؛ `Reports-Analytics.getNetWorth()` با `includeCashInWealth = true` فراخوانی می‌کند (تصویر کامل ثروت). این تفاوت عمدی است و هر دو از `calculateNetWorth()` می‌خوانند — کاربر ممکن است دو عدد متفاوت ببیند که در UI باید با برچسب مناسب («ارزش پرتفوی» در برابر «ثروت خالص کل») تفکیک شوند.
 
 ---
 
 ## APIهای داخلی
 
 ### Portfolio APIs
-- `getPortfolioOverview()` → خلاصه کامل پرتفوی و ثروت
+- `calculateNetWorth(options?: { date?: Date; includeCashInWealth?: boolean })` → **تابع Domain مشترک — منبع حقیقت واحد محاسبه ثروت خالص** (هم `getPortfolioOverview()` و هم `Reports-Analytics.getNetWorth()` این تابع را صدا می‌زنند)؛ خروجی: `{ totalWealth, netWealth, totalWealthUSDT, netWealthUSDT, breakdown }` — `includeCashInWealth` کنترل می‌کند موجودی نقدی صرافی/کارگزاری لحاظ شود یا نه (پیش‌فرض `false` در پرتفوی، `true` در گزارش Net Worth)
+- `getPortfolioOverview()` → خلاصه کامل پرتفوی و ثروت (از `calculateNetWorth({ includeCashInWealth: false })` می‌خواند)
 - `getInvestmentBreakdown()` → تفکیک سرمایه‌گذاری‌ها
 - `getPhysicalAssetsBreakdown()` → تفکیک دارایی‌های فیزیکی
 - `getProfitLossSummary()` → سود/زیان کل و به تفکیک بخش
