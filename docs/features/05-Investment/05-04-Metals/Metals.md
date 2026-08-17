@@ -43,9 +43,11 @@ Business Rules
   - نمایش به کاربر می‌تواند میلی‌گرم / گرم / کیلو / اونس باشد؛ تبدیل فقط در Presentation Layer.
   - `purity` (عیار/خلوص) فیلد اجباری و مستقل از وزن است؛ `1g Gold 18K` هرگز معادل `1g pure gold` نیست.
   - **وزن خالص (Fine Weight)** محاسبه می‌شود و ذخیره نمی‌شود:
-    - طلای عیاری: `fineWeightMg = quantityMg × (karat / 24)`
-    - نقره/مس با خلوص permille: `fineWeightMg = quantityMg × (purityPermille / 1000)`
-    - سکه (`gold_coin`): وزن خالص از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
+    - فرمول واحد برای همه فلزات: `fineWeightMg = quantityMg × purityRatio`
+    - `purityRatio` نسبت خلوص نرمال‌شده (۰ تا ۱) است که هنگام ثبت دارایی از عیار اصلی محاسبه و ذخیره می‌شود:
+      - طلای عیاری: `purityRatio = karat / 24` (مثلاً ۱۸ عیار → `0.750`)
+      - خلوص permille: `purityRatio = purityPermille / 1000` (مثلاً ۹۹۹ → `0.999`)
+    - سکه (`gold_coin`): `purityRatio` از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
   - قیمت و میانگین خرید همیشه **به ازای همان purity همان holding** است.
   - جدول تبدیل واحد (فقط نمایش/ورود):
     | واحد نمایش | به میلی‌گرم |
