@@ -180,6 +180,7 @@
 ## تنظیمات پیشنهادی پیش‌فرض
 
 | کلید | مقدار پیش‌فرض |
+| `autoVersionCheckEnabled` | `false` (BUG-C02 Offline-by-default) |
 |------|----------------|
 | `language` | `fa` |
 | `theme` | `system` |
