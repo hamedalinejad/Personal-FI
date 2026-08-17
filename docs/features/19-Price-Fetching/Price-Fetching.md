@@ -515,3 +515,26 @@ interface CanonicalPriceInstrument {
 4. تست: برای هر assetCategory حداقل یک fixture mapping → fetch → history row با instrumentId صحیح.
 
 بدون این لایه، semantics پراکنده دوباره به Core نشت می‌کند.
+
+
+---
+
+## راهنمای پیاده‌سازی
+
+### جریان fetch
+```text
+build CanonicalPriceInstrument[] from holdings
+resolve PriceProviderAdapter by adapterKey
+fetchPrices → normalize → Domain validation (price>0, ts, currency)
+dedupe (assetCategory, instrumentId, sourceId, price, priceCurrency)
+INSERT price_history (instrumentId, quoteType, marketDate, fetchedAt)
+```
+
+### قوانین
+- API عمومی فقط `PriceFetchResult` (decimal string)
+- Manual با expiresAt؛ API پیش‌فرض Manual فعال را override نمی‌کند
+- getLatestPrice({ assetCategory, instrumentId, priceCurrency? })
+- Auto-sync پیش‌فرض خاموش؛ کلید API فقط session per provider
+
+### تست
+Partial success؛ offline skip؛ future timestamp reject؛ USDT-ERC20 vs TRC20 جدا

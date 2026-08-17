@@ -288,3 +288,21 @@ fineWeightMg = quantityMg × purityRatio
 - این زیر‌فیچر مخصوص پلتفرم‌های ایران است (طلا، نقره، مس، سکه).
 
 > **Tax metadata**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
+
+
+---
+
+## راهنمای پیاده‌سازی
+
+### واحدها
+- ذخیره فقط `quantityMg` (وزن ناخالص)
+- `fineWeightMg = quantityMg × purityRatio` محاسبه‌ای — ذخیره نکن
+- قیمت per mg همان عیار؛ 18K ≠ pure
+
+### APIها (Atomic)
+- `buyMetal` / `sellMetal` / `physicalDelivery` / platform cash deposit-withdraw
+- instrumentId قیمت: `metalType_purity` (مثلاً gold_18k)
+- `rebuildMetalsHolding` / `reconcileMetalsHolding` / `reconcileMetalsPlatformCash`
+
+### تست
+خرید 1g 18K؛ delivery؛ platform cash vs bank؛ purity اشتباه نپذیرد
