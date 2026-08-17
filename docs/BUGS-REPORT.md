@@ -2,6 +2,19 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-H06 — FIF multi-currency
+**راه‌حل:** currency روی معامله + exchangeRateToBase به baseCurrency؛ حذف hard-code ریال/تتر.
+
+### BUG-H07 — Fund fee cost basis
+**راه‌حل:** includeInCostBasis؛ subscription/brokerage در basis؛ redemption از proceeds.
+
+### BUG-H08 — Transfer conservation
+**راه‌حل:** تفکیک transfer بدون fee vs با network fee؛ fee می‌سوزاند و کل موجودی کم می‌شود.
+
+### BUG-H09 — C2C gross/net
+**راه‌حل:** grossQuantity + feeQuantity + netQuantity روی هر leg C2C.
+
+
 ### BUG-H01 — Crypto price API by instrumentId
 **راه‌حل:** fetch/get/set با instrumentId/PriceAssetRef؛ symbol API deprecated.
 

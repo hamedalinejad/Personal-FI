@@ -16,7 +16,7 @@
 - برخی صندوق‌ها امکان سرمایه‌گذاری مجدد سود (خرید واحد جدید از محل سود) را می‌دهند.
 - دو روش معامله: صدور و ابطالی و ETF (قابل معامله در بورس).
 
-تمام مبالغ به ریال هستند و در هر معامله نرخ تتر لحظه ذخیره می‌شود.
+مبالغ به **ارز معامله** (معمولاً IRR برای صندوق‌های ایران) ثبت می‌شوند؛ `exchangeRateToBase` نرخ تبدیل به **baseCurrency کاربر** است — نه hard-code ریال/تتر (BUG-H06).
 
 User Stories
 Must Have:
@@ -29,7 +29,7 @@ Must Have:
 - مشاهده تعداد واحد، میانگین خرید و ارزش فعلی
 - پیگیری سود پیش‌بینی‌شده در مقابل سود واقعی (فقط در تراکنش‌های nav_update و dividend)
 - واریز/برداشت مرتبط با حساب بانکی یا کارگزاری
-- ذخیره نرخ تتر لحظه هر رویداد
+- ذخیره `exchangeRateToBase` هر رویداد (ارز معامله → baseCurrency)
 - ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase`)
 
 Should Have:
@@ -41,7 +41,7 @@ Should Have:
 
 Business Rules
 
-- تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
+- ارز معامله روی تراکنش (`currency`)؛ `exchangeRateToBase` → baseCurrency کاربر (BUG-H06). پیش‌فرض صندوق‌های ایران اغلب IRR است ولی مدل multi-currency است.
 - خرید واحد:
   - موجودی نقدی (حساب بانکی یا کارگزاری) کاهش می‌یابد.
   - تعداد واحد (`units`) افزایش می‌یابد و میانگین خرید بر اساس `transactionPrice` (قیمت صدور) به‌روزرسانی می‌شود.
@@ -150,7 +150,8 @@ Domain Entities
 - `units` → decimal (تعداد واحد — در buy/sell/reinvest؛ در nav_update و dividend معمولاً خالی)
 - `nav` → decimal (nullable — **NAV** در تاریخ تراکنش؛ الزامی در nav_update؛ توصیه‌شده در buy/sell برای snapshot تاریخی)
 - `transactionPrice` → decimal (nullable — **قیمت واقعی معامله**: قیمت صدور در buy/reinvest، قیمت ابطال در sell؛ در nav_update خالی می‌ماند)
-- `amount` → decimal (مبلغ ریالی خالص معامله؛ معمولاً `units × transactionPrice` برای buy/sell)
+- `amount` → decimal (مبلغ خالص معامله به `currency`؛ معمولاً `units × transactionPrice`)
+- `currency` → string (ارز معامله — پیش‌فرض IRR برای صندوق ایران)
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal
@@ -275,3 +276,35 @@ $  \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} 
 2. اگر کاربر همان صندوق را از دو حساب بخرد، Holding می‌تواند یکی بماند؛ تاریخچه per-account از ledger تراکنش‌ها و `acc_transactions` بازیابی می‌شود.
 3. برای Audit/Report «از کدام حساب خرید شده» باید از transactions استفاده شود نه فقط Holding.
 4. Should Have: نمای تفکیک units per account از Σ تراکنش‌ها (بدون اجباری کردن Holding جدا per account در v1).
+
+---
+
+## Cost Basis و کارمزد صندوق (BUG-H07)
+
+`transactionPrice` = قیمت واحد (صدور/ابطال). **Cost basis تحصیل** ممکن است fee داشته باشد.
+
+### طبقه‌بندی کارمزد
+| نوع | فیلد پیشنهادی / feeCategory | وارد Cost Basis؟ | رفتار حسابداری |
+|-----|------------------------------|------------------|----------------|
+| کارمزد صدور / subscription | `subscription` | **بله** (پیش‌فرض) | به `totalInvested` اضافه می‌شود |
+| کارمزد خرید کارگزاری (ETF) | `brokerage` | **بله** (پیش‌فرض) | به `totalInvested` |
+| کارمزد ابطال / redemption | `redemption` | **خیر** — از عایدی فروش کم می‌شود | expense روی realized |
+| کارمزد نگهداری دوره‌ای | `management` / periodic | معمولاً **expense** جدا (نه averageBuy) | در صورت کسر از units طبق قرارداد صندوق مستند شود |
+
+### فرمول
+```text
+buy/reinvest:
+  unitsCost = units × transactionPrice
+  feesInBasis = Σ feeAmount (where includeInCostBasis=true)  // به همان currency یا تبدیل‌شده
+  totalInvested += unitsCost + feesInBasis
+  averageBuyPrice = totalInvested / units   // یا فقط unitsCost/units اگر سیاست «قیمت واحد خالص» انتخاب شود — پیش‌فرض پروژه: totalInvested شامل feeهای includeInCostBasis
+
+sell:
+  grossProceeds = units × transactionPrice
+  netProceeds = grossProceeds - redemptionFees
+  costRemoved = averageBuyPrice × units   // بر اساس basis قبلی
+  realizedPL = netProceeds - costRemoved
+```
+
+- روی `inv_fif_transactions`: `feeAmount`, `feeCurrency`, **`includeInCostBasis` boolean**
+- Unrealized: `(currentNAV - averageBuyPrice) × units` با همان تعریف average که basis را ساخت.

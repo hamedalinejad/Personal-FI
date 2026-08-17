@@ -50,11 +50,14 @@
      - یکی در صرافی مبدا با `type: transfer_out`، `counterExchangeId` به مقصد و `transferId` مشترک
      - یکی در صرافی مقصد با `type: transfer_in`، `counterExchangeId` به مبدا و همان `transferId`
    - `transferId` (نه صرفاً `counterExchangeId`) مرجع قطعی برای پیدا کردن رکورد جفت است؛ این لازم است چون ممکن است چند انتقال هم‌زمان بین همان دو صرافی در یک روز ثبت شود.
-   - کارمزد می‌تواند از مقدار ارز ارسالی کسر شود:
-     - مقدار ارسالی: `amountToSend`
-     - کارمزد: `feeAmount` (از `amountToSend` کسر می‌شود)
-     - موجودی افزایش شده در مقصد: `amountToSend - feeAmount`
-   - موجودی کل رمزارز کاربر تغییر نمی‌کند (فقط جابه‌جایی بین پلتفرم‌ها).
+   - کارمزد شبکه/انتقال می‌تواند از مقدار ارسالی کسر شود (`feePresence = fee_from_received` یا `fee_from_base_asset`):
+     - `grossQuantity` / `amountToSend` = مقدار کسرشده از مبدا
+     - `feeQuantity` / `feeAmount` = سوخته‌شده (شبکه یا واسطه)
+     - `netQuantity` در مقصد = `amountToSend - fee` (وقتی fee از همان asset است)
+   - **تفکیک دو مفهوم (BUG-H08)**:
+     - *Internal platform transfer بدون fee*: مجموع quantity بین پلتفرم‌های کاربر **حفاظت می‌شود** (conservation).
+     - *Transfer با network fee*: مجموع اقتصادی `Σ holdings` کاربر **کاهش می‌یابد** به‌اندازه fee — این «جابه‌جایی خالص» نیست؛ سوزاندن کارمزد است و باید در journal به‌عنوان `fee` ثبت شود.
+   - جملهٔ «موجودی کل تغییر نمی‌کند» **فقط** برای transfer بدون fee یا fee_external (پرداخت از دارایی دیگر) صدق می‌کند.
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
 8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
@@ -895,3 +898,30 @@ assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
 2. Fallback قیمت‌گیری به `symbol` تنها **ممنوع** است (حذف collision path).
 3. اگر Provider فقط symbol می‌فهمد، Adapter از `assetKey` → `normalizeSymbol` / `assetId` mapping می‌سازد؛ Application هرگز با symbol خام fetch نمی‌کند.
 4. IRR/USDT داخلی صرافی: `assetKey = exchange:{exchangeId}:IRR` و `exchange:{exchangeId}:USDT`.
+
+---
+
+## C2C Gross / Net کامل (BUG-H09)
+
+هر پایه C2C دو رکورد با `tradeGroupId`/`tradeId` مشترک دارد. برای **عدم از دست رفتن داده**:
+
+### روی رکورد SELL (fromAsset)
+| فیلد | معنی |
+|------|------|
+| `grossQuantity` | مقدار from فروخته‌شده |
+| `netQuantity` | معمولاً = gross مگر fee از from |
+| `quoteAmount` | ارزش به quote میانی یا to |
+| `feePresence` / `feeQuantity` / `feeCurrency` | اگر fee روی پایه from باشد |
+
+### روی رکورد BUY (toAsset)
+| فیلد | معنی |
+|------|------|
+| `grossQuantity` | مقدار to قبل از کسر fee (اگر fee از to باشد) |
+| `feeQuantity` | کارمزد به واحد to یا fee asset |
+| `netQuantity` | مقدار واقعی اضافه‌شده به holding (**الزامی**) |
+| `quoteAmount` | مبلغ پرداختی معادل |
+
+قوانین:
+1. اگر فقط «quantity = مقدار دریافتی» ذخیره شود بدون gross/fee جدا، **بازسازی trade خام ناقص است** — هر سه فیلد وقتی fee روی leg مربوطه است الزامی‌اند.
+2. `netQuantity` مبنای holding؛ `grossQuantity` و `feeQuantity` برای audit و reconcile.
+3. `feeBase` و journal entry fee برای هر leg که fee دارد.
