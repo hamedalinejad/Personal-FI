@@ -394,3 +394,10 @@ export function preserveFull(amount: Decimal): string {
 - `features/04-Debt-Loan-Management` → فرمول‌های قسط از این Policy استفاده می‌کنند
 - `features/05-Investment/*` → Weighted Average و quantity از قوانین ۳ و ۴ پیروی می‌کنند
 - `features/17-Currency-CrossRate` → round فقط در نتیجه نهایی `convert`
+
+---
+
+## راهنمای پیاده‌سازی
+- همه roundهای پول از `roundMoney` / سیاست همین سند
+- میانگین قیمت: تقسیم بدون round میانی؛ round فقط در نمایش UI در صورت نیاز
+- تست: 10/3 و مجموع اقساط نباید drift بیش از 1 واحد پول در قسط آخر ایجاد کند (قسط آخر residual)
