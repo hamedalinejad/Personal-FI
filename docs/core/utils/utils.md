@@ -156,3 +156,9 @@ export function formatMoney(
 3. باید به راحتی Unit Test شوند (هر تابع با ورودی/خروجی مشخص).
 4. **هرگز** `Number` یا `parseFloat` برای مبالغ مالی استفاده نشود — فقط `new Decimal(...)`.
 5. `toMinorUnit` و `fromMinorUnit` تنها مکانی هستند که تبدیل Minor Unit انجام می‌دهند — نه inline در هیچ فیچری.
+
+---
+
+## راهنمای پیاده‌سازی
+- UUID، date helpers، decimal helpers مشترک
+- هیچ utils نباید مستقیم SQL بزند

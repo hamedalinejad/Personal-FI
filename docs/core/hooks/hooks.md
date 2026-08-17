@@ -43,3 +43,9 @@ hooks/
 3. هیچ Hook ای نباید مستقیماً `window.localStorage` یا `window.sessionStorage` صدا بزند — همیشه از `localStorageService` / `sessionStorageService` استفاده شود.
 4. هر Hook که با شبکه کار می‌کند باید ابتدا `useOnlineStatus` را چک کند و طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` رفتار کند.
 5. تمام Hookها باید cleanup (unsubscribe، removeEventListener) مناسب داشته باشند.
+
+---
+
+## راهنمای پیاده‌سازی
+- Hooks فقط UI glue؛ منطق مالی در Domain
+- `useCurrency` نازک روی store؛ convert در Domain/Currency feature

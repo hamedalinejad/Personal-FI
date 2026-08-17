@@ -85,3 +85,9 @@ stores/
 4. برای تنظیمات UI (زبان، تم)، `persist` با `localStorage` فعال شود تا بعد از reload اپ تنظیمات از دست نرود؛ برای بقیه Storeها persist لازم نیست (از SQLite بار می‌شوند).
 5. هیچ Store‌ای نباید مستقیماً به SQL layer بنویسد — فقط بخواند یا از API لایه Domain فراخوانی کند.
 6. وقتی UI به داده‌ای نیاز دارد که فقط در یک صفحه/کامپوننت خاص لازم است، آن داده را در Store نریزید — از `useState` / local state استفاده کنید.
+
+---
+
+## راهنمای پیاده‌سازی
+- Zustand فقط UI/session state (نه ledger)
+- API keys قیمت در sessionStorage از مسیر Settings — نه در store دائمی
