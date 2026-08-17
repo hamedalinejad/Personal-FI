@@ -214,6 +214,29 @@
 - `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
 - `tiers` → JSON (nullable — **deprecated برای داده جدید**؛ فقط مهاجرت)
 - برای کارمزد پلکانی: ردیف‌های جدول `ln_loan_fee_tiers` (BUG-030)
+
+### ۵-الف. Loan Fee Tiers (جدول: `ln_loan_fee_tiers`)
+
+جایگزین رسمی فیلد deprecated شده `tiers` (JSON) در `ln_loan_fees`. هر ردیف یک بازه از پلکان کارمزد است.
+
+- `id` → UUID (Primary Key)
+- `loanFeeId` → UUID (FK به `ln_loan_fees.id`)
+- `thresholdFrom` → decimal (nullable — شروع بازه درصدی یا مبلغی؛ `null` برای اولین tier یعنی از صفر)
+- `thresholdTo` → decimal (nullable — پایان بازه؛ `null` برای آخرین tier یعنی بدون سقف)
+- `thresholdUnit` → enum: `percent_of_principal` | `absolute_amount` (نوع بازه — درصد از اصل وام یا مبلغ مطلق)
+- `rate` → decimal (nullable — نرخ درصدی این tier — مثلاً `2.0` برای ۲٪)
+- `fixedAmount` → decimal (nullable — مبلغ ثابت این tier — اگر کارمزد tier ثابت است نه درصدی)
+- `sortOrder` → integer (ترتیب ردیف‌ها — از کوچک به بزرگ)
+- `createdAt` → datetime
+
+**مثال** (کارمزد پیش‌پرداخت پلکانی):
+```
+thresholdFrom=null, thresholdTo=30,  thresholdUnit=percent_of_principal, rate=1.0  → تا ۳۰٪: ۱٪
+thresholdFrom=30,   thresholdTo=60,  thresholdUnit=percent_of_principal, rate=2.0  → ۳۰٪ تا ۶۰٪: ۲٪
+thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0  → بالای ۶۰٪: ۳٪
+```
+
+> **قانون**: `ln_loan_fee_tiers` فقط برای `feeType = 'tiered'` در `ln_loan_fees` استفاده می‌شود. برای سایر `feeType`ها، این جدول خالی است و `amount`/`rate` در خود `ln_loan_fees` کافی است.
 - `calculatedAmount` → decimal (nullable — مبلغ نهایی محاسبه‌شده — پس از `createLoan` یا `payLoan` پر می‌شود)
 - `description` → string (nullable — توضیح اضافه، لازم برای `feeCategory = 'other'`)
 - `createdAt` → datetime
