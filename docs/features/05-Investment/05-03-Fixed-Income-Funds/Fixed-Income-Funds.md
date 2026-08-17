@@ -307,3 +307,25 @@ sell:
 
 - روی `inv_fif_transactions`: `feeAmount`, `feeCurrency`, **`includeInCostBasis` boolean**
 - Unrealized: `(currentNAV - averageBuyPrice) × units` با همان تعریف average که basis را ساخت.
+
+
+---
+
+## راهنمای پیاده‌سازی
+
+### APIها
+- `createFund` / `buyUnits` / `sellUnits` / `registerDividend` / `reinvest` / `updateNAV`
+- NAV فقط از Price Fetching / manual؛ `transactionPrice` مبنای basis خرید/ابطال
+- issuance: `accountId` اجباری روی تراکنش
+
+### Atomic buy
+```text
+validate cash (bank or brokerage)
+INSERT inv_fif_transactions (transactionPrice, fees, includeInCostBasis)
+update units + totalInvested + averageBuyPrice
+journal + acc or brokerage cash
+COMMIT → persist
+```
+
+### تست
+issuance vs ETF path؛ fee in basis vs redemption fee؛ NAV ≠ transactionPrice

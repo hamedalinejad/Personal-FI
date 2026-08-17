@@ -298,3 +298,24 @@ isin / instrumentId = stable identity
 
 تغییر نماد ≠ Holding جدید. 
 Provider mapping جدا از identity است و با `setStockPriceMapping` عوض می‌شود.
+
+
+---
+
+## راهنمای پیاده‌سازی
+
+### APIهای اصلی (Atomic + journal + persist)
+- `createBrokerage` / cash deposit-withdraw ↔ `acc_transactions` + brokerage cash ledger
+- `executeBuy` / `executeSell` / `registerDividend`
+- `applyCorporateAction(type, payload)` برای همه CAها
+- `setStockPriceMapping(holdingId, { priceProviderId, providerSymbol, market })`
+- `rebuildStockHoldingFromLedger` / `reconcileStockHolding` / `reconcileBrokerage`
+
+### Invariants
+- UNIQUE(brokerageId, instrumentId)
+- feeAmount = sum of fee parts
+- cashBalance snapshot؛ ledger authoritative
+- CAها quantity/cost را طبق جدول CA به‌روز می‌کنند
+
+### تست حداقل
+buy/sell/dividend؛ bonus share؛ symbol_change بدون عوض شدن instrumentId؛ reconcile بعد از trade
