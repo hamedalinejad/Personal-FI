@@ -543,8 +543,21 @@ Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) م
 | `reconcileFund(holdingId)` | `units` / `totalInvested` ↔ Σ `inv_fif_transactions` (buy/sell/reinvest) |
 | `reconcileMetalsHolding(holdingId)` | `quantityMg` / `totalInvested` ↔ Σ `inv_metals_transactions` |
 | `reconcileLoan(loanId)` | مانده وام ↔ جدول اقساط / `ln_transactions` |
+| `reconcileCheque(chequeId)` | سازگاری `status` / `accountTransactionId` / `reversalTransactionId` در `chk_cheques` ↔ وجود/جهت/وضعیت تراکنش‌های مرتبط در `acc_transactions` — بر اساس ماتریس state machine (جدول زیر) |
 | `reconcilePortfolio()` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
-| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها)؛ خروجی گزارش یکپارچه |
+| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها و `reconcileCheque` برای همه چک‌های غیر-cancelled)؛ خروجی گزارش یکپارچه |
+
+**ماتریس انتظار `reconcileCheque` — یک چک سالم باید:**
+
+| status | accountTransactionId | reversalTransactionId |
+|--------|---------------------|----------------------|
+| `pending` | `null` | `null` |
+| `cleared` | UUID معتبر + `isVoided=false` در `acc_transactions` | `null` |
+| `bounced` (مستقیم از pending) | `null` | `null` |
+| `bounced` (از cleared) | UUID معتبر + `isVoided=true` در `acc_transactions` | UUID معتبر + `isVoided=false` در `acc_transactions` |
+| `cancelled` | `null` | `null` |
+
+هر انحراف از این ماتریس به‌عنوان Mismatch گزارش می‌شود.
 
 ### خروجی استاندارد هر reconcile
 
