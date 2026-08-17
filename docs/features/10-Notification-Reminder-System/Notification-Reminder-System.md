@@ -58,8 +58,10 @@
 - `title` → string
 - `message` → string
 - `type` → string (`info`, `warning`, `critical`)
-- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
+- `category` → string (`bills`, `loan`, `cheque`, `budget`, `goals`, `tax`, `system`, `custom`) — هماهنگ با مقادیر `RelatedFeature` در `types.md`؛ `system`/`custom` معادل `RelatedFeature` ندارند
 - `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`)
+
+> **نگاشت `category` ↔ `relatedFeature`**: مقادیر `category` عمداً با `RelatedFeature` هماهنگ شده‌اند تا نگاشت مستقیم (`category === relatedFeature`) کار کند — به‌جز دو استثنا: `system` (اعلان‌های داخلی سیستم) و `custom` (اعلان‌های دستی کاربر) که معادل `RelatedFeature` ندارند و `relatedFeature` آن‌ها `null` است.
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
 - `dedupeKey` → string (nullable — کلید یکتایی منطقی برای جلوگیری از اعلان تکراری؛ فرمت پیشنهادی: `{category}:{relatedFeature}:{relatedId}:{dueDate-YYYY-MM}`؛ قبل از ساخت اعلان جدید در `generateDueReminders()` بررسی می‌شود که اعلان فعالی با همین `dedupeKey` وجود نداشته باشد)
 - `isRead` → boolean
@@ -70,9 +72,9 @@
 ### ۲. Notification Setting (جدول: `notif_settings`)
 
 - `id` → UUID
-- `category` → string (`bill`, `loan`, `cheque`, `budget`, `goal`, `tax`, `system`, `custom`)
+- `category` → string (`bills`, `loan`, `cheque`, `budget`, `goals`, `tax`, `system`, `custom`) — هماهنگ با مقادیر `RelatedFeature` در `types.md`
 - `isEnabled` → boolean
-- `daysBefore` → number (مقدار پیش‌فرض سراسری: چند روز قبل از سررسید یادآوری شود؛ برای قبوض/تکرارشونده‌ها (`category='bill'`) این مقدار fallback است و توسط `br_items.reminderDaysBefore` در سطح آیتم override می‌شود اگر آن فیلد non-null باشد)
+- `daysBefore` → number (مقدار پیش‌فرض سراسری: چند روز قبل از سررسید یادآوری شود؛ برای قبوض/تکرارشونده‌ها (`category='bills'`) این مقدار fallback است و توسط `br_items.reminderDaysBefore` در سطح آیتم override می‌شود اگر آن فیلد non-null باشد)
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -134,12 +136,12 @@
 
 | دسته | مثال |
 |------|------|
-| `bill` | «قبوض برق تا ۳ روز دیگر سررسید می‌شود» |
+| `bills` | «قبوض برق تا ۳ روز دیگر سررسید می‌شود» |
 | `loan` | «قسط وام مسکن فردا سررسید دارد» |
 | `cheque` | «چک دریافتی به شماره ۱۲۳۴ فردا سررسید است» |
 | `tax` | «مالیات عوارض خودرو تا ۵ روز دیگر سررسید دارد» |
 | `budget` | «پاکت خوراک به ۸۵٪ سقف خود رسیده است» |
-| `goal` | «هدف سفر فقط ۱۵٪ پیشرفت داشته است» |
+| `goals` | «هدف سفر فقط ۱۵٪ پیشرفت داشته است» |
 | `system` | اعلان‌های سیستمی و به‌روزرسانی‌ها |
 | `custom` | یادآوری‌های تعریف‌شده توسط کاربر |
 
