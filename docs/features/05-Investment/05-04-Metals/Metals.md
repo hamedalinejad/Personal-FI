@@ -209,7 +209,7 @@ Transaction APIs:
 
 createMetalsTransaction(data) → خرید / فروش
 createPhysicalDeliveryTransaction(data) → تحویل فیزیکی (با `deliveryFee`)
-createPlatformCashTransaction(data) → واریز (`type='deposit-investment'`) / برداشت (`type='withdrawal-investment'`) + لینک بانکی
+createPlatformCashTransaction(data) → واریز (`type='deposit'`) / برداشت (`type='withdraw'`) + لینک بانکی
 requestPhysicalDelivery(data) → ثبت درخواست تحویل فیزیکی (ایجاد تراکنش + جزئیات)
 updateDeliveryStatus(id, status)
 getMetalsTransactions(filters) → شامل `deliveryFee` برای تحویل‌ها
