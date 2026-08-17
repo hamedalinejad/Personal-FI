@@ -143,18 +143,20 @@ export type PriceSkipReason =
 
 // خروجی عملیات دریافت قیمت از API
 export interface PriceFetchResult {
- fetchRequestId: string; // succeeded: Array<{ symbol: string; price: string; deduped?: boolean }>;
- failed: Array<{ symbol: string; reason: string; failureKind: PriceFailureKind; httpStatus?: number }>;
- skipped?: Array<{ symbol?: string; reason: PriceSkipReason | string }>; // PriceSkipReason برای offline و api_key_required
- fetchedAt: Timestamp;
- triggeredBy: 'user_click' | 'auto_sync';
+  fetchRequestId: string;
+  succeeded: Array<{ instrumentId: string; price: string; deduped?: boolean }>;
+  failed: Array<{ instrumentId: string; reason: string; failureKind: PriceFailureKind; httpStatus?: number }>;
+  skipped?: Array<{ instrumentId?: string; reason: PriceSkipReason | string }>;
+  fetchedAt: Timestamp;
+  triggeredBy: 'user_click' | 'auto_sync';
 }
 
 // آخرین قیمت کش‌شده یک نماد
 export interface CachedPrice {
- symbol: string;
+ instrumentId: string;
+ displaySymbol?: string;
  assetCategory: AssetCategory;
- price: string; // decimal string — نه number
+ price: string; // decimal string
  priceCurrency: PriceCurrency;
  source: 'manual' | 'api';
  sourceId?: string;
@@ -226,7 +228,7 @@ export type AppEvent =
  | { type: 'TaxPaid'; payload: { taxId: UUID; amount: string; transactionId: UUID } }
  // دریافت قیمت (Price Fetching — فیچر ۱۹)
  | { type: 'PriceFetchCompleted'; payload: PriceFetchResult }
- | { type: 'PriceFetchStarted'; payload: { symbols: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
+ | { type: 'PriceFetchStarted'; payload: { instrumentIds: string[]; assetCategory: AssetCategory; triggeredBy: 'user_click' | 'auto_sync' } }
  // نسخه برنامه
  | { type: 'VersionUpdateAvailable'; payload: { currentVersion: string; latestVersion: string; releaseNotesUrl: string } };
 
@@ -250,7 +252,7 @@ export interface EventBus {
  subscribe<T extends AppEvent['type']>(
  type: T,
  handler: (payload: Extract<AppEvent, { type: T }>['payload']) => void
- ):  => void;
+ ): () => void;
 }
 ```
 
@@ -293,3 +295,11 @@ export type ReconcileScope =
 4. `TransactionType` باید همیشه با enum فیلد `type` در `acc_transactions` یکی باشد.
 5. تمام جداول با ارتباط چندریختی دقیقاً از `relatedFeature: RelatedFeature` و `relatedId: UUID` استفاده کنند. مقدار خارج از Union در compile-time خطا و در runtime validate رد می‌شود.
 6. هر رویداد جدید در `AppEvent` باید در `core/services/services.md` (بخش Event Bus) هم مستند شود.
+
+---
+
+## راهنمای پیاده‌سازی Types
+- فایل‌های واقعی: `transaction.ts`, `price.ts`, `events.ts`, `reconciliation.ts` زیر `core/types/`
+- Event payloadها فقط string برای پول
+- `RelatedFeature` و `TransactionType` را در فیچرها دوباره تعریف نکنید — import از core
+- تست type: `tsc --noEmit` باید fail شود اگر number برای amount استفاده شود
