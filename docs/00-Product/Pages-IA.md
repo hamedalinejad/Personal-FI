@@ -278,3 +278,14 @@
 5. هدف: **کم‌صفحه‌بودن در UI و در درخت route** — نه فقط در Bottom Nav.
 
 این بخش بر اولویت اجرایی می‌دهد: Sheets بیش از nested routes.
+
+### الگوی Sheet جنریک سرمایه‌گذاری
+
+یک کامپوننت مثلاً `InvestmentActionSheet` با props:
+
+```ts
+{ assetClass: 'crypto'|'stock'|'fif'|'metal', action: 'buy'|'sell'|..., entityId: string }
+```
+
+Route واقعی: `/investments/crypto/:exchangeId` + `?action=buy` اختیاری.  
+از ساخت `pages/crypto/buy.tsx` جدا برای هر عمل خودداری شود مگر deep-link اجباری محصول.
