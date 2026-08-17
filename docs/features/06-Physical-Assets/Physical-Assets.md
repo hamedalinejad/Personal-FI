@@ -209,3 +209,10 @@
 | **Physical Assets** | دارایی فیزیکی که کاربر واقعاً در اختیار دارد |
 | **Stocks Iran** | سهام بورس ایران |
 | **Crypto** | رمزارز |
+
+---
+
+## راهنمای پیاده‌سازی
+- دسته‌های `gold`/`coin` فیزیکی ≠ Metals پلتفرمی؛ انتقال از Metals با delivery باید دو فیچر را atomic لینک کند (یا دو op با related ids)
+- `exchangeRateToBase` اجباری روی تراکنش
+- rebuild از `pa_transactions`؛ snapshot ارزش روز از قیمت/ارزش‌گذاری دستی
