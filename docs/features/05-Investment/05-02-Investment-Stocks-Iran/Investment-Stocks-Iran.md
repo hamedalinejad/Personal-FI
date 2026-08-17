@@ -319,3 +319,24 @@ Provider mapping جدا از identity است و با `setStockPriceMapping` عو
 
 ### تست حداقل
 buy/sell/dividend؛ bonus share؛ symbol_change بدون عوض شدن instrumentId؛ reconcile بعد از trade
+
+### مثال عددی Corporate Action (تست)
+
+```
+Holding: instrumentId=ISIN-X, symbol=فولاد, qty=100, avg=2000, totalInvested=200,000
+
+bonus_share ratio 1:10 (هر ۱۰ سهم یک جایزه):
+  qty → 110
+  totalInvested → 200,000 (ثابت)
+  avg → 200,000/110 ≈ 1818.18
+
+split 2:1:
+  qty → 220
+  totalInvested ثابت
+  avg نصف
+
+symbol_change فولاد → فولاد1:
+  instrumentId unchanged
+  symbol updated
+  qty/cost unchanged
+```
