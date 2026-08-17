@@ -10,7 +10,7 @@
 - کارمزد شفاف (معمولاً ۰.۵٪ تا ۱.۵٪)
 - واریز و برداشت ریالی از/به حساب بانکی
 
-تمام مبالغ به ریال هستند و در هر معامله نرخ تتر لحظه ذخیره می‌شود تا بتوان عملکرد را نسبت به دلار/تتر نیز مقایسه کرد.
+تمام مبالغ می‌توانند در هر ارزی باشند و در هر معامله `exchangeRateToBase` (نرخ تبدیل به `baseCurrency` کاربر — BUG-003) ذخیره می‌شود تا بتوان عملکرد را در ارز پایه کاربر مقایسه کرد.
 
 User Stories
 Must Have:
@@ -37,7 +37,7 @@ Should Have:
 
 Business Rules
 
-- تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
+- `exchangeRateToBase` در هر رکورد ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — BUG-003).
 - **واحد، عیار و وزن خالص باید همیشه مستقل بمانند (باگ ۳۵ — High)**:
   - واحد پایه ذخیره‌سازی موجودی: **میلی‌گرم (`quantityMg`)** — هرگز گرم/اونس در دیتابیس ذخیره نمی‌شود.
   - نمایش به کاربر می‌تواند میلی‌گرم / گرم / کیلو / اونس باشد؛ تبدیل فقط در Presentation Layer.
@@ -154,7 +154,7 @@ Domain Entities
 - `totalAmount` → decimal
 - `feeAmount` → decimal (کارمزد معامله)
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
 - `deliveryFee` → decimal (nullable — هزینه تحویل فیزیکی فقط برای `type=physical_delivery`)
 - `description` → string
 - `date` → datetime
@@ -177,7 +177,7 @@ type → string (deposit, withdraw)
 amount → decimal (ریال)
 feeAmount → decimal
 feeCurrency → string
-exchangeRateToBase → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+exchangeRateToBase → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت — BUG-003؛ برای کاربران با `baseCurrency=IRR` معمولاً برابر نرخ ریال-به-تتر است، اما عمومی است. قرارداد کامل در `Currency-CrossRate.md`)
 accountId → UUID
 accountTransactionId → UUID (لینک به `acc_transactions`)
 description → string
@@ -228,7 +228,7 @@ calculateProfitLoss(metalType?, platformId?)
 روابط با سایر فیچرها
 
 Accounts & Banking: واریز و برداشت
-Currency & Multi-Currency: نرخ تتر لحظه‌ای
+Currency & Multi-Currency: قرارداد `exchangeRateToBase` (BUG-003) — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر
 Reports / Dashboard / Portfolio: ارزش پرتفوی فلزات و سود/زیان
 Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می‌توان به دارایی فیزیکی منتقل کرد
 
