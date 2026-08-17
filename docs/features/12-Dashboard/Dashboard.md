@@ -73,7 +73,7 @@
 
 ### ۶. پرتفوی سرمایه‌گذاری (خلاصه)
 - ارزش کل سرمایه‌گذاری‌ها
-- سود/زیان تقریبی
+- سود/زیان تحقق‌یافته (Realized) و تحقق‌نیافته (Unrealized) — جداگانه، **هرگز ترکیب نشوند**
 - تفکیک کلی (کریپتو، سهام، صندوق، فلزات)
 
 ### ۷. اعلان‌ها
@@ -99,7 +99,9 @@
 - `widgets` → JSON (لیست ویجت‌ها + ترتیب + تنظیمات هر ویجت)
 - `updatedAt` → datetime
 
-### ۲. Dashboard Widget Config (درون JSON یا جدول جدا)
+### ۲. Dashboard Widget Config (ساختار هر آیتم درون فیلد JSON `dash_layouts.widgets`)
+
+> **تصمیم معماری**: این Entity **جدول SQL مجزا نیست** — صرفاً schema هر آیتم درون آرایه `dash_layouts.widgets` را مستند می‌کند. چیدمان ویجت‌ها نیازی به Query رابطه‌ای ندارد و نگه‌داشتن آن داخل JSON کافی است.
 
 - `widgetKey` → string (`net_worth`, `budget`, `goals`, ...)
 - `isVisible` → boolean
@@ -184,7 +186,9 @@
   }>,
   investments: {
     totalValue: number,
-    profitLoss: number
+    realizedPL: number,       // سود/زیان تحقق‌یافته — جداگانه نگه داشته شود
+    unrealizedPL: number      // سود/زیان تحقق‌نیافته — جداگانه نگه داشته شود
+    // ممنوع: ترکیب این دو در یک فیلد profitLoss واحد (طبق قاعده سرتاسری پروژه)
   },
   notifications: {
     unreadCount: number
