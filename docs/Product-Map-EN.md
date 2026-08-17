@@ -21,9 +21,9 @@ Management of issued and received cheques, due dates, clearing, and bouncing.
 6. Debt & Loan Management
 Management of debts, receivables, loans, installments, interest, and late fees.
 7. Investment Management
-Includes Fixed Income Funds, Cryptocurrency, Stocks & Capital Market, Portfolio Tracking, and Fee Analysis.
+Includes crypto, Iran equities, fixed-income funds, metals (gold/silver, etc.), portfolio tracking, and fees.
 8. Physical Assets
-Management of gold, coins, vehicles, real estate, and other physical assets with purchase, sale, and valuation.
+Management of vehicles, real estate, and other non-market physical assets (investment metals are under Investment — Metals).
 9. Budget Management
 Monthly and yearly budgeting using Envelope (Zero-Based) method with controls and alerts.
 10. Financial Goals
