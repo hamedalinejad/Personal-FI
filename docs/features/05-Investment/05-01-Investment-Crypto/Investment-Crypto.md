@@ -190,7 +190,8 @@
 - `averageBuyPrice` → decimal
 - `currency` → string
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT طبق فرمول بخش «منطق کارمزد» — صرف‌نظر از اینکه کارمزد هر تراکنش به IRR، USDT یا خود رمزارز پرداخت شده)
+- `totalFeesPaidBase` → decimal (مجموع تجمیعی کارمزدها به **baseCurrency کاربر** — BUG-C04؛ جایگزین `totalFeesPaidUSDT`)
+- `totalFeesPaidUSDT` → deprecated alias — نوشته نشود؛ در migration به Base تبدیل شود
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -208,7 +209,7 @@
 > - برای IRR و USDT:  
 >   - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است)  
 >   - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود)  
->   - `totalFeesPaidUSDT = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
+>   - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند)  
 > - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی)  
 > - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
@@ -223,7 +224,7 @@
 - `totalAmount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003 — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
@@ -258,7 +259,7 @@
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003)
 - `accountId` → UUID (حساب بانکی مرتبط — **اجباری**؛ بدون حساب بانکی این تراکنش نباید در این جدول باشد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
@@ -302,8 +303,13 @@ function convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase, exchangeR
 
 ### بخش ۲ — قانون واحد Fee Treatment روی `quantity` و `Cost Basis`
 
-> **اصل بنیادی**: کارمزد **هرگز** از `quantity` کسر نمی‌شود — حتی وقتی `feeCurrency = symbol` دارایی است.
-> کارمزد فقط روی **Cost Basis** (`totalInvested`) و **Realized P&L** تأثیر می‌گذارد.
+> **اصل بنیادی (BUG-C06)**: رفتار کارمزد با فیلد `feePresence` روی تراکنش تعیین می‌شود — **نه یک قانون ثابت برای همه صرافی‌ها**.
+> - `fee_in_quote` — کارمزد از ارز قیمت‌گذاری/تسویه؛ quantity دارایی پایه معمولاً gross=net
+> - `fee_from_base_asset` — کارمزد از خود دارایی؛ `netQuantity = grossQuantity - feeQuantity`
+> - `fee_external` — کارمزد جدا پرداخت شده (خارج از این trade)
+> - `fee_from_received` — کارمزد از مقدار دریافتی کسر (شبیه transfer)
+>
+> فیلدهای اجباری وقتی fee وجود دارد: `grossQuantity`, `feeQuantity`, `netQuantity`, `feeCurrency`, `feeAmount`
 
 #### ۲-الف) خرید (BUY)
 
@@ -403,7 +409,7 @@ costTransferred   = 0.999 × 50,000 = 49,950 USDT  ← این است که به �
 > **چرا در انتقال `quantity` کمتر می‌شود؟**
 > چون در transfer، کارمزد از **ارز ارسالی خودِ BTC** برداشته می‌شود —
 > مقصد واقعاً ۰.۹۹۹ BTC دریافت کرده، نه ۱ BTC.
-> این تفاوت اساسی با خرید/فروش است که کارمزد از موجودی دارایی کسر **نمی‌شود**.
+> در transfer معمولاً fee_from_received است. در BUY/SELL بستگی به `feePresence` دارد (BUG-C06) — نه همیشه بدون اثر روی quantity.
 
 #### ۲-د) معامله رمزارز-به-رمزارز (C2C)
 
@@ -425,15 +431,15 @@ costTransferred   = 0.999 × 50,000 = 49,950 USDT  ← این است که به �
 
 ### بخش ۳ — جدول خلاصه
 
-| عملیات | `feeCurrency = baseCurrency/IRR` | `feeCurrency = symbol دارایی` |
-|---------|----------------------------------|-------------------------------|
-| **BUY** | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه | `quantity` بدون تغییر ✅ — `feeBase` به `totalInvested` اضافه |
-| **SELL** | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر | `quantity` بدون تغییر ✅ — `feeBase` از `realizedPL` کسر |
-| **TRANSFER** | `quantity` بدون تغییر در مبدا ✅ — `quantity` کامل در مقصد ✅ — `feeBase` به `totalFeesPaidBase` | `quantity` کامل در مبدا ✅ — `quantity` کاهش‌یافته در مقصد ⚠️ (چون ارز کمتری رسیده) |
-| **C2C** | `quantity` هر دو طرف بدون تغییر ✅ — `feeBase` در SELL از P&L کسر و در BUY به Cost Basis اضافه | همان قانون ✅ |
+| `feePresence` | اثر روی quantity | اثر روی cost / P&L |
+|---------------|------------------|---------------------|
+| `fee_in_quote` | `netQuantity = grossQuantity` | feeBase به cost (BUY) یا از realized (SELL) |
+| `fee_from_base_asset` | `netQuantity = grossQuantity − feeQuantity` | cost basis روی **net**؛ feeBase به totalFeesPaidBase |
+| `fee_from_received` | مقصد کمتر می‌گیرد (transfer/C2C) | مشابه |
+| `fee_external` | quantity طبق trade خالص | fee جدا در ledger/journal |
 
-> **قانون طلایی**: `feeCurrency = symbol` تنها در **TRANSFER** روی `quantity` مقصد تأثیر می‌گذارد —
-> در هر عملیات دیگری (BUY/SELL/C2C) فقط روی `Cost Basis` یا `realizedPL` اثر دارد.
+> **قانون (BUG-C06)**: Holding همیشه با **`netQuantity`** به‌روز می‌شود. فیلد `quantity` روی تراکنش = net مگر صریحاً gross جدا ذخیره شود.
+> مثال: BUY 1 BTC fee 0.001 BTC → gross=1, feeQty=0.001, net=0.999 → holding += 0.999
 
 ---
 
@@ -837,3 +843,37 @@ averageBuyPrice  بدون تغییر می‌ماند       // Weighted Average �
 فرمول Average Buy فقط با quantity **خالص** و cost **سازگار با همان quantity** اجرا شود؛ در غیر این صورت Unrealized P&L منحرف می‌شود.
 
 > **BUG-009**: Fetch قیمت باید `assetId` و mapping Provider روی Holding را مصرف کند (از طریق PriceAssetRef)، نه فقط symbol.
+
+---
+
+## Trade Model عمومی کریپتو (BUG-C05)
+
+Valuation با `priceCurrency` (اغلب USDT در price_history) **جدا** از مدل معامله است.
+
+### فیلدهای معامله (`inv_crypto_transactions`)
+
+| فیلد | نقش |
+|------|-----|
+| `baseAsset` / `symbol` | دارایی اصلی (BTC, ETH, …) |
+| `quoteAsset` | ارز قیمت‌گذاری معامله (USDT, USDC, IRR, EUR, BTC, …) |
+| `settlementAsset` | nullable — اگر تسویه با چیزی غیر از quote باشد |
+| `grossQuantity` | مقدار پایه قبل از fee |
+| `netQuantity` | مقدار مؤثر روی holding |
+| `feeQuantity` | مقدار fee به واحد fee asset |
+| `feeCurrency` | دارایی کارمزد |
+| `feePresence` | enum بالا (BUG-C06) |
+| `quoteAmount` | مبلغ quote پرداخت/دریافت‌شده |
+| `price` | قیمت: quote per 1 base |
+| `exchangeRateToBase` | quote (یا settlement) → baseCurrency کاربر |
+
+نمونه‌های مجاز بدون ابهام:
+- BTC/USDT, BTC/USDC, BTC/IRR, BTC/EUR
+- ETH/BTC, SOL/ETH (C2C: دو رکورد linked با `tradeGroupId`)
+
+### قیمت‌گیری (Price Fetching)
+- `price_history` می‌تواند هنوز جفت‌های رایج (مثلاً */USDT) را برای **valuation** نگه دارد.
+- معامله با quote دیگر: `price` و `quoteAmount` از خود trade؛ تبدیل به base با `exchangeRateToBase` یا مسیر quote→USDT→base در صورت نیاز.
+- **ممنوع**: فرض اینکه هر trade فقط USDT است.
+
+### C2C
+`tradeGroupId` مشترک روی SELL(base1) + BUY(base2)؛ quote می‌تواند دارایی سوم باشد.

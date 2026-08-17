@@ -194,9 +194,9 @@ const newAvg = totalInvested.dividedBy(totalQty);           // هرگز round ن
 const unrealized = currentPrice.minus(averageBuyPrice).times(quantity);
 const unrealizedDisplay = unrealized.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
-// کارمزد رمزارز — تبدیل به USDT برای totalFeesPaidUSDT
-const feeInUSDT = feeAmount.times(feeAssetPriceToUSDT);    // کامل در محاسبه
-// totalFeesPaidUSDT = Σ feeInUSDT — با ROUND_HALF_UP آخر
+// کارمزد رمزارز — تبدیل به baseCurrency برای totalFeesPaidBase
+const feeInBase = feeAmount.times(feeAssetPriceToUSDT);    // کامل در محاسبه
+// totalFeesPaidBase = Σ feeInBase — با ROUND_HALF_UP آخر
 ```
 
 ### سهام ایران (Stocks Iran)

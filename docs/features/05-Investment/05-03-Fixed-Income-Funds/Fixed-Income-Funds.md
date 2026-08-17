@@ -121,7 +121,8 @@ Domain Entities
 - `units` → decimal (تعداد واحد فعلی)
 - `averageBuyPrice` → decimal (میانگین قیمت **خرید/صدور** بر اساس `transactionPrice` تراکنش‌های buy/reinvest)
 - `totalInvested` → decimal (مجموع سرمایه‌گذاری بر اساس قیمت واقعی خرید)
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
+- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — BUG-C04)
+- `totalFeesPaidUSDT` → deprecated
 - `currentNAV` → decimal (آخرین **NAV** ثبت‌شده — فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با قیمت صدور/ابطال قاطی نشود)
 - `lastSubscriptionPrice` → decimal (nullable — آخرین قیمت صدور دیده‌شده)
 - `lastRedemptionPrice` → decimal (nullable — آخرین قیمت ابطال دیده‌شده)

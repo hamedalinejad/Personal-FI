@@ -110,7 +110,7 @@
 
 - **Accounts & Banking**: ذخیره `currency` در Account و `exchangeRateToBase` در تراکنش‌ها
 - **Income / Expense**: ذخیره `currency` در تراکنش و تبدیل به نرخ لحظه
-- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToBase` برای هر تراکنش و محاسبه `totalFeesPaidUSDT`
+- **Investment (همه زیر‌فیچرها)**: ذخیره `exchangeRateToBase` برای هر تراکنش و محاسبه `totalFeesPaidBase` (BUG-C04؛ نه USDT سخت‌کد)
 - **Physical Assets**: ذخیره `currency` و `exchangeRateToBase` در خرید و فروش
 - **Budget**: نمایش مبالغ در ارز پیش‌فرض کاربر
 - **Financial Goals**: نمایش پیشرفت اهداف به ارز پیش‌فرض

@@ -67,7 +67,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `theme` | `'light' \| 'dark' \| 'system'` | `'system'` | تم |
 | `dateFormat` | `'jalali' \| 'gregorian'` | `'jalali'` | فرمت تاریخ |
 | `numberFormat` | `'fa' \| 'en'` | `'fa'` | فرمت اعداد |
-| `autoVersionCheckEnabled` | `boolean` | `true` | بررسی خودکار نسخه در Startup (به «سیاست دسترسی به شبکه» در `Technical-Architecture.md` مراجعه کنید) |
+| `autoVersionCheckEnabled` | `boolean` | **`false`** | بررسی خودکار نسخه در Startup — **پیش‌فرض خاموش (BUG-C02 / Offline-by-default)**؛ فقط با opt-in صریح کاربر روشن می‌شود |
 | `defaultAccountId` | `UUID \| null` | `null` | حساب پیش‌فرض در فرم ثبت تراکنش |
 | `dashboardLayout` | `string` | `'default'` | چیدمان داشبورد (به `dash_layouts` مراجعه کنید) |
 
@@ -138,7 +138,8 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | جدول | فیچر | توضیح |
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
-| `acc_transactions` | Accounts & Banking | تراکنش‌های بانکی |
+| `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
+| `fin_journal_entries` | Core Accounting | **دفتر روزنامه یکپارچه همه رویدادهای مالی (BUG-C03)** |
 | `inc_transactions` | Income | تراکنش‌های درآمد |
 | `inc_recurring` | Income | درآمدهای تکرارشونده |
 | `exp_transactions` | Expense | تراکنش‌های هزینه |
@@ -249,7 +250,7 @@ export interface InvFifHolding {
   units: Decimal;
   averageBuyPrice: Decimal;      // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
   totalInvested: Decimal;
-  totalFeesPaidUSDT: Decimal;
+  totalFeesPaidBase: Decimal; // BUG-C04 was totalFeesPaidUSDT
   currentNAV: Decimal;           // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
   lastSubscriptionPrice?: Decimal;
   lastRedemptionPrice?: Decimal;
@@ -289,7 +290,7 @@ export interface InvMetalsHolding {
   quantityMg: Decimal;            // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
   averageBuyPricePerMg: Decimal;  // میانگین همان purity (نه طلای خالص)
   totalInvested: Decimal;
-  totalFeesPaidUSDT: Decimal;
+  totalFeesPaidBase: Decimal; // BUG-C04 was totalFeesPaidUSDT
 }
 
 export interface InvMetalsTransaction {
@@ -780,3 +781,46 @@ sql.js در هر Tab یک کپی در RAM دارد. بدون هماهنگی، La
 5. عملیات مالی در Tab غیر-holder قفل: صف یا reject با پیام واضح — نه silent LWW.
 
 v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از از دست رفتن commit بدون اطلاع کاربر است.
+
+---
+
+## دفتر روزنامه یکپارچه — `fin_journal_entries` (BUG-C03)
+
+### مشکل
+جدول‌های `inc_*`, `exp_*`, `ln_*`, `inv_*`, `pa_*` و `acc_transactions` لاگ‌های دامنه‌ای جدا هستند. `acc_transactions` فقط **Cash/Bank ledger** است، نه Journal عمومی. گزارش‌ها و Reconciliation اگر فقط یکی را ببینند ناقص می‌مانند.
+
+### قرارداد
+هر `runAtomicFinancialOperation` **اجباری** است حداقل یک (معمولاً چند) ردیف در `fin_journal_entries` بنویسد — علاوه بر جداول دامنه فیچر.
+
+| فیلد | نوع | نقش |
+|------|-----|------|
+| `id` | UUID | PK |
+| `operationId` | UUID | همان atomic op |
+| `entryKind` | enum | `cash` \| `income` \| `expense` \| `transfer` \| `investment` \| `loan` \| `fee` \| `tax` \| `adjustment` \| `other` |
+| `direction` | enum | `debit` \| `credit` (از دید حساب/پرتفوی طبق قرارداد فیچر) یا `+`/`-` amountInBase |
+| `amount` | decimal string | مبلغ به ارز رویداد |
+| `currency` | string | |
+| `exchangeRateToBase` | decimal string | |
+| `amountInBase` | decimal string | `amount × rate` — برای گزارش یکپارچه |
+| `accountId` | UUID nullable | اگر رویداد روی حساب بانکی اثر دارد |
+| `relatedFeature` | RelatedFeature | |
+| `relatedId` | UUID | PK جدول دامنه (مثلاً inv_crypto_transactions.id) |
+| `businessDate` | date | |
+| `memo` | string nullable | |
+| `isVoided` | boolean | |
+| `createdAt` | timestamp UTC | |
+
+### قوانین
+1. جداول فیچر = **جزئیات دامنه** (units، NAV، loan portions، …).
+2. `fin_journal_entries` = **منبع حقیقت برای گزارش‌های میان‌فیچری و Net movement**.
+3. `acc_transactions` همچنان Cash ledger است و وقتی پول بانکی جابه‌جا می‌شود نوشته می‌شود؛ همان op باید journal entry هم داشته باشد (`relatedId` به acc یا به domain tx).
+4. گزارش‌های حسابداری (`getLedger`, reconcileAll سطح سیستم) از journal می‌خوانند؛ جزئیات از relatedFeature/relatedId.
+5. بدون journal entry، atomic op ناقص و باید fail شود (در تست‌های architecture).
+
+```text
+Feature domain row(s)
+  + fin_journal_entries (الزامی)
+  + acc_transactions (فقط اگر cash بانکی)
+  + snapshots
+→ COMMIT → persist
+```

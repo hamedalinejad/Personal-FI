@@ -125,7 +125,8 @@ Domain Entities
 - `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم — واحد پایه ذخیره‌سازی؛ هرگز گرم/اونس)
 - `averageBuyPricePerMg` → decimal (میانگین قیمت خرید به ازای **هر میلی‌گرم از همین purity** — ریال؛ نه قیمت طلای خالص)
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی تمام کارمزدهای پرداخت‌شده، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
+- `totalFeesPaidBase` → decimal (کارمزد تجمعی به baseCurrency — BUG-C04)
+- `totalFeesPaidUSDT` → deprecated
 - `createdAt` → datetime
 - `updatedAt` → datetime
 

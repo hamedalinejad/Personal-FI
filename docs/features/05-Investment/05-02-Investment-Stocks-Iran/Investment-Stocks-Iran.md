@@ -66,7 +66,8 @@
 - `quantity` → decimal
 - `averageBuyPrice` → decimal ریال
 - `totalInvested` → decimal
-- `totalFeesPaidUSDT` → decimal (مجموع تجمیعی `feeAmount` کل — شامل هر ۴ جزء کارمزد: `feeBrokerCommission + feeExchange + feeTax + feeOther` — تمام تراکنش‌ها، پس از تبدیل هر کارمزد به USDT با `exchangeRateToBase` همان تراکنش)
+- `totalFeesPaidBase` → decimal (مجموع کارمزدها به baseCurrency — BUG-C04؛ شامل feeBroker+Exchange+Tax+Other پس از تبدیل با exchangeRateToBase همان تراکنش)
+- `totalFeesPaidUSDT` → deprecated
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
