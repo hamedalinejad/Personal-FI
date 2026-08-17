@@ -159,22 +159,34 @@
 
 ### ۲. Crypto Wallet Network (جدول: `inv_crypto_wallet_networks`)
 
-> این جدول فقط برای wallet های نرم‌افزاری و سخت‌افزاری (`type = 'software_wallet' | 'hardware_wallet'`) کاربرد دارد؛ برای صرافی‌ها (`type = 'exchange'`) نیازی به این جدول نیست چون صرافی یک آدرس واحد مدیریت می‌کند.
+> فقط برای `software_wallet` | `hardware_wallet`. صرافی متمرکز معمولاً نیاز ندارد.
 
-- `id` → UUID (Primary Key)
-- `exchangeId` → UUID (کلید خارجی به `inv_crypto_exchanges.id`)
-- `network` → string (نام شبکه بلاکچین — مثلاً `TRC20`, `ERC20`, `BEP20`, `SOL`, `BTC`, `TON`)
-- `custodyAccount` → string (nullable — نام یا برچسب توضیحی برای این آدرس، مثلاً «کیف پول اصلی» یا «آدرس سرد»)
-- `address` → string (nullable — آدرس عمومی کیف پول برای این شبکه)
-- `isActive` → boolean
-- `createdAt` → datetime
-- `updatedAt` → datetime
+- `id` → UUID
+- `exchangeId` → UUID FK
+- `network` / `chainId` → شناسایی شبکه (TRC20/ERC20/…)
+- `label` → string nullable (مثلاً «سرد»، «حساب ۰»)
+- `isActive`, `createdAt`, `updatedAt`
 
-> **چرا این جدول لازم است؟**  
-> یک رمزارز واحد (مثلاً USDT) می‌تواند روی شبکه‌های مختلف وجود داشته باشد: `USDT TRC20`، `USDT ERC20`، `USDT BEP20` — این‌ها از نظر آدرس والت و مسیر انتقال کاملاً متفاوت‌اند. اگر کاربر USDT را از شبکه اشتباه بفرستد، دارایی از دست می‌رود. بنابراین:
-> - هر والت می‌تواند چند شبکه داشته باشد (یک ردیف در `inv_crypto_wallet_networks` به ازای هر شبکه).
-> - هر Holding رمزارز در والت می‌تواند اختیاراً با یک شبکه مشخص لینک شود (فیلد `networkId` در `inv_crypto_holdings` — nullable).
-> - انتقال بین والت‌ها/صرافی‌ها باید شبکه را مشخص کند تا تاریخچه کامل باشد.
+> **BUG-H10**: یک ردیف network **دیگر یک address واحد نیست**. آدرس‌ها در جدول فرزند:
+
+### ۲b. Wallet Addresses — `inv_crypto_wallet_addresses`
+| فیلد | نقش |
+|------|-----|
+| `id` | UUID |
+| `networkId` | FK → `inv_crypto_wallet_networks` |
+| `address` | آدرس on-chain |
+| `derivationPath` | nullable (مثلاً BIP44 `m/44'/60'/0'/0/0`) |
+| `accountIndex` | nullable |
+| `addressType` | `receiving` \| `change` \| `contract` \| `other` |
+| `isPrimary` | boolean — حداکثر یک primary per network |
+| `label` | nullable |
+| `isActive` | boolean |
+
+قوانین:
+1. `network` = لایه زنجیره؛ `address` = یک هویت دریافت/ارسال روی آن شبکه.
+2. Holding همچنان به `networkId` (و assetKey) وصل است — موجودی per-network؛ نه per-address (v1).
+3. تراکنش on-chain می‌تواند `fromAddressId` / `toAddressId` اختیاری داشته باشد برای audit آینده.
+4. v1 می‌تواند با یک address per network شروع کند ولی schema از روز اول چندآدرسی است تا محدود نشود.
 
 > **BUG-005/006**: شبکه فقط در `inv_crypto_transactions` (فیلد `networkId` FK) ثبت می‌شود، نه در `inv_crypto_exchange_transactions`. جدول exchange transactions فقط برای جریان نقدی Bank ↔ Exchange است و فیلدهای آنچین (network, txHash, ...) در آن جایی ندارند.
 

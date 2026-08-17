@@ -151,7 +151,8 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `ln_transactions` | Debt & Loan | تراکنش‌های وام |
 | `ln_rate_history` | Debt & Loan | تاریخچه نرخ سود وام‌های Variable |
 | `inv_crypto_exchanges` | Investment Crypto | صرافی‌ها و والت‌ها |
-| `inv_crypto_wallet_networks` | Investment Crypto | شبکه‌های بلاکچین هر والت (TRC20/ERC20/BEP20 و ...) |
+| `inv_crypto_wallet_networks` | Investment Crypto | شبکه‌های بلاکچین هر والت |
+| `inv_crypto_wallet_addresses` | Investment Crypto | چند آدرس/derivation per شبکه (BUG-H10) |
 | `inv_crypto_holdings` | Investment Crypto | دارایی‌های رمزارز |
 | `inv_crypto_transactions` | Investment Crypto | تراکنش‌های رمزارز |
 | `inv_crypto_exchange_transactions` | Investment Crypto | تراکنش‌های نقدی صرافی |
@@ -237,7 +238,7 @@ export interface AccTransaction {
   feeAmount?: Decimal;
   feeCurrency?: string;
   exchangeRateToBase?: Decimal; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
-  balanceAfterTransaction: Decimal; // snapshot برای جلوگیری از خطاهای رُند
+  balanceAfterTransaction: Decimal; // derived snapshot only (BUG-H13) — ledger authoritative
   accountId: string;
   isVoided: boolean;
 }
@@ -721,7 +722,12 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 4. **ممنوع DELETE فیزیکی** parent تا وقتی child link دارد (هم‌راستا با ON DELETE RESTRICT روی FKهای واقعی).
 5. تست integration: حذف/void والد نباید child را بی‌سرپرست رها کند بدون گزارش.
 
-این همچنان Weak Integrity نسبت به FK واقعی است، ولی پنجره orphan بدون تشخیص تا «فقط وقتی کاربر reconcile بزند» نباید باز بماند — حداقل در Backup/Restore و `reconcileAll` اجباری است.
+این همچنان Weak Integrity نسبت به FK واقعی است (BUG-H14)، ولی mitigations **الزامی در runtime**اند:
+1. CHECK `relatedFeature` ∈ enum بسته (لیست در types) در صورت امکان + validate Domain.
+2. قبل از COMMIT: SELECT وجود `relatedId` در جدول map[relatedFeature].
+3. `reconcileOrphanLinks` در Backup/Restore و دوره‌ای در Settings «سلامت داده».
+4. UI هرگز relatedId را بدون انتخاب entity از API فیچر مالک نمی‌نویسد.
+5. مسیر آینده Should Have: جدول link اختصاصی per pair برای روابط پرتکرار (کاهش polymorphic surface).
 
 ---
 

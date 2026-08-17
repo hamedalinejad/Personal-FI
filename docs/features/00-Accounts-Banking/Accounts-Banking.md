@@ -9,7 +9,7 @@ Business Rules
 - نام حساب باید منحصر به فرد باشد.
 - حذف حساب وجود ندارد — فقط آرشیو (Soft Archive).
 - تراکنش‌ها پس از ثبت تغییرناپذیر هستند؛ برای اصلاح، تراکنش reversed/voided ثبت می‌شود.
-- مانده حساب بعد از هر تراکنش در فیلد `balanceAfterTransaction` snapshot می‌شود (برای جلوگیری از بازپخش تراکنش‌ها و تغییر دستی).
+- `balanceAfterTransaction` یک **derived snapshot** روی هر ردیف تراکنش است (BUG-H13) — برای نمایش/دیباگ سریع. **منبع حقیقت مانده = Ledger** (`Σ acc_transactions` / `rebuildAccountFromLedger`). هیچ Report یا API تعمیری نباید این فیلد را authoritative فرض کند.
 
 Domain Entities
 1. Account (جدول: acc_accounts)

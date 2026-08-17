@@ -2,6 +2,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-H10 — Multiple wallet addresses per network
+**راه‌حل:** inv_crypto_wallet_addresses با derivationPath/accountIndex؛ network ≠ یک address.
+
+### BUG-H11 — Qarz principal vs service fee
+**راه‌حل:** principalAmount مبنای اقساط/remaining؛ serviceFee expense جدا؛ نه P=principal-fee.
+
+### BUG-H12 — Loan fee accounting treatment
+**راه‌حل:** accountingTreatment per feeCategory؛ پیش‌فرض expense نه reduction of liability.
+
+### BUG-H13 — balanceAfterTransaction derived only
+**راه‌حل:** snapshot غیرauthoritative؛ rebuild از ledger.
+
+### BUG-H14 — Polymorphic link risk
+**راه‌حل:** validate-before-commit، enum check، orphan reconcile اجباری؛ کاهش surface در آینده.
+
+
 ### BUG-H06 — FIF multi-currency
 **راه‌حل:** currency روی معامله + exchangeRateToBase به baseCurrency؛ حذف hard-code ریال/تتر.
 

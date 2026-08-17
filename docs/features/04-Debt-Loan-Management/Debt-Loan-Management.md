@@ -27,10 +27,14 @@
 - هر قسط: اصل = `principalAmount / totalInstallments`، سود = `principalAmount × rate × years / totalInstallments` — این دو مقدار **در داخل** `fixedInstallmentAmount` جمع می‌شوند، نه جدا از آن
 
 **3. Qarz Al-Hasaneh (قرض‌الحسنه):**
-- سود = ۰، فقط کارمزد خدمات ۴٪
-- نیاز: `calculationMethod = 'qarz_al_hasaneh'` و `serviceFeeRate = 4`
-- کارمزد یک‌بار کسر می‌شود: `serviceFeeAmount = principalAmount × serviceFeeRate / 100`
-- هر قسط: صرفاً تقسیم‌کردن اصل: `installment = principalAmount / totalInstallments`
+- سود = ۰؛ کارمزد خدمات معمولاً ۴٪ یک‌بار در disbursement
+- `serviceFeeAmount = principalAmount × serviceFeeRate / 100`
+- **قرارداد اصل بدهی (BUG-H11)**:
+  - `principalAmount` = اصل تعهد بازپرداخت (مثلاً ۱۰۰m) — مبنای اقساط و `remainingBalance` اولیه
+  - `serviceFeeAmount` = کارمزد جدا (مثلاً ۴m) — **expense** در disbursement؛ از اصل بدهی کم **نمی‌شود**
+  - مبلغ نقدی خالص دریافتی کاربر اغلب `principalAmount - serviceFeeAmount` است (اگر fee از محل پرداخت کسر شود)
+  - `installment = principalAmount / totalInstallments` (نه 96m)
+- **ممنوع**: `P = principal - serviceFee` در فرمول اقساط (تناقض قبلی حذف شد)
 
 **4. Bullet:**
 - اصل کل در پایان، سود ماهانه
@@ -454,7 +458,7 @@ function getTotalPeriods(loan: Loan): number {
 ```
 r = getPeriodRate(loan)                        // نرخ دوره‌ای (ماهانه / هفتگی / فصلی / custom)
 n = getTotalPeriods(loan)                      // تعداد کل اقساط
-P = principalAmount                            // (برای قرض‌الحسنه: P = principalAmount - serviceFeeAmount)
+P = principalAmount                            // فقط Declining — قرض‌الحسنه از بخش «ج»؛ هرگز serviceFee از P کم نشود اینجا
 
 calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
 ```
@@ -528,16 +532,19 @@ interestPortion      = totalInterest / n              // ثابت برای تم�
 فرکانس تأثیری بر سود ندارد (سود = صفر). فقط تعداد اقساط تغییر می‌کند:
 
 ```
-serviceFeeAmount = principalAmount × (serviceFeeRate / 100)   // یک‌بار کسر
-installment      = principalAmount / totalInstallments         // بدون توجه به فرکانس
-principalPortion = installment
-interestPortion  = 0
+serviceFeeAmount = principalAmount × (serviceFeeRate / 100)  // fee جدا — expense
+remainingBalance0 = principalAmount                          // اصل بدهی کامل (BUG-H11)
+installment       = principalAmount / totalInstallments
+principalPortion  = installment
+interestPortion   = 0
+// netCashAtDisbursement (اغلب) = principalAmount - serviceFeeAmount  وقتی fee از پرداخت کسر شود
 ```
 
 **مثال هفتگی:**
-- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، کارمزد ۴٪
-- serviceFeeAmount = 4,000,000
-- installment = 100,000,000 / 52 ≈ 1,923,077 ریال در هفته
+- اصل تعهد ۱۰۰,۰۰۰,۰۰۰؛ کارمزد ۴٪ = ۴,۰۰۰,۰۰۰؛ خالص دریافتی ≈ ۹۶,۰۰۰,۰۰۰
+- remainingBalance اولیه = **۱۰۰,۰۰۰,۰۰۰**
+- installment = ۱۰۰,۰۰۰,۰۰۰ / ۵۲ ≈ ۱,۹۲۳,۰۷۷
+- اقساط جمعاً اصل ۱۰۰m را تسویه می‌کنند؛ fee جدا در `fee_payment` / journal
 
 ---
 
@@ -1052,3 +1059,24 @@ ln_loan_fees:
      → tiers: [{upToPercent:50, rate:1}, {upToPercent:100, rate:2}]
      → فقط اگر پیش‌پرداخت انجام شود محاسبه می‌شود
 ```
+
+---
+
+## Accounting Treatment کارمزد وام (BUG-H12)
+
+علاوه بر محاسبه مبلغ، هر `ln_loan_fees.feeCategory` باید `accountingTreatment` داشته باشد:
+
+| feeCategory | treatment پیش‌فرض | اثر |
+|-------------|-------------------|-----|
+| `origination` | `expense` یا `reduction_of_proceeds` | کاهش net cash دریافتی؛ **نه** کاهش principal liability مگر صریح |
+| `early_payment` | `expense` | با پیش‌پرداخت؛ remainingBalance فقط از portion اصل کم می‌شود |
+| `monthly_management` | `expense` | همراه قسط؛ به principal اضافه نمی‌شود |
+| `per_transaction` | `expense` | |
+| `insurance` | `expense` | |
+| `tiered` (زیرگروه early) | `expense` | |
+
+قوانین:
+1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `reduction_of_proceeds` | `reduction_of_liability`
+2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_liability` صریح (نادر).
+3. هر fee → `ln_transactions type=fee_payment` + `fin_journal_entries` با entryKind=fee.
+4. `capitalized_cost` فقط اگر محصولاً به cost of borrowing اضافه شود و در گزارش جداگانه مستند باشد.
