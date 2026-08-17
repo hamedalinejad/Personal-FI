@@ -141,10 +141,12 @@
 - پس از override، محاسبات خودکار متوقف می‌شود.
 
 ### Rollover
-- هنگام بستن بودجه (`status = closed`) و اگر `rolloverEnabled = true`:
-  - `rolloverAmount` هر پاکت به مقدار `remainingAmount` آن به‌روزرسانی می‌شود.
-  - `remainingAmount` هر پاکت صفر می‌شود.
-  - پاکت "آماده تخصیص" مجدد پر می‌شود با مقدار `totalIncome` دوره جدید.
+- هنگام بستن بودجه (`status = closed`) و اگر `rolloverEnabled = true`، `closeBudget(id)` به‌صورت atomic:
+  1. برای هر پاکت، مقدار `remainingAmount` دوره جاری را محاسبه می‌کند (`assignedAmount + rolloverAmount - spentAmount`).
+  2. یک پاکت **جدید** در دوره بعدی با همین `envelopeCategory` می‌سازد که `assignedAmount = 0`، `spentAmount = 0` و `rolloverAmount = <مقدار محاسبه‌شده بالا>` دارد — در نتیجه `remainingAmount` دوره جدید خودبه‌خود برابر همان مبلغ منتقل‌شده می‌شود.
+  3. دوره جاری `status = 'closed'` می‌شود.
+  - **توجه**: عبارت «`remainingAmount` صفر می‌شود» در ادبیات قدیمی این سند به معنی مقداردهی مستقیم به این فیلد **نیست** (چون محاسبه‌ای است و در دیتابیس ذخیره نمی‌شود)؛ بسته‌شدن دوره جاری به خودی خود `remainingAmount` آن دوره را بی‌اثر می‌کند.
+- پاکت "آماده تخصیص" دوره جدید با مقدار `totalIncome` دوره جدید ساخته می‌شود (نه Rollover).
 
 ---
 
