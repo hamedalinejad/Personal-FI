@@ -123,7 +123,7 @@
 ### Report APIs
 - `getCashFlow(startDate, endDate, accountIds?)`
 - `getIncomeExpenseReport(startDate, endDate, groupBy?)`
-- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص
+- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص؛ منابع جمع‌آوری: موجودی حساب‌های بانکی + ارزش holding تمام سرمایه‌گذاری‌ها + ارزش دارایی‌های فیزیکی − مانده بدهی‌ها؛ **شرطی** (`includeCashInWealth = true`): موجودی نقدی `inv_metals_platforms.cashBalance` و `inv_stocks_iran_brokerages.cashBalance` نیز جمع می‌شود
 - `getNetWorthTrend(startDate, endDate)` → روند Net Worth
 - `getInvestmentPerformance(startDate?, endDate?)`
 - `getTaxSummary(year?)` → خلاصه مالیات‌ها (پرداخت‌شده، در انتظار، معوق)
@@ -168,7 +168,8 @@
 - ارزش پرتفوی کریپتو
 - ارزش پرتفوی سهام ایران
 - ارزش صندوق‌های درآمد ثابت
-- ارزش فلزات (پلتفرم‌ها)
+- ارزش فلزات (پلتفرم‌ها — holding)
+- **موجودی نقدی پلتفرم‌ها/کارگزاری‌های سرمایه‌گذاری** (شرطی — فقط اگر `includeCashInWealth = true` در تنظیمات پرتفوی؛ منابع: `inv_metals_platforms.cashBalance` + `inv_stocks_iran_brokerages.cashBalance`)
 - ارزش دارایی‌های فیزیکی
 
 ### بدهی‌ها:
