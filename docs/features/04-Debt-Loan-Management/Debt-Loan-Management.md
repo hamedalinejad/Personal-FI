@@ -1075,6 +1075,33 @@ ln_loan_fees:
 
 ---
 
+
+### مثال عددی Variable Rate (مرجع تست)
+
+```
+اصل: 120,000,000 IRR
+n اولیه: 12 ماهانه، نرخ اولیه 18٪ سالانه → r0 = 0.015
+قسط اولیه ≈ 10,978,000 (تقریبی؛ در تست با decimal.js دقیق محاسبه شود)
+
+پرداخت قسط ۱ و ۲ با r0 انجام و immutable است.
+
+updateLoanRate(newRate=24٪ annual, effectiveDate = dueDate قسط ۳)
+r_new = 0.02
+remainingBalance بعد از قسط ۲ را از ledger بخوان (مثلاً ≈ 100,150,000)
+remainingInstallments = 10
+
+اگر recalculateOnEarlyPayment / تعداد ثابت:
+  calculatedInstallment_new = P_rem × [r(1+r)^10]/[(1+r)^10-1] با r=0.02
+
+اقساط ۱–۲: بدون تغییر در history
+اقساط ۳–۱۲: با r_new
+ln_loans.interestRate همچنان 18 (نرخ اولیه)
+ln_rate_history: { rate:24, effectiveDate: ... }
+```
+
+تست: `payLoan` قسط ۳ باید `interestPortion = remaining × 0.02` بسازد نه 0.015.
+
+
 ## راهنمای پیاده‌سازی (برای توسعه‌دهنده)
 
 ### توابع اجباری Domain
