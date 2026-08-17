@@ -250,3 +250,31 @@
 2. Deep link فقط برای entity جزئیات (`/:id`) و گزارش‌های مهم؛ نه برای هر دکمه.
 3. هر sub-route جدید در PR باید توجیه کند چرا Sheet از روی همان صفحه کافی نبود.
 4. شمارش هدف v1: زیر‌مسیرهای پایدار (bookmarkپذیر) محدود؛ بقیه state محلی UI.
+
+---
+
+## Route در برابر UI State (BUG-M04)
+
+فهرست‌های طولانی شبیه:
+
+```text
+/investments/crypto/:exchangeId/buy
+/investments/crypto/:exchangeId/sell
+...
+```
+
+**نقشه‌ی مفهومی عمل‌ها** هستند، نه الزام به یک React page/route component per URL.
+
+### قرارداد implementation
+1. **Route واقعی (bookmarkپذیر)** فقط:
+   - ۹ صفحه اصلی
+   - جزئیات entity مهم: `/investments/crypto/:exchangeId`, `/investments/stocks/:symbol` یا `:holdingId`, …
+   - چند گزارش کلیدی زیر `/reports/...`
+2. **اعمال buy/sell/deposit/withdraw/nav/...** → **یک Sheet جنریک** با state:
+   `{ assetClass, action, entityId }` از همان صفحه جزئیات — نه لزوماً path جدا در router.
+3. اگر deep-link برای فرم لازم شد، query مجاز است:  
+   `/investments/crypto/:id?action=buy` به‌جای ده‌ها path ثابت.
+4. PR که path جدید در `react-router` اضافه می‌کند باید توجیه کند چرا query/state کافی نبود.
+5. هدف: **کم‌صفحه‌بودن در UI و در درخت route** — نه فقط در Bottom Nav.
+
+این بخش بر BUG-039 اولویت اجرایی می‌دهد: Sheets بیش از nested routes.

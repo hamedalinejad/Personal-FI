@@ -830,3 +830,31 @@ Feature domain row(s)
   + snapshots
 → COMMIT → persist
 ```
+
+---
+
+## مکانیزم واقعی Reconciliation (BUG-M02)
+
+APIهای `reconcile*` / `rebuild*` فقط مشخصات نیستند؛ در implementation باید **قابل اثبات** کنند `snapshot == ledger`.
+
+### قرارداد اجرایی
+1. **ماژول** `core/reconciliation/` (یا `db/reconciliation.ts`):
+   - `reconcileX(id): Promise<ReconcileResult>`
+   - `rebuildXFromLedger(id): Promise<void>` فقط پس از تأیید کاربر
+2. **الگوریتم مشترک**:
+```text
+expected = pure function over non-voided ledger rows (decimal.js)
+actual   = current snapshot column(s)
+delta    = actual - expected
+ok       = delta.isZero()
+```
+3. **اثبات در تست**: unit/integration با fixture — بعد از atomic op، `reconcileX` → `ok:true`؛ بعد از فساد عمدی snapshot → `ok:false` و rebuild جبران می‌کند.
+4. **Runtime**:
+   - Dev/Test: بعد از هر `runAtomicFinancialOperation` روی aggregate همان op
+   - Production v1: `reconcileAll` از Settings «سلامت داده» + قبل از Backup + بعد از Restore
+5. **خروجی پایدار** در جدول اختیاری `fin_reconcile_runs` (Should Have): `{ ranAt, scope, ok, deltaSummary }` برای audit.
+6. تا وقتی کد و تست fixture وجود ندارد، checklist پیاده‌سازی این باگ را **باز** می‌داند — مستند به‌تنهایی «حل‌شده در runtime» نیست.
+
+### منبع حقیقت مقایسه
+- همیشه **ledger rows** (و در صورت نیاز `fin_journal_entries` برای cross-feature)
+- هرگز `balanceAfterTransaction` یا سایر snapshotها به‌عنوان expected

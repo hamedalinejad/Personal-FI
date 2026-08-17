@@ -484,3 +484,36 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 2. Valuation به base: `price(instrument, quote) × rate(quote→base, asOf)` — rate جدا از quote است.
 3. `getLatestPrice` باید `(assetCategory, instrumentId, priceCurrency)` یا `quoteMarket` را بپذیرد؛ بدون quote پیش‌فرض documented (مثلاً USDT برای crypto valuation).
 4. P&L تاریخی فقط با quote + rate هم‌زمان همان asOf معتبر است.
+
+---
+
+## Canonical Asset Identity برای قیمت (BUG-M05)
+
+قبل از implementation نهایی، همه Adapterها فقط با **یک** شکل کار می‌کنند:
+
+```typescript
+interface CanonicalPriceInstrument {
+  assetCategory: 'crypto' | 'stock' | 'fif' | 'metal';
+  instrumentId: string;     // کلید پایدار در price_history
+  // نرمال‌سازی از دامنه:
+  // crypto: assetKey
+  // stock:  instrumentId (ISIN/stable) — نه صرفاً symbol نمایشی
+  // fif:    fundId
+  // metal:  `${metalType}_${purity}` یا id معادل
+  displaySymbol?: string;   // label
+  priceProviderId?: string;
+  providerSymbol?: string;
+  market?: string;
+  quoteCurrency?: string;   // برای stream بازار (BUG-H03)
+  chainId?: string;
+  contractAddress?: string;
+}
+```
+
+### قوانین
+1. Feature دامنه Holding را به `CanonicalPriceInstrument` / `PriceAssetRef` **map** می‌کند؛ Adapter منطق `fundId` vs `assetKey` را داخل Core پخش **نمی‌کند**.
+2. `instrumentId` در `price_history` همیشه همین کلید canonical است.
+3. جدول/registry نگاشت اختیاری: `price_instrument_aliases` اگر Provider شناسه دیگری دارد.
+4. تست: برای هر assetCategory حداقل یک fixture mapping → fetch → history row با instrumentId صحیح.
+
+بدون این لایه، semantics پراکنده دوباره به Core نشت می‌کند.

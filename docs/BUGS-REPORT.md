@@ -2,6 +2,16 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-M02 — Reconciliation as real mechanism
+**راه‌حل:** الگوریتم expected-from-ledger، تست fixture، runtime نقاط Backup/Settings؛ مستند ≠ runtime تا کد+تست باشد.
+
+### BUG-M04 — Route sprawl vs sheets
+**راه‌حل:** path واقعی محدود؛ buy/sell به‌صورت Sheet/state یا query؛ نه page per action.
+
+### BUG-M05 — Canonical price instrument
+**راه‌حل:** CanonicalPriceInstrument واحد؛ map از دامنه؛ Adapter بدون منطق پراکنده per asset.
+
+
 ### BUG-H10 — Multiple wallet addresses per network
 **راه‌حل:** inv_crypto_wallet_addresses با derivationPath/accountIndex؛ network ≠ یک address.
 
