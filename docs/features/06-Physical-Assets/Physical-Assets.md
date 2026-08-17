@@ -36,16 +36,17 @@
 
 ## Business Rules
 
-1. تمام مبالغ به ریال هستند و نرخ تتر لحظه در هر رکورد ذخیره می‌شود.
+1. `exchangeRateToBase` در هر رکورد تراکنش ذخیره می‌شود (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر — BUG-003؛ قرارداد کامل در `Currency-CrossRate.md`).
 2. **الگوی نگهداری دارایی‌ها:**
    - برای دسته‌های `gold` و `coin` (قابل‌تفکیک و هم‌ارز): خرید بیشتر همان نوع دارایی، `quantity` و `averageBuyPrice` (Weighted Average) را روی همان asset آپدیت می‌کند.
    - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است.
 3. هنگام **خرید دارایی**:
    - موجودی حساب بانکی کاهش می‌یابد.
-   - تراکنش در `acc_transactions` ثبت می‌شود.
+   - تراکنش در `acc_transactions` با `type = 'withdrawal-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — خرید دارایی سرمایه‌گذاری است، نه هزینه معمولی).
    - دارایی جدید (یا به‌روزرسانی موجود) با قیمت خرید ثبت می‌گردد.
 4. هنگام **فروش دارایی** (`type = 'sale'`):
    - موجودی حساب بانکی افزایش می‌یابد.
+   - تراکنش در `acc_transactions` با `type = 'deposit-investment'` و `relatedFeature = 'physical_assets'` ثبت می‌شود (هم‌راستا با Metals/FIF/Crypto — فروش دارایی درآمد معمولی نیست).
    - سود/زیان تحقق‌یافته محاسبه می‌شود.
    - `quantity` دارایی به اندازه `quantitySold` کاهش می‌یابد.
    - `quantity` نمی‌تواند منفی شود (یعنی `quantitySold` نمی‌تواند از `quantity` فعلی بیشتر باشد).
