@@ -2,6 +2,22 @@
 
 ## ✅ رفع‌شده در همین بررسی
 
+### BUG-H01 — Crypto price API by instrumentId
+**راه‌حل:** fetch/get/set با instrumentId/PriceAssetRef؛ symbol API deprecated.
+
+### BUG-H02 — assetKey required, no symbol fallback
+**راه‌حل:** assetKey اجباری و UNIQUE؛ symbol فقط label؛ assetId فقط mapping Provider.
+
+### BUG-H03 — Quote market vs valuation stream
+**راه‌حل:** priceCurrency/quoteMarket جدا؛ BTC-USDT ≠ BTC-USD در یک stream.
+
+### BUG-H04 — Iran stocks corporate actions
+**راه‌حل:** انواع CA روی transactions + قوانین cost basis + جدول اختیاری CA.
+
+### BUG-H05 — Stock holding stable instrumentId
+**راه‌حل:** UNIQUE(brokerageId, instrumentId)؛ symbol mutable.
+
+
 ### BUG-C02 — Offline-by-default
 **راه‌حل:** `autoVersionCheckEnabled` پیش‌فرض **false**؛ Network فقط پس از opt-in.
 

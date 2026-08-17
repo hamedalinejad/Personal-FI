@@ -463,3 +463,24 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 1. برای NAV و بورس ایران، **`marketDate` مبنای «قیمت کدام روز»** است؛ `fetchedAt` فقط زمان دریافت است.
 2. `getLatestPrice` برای fif/stock ترجیحاً بر اساس آخرین `marketDate` (سپس fetchedAt) انتخاب می‌کند، نه فقط fetchedAt خام.
 3. اگر Provider فقط timestamp بدهد، Adapter باید `marketDate` را از تقویم بازار استخراج یا از کاربر برای manual بگیرد.
+
+---
+
+## مرز Market Quote در برابر Valuation (BUG-H03)
+
+هر ردیف `price_history` باید به **یک بازار قیمت مشخص** تعلق داشته باشد:
+
+| فیلد | نقش |
+|------|-----|
+| `instrumentId` | دارایی پایه |
+| `priceCurrency` | **quote currency همان بازار** (USDT در BTC/USDT، USD در BTC/USD، …) |
+| `quoteMarket` | string پایدار اختیاری ولی توصیه‌شده: مثلاً `BTC-USDT`, `BTC-USD` |
+| `sourceId` | Provider |
+| `marketDate` / `fetchedAt` | زمان بازار / دریافت |
+| `quoteType` | last/nav/close/… |
+
+قوانین:
+1. **BTC/USDT و BTC/USD و BTC/USDC سه stream جدا** هستند — در یک سری زمانی مخلوط نشوند.
+2. Valuation به base: `price(instrument, quote) × rate(quote→base, asOf)` — rate جدا از quote است.
+3. `getLatestPrice` باید `(assetCategory, instrumentId, priceCurrency)` یا `quoteMarket` را بپذیرد؛ بدون quote پیش‌فرض documented (مثلاً USDT برای crypto valuation).
+4. P&L تاریخی فقط با quote + rate هم‌زمان همان asOf معتبر است.

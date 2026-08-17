@@ -43,15 +43,16 @@
 - `fetchCryptoPrices(symbols[], triggeredBy: 'user_click' | 'auto_sync')` → صرفاً یک Wrapper مخصوص کریپتو روی `fetchAndStorePrices` فیچر پدر (با `assetCategory='crypto'` ثابت)؛ دریافت از API خارجی + ذخیره Batch در `price_history` + برگرداندن خلاصه نتیجه:
   ```typescript
   {
-    succeeded: { symbol: string; price: string // decimal string — BUG-010؛ نه number و نه Decimal class در مرز API }[],
-    failed: { symbol: string; reason: string }[],
+    succeeded: { instrumentId: string; price: string }[], // BUG-010 decimal string; BUG-H01 identity
+    failed: { instrumentId: string; reason: string }[],
     skipped?: { reason: 'offline' },   // وقتی navigator.onLine=false بوده
     fetchedAt: Timestamp,
     triggeredBy: 'user_click' | 'auto_sync'
   }
   ```
-- `getLatestCryptoPrice(symbol)` → میانبر روی `getLatestPrice(symbol)` فیچر پدر، مخصوص `assetCategory='crypto'`
-- `setManualCryptoPrice(symbol, price)` → میانبر روی `setManualPrice(symbol, price, priceCurrency='USDT')` فیچر پدر؛ کاملاً آفلاین
+- `getLatestCryptoPrice(instrumentId | PriceAssetRef)` → میانبر روی `getLatestPrice({ assetCategory:'crypto', instrumentId })` — **نه symbol خام (BUG-H01)**
+- `setManualCryptoPrice(instrumentId, price, priceCurrency?)` → میانبر روی `setManualPrice` با instrumentId؛ کاملاً آفلاین
+- `fetchCryptoPrices(refs: PriceAssetRef[], triggeredBy)` → Wrapper روی `fetchAndStorePrices`؛ ورودی لیست `PriceAssetRef`/`instrumentId` است نه `string[]` symbol (BUG-H01)
 - `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
 
 ---
@@ -73,3 +74,18 @@
 > **Adapter (باگ ۳۶)**: هر Provider کریپتو (CoinGecko، Nobitex، ...) باید `PriceProviderAdapter` را implement کند (`fetchPrices`, `normalizeSymbol`, `normalizePrice`, `validateTimestamp`, `validateCurrency`). جزئیات قرارداد در `Price-Fetching.md` بخش Provider Adapter Contract.
 
 > **BUG-C05**: Provider می‌تواند جفت‌های دیگر را هم support کند؛ `priceCurrency` روی history همان quote همان quote است نه همیشه USDT.
+
+---
+
+## هویت API کریپتو (BUG-H01)
+
+`symbol` به‌تنهایی برای USDT-ERC20 / USDT-TRC20 / توکن‌های همنام **کافی نیست**.
+
+| API | قرارداد |
+|-----|---------|
+| `fetchCryptoPrices` | `PriceAssetRef[]` یا `instrumentId[]` |
+| `getLatestCryptoPrice` | `instrumentId` |
+| `setManualCryptoPrice` | `instrumentId` + price |
+
+`instrumentId` = `assetKey` پایدار Holding (مثلاً `1:0xdac1…` یا `exchange:binance:USDT`).  
+امضای قدیمی بر پایه `symbol` **deprecated** و نباید در implementation جدید استفاده شود.

@@ -58,27 +58,42 @@
 
 - `id` → UUID
 - `brokerageId` → UUID
-- `symbol` → string — شناسه داخلی سیستم، مثلاً `فولاد`
+- `instrumentId` → string (**اجباری — BUG-H05**؛ هویت پایدار داخلی، ترجیحاً ISIN یا UUID ثابت سیستم؛ با تغییر نماد عوض **نمی‌شود**)
+- `isin` → string nullable — ISIN رسمی وقتی شناخته شده
+- `symbol` → string — **نماد نمایشی فعلی** (فولاد، …)؛ با corporate action قابل تغییر است
 - `name` → string
-- `providerSymbol` → string nullable — شناسه دقیق نماد در Provider انتخاب‌شده، مثلاً TSETMC/ISIN/slug
+- `providerSymbol` → string nullable — شناسه نزد Provider فعلی
 - `priceProviderId` → UUID nullable — FK → `price_sources.id`
-- `market` → string nullable — مانند `bourse`, `fara_bourse`, `base_market`
+- `market` → string nullable — `bourse` | `fara_bourse` | `base_market` | …
 - `quantity` → decimal
 - `averageBuyPrice` → decimal ریال
 - `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (مجموع کارمزدها به baseCurrency — BUG-C04؛ شامل feeBroker+Exchange+Tax+Other پس از تبدیل با exchangeRateToBase همان تراکنش)
+- `totalFeesPaidBase` → decimal (به baseCurrency — BUG-C04)
 - `totalFeesPaidUSDT` → deprecated
-- `createdAt` → datetime
-- `updatedAt` → datetime
+- `createdAt` / `updatedAt` → datetime
 
-> **قرارداد Mapping**: `symbol` شناسه داخلی است؛ `priceProviderId` Provider را تعیین می‌کند؛ `providerSymbol` شناسه همان نماد در آن Provider است. اگر Provider نیاز داشته باشد `market` نیز ارسال می‌شود. Provider هرگز نباید فرض کند `symbol` همان شناسه خارجی است.
+> **هویت (BUG-H05)**: کلید منطقی Holding = `brokerageId + instrumentId` (نه `brokerageId + symbol`).  
+> `symbol` / `market` / `providerSymbol` metadata قابل‌تغییرند. تاریخچه تغییر نماد در `inv_stocks_iran_symbol_history` یا event corporate action ثبت می‌شود.  
+> Mapping قیمت: `priceProviderId + providerSymbol + market`؛ Provider هرگز `symbol` داخلی را هویت فرض نکند.
 
 ### ۳. Stock Transaction — `inv_stocks_iran_transactions`
 
 - `id` → UUID
 - `brokerageId` → UUID
 - `symbol` → string
-- `type` → `buy | sell | dividend`
+- `type` → enum گسترده (BUG-H04):
+  - `buy` | `sell` | `dividend`
+  - `capital_increase` — افزایش سرمایه (نقدی/از محل مطالبات)
+  - `rights_issue` — تخصیص حق تقدم
+  - `rights_exercise` — تبدیل/استفاده حق تقدم
+  - `rights_sell` — فروش حق تقدم
+  - `bonus_share` — سهام جایزه
+  - `split` — تجزیه سهم
+  - `reverse_split` — تجمیع سهم
+  - `symbol_change` — تغییر نماد (quantity ثابت؛ metadata)
+  - `isin_change` — تغییر ISIN/شناسه
+  - `transfer_ca` — انتقال ناشی از corporate action بین instrumentها
+  - `suspension_note` — اختیاری ثبت توقف/بازگشایی (معمولاً بدون اثر quantity)
 - `quantity` → decimal nullable برای dividend
 - `price` → decimal nullable برای dividend
 - `totalAmount` → decimal
@@ -245,3 +260,42 @@ Realized و Unrealized نباید با یکدیگر مخلوط شوند.
 - ساختار باید ساده، ماژولار، Offline-First و قابل استفاده توسط APIهای مستقل باقی بماند.
 
 > **exchangeRateToBase (BUG-003)**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
+
+---
+
+## Corporate Actions سهام ایران (BUG-H04)
+
+بدون این رویدادها `quantity` / `averageBuyPrice` / cost basis در زمان غلط می‌شود.
+
+### قوانین Cost Basis (خلاصه)
+| رویداد | quantity | cost basis |
+|--------|----------|------------|
+| `bonus_share` | افزایش | totalInvested ثابت → average پایین می‌آید |
+| `split` / `reverse_split` | × ratio | average بر ratio تنظیم؛ totalInvested ثابت |
+| `rights_issue` | ثبت حق به‌عنوان holding جدا (`instrumentId` حق) یا quantity حقوق | هزینه حق جدا |
+| `rights_exercise` | تبدیل حق → سهم؛ cost حق + پرداخت نقدی به cost سهم |
+| `capital_increase` (آورده نقدی) | +shares؛ totalInvested += پرداخت |
+| `symbol_change` / `isin_change` | بدون تغییر quantity/cost؛ آپدیت metadata + تاریخچه |
+| `dividend` نقدی | quantity ثابت؛ cash به حساب/کارگزاری |
+
+### الزامات
+1. هر CA داخل `runAtomicFinancialOperation` + `fin_journal_entries`.
+2. `instrumentId` Holding در symbol_change ثابت می‌ماند.
+3. اگر CA دو instrument بسازد (حق تقدم)، holding دوم با `instrumentId` جدید و `relatedCorporateActionId`.
+4. `rebuildHoldingFromLedger` باید همه typeهای CA را در Σ اعمال کند.
+
+### جدول اختیاری `inv_stocks_iran_corporate_actions`
+`id, instrumentId, actionType, ratio, cashAmount, effectiveDate, notes, operationId` — برای audit و UI.
+
+---
+
+## هویت پایدار Holding (BUG-H05)
+
+```text
+UNIQUE(brokerageId, instrumentId)
+symbol = mutable label
+isin / instrumentId = stable identity
+```
+
+تغییر نماد ≠ Holding جدید.  
+Provider mapping جدا از identity است و با `setStockPriceMapping` عوض می‌شود.

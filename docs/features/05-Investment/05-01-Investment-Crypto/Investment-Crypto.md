@@ -185,7 +185,9 @@
 - `chainId` → string (nullable — شناسه شبکه بلاکچین؛ مثلاً `1` برای Ethereum Mainnet، `56` برای BSC، `728126428` برای Tron؛ برای tokenهای native مثل BTC یا ETH از نام شبکه مادر استفاده می‌شود)
 - `contractAddress` → string (nullable — آدرس قرارداد هوشمند توکن؛ برای native tokenهایی مثل BTC و ETH که آدرس قرارداد ندارند null است؛ برای USDT-TRC20، USDT-ERC20، و هر ERC20/BEP20/TRC20 Token دیگری الزامی است)
 - `decimals` → integer (nullable — تعداد اعشار توکن؛ مثلاً 18 برای USDT-ERC20، 6 برای USDT-TRC20؛ اگر null باشد فرض می‌شود هسته اصلی شبکه — مثلاً 18 برای ETH؛ برای IRR و USDT داخلی صرافی null قابل قبول است)
-- `assetId` → string (nullable — شناسه این رمزارز در Provider قیمت‌گیری — مثلاً `bitcoin` در CoinGecko یا `BTC_USDT` در Nobitex؛ وقتی null باشد، `symbol` برای جستجوی قیمت استفاده می‌شود اما ممکن است tokenهای همنام تداخل داشته باشند)
+- `assetKey` → string (**اجباری — BUG-H02**؛ هویت پایدار داخلی: `chainId:contractAddress` یا `chainId:native:SYMBOL` یا `exchange:{exchangeId}:SYMBOL` برای موجودی داخلی صرافی)
+- `assetId` → string (nullable فقط به‌عنوان **شناسه Provider خارجی** برای mapping؛ هرگز به‌جای assetKey برای uniqueness استفاده نشود)
+- `symbol` → string (**فقط label نمایشی** — نه هویت یکتا)
 - `quantity` → decimal (موجودی فعلی)
 - `averageBuyPrice` → decimal
 - `currency` → string
@@ -877,3 +879,19 @@ Valuation با `priceCurrency` (اغلب USDT در price_history) **جدا** ا�
 
 ### C2C
 `tradeGroupId` مشترک روی SELL(base1) + BUY(base2)؛ quote می‌تواند دارایی سوم باشد.
+
+---
+
+## Asset Registry هویت (BUG-H02)
+
+```text
+identity = assetKey = f(chainId, contractAddress | native, symbol-for-native-only)
+symbol  = label only
+assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
+```
+
+قوانین:
+1. `assetKey` روی هر Holding **NOT NULL** و بخشی از UNIQUE است.
+2. Fallback قیمت‌گیری به `symbol` تنها **ممنوع** است (حذف collision path).
+3. اگر Provider فقط symbol می‌فهمد، Adapter از `assetKey` → `normalizeSymbol` / `assetId` mapping می‌سازد؛ Application هرگز با symbol خام fetch نمی‌کند.
+4. IRR/USDT داخلی صرافی: `assetKey = exchange:{exchangeId}:IRR` و `exchange:{exchangeId}:USDT`.
