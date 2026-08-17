@@ -940,6 +940,21 @@ assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
 
 ---
 
+
+
+### ماتریس تصمیم `feePresence` (الزامی برای پیاده‌سازی)
+
+| mode | quantity روی holding | cost basis | مثال |
+|------|----------------------|------------|------|
+| `fee_in_quote` | `net = gross` (دارایی پایه کم نمی‌شود) | `+ feeBase` به totalInvested در BUY؛ در SELL از proceeds | خرید 1 BTC، fee 10 USDT |
+| `fee_from_base_asset` | `net = gross - feeQuantity` | BUY: cost روی **net** یا gross طبق صرافی — **پیش‌فرض پروژه: holding += netQuantity؛ totalInvested += quoteSpent + feeBase** | صرافی 1 BTC می‌خرد ولی 0.001 fee از BTC → holding +0.999 |
+| `fee_from_received` | مقصد `net` می‌گیرد | مثل transfer | transfer 1 → receive 0.999 |
+| `fee_external` | `net = gross` | fee در trade جدا یا `fee_payment` | کارمزد بانکی جدا |
+
+**تضاد با متن قدیمی «همیشه quantity=1»**: آن متن فقط برای حالتی است که صرافی **کل 1 BTC را به کیف می‌دهد و fee را از quote می‌گیرد** (`fee_in_quote`). اگر fee از base asset باشد، **باید** `feePresence=fee_from_base_asset` و `netQuantity` ثبت شود — در غیر این صورت موجودی و P&L غلط می‌شود.
+
+فیلدهای اجباری در هر trade با fee: `feePresence`, `grossQuantity`, `feeQuantity`, `netQuantity`.
+
 ## راهنمای پیاده‌سازی
 
 ### APIهای معامله (همه Atomic + journal + persist)
