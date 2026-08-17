@@ -223,3 +223,10 @@
 1. Backup بدون `schemaVersion` و `checksum` ناقص است و در v1 نباید به‌عنوان backup کامل پذیرفته شود.
 2. Restore هرگز مستقیماً روی `db_main` نمی‌نویسد مگر پس از validate کامل روی temp.
 3. جزئیات جریان در `core/db/db.md` بخش «قرارداد Backup / Restore».
+
+---
+
+## راهنمای پیاده‌سازی
+- `autoVersionCheckEnabled` پیش‌فرض false
+- Backup: meta schemaVersion + checksum؛ Restore atomic temp→validate→swap
+- مدیریت price sources و API key UX (session only) از اینجا

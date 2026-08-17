@@ -111,3 +111,11 @@
 - نسخه ۱: فقط Session Storage؛ پس از بستن tab کاربر دوباره وارد می‌کند.
 - ممنوع: plaintext در LocalStorage، ذخیره در جداول دیتابیس، لاگ کردن مقدار کلید.
 - آینده (خارج از v1): Remember رمزنگاری‌شده با Web Crypto و/یا Credential Vault متصل به قفل اپ.
+
+---
+
+## راهنمای پیاده‌سازی
+- قفل اپ محلی (PIN/biometrics)؛ داده در sql.js/IndexedDB
+- بدون ارسال داده مالی به سرور
+- License بیرون از DB مالی (مرز جدا)
+- failed attempts / lockout در تنظیمات محلی
