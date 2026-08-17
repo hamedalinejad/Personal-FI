@@ -80,7 +80,9 @@
 - `purchaseDate` → datetime
 - `currentValue` → decimal (آخرین ارزش‌گذاری — ریال)
 - `currentValueDate` → datetime
-- `averageBuyPrice` → decimal (میانگین قیمت خرید به ازای واحد — فقط برای `gold`, `coin`, `electronics`; برای `vehicle`, `real_estate` مقدار ثابت یا قیمت کل بر واحد)
+- `averageBuyPrice` → decimal (قیمت خرید به ازای واحد):
+  - **Weighted Average (چند خرید روی یک asset):** فقط برای `gold` و `coin` — هر خرید بعدی این مقدار را با فرمول Weighted Average به‌روز می‌کند
+  - **قیمت خرید ثابت اولیه (یک خرید = یک asset):** برای `vehicle`, `real_estate`, `electronics`, `other` — چون هر خرید یک asset مستقل است (Business Rule #2)، این فیلد برابر `totalCost / quantity` همان خرید اولیه است و هرگز با خرید بعدی به‌روز نمی‌شود
 - `status` → string (`active`, `sold`, `written_off`)
 - `location` → string (محل نگهداری — اختیاری)
 - `description` → string
@@ -98,8 +100,7 @@
 
 > **نکته مهم - فیلد `purchaseTransactionId` حذف شد**:  
 > - برای دسته‌های قابل‌تفکیک (`gold`, `coin`): ممکن است دارایی چند بار خریداری شود و `averageBuyPrice` به‌روزرسانی شود  
-> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): `averageBuyPrice` به معنی قیمت خرید به ازای هر واحد است (برای مثال قیمت هر متر مربع برای املاک یا هر قطعه برای خودروها)  
-> - برای `electronics`: `averageBuyPrice` میانگین قیمت خرید به ازای هر قطعه است (اگر چند قطعه خریده شود)  
+> - برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): `averageBuyPrice` برابر `totalCost / quantity` همان خرید اولیه است و هرگز با Weighted Average به‌روز نمی‌شود، چون هر خرید یک asset جدید مستقل است (Business Rule #2)  
 > - فیلد `purchaseTransactionId` در این حالت معنای نامشخص دارد (به کدام خرید اشاره دارد؟)  
 > - برای ردیابی تمام خریدها، از جدول `pa_transactions` استفاده کنید  
 > - در صورت نیاز به لینک به تراکنش خرید اصلی، می‌توانید از `pa_transactions` با `assetId` استفاده کنید
@@ -118,7 +119,8 @@
 
 - `id` → UUID
 - `assetId` → UUID
-- `type` → string (`purchase`, `sale`, `expense`)
+- `type` → string (`purchase`, `sale`, `expense`, `write_off`)
+  - `write_off`: هنگامی که دارایی به وضعیت `written_off` تغییر می‌کند؛ `amount` برابر با ارزش جاری دارایی (`currentValue`) در لحظه رونویسی است و جهت آن منفی (زیان) ثبت می‌شود
 - `amount` → decimal
 - `quantitySold` → decimal (nullable — فقط برای `type = 'sale'`؛ مقدار فروخته‌شده. اگر برابر با کل `quantity` دارایی قبل از این فروش باشد، فروش کامل محسوب می‌شود، در غیر این صورت فروش جزئی)
 - `feeAmount` → decimal
@@ -143,7 +145,7 @@
 - `updateAsset(id, data)`
 - `getAllAssets(filters)` → فیلتر بر اساس دسته، وضعیت و ...
 - `getAssetById(id)`
-- `changeAssetStatus(id, status)` → شامل تغییر به `written_off` با ثبت زیان
+- `changeAssetStatus(id, status)` → تغییر وضعیت دارایی؛ **هنگام تغییر به `written_off`**: به‌صورت atomic هم `pa_assets.status = 'written_off'` و `currentValue = 0` را به‌روز می‌کند، هم یک رکورد `pa_transactions` از نوع `write_off` با `amount = -currentValue` (مقدار قبل از صفرشدن) می‌سازد تا زیان تحقق‌یافته در Immutable Log ثبت بماند
 
 ### Valuation APIs
 - `addValuation(assetId, value, date, note?)` → ثبت ارزش‌گذاری جدید
@@ -157,7 +159,7 @@
 
 ### Portfolio APIs
 - `getPortfolioValue()` → ارزش کل دارایی‌های فیزیکی (ریال + معادل تتری)
-- `calculateProfitLoss(assetId?)` → سود/زیان تحقق‌یافته و تحقق‌نیافته
+- `calculateProfitLoss(assetId?)` → سود/زیان تحقق‌یافته و تحقق‌نیافته؛ **سود/زیان تحقق‌یافته** = جمع `amount` تمام رکوردهای `pa_transactions` با `type = 'sale'` یا `type = 'write_off'` (هر دو نوع در یک جمع یکپارچه از روی Transaction Log، بدون نیاز به اسکن جداگانه `pa_assets.status`)
 - `getAssetsByCategory()`
 
 ---
@@ -194,7 +196,7 @@
 - امکان فروش جزئی (مثلاً فروش بخشی از سکه‌ها) پشتیبانی می‌شود.
 - نرخ تتر در خرید، فروش و هر ارزش‌گذاری ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند.
 - برای دسته‌های `gold` و `coin`: `averageBuyPrice` فقط هنگام **خرید** با Weighted Average به‌روزرسانی می‌شود — هنگام فروش بدون تغییر باقی می‌ماند.
-- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`): هر خرید یک asset جدید مستقل است.
+- برای دسته‌های غیرقابل‌تفکیک (`vehicle`, `real_estate`, `electronics`, `other`): هر خرید یک asset جدید مستقل است؛ `averageBuyPrice` یعنی `totalCost / quantity` همان خرید اولیه — Weighted Average اعمال نمی‌شود.
 
 ---
 
