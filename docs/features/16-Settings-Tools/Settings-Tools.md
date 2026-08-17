@@ -187,6 +187,7 @@
 | `number_format` | `persian` |
 | `default_income_account` | null |
 | `default_expense_account` | null |
+| `default_transfer_account` | null |
 
 > **توجه**: `base_currency` و `display_currency` در این جدول ذخیره نمی‌شوند — آن‌ها در `cur_currency_preferences` هستند.
 

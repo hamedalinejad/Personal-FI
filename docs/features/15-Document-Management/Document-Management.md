@@ -104,7 +104,7 @@
 - `updateDocument(docId, data)` → ویرایش عنوان، دسته، برچسب و ...
 - `getAllDocuments(filters)` → فیلتر بر اساس دسته، فیچر، تاریخ و ...
 - `getDocumentById(docId)`
-- `getDocumentsByRelated(feature, relatedId)` → اسناد متصل به یک رکورد
+- `getDocumentsByRelated(feature, relatedId)` → اسناد متصل به یک رکورد؛ **الزامی: هر دو منبع را UNION کند** — هم `docs_documents` که مستقیماً `relatedFeature=feature AND relatedId=relatedId` دارند، هم اسنادی که از طریق `docs_links` به همین رکورد متصل شده‌اند. نادیده‌گرفتن هر یک از دو مسیر باعث گم‌شدن اسناد می‌شود.
 - `archiveDocument(docId)`
 - `deleteDocument(docId)` → حذف (با احتیاط)
 - `downloadDocument(docId)` → دریافت فایل
