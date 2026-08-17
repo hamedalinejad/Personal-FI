@@ -543,10 +543,11 @@ Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) م
 | `reconcileStockHolding(holdingId)` | `quantity` / `totalInvested` / `averageBuyPrice` ↔ Σ `inv_stocks_iran_transactions` (buy/sell) — محاسبه با Weighted Average از صفر |
 | `reconcileFund(holdingId)` | `units` / `totalInvested` ↔ Σ `inv_fif_transactions` (buy/sell/reinvest) |
 | `reconcileMetalsHolding(holdingId)` | `quantityMg` / `totalInvested` ↔ Σ `inv_metals_transactions` |
+| `reconcileMetalsPlatformCash(platformId)` | `inv_metals_platforms.cashBalance` ↔ Σ دو منبع: (۱) `inv_metals_platform_transactions` (deposit اضافه، withdraw کم) + (۲) `inv_metals_transactions` (buy کم، sell اضافه، deliveryFee کم) |
 | `reconcileLoan(loanId)` | مانده وام ↔ جدول اقساط / `ln_transactions` |
 | `reconcileCheque(chequeId)` | سازگاری `status` / `accountTransactionId` / `reversalTransactionId` در `chk_cheques` ↔ وجود/جهت/وضعیت تراکنش‌های مرتبط در `acc_transactions` — بر اساس ماتریس state machine (جدول زیر) |
 | `reconcilePortfolio()` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
-| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها و `reconcileCheque` برای همه چک‌های غیر-cancelled)؛ خروجی گزارش یکپارچه |
+| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها، `reconcileCheque` برای همه چک‌های غیر-cancelled، و `reconcileMetalsPlatformCash` برای همه پلتفرم‌های فلزات)؛ خروجی گزارش یکپارچه |
 
 **ماتریس انتظار `reconcileCheque` — یک چک سالم باید:**
 
