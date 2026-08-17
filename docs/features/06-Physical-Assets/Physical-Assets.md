@@ -94,7 +94,7 @@
 > - برای دسته‌های `vehicle`, `real_estate`, `electronics`, `other` (غیرقابل‌تفکیک): هر خرید یک asset جدید مستقل است، پس `accountId` همیشه همان حساب خرید آن asset است.
 > - برای دسته‌های `gold` و `coin` (قابل‌تفکیک): چند خرید روی همان asset انجام می‌شود. `accountId` در `pa_assets` **ثابت می‌ماند** و نشان‌دهنده حساب اولین خرید است. خریدهای بعدی `accountId` خود را در `pa_transactions.accountId` ذخیره می‌کنند.
 > - برای دریافت همه حساب‌های مرتبط با یک asset: از `pa_transactions` با `assetId` استفاده کنید.
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه خرید — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -110,7 +110,7 @@
 - `id` → UUID
 - `assetId` → UUID
 - `value` → decimal (ارزش ثبت‌شده — ریال)
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `note` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -125,7 +125,7 @@
 - `quantitySold` → decimal (nullable — فقط برای `type = 'sale'`؛ مقدار فروخته‌شده. اگر برابر با کل `quantity` دارایی قبل از این فروش باشد، فروش کامل محسوب می‌شود، در غیر این صورت فروش جزئی)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `exchangeRateToBase` → decimal (نرخ تتر لحظه — ریال به ازای ۱ تتر، مثلاً ۶۰,۰۰۰)
+- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 - `accountId` → UUID (nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
