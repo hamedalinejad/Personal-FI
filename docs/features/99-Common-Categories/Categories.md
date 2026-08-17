@@ -97,3 +97,10 @@ export const EXPENSE_CATEGORIES = {
 
 ### استفاده در فیچرها
 Income و Expense فیلد `category` را یک string محدود به مقادیر لیست در نظر می‌گیرند.
+
+---
+
+## راهنمای پیاده‌سازی
+- Income/Expense فقط کلیدهای این سند را بپذیرند (validate در Domain)
+- UI از همین لیست برای select پر شود؛ string آزاد در production ممنوع مگر `other` + note
+- افزودن دسته جدید = PR روی این فایل + در صورت نیاز i18n

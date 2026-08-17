@@ -127,3 +127,10 @@ services/
 3. تمام Side Effectهای شبکه باید طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` مجاز باشند.
 4. سرویس‌ها به‌عنوان Singleton پیاده‌سازی شوند یا از طریق Dependency Injection در Store ها در دسترس باشند.
 5. سرویس‌ها هیچ import ای از پوشه `features/` نداشته باشند؛ فقط از `core/types/` و `core/db/` می‌توانند import کنند.
+
+---
+
+## راهنمای پیاده‌سازی
+- EventBus sync و in-process؛ payload مطابق `types.md` (مبالغ string)
+- `runAtomicFinancialOperation` در لایه db/domain — نه داخل React component
+- سرویس‌ها stateless نسبت به UI؛ state موقت در Zustand (`stores.md`)
