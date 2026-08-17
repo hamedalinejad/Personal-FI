@@ -1,97 +1,106 @@
-فیچر: Accounts & Banking
-توضیح کلی:
-مدیریت حساب‌های بانکی واقعی (جاری، پس‌انداز، سپرده و غیره). صندوق نقدی، کیف پول و صرافی در فیچرهای جداگانه مدیریت می‌شوند.
+# فیچر: Accounts & Banking
 
-Business Rules
+## توضیح کلی
+مدیریت حساب‌های بانکی واقعی (جاری، پس‌انداز، سپرده و غیره).  
+صندوق نقدی پلتفرم‌های سرمایه‌گذاری، کیف پول رمزارز و صرافی در فیچرهای Investment مدیریت می‌شوند — **نه** در این فیچر.
 
-- موجودی حساب نمی‌تواند منفی شود (مگر حساب اعتباری در آینده).
-- انتقال وجه بین حساب‌ها باعث ایجاد دو تراکنش مستقل می‌شود (برداشت از مبدا + واریز به مقصد).
-- نام حساب باید منحصر به فرد باشد.
-- حذف حساب وجود ندارد — فقط آرشیو (Soft Archive).
-- تراکنش‌ها پس از ثبت تغییرناپذیر هستند؛ برای اصلاح، تراکنش reversed/voided ثبت می‌شود.
-- `balanceAfterTransaction` یک **derived snapshot** روی هر ردیف تراکنش است — برای نمایش/دیباگ سریع. **منبع حقیقت مانده = Ledger** (`Σ acc_transactions` / `rebuildAccountFromLedger`). هیچ Report یا API تعمیری نباید این فیلد را authoritative فرض کند.
+## Business Rules
 
-Domain Entities
-1. Account (جدول: acc_accounts)
+1. موجودی حساب نمی‌تواند منفی شود (حساب اعتباری خارج از نسخه ۱).
+2. ارز حساب (`currency`) ثابت است؛ انتقال فقط بین حساب‌های **هم‌ارز** مجاز است مگر مسیر تبدیل صریح (نسخه ۱: هم‌ارز اجباری).
+3. انتقال وجه = دو ردیف `acc_transactions` (transfer-out + transfer-in) در یک `runAtomicFinancialOperation`.
+4. نام حساب یکتا است (`UNIQUE(name)` در میان حساب‌های غیرآرشیو).
+5. حذف فیزیکی حساب ممنوع — فقط `isArchived = true`؛ آرشیو فقط اگر `currentBalance` (ledger) صفر باشد.
+6. ردیف‌های `acc_transactions` پس از ثبت از نظر مبلغ/حساب/نوع immutable هستند؛ اصلاح فقط با void + reversal.
+7. `currentBalance` و `balanceAfterTransaction` **snapshot مشتق**اند. منبع حقیقت = مجموع اثر ledger غیرvoid.
+8. هر عملیات مالی این فیچر باید:
+   - `BEGIN` … `COMMIT` داخل SQLite
+   - حداقل یک ردیف `fin_journal_entries` (طبق `core/db/db.md`)
+   - سپس `await persist` (Write-to-temp-then-swap) قبل از UI «ثبت شد»
+9. `relatedFeature` + `relatedId` قبل از COMMIT validate می‌شوند (وجود هدف).
 
-id → UUID (Primary Key)
-name → string (نام حساب)
-accountNumber → string (شماره حساب)
-iban → string (شماره شبا)
-cardNumber → string (شماره کارت)
-branchName → string (نام شعبه)
-bankName → string (نام بانک)
-currency → string (ارز حساب: IRR, USDT, USD و ...)
-accountType → enum (جاری، پس‌انداز، سپرده ثابت، ...)
-currentBalance → decimal (مانده فعلی)
-isArchived → boolean
-notes → text (یادداشت)
-createdAt → datetime
-updatedAt → datetime
+## Domain Entities
 
-2. Transaction (جدول: acc_transactions)
+### ۱. Account — `acc_accounts`
 
-id → UUID (Primary Key)
-date → datetime (تاریخ تراکنش)
-type → string (نوع `TransactionType` — تعریف مرکزی و تنها enum معتبر در core/types/types.md؛ مقادیر: deposit-income, withdrawal-expense, transfer-in, transfer-out, deposit-loan, withdrawal-loan, withdrawal-expense-tax, deposit-income-tax, withdrawal-cheque, deposit-cheque, deposit-investment, withdrawal-investment)
-amount → decimal (مبلغ)
-feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
-feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
-exchangeRateToBase → decimal (nullable — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
-balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
-accountId → UUID (حساب مرتبط)
-description → string (توضیحات)
-relatedFeature → string (نوع `RelatedFeature` — **فهرست کامل و تنها مرجع معتبر**: `core/types/types.md → RelatedFeature`؛ کپی لیست اینجا نگه داشته نمی‌شود تا از drift جلوگیری شود)
+| فیلد | نوع | توضیح |
+|------|-----|--------|
+| `id` | UUID | PK |
+| `name` | string | یکتا بین غیرآرشیوها |
+| `accountNumber` | string nullable | |
+| `iban` | string nullable | |
+| `cardNumber` | string nullable | |
+| `branchName` | string nullable | |
+| `bankName` | string nullable | |
+| `currency` | string | کد ارز حساب |
+| `accountType` | enum | `current` \| `savings` \| `term_deposit` \| `other` |
+| `currentBalance` | decimal string | snapshot |
+| `isArchived` | boolean | |
+| `notes` | text nullable | |
+| `createdAt` / `updatedAt` | datetime UTC | |
 
-relatedId → UUID (شناسه رکورد در فیچر مرتبط)
+### ۲. Transaction — `acc_transactions`
 
-> **Polymorphic FK**: SQLite این جفت را enforce نمی‌کند. وجود ردیف هدف باید در Domain validate شود؛ orphanها با `reconcileAccount` / `reconcileAll` قابل کشف‌اند. جزئیات در `core/db/db.md`.
-isVoided → boolean (آیا تراکنش لغو شده؟ به‌جای حذف/ویرایش مستقیم)
-relatedTransactionId → UUID (nullable — برای تراکنش‌های reversed، لینک به تراکنش اصلی)
-createdAt → datetime
-updatedAt → datetime
+| فیلد | نوع | توضیح |
+|------|-----|--------|
+| `id` | UUID | PK |
+| `date` | datetime | زمان رویداد |
+| `businessDate` | date nullable | روز کسب‌وکار در صورت نیاز گزارش |
+| `type` | `TransactionType` | فقط از `core/types/types.md` |
+| `amount` | decimal string | همیشه > 0؛ جهت از `type` |
+| `feeAmount` | decimal string nullable | >= 0 |
+| `feeCurrency` | string nullable | |
+| `exchangeRateToBase` | decimal string | ارز حساب → baseCurrency در لحظه ثبت |
+| `balanceAfterTransaction` | decimal string | snapshot مشتق؛ authoritative نیست |
+| `accountId` | UUID | FK RESTRICT |
+| `description` | string nullable | |
+| `relatedFeature` | `RelatedFeature` nullable | |
+| `relatedId` | UUID nullable | |
+| `isVoided` | boolean | |
+| `relatedTransactionId` | UUID nullable | reversal → اصل |
+| `operationId` | UUID | مشترک در یک atomic op |
+| `source` | enum | `ui` \| `import` \| `system` \| `migration` |
+| `createdAt` / `updatedAt` | datetime UTC | |
 
-> **نکته**: برای سرمایه‌گذاری‌ها (واریز/برداشت از/به صرافی، کارگزاری، پلتفرم):
-> - `type = 'deposit-investment'` یا `type = 'withdrawal-investment'`
-> - `relatedFeature = 'crypto_exchange'` یا `relatedFeature = 'stocks_iran'` یا `relatedFeature = 'fif'` یا `relatedFeature = 'metals'`
-> - `relatedId` به جدول مخصوص آن فیچر لینک می‌شود
+**اثر روی مانده (ساده):**
+- انواع `deposit-*` / `transfer-in` → +amount (− fee در صورت کسر از حساب)
+- انواع `withdrawal-*` / `transfer-out` → −amount (− fee)
 
-APIهای داخلی
-Account:
+> سرمایه‌گذاری: `deposit-investment` / `withdrawal-investment` با `relatedFeature` یکی از `crypto_exchange` | `stocks_iran` | `fif` | `metals` و `relatedId` به جدول دامنه همان فیچر.
 
-createAccount(data)
-updateAccount(id, data) // فقط ویرایش اطلاعات حساب
-getAllAccounts(includeArchived = false)
-getAccountById(id)
-archiveAccount(id)
-getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')
-> - **`cached`** (پیش‌فرض): مقدار `acc_accounts.currentBalance` (Snapshot — سریع، برای نمایش UI)
-> - **`ledger`**: بازمحاسبه از مجموع `acc_transactions` با فراخوانی معادل `rebuildAccountFromLedger` (کند ولی همیشه دقیق — برای عملیات حساس مثل برداشت، انتقال، یا Reconciliation)
->
-> ⚠️ `currentBalance` Snapshot است نه Ledger. برای هر عملیاتی که روی صحت موجودی حساس است (برداشت، انتقال)، حتماً `mode='ledger'` استفاده شود — جزئیات در `core/db/db.md → `.
+## APIهای داخلی
 
-getAvailableBalance(accountId) → موجودی در دسترس (فقط‌خواندنی — برای نمایش هشدار در UI)
-> ```
-> getAvailableBalance(accountId) =
-> currentBalance
-> − Σ (amount of pending پرداختی cheques روی این حساب)
-> ```
-> این مقدار **کمتر یا مساوی** `currentBalance` است. در UI کنار موجودی واقعی نمایش داده می‌شود تا کاربر از تعهدات چک‌های صادرشده‌ی هنوز وصول‌نشده آگاه باشد. این یک **هشدار اطلاعاتی** است، نه قید سخت — سیستم مانع ثبت تراکنش جدید نمی‌شود.
+### Account
+- `createAccount(data)`
+- `updateAccount(id, data)` — فقط metadata (نه دستکاری مستقیم balance)
+- `getAllAccounts(includeArchived?)`
+- `getAccountById(id)`
+- `archiveAccount(id)` — فقط اگر ledger balance = 0
+- `getCurrentBalance(accountId, mode: 'cached' | 'ledger' = 'cached')`
+- `getAvailableBalance(accountId)` = ledger/cached balance − Σ چک‌های پرداختی pending روی حساب (هشدار UI؛ قید سخت نیست)
+- `rebuildAccountFromLedger(accountId)` — snapshot را از ledger بازسازی می‌کند
+- `reconcileAccount(accountId)` → `ReconcileResult`
 
-Transaction:
+### Transaction
+- `createTransaction(data)` — معمولاً از فیچرهای دیگر صدا زده می‌شود نه مستقیم از UI عمومی
+- `updateTransactionMetadata(id, data)` — فقط description و فیلدهای غیرمالی
+- `voidTransaction(id, reason)` — void + در صورت نیاز reversal طبق caller
+- `getTransactionsByAccount(accountId, filters)`
+- `getTransactionById(id)`
 
-createTransaction(data)
-updateTransaction(id, data) // فقط برای update متنی (description و ...)
-voidTransaction(id, reason, relatedTransactionId?) // لغو تراکنش و ثبت reversed
-getTransactionsByAccount(accountId, filters)
-getTransactionById(id)
+### Transfer
+- `transferBetweenAccounts({ sourceAccountId, targetAccountId, amount, description?, date? })`
+  1. validate هم‌ارز بودن currency و موجودی کافی (mode ledger)
+  2. یک `operationId`
+  3. INSERT transfer-out + transfer-in + journal entries + به‌روز snapshotها
+  4. persist
 
-Transfer:
+## روابط
+- **Income / Expense / Cheque / Loan / Tax / Investment**: ایجاد `acc_transactions` با type و related مناسب
+- **Currency**: `exchangeRateToBase` از نرخ لحظه یا ورودی کاربر
+- **Reports / Dashboard**: خواندن ledger و snapshot
 
-transferBetweenAccounts(sourceAccountId, targetAccountId, amount, description)
-> **الزاماً Atomic (BEGIN/COMMIT)**:
-> 1. INSERT تراکنش مبدا: `type='transfer-out'`، `relatedFeature='accounts'`، `relatedId=targetAccountId`
-> 2. INSERT تراکنش مقصد: `type='transfer-in'`، `relatedFeature='accounts'`، `relatedId=sourceAccountId`
-> 3. آپدیت `currentBalance` هر دو حساب
->
-> `relatedFeature='accounts'` برای هر دو رکورد — طبق تعریف `types.md`: «انتقال/تعدیل مستقیم بین حساب‌ها».
+## نکات پیاده‌سازی
+- همه مبالغ `string` decimal در مرز TypeScript
+- `PRAGMA foreign_keys = ON`
+- تست: transfer atomic؛ void؛ archive با balance غیرصفر باید fail شود
