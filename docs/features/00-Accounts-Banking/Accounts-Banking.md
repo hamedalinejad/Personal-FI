@@ -37,7 +37,7 @@ type → string (نوع `TransactionType` — تعریف مرکزی و تنها 
 amount → decimal (مبلغ)
 feeAmount → decimal (nullable — کارمزد تراکنش در صورت وجود)
 feeCurrency → string (nullable — ارز کارمزد: IRR, USDT و ...)
-exchangeRateToBase → decimal (nullable — نرخ تتر لحظه تراکنش)
+exchangeRateToBase → decimal (nullable — نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (BUG-003؛ نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))
 balanceAfterTransaction → decimal (مانده حساب پس از این تراکنش)
 accountId → UUID (حساب مرتبط)
 description → string (توضیحات)
