@@ -125,7 +125,8 @@ export type RelatedFeature =
 // دسته‌بندی دارایی در price_history و price_sources
 export type AssetCategory = 'crypto' | 'stock' | 'fif' | 'metal';
 
-// طبقه‌بندی خطای شبکه/پاسخ (باگ ۳۸)
+// طبقه‌بندی خطای شبکه/پاسخ — فقط برای failed[] (باگ ۳۸)
+// api_key_required و offline در skipped[] می‌روند (نه failed[]) — به Price-Fetching.md/باگ ۳۷ مراجعه شود
 export type PriceFailureKind =
   | 'network_error'
   | 'timeout'
@@ -133,16 +134,19 @@ export type PriceFailureKind =
   | 'invalid_payload'
   | 'validation_error'
   | 'rate_limit'
-  | 'not_found'
-  | 'api_key_required'
-  | 'offline';
+  | 'not_found';
+
+// دلایل مجاز برای skipped[] — بخشی از PriceFetchResult
+export type PriceSkipReason =
+  | 'offline'           // navigator.onLine === false
+  | 'api_key_required'; // منبع requiresApiKey=true ولی کلید در Session Storage نیست (باگ ۳۷)
 
 // خروجی عملیات دریافت قیمت از API
 export interface PriceFetchResult {
   fetchRequestId: string; // باگ ۴۲
   succeeded: Array<{ symbol: string; price: string; deduped?: boolean }>;
   failed: Array<{ symbol: string; reason: string; failureKind: PriceFailureKind; httpStatus?: number }>;
-  skipped?: Array<{ symbol?: string; reason: PriceFailureKind | string }>;
+  skipped?: Array<{ symbol?: string; reason: PriceSkipReason | string }>; // PriceSkipReason برای offline و api_key_required
   fetchedAt: Timestamp;
   triggeredBy: 'user_click' | 'auto_sync';
 }
