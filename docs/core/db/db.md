@@ -858,3 +858,14 @@ ok = delta.isZero
 ### منبع حقیقت مقایسه
 - همیشه **ledger rows** (و در صورت نیاز `fin_journal_entries` برای cross-feature)
 - هرگز `balanceAfterTransaction` یا سایر snapshotها به‌عنوان expected
+
+---
+
+## راهنمای پیاده‌سازی bootstrap
+
+1. init sql.js → load blob از IndexedDB (یا schema خالی)
+2. `PRAGMA foreign_keys=ON`; `PRAGMA journal_mode` مطابق تنظیمات
+3. اگر schemaVersion قدیمی → migration chain
+4. `navigator.storage.persist()` یک‌بار؛ نتیجه را در settings نشان بده
+5. هر write: mutate memory DB → enqueue persist (temp key → swap)
+6. قبل از unload: تلاش برای flush queue (موبایل تضمین نیست — موفقیت فقط بعد از persist صریح)
