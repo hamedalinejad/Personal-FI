@@ -35,7 +35,7 @@
 2. پیشرفت هدف بر اساس مجموع مبالغ اختصاص‌داده‌شده محاسبه می‌شود.
 3. هدف می‌تواند تاریخ پایان داشته باشد یا بدون مهلت باشد.
 4. هنگام رسیدن مبلغ اختصاص‌داده‌شده به مبلغ هدف، وضعیت به `completed` تغییر می‌کند.
-5. امکان برداشت از هدف (کاهش مبلغ اختصاص‌داده‌شده) وجود دارد.
+5. امکان برداشت از هدف (کاهش مبلغ اختصاص‌داده‌شده) وجود دارد. **برداشت بسته به `source` کمک‌های مربوطه متفاوت است:** اگر کمک‌ها از نوع `manual`/`transfer` بودند، تراکنش بانکی واقعی ایجاد می‌شود؛ اگر از نوع `budget`/`income` بودند (برچسب‌گذاری بدون پول واقعی)، فقط `currentAmount` کاهش می‌یابد و هیچ تراکنش بانکی ایجاد نمی‌شود — به API `withdrawFromGoal` مراجعه شود.
 6. پول اختصاص‌داده‌شده به هدف می‌تواند از حساب بانکی یا از پاکت بودجه تأمین شود.
 7. حذف فیزیکی وجود ندارد — فقط تغییر وضعیت (`active`, `completed`, `cancelled`, `paused`).
 8. `currentAmount` نمی‌تواند منفی شود.
@@ -127,7 +127,10 @@
 
 ### Contribution APIs
 - `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
-- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
+- `withdrawFromGoal(goalId, amount, accountId?)` → برداشت از هدف + آپدیت `currentAmount` در `fg_goals` (atomic)؛ منطق اجرا بسته به ترکیب کمک‌های موجود (FIFO روی `fg_contributions` با `type='deposit'`):
+  - اگر مبلغ برداشت از کمک‌های `source ∈ {manual, transfer}` تأمین شود: یک رکورد `fg_contributions` با `type='withdraw'` و یک تراکنش واقعی در `acc_transactions` برای `accountId` می‌سازد.
+  - اگر مبلغ برداشت از کمک‌های `source ∈ {budget, income}` تأمین شود (برچسب‌گذاری بدون پول واقعی): فقط یک رکورد `fg_contributions` با `type='withdraw'` و `accountTransactionId = null` می‌سازد — بدون تراکنش بانکی (پول هرگز از حساب واقعی خارج نشده بود). اگر `accountId` پاس داده شود در این حالت، **خطای اعتبارسنجی** برمی‌گرداند.
+  - اگر مبلغ از هر دو نوع کمک تأمین شود: بخش «واقعی» تراکنش بانکی می‌گیرد، بخش «برچسب» `accountTransactionId = null` می‌ماند — دو رکورد جداگانه در `fg_contributions` ثبت می‌شود.
 - `getContributions(goalId)` → تاریخچه کمک‌ها
 - `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
 
