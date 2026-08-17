@@ -211,3 +211,19 @@ UI / Hooks
 3. **ESLint** `no-restricted-imports` / dependency-cruiser / arch unit test در CI — rule نمونه: هر import از `features/*/!(public-api)` خارج از پوشه خودِ همان فیچر باید error باشد.
 4. تست نمونه: هیچ فایلی خارج از `features/*/db/` نباید `sql.js` یا `runQuery` مستقیم صدا بزند مگر از طریق `public-api.ts` همان فیچر.
 5. تا قبل از وجود این ruleها در repo، مرز فقط مستند است — در checklist پیاده‌سازی v1 این item باید tick شود.
+
+---
+
+## راهنمای پیاده‌سازی لایه‌ها
+
+```text
+UI (pages/sheets)
+  → Feature public API (functions only)
+    → Domain services (decimal.js, invariants)
+      → db repositories / sql.js
+        → persist queue → IndexedDB
+```
+
+ممنوع: `UI → SQL`، `FeatureA → جداول FeatureB` بدون API عمومی B.  
+شبکه فقط داخل Adapterهای opt-in (Price، Version check).  
+Worker برای serialize DB و گزارش سنگین وقتی حجم بالا شد (Should Have واضح در db.md).
