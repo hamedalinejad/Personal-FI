@@ -212,3 +212,8 @@ async function convert(
 > الگوی مرجع: تابع `convertFeeToBase` در `Investment-Crypto.md` هر سه حالت را صریحاً مدیریت می‌کند.
 
 همه فیچرها (Crypto, Stocks, FIF, Loans, Tax, Metals) باید از همین تعریف استفاده کنند؛ متن‌های قدیمی «ریال به ازای ۱ تتر» فقط مثال وقتی base=IRR هستند.
+
+## پیاده‌سازی
+- نرخ‌ها decimal string؛ `convert(amount, from, to)` فقط از `decimal.js` و Rounding-Policy
+- آفلاین: آخرین نرخ کش‌شده؛ اگر نبود، ثبت تراکنش با نرخ دستی کاربر الزامی است
+- این فیچر **هرگز** `acc_transactions` نمی‌سازد
