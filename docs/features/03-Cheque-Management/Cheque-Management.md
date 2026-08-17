@@ -90,6 +90,7 @@ getChequeById(id) → شامل reversalTransactionId برای بررسی ترا�
 getPendingCheques() → چک‌های در انتظار
 getTotalChequesByStatus(status, startDate?, endDate?) → مجموع چک‌ها بر اساس وضعیت
 getUpcomingDueCheques(days) → چک‌های نزدیک به سررسید (برای یادآوری)
+getPendingPayableChequesByAccount(accountId) → مجموع و لیست چک‌های پرداختی pending یک حساب — ورودی `getAvailableBalance` در Accounts & Banking
 
 
 روابط با سایر فیچرها
@@ -105,6 +106,18 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 
 وضعیت چک‌ها به صورت state machine مدیریت می‌شود.
 تصویر چک به عنوان attachment ذخیره می‌شود.
-برای چک‌های پرداختی، موجودی حساب در زمان صدور چک قفل یا رزرو نمی‌شود (مگر تصمیم دیگری گرفته شود).
+
+> **تصمیم قطعی — موجودی رزرو vs. موجودی در دسترس (v1)**:
+> برای چک‌های پرداختی، موجودی حساب در زمان صدور **قفل یا کسر نمی‌شود** — `currentBalance` حساب دست‌نخورده می‌ماند تا صف state machine اجرا شود. به‌جای آن، یک تابع محاسباتی فقط‌خواندنی `getAvailableBalance(accountId)` موجودی واقعی منهای تعهدات pending را محاسبه می‌کند:
+>
+> ```
+> getAvailableBalance(accountId) =
+>   currentBalance
+>   − Σ (amount of pending پرداختی cheques on this account)
+> ```
+>
+> این مقدار در UI به‌عنوان **هشدار** (نه قید سخت) کنار `currentBalance` نمایش داده می‌شود تا کاربر از تعهدات آتی خود آگاه باشد.
+>
+> **چرا رزرو واقعی نه؟** رزرو واقعی نیازمند rollback خودکار در صورت `bounced`/`cancelled` است و معماری را پیچیده می‌کند — این برای v2 در نظر گرفته شود.
 
 > **نکته نام‌گذاری**: لینک به `acc_transactions` با نام `accountTransactionId` تعریف شود (یکسان‌سازی با Income و Expense).
