@@ -255,7 +255,25 @@ thresholdFrom=60,   thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.
 - `getAllLoans(filters)`
 - `getLoanById(id)`
 - `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
-- `cancelLoan(id)`
+- `cancelLoan(id)` → لغو وام — **فقط قبل از ثبت اولین پرداخت مجاز است**
+
+  **قرارداد (الزاماً Atomic — BEGIN/COMMIT)**:
+  ```
+  BEGIN TRANSACTION;
+    1. Guard: بررسی وجود هر رکورد غیر‌void در ln_transactions با type='installment_payment'
+              روی این loanId — اگر وجود دارد → ROLLBACK + خطا «لغو وام پس از پرداخت مجاز نیست»
+    2. disbursementTx = SELECT * FROM ln_transactions WHERE loanId=? AND type='disbursement' AND isVoided=false
+    3. IF disbursementTx EXISTS:
+         disbursementTx.isVoided = true  (در ln_transactions)
+         acc_transactions[disbursementTx.accTxId].isVoided = true
+         INSERT reversal_acc_tx (amount=disbursementAmount، به‌طور معکوس — موجودی حساب برمی‌گردد)
+    4. UPDATE ln_loans SET status='cancelled'
+  COMMIT;
+  ```
+
+  > **اگر پرداخت قبلی وجود دارد**: `cancelLoan` خطا برمی‌گرداند. کاربر باید اقساط را به‌صورت دستی با `voidTransaction`/Reversal اصلاح کند — reversal خودکار تراکنش‌های متعدد خارج از scope این تابع است.
+  >
+  > **چرا گزینه ۱ (محدود) انتخاب شد؟** طبق اصل Immutable Transactions پروژه، reversal خودکار چند تراکنش پیچیده و پرریسک است. سادگی و قابلیت پیش‌بینی ترجیح دارد.
 - `updateLoanRate(loanId, newRate, effectiveDate, note?)` → فقط برای `interestType = 'variable'` و `calculationMethod = 'declining_balance'`؛ ثبت رکورد جدید در `ln_rate_history` و بازمحاسبه اقساط آینده — الگوریتم کامل در بخش «ه-۲) تغییر نرخ سود در وام‌های Variable Rate»
 - `addLoanFee(loanId, feeData)` → افزودن رکورد کارمزد به `ln_loan_fees`؛ فقط قبل از اولین پرداخت مجاز است (بعد از آن `updateLoanFee` ممنوع)
 - `getLoanFees(loanId)` → دریافت تمام کارمزدهای یک وام از `ln_loan_fees`
