@@ -53,7 +53,7 @@
 - `getLatestCryptoPrice(instrumentId | PriceAssetRef)` → میانبر روی `getLatestPrice({ assetCategory:'crypto', instrumentId })` — **نه symbol خام**
 - `setManualCryptoPrice(instrumentId, price, priceCurrency?)` → میانبر روی `setManualPrice` با instrumentId؛ کاملاً آفلاین
 - `fetchCryptoPrices(refs: PriceAssetRef[], triggeredBy)` → Wrapper روی `fetchAndStorePrices`؛ ورودی لیست `PriceAssetRef`/`instrumentId` است نه `string[]` symbol
-- `getCryptoAutoSyncSettings()` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
+- `getCryptoAutoSyncSettings` / `setCryptoAutoSyncSettings(data)` → میانبر روی `getSyncSettings`/`setSyncSettings` فیچر پدر با `assetCategory='crypto'`
 
 ---
 

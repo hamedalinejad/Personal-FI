@@ -93,7 +93,7 @@
 > - تنظیم ارز پایه در `stg_settings` **وجود ندارد**.
 > - ارز پایه و ارز نمایشی در جدول `cur_currency_preferences` نگهداری می‌شوند (فیچر Currency & Multi-Currency).
 > - `stg_settings` فقط برای تنظیمات UI (زبان، تم، فرمت تاریخ، فرمت اعداد) استفاده می‌شود.
-> - برای خواندن ارز پایه: `getUserCurrencyPreference()` از فیچر Currency را فراخوانی کنید.
+> - برای خواندن ارز پایه: `getUserCurrencyPreference` از فیچر Currency را فراخوانی کنید.
 
 ### ۲. Category (جدول: `cat_categories`)
 
@@ -134,8 +134,8 @@
 ### Settings APIs
 - `getSetting(key)`
 - `setSetting(key, value)`
-- `getAllSettings()`
-- `resetSettingsToDefault()`
+- `getAllSettings`
+- `resetSettingsToDefault`
 
 ### Category APIs
 - `getCategories(type?)` → فیلتر بر اساس type (income/expense)
@@ -147,7 +147,7 @@
 - `reorderCategories(type, orderedIds)` → تغییر ترتیب نمایش دسته‌ها
 
 ### Backup APIs
-- `createBackup()` → Export SQLite + متادیتا (`schemaVersion`, `appVersion`, `exportedAt`, `checksum`) + ثبت `stg_backup_logs`
+- `createBackup` → Export SQLite + متادیتا (`schemaVersion`, `appVersion`, `exportedAt`, `checksum`) + ثبت `stg_backup_logs`
 - `restoreBackup(file)` → **Atomic Restore** با Integrity Contract (باگ‌های ۴۷–۴۸):
  1. تأیید کاربر
  2. checksum + schemaVersion + load temp
@@ -155,14 +155,14 @@
  4. migration روی temp در صورت نیاز
  5. فقط در موفقیت کامل → swap با `db_main` (DB قبلی تا آن لحظه سالم می‌ماند)
  6. هر شکست → abort بدون overwrite
-- `listBackups()` → دریافت لیست با `backupType` و `backupDate`
+- `listBackups` → دریافت لیست با `backupType` و `backupDate`
 - `deleteBackup(backupLogId)` → حذف رکورد + فایل
 - `getBackupInfo(backupLogId)` → جزئیات + schemaVersion + checksum
 - `validateBackupFile(file)` → اجرای مراحل ۲–۳ بدون swap (پیش‌نمایش سلامت فایل)
 
 ### Tools APIs
-- `clearCache()`
-- `getAppInfo()` → نسخه، محیط و ...
+- `clearCache`
+- `getAppInfo` → نسخه، محیط و ...
 
 ---
 
@@ -180,7 +180,7 @@
 ## تنظیمات پیشنهادی پیش‌فرض
 
 | کلید | مقدار پیش‌فرض |
-| `autoVersionCheckEnabled` | `false` ( Offline-by-default) |
+| `autoVersionCheckEnabled` | `false` (Offline-by-default) |
 |------|----------------|
 | `language` | `fa` |
 | `theme` | `system` |

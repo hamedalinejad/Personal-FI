@@ -204,13 +204,13 @@ Platform APIs:
 
 createPlatform(data) → ایجاد پلتفرم با `cashBalance = 0`
 updatePlatform(id, data) → به‌روزرسانی اطلاعات پلتفرم (شامل `cashBalance`)
-getAllPlatforms() → لیست پلتفرم‌ها همراه با `cashBalance`
+getAllPlatforms → لیست پلتفرم‌ها همراه با `cashBalance`
 
 Holding APIs:
 
 getHoldings(platformId?)
 getHoldingByMetal(metalType, platformId?)
-getPortfolioValue() → ارزش کل به ریال + معادل تتری
+getPortfolioValue → ارزش کل به ریال + معادل تتری
 
 Transaction APIs:
 
@@ -235,7 +235,7 @@ Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می
 
 منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 
-فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش.
+فرمول رسمی برای `calculateProfitLoss` و به‌روزرسانی Holding هنگام خرید/فروش.
 
 > **پیش‌شرط**: Holding بر اساس `(platformId, metalType, purity)` یکتاست. خرید/فروش فقط روی همان `purity` اعمال می‌شود. واحد همه محاسبات: میلی‌گرم ناخالص + قیمت per-mg همان عیار.
 

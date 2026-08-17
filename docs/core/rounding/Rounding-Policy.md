@@ -118,7 +118,7 @@ holding.quantity = parseFloat(holding.quantity + trx.quantity); // float + loss
 
 ```typescript
 // ✅ درست — averageBuyPrice با precision کامل ذخیره می‌شود
-averageBuyPrice = totalInvested.dividedBy(totalQuantity); // بدون .toDecimalPlaces()
+averageBuyPrice = totalInvested.dividedBy(totalQuantity); // بدون .toDecimalPlaces
 
 // ❌ غلط
 averageBuyPrice = (totalInvested / totalQuantity).toFixed(4); // بعد از چند ضرب خطا جمع می‌شود
@@ -256,7 +256,7 @@ const rateSnapshot = await getExchangeRate('IRR', 'USDT'); // e.g. 62345.6789012
 function displayInUSDT(amountIRR: Decimal, rate: Decimal): string {
  return amountIRR.dividedBy(rate)
  .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
- .toString();
+ .toString;
 }
 
 // تبدیل زنجیره‌ای (BTC → USDT → IRR) — round فقط در انتهای زنجیره
@@ -367,7 +367,7 @@ export function roundForStorage(amount: Decimal, currency: string): Decimal {
 
 /** ذخیره کامل (بدون round) — برای quantity، averageBuyPrice، exchangeRate */
 export function preserveFull(amount: Decimal): string {
- return amount.toFixed(); // بدون تغییر، به‌صورت string
+ return amount.toFixed; // بدون تغییر، به‌صورت string
 }
 ```
 
@@ -382,7 +382,7 @@ export function preserveFull(amount: Decimal): string {
 - [ ] آیا `averageBuyPrice` یا `exchangeRateToBase` با precision کمتر از ۸ اعشار ذخیره می‌شوند؟ → **ممنوع**
 - [ ] آیا round در میانه محاسبه زنجیره‌ای انجام شده؟ → **ممنوع (فقط در آخر)**
 - [ ] آیا `principalPortion + interestPortion = installmentAmount` برقرار است؟ → **الزامی**
-- [ ] آیا تمام round ها از `roundMoney()` استفاده می‌کنند؟ → **الزامی**
+- [ ] آیا تمام round ها از `roundMoney` استفاده می‌کنند؟ → **الزامی**
 - [ ] آیا دلیل انتخاب `ROUND_DOWN` (تعداد سهم/واحد صندوق) مستند است؟ → **الزامی**
 
 ---
@@ -393,4 +393,4 @@ export function preserveFull(amount: Decimal): string {
 - `core/db/db.md` → نوع TEXT برای اعشار مالی (بخش «قانون Minor Unit Storage»)
 - `features/04-Debt-Loan-Management` → فرمول‌های قسط از این Policy استفاده می‌کنند
 - `features/05-Investment/*` → Weighted Average و quantity از قوانین ۳ و ۴ پیروی می‌کنند
-- `features/17-Currency-CrossRate` → round فقط در نتیجه نهایی `convert()`
+- `features/17-Currency-CrossRate` → round فقط در نتیجه نهایی `convert`

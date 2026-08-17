@@ -43,8 +43,8 @@
 10. وقتی `source=budget` (انتقال از پاکت به هدف)، پول واقعاً بین حساب‌ها جابه‌جا نمی‌شود؛ `accountTransactionId` باید `null` بماند (فقط یک برچسب‌گذاری داخلی است).
 10a. وقتی `source=income` (اختصاص بخشی از یک درآمد ثبت‌شده به هدف)، این نیز مانند `source=budget` صرفاً یک **برچسب‌گذاری داخلی** است، نه جابه‌جایی پول جدید: مبلغ درآمد از قبل طی تراکنش اصلی در `acc_transactions`/`inc_transactions` به حساب بانکی واریز شده؛ اختصاص آن به هدف فقط یک `fg_contributions` با `source='income'` و `accountTransactionId = null` ایجاد می‌کند (بدون رکورد جدید در `acc_transactions`). ایجاد یک تراکنش بانکی واقعی جداگانه برای این حالت **ممنوع است**، چون باعث دوبار شمارش همان مبلغ درآمد (یک‌بار در واریز اصلی، یک‌بار در تخصیص به هدف) می‌شود. تنها `source`هایی که مجازند `accountTransactionId` واقعی داشته باشند `manual` و `transfer` هستند (پول واقعاً و مستقیماً به‌خاطر همین هدف جابه‌جا می‌شود).
 11. `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد:
- - وقتی `addContribution()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
- - وقتی `withdrawFromGoal()` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
+ - وقتی `addContribution` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
+ - وقتی `withdrawFromGoal` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
  - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن/حذف `fg_contributions` در یک transaction انجام می‌شود
 
 ---
@@ -122,8 +122,8 @@
 - `getAllGoals(filters)` → فیلتر بر اساس وضعیت، دسته و ...
 - `getGoalById(id)` → شامل محاسبه `progressPercentage` و `remainingAmount`
 - `changeGoalStatus(id, status)` → تغییر وضعیت
-- `getActiveGoals()` → اهداف فعال
-- `getCompletedGoals()` → اهداف تکمیل‌شده
+- `getActiveGoals` → اهداف فعال
+- `getCompletedGoals` → اهداف تکمیل‌شده
 
 ### Contribution APIs
 - `addContribution(goalId, amount, source, accountId?, envelopeId?)` → واریز به هدف + آپدیت `currentAmount` در `fg_goals` (atomic)
@@ -136,14 +136,14 @@
 
 > **نکته مهم - مکانیزم sync `currentAmount`**: 
 > - `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد 
-> - وقتی `addContribution()` یا `withdrawFromGoal()` صدا زده می‌شود، تغییر `currentAmount` **atomic** انجام می‌شود (در یک transaction با `fg_contributions` اضافه شدن) 
+> - وقتی `addContribution` یا `withdrawFromGoal` صدا زده می‌شود، تغییر `currentAmount` **atomic** انجام می‌شود (در یک transaction با `fg_contributions` اضافه شدن) 
 > - فرمول: `currentAmount = SUM(amount WHERE type='deposit') - SUM(amount WHERE type='withdraw')` 
 > - این تصمیم یکسان با `cashBalance` در `inv_stocks_iran_brokerages` و `inv_metals_platforms` است 
 > - برای جلوگیری از out-of-sync، آپدیت `currentAmount` همیشه با اضافه شدن `fg_contributions` در یک transaction انجام می‌شود
 
 ### Calculation APIs
 - `calculateMonthlySuggestion(goalId)` → مبلغ پیشنهادی ماهانه برای رسیدن به هدف تا تاریخ مشخص
-- `getGoalsSummary()` → خلاصه کل اهداف (تعداد، مجموع هدف، مجموع جمع‌شده)
+- `getGoalsSummary` → خلاصه کل اهداف (تعداد، مجموع هدف، مجموع جمع‌شده)
 
 ---
 

@@ -66,26 +66,26 @@
 ## APIهای داخلی
 
 ### Security APIs
-- `getSecuritySettings()` → دریافت تنظیمات امنیتی
+- `getSecuritySettings` → دریافت تنظیمات امنیتی
 - `updateSecuritySettings(data)` → بروزرسانی تنظیمات
 - `enableLock(type, credential)` → فعال‌سازی قفل با FaceID/TouchID یا PIN
-- `disableLock()` → غیرفعال‌سازی قفل
+- `disableLock` → غیرفعال‌سازی قفل
 - `verifyLock(credential)` → تأیید هویت کاربر
-- `forceLock()` → قفل فوری اپ
-- `getFailedAttempts()` → دریافت تعداد تلاش‌های ناموفق
-- `resetFailedAttempts()` → ریست کردن تعداد تلاش‌ها (پس از ورود موفق)
-- `getLockoutRemainingSeconds()` → ثانیه‌های باقی‌مانده از Backoff فعلی (برای نمایش در UI)
+- `forceLock` → قفل فوری اپ
+- `getFailedAttempts` → دریافت تعداد تلاش‌های ناموفق
+- `resetFailedAttempts` → ریست کردن تعداد تلاش‌ها (پس از ورود موفق)
+- `getLockoutRemainingSeconds` → ثانیه‌های باقی‌مانده از Backoff فعلی (برای نمایش در UI)
 
 ### Encryption APIs
 - `encryptData(data, key)` → رمزنگاری **کل Blob فایل SQLite** قبل از نوشتن در IndexedDB (ورودی: `Uint8Array` کل دیتابیس؛ نه رکورد تکی)
 - `decryptData(encrypted, key)` → رمزگشایی Blob و تحویل `Uint8Array` به sql.js برای بارگذاری در RAM (نه رمزگشایی فیلد-به-فیلد)
-- `generateKey()` → تولید کلید رمزنگاری جدید (مشتق از PIN/بیومتریک با Web Crypto API)
+- `generateKey` → تولید کلید رمزنگاری جدید (مشتق از PIN/بیومتریک با Web Crypto API)
 
 ### Session APIs
-- `createSession()` → ایجاد جلسه جدید
-- `endSession()` → پایان جلسه
-- `checkSession()` → بررسی وضعیت جلسه
-- `extendSession()` → تمدید جلسه
+- `createSession` → ایجاد جلسه جدید
+- `endSession` → پایان جلسه
+- `checkSession` → بررسی وضعیت جلسه
+- `extendSession` → تمدید جلسه
 
 ---
 

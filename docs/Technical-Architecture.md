@@ -55,7 +55,7 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 - نوشتن دیتابیس با الگوی **Write-to-temp-then-swap** انجام شود تا خرابی فایل در صورت قطع ناگهانی رخ ندهد.
 - **Persist مالی**: UI «ثبت شد» فقط بعد از COMMIT + await موفق IndexedDB swap؛ `beforeunload`/`visibilitychange` فقط best-effort هستند و روی موبایل تضمین نیستند.
 - **Persistence queue + Worker (باگ‌های ۴۴–۴۵)**: serialize سنگین و گزارش‌های حجیم نباید Main Thread را قفل کنند؛ جزئیات در `core/db/db.md`.
-- در اولین اجرا `navigator.storage.persist()` فراخوانی شود.
+- در اولین اجرا `navigator.storage.persist` فراخوانی شود.
 - **Service Worker** برای Cache کردن App Shell و WASM sql.js الزامی است.
 - **Migration / Backup-Restore atomic (باگ‌های ۴۶–۴۸)**: قرارداد در `db.md` و `Settings-Tools.md` — بدون integrity check، Restore مجاز نیست.
 - **Internal API**: UI و Feature A هرگز مستقیماً به جداول Feature B یا sql.js خام دسترسی ندارند؛ فقط از طریق API عمومی همان Feature.
@@ -72,7 +72,7 @@ sql.js دیتابیس را در حافظه نگه می‌دارد و اتصال 
 
 **استثناهای مجاز** (فقط همین سه مورد؛ هر مورد جدید باید صریحاً به همین لیست اضافه شود، نه به‌صورت پیش‌فرض مجاز فرض شود):
 
-1. **بررسی نسخه (Version Check)** — **استثنای صریح Offline-first**: هر بار باز شدن اپ، در پس‌زمینه و بدون مسدود کردن UI، یک درخواست سبک به Endpoint استاتیک نسخه ممکن است زده شود. این Network **فقط وقتی کاربر opt-in کرده** (`autoVersionCheckEnabled=true`) اجرا می‌شود — **پیش‌فرض نصب تازه = false ( Offline-by-default)**.
+1. **بررسی نسخه (Version Check)** — **استثنای صریح Offline-first**: هر بار باز شدن اپ، در پس‌زمینه و بدون مسدود کردن UI، یک درخواست سبک به Endpoint استاتیک نسخه ممکن است زده شود. این Network **فقط وقتی کاربر opt-in کرده** (`autoVersionCheckEnabled=true`) اجرا می‌شود — **پیش‌فرض نصب تازه = false (Offline-by-default)**.
  - پیش‌فرض نصب تازه: `autoVersionCheckEnabled=false` (کاملاً آفلاین تا opt-in). با روشن کردن دستی در Settings، Startup می‌تواند یک درخواست نسخه بزند.
  - در Onboarding/Settings/Install docs باید نوشته شود: «با روشن بودن بررسی نسخه، در Startup یک درخواست شبکه زده می‌شود».
  - بدون این شفافیت، ادعای «کاملاً آفلاین» گمراه‌کننده است.

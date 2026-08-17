@@ -42,7 +42,7 @@
 - هر قسط تا دوره آخر: اصل = ۰، سود = `remainingBalance × r` با همان `getPeriodRate`؛ دوره آخر: کل اصل باقیمانده یک‌جا
 
 **برنامه اقساط:**
-- `getUpcomingPayments()` باید `calculationMethod` را چک کند
+- `getUpcomingPayments` باید `calculationMethod` را چک کند
 - برای هر روش فرمول‌های متفاوت است
 - تاریخ اولین قسط از `firstPaymentDate` شروع می‌شود (ممکن است بعد از `disbursementDate`)
 - در صورت `gracePeriodMonths > 0`، رفتار به روش محاسبه بستگی دارد (Declining: Interest-Only / Qarz: Payment Holiday / Flat Rate و Bullet: مجاز نیستند — بخش «ز» فرمول‌های کامل)
@@ -131,7 +131,7 @@
 **اسنپ‌شات برای Dashboard:**
 - `totalPaidPrincipal` → decimal (مجموع اصل پرداخت‌شده) ✅ **جدید**
 - `totalPaidInterest` → decimal (مجموع سود پرداخت‌شده) ✅ **جدیدشرایط:**
-- `disbursementType` → enum (`lump_sum`) — **در نسخه ۱ فقط `lump_sum` پشتیبانی می‌شود.** مقدار `phased` (واریز چندمرحله‌ای) از enum حذف شد چون پیاده‌سازی متناظری (چند رکورد `disbursement` و چند `disbursementDate`) وجود ندارد؛ ساختار فعلی (`disbursementDate` و `accountTransactionId` واحد در `ln_loans`) فقط از یک واریز یک‌باره پشتیبانی می‌کند. افزودن `phased` به نسخه‌های بعدی موکول شد و نیازمند API جداگانه (مثلاً `disburseLoanPhase()`) و مدل داده چندواریزی خواهد بود.
+- `disbursementType` → enum (`lump_sum`) — **در نسخه ۱ فقط `lump_sum` پشتیبانی می‌شود.** مقدار `phased` (واریز چندمرحله‌ای) از enum حذف شد چون پیاده‌سازی متناظری (چند رکورد `disbursement` و چند `disbursementDate`) وجود ندارد؛ ساختار فعلی (`disbursementDate` و `accountTransactionId` واحد در `ln_loans`) فقط از یک واریز یک‌باره پشتیبانی می‌کند. افزودن `phased` به نسخه‌های بعدی موکول شد و نیازمند API جداگانه (مثلاً `disburseLoanPhase`) و مدل داده چندواریزی خواهد بود.
 - `collateralNote` → string (nullable — وثیقه/ضامن) ✅ **جدیدطرف مقابل:**
 - `contactName` → string (نام)
 - `contactPhone` → string (nullable — شماره تماس) ✅ **جدید**
@@ -252,7 +252,7 @@ thresholdFrom=60, thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0 
 - `updateLoan(id, data)` → ویرایش (فقط قبل از اولین پرداخت)
 - `getAllLoans(filters)`
 - `getLoanById(id)`
-- `getLoanSummary()` → مجموع بدهی‌ها و مطالبات
+- `getLoanSummary` → مجموع بدهی‌ها و مطالبات
 - `cancelLoan(id)` → لغو وام — **فقط قبل از ثبت اولین پرداخت مجاز استقرارداد (الزاماً Atomic — BEGIN/COMMIT)**:
  ```
  BEGIN TRANSACTION;

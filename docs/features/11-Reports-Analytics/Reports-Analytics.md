@@ -123,22 +123,22 @@
 ### Report APIs
 - `getCashFlow(startDate, endDate, accountIds?)`
 - `getIncomeExpenseReport(startDate, endDate, groupBy?)`
-- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص — **Wrapper** روی `Portfolio-Wealth-Overview.calculateNetWorth({ date, includeCashInWealth: true })`؛ با `includeCashInWealth = true` (تفاوت عمدی با پیش‌فرض پرتفوی که `false` است) تا تصویر کامل ثروت شامل موجودی نقدی صرافی‌ها/کارگزاری‌ها هم باشد. **هیچ منطق محاسباتی مستقلی اینجا نیست** — منبع حقیقت `calculateNetWorth()` در `Portfolio-Wealth-Overview` است
+- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص — **Wrapper** روی `Portfolio-Wealth-Overview.calculateNetWorth({ date, includeCashInWealth: true })`؛ با `includeCashInWealth = true` (تفاوت عمدی با پیش‌فرض پرتفوی که `false` است) تا تصویر کامل ثروت شامل موجودی نقدی صرافی‌ها/کارگزاری‌ها هم باشد. **هیچ منطق محاسباتی مستقلی اینجا نیست** — منبع حقیقت `calculateNetWorth` در `Portfolio-Wealth-Overview` است
 - `getNetWorthTrend(startDate, endDate)` → روند Net Worth
 - `getInvestmentPerformance(startDate?, endDate?)`
 - `getTaxSummary(year?)` → خلاصه مالیات‌ها (پرداخت‌شده، در انتظار، معوق)
 - `getBudgetVsActual(budgetId)`
 - `getCategoryBreakdown(type, startDate, endDate)` → درآمد یا هزینه به تفکیک دسته
-- `getLoansSummary()`
-- `getGoalsProgress()`
-- `getChequesSummary()`
+- `getLoansSummary`
+- `getGoalsProgress`
+- `getChequesSummary`
 
 ### Export APIs
 - `exportReportToExcel(reportType, filters)`
 - `exportReportToPDF(reportType, filters)`
 
 ### Snapshot APIs
-- `createNetWorthSnapshot()` → ثبت وضعیت فعلی (می‌تواند Job روزانه باشد)
+- `createNetWorthSnapshot` → ثبت وضعیت فعلی (می‌تواند Job روزانه باشد)
 - `getNetWorthSnapshots(startDate, endDate)`
 
 ---
@@ -176,6 +176,6 @@
 
 - مانده وام‌های دریافتی
 - بدهی‌ها و اقساط معوق
-- **چک‌های پرداختی معلق (اختیاری)**: چک‌های صادرشده با وضعیت `pending` که هنوز از حساب کسر نشده‌اند یک تعهد مالی آتی واقعی‌اند. `getNetWorth()` می‌تواند این مبلغ را (از طریق `getPendingPayableChequesByAccount`) به‌عنوان بدهی احتمالی نمایش دهد تا کاربر بین «Net Worth فعلی» و «Net Worth پس از تسویه تعهدات معلق» تمایز قائل شود. (مرتبط با مورد ۲۱ — `getAvailableBalance`)
+- **چک‌های پرداختی معلق (اختیاری)**: چک‌های صادرشده با وضعیت `pending` که هنوز از حساب کسر نشده‌اند یک تعهد مالی آتی واقعی‌اند. `getNetWorth` می‌تواند این مبلغ را (از طریق `getPendingPayableChequesByAccount`) به‌عنوان بدهی احتمالی نمایش دهد تا کاربر بین «Net Worth فعلی» و «Net Worth پس از تسویه تعهدات معلق» تمایز قائل شود. (مرتبط با مورد ۲۱ — `getAvailableBalance`)
 
 ### Net Worth = دارایی‌ها − بدهی‌ها

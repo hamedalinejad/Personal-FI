@@ -119,8 +119,8 @@ Recurring Expense APIs:
 createRecurringExpense(data)
 updateRecurringExpense(id, data)
 toggleRecurring(id, active)
-getAllRecurringExpenses()
-generateRecurringExpenses() → تولید تراکنش‌های هزینه از روی قالب‌های فعال (Job روزانه)
+getAllRecurringExpenses
+generateRecurringExpenses → تولید تراکنش‌های هزینه از روی قالب‌های فعال (Job روزانه)
 
 
 روابط با سایر فیچرها

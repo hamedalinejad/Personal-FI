@@ -30,7 +30,7 @@ hooks/
 | `useMediaQuery` | تشخیص اندازه صفحه (موبایل / تبلت / دسکتاپ) | از breakpointهای ثابت در `lib/constants.ts` استفاده کند |
 | `useClickOutside` | تشخیص کلیک بیرون از المان (بستن منو و مودال) | ref-based، با cleanup مناسب |
 | `useOnlineStatus` | وضعیت آنلاین/آفلاین | مقدار را در `useAppStore.isOnline` هم sync کند (یا مستقیم از Store بخواند تا دو منبع حقیقت نباشد) |
-| `useCurrency` | دسترسی آسان به `useCurrencyStore` و `convert()` | یک لایه نازک روی Store؛ نباید منطق تبدیل را خودش پیاده کند |
+| `useCurrency` | دسترسی آسان به `useCurrencyStore` و `convert` | یک لایه نازک روی Store؛ نباید منطق تبدیل را خودش پیاده کند |
 | `useJalaliDate` | کار راحت با تاریخ شمسی در کامپوننت‌ها | از instance پیکربندی‌شده `dayjs` در `lib/dayjs.ts` استفاده کند |
 | `useEventBus` | گوش دادن و ارسال رویداد بین فیچرها | Subscribe در mount، unsubscribe در unmount |
 

@@ -245,12 +245,12 @@ export interface EventBus {
  * ثبت یک handler برای یک نوع رویداد.
  * خروجی: تابع unsubscribe — فراخوانی آن handler را از لیست حذف می‌کند.
  * الگوی استفاده: const unsub = eventBus.subscribe('TransactionCreated', handler)
- * // هنگام cleanup: unsub()
+ * // هنگام cleanup: unsub
  */
  subscribe<T extends AppEvent['type']>(
  type: T,
  handler: (payload: Extract<AppEvent, { type: T }>['payload']) => void
- ): () => void;
+ ):  => void;
 }
 ```
 

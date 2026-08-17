@@ -196,7 +196,7 @@
 | Route | هدف | مستند مرتبط |
 |---|---|---|
 | `/onboarding` | اولین اجرا: خوشامد + توضیح آفلاین بودن اپ | `db.md` |
-| `/onboarding/storage` | درخواست Persistent Storage (`navigator.storage.persist()`) + توضیح ریسک | `db.md` بخش ۲ |
+| `/onboarding/storage` | درخواست Persistent Storage (`navigator.storage.persist`) + توضیح ریسک | `db.md` بخش ۲ |
 | `/onboarding/backup` | توضیح اهمیت پشتیبان‌گیری دوره‌ای + راهنمای Export (**الزامی** — `db.md` صراحتاً خواسته) | `db.md` بخش ۲ |
 | `/onboarding/currency` | انتخاب ارز پایه (`cur_currency_preferences`) | `Currency-CrossRate.md` |
 | `/onboarding/accounts` | ثبت اولین حساب بانکی | `Accounts-Banking.md` |

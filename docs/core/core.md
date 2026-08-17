@@ -11,7 +11,7 @@
 3. **قابلیت تست**: `utils` و `services` باید به راحتی Unit Test شوند (توابع Pure، بدون Side Effect پنهان).
 4. **Offline-First**: سرویس‌ها باید حالت آفلاین را در نظر بگیرند — هر سرویسی که با شبکه کار می‌کند باید طبق «سیاست دسترسی به شبکه» در `Technical-Architecture.md` رفتار کند.
 5. **Type-Safe**: تمام بخش‌ها با TypeScript قوی نوشته شوند. از `any` پرهیز شود.
-6. **Decimal-Safe**: هرگز `Number()` یا `parseFloat()` برای مبالغ مالی استفاده نشود — فقط `Decimal.js`.
+6. **Decimal-Safe**: هرگز `Number` یا `parseFloat` برای مبالغ مالی استفاده نشود — فقط `Decimal.js`.
 7. **Rounding-Policy**: هر محاسبه مالی که نیاز به گرد کردن دارد باید از `utils/money/round.ts` و طبق `docs/core/rounding/Rounding-Policy.md` انجام شود. Round در میانه محاسبه زنجیره‌ای ممنوع است.
 
 ---

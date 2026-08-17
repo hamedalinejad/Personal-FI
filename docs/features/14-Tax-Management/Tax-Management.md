@@ -101,7 +101,7 @@
  > **توجه**: پارامترهای `relatedFeature`/`relatedId` از امضای این تابع حذف شده‌اند — این فیلدها فقط در زمان ایجاد رکورد (`createTaxRecord`) یا ویرایش (`updateTaxRecord`) قابل تنظیم‌اند و به منشأ مالیاتی رکورد اشاره دارند، نه به عملیات پرداخت. تنظیم آن‌ها در `payTax` باعث می‌شد با مقادیر اولیه رکورد تداخل ایجاد شود و پیوند audit trail گم شود.
 - `markAsPaid(taxRecordId, paidDate, accountId, accountTransactionId, ...)` → فقط وقتی تراکنش Tax **از قبل** با type صحیح ساخته شده (مثلاً import)؛ اگر type عمومی expense باشد باید reject شود تا double-count نشود.
 - `changeStatus(taxRecordId, status)` → تغییر وضعیت (pending, paid, overdue, cancelled) بدون ساخت ledger مگر از مسیر payTax
-- `getPendingTaxes()` / `getOverdueTaxes()`
+- `getPendingTaxes` / `getOverdueTaxes`
 
 ### Summary APIs
 - `getTaxSummary(taxYear?, taxCalendar?)` → مجموع پرداخت‌شده و در انتظار

@@ -9,7 +9,7 @@
 ```bash
 stores/
 ├── useAppStore.ts # تنظیمات UI اپ (تم، زبان، فرمت‌ها)
-├── useCurrencyStore.ts # نرخ ارز جاری + تابع convert()
+├── useCurrencyStore.ts # نرخ ارز جاری + تابع convert
 ├── useUiStore.ts # State رابط کاربری (سایدبار، مودال، loading)
 ├── usePriceSyncStore.ts # وضعیت دریافت قیمت‌ها (در حال fetch، آخرین نتیجه)
 └── index.ts # re-export مرکزی
@@ -73,7 +73,7 @@ stores/
 | `lastFetchResult` | `PriceFetchResult \| null` | خلاصه آخرین fetch (succeeded/failed) — فقط برای نمایش در UI؛ داده واقعی در `price_history` است |
 | `autoSyncActive` | `boolean` | آیا تایمر Auto-Sync الان در حال اجرا است |
 
-> این Store هیچ‌وقت قیمت‌های واقعی را کش نمی‌کند — فقط وضعیت UI عملیات fetch را نگه می‌دارد. آخرین قیمت واقعی همیشه از `price_history` (SQLite) از طریق `getLatestPrice()` خوانده می‌شود.
+> این Store هیچ‌وقت قیمت‌های واقعی را کش نمی‌کند — فقط وضعیت UI عملیات fetch را نگه می‌دارد. آخرین قیمت واقعی همیشه از `price_history` (SQLite) از طریق `getLatestPrice` خوانده می‌شود.
 
 ---
 

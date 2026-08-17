@@ -226,7 +226,7 @@
 > - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است) 
 > - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود) 
 > - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند) 
-> - در تابع `getPortfolioValue()`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی) 
+> - در تابع `getPortfolioValue`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی) 
 > - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
 ### ۴. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
@@ -304,7 +304,7 @@
 
 ```typescript
 function convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase, exchangeRateToBase, baseCurrency): Decimal {
- if (feeAmount.isZero()) return new Decimal(0);
+ if (feeAmount.isZero) return new Decimal(0);
  if (feeCurrency === baseCurrency) return feeAmount; // بدون تبدیل
  if (feeCurrency === 'IRR') return feeAmount.dividedBy(exchangeRateToBase); // IRR → base
  /* feeCurrency = رمزارز دیگر (BTC, ETH, ...) — feeAssetPriceToBase الزامی */
@@ -474,7 +474,7 @@ holding.totalFeesPaidBase += feeBase
 ### Exchange APIs
 - `createExchange(data)`
 - `updateExchange(id, data)`
-- `getAllExchanges()`
+- `getAllExchanges`
 - `getExchangeById(id)`
 
 ### Holding APIs
@@ -510,7 +510,7 @@ holding.totalFeesPaidBase += feeBase
  totalInvested = totalInvested.plus(tx.totalAmountBase).plus(feeBase)
  qty = qty.plus(tx.quantity)
  } else if (tx.type === 'sell') {
- const soldCost = tx.quantity.times(qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty))
+ const soldCost = tx.quantity.times(qty.isZero ? new Decimal(0) : totalInvested.dividedBy(qty))
  totalInvested = totalInvested.minus(soldCost)
  qty = qty.minus(tx.quantity)
  } else if (tx.type === 'transfer_in') {
@@ -524,13 +524,13 @@ holding.totalFeesPaidBase += feeBase
  totalInvested = totalInvested.plus(costTransferred)
  qty = qty.plus(tx.quantity)
  } else if (tx.type === 'transfer_out') {
- const avgBuy = qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty)
+ const avgBuy = qty.isZero ? new Decimal(0) : totalInvested.dividedBy(qty)
  totalInvested = totalInvested.minus(tx.quantity.times(avgBuy))
  qty = qty.minus(tx.quantity)
  }
  }
 
- const averageBuyPrice = qty.isZero() ? new Decimal(0) : totalInvested.dividedBy(qty)
+ const averageBuyPrice = qty.isZero ? new Decimal(0) : totalInvested.dividedBy(qty)
  return { quantity: qty, totalInvested, averageBuyPrice, totalFeesPaidBase }
  }
  ```
@@ -748,7 +748,7 @@ holding.totalFeesPaidBase += feeBase
 
 ## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 
-فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش:
+فرمول رسمی و تنها فرمول معتبر برای `calculateProfitLoss` و به‌روزرسانی Holding هنگام خرید/فروش:
 
 **هنگام خرید** (Weighted Average):
 ```

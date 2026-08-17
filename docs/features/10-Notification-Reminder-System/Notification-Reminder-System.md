@@ -63,7 +63,7 @@
 
 > **نگاشت `category` ↔ `relatedFeature`**: مقادیر `category` عمداً با `RelatedFeature` هماهنگ شده‌اند تا نگاشت مستقیم (`category === relatedFeature`) کار کند — به‌جز دو استثنا: `system` (اعلان‌های داخلی سیستم) و `custom` (اعلان‌های دستی کاربر) که معادل `RelatedFeature` ندارند و `relatedFeature` آن‌ها `null` است.
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
-- `dedupeKey` → string (nullable — کلید یکتایی منطقی برای جلوگیری از اعلان تکراری؛ فرمت پیشنهادی: `{category}:{relatedFeature}:{relatedId}:{dueDate-YYYY-MM}`؛ قبل از ساخت اعلان جدید در `generateDueReminders()` بررسی می‌شود که اعلان فعالی با همین `dedupeKey` وجود نداشته باشد)
+- `dedupeKey` → string (nullable — کلید یکتایی منطقی برای جلوگیری از اعلان تکراری؛ فرمت پیشنهادی: `{category}:{relatedFeature}:{relatedId}:{dueDate-YYYY-MM}`؛ قبل از ساخت اعلان جدید در `generateDueReminders` بررسی می‌شود که اعلان فعالی با همین `dedupeKey` وجود نداشته باشد)
 - `isRead` → boolean
 - `scheduledAt` → datetime (زمان برنامه‌ریزی‌شده برای نمایش)
 - `createdAt` → datetime
@@ -96,27 +96,27 @@
 ### Notification APIs
 - `createNotification(data)` → ایجاد اعلان جدید
 - `getAllNotifications(filters)` → فیلتر بر اساس خوانده‌شده، دسته و ...
-- `getUnreadNotifications()`
+- `getUnreadNotifications`
 - `markAsRead(notifId)`
-- `markAllAsRead()`
+- `markAllAsRead`
 - `deleteNotification(notifId)`
 - `clearOldNotifications(beforeDate)`
 
 ### Settings APIs
-- `getNotificationSettings()`
+- `getNotificationSettings`
 - `updateNotificationSetting(category, data)`
 - `toggleCategory(category, enabled)`
 
 ### Custom Reminder APIs
 - `createCustomReminder(data)`
 - `updateCustomReminder(notifReminderId, data)`
-- `getActiveCustomReminders()`
+- `getActiveCustomReminders`
 - `deactivateCustomReminder(notifReminderId)`
 
 ### Scheduler APIs
-- `generateDueReminders()` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق اولویت `daysBefore`**: برای هر رکورد، ابتدا مقدار سطح‌آیتم بررسی می‌شود (مثلاً `br_items.reminderDaysBefore`)؛ اگر non-null بود از آن استفاده می‌شود، در غیر این صورت از `notif_settings.daysBefore` برای `category` مربوطه به‌عنوان fallback استفاده می‌شود؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود)
-- `checkBudgetAlerts()` → بررسی وضعیت بودجه‌ها
-- `checkGoalProgress()` → بررسی پیشرفت اهداف
+- `generateDueReminders` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق اولویت `daysBefore`**: برای هر رکورد، ابتدا مقدار سطح‌آیتم بررسی می‌شود (مثلاً `br_items.reminderDaysBefore`)؛ اگر non-null بود از آن استفاده می‌شود، در غیر این صورت از `notif_settings.daysBefore` برای `category` مربوطه به‌عنوان fallback استفاده می‌شود؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود)
+- `checkBudgetAlerts` → بررسی وضعیت بودجه‌ها
+- `checkGoalProgress` → بررسی پیشرفت اهداف
 
 ---
 
@@ -162,6 +162,6 @@
 - اعلان‌ها باید سبک و غیرمزاحم باشند.
 - در حالت Offline، اعلان‌ها به صورت محلی ذخیره و نمایش داده می‌شوند.
 - Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند؛ **اولویت `daysBefore`**: مقدار سطح‌آیتم (مثلاً `br_items.reminderDaysBefore`) بر مقدار سراسری `notif_settings.daysBefore` اولویت دارد؛ `notif_settings.daysBefore` فقط زمانی استفاده می‌شود که مقدار سطح‌آیتم `null` باشد.
-- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders()` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
+- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
 - در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
 - تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.

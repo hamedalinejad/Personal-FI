@@ -113,20 +113,20 @@
 ## APIهای داخلی
 
 ### Dashboard APIs
-- `getDashboardData()` → دریافت یکجای داده‌های اصلی داشبورد
+- `getDashboardData` → دریافت یکجای داده‌های اصلی داشبورد
 - `getWidgetData(widgetKey)` → دریافت داده یک ویجت خاص
-- `getDashboardLayout()` → دریافت چیدمان ذخیره‌شده کاربر
+- `getDashboardLayout` → دریافت چیدمان ذخیره‌شده کاربر
 - `updateDashboardLayout(layout)` → ذخیره چیدمان جدید
 
 ### داده‌های تجمیعی مورد نیاز
-- `getAccountsSummary()`
-- `getMonthlyCashFlow()`
-- `getNetWorthSummary()`
-- `getBudgetSummary()`
-- `getActiveGoalsSummary()`
-- `getUpcomingDueItems()`
-- `getInvestmentSummary()`
-- `getUnreadNotificationsCount()`
+- `getAccountsSummary`
+- `getMonthlyCashFlow`
+- `getNetWorthSummary`
+- `getBudgetSummary`
+- `getActiveGoalsSummary`
+- `getUpcomingDueItems`
+- `getInvestmentSummary`
+- `getUnreadNotificationsCount`
 
 ---
 

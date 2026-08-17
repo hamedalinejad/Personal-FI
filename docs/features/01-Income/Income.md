@@ -117,8 +117,8 @@ Recurring Income APIs:
 createRecurringIncome(data)
 updateRecurringIncome(id, data)
 toggleRecurring(id, active)
-getAllRecurringIncomes()
-generateRecurringIncomes() → تولید تراکنش‌های درآمد از روی قالب‌های فعال (Job روزانه)
+getAllRecurringIncomes
+generateRecurringIncomes → تولید تراکنش‌های درآمد از روی قالب‌های فعال (Job روزانه)
 
 
 روابط با سایر فیچرها

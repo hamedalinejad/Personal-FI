@@ -86,7 +86,7 @@
 ## APIهای داخلی
 
 ### Currency APIs
-- `getCurrencies()` → لیست ارزهای فعال
+- `getCurrencies` → لیست ارزهای فعال
 - `getCurrencyByCode(code)` → دریافت ارز با کد مشخص
 
 ### Exchange Rate APIs
@@ -99,7 +99,7 @@
 - `getRatesForCurrency(currencyCode)` → نرخ‌های مرتبط با یک ارز
 
 ### Preference APIs
-- `getUserCurrencyPreference()` → دریافت تنظیمات نمایش کاربر جاری (از دیتابیس محلی همان کاربر)
+- `getUserCurrencyPreference` → دریافت تنظیمات نمایش کاربر جاری (از دیتابیس محلی همان کاربر)
 - `updateUserCurrencyPreference(displayCurrency, baseCurrency)` → به‌روزرسانی
 
 > نکته: هر کاربر دیتابیس مستقل خودش را دارد (به `db.md` مراجعه شود)، بنابراین APIها نیازی به پارامتر `userId` ندارند.

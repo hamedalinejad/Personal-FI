@@ -159,9 +159,9 @@
 - `getAssetTransactions(assetId)`
 
 ### Portfolio APIs
-- `getPortfolioValue()` → ارزش کل دارایی‌های فیزیکی (ریال + معادل تتری)
+- `getPortfolioValue` → ارزش کل دارایی‌های فیزیکی (ریال + معادل تتری)
 - `calculateProfitLoss(assetId?)` → سود/زیان تحقق‌یافته و تحقق‌نیافته؛ **سود/زیان تحقق‌یافته** = جمع `amount` تمام رکوردهای `pa_transactions` با `type = 'sale'` یا `type = 'write_off'` (هر دو نوع در یک جمع یکپارچه از روی Transaction Log، بدون نیاز به اسکن جداگانه `pa_assets.status`)
-- `getAssetsByCategory()`
+- `getAssetsByCategory`
 
 ---
 

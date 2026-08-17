@@ -269,7 +269,7 @@ IndexedDB
 * Backup / Restore
 * Import / Export
 * آماده برای Cloud Sync
-* Persistent Storage (`navigator.storage.persist()`) برای جلوگیری از حذف داده روی موبایل
+* Persistent Storage (`navigator.storage.persist`) برای جلوگیری از حذف داده روی موبایل
 * الگوی نوشتن Write-to-temp-then-swap برای جلوگیری از خرابی فایل دیتابیس حین اجرای PWA روی موبایل
 
 ---

@@ -12,7 +12,7 @@
 پروژه قرار است به‌صورت **PWA نصب‌شونده روی موبایل** و کاملاً آفلاین اجرا شود (Project-Blueprint بخش ۲ و ۷). این محدودیت‌های واقعی مرورگرهای موبایل (به‌ویژه Safari/iOS) باید صراحتاً در معماری دیتابیس لحاظ شوند:
 
 ### ۱. ریسک بازنویسی کامل Blob در هر ذخیره‌سازی
-چون sql.js افزایشی نیست، هر `save()` باید کل دیتابیس را دوباره سریالایز و در IndexedDB بازنویسی کند. اگر اپ حین این نوشتن (مثلاً به‌خاطر رفتن به پس‌زمینه یا قطع ناگهانی روی موبایل) متوقف شود، ریسک خرابی (corruption) فایل دیتابیس وجود دارد.
+چون sql.js افزایشی نیست، هر `save` باید کل دیتابیس را دوباره سریالایز و در IndexedDB بازنویسی کند. اگر اپ حین این نوشتن (مثلاً به‌خاطر رفتن به پس‌زمینه یا قطع ناگهانی روی موبایل) متوقف شود، ریسک خرابی (corruption) فایل دیتابیس وجود دارد.
 - **راه‌حل الزامی**: نوشتن باید به روش **Write-to-temp-then-swap** انجام شود: ابتدا Blob جدید با کلید موقت (`db_pending`) نوشته شود، سپس در یک تراکنش IndexedDB atomic، کلید اصلی (`db_main`) با آن جایگزین شود. هرگز مستقیم روی کلید اصلی overwrite نشود.
 - نوشتن‌ها باید **Debounce** شوند برای تغییرات غیرمالی UI؛ برای **عملیات مالی کامل** مسیر جداست (پایین).
 - `visibilitychange` / `beforeunload` فقط **best-effort flush** هستند — **هرگز تضمین persist نیستند**.
@@ -21,7 +21,7 @@
 
 ### ۲. عدم تضمین ماندگاری Storage روی موبایل (خصوصاً iOS Safari)
 مرورگرها (به‌خصوص Safari) می‌توانند در شرایط کمبود فضا، داده‌های IndexedDB اپ‌هایی که Persistent Storage درخواست نکرده‌اند را حذف کنند. برای یک اپ حسابداری مالی این ریسک غیرقابل قبول است.
-- **راه‌حل الزامی**: در اولین اجرای اپ، `navigator.storage.persist()` باید فراخوانی و نتیجه آن (granted/denied) به کاربر نمایش داده شود.
+- **راه‌حل الزامی**: در اولین اجرای اپ، `navigator.storage.persist` باید فراخوانی و نتیجه آن (granted/denied) به کاربر نمایش داده شود.
 - یادآوری/هشدار به کاربر در صفحه تنظیمات اگر Persistent Storage تایید نشده باشد.
 - **پشتیبان‌گیری دوره‌ای اجباری** (نه صرفاً اختیاری) از طریق Export فایل SQLite به دستگاه/فضای ابری کاربر باید در جریان Onboarding به کاربر یادآوری شود، دقیقاً به‌خاطر همین عدم قطعیت. جدول `stg_backup_logs` باید یادآوری «آخرین بکاپ چند روز پیش بوده» را در Dashboard نمایش دهد.
 
@@ -67,7 +67,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `theme` | `'light' \| 'dark' \| 'system'` | `'system'` | تم |
 | `dateFormat` | `'jalali' \| 'gregorian'` | `'jalali'` | فرمت تاریخ |
 | `numberFormat` | `'fa' \| 'en'` | `'fa'` | فرمت اعداد |
-| `autoVersionCheckEnabled` | `boolean` | **`false`** | بررسی خودکار نسخه در Startup — **پیش‌فرض خاموش ( / Offline-by-default)**؛ فقط با opt-in صریح کاربر روشن می‌شود |
+| `autoVersionCheckEnabled` | `boolean` | **`false`** | بررسی خودکار نسخه در Startup — **پیش‌فرض خاموش (Offline-by-default)**؛ فقط با opt-in صریح کاربر روشن می‌شود |
 | `defaultAccountId` | `UUID \| null` | `null` | حساب پیش‌فرض در فرم ثبت تراکنش |
 | `dashboardLayout` | `string` | `'default'` | چیدمان داشبورد (به `dash_layouts` مراجعه کنید) |
 
@@ -342,7 +342,7 @@ import Decimal from 'decimal.js';
 
 // ورود: "1234.56" → تبدیل به کوچک‌ترین واحد
 const inputAmount = new Decimal('1234.56');
-const minorUnits = inputAmount.times(100).toNumber(); // 123456
+const minorUnits = inputAmount.times(100).toNumber; // 123456
 
 // ذخیره‌سازی: 123456
 database.save({ amount: minorUnits });
@@ -526,14 +526,14 @@ COMMIT;
 
 
 - نوشتن دیتابیس در IndexedDB همیشه با الگوی Write-to-temp-then-swap و Debounce انجام شود (بخش «سازگاری با PWA و اجرای آفلاین روی موبایل»).
-- در اولین اجرا، `navigator.storage.persist()` باید درخواست شود.
+- در اولین اجرا، `navigator.storage.persist` باید درخواست شود.
 
 
 ---
 
 ## قرارداد Reconciliation مرکزی
 
-Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) ممکن است به‌خاطر باگ Domain از Ledger فاصله بگیرند. یک مکانیزم **مرکزی فقط‌خواندنی** برای تشخیص ناهماهنگی الزامی است.
+Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) ممکن است به‌خاطر خطای Domain از Ledger فاصله بگیرند. یک مکانیزم **مرکزی فقط‌خواندنی** برای تشخیص ناهماهنگی الزامی است.
 
 ### APIهای مشترک (لایه Domain / `core` یا `db/reconciliation.ts`)
 
@@ -548,8 +548,8 @@ Snapshotها (موجودی حساب، units، quantityMg، cashBalance، …) م
 | `reconcileMetalsPlatformCash(platformId)` | `inv_metals_platforms.cashBalance` ↔ Σ دو منبع: (۱) `inv_metals_platform_transactions` (deposit اضافه، withdraw کم) + (۲) `inv_metals_transactions` (buy کم، sell اضافه، deliveryFee کم) |
 | `reconcileLoan(loanId)` | مانده وام ↔ جدول اقساط / `ln_transactions` |
 | `reconcileCheque(chequeId)` | سازگاری `status` / `accountTransactionId` / `reversalTransactionId` در `chk_cheques` ↔ وجود/جهت/وضعیت تراکنش‌های مرتبط در `acc_transactions` — بر اساس ماتریس state machine (جدول زیر) |
-| `reconcilePortfolio()` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
-| `reconcileAll()` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها، `reconcileCheque` برای همه چک‌های غیر-cancelled، و `reconcileMetalsPlatformCash` برای همه پلتفرم‌های فلزات)؛ خروجی گزارش یکپارچه |
+| `reconcilePortfolio` | جمع ارزش‌ها و اسنپ‌شات‌های کلیدی در برابر مجموع reconciles جزئی |
+| `reconcileAll` | اجرای همه موارد بالا (شامل `reconcileStockHolding` برای همه Holdingها، `reconcileCheque` برای همه چک‌های غیر-cancelled، و `reconcileMetalsPlatformCash` برای همه پلتفرم‌های فلزات)؛ خروجی گزارش یکپارچه |
 
 **ماتریس انتظار `reconcileCheque` — یک چک سالم باید:**
 
@@ -579,14 +579,14 @@ interface ReconcileResult {
 ### قوانین
 1. Reconciliation **هرگز خودکار snapshot را عوض نمی‌کند** مگر با عملیات صریح Repair (نسخه ۱: فقط گزارش؛ Repair = Should Have با تأیید کاربر).
 2. بعد از هر `runAtomicFinancialOperation` موفق، فراخوانی reconcile همان aggregate در dev/test توصیه‌شده است.
-3. Dashboard/Settings می‌تواند «سلامت داده» را از `reconcileAll()` نشان دهد (اختیاری v1).
+3. Dashboard/Settings می‌تواند «سلامت داده» را از `reconcileAll` نشان دهد (اختیاری v1).
 4. معیار مقایسه همیشه decimal.js؛ آستانه صفر مطلق برای پول (یا epsilon بسیار کوچک فقط برای نرخ‌های اعشاری اگر مستند شود).
 
 ---
 
 ## قرارداد CHECK Constraints در SQLite
 
-قوانین Domain لازم‌اند ولی کافی نیستند. Schema باید تا حد ممکن همان invariants را enforce کند تا باگ Domain نتواند `quantity = -1` را commit کند.
+قوانین Domain لازم‌اند ولی کافی نیستند. Schema باید تا حد ممکن همان invariants را enforce کند تا خطای Domain نتواند `quantity = -1` را commit کند.
 
 ### حداقل CHECKهای الزامی (نمونه — در `schema.sql` پیاده‌سازی)
 
@@ -718,7 +718,7 @@ FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 
 1. **Validate همزمان با INSERT** (داخل همان BEGIN atomic): وجود ردیف هدف؛ وگرنه COMMIT نشود.
 2. **جدول `ref_integrity_queue` (اختیاری v1 / Should Have)**: اگر حذف منطقی parent لازم شد، قبل از archive، child links بررسی شوند (RESTRICT منطقی).
-3. **Reconcile اجباری در مسیرهای حساس**: قبل از Backup و بعد از Restore، `reconcileOrphanLinks()` برای `acc_transactions` و سایر polymorphic tables.
+3. **Reconcile اجباری در مسیرهای حساس**: قبل از Backup و بعد از Restore، `reconcileOrphanLinks` برای `acc_transactions` و سایر polymorphic tables.
 4. **ممنوع DELETE فیزیکی** parent تا وقتی child link دارد (هم‌راستا با ON DELETE RESTRICT روی FKهای واقعی).
 5. تست integration: حذف/void والد نباید child را بی‌سرپرست رها کند بدون گزارش.
 
@@ -846,14 +846,14 @@ APIهای `reconcile*` / `rebuild*` فقط مشخصات نیستند؛ در impl
 expected = pure function over non-voided ledger rows (decimal.js)
 actual = current snapshot column(s)
 delta = actual - expected
-ok = delta.isZero()
+ok = delta.isZero
 ```
 3. **اثبات در تست**: unit/integration با fixture — بعد از atomic op، `reconcileX` → `ok:true`؛ بعد از فساد عمدی snapshot → `ok:false` و rebuild جبران می‌کند.
 4. **Runtime**:
  - Dev/Test: بعد از هر `runAtomicFinancialOperation` روی aggregate همان op
  - Production v1: `reconcileAll` از Settings «سلامت داده» + قبل از Backup + بعد از Restore
 5. **خروجی پایدار** در جدول اختیاری `fin_reconcile_runs` (Should Have): `{ ranAt, scope, ok, deltaSummary }` برای audit.
-6. تا وقتی کد و تست fixture وجود ندارد، checklist پیاده‌سازی این باگ را **باز** می‌داند — مستند به‌تنهایی «حل‌شده در runtime» نیست.
+6. تا وقتی کد و تست fixture وجود ندارد، checklist پیاده‌سازی این قابلیت **باز** است — مستند به‌تنهایی «اجرایی‌شده در runtime» نیست.
 
 ### منبع حقیقت مقایسه
 - همیشه **ledger rows** (و در صورت نیاز `fin_journal_entries` برای cross-feature)

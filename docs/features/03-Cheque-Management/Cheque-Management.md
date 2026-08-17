@@ -87,7 +87,7 @@ updateCheque(id, data) → ویرایش چک (فقط در وضعیت pending)
 changeChequeStatus(id, newStatus) → تغییر وضعیت + ایجاد/لغو تراکنش + ایجاد/به‌روزرسانی reversalTransactionId
 getAllCheques(filters) → لیست با فیلتر (وضعیت، نوع، تاریخ سررسید، حساب)
 getChequeById(id) → شامل reversalTransactionId برای بررسی تراکنش معکوس
-getPendingCheques() → چک‌های در انتظار
+getPendingCheques → چک‌های در انتظار
 getTotalChequesByStatus(status, startDate?, endDate?) → مجموع چک‌ها بر اساس وضعیت
 getUpcomingDueCheques(days) → چک‌های نزدیک به سررسید (برای یادآوری)
 getPendingPayableChequesByAccount(accountId) → مجموع و لیست چک‌های پرداختی pending یک حساب — ورودی `getAvailableBalance` در Accounts & Banking
@@ -101,7 +101,7 @@ reconcileCheque(chequeId: UUID): {
 }
 ```
 
-**زمان استفاده**: پس از Migration، پس از Import/Restore، در `reconcileAll()`.
+**زمان استفاده**: پس از Migration، پس از Import/Restore، در `reconcileAll`.
 
 
 روابط با سایر فیچرها

@@ -187,11 +187,11 @@ Domain Entities
 
 APIهای داخلی
 
-createFund(data) / updateFund(id, data) / getAllFunds()
+createFund(data) / updateFund(id, data) / getAllFunds
 createTransaction(data) → خرید، فروش، واریز/برداشت مستقیم حساب بانکی (issuance_redemption)، تقسیم سود، سرمایه‌گذاری مجدد — همگی روی `inv_fif_transactions` ثبت می‌شوند؛ برای واریز/برداشت ETF از طریق کارگزاری، به APIهای `Investment-Stocks-Iran` (`createBrokerageTransaction`) مراجعه شود.
 updateNAV(fundId, nav, date) → ثبت NAV جدید (از نسخه ۱، این تابع یک Wrapper نازک روی `setManualFundNAV` فیچر `19-Price-Fetching` است تا NAV هم در `price_history` مرکزی و هم در `inv_fif_holdings.currentNAV` ثبت شود؛ جزئیات کامل در `19-03-Fund-NAV/Fund-NAV.md`)
-getHoldings() / getHoldingByFund(fundId)
-getPortfolioValue() → ارزش کل + معادل تتری
+getHoldings / getHoldingByFund(fundId)
+getPortfolioValue → ارزش کل + معادل تتری
 getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌شده و واقعی (Derived — محاسبه در لحظه، نه Stored)
 
  **فرمول سود واقعی در بازه `period`**:
@@ -220,7 +220,7 @@ Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
 
 ## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 
-فرمول رسمی برای `calculateProfitLoss()` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده).
+فرمول رسمی برای `calculateProfitLoss` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده).
 
 > **قانون اصلی**: محاسبات خرید و میانگین و Realized P&L همیشه بر اساس `transactionPrice` (قیمت واقعی صدور/ابطال) انجام می‌شود. `nav` فقط برای ارزش‌گذاری و Unrealized P&L استفاده می‌شود.
 

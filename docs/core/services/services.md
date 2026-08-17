@@ -52,7 +52,7 @@ services/
 | متد | امضا | توضیح |
 |-----|------|-------|
 | `emit` | `emit<T>(type, payload): void` | انتشار رویداد به همه handlerهای ثبت‌شده |
-| `subscribe` | `subscribe<T>(type, handler): () => void` | ثبت handler؛ خروجی تابع unsubscribe است |
+| `subscribe` | `subscribe<T>(type, handler):  => void` | ثبت handler؛ خروجی تابع unsubscribe است |
 
 **قوانین رفتاری (الزامی در هر implementation):**
 

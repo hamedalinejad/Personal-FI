@@ -146,14 +146,14 @@ feeAmount =
 ### Brokerage
 - `createBrokerage(data)`
 - `updateBrokerage(id, data)`
-- `getAllBrokerages()`
+- `getAllBrokerages`
 - `getBrokerageById(id)`
 - `getBrokerageCashBalance(brokerageId)`
 
 ### Holding
 - `getHoldings(brokerageId?)`
 - `getHoldingBySymbol(symbol, brokerageId?)`
-- `getPortfolioValue()`
+- `getPortfolioValue`
 - **`reconcileStockHolding(holdingId)`** → مقایسه `quantity` / `totalInvested` / `averageBuyPrice` snapshot با محاسبه از صفر از روی لاگ تراکنش‌ها
 
  ```typescript

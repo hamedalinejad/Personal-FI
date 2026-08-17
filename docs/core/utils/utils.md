@@ -80,7 +80,7 @@ export function toMinorUnit(amount: string | Decimal, currency: string): bigint 
  */
 export function fromMinorUnit(minorUnits: bigint | number, currency: string): Decimal {
  const decimals = MINOR_UNIT_DECIMALS[currency] ?? DEFAULT_DECIMALS;
- return new Decimal(minorUnits.toString()).dividedBy(Decimal.pow(10, decimals));
+ return new Decimal(minorUnits.toString).dividedBy(Decimal.pow(10, decimals));
 }
 
 /**
@@ -121,7 +121,7 @@ export function calculateWeightedAverage(
  const newInvested = nQ.times(nP).plus(fee);
  const totalQty = cQ.plus(nQ);
  const totalInvested = prevInvested.plus(newInvested);
- const avgPrice = totalQty.isZero() ? new Decimal(0) : totalInvested.dividedBy(totalQty);
+ const avgPrice = totalQty.isZero ? new Decimal(0) : totalInvested.dividedBy(totalQty);
 
  return { newAvgPrice: avgPrice, newTotalInvested: totalInvested, newQuantity: totalQty };
 }
@@ -154,5 +154,5 @@ export function formatMoney(
 1. تمام توابع باید **Pure** باشند (بدون Side Effect، بدون state، بدون I/O).
 2. هیچ وابستگی به React، DOM، یا مرورگر نداشته باشند.
 3. باید به راحتی Unit Test شوند (هر تابع با ورودی/خروجی مشخص).
-4. **هرگز** `Number()` یا `parseFloat()` برای مبالغ مالی استفاده نشود — فقط `new Decimal(...)`.
+4. **هرگز** `Number` یا `parseFloat` برای مبالغ مالی استفاده نشود — فقط `new Decimal(...)`.
 5. `toMinorUnit` و `fromMinorUnit` تنها مکانی هستند که تبدیل Minor Unit انجام می‌دهند — نه inline در هیچ فیچری.

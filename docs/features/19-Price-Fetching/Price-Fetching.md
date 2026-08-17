@@ -346,7 +346,7 @@ UI / Auto-Sync
 ### مدیریت Auto-Sync
 - `getSyncSettings(scope, assetCategory?, symbol?)`
 - `setSyncSettings(data)` → روشن/خاموش کردن و تنظیم `syncIntervalMinutes` برای یک دسته یا یک نماد
-- `runDueAutoSyncs()` → روی همه رکوردهای `autoSyncEnabled=true` که `now - lastSyncAt >= syncIntervalMinutes` است چک می‌کند و برای هرکدام `fetchAndStorePrices(..., triggeredBy='auto_sync')` را صدا می‌زند؛ این تابع فقط از تایمر داخل اپ (وقتی تب باز و آنلاین است) صدا زده می‌شود، نه از بیرون.
+- `runDueAutoSyncs` → روی همه رکوردهای `autoSyncEnabled=true` که `now - lastSyncAt >= syncIntervalMinutes` است چک می‌کند و برای هرکدام `fetchAndStorePrices(..., triggeredBy='auto_sync')` را صدا می‌زند؛ این تابع فقط از تایمر داخل اپ (وقتی تب باز و آنلاین است) صدا زده می‌شود، نه از بیرون.
 
 ---
 
@@ -363,7 +363,7 @@ UI / Auto-Sync
 
 ## روابط با سایر فیچرها
 
-- **Investment - Crypto / Stocks Iran / FIF / Metals**: این فیچرها برای محاسبه Unrealized P&L و ارزش لحظه‌ای پرتفوی فقط از `getLatestPrice()` می‌خوانند؛ خودشان هرگز API خارجی صدا نمی‌زنند و هرگز خودشان تصمیم به آنلاین‌شدن نمی‌گیرند. برای FIF، تابع `updateNAV(fundId, nav, date)` خودِ فیچر Investment در واقع یک لایه نازک روی `setManualPrice`/`fetchAndStorePrices` همین فیچر است (به `19-03-Fund-NAV` مراجعه شود) تا NAV هم در `inv_fif_holdings.currentNAV` (برای سرعت) و هم در `price_history` (برای تاریخچه و استاندارد یکپارچه) ثبت شود. **توجه**: این مسیر فقط NAV را تأمین می‌کند؛ قیمت صدور/ابطال در `inv_fif_transactions.transactionPrice` ثبت می‌شود و مبنای میانگین خرید و Realized P&L است.
+- **Investment - Crypto / Stocks Iran / FIF / Metals**: این فیچرها برای محاسبه Unrealized P&L و ارزش لحظه‌ای پرتفوی فقط از `getLatestPrice` می‌خوانند؛ خودشان هرگز API خارجی صدا نمی‌زنند و هرگز خودشان تصمیم به آنلاین‌شدن نمی‌گیرند. برای FIF، تابع `updateNAV(fundId, nav, date)` خودِ فیچر Investment در واقع یک لایه نازک روی `setManualPrice`/`fetchAndStorePrices` همین فیچر است (به `19-03-Fund-NAV` مراجعه شود) تا NAV هم در `inv_fif_holdings.currentNAV` (برای سرعت) و هم در `price_history` (برای تاریخچه و استاندارد یکپارچه) ثبت شود. **توجه**: این مسیر فقط NAV را تأمین می‌کند؛ قیمت صدور/ابطال در `inv_fif_transactions.transactionPrice` ثبت می‌شود و مبنای میانگین خرید و Realized P&L است.
 - **Portfolio & Wealth Overview**: استفاده از آخرین قیمت‌ها برای Snapshot ارزش کل ثروت — کاملاً از دادهٔ محلی، بدون هیچ اتصال شبکه.
 - **Currency & Multi-Currency**: تبدیل نهایی قیمت به ارز پایه کاربر با `cur_exchange_rates` انجام می‌شود، نه در همین فیچر.
 - **Settings & Tools**: مدیریت منابع قیمت و تنظیمات Auto-Sync (`price_sync_settings`) از صفحه تنظیمات انجام می‌شود؛ این فیچر صفحه مستقل در ناوبری اصلی ندارد (طبق اصل «صفحات کم» در `Pages-IA.md`) و به‌صورت دکمه «دریافت قیمت‌ها» + سوییچ «به‌روزرسانی خودکار» داخل صفحه «سرمایه‌گذاری» (`/investments`) و بخش تنظیمات (`/settings`) نمایش داده می‌شود.
@@ -444,7 +444,7 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 
 ---
 
-## Quote کامل‌تر ( / )
+## Quote کامل‌تر 
 
 > **✅ اعمال‌شده در Domain Entity بالا**: فیلدهای `quoteType` (الزامی) و `marketDate` (nullable) به جدول `price_history` اضافه شدند. این بخش برای توضیح دلیل تصمیم و قوانین تکمیلی نگه داشته شده است.
 

@@ -41,7 +41,7 @@
 3a. **وام و بودجه**: از نظر حسابداری، فقط بخش‌های واقعاً «هزینه» یک پرداخت وام مجاز به لینک‌شدن به `bg_envelopes` هستند — یعنی `interestPortion` (سود)، `penaltyPortion` (جریمه) و `feePortion` (کارمزد) از `ln_transactions`. **`principalPortion` (اصل وام) هرگز نباید به یک envelope لینک شود**، چون بازپرداخت اصل کاهش بدهی در ترازنامه است، نه هزینه؛ لینک‌کردن کل مبلغ (اصل+سود) به یک پاکت، گزارش بودجه واقعی را با کم‌نمایی نادرست ظرفیت مصرف مخدوش می‌کند. در `bg_transaction_links`، فیلد `amount` برای `relatedFeature = 'loan'` باید فقط برابر مجموع `interestPortion + penaltyPortion + feePortion` همان `ln_transactions` باشد، نه `amount` کامل تراکنش وام.
 4. اگر پاکت موجودی کافی نداشته باشد:
  - هشدار نمایش داده می‌شود.
- - اگر `strictMode = true`: ثبت هزینه واقعی (`exp_transactions`/`acc_transactions`) **هرگز رد نمی‌شود** — بودجه یک لایه مدیریتی است، نه قید حسابداری سخت. اما `applyTransactionToBudget()` یک خطای اعتبارسنجی برمی‌گرداند و UI **باید تأیید صریح کاربر** را (با نمایش مازاد) قبل از ادامه دریافت کند.
+ - اگر `strictMode = true`: ثبت هزینه واقعی (`exp_transactions`/`acc_transactions`) **هرگز رد نمی‌شود** — بودجه یک لایه مدیریتی است، نه قید حسابداری سخت. اما `applyTransactionToBudget` یک خطای اعتبارسنجی برمی‌گرداند و UI **باید تأیید صریح کاربر** را (با نمایش مازاد) قبل از ادامه دریافت کند.
 5. امکان انتقال مبلغ از یک پاکت به پاکت دیگر وجود دارد.
 6. باقی‌مانده پاکت در پایان ماه می‌تواند:
  - به ماه بعد منتقل شود (Rollover)
@@ -158,7 +158,7 @@
 - `createBudget(data, copyFromBudgetId?)` → ایجاد بودجه جدید برای دوره مشخص؛ اگر `copyFromBudgetId` ارائه شود، envelope‌های آن بودجه را (با `assignedAmount=0`, `spentAmount=0`) کپی می‌کند — برای ساخت دستی دوره بعد بدون Rollover
 - `updateBudget(id, data)` → شامل `strictMode`, `rolloverEnabled`, `totalIncome` (override)
 - `getBudgetByPeriod(year, month?)`
-- `getActiveBudget()`
+- `getActiveBudget`
 - `closeBudget(id)` → بستن بودجه؛ اگر `rolloverEnabled = true`: محاسبه `remainingAmount` هر پاکت، ساخت بودجه + envelope‌های دوره بعد با `rolloverAmount` صحیح، و بازگشت id بودجه جدید؛ اگر `rolloverEnabled = false`: فقط `status = 'closed'`
 - `getBudgetSummary(budgetId)` → خلاصه کل بودجه
 
@@ -198,5 +198,5 @@
  - `expense` → `exp_transactions`
  - `cheque` → `chk_cheques`
  - `loan` → `ln_transactions`
-- در حالت `strictMode = true`، اگر `remainingAmount <= 0`: `applyTransactionToBudget()` خطای اعتبارسنجی برمی‌گرداند و UI باید تأیید صریح کاربر را بگیرد — اما ثبت هزینه واقعی در `exp_transactions`/`acc_transactions` هرگز رد نمی‌شود (بودجه Soft Limit است، نه Hard Block).
+- در حالت `strictMode = true`، اگر `remainingAmount <= 0`: `applyTransactionToBudget` خطای اعتبارسنجی برمی‌گرداند و UI باید تأیید صریح کاربر را بگیرد — اما ثبت هزینه واقعی در `exp_transactions`/`acc_transactions` هرگز رد نمی‌شود (بودجه Soft Limit است، نه Hard Block).
 - برای Zero-Based کامل، مبلغ پاکت "آماده تخصیص" باید صفر شود.

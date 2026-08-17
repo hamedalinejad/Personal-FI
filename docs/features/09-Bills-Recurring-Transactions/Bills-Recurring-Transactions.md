@@ -53,7 +53,7 @@
 5. اگر تا بعد از سررسید پرداخت نشود، وضعیت `overdue` می‌شود.
 6. مبلغ می‌تواند ثابت یا متغیر باشد.
 7. حذف فیزیکی وجود ندارد — فقط غیرفعال‌سازی (`isActive = false`).
-8. **پایان تکرار (`endDate`):** اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، هیچ Occurrence جدیدی تولید نمی‌شود و `isActive` آن مورد به‌صورت خودکار `false` می‌شود. این بررسی هم در `generateUpcomingOccurrences()` (Job دوره‌ای) و هم در `markAsPaid()` (هنگام به‌روزرسانی `nextDueDate`) انجام می‌شود.
+8. **پایان تکرار (`endDate`):** اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، هیچ Occurrence جدیدی تولید نمی‌شود و `isActive` آن مورد به‌صورت خودکار `false` می‌شود. این بررسی هم در `generateUpcomingOccurrences` (Job دوره‌ای) و هم در `markAsPaid` (هنگام به‌روزرسانی `nextDueDate`) انجام می‌شود.
 
 ---
 
@@ -90,14 +90,14 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `exchangeRateToBase` → decimal (nullable — نرخ تتر لحظه پرداخت: ریال به ازای ۱ تتر؛ هنگام `markAsPaid()` پر می‌شود، مشابه الگوی سایر فیچرها)
+- `exchangeRateToBase` → decimal (nullable — نرخ تتر لحظه پرداخت: ریال به ازای ۱ تتر؛ هنگام `markAsPaid` پر می‌شود، مشابه الگوی سایر فیچرها)
 - `transactionId` → UUID (لینک به تراکنش واقعی `exp_transactions.id` یا `inc_transactions.id` — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
 - `note` → string
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته لینک در `markAsPaid()`**:
+> **نکته لینک در `markAsPaid`**:
 > - `transactionId` → `exp_transactions.id` (اگر `type=expense`) یا `inc_transactions.id` (اگر `type=income`)
 > - `accountTransactionId` → `acc_transactions.id` (تراکنش بانکی مرتبط)
 > - هر دو در یک عملیات atomic پر می‌شوند
@@ -116,17 +116,17 @@
 
 ### Occurrence APIs
 - `getOccurrences(brItemId)`
-- `getPendingOccurrences()`
-- `getOverdueOccurrences()`
+- `getPendingOccurrences`
+- `getOverdueOccurrences`
 - `markAsPaid(brOccurrenceId, amount, date, accountId?, exchangeRateToBase?)`
  → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + ذخیره `exchangeRateToBase` روی Occurrence + به‌روزرسانی `nextDueDate`؛ اگر `nextDueDate` جدید بعد از `endDate` باشد → `isActive = false` (طبق Business Rule 8)
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 
 ### Scheduler APIs
-- `generateUpcomingOccurrences()` → تولید Occurrenceهای آینده (Job دوره‌ای)؛ اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، Occurrence جدید تولید نمی‌شود و `isActive = false` می‌شود (طبق Business Rule 8)
-- `checkOverdueOccurrences()` → به‌روزرسانی وضعیت معوق‌ها
-- `sendReminders()` → ارسال یادآوری‌ها
+- `generateUpcomingOccurrences` → تولید Occurrenceهای آینده (Job دوره‌ای)؛ اگر `nextDueDate` محاسبه‌شده بعد از `endDate` باشد، Occurrence جدید تولید نمی‌شود و `isActive = false` می‌شود (طبق Business Rule 8)
+- `checkOverdueOccurrences` → به‌روزرسانی وضعیت معوق‌ها
+- `sendReminders` → ارسال یادآوری‌ها
 
 ---
 
