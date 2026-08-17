@@ -173,7 +173,7 @@
 > - هر Holding رمزارز در والت می‌تواند اختیاراً با یک شبکه مشخص لینک شود (فیلد `networkId` در `inv_crypto_holdings` — nullable).
 > - انتقال بین والت‌ها/صرافی‌ها باید شبکه را مشخص کند تا تاریخچه کامل باشد.
 
-> **نکته**: برای صرافی‌ها (`type = 'exchange'`)، شبکه در لحظه واریز/برداشت در فیلد `network` جدول `inv_crypto_exchange_transactions` ثبت می‌شود (ببینید بخش «۵. Crypto Exchange Transaction» — فیلد جدید اضافه‌شده) — نیازی به ردیف در `inv_crypto_wallet_networks` ندارد.
+> **BUG-005/006**: شبکه فقط در `inv_crypto_transactions` (فیلد `networkId` FK) ثبت می‌شود، نه در `inv_crypto_exchange_transactions`. جدول exchange transactions فقط برای جریان نقدی Bank ↔ Exchange است و فیلدهای آنچین (network, txHash, ...) در آن جایی ندارند.
 
 ### ۳. Crypto Holding (جدول: `inv_crypto_holdings`)
 
@@ -227,7 +227,7 @@
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003 — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
-- `network` → string (nullable — شبکه بلاکچینی که انتقال از طریق آن انجام شده؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی، برای `buy`/`sell` null)
+- `networkId` → UUID (nullable — FK به `inv_crypto_wallet_networks.id`؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی؛ برای `buy`/`sell` داخل صرافی null — **BUG-006**: فیلد string آزاد `network` ممنوع است؛ نمایش UI از `inv_crypto_wallet_networks.name`/`chainId` می‌آید)
 - `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
 - `txHash` → string (nullable — شناسه تراکنش آنچین (Transaction Hash) روی بلاکچین؛ برای `transfer_in`/`transfer_out` بین والت‌ها بسیار ارزشمند است؛ برای `buy`/`sell` داخل صرافی متمرکز معمولاً null است)
 - `blockNumber` → integer (nullable — شماره بلاکی که تراکنش در آن تأیید شده؛ فقط اگر `txHash` موجود باشد معنی دارد)
@@ -249,6 +249,8 @@
 
 ### ۵. Crypto Exchange Transaction (جدول: `inv_crypto_exchange_transactions`) — لاگ واریز و برداشت ریالی/تتری
 
+> **BUG-005**: این جدول **فقط** برای جریان نقدی فیات/استیبل مرتبط با حساب بانکی (Bank ↔ Exchange cash) است. فیلدهای `network`, `txHash`, `blockNumber`, `confirmations` از این جدول حذف شده‌اند — این فیلدها فقط در `inv_crypto_transactions` (برای `transfer_in`/`transfer_out` آنچین) معنی دارند.
+
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
 - `type` → string (`deposit`, `withdraw`)
@@ -258,11 +260,7 @@
 - `feeCurrency` → string
 - `feeAssetPriceToUSDT` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — BUG-003)
-- `accountId` → UUID (حساب بانکی مرتبط)
-- `network` → string (nullable — شبکه بلاکچینی که واریز/برداشت از طریق آن انجام شده؛ مثلاً `TRC20`، `ERC20`؛ برای واریز/برداشت ریالی null است)
-- `txHash` → string (nullable — شناسه تراکنش آنچین برای واریز/برداشت کریپتویی؛ برای واریز/برداشت ریالی فیات null است)
-- `blockNumber` → integer (nullable — شماره بلاک تأییدشده در بلاکچین؛ اختیاری)
-- `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی — فقط وقتی `txHash` موجود باشد معنی دارد)
+- `accountId` → UUID (حساب بانکی مرتبط — **اجباری**؛ بدون حساب بانکی این تراکنش نباید در این جدول باشد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime
