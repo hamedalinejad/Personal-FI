@@ -156,14 +156,17 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 - `id` → UUID (Primary Key)
 - `sourceId` → UUID (nullable — لینک به `price_sources`؛ برای رکوردهای `source='manual'` مقدارش `null` است)
-- `symbol` → string (مثلاً `BTC`, `ETH`؛ برای زیرفیچرهای آینده: نماد سهام، کد ملک و ...)
+- `instrumentId` → string (**الزامی** — شناسه پایدار داخلی دارایی؛ برای FIF = `fundId`، crypto = `assetKey`، stock = نماد داخلی، metal = `{metalType}_{purity}` — BUG-036؛ کوئری‌ها با `assetCategory + instrumentId` فیلتر می‌شوند نه فقط symbol)
+- `symbol` → string (**deprecated به‌عنوان شناسه اصلی** — فقط برای سازگاری/نمایش legacy؛ می‌تواند برابر `instrumentId` باشد — BUG-036)
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — فقط همین چهار مقدار؛ هم‌راستا با `AssetCategory` در types.md (BUG-011)
 - `price` → decimal (قیمت — با `decimal.js`)
 - `priceCurrency` → string (ارزی که قیمت در آن ثبت شده، معمولاً `USDT` یا `IRR`)
+- `quoteType` → enum (`last` | `nav` | `close` | `manual` | `indicative`) (**الزامی** — نوع Quote مالی — BUG-037/038؛ برای ثبت دستی مقدار `manual` استفاده شود)
+- `marketDate` → date (nullable — تاریخ بازار مرتبط با قیمت؛ **الزامی برای stock/fif NAV روزانه**؛ nullable برای crypto لحظه‌ای — BUG-038؛ برای fif/stock `getLatestPrice` بر اساس آخرین `marketDate` (سپس fetchedAt) انتخاب می‌کند)
 - `source` → enum (`manual`, `api`)
 - `triggeredBy` → enum (`user_click`, `auto_sync`, `manual_entry`)
 - `fetchRequestId` → UUID (nullable — باگ ۴۲؛ برای رکوردهای یک اجرای fetch مشترک؛ manual می‌تواند null باشد)
-- `fetchedAt` → datetime (لحظه دریافت/ثبت واقعی)
+- `fetchedAt` → datetime (لحظه دریافت/ثبت واقعی — برای stock/fif این با `marketDate` متفاوت است)
 - `createdAt` → datetime
 
 > **نکته**: `price_history` فقط از طریق `fetchAndStorePrices` / `setManualPrice` نوشته می‌شود. قبل از هر INSERT، Domain Validation (باگ ۳۹) اجباری است. فیچرهای دیگر فقط Read دارند.
@@ -423,6 +426,8 @@ Adapter فقط `PriceAssetRef` می‌گیرد — نه Holding خام متفا�
 
 ## شناسه قیمت در `price_history` (BUG-036)
 
+> **✅ اعمال‌شده در Domain Entity بالا**: فیلد `instrumentId` الزامی شد و `symbol` به deprecated تغییر یافت. این بخش برای توضیح دلیل تصمیم نگه داشته شده است.
+
 ستون تاریخی `symbol` برای چند معنی overload شده بود (BTC در برابر UUID صندوق). قرارداد واحد:
 
 | فیلد | نقش |
@@ -437,6 +442,8 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 ---
 
 ## Quote کامل‌تر (BUG-037 / BUG-038)
+
+> **✅ اعمال‌شده در Domain Entity بالا**: فیلدهای `quoteType` (الزامی) و `marketDate` (nullable) به جدول `price_history` اضافه شدند. این بخش برای توضیح دلیل تصمیم و قوانین تکمیلی نگه داشته شده است.
 
 حداقل فیلدهای `price_history` برای Quote مالی:
 
