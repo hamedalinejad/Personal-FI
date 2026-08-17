@@ -123,7 +123,7 @@
 ### Report APIs
 - `getCashFlow(startDate, endDate, accountIds?)`
 - `getIncomeExpenseReport(startDate, endDate, groupBy?)`
-- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص؛ منابع جمع‌آوری: موجودی حساب‌های بانکی + ارزش holding تمام سرمایه‌گذاری‌ها + ارزش دارایی‌های فیزیکی − مانده بدهی‌ها؛ **شرطی** (`includeCashInWealth = true`): موجودی نقدی `inv_metals_platforms.cashBalance` و `inv_stocks_iran_brokerages.cashBalance` نیز جمع می‌شود
+- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص — **Wrapper** روی `Portfolio-Wealth-Overview.calculateNetWorth({ date, includeCashInWealth: true })`؛ با `includeCashInWealth = true` (تفاوت عمدی با پیش‌فرض پرتفوی که `false` است) تا تصویر کامل ثروت شامل موجودی نقدی صرافی‌ها/کارگزاری‌ها هم باشد. **هیچ منطق محاسباتی مستقلی اینجا نیست** — منبع حقیقت `calculateNetWorth()` در `Portfolio-Wealth-Overview` است
 - `getNetWorthTrend(startDate, endDate)` → روند Net Worth
 - `getInvestmentPerformance(startDate?, endDate?)`
 - `getTaxSummary(year?)` → خلاصه مالیات‌ها (پرداخت‌شده، در انتظار، معوق)
