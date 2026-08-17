@@ -74,7 +74,7 @@
 - `startDate` → datetime
 - `endDate` → datetime (nullable — در صورت محدود بودن)
 - `nextDueDate` → datetime (تاریخ سررسید بعدی)
-- `reminderDaysBefore` → number (چند روز قبل یادآوری شود)
+- `reminderDaysBefore` → number (nullable — تعداد روز قبل از سررسید برای یادآوری این مورد؛ اگر مقدار داشته باشد، مقدار سراسری `notif_settings.daysBefore` برای `category='bill'` را override می‌کند؛ اگر `null` باشد، از `notif_settings.daysBefore` به‌عنوان مقدار پیش‌فرض استفاده می‌شود)
 - `autoCreateTransaction` → boolean (ثبت خودکار تراکنش؟)
 - `envelopeId` → UUID (پاکت بودجه مرتبط — nullable)
 - `isActive` → boolean
