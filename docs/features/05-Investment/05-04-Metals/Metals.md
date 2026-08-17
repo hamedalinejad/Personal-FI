@@ -101,13 +101,18 @@ Domain Entities
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **نکته طراحی**: موجودی نقدی پلتفرم از طریق فیلد `cashBalance` در این جدول با snapshot نگهداری می‌شود.  
-> - هنگام واریز: `cashBalance += amount`  
-> - هنگام برداشت: `cashBalance -= amount`  
-> - هنگام خرید فلز: `cashBalance -= totalAmount`  
-> - هنگام فروش فلز: `cashBalance += totalAmount`  
-> - هنگام تحویل فیزیکی: `cashBalance -= deliveryFee`  
-> - تراکنش‌ها در `inv_metals_platform_transactions` فقط لاگ هستند  
+> **معماری حسابداری — Journal/Cache**:
+> `inv_metals_platform_transactions` + `inv_metals_transactions` = **Truth (Journal)**
+> `inv_metals_platforms.cashBalance` = **Cache (Snapshot برای سرعت)**
+>
+> **آپدیت Atomic (الزامی)** — همه عملیات در یک BEGIN/COMMIT:
+> - هنگام واریز: `cashBalance += amount` (لاگ در `inv_metals_platform_transactions`)
+> - هنگام برداشت: `cashBalance -= amount` (لاگ در `inv_metals_platform_transactions`)
+> - هنگام خرید فلز: `cashBalance -= totalAmount` (لاگ در `inv_metals_transactions`)
+> - هنگام فروش فلز: `cashBalance += totalAmount` (لاگ در `inv_metals_transactions`)
+> - هنگام تحویل فیزیکی: `cashBalance -= deliveryFee` (لاگ در `inv_metals_transactions`)
+>
+> برای بررسی انطباق Snapshot با لاگ: `reconcileMetalsPlatformCash(platformId)` — جزئیات در `db.md`.  
 > - این موجودی در محاسبه ثروت در `Portfolio & Wealth Overview` با کنترل `includeCashInWealth` لحاظ می‌شود
 
 ۲. Metals Holding (جدول: `inv_metals_holdings`)
