@@ -329,3 +329,21 @@ COMMIT → persist
 
 ### تست
 issuance vs ETF path؛ fee in basis vs redemption fee؛ NAV ≠ transactionPrice
+
+### مثال عددی NAV در برابر قیمت صدور
+
+```
+NAV روز: 1,000
+قیمت صدور (subscription): 1,010
+کارمزد صدور includeInCostBasis=true: 5,000 IRR
+خرید 10 واحد:
+
+units += 10
+unitsCost = 10 × 1010 = 10,100
+totalInvested += 10,100 + 5,000 = 15,100
+averageBuyPrice = 15,100 / 10 = 1,510
+
+Unrealized با NAV:
+  (1000 - 1510) × 10 = -5,100
+(نه با transactionPrice)
+```
