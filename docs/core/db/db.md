@@ -13,9 +13,31 @@
 
 ### ۱. ریسک بازنویسی کامل Blob در هر ذخیره‌سازی
 چون sql.js افزایشی نیست، هر `save` باید کل دیتابیس را دوباره سریالایز و در IndexedDB بازنویسی کند. اگر اپ حین این نوشتن (مثلاً به‌خاطر رفتن به پس‌زمینه یا قطع ناگهانی روی موبایل) متوقف شود، ریسک خرابی (corruption) فایل دیتابیس وجود دارد.
-- **راه‌حل الزامی**: نوشتن باید به روش **Write-to-temp-then-swap** انجام شود: ابتدا Blob جدید با کلید موقت (`db_pending`) نوشته شود، سپس در یک تراکنش IndexedDB atomic، کلید اصلی (`db_main`) با آن جایگزین شود. هرگز مستقیم روی کلید اصلی overwrite نشود.
+- **راه‌حل الزامی — چند اسلات IndexedDB** (نه فقط یک pending):
+
+| کلید | نقش |
+|------|------|
+| `db_main` | نسخه فعال آخرین persist موفق |
+| `db_pending` | نوشتهٔ در حال انجام (temp) |
+| `db_backup` | کپی آخرین `db_main` موفق قبل از هر swap (rolling safety) |
+| `db_meta` | JSON: `{ schemaVersion, appVersion, databaseId, checksum, lastSuccessfulPersist, pendingChecksum? }` |
+
+جریان persist:
+```text
+1. serialize sql.js → Uint8Array
+2. checksum = hash(blob)
+3. write db_pending + update meta.pendingChecksum
+4. copy current db_main → db_backup (اگر main وجود دارد)
+5. atomic IDB tx: db_pending → db_main؛ پاک کردن pending
+6. meta.lastSuccessfulPersist = now; meta.checksum = checksum
+```
+اگر pending خراب شد: main و backup دست‌نخورده‌اند.  
+Recovery boot: اگر main corrupt → امتحان backup با verify checksum؛ اگر pending کامل و main ناقص → می‌توان pending را با احتیاط validate کرد.
+
+- هرگز overwrite مستقیم روی `db_main`.
 - نوشتن‌ها باید **Debounce** شوند برای تغییرات غیرمالی UI؛ برای **عملیات مالی کامل** مسیر جداست (پایین).
 - `visibilitychange` / `beforeunload` فقط **best-effort flush** هستند — **هرگز تضمین persist نیستند**.
+- **UI Success Contract**: پیام «ثبت شد» / `Saved` فقط پس از موفقیت گام ۶ persist (swap + meta) مجاز است. SQL COMMIT در RAM بدون IndexedDB swap = هنوز unsaved؛ UI باید pending/error نشان دهد.
  - روی موبایل (به‌ویژه iOS Safari) `beforeunload` اغلب اجرا نمی‌شود یا فرصت serialize کامل ندارد.
  - بنابراین اعتماد به این رویدادها برای «آخرین تغییر حتماً ذخیره شد» **ممنوع** است.
 
@@ -1012,3 +1034,36 @@ COMMIT
 → سپس post-commit events
 ```
 ممنوع: UPDATE snapshot بدون verify و audit.
+
+---
+
+## Backup Package و Restore Migration-Aware
+
+### فایل Backup (نه فقط raw SQLite)
+```text
+{
+  format: 'personal-fi-backup',
+  schemaVersion: number,
+  appVersion: string,
+  databaseId: string,
+  createdAt: ISO,
+  checksum: string,  // of sqliteBlob
+  sqliteBlob: ...    // or separate file + sidecar JSON
+}
+```
+بدون schemaVersion + checksum → در v1 به‌عنوان backup کامل **رد** می‌شود.
+
+### Restore pipeline (اجباری)
+```text
+1. parse package + checksum match
+2. load into TEMP sql.js instance (نه db_main)
+3. PRAGMA integrity_check / quick_check
+4. verify required tables + foreign_keys
+5. if backup.schemaVersion < app.schemaVersion → run migration chain on TEMP
+6. re-verify integrity + schemaVersion == app
+7. serialize TEMP → persist slots (backup current main first) → swap
+8. fin_audit_log restore event
+```
+اگر migration fail → TEMP دور انداخته می‌شود؛ `db_main` قبلی سالم می‌ماند.
+
+`beforeunload` هرگز مسیر اصلی save نیست و جایگزین pipeline بالا نمی‌شود.
