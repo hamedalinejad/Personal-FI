@@ -551,3 +551,28 @@ Partial success؛ offline skip؛ future timestamp reject؛ USDT-ERC20 vs TRC20 �
 - فقط `priceCurrency=USDT` **کافی نیست**
 - `getLatestPrice({ assetCategory, instrumentId, quoteMarket?, sourceId?, priceCurrency? })`
 - اگر `quoteMarket` برای crypto null باشد، Adapter باید از جفت پیش‌فرض Provider بسازد و **ذخیره کند** نه null بگذارد
+
+### سیاست انتخاب Provider در getLatestPrice (valuation)
+
+امضا:
+
+```ts
+getLatestPrice({
+  assetCategory,
+  instrumentId,
+  priceCurrency?,
+  quoteMarket?,
+  sourceId?,           // اختیاری — قفل به یک Provider
+  preferHoldingId?,    // اگر داده شود، mapping همان Holding اولویت دارد
+})
+```
+
+**ترتیب قطعی انتخاب ردیف:**
+1. اگر `preferHoldingId` / Holding: `priceProviderId` + `providerSymbol` + `market` + quote → فقط ردیف‌های همان `sourceId`
+2. وگرنه اگر `sourceId` در آرگومان باشد → همان منبع
+3. وگرنه Default active source برای `assetCategory` (`isDefault`)
+4. وگرنه بالاترین `priority` بین منابع فعال که برای آن instrument ردیف دارند
+5. بین کاندیدها: تازه‌ترین `marketDate` سپس `fetchedAt`؛ Manual معتبر بر API طبق قواعد قبلی
+
+**ممنوع:** انتخاب «هر آخرین BTC/USDT از هر صرافی» بدون policy بالا.
+خروجی همیشه شامل `sourceId`, `quoteMarket`, `fetchedAt`, `isStale`.
