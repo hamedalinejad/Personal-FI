@@ -230,3 +230,14 @@
 - `autoVersionCheckEnabled` پیش‌فرض false
 - Backup: meta schemaVersion + checksum؛ Restore atomic temp→validate→swap
 - مدیریت price sources و API key UX (session only) از اینجا
+
+---
+
+## Migration-aware Restore (Settings API)
+
+`restoreBackup(file)` باید همان pipeline `core/db/db.md` را صدا بزند:
+validate → temp DB → integrity → migrate if needed → verify → swap slots → audit.
+
+UI پیشرفت: مراحل visible؛ در صورت خطا main قبلی دست‌نخورده و پیام خطا.
+
+`createBackup` همیشه sidecar metadata (schemaVersion, appVersion, databaseId, createdAt, checksum) می‌نویسد.
