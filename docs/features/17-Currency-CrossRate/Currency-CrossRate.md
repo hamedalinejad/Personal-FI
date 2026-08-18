@@ -217,3 +217,30 @@ async function convert(
 - نرخ‌ها decimal string؛ `convert(amount, from, to)` فقط از `decimal.js` و Rounding-Policy
 - آفلاین: آخرین نرخ کش‌شده؛ اگر نبود، ثبت تراکنش با نرخ دستی کاربر الزامی است
 - این فیچر **هرگز** `acc_transactions` نمی‌سازد
+
+---
+
+## تبدیل تاریخی و زنجیره‌ای (Invariant)
+
+### `convert(amount, from, to, asOf?)`
+- بدون `asOf` → نرخ جاری کش (آخرین معتبر)
+- با `asOf` (تاریخ/زمان valuation) → **فقط** نرخ با `rateDate ≤ asOf` (نزدیک‌ترین قبلی)؛ اگر نبود → خطا یا الزام نرخ دستی کاربر — **هرگز** latest به‌جای تاریخی برای P&L گذشته
+
+### Historical P&L
+```text
+valueInBase(asOf) = price(instrument, quote, asOf) × convert(1, quote, base, asOf)
+```
+قیمت و FX باید **همان asOf** باشند.
+
+### زنجیره تبدیل (مثلاً ETH→BTC→USDT→IRR)
+```text
+convertChain(amount, [c1,c2,...,cn], asOf) =
+  fold convert step-by-step با نرخ‌های asOf هر جفت
+```
+اگر مسیر مستقیم `from→to` در جدول نرخ نبود، مسیر مجاز:
+1. مستقیم در `cur_rates`
+2. via `baseCurrency`
+3. via USDT (اگر در تنظیمات `bridgeCurrency` تعریف شده)
+4. در غیر این صورت fail — سکوت و latest ممنوع
+
+روی تراکنش: ترجیحاً `exchangeRateToBase` همان لحظه **قفل** شود تا rebuild به FX آینده وابسته نباشد.
