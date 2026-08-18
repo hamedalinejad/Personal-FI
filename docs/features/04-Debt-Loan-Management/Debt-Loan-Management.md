@@ -50,7 +50,7 @@
 ### دیگر Business Rules
 
 1. وام می‌تواند از نوع `borrowed` (دریافتی) یا `lent` (پرداختی / طلب) باشد.
-2. ارز وام همیشه با ارز حساب مرتبط یکی است.
+2. ارز وام (`loan.currency`) ارز تعهد است. حساب تسویه می‌تواند ارز دیگری داشته باشد (تبدیل در disbursement/payment).
 3. `loanType` باید یکی از انواع تعریف‌شده باشد (bank_installment, qarz_al_hasaneh, facility, ...)
 4. `interestRate` واحد: درصد کامل (18 برای ۱۸٪، نه 0.18)
 5. هنگام ثبت وام **دریافتی (borrowed)**:
@@ -1152,4 +1152,77 @@ COMMIT → persist
 2. Qarz: remaining = full principal؛ fee جدا  
 3. Grace: interest-only vs payment holiday  
 4. Early payment با/بدون re-amortize  
-5. reconcileLoan بعد از payLoan → ok  
+5. reconcileLoan بعد از payLoan → ok
+
+---
+
+## Multi-Currency Loan Settlement
+
+| فیلد | نقش |
+|------|-----|
+| `currency` | ارز اصل تعهد و اقساط محاسبه‌شده |
+| `settlementAccountId` | حساب بانکی تسویه (می‌تواند ارز ≠ loan.currency) |
+| `disbursementFxRate` | اگر settlement ≠ loan currency: نرخ قفل‌شده روز واریز |
+| `paymentFxRate` | روی هر `payLoan` وقتی حساب ≠ loan currency |
+
+```text
+disburse USD loan to IRR account:
+  liability in USD = principal
+  bank cash IRR += principalUSD × disbursementFxRate
+  journal: Dr cash IRR / Cr loan_liability USD (amountInBase هر دو leg)
+```
+
+ممنوع فرض hard-code «همه چیز ریال».
+
+---
+
+## سقف جریمه (Cap)
+
+| فیلد | معنی |
+|------|------|
+| `penaltyMaxCapAmount` | مبلغ سقف به **`loan.currency`** (نه hard-code ریال) |
+| `penaltyMaxCapCurrency` | اختیاری؛ پیش‌فرض = `loan.currency` |
+| `penaltyCapScope` | `per_installment` \| `loan_lifetime` \| `per_calendar_period` |
+
+- `per_installment`: MIN(penalty_i, cap) برای هر قسط جدا  
+- `loan_lifetime`: Σ penalties تا کنون ≤ cap؛ باقی قسط‌ها صفر یا کاهش‌یافته  
+- `per_calendar_period`: سقف در بازه (مثلاً سال)
+
+پیاده‌سازی باید `penaltyCapScope` را enforce کند — پیش‌فرض پیشنهادی ایران: `per_installment` با مستندسازی صریح در UI.
+
+---
+
+## Accounting Classification کارمزد وام (تکمیل)
+
+| feeCategory | treatment پیش‌فرض | توضیح |
+|-------------|-------------------|--------|
+| `origination` | `reduction_of_proceeds` یا `expense` | کاهش net cash دریافتی؛ liability = full principal مگر policy دیگر |
+| `monthly_management` / `service` | `expense` | دوره‌ای |
+| `early_payment` / prepayment | `expense` | با پیش‌پرداخت |
+| `late` / penalty | `expense` | نه افزایش principal |
+| `insurance` | `expense` | |
+
+فیلد `accountingTreatment` روی `ln_loan_fees` اجباری در create.
+
+---
+
+## Flat Rate — تابع واحد deterministic
+
+```text
+function flatRateTotalInterest(loan):
+  r_annual = normalizeToAnnual(loan.interestRate, loan.interestRatePeriod)
+  // interestRatePeriod=monthly → r_annual = rate * 12 (اگر rate ماهانه وارد شده)
+  yearsTotal = getTotalPeriods(loan) / periodsPerYear(loan)
+  // مثال: 18 ماه ماهانه → yearsTotal=1.5
+  // 78 هفته → yearsTotal = 78/52
+  return principalAmount × (r_annual/100) × yearsTotal
+
+fixedInstallment = (principal + totalInterest) / n
+principalPortion = principal / n
+interestPortion = totalInterest / n
+```
+
+مثال: 18٪ annual، ۱۸ ماه، اقساط هفتگی:
+`n = weeks in term`, `yearsTotal = n/52`, `totalInterest = P × 0.18 × yearsTotal`.
+
+همه از `getPeriodRate` / `periodsPerYear` / `getTotalPeriods` — بدون فرمول موازی.
