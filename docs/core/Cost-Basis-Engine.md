@@ -61,3 +61,7 @@ Feature **نباید** `totalInvested += qty*price` را مستقیم در UI ک
 
 ## calculationVersion
 هر تغییر فرمول → bump version + rebuild snapshots (طبق Rounding-Policy / db).
+
+## Transfer
+`transfer_out` / `transfer_in`: جابه‌جایی cost pool؛ **Realized P&L = 0**.  
+Fee شبکه = `feeOut` یا کاهش quantity جدا — نه disposal بازاری.

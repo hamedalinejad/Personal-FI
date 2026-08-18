@@ -1072,3 +1072,19 @@ isReversal=true ⇒ خود آن ردیف دوباره reverse نمی‌شود (�
 2. درج ردیف‌های journal معکوس (debit/credit جابه‌جا) با `reversesOperationId`
 
 Domain void بدون journal reverse = **باگ**؛ atomic op باید هر دو را انجام دهد سپس rebuild holding.
+
+---
+
+## Transfer بدون Realized P&L
+
+انتقال داخلی بین والت/صرافی **خود کاربر** (همان economic owner):
+
+```text
+realizedPL = 0
+```
+
+- cost basis متناسب از مبدأ به مقصد منتقل می‌شود (CostBasisEngine `transfer_out` / `transfer_in`)
+- **network fee** اگر از asset کم شود: کاهش quantity کل + journal `trading_fee` / asset loss — **نه** فروش به قیمت بازار
+- ممنوع: ثبت disposal با `unitPrice = market` فقط به‌خاطر transfer
+
+همین اصل برای جابه‌جایی سهام بین کارگزاری‌های خود کاربر (در صورت پشتیبانی) و فلز بین پلتفرم‌های خودی صدق می‌کند مگر documentation صریح خلاف بگوید.
