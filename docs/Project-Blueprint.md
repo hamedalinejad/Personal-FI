@@ -73,6 +73,17 @@
 
 ---
 
+
+## Source of Truth محدوده نسخه ۱
+
+| سند | نقش |
+|-----|-----|
+| **`00-Product/Product-Map.md` (نسخه جاری)** | **SoT لیست Featureهای محصول** — شامل Accounting، Investment، Tax، Security، Documents، Price Fetching، Notifications، Physical Assets و بقیه |
+| **`Project-Blueprint.md`** | اصول معماری، اصول داده، Out of Scope غیرفیچری (مثلاً server-first) |
+| Feature docs | جزئیات هر فیچر |
+
+بخش‌های قدیمی Blueprint که محصول را فقط به «Personal Accounting + Investment» تقلیل می‌دهند **تفسیر تاریخی**اند؛ برای scope پیاده‌سازی v1 از Product-Map پیروی کنید. در صورت تعارض، Product-Map + این جدول برنده است.
+
 # 5. Out of Scope
 
 موارد زیر در نسخه اول پروژه پیاده‌سازی نخواهند شد:
@@ -576,3 +587,18 @@ docs/
 هر تغییری که یکی از اصول این سند را نقض کند، باید ابتدا به عنوان یک **Architecture Decision Record (ADR)** ثبت، بررسی و تأیید شود.
 
 تمام اسناد، طراحی‌ها و پیاده‌سازی‌های آینده باید با این سند سازگار باشند.
+
+## قرارداد قطعی Amount Storage (v1)
+
+**مدل رسمی ذخیره‌سازی در Domain و DB متنی:** decimal string با `decimal.js` (نه float).
+
+| نوع | ذخیره |
+|-----|--------|
+| MoneyAmount | TEXT decimal string؛ precision از CurrencyRecord |
+| AssetQuantity | TEXT decimal string |
+| Rate / Price | TEXT decimal string |
+
+**Minor Unit:** لایه اختیاری برای **نمایش/ادغام با API بانکی** یا export — تابع `toMinorUnit` / `fromMinorUnit` در مرز UI یا import.  
+ستون‌های اصلی مالی v1 **INTEGER minor نیستند** مگر جدول مشخصاً اعلام کند (مثلاً `quantityMg` به‌عنوان واحد فیزیکی شمارشی).
+
+بخش قدیمی Blueprint با عنوان «همه چیز Minor Unit integer» با این قرارداد **جایگزین** می‌شود.

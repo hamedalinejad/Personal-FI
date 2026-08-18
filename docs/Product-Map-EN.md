@@ -1,3 +1,5 @@
+> **SoT Scope v1:** این نقشه لیست Featureهای محصول است و بر تفسیر محدود Blueprint قدیمی مقدم است.
+
 English Version - Product Map
 Product Map
 Personal Finance & Investment Management System
