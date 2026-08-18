@@ -347,3 +347,52 @@ Unrealized با NAV:
   (1000 - 1510) × 10 = -5,100
 (نه با transactionPrice)
 ```
+
+---
+
+## Valuation و گزارش ارزش صندوق
+
+دو متریک جدا — مخلوط نشوند:
+
+| متریک | فرمول | کاربرد |
+|--------|--------|--------|
+| `navValue` | `units × currentNAV` | مقایسه با اعلامیه صندوق / tracking error |
+| `estimatedRedemptionValue` | `units × lastRedemptionPrice` (یا قیمت ابطال روز) − fees تخمینی | ارزش تقریبی نقدشوندگی سرمایه‌گذار |
+
+**Invariant:** UI/Portfolio برای «چقدر می‌توانم نقد کنم؟» پیش‌فرض `estimatedRedemptionValue` (issuance/redemption)؛ برای «ارزش اعلامی واحد» از `navValue`. ETF: معمولاً قیمت بازار آخرین معامله ≈ هر دو.
+
+پارامتر API: `getFundPositionValue(holdingId, mode: 'nav' | 'redemption')`.
+
+---
+
+## Realized / Total Economic Return صندوق
+
+**ممنوع** به‌عنوان تنها سود اقتصادی: `sellPrice - averageBuyPrice`.
+
+```text
+totalEconomicReturn(period) =
+  Σ cash dividends (type=dividend, isVoided=false)
+  + Σ realizedPL on sells (transactionPrice vs avg cost, after redemption fees)
+  + unrealized (اختیاری، جدا برچسب): units × (markPrice - avg) با mark = NAV یا redemption طبق mode
+```
+
+بعد از distribution: NAV افت می‌کند؛ سود نقدی در leg dividend است — capital leg جدا گزارش شود.
+
+---
+
+## Reinvested Dividend — دو Event یک operationId
+
+```text
+BEGIN operationId=O
+  1) Domain+Journal: dividend income
+       Dr cash_or_receivable / Cr income   amount = dividend cash equivalent
+  2) Domain+Journal: buy/reinvest units
+       Dr fund_unit / Cr cash_or_receivable
+       units += X; totalInvested += amount (includeInCostBasis طبق fee)
+  fin_journal دو طرفه؛ در صورت bank: acc_transactions فقط اگر پول واقعاً از حساب رد شود
+  // اگر reinvest مستقیم بدون ورود به حساب بانکی: acc نباشد؛ journal همچنان دو leg
+COMMIT
+```
+
+فقط `units += X` بدون income leg → Income گم می‌شود.  
+فقط income بدون purchase → cost basis خراب.
