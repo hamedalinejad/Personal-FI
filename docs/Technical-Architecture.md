@@ -182,6 +182,8 @@ UI / Hooks
 3. لایه License فقط تعیین می‌کند کدام فایل DB باز شود یا آیا قابلیت‌های محصولی فعال‌اند — **نه** اینکه داده مالی چگونه تفسیر شود.
 4. Backup/Export مالی می‌تواند بدون اسرار لایسنس باشد؛ Restore مالی نباید به سرور لایسنس نیاز داشته باشد (offline-first).
 5. Implementation آینده multi-user/cloud نباید `acc_transactions` را با `licenseId` آلوده کند؛ mapping کاربر↔فایل DB بیرون از schema مالی است.
+6. **Invariant:** `Financial DB ≠ License DB/store`. انقضای لایسنس یا failure اعتبارسنجی **نباید** تراکنش‌های قبلی را void/invalidate کند یا مانع خواندن/گزارش آفلاین دادهٔ محلی شود — حداکثر UI قابلیت‌های جدید/sync را محدود می‌کند.
+7. کد مالی Domain هیچ `import` از ماژول License برای تصمیم‌گیری حسابداری ندارد.
 
 ---
 
