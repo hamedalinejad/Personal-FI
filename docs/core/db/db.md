@@ -1109,3 +1109,38 @@ COMMIT
 هر polymorphic: validate قبل از COMMIT + reconcile orphan + ترجیحاً `acc_transaction_links` برای روابط پرتکرار.
 
 هدف: سطح Accounting-critical با FK واقعی؛ polymorphic حداقل و کنترل‌شده.
+
+---
+
+## Backward Compatibility Contract (حفظ داده)
+
+1. **ممنوع** در migration تولیدی: `DROP COLUMN` روی داده مالی بدون دوره deprecate + export اجباری.
+2. **ممنوع**: تغییر معنای semantic یک ستون موجود (مثلاً `amount` از gross به net) بدون ستون جدید و backfill.
+3. افزودن ستون: nullable یا default امن؛ داده قدیمی معتبر می‌ماند.
+4. Rename: ستون جدید + کپی + خواندن dual-write در یک نسخه؛ حذف قدیمی فقط در major بعدی پس از migrate همه backupها.
+5. اصل محصول: **هیچ فیلد تاریخی از بین نرود** — legacy fee بدون breakdown حفظ می‌شود (الگوی سهام).
+
+---
+
+## Instrument Registry مرکزی
+
+جدول `ref_instruments` (Core):
+
+| فیلد | نقش |
+|------|-----|
+| `id` | UUID = **instrumentId** سراسری |
+| `assetCategory` | crypto \| stock \| fif \| metal \| other |
+| `displaySymbol` | label قابل‌تغییر |
+| `name` | |
+| `externalRef` | JSON: assetKey / ISIN / fundId / metalType+purity |
+
+Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید معادل پایدار category-scoped که در registry ثبت شده) اشاره می‌کنند.
+
+| دسته | هویت در registry |
+|------|------------------|
+| crypto | assetKey ثبت‌شده → instrument id |
+| stock | ISIN/UUID پایدار — **نه symbol** |
+| fif | fundId |
+| metal | metalType + purity |
+
+**Invariant:** `symbol` / `displaySymbol` هرگز UNIQUE identity holding نیست.
