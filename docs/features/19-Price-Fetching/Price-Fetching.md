@@ -21,7 +21,7 @@
 | FIF (صندوق) | `fundId` (نه symbol — چون issuance_redemption نماد بورسی ندارد) | NAV به ریال | **هیچ API عمومی یکپارچه‌ای وجود ندارد** — هر صندوق NAV را در سایت خودش منتشر می‌کند | **دستی، Fetch به‌صورت اختیاری per-fund در آینده** |
 | Metals | `metalType + purity` (نه symbol تکی) | ریال به ازای هر گرم | منابع نیمه‌رسمی قیمت طلا/سکه ایران (چند منبع رایج) | خودکار/دستی هر دو عملی |
 
-نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto همان `assetKey` یا `symbol` بورسی، و برای Stocks نماد داخلی سیستم است؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش شناسه قیمت.
+نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto **فقط** `assetKey` (هرگز symbol خام)، و برای Stocks نماد داخلی سیستم است؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش شناسه قیمت.
 
 ---
 
@@ -159,7 +159,7 @@ Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در ج�
 
 - `id` → UUID (Primary Key)
 - `sourceId` → UUID (nullable — لینک به `price_sources`؛ برای رکوردهای `source='manual'` مقدارش `null` است)
-- `instrumentId` → string (**الزامی** — شناسه پایدار داخلی دارایی؛ برای FIF = `fundId`، crypto = `assetKey`، stock = نماد داخلی، metal = `{metalType}_{purity}` — ؛ کوئری‌ها با `assetCategory + instrumentId` فیلتر می‌شوند نه فقط symbol)
+- `instrumentId` → string (**الزامی** — شناسه پایدار داخلی دارایی؛ برای FIF = `fundId`، crypto = `assetKey`، stock = `instrumentId` پایدار (ISIN/UUID)، metal = `{metalType}_{purity}` — ؛ کوئری‌ها با `assetCategory + instrumentId` فیلتر می‌شوند نه فقط symbol)
 - `symbol` → string (**deprecated به‌عنوان شناسه اصلی** — فقط برای سازگاری/نمایش legacy؛ می‌تواند برابر `instrumentId` باشد.
 - `assetCategory` → enum (`crypto`, `stock`, `fif`, `metal`) — فقط همین چهار مقدار؛ هم‌راستا با `AssetCategory` در types.md
 - `price` → decimal (قیمت — با `decimal.js`)
@@ -472,7 +472,7 @@ Queryها همیشه با `assetCategory + instrumentId` فیلتر شوند ن�
 |------|-----|
 | `instrumentId` | دارایی پایه |
 | `priceCurrency` | **quote currency همان بازار** (USDT در BTC/USDT، USD در BTC/USD، …) |
-| `quoteMarket` | string پایدار اختیاری ولی توصیه‌شده: مثلاً `BTC-USDT`, `BTC-USD` |
+| `quoteMarket` | string **الزامی برای crypto** (و توصیه‌شده برای بقیه): مثلاً `BTC-USDT` |
 | `sourceId` | Provider |
 | `marketDate` / `fetchedAt` | زمان بازار / دریافت |
 | `quoteType` | last/nav/close/… |
@@ -538,3 +538,16 @@ INSERT price_history (instrumentId, quoteType, marketDate, fetchedAt)
 
 ### تست
 Partial success؛ offline skip؛ future timestamp reject؛ USDT-ERC20 vs TRC20 جدا
+
+### هویت یکتای ردیف قیمت (ضد اختلاط بازار)
+
+کلید منطقی history / dedupe:
+
+```text
+(assetCategory, instrumentId, quoteMarket, priceCurrency, sourceId, marketDate|fetchedAt bucket)
+```
+
+- `BTC-USDT` Binance ≠ `BTC-USDT` Coinbase → `sourceId` جدا در identity
+- فقط `priceCurrency=USDT` **کافی نیست**
+- `getLatestPrice({ assetCategory, instrumentId, quoteMarket?, sourceId?, priceCurrency? })`
+- اگر `quoteMarket` برای crypto null باشد، Adapter باید از جفت پیش‌فرض Provider بسازد و **ذخیره کند** نه null بگذارد
