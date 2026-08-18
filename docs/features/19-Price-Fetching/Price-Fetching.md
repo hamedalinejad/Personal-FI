@@ -583,3 +583,35 @@ getLatestPrice({
 
 **ممنوع:** انتخاب «هر آخرین BTC/USDT از هر صرافی» بدون policy بالا.
 خروجی همیشه شامل `sourceId`, `quoteMarket`, `fetchedAt`, `isStale`.
+
+---
+
+## ترتیب Resolve قبل از Fetch
+
+```text
+1. internal instrumentId (از Holding / Registry)
+2. resolve provider mapping: priceProviderId + providerSymbol + market + quoteMarket
+3. Adapter.fetch(providerSymbol…)  — Adapter هویت داخلی اختراع نکند
+4. response → NormalizedPriceQuote با همان instrumentId ورودی
+5. write price_history
+```
+
+ممنوع: Adapter خروجی را فقط با `BTC`/`XBT` بدون map برگشتی به instrumentId بنویسد.
+
+---
+
+## Source Kind و Priority (valuation)
+
+| sourceKind | confidence پیش‌فرض | توضیح |
+|------------|-------------------|--------|
+| `manual` | 100 | تا `manualExpiresAt`؛ API override نمی‌کند |
+| `trusted_api` | 80 | isDefault / priority بالا |
+| `secondary_api` | 50 | fallback |
+| `import` | 40 | وارداتی |
+
+`getLatestPrice` ترتیب:
+1. manual معتبر (غیرمنقضی)
+2. در غیر این صورت بالاترین confidence سپس priority سپس تازگی زمان
+3. خروجی: `sourceKind`, `sourceId`, `confidence`
+
+Portfolio Value همیشه از همین policy — نه «آخرین ردیف خام بدون kind».
