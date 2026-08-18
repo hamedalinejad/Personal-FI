@@ -227,3 +227,23 @@ UI (pages/sheets)
 ممنوع: `UI → SQL`، `FeatureA → جداول FeatureB` بدون API عمومی B.  
 شبکه فقط داخل Adapterهای opt-in (Price، Version check).  
 Worker برای serialize DB و گزارش سنگین وقتی حجم بالا شد (Should Have واضح در db.md).
+
+---
+
+## لایه‌بندی API فیچر (ضد انفجار سطح API)
+
+| لایه | دیده می‌شود توسط | مثال |
+|------|------------------|------|
+| **Public Feature API** | UI و فیچرهای دیگر | `createIncome`, `executeCryptoBuy`, `payLoan`, `getLatestPrice` |
+| **Application Command/Query** | فقط داخل همان فیچر | `BuyCryptoCommand`, `ListHoldingsQuery` |
+| **Domain Service** | Application | cost basis, installment math |
+| **Internal Repository** | Domain/Application همان فیچر | `insertTx`, `findHolding` — **export عمومی نشود** |
+
+### چه چیزی Public شود؟
+- عملیات کاربر یا نیاز واقعی cross-feature
+- نه هر CRUD خام جدول
+- `reconcile*` / `rebuild*` عمومی در Settings/Health؛ جزئیات adapter داخلی engine
+
+### ممنوع
+- `FeatureA` import repository/SQL از `FeatureB`
+- expose کردن `updateRow(table, id, patch)` عمومی
