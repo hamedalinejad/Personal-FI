@@ -314,3 +314,28 @@ export type ReconcileScope =
 - Event payloadها فقط string برای پول
 - `RelatedFeature` و `TransactionType` را در فیچرها دوباره تعریف نکنید — import از core
 - تست type: `tsc --noEmit` باید fail شود اگر number برای amount استفاده شود
+
+---
+
+## قرارداد Event: Post-Commit
+
+### دو باس جدا
+| Bus | انواع | نقش |
+|-----|--------|------|
+| `DomainEventBus` | TransactionCreated, LoanPaymentMade, ChequeStatusChanged, … | بعد از COMMIT موفق مالی |
+| `ApplicationEventBus` | PriceFetchStarted/Completed, VersionUpdateAvailable, UI toasts | غیرمالی / integration |
+
+Price events **روی DomainEventBus مالی emit نشوند**.
+
+### قوانین
+1. **هیچ `emit` داخل BEGIN…COMMIT** — فقط بعد از COMMIT موفق و پس از enqueue persist (یا همراه موفقیت persist).
+2. اگر handler fail شود، DB از قبل consistent است؛ handler نباید فرض کند می‌تواند transaction را rollback کند.
+3. `emit` می‌تواند sync برای handlerهای سبک UI باشد؛ handlerهای سنگین (reconcile، persist دوباره) باید **async queue** شوند نه blocking در call stack مالی.
+4. ممنوع: handler مربوط به `TransactionCreated` که دوباره SQL write روی همان aggregate بدون operation جدید بزند (ریسک حلقه).
+
+```typescript
+// الگوی صحیح
+await runAtomicFinancialOperation(async (tx) => { /* writes */ });
+await persist();
+domainEvents.emit('TransactionCreated', payload); // post-commit only
+```

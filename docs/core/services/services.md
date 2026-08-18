@@ -134,3 +134,12 @@ services/
 - EventBus sync و in-process؛ payload مطابق `types.md` (مبالغ string)
 - `runAtomicFinancialOperation` در لایه db/domain — نه داخل React component
 - سرویس‌ها stateless نسبت به UI؛ state موقت در Zustand (`stores.md`)
+
+---
+
+## Event Bus — Post-Commit و جداسازی
+
+- `emit` وسط SQL transaction **ممنوع** (ناسازگاری event با rollback).
+- دو instance: `domainEventBus` و `applicationEventBus` (Price/Version روی application).
+- Handler مالی سنگین: `queueMicrotask` / job queue؛ نه کار DB طولانی sync داخل emit.
+- جزئیات در `types.md → قرارداد Event: Post-Commit`.
