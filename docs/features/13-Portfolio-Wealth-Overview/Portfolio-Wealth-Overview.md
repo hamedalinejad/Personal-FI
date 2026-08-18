@@ -239,3 +239,17 @@
 - قیمت‌ها فقط `getLatestPrice`؛ بدون fetch شبکه در Portfolio
 - `includeCashInWealth` رفتار IRR/USDT داخلی صرافی را کنترل می‌کند
 - snapshot اختیاری برای روند تاریخی
+
+---
+
+## Valuation As-Of
+
+هر جزء دارایی در خروجی Portfolio:
+
+```ts
+{ instrumentId, value, price, priceAsOf, marketDate?, fetchedAt, isStale, sourceId }
+```
+
+- `priceAsOf = marketDate ?? fetchedAt` (اولویت marketDate برای stock/fif)
+- UI مجموع ثروت را با توضیح «بر اساس قیمت‌های as-of مختلط» نشان می‌دهد اگر تاریخ‌ها یک روز نیستند
+- ممنوع نمایش NAV دیروز به‌عنوان «قیمت لحظه‌ای امروز» بدون برچسب

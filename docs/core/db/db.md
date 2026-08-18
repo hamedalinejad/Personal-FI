@@ -1144,3 +1144,15 @@ Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید �
 | metal | metalType + purity |
 
 **Invariant:** `symbol` / `displaySymbol` هرگز UNIQUE identity holding نیست.
+
+---
+
+## مرز مستند در برابر Runtime
+
+مستندات **قرارداد** هستند، نه اثبات اجرای صحیح در production.
+
+تا وقتی برای مسیرهای زیر **تست/fixture اجرایی** وجود نداشته باشد، صحت محاسبات تضمین runtime ندارد:
+
+BUY/SELL، C2C، Transfer+fee، Loan installment، Fund NAV vs redemption، Stock CA، reconcile/repair.
+
+Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و unit تست Domain اجباری قبل از ادعای «آماده استفاده مالی» است.
