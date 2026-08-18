@@ -932,3 +932,6 @@ ok = delta.isZero
 
 همه assertها با decimal string و `delta === '0'`.
 Repair فقط API صریح با flag کاربر؛ تست‌ها Repair را جدا از reconcile بخوانند.
+
+### Reversal و Journal
+هر reverse دامنه باید در همان BEGIN/COMMIT یا journalهای `operationId` اصلی را void کند یا entryهای معکوس با `reversesOperationId` بنویسد. Snapshot rebuild بعد از هر دو.

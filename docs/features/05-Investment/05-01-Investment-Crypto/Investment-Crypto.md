@@ -1021,3 +1021,54 @@ USDT-TRC20 و USDT-ERC20 = دو assetKey متفاوت = دو holding مجاز
 
 Deposit/Withdraw/Transfer **بدون** networkId معتبر (برای on-chain) رد می‌شوند.
 قیمت‌گیری و P&L همیشه روی `assetKey` نه `symbol` خام.
+
+---
+
+## Cost Basis در C2C
+
+برای `SELL ETH` + `BUY BTC` با `tradeGroupId` مشترک در یک atomic op:
+
+```text
+sourceCostReleased = netQty_ETH_sold × avgBuy_ETH   // از holding ETH
+feeBaseTotal = Σ feeInBase روی هر دو leg (طبق feePresence هر leg)
+economicValueOut = sourceCostReleased + fees_allocated_to_disposal
+// مقصد:
+BTC_totalInvested += economicValueOut   // نه «قیمت لحظه‌ای USD» مگر quote به base قفل شود
+BTC_qty += netQty_BTC
+avg_BTC = BTC_totalInvested / BTC_qty
+```
+
+اگر معامله ETH/BTC است و قیمت USDT جدا نیست:
+- `totalAmountBase` روی SELL = `sourceCostReleased` (انتقال cost)
+- یا اگر کاربر/قیمت quote میانی بدهد: `quoteAmount` × `exchangeRateToBase` قفل‌شده در همان op
+- **ممنوع:** rebuild بعدی با latest USDT/IRR برای همان trade تاریخی
+
+### تخصیص Fee در C2C
+| feePresence روی leg | تعلق حسابداری | اثر Cost Basis |
+|---------------------|----------------|----------------|
+| SELL + fee_from_base_asset | SELL leg | fee در disposal؛ از proceeds اقتصادی کم یا به cost released اضافه |
+| BUY + fee_from_received | BUY leg | net qty کمتر؛ fee در cost مقصد |
+| fee_in_quote روی یک leg | همان leg | به cost مقصد یا کاهش proceeds طبق جهت |
+| fee_external | transaction-level journal `trading_fee` | معمولاً expense؛ نه qty |
+
+هر leg فیلدهای `grossQuantity` / `feeQuantity` / `netQuantity` / `feePresence` خودش را دارد.
+
+---
+
+## قیود Reversal (Crypto)
+
+```text
+CHECK: isReversal=true ⇒ reversedTxId IS NOT NULL
+CHECK: reversedTxId set ⇒ target.isVoided=true پس از COMMIT
+هر tx حداکثر یک reversal موفق (unique reversedTxId)
+isReversal=true ⇒ خود آن ردیف دوباره reverse نمی‌شود (بازگشت فقط با correcting trade جدید)
+```
+
+زنجیره ممنوع: Original → Reversal → Reversal-of-Reversal.
+
+### Journal همراه Reversal
+همان `operationId` reversal:
+1. void/flag journal entries مربوط به `operationId` اصلی (`isVoided=true`) **یا**
+2. درج ردیف‌های journal معکوس (debit/credit جابه‌جا) با `reversesOperationId`
+
+Domain void بدون journal reverse = **باگ**؛ atomic op باید هر دو را انجام دهد سپس rebuild holding.
