@@ -816,20 +816,64 @@ v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از
 | `isVoided` | boolean | |
 | `createdAt` | timestamp UTC | |
 
+### قوانین لایه‌ها (ضد Double-Counting)
+
+| لایه | چیست | Source of Truth برای چه |
+|------|------|-------------------------|
+| **Domain Ledger** | `inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, … | quantity، units، cost basis، loan portions، P&L دامنه همان asset |
+| **Cash Ledger** | `acc_transactions` (+ cash brokerage/platform tables) | فقط جابه‌جایی پول بانکی/نقدی حساب |
+| **Accounting Journal** | `fin_journal_entries` | گزارش میان‌فیچری، جریان وجوه یکپارچه، audit دو طرفه |
+| **Snapshot** | `currentBalance`, holding qty، `cashBalance`، … | **فقط Projection** — مشتق از Domain/Cash ledger؛ هرگز SoT گزارش |
+
+**قانون طلایی گزارش:** هر رویداد اقتصادی **یک‌بار** از Journal (یا از Domain برای متریک تخصصی) شمرده می‌شود — نه Journal+Domain+acc با هم در یک مجموع.
+
+### طبقه‌بندی حساب (Double-Entry سبک)
+
+هر atomic op حداقل **دو** ردیف journal با `accountClass` و `direction` متوازن از نظر `amountInBase` می‌نویسد:
+
+| فیلد اضافه | نقش |
+|------------|-----|
+| `accountClass` | `cash` \| `crypto_asset` \| `stock_asset` \| `fund_unit` \| `metal_asset` \| `loan_liability` \| `loan_receivable` \| `income` \| `expense` \| `trading_fee` \| `equity` \| `other` |
+| `direction` | `debit` \| `credit` |
+| `amountInBase` | برای balance check: Σ debit = Σ credit در همان `operationId` |
+
+مثال BUY BTC با USDT + fee USDT:
+```text
+Dr crypto_asset     amountInBase = cost of BTC
+Cr cash             amountInBase = USDT spent (quote)
+Dr trading_fee      amountInBase = fee
+Cr cash             amountInBase = fee
+```
+(اگر cash داخلی صرافی است نه بانک، `accountId` null و `accountClass=cash` با memo exchange؛ `acc_transactions` نوشته **نمی‌شود**.)
+
 ### قوانین
-1. جداول فیچر = **جزئیات دامنه** (units، NAV، loan portions، …).
-2. `fin_journal_entries` = **منبع حقیقت برای گزارش‌های میان‌فیچری و Net movement**.
-3. `acc_transactions` همچنان Cash ledger است و وقتی پول بانکی جابه‌جا می‌شود نوشته می‌شود؛ همان op باید journal entry هم داشته باشد (`relatedId` به acc یا به domain tx).
-4. گزارش‌های حسابداری (`getLedger`, reconcileAll سطح سیستم) از journal می‌خوانند؛ جزئیات از relatedFeature/relatedId.
-5. بدون journal entry، atomic op ناقص و باید fail شود (در تست‌های architecture).
+1. جداول فیچر = جزئیات دامنه (units، NAV، portions، …).
+2. `fin_journal_entries` = SoT گزارش میان‌فیچری و Net movement یکپارچه.
+3. `acc_transactions` = Cash/Bank ledger؛ فقط وقتی پول **حساب بانکی** جابه‌جا می‌شود.
+4. Snapshot = Projection؛ rebuild از Domain/Cash ledger.
+5. بدون journal متوازن، atomic op fail.
+6. گزارش Expense بانکی از `acc`/`exp` یا journal `accountClass=expense` — **نه** جمع همزمان هر دو.
 
 ```text
-Feature domain row(s)
- + fin_journal_entries (الزامی)
- + acc_transactions (فقط اگر cash بانکی)
- + snapshots
+Domain row(s)
+ + fin_journal_entries (متوازن، الزامی)
+ + acc_transactions (فقط bank cash)
+ + snapshots (projection)
 → COMMIT → persist
 ```
+
+### ماتریس SoT محاسبات
+
+| متریک | Source of Truth |
+|--------|-----------------|
+| Cash balance حساب بانکی | `acc_transactions` (rebuild) |
+| Brokerage/platform cash | ledger نقدی همان فیچر |
+| Holding qty / cost basis / avg | Domain `inv_*_transactions` (+ CA) |
+| Realized P&L دارایی | Domain ledger همان asset |
+| Net Worth | Portfolio API: assets از holdings×price + bank cash − loans؛ **نه** جمع خام journal+domain |
+| Expense/Income کاربر | `exp_*` / `inc_*` (isVoided=false) |
+| Tax paid | `tax_*` + acc tax types |
+| Cross-feature cashflow report | `fin_journal_entries` با فیلتر accountClass |
 
 ---
 
