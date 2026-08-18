@@ -220,22 +220,31 @@ Fallback به `symbol` فقط برای تلاش موقت مجاز است و نب
 
 تمام محاسبات پولی باید با `decimal.js` انجام شوند و استفاده از `Number` برای محاسبات مالی مجاز نیست.
 
+### تبدیل کارمزد (الزامی)
+
+```text
+feeInTradeCurrency = convert(feeAmount, feeCurrency → transactionCurrency)
+feeInBase = convert(feeAmount, feeCurrency → baseCurrency)  // برای totalFeesPaidBase
+// هرگز feeAmount خام را با price ریالی جمع نکن مگر feeCurrency == currency معامله
+```
+
 ### خرید
 
 ```text
-newTotalInvested = totalInvested + (quantityBought × price) + feeAmount
+newTotalInvested = totalInvested + (quantityBought × price) + feeInTradeCurrency
 newQuantity = quantity + quantityBought
 newAverageBuyPrice = newTotalInvested / newQuantity
+totalFeesPaidBase += feeInBase
 ```
 
 ### فروش
 
 ```text
 soldPortionCost = quantitySold × averageBuyPrice
-realizedPL = saleProceeds - soldPortionCost - feeAmount
+realizedPL = saleProceeds - soldPortionCost - feeInTradeCurrency
 totalInvested -= soldPortionCost
 quantity -= quantitySold
-averageBuyPrice بدون تغییر می‌ماند
+// averageBuyPrice برای باقی‌مانده بدون تغییر
 ```
 
 ### Unrealized
@@ -251,7 +260,7 @@ Realized و Unrealized نباید با یکدیگر مخلوط شوند.
 ## نکات طراحی
 
 - این زیر‌فیچر مخصوص سهام بورس ایران است.
-- همه مبالغ ریالی هستند و نرخ تتر لحظه‌ای هر رکورد حفظ می‌شود.
+- ارز معامله معمولاً IRR است؛ `feeCurrency` می‌تواند متفاوت باشد — همیشه از `feeInTradeCurrency` / `feeInBase` استفاده شود.
 - `feeAmount` هرگز حذف نمی‌شود.
 - Breakdown کارمزد شامل کارگزار، بورس/ارکان، مالیات و سایر هزینه‌ها است.
 - Mapping قیمت صریح و قابل اعتبارسنجی است.
@@ -340,3 +349,59 @@ symbol_change فولاد → فولاد1:
   symbol updated
   qty/cost unchanged
 ```
+
+### الگوریتم کامل `rebuildStockHolding` (شامل Corporate Action)
+
+```text
+qty = 0; totalInvested = 0
+برای هر tx در ORDER BY date, createdAt (isVoided=false):
+
+  buy:
+    totalInvested += qty*price + feeInTradeCurrency(tx)
+    qty += quantity
+
+  sell:
+    cost = qty==0 ? 0 : quantity * (totalInvested/qty)
+    totalInvested -= cost
+    qty -= quantity
+
+  dividend:  // نقدی
+    // qty و totalInvested بدون تغییر (cash جدا)
+
+  bonus_share:
+    qty += bonusQty
+    // totalInvested ثابت
+
+  split:
+    qty *= ratio
+    // totalInvested ثابت → average رقیق می‌شود
+
+  reverse_split:
+    qty /= ratio  (با سیاست باقیمانده مستند)
+    // totalInvested ثابت
+
+  capital_increase (cash):
+    qty += newShares
+    totalInvested += cashPaid + feesInTrade
+
+  rights_issue:
+    // اگر holding حق جدا: در holding دیگر؛ اینجا qty سهم اصلی ثابت
+    // اگر روی همین holding: طبق payload
+
+  rights_exercise:
+    qty += sharesFromRights
+    totalInvested += costOfRights + cashPaid
+
+  rights_sell:
+    // کاهش quantity حق روی holding حق؛ cash جدا
+
+  symbol_change | isin_change:
+    // metadata only — skip qty/cost
+
+  transfer_ca:
+    // از holding منبع کم / به مقصد اضافه با cost متناسب
+
+averageBuyPrice = qty>0 ? totalInvested/qty : 0
+```
+
+**تست:** 1000 سهم → split 1:2 → qty=2000 و totalInvested همان؛ average نصف.
