@@ -244,3 +244,23 @@ convertChain(amount, [c1,c2,...,cn], asOf) =
 4. در غیر این صورت fail — سکوت و latest ممنوع
 
 روی تراکنش: ترجیحاً `exchangeRateToBase` همان لحظه **قفل** شود تا rebuild به FX آینده وابسته نباشد.
+
+---
+
+## Currency Registry
+
+جدول `cur_currencies` (یا seed در DB): هر ردیف = یک `CurrencyRecord` (types.md).
+
+- `minorUnit` / `precision` / `roundingMode` از registry خوانده می‌شود نه hard-code
+- افزودن ارز = INSERT registry + در صورت نیاز literal در Union شناخته‌شده
+- `convert` قبل از اجرا `assertCurrency(code)` از registry
+
+## Currency در برابر Asset
+
+| | Currency | Asset |
+|--|----------|--------|
+| مثال | IRR, USD, USDT (به‌عنوان واحد پول) | BTC on Ethereum, USDT-TRC20, فولاد, fundId |
+| Registry | `cur_currencies` | `inv_crypto_assets` / instrumentId سهام / … |
+| نقش | واحد اندازه‌گیری مبلغ | آنچه نگه داشته/معامله می‌شود |
+
+موجودی «USDT روی صرافی» = Holding روی **Asset** با quote/settlement در **Currency** USDT.

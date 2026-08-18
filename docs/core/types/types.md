@@ -43,28 +43,39 @@ export interface PaginatedResult<T> {
 
 ```typescript
 // ارزهای فیات پشتیبانی‌شده
+// کدهای شناخته‌شده — لیست بسته برای typecheck؛ ارز جدید = افزودن literal + ردیف registry
 export type FiatCurrencyCode = 'IRR' | 'USD' | 'EUR' | 'AED' | 'GBP' | 'TRY';
+export type WellKnownCryptoCurrencyCode = 'BTC' | 'ETH' | 'USDT' | 'USDC' | 'BNB' | 'XRP' | 'SOL';
 
-// ارزهای دیجیتال پشتیبانی‌شده (نمادهای رایج — لیست قابل گسترش است)
-export type CryptoCurrencyCode = 'BTC' | 'ETH' | 'USDT' | 'BNB' | 'XRP' | 'SOL' | string;
-// نکته: string& برای باز بودن لیست — هر نماد رمزارز جدیدی قابل قبول است
+/** کد ارز در runtime از registry می‌آید؛ TypeScript: برند برای جلوگیری از string آزاد تصادفی */
+export type CurrencyCode = string & { readonly __currencyBrand: unique symbol };
+// در عمل: as CurrencyCode فقط پس از validate در CurrencyRegistry
 
-// ارز پایه پشتیبانی‌شده برای ذخیره قیمت در price_history
-export type PriceCurrency = FiatCurrencyCode | CryptoCurrencyCode;
+export type PriceCurrency = CurrencyCode; // هر ارز quote مجاز پس از registry
 
-// اتحادیه کامل (برای فیلدهایی که هر نوع ارزی را می‌پذیرند)
-export type CurrencyCode = FiatCurrencyCode | CryptoCurrencyCode;
+export interface CurrencyRecord {
+  code: string;           // IRR, USD, USDT, ...
+  name: string;
+  symbol: string;         // ﷼, $, ...
+  type: 'fiat' | 'crypto' | 'stablecoin' | 'other';
+  minorUnit: number;      // 0 for IRR often, 2 for USD, 8 for BTC display policy
+  precision: number;      // decimal places for storage/calc
+  roundingMode: 'HALF_UP' | 'HALF_EVEN' | 'FLOOR';
+  isCrypto: boolean;
+  network?: string;       // فقط اگر این «ارز شبکه» باشد — معمولاً خالی؛ شبکه روی Asset است
+  isActive: boolean;
+}
 
 export interface ExchangeRate {
- from: CurrencyCode;
- to: CurrencyCode;
- rate: string; // decimal string — هرگز number/float
- timestamp: Timestamp;
+  from: CurrencyCode;
+  to: CurrencyCode;
+  rate: string;
+  asOf: Timestamp; // historical
+  timestamp: Timestamp; // when recorded
 }
 ```
 
-> **چرا `USDT` در `CryptoCurrencyCode` است نه `FiatCurrencyCode`؟** 
-> USDT از نظر فنی یک Stablecoin رمزارز است، نه ارز فیات — حتی اگر به دلار پگ باشد. در این پروژه همه تراکنش‌های کریپتو (از جمله موجودی ریال/تتر صرافی) از طریق `priceCurrency='USDT'` یا `priceCurrency='IRR'` در `price_history` کار می‌کنند. این تفکیک با تعریف فیچر `Investment-Crypto` سازگار است.
+> **USDT** در `CurrencyRecord.type = 'stablecoin'` ثبت می‌شود. **Asset کریپتو** (مثلاً USDT-TRC20) در Asset Registry جداست — Currency ≠ Asset.
 
 ---
 
