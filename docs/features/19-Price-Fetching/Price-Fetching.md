@@ -615,3 +615,35 @@ getLatestPrice({
 3. خروجی: `sourceKind`, `sourceId`, `confidence`
 
 Portfolio Value همیشه از همین policy — نه «آخرین ردیف خام بدون kind».
+
+---
+
+## Stale Policy per Asset Category
+
+`staleAfterMs` **سراسری یکسان نیست**. ترتیب resolve:
+
+1. `price_sources.staleAfterMinutes` برای آن source  
+2. وگرنه پیش‌فرض **per assetCategory** (و در صورت نیاز per quoteType):
+
+| assetCategory | پیش‌فرض پیشنهادی staleAfter | مبنای age |
+|---------------|------------------------------|-----------|
+| crypto | 15–60 دقیقه | `now - fetchedAt` |
+| stock | پایان همان session / یک روز معاملاتی | ترجیحاً `now - marketDate` (تقویم بازار) |
+| fif | 1–2 روز تقویمی (NAV روزانه) | `now - marketDate` |
+| metal | 1–6 ساعت | `now - fetchedAt` |
+
+`isStale` روی CachedPrice با همین policy. UI برچسب «قیمت مربوط به {priceAsOf}» نشان می‌دهد.
+
+---
+
+## بدون default پنهان USDT
+
+- هیچ `priceCurrency = 'USDT'` hard-code در Domain به‌عنوان پیش‌فرض خاموش نیست.
+- Holding/mapping باید `quoteMarket` / `priceCurrency` صریح داشته باشد یا از تنظیمات کاربر (`defaultCryptoQuote`) **opt-in**.
+- `BTC-IRR`, `BTC-USDT`, `BTC-USD` سه stream جدا در history.
+
+---
+
+## PriceFetchResult کامل
+
+هر آیتم `succeeded[]` حداقل: `instrumentId, price, priceCurrency, quoteMarket, sourceId, quoteType, marketDate?, fetchedAt` — Application حق ندارد این‌ها را از context بیرونی «حدس» بزند.

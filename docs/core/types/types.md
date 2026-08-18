@@ -153,9 +153,21 @@ export type PriceSkipReason =
  | 'api_key_required'; // منبع requiresApiKey=true ولی کلید در Session Storage نیست
 
 // خروجی عملیات دریافت قیمت از API
+export interface PriceFetchSucceededItem {
+  instrumentId: string;
+  price: string;
+  priceCurrency: string;
+  quoteMarket: string;
+  sourceId: string;
+  quoteType: 'last' | 'nav' | 'close' | 'mid' | 'other';
+  marketDate?: string; // YYYY-MM-DD
+  fetchedAt: Timestamp;
+  deduped?: boolean;
+}
+
 export interface PriceFetchResult {
   fetchRequestId: string;
-  succeeded: Array<{ instrumentId: string; price: string; deduped?: boolean }>;
+  succeeded: PriceFetchSucceededItem[];
   failed: Array<{ instrumentId: string; reason: string; failureKind: PriceFailureKind; httpStatus?: number }>;
   skipped?: Array<{ instrumentId?: string; reason: PriceSkipReason | string }>;
   fetchedAt: Timestamp;
@@ -164,27 +176,28 @@ export interface PriceFetchResult {
 
 // آخرین قیمت کش‌شده یک نماد
 export interface CachedPrice {
- instrumentId: string;
- displaySymbol?: string;
- assetCategory: AssetCategory;
- price: string; // decimal string
- priceCurrency: PriceCurrency;
- source: 'manual' | 'api';
- sourceId?: string;
- fetchedAt: Timestamp;
- priceAgeMs: number;
- staleAfterMs: number;
- isStale: boolean; // priceAgeMs > staleAfterMs
+  instrumentId: string;
+  displaySymbol?: string;
+  assetCategory: AssetCategory;
+  price: string;
+  priceCurrency: PriceCurrency;
+  quoteMarket?: string;
+  source: 'manual' | 'api' | 'import';
+  sourceKind?: 'manual' | 'trusted_api' | 'secondary_api' | 'import';
+  sourceId?: string;
+  marketDate?: string;
+  fetchedAt: Timestamp;
+  /** as-of برای valuation: marketDate اگر هست وگرنه fetchedAt */
+  priceAsOf: Timestamp | string;
+  priceAgeMs: number;
+  staleAfterMs: number;
+  isStale: boolean;
 }
 
 // --- Provider Adapter Contract — تعریف کامل رفتاری در Price-Fetching.md ---
-export interface NormalizedPriceQuote {
- symbol: string;
- price: string; // decimal string
- priceCurrency: PriceCurrency | string;
- fetchedAt: string; // ISO datetime
- rawSymbol?: string;
-}
+// NormalizedPriceQuote کامل در Price-Fetching.md — اینجا فقط re-export مفهومی
+export type { /* see Price-Fetching NormalizedPriceQuote with instrumentId */ };
+
 
 export interface ProviderFetchResult {
  succeeded: NormalizedPriceQuote[];
