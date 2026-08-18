@@ -289,3 +289,33 @@
 
 Route واقعی: `/investments/crypto/:exchangeId` + `?action=buy` اختیاری.  
 از ساخت `pages/crypto/buy.tsx` جدا برای هر عمل خودداری شود مگر deep-link اجباری محصول.
+
+---
+
+## قرارداد سخت Route سرمایه‌گذاری (کم‌شلوغی)
+
+### Routeهای واقعی مجاز (bookmark / deep-link)
+```text
+/investments
+/investments/crypto
+/investments/crypto/:exchangeId
+/investments/stocks
+/investments/stocks/:brokerageId
+/investments/fif
+/investments/fif/:fundId
+/investments/metals
+/investments/metals/:platformId
+```
+حداکثر: لیست کلاس دارایی + **یک** سطح detail.
+
+### ممنوع به‌عنوان React Route جدا
+```text
+.../buy, .../sell, .../deposit, .../withdraw, .../correct, .../new-*
+```
+این‌ها فقط:
+- **Sheet / Drawer / Dialog** روی detail، یا
+- query روی detail: `?action=buy|sell|deposit|withdraw|correct|new`
+
+پیاده‌سازی مرجع: `InvestmentActionSheet` با `{ assetClass, action, entityId }`.
+
+اگر در کد `path` جدید زیر investments اضافه شود بدون توجیه deep-link قانونی، با این قرارداد در تضاد است.
