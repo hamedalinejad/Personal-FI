@@ -319,3 +319,31 @@ Route واقعی: `/investments/crypto/:exchangeId` + `?action=buy` اختیار
 پیاده‌سازی مرجع: `InvestmentActionSheet` با `{ assetClass, action, entityId }`.
 
 اگر در کد `path` جدید زیر investments اضافه شود بدون توجیه deep-link قانونی، با این قرارداد در تضاد است.
+
+---
+
+## Core UI: InvestmentActionSheet Contract
+
+مسیر پیشنهادی: `core/ui/InvestmentActionSheet` (یا `components/investment/`) — **یک** implementation مشترک.
+
+```ts
+type InvestmentAssetClass = 'crypto' | 'stock' | 'fif' | 'metal';
+type InvestmentAction = 'buy' | 'sell' | 'deposit' | 'withdraw' | 'correct' | 'transfer' | 'dividend' | 'nav' | 'new';
+
+interface InvestmentActionSheetProps {
+  assetClass: InvestmentAssetClass;
+  action: InvestmentAction;
+  entityId: string; // exchangeId | brokerageId | fundId | platformId
+  open: boolean;
+  onClose: () => void;
+  // اختیاری: prefill
+}
+```
+
+### قوانین
+1. چهار دامنه crypto/stocks/fif/metals **فرم کامل جدا** برای همان action ننویسند؛ فقط **strategy/adapter** کوچک برای فیلدهای خاص دامنه.
+2. Submit → فقط **Public Feature API** همان دامنه (`executeBuy`, …) نه SQL.
+3. بعد از موفقیت: بستن sheet + invalidate queries لیست/detail.
+4. `correct` داخل همین pattern با flow void+reversal طبق Domain.
+
+تکرار چهار صفحه Buy = نقض این قرارداد.
