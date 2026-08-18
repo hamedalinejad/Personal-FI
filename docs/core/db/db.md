@@ -1156,3 +1156,29 @@ Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید �
 BUY/SELL، C2C، Transfer+fee، Loan installment، Fund NAV vs redemption، Stock CA، reconcile/repair.
 
 Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و unit تست Domain اجباری قبل از ادعای «آماده استفاده مالی» است.
+
+### Numerical Fixtures اجباری (Must Have قبل از release مالی)
+
+مسیر پیشنهادی: `tests/fixtures/financial/*.json` + runner که Domain/Engine را صدا می‌زند — **نه** فقط mock UI.
+
+هر fixture: `{ name, inputs, steps[], expected: { state, realizedPL?, journalBalance? } }` با decimal string.
+
+| ID | سناریو | assert کلیدی |
+|----|--------|----------------|
+| `crypto_buy_fee_quote` | BUY 1 BTC fee 10 USDT | qty=1, cost includes feeIn |
+| `crypto_buy_fee_base` | BUY gross 1 fee 0.001 BTC | netQty=0.999 |
+| `crypto_sell` | SELL partial | realizedPL, avg unchanged on remainder |
+| `crypto_c2c` | ETH→BTC | cost moved, dual leg |
+| `crypto_transfer_fee` | transfer 1 fee 0.001 | Σ qty −0.001 |
+| `multi_currency_fee` | feeCurrency ≠ trade currency | feeInTradeCurrency |
+| `stock_split` | 1000 → 1:2 | qty=2000, totalInvested same |
+| `stock_bonus` | bonus 1:10 | qty up, invested same |
+| `stock_rights` | issue+exercise | cost + cash |
+| `fif_nav_ne_subscription` | buy @ 1010 NAV 1000 | avg from 1010 not NAV |
+| `fif_reinvest` | dual leg income+buy | units+invested+journal |
+| `loan_flat` | flat 18% 18m | totalInterest formula |
+| `loan_declining` | monthly r=getPeriodRate | portions |
+| `loan_grace` | interest-only then amort | |
+| `loan_penalty` | cap scope lifetime vs per installment | |
+
+**قانون:** تا این fixtureها در CI سبز نباشند، مسیر مالی «تأییدشده» اعلام نشود. مستند به‌تنهایی bug runtime را close نمی‌کند.
