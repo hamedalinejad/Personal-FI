@@ -1079,3 +1079,27 @@ COMMIT
 اگر migration fail → TEMP دور انداخته می‌شود؛ `db_main` قبلی سالم می‌ماند.
 
 `beforeunload` هرگز مسیر اصلی save نیست و جایگزین pipeline بالا نمی‌شود.
+
+---
+
+## سیاست کاهش Polymorphic Link
+
+`relatedFeature` + `relatedId` **فقط** جایی که رابطه واقعاً چندجدول است (مثلاً `acc_transactions` به چند منبع رویداد).
+
+### ترجیح FK واقعی
+| رابطه | به‌جای polymorphic |
+|--------|---------------------|
+| crypto tx → holding | `holdingId` FK |
+| stock tx → brokerage | `brokerageId` FK |
+| loan payment → loan | `loanId` FK |
+| cheque → account | `accountId` FK |
+| document → یک entity مشخص پرتکرار | جدول link اختصاصی یا FK مستقیم |
+
+### Polymorphic مجاز
+- `acc_transactions.related*` (ورود به cash از منابع مختلف)
+- `docs_links` / notifications به چند نوع entity
+- `fin_journal_entries.related*` برای audit میان‌فیچری
+
+هر polymorphic: validate قبل از COMMIT + reconcile orphan + ترجیحاً `acc_transaction_links` برای روابط پرتکرار.
+
+هدف: سطح Accounting-critical با FK واقعی؛ polymorphic حداقل و کنترل‌شده.
