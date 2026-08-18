@@ -401,3 +401,61 @@ export function preserveFull(amount: Decimal): string {
 - همه roundهای پول از `roundMoney` / سیاست همین سند
 - میانگین قیمت: تقسیم بدون round میانی؛ round فقط در نمایش UI در صورت نیاز
 - تست: 10/3 و مجموع اقساط نباید drift بیش از 1 واحد پول در قسط آخر ایجاد کند (قسط آخر residual)
+
+---
+
+## تفکیک نوع مقدار و Precision Contract
+
+| نوع | معنی | ذخیره پیشنهادی | precision پیش‌فرض |
+|-----|------|----------------|-------------------|
+| **MoneyAmount** | مبلغ پولی یک Currency | TEXT decimal string یا INTEGER minor units طبق `CurrencyRecord.minorUnit` | از `cur_currencies.precision` / roundingMode |
+| **AssetQuantity** | تعداد واحد دارایی (BTC, shares, fund units, mg) | TEXT decimal string | crypto تا 18؛ stock/fund طبق بازار (اغلب 0–4)؛ فلز mg integer |
+| **UnitPrice** | قیمت هر واحد دارایی به یک Currency | TEXT | از جفت (asset, quote) — نه لزوماً minor money |
+| **Rate** | نرخ FX / بهره | TEXT | حداقل 12–18 رقم معنادار داخلی |
+| **Percentage** | درصد (fee rate, interest) | TEXT | 4–8 رقم؛ نمایش جدا |
+
+**Invariant:** Quantity و Money در یک ستون/یک precision policy مخلوط نشوند.  
+`BTC qty 1e-8` ≠ `IRR minor unit`.  
+تبدیل Money ↔ minor فقط با `CurrencyRecord`؛ Quantity هرگز از `toMinorUnit(currency)` رد نشود.
+
+### نگاشت به فیلدها
+- `amount`, `feeAmount`, `totalInvested` (وقتی پولی) → MoneyAmount  
+- `quantity`, `units`, `quantityMg` → AssetQuantity  
+- `price`, `nav`, `transactionPrice`, `averageBuyPrice` → UnitPrice  
+- `exchangeRateToBase`, `interestRate` → Rate / Percentage
+
+---
+
+## Rounding در Transaction Contract
+
+هر `runAtomicFinancialOperation` باید round را **در نقاط مشخص** اعمال کند (deterministic):
+
+| مرحله | rule |
+|--------|------|
+| ورودی کاربر price/qty | validate + normalize به precision نوع |
+| `line = qty × price` | ضرب کامل decimal؛ round به Money precision ارز معامله **یک‌بار** قبل از persist مبلغ |
+| fee | round جدا به precision `feeCurrency` سپس convert |
+| interest / installment portions | طبق جدول وام (principal ROUND_DOWN، residual در آخر) |
+| tax | ROUND_HALF_UP به money currency |
+| P&L نمایشی | از مقادیر ذخیره‌شده؛ round فقط UI |
+| averageBuyPrice ذخیره | **بدون** round میانی (UnitPrice full) |
+
+تابع کمکی الزامی: `roundMoney(amount, currencyCode)`, `roundQuantity(qty, assetKey|instrument)`, `roundRate(rate)`.
+
+---
+
+## calculationVersion روی Snapshot
+
+روی جداول snapshot (holdings، `currentBalance` مشتق، avg price، …):
+
+| فیلد | نقش |
+|------|------|
+| `calculationVersion` | string/semver الگوریتم (مثلاً `cost-basis.v1`, `rebuild.stock.ca.v1`) |
+| `calculatedAt` | زمان آخرین rebuild |
+
+اگر الگوریتم در migration عوض شد:
+1. bump `calculationVersion` در کد
+2. `rebuild*FromLedger` همه ردیف‌های متأثر
+3. audit: `repair` با version قدیم→جدید
+
+Reconcile: mismatch می‌تواند به‌خاطر version باشد — در `details` ذکر شود.
