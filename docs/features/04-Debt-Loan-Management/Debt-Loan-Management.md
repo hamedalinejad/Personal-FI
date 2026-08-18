@@ -363,8 +363,34 @@ custom → periodsPerYear = 365 / customIntervalDays // مثلاً هر ۴۵ ر�
 | `quarterly` | ۴ | `annualRate / 4` | استاندارد — ۴ فصل در سال |
 | `custom` | `365 / customIntervalDays` | `annualRate × customIntervalDays / 365` | Day Count = Actual/365 — مناسب برای اکثر وام‌های ایرانی |
 
-> **چرا Actual/365 و نه Actual/360؟** 
-> در ایران تقویم شمسی ۳۶۵ یا ۳۶۶ روز دارد. برای سادگی و سازگاری با محاسبات بانکی رایج، از ۳۶۵ روز به‌عنوان پایه ثابت استفاده می‌شود (نه ۳۶۶ در سال کبیسه و نه ۳۶۰). اگر وام‌دهنده قرارداد صریحی با پایه متفاوت داشت، می‌توان `customIntervalDays` را با دقت بیشتر تعریف کرد.
+### فیلد `dayCountConvention` روی `ln_loans` (اجباری برای custom؛ توصیه برای همه)
+
+| مقدار | معنی |
+|--------|------|
+| `actual_365` | پیش‌فرض پروژه / رایج ایران — پایه ۳۶۵ |
+| `actual_360` | Actual/360 بانکی بین‌المللی |
+| `30_360` | هر ماه ۳۰ روز، سال ۳۶۰ |
+| `actual_actual` | Actual/Actual (سال کبیسه) — Should Have |
+
+```text
+r_custom = annualRate × customIntervalDays / yearBasis(dayCountConvention)
+yearBasis: actual_365→365, actual_360→360, 30_360→360, actual_actual→daysInYear(asOf)
+```
+
+بدون این فیلد، وام‌های مختلف با فرض ضمنی متفاوت drift می‌کنند.
+
+### تقویم اقساط و Business Date
+
+| فیلد | نقش |
+|------|------|
+| `calendarSystem` | `jalali` \| `gregorian` — برای شمارش ماه تنفس و نمایش |
+| `dueDate` | تاریخ سررسید قسط (date محلی قرارداد، نه فقط UTC instant) |
+| `firstPaymentDate` | اولین due |
+| `businessDayAdjustment` | `none` \| `following` \| `preceding` \| `modified_following` |
+| `holidayCalendarId` | nullable — تعطیلات بانکی ایران (Should Have v1: none) |
+
+`gracePeriodMonths` با `calendarSystem` شمرده می‌شود؛ `gracePeriodCount` در صورت پر بودن مقدم است.  
+Timestamp UTC برای `createdAt`؛ due/business جدا از clock.UTC.
 
 #### اگر `interestRatePeriod = 'monthly'` باشد
 
