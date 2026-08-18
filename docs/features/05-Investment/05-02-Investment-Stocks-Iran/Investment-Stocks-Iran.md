@@ -17,7 +17,7 @@
  - `feeAmount` فیلد Total و برای سازگاری با مدل قبلی **حذف نمی‌شود**.
  - `feeBrokerCommission` = کارمزد کارگزار.
  - `feeExchange` = کارمزد/هزینه بورس و ارکان بازار.
- - `feeTax` = مالیات.
+ - `feeTax` = **مالیات/عوارض به‌عنوان هزینه معامله** (transaction cost) — نه جایگزین `tax_records` / بدهی مالیاتی دوره‌ای (قرارداد در Tax-Management.md).
  - `feeOther` = سایر هزینه‌ها و کارمزدهای قابل گزارش.
  - برای تراکنش‌های جدید: `feeAmount = feeBrokerCommission + feeExchange + feeTax + feeOther`.
  - برای داده‌های قدیمی که Breakdown ندارند، `feeAmount` اصلی بدون تغییر حفظ می‌شود و اجزای Breakdown می‌توانند null/0 باشند؛ هیچ داده‌ای نباید حذف یا بازنویسی شود.

@@ -183,3 +183,21 @@ Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بع
 - همیشه جفت `(taxYear, taxCalendar)` ذخیره و فیلتر شود.
 - گزارش سالانه: `getAnnualTaxReport(taxYear, taxCalendar)`.
 - پیش‌فرض UI از تنظیمات `dateFormat` کاربر (`jalali`/`gregorian`) می‌آید ولی در رکورد snapshot می‌شود.
+
+---
+
+## feeTax در برابر Tax Liability
+
+| مفهوم | کجا | نقش حسابداری |
+|--------|-----|----------------|
+| **`feeTax` (سهام و مشابه)** | breakdown کارمزد معامله (`inv_stocks_*`) | **هزینه معامله / transaction cost** — وارد cost basis یا کاهش proceeds همان trade |
+| **`withholdingTaxAmount`** | metadata همان trade | مبلغ کسر در مبدأ (اغلب برابر یا جزئی از feeTax) — هنوز **نه** لزوماً `tax_records` |
+| **Tax liability / `tax_records`** | فیچر Tax | بدهی/تعهد مالیاتی کاربر برای دوره (اظهار، پرداخت `payTax`) |
+
+**ممنوع:** یکی فرض کردن «feeTax روی خرید سهام» با «بدهی مالیات سالانه در Tax Management».
+
+جریان درست:
+1. Trade ثبت می‌شود؛ `feeTax` در P&L/cost همان معامله اثر دارد.
+2. در صورت نیاز، taxable event metadata پر می‌شود.
+3. `tax_records` جدا ساخته/لینک می‌شود (`linkedTaxRecordId`) وقتی کاربر/قوانین بدهی دوره‌ای را ثبت می‌کند.
+4. پرداخت بدهی فقط از `payTax` — نه با دوبار شمردن feeTax به‌عنوان expense مالیات.
