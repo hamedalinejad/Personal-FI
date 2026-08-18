@@ -241,3 +241,11 @@ validate → temp DB → integrity → migrate if needed → verify → swap slo
 UI پیشرفت: مراحل visible؛ در صورت خطا main قبلی دست‌نخورده و پیام خطا.
 
 `createBackup` همیشه sidecar metadata (schemaVersion, appVersion, databaseId, createdAt, checksum) می‌نویسد.
+
+---
+
+## Persistent Storage (Settings)
+
+- کلید `persistentStorage`: `granted` | `denied` | `unknown`
+- API: `requestPersistentStorage()` → فراخوانی مجدد `navigator.storage.persist()` + ذخیره نتیجه
+- اگر denied: نمایش بنر و لینک `createBackup`؛ کپی متن راهنمای مرورگر (بدون وعده تضمین)
