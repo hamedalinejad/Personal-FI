@@ -352,3 +352,12 @@ await runAtomicFinancialOperation(async (tx) => { /* writes */ });
 await persist();
 domainEvents.emit('TransactionCreated', payload); // post-commit only
 ```
+
+---
+
+## Provider و App Result — شناسه یکسان
+
+- Adapter خروجی = `NormalizedPriceQuote` با **`instrumentId`** (نه فقط symbol).
+- `PriceFetchResult.succeeded[]` = همان فیلدهای کامل (قبلاً مستند شد).
+- `PriceFetchStarted.payload.instrumentIds` با نتیجه fetch هم‌تراز است.
+- `quoteType` مشترک: last | nav | close | mid | indicative | manual | other.

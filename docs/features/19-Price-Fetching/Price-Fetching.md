@@ -70,7 +70,7 @@
 1. هر منبع قیمت (Provider) به‌صورت مستقل در `price_sources` تعریف می‌شود؛ هر نماد می‌تواند از چند منبع قیمت بگیرد (مثلاً BTC هم از منبع A هم از منبع B).
 2. دریافت از API همیشه با اراده کاربر شروع می‌شود — یا با کلیک دستی، یا (در صورت فعال بودن) با تایمر Auto-Sync که خودِ کاربر روشنش کرده. **هیچ حالت سومی وجود ندارد.**
 3. هر بار دریافت **معتبر** (پس از Domain Validation )، یک رکورد جدید در `price_history` اضافه می‌شود (Append-Only) — قیمت‌های قبلی overwrite/حذف نمی‌شوند.
-4. آخرین قیمت از `getLatestPrice(symbol, targetCurrency?)` خوانده می‌شود: جدیدترین رکورد معتبر `price_history` (نه میانگین). خروجی **همیشه** شامل `fetchedAt`, `priceAgeMs`, `isStale`, `staleAfterMs` است — هرگز «قیمت ۳ روزه» را بدون برچسب stale به‌عنوان current خام ارائه ندهد.
+4. آخرین قیمت از `getLatestPrice({ assetCategory, instrumentId, priceCurrency?, quoteMarket?, sourceId? })` خوانده می‌شود: جدیدترین رکورد معتبر `price_history` (نه میانگین). خروجی **همیشه** شامل `fetchedAt`, `priceAgeMs`, `isStale`, `staleAfterMs` است — هرگز «قیمت ۳ روزه» را بدون برچسب stale به‌عنوان current خام ارائه ندهد.
 4b. **Domain Validation قبل از ذخیره — اجباری در Application، نه فقط در Adapter**:
  قبل از INSERT در `price_history` همه این‌ها باید پاس شوند؛ در غیر این صورت نماد در `failed[]` با `failureKind='validation_error'` می‌رود و **چیزی نوشته نمی‌شود**:
  - `symbol` غیرخالی و مطابق شناسه داخلی دسته
@@ -329,7 +329,7 @@ UI / Auto-Sync
 ### مدیریت منبع و تاریخچه
 - `getAllSources(assetCategory?)`
 - `createSource(data)` / `updateSource(id, data)`
-- `getLatestPrice(symbol, targetCurrency?)` → آخرین قیمت معتبر + `{ price, priceCurrency, fetchedAt, priceAgeMs, staleAfterMs, isStale, sourceId, source }`. UI موظف است اگر `isStale` بود برچسب «قیمت قدیمی» نشان دهد.
+- `getLatestPrice({ assetCategory, instrumentId, priceCurrency?, quoteMarket?, sourceId? })` → آخرین قیمت معتبر + `{ price, priceCurrency, fetchedAt, priceAgeMs, staleAfterMs, isStale, sourceId, source }`. UI موظف است اگر `isStale` بود برچسب «قیمت قدیمی» نشان دهد.
 - `getPriceHistory(symbol, dateRange?)` → برای نمودار تاریخچه قیمت
 
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
@@ -647,3 +647,18 @@ Portfolio Value همیشه از همین policy — نه «آخرین ردیف �
 ## PriceFetchResult کامل
 
 هر آیتم `succeeded[]` حداقل: `instrumentId, price, priceCurrency, quoteMarket, sourceId, quoteType, marketDate?, fetchedAt` — Application حق ندارد این‌ها را از context بیرونی «حدس» بزند.
+
+---
+
+## یکپارچگی شناسه API قیمت (الزامی)
+
+| سطح | شناسه |
+|------|--------|
+| Public API | همیشه `assetCategory + instrumentId` (+ `quoteMarket` / `sourceId` در صورت نیاز) |
+| `price_history` | `instrumentId` |
+| `price_sync_settings` | کلید منطقی = `(scope, assetCategory, instrumentId)` — ستون legacy `symbol` فقط نمایش/مهاجرت |
+| Adapter ورودی | `instrumentId` + `providerSymbol` resolveشده |
+
+**Deprecated:** `getLatestPrice(symbol)` بدون category — فقط wrapper موقت که به registry resolve می‌کند و در log هشدار می‌دهد.
+
+`quoteType` یکسان در همه قراردادها: `'last' | 'nav' | 'close' | 'mid' | 'indicative' | 'manual' | 'other'`.
