@@ -396,3 +396,6 @@ COMMIT
 
 فقط `units += X` بدون income leg → Income گم می‌شود.  
 فقط income بدون purchase → cost basis خراب.
+
+### Dividend صندوق — Gross / Net
+همان قرارداد سهام: `grossDividend`, `withholdingTaxAmount`, `netDividend`؛ `totalAmount` = خالص دریافتی.

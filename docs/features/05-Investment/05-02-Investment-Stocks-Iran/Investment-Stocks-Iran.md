@@ -405,3 +405,17 @@ averageBuyPrice = qty>0 ? totalInvested/qty : 0
 ```
 
 **تست:** 1000 سهم → split 1:2 → qty=2000 و totalInvested همان؛ average نصف.
+
+### Dividend — Gross / Withholding / Net
+
+برای `type = 'dividend'`:
+
+| فیلد | معنی |
+|------|------|
+| `grossDividend` | سود ناخالص قبل از کسر |
+| `withholdingTaxAmount` | مالیات کسرشده در مبدأ (nullable) |
+| `netDividend` | مبلغ واریزی به نقد (`= gross - withholding` در صورت کسر) |
+| `totalAmount` | باید = `netDividend` (پول واقعی رسیده‌شده) مگر مستند خلاف |
+
+Journal: income روی gross یا net طبق سیاست محلی — پیش‌فرض پروژه: درآمد قابل‌گزارش = gross؛ cash = net؛ withholding جدا metadata (و در صورت ایجاد tax_record لینک، نه expense دوباره از feeTax).
+`isTaxableEvent=true` معمول برای dividend.

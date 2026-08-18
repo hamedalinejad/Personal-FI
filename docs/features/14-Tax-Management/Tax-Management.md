@@ -201,3 +201,17 @@ Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بع
 2. در صورت نیاز، taxable event metadata پر می‌شود.
 3. `tax_records` جدا ساخته/لینک می‌شود (`linkedTaxRecordId`) وقتی کاربر/قوانین بدهی دوره‌ای را ثبت می‌کند.
 4. پرداخت بدهی فقط از `payTax` — نه با دوبار شمردن feeTax به‌عنوان expense مالیات.
+
+### قانون ضد Double-Count feeTax و withholding
+
+```text
+feeTax              → فقط در breakdown کارمزد معامله و cost/P&L همان trade
+withholdingTaxAmount → همان مبلغ (یا جزئی از آن) برای metadata مالیاتی؛ کپی معنایی نه هزینه دوم
+```
+
+گزارش Expense/Tax:
+- **نباید** `Σ feeTax` را به‌عنوان «مالیات پرداخت‌شده» به `tax_records` اضافه کند.
+- گزارش مالیات دوره‌ای فقط از `tax_records` / `payTax`.
+- اگر `withholdingTaxAmount` پر است و برابر `feeTax` است → یک مبلغ اقتصادی؛ دو برچسب.
+
+در UI: feeTax زیر «هزینه معامله»؛ withholding فقط در بخش tax metadata / گزارش taxable events.
