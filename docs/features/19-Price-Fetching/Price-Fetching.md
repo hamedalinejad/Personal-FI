@@ -217,17 +217,24 @@ features/19-Price-Fetching/
 ```typescript
 /** پاسخ خام یک نماد پس از نرمال‌سازی Adapter — قبل از نوشتن در price_history */
 export interface NormalizedPriceQuote {
- symbol: string; // نماد داخلی سیستم (پس از normalizeSymbol)
- price: string; // decimal به‌صورت string
- priceCurrency: string; // ISO یا USDT / IRR
- fetchedAt: string; // ISO datetime معتبر
- rawSymbol?: string; // نماد اصلی Provider (برای دیباگ)
+  assetCategory: 'crypto' | 'stock' | 'fif' | 'metal';
+  instrumentId: string;       // canonical — نه symbol خام
+  providerSymbol: string;     // شناسه نزد Provider
+  market?: string;
+  quoteMarket: string;        // e.g. BTC-USDT
+  price: string;              // decimal string
+  priceCurrency: string;
+  quoteType: 'last' | 'nav' | 'close' | 'mid' | 'other';
+  marketDate?: string;        // YYYY-MM-DD when applicable
+  fetchedAt: string;          // ISO datetime UTC
+  sourceAdapterKey: string;
+  rawSymbol?: string;         // debug only
 }
 
 export interface ProviderFetchResult {
- succeeded: NormalizedPriceQuote[];
- failed: Array<{ symbol: string; reason: string }>;
- skipped: Array<{ symbol: string; reason: string }>;
+  succeeded: NormalizedPriceQuote[];
+  failed: Array<{ instrumentId?: string; providerSymbol?: string; reason: string }>;
+  skipped: Array<{ instrumentId?: string; reason: string }>;
 }
 
 /**
@@ -248,12 +255,12 @@ export interface PriceProviderAdapter {
  * خروجی: فقط NormalizedPriceQuote — نه JSON خام Provider.
  */
  fetchPrices(
- symbols: string[],
+ refs: Array<{ instrumentId: string; providerSymbol?: string; market?: string; quoteMarket?: string }>,
  options?: { apiKey?: string; signal?: AbortSignal }
  ): Promise<ProviderFetchResult>;
 
- /** تبدیل نماد داخلی ↔ نماد Provider (دو طرفه در صورت نیاز) */
- normalizeSymbol(symbol: string, direction: 'toProvider' | 'toInternal'): string;
+ /** map instrumentId / providerSymbol */
+ normalizeSymbol(instrumentIdOrSymbol: string, direction: 'toProvider' | 'toInternal'): string;
 
  /**
  * استخراج و اعتبارسنجی قیمت از payload خام یک آیتم.
