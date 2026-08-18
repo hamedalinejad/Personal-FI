@@ -205,7 +205,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
 | `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — Should Have |
 | `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی void/reversal/repair/import/restore — **Must Have** |
-| `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف بررسی یکپارچگی قبل از archive والد — Should Have |
+| `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف detect→quarantine→reconcile→repair — **Must Have** |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
 
@@ -717,7 +717,7 @@ actorId, source, reason, payloadSummary, createdAt
 FK واقعی SQLite ممکن نیست؛ mitigations **لایه‌ای**:
 
 1. **Validate همزمان با INSERT** (داخل همان BEGIN atomic): وجود ردیف هدف؛ وگرنه COMMIT نشود.
-2. **جدول `ref_integrity_queue` (اختیاری v1 / Should Have)**: اگر حذف منطقی parent لازم شد، قبل از archive، child links بررسی شوند (RESTRICT منطقی).
+2. **جدول `ref_integrity_queue` (Must Have)**: مسیر یکپارچگی اجباری — نه قابلیت جانبی.
 3. **Reconcile اجباری در مسیرهای حساس**: قبل از Backup و بعد از Restore، `reconcileOrphanLinks` برای `acc_transactions` و سایر polymorphic tables.
 4. **ممنوع DELETE فیزیکی** parent تا وقتی child link دارد (هم‌راستا با ON DELETE RESTRICT روی FKهای واقعی).
 5. تست integration: حذف/void والد نباید child را بی‌سرپرست رها کند بدون گزارش.
@@ -946,3 +946,69 @@ Repair فقط API صریح با flag کاربر؛ تست‌ها Repair را جد
 
 فیلدهای حداقل: `id, at, action, actor (local user/device), operationId, entityType, entityId, beforeSummary, afterSummary, calculationVersion?`  
 بدون payload حاوی API key. حذف فیزیکی audit ممنوع.
+
+---
+
+## Integrity Pipeline (Must Have)
+
+```text
+detect (reconcile / FK validate / orphan scan)
+  → quarantine (flag entity: integrityStatus=suspect؛ جلوگیری از archive/delete خام)
+  → reconcile (گزارش expected/actual/delta)
+  → repair (صریح کاربر؛ transactional)
+  → audit (fin_audit_log)
+```
+
+`ref_integrity_queue` ردیف‌ها: `{ id, entityType, entityId, issueCode, detectedAt, status: open|quarantined|repaired|dismissed, operationId? }`.
+
+Archive والد فقط اگر صف open برای children خالی باشد یا RESTRICT.
+
+---
+
+## Reconciliation Engine مرکزی
+
+ماژول `core/reconciliation/` — فیچرها فقط adapter می‌نویسند، نه engine جدا.
+
+```typescript
+interface ReconcileContext {
+  scope: ReconcileScope;
+  targetId: string;
+  operationId?: string;
+}
+
+interface ReconcileResult {
+  target: string;
+  ok: boolean;
+  expected: string; // decimal or structured JSON string
+  actual: string;
+  delta: string;
+  source: 'domain_ledger' | 'cash_ledger' | 'journal' | 'mixed';
+  repairStrategy: 'none' | 'rebuild_snapshot_from_ledger' | 'manual';
+  severity: 'info' | 'warning' | 'critical';
+  details?: string;
+  calculationVersion?: string;
+}
+
+interface ReconcileAdapter {
+  scope: ReconcileScope;
+  computeExpected(id: string): Promise<string>;
+  readActual(id: string): Promise<string>;
+  repair?(id: string, ctx: ReconcileContext): Promise<void>; // فقط از engine
+}
+```
+
+`reconcileAll` = اجرای همه adapterهای ثبت‌شده.
+
+### Repair Transactional + Audited
+```text
+BEGIN
+  validate target + pre-reconcile snapshot
+  rebuild from ledger (Domain SoT)
+  post-verify reconcile ok
+  INSERT fin_audit_log (action=repair, before/after, calculationVersion)
+  clear/update ref_integrity_queue
+COMMIT
+→ persist
+→ سپس post-commit events
+```
+ممنوع: UPDATE snapshot بدون verify و audit.
