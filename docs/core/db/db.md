@@ -204,7 +204,7 @@ sql.js کل دیتابیس را در حافظه نگه می‌دارد؛ برا�
 | `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only؛ دستی یا از API) |
 | `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
 | `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — Should Have |
-| `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی برای void/reversal/repair — Should Have |
+| `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی void/reversal/repair/import/restore — **Must Have** |
 | `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف بررسی یکپارچگی قبل از archive والد — Should Have |
 
 ## فراهم کردن دسترسی یکپارچه به داده‌ها
@@ -694,7 +694,7 @@ Immutable transaction کافی نیست؛ برای عملیات حساس بای�
 | `source` | بله | `ui` \| `import` \| `system` \| `migration` \| `api` |
 | `reason` | برای void/reversal/repair | متن کوتاه دلیل |
 
-### جدول اختیاری `fin_audit_log` (Should Have قوی)
+### جدول `fin_audit_log` (**Must Have**)
 
 ```text
 id, operationId, action, entityTable, entityId,
@@ -935,3 +935,14 @@ Repair فقط API صریح با flag کاربر؛ تست‌ها Repair را جد
 
 ### Reversal و Journal
 هر reverse دامنه باید در همان BEGIN/COMMIT یا journalهای `operationId` اصلی را void کند یا entryهای معکوس با `reversesOperationId` بنویسد. Snapshot rebuild بعد از هر دو.
+
+### قرارداد Must-Have Audit
+حداقل رویدادهای اجباری در `fin_audit_log`:
+- void / reversal هر تراکنش مالی
+- repair snapshot / rebuild
+- import و restore backup
+- تغییر تنظیمات امنیتی و `baseCurrency`
+- create/void journal operation
+
+فیلدهای حداقل: `id, at, action, actor (local user/device), operationId, entityType, entityId, beforeSummary, afterSummary, calculationVersion?`  
+بدون payload حاوی API key. حذف فیزیکی audit ممنوع.
