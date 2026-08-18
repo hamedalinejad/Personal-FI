@@ -95,7 +95,7 @@
 - `getRateHistory(fromCode, toCode, startDate, endDate)` → تاریخچه نرخ
 
 ### Utility APIs
-- `convert(amount, fromCurrency, toCurrency)` → تبدیل مبلغ (نرخ مستقیم، معکوس یا از طریق USDT به‌عنوان ارز واسط پیدا می‌شود)
+- `convert(amount, fromCurrency, toCurrency, asOf?)` → تبدیل؛ **بدون asOf فقط برای نمایش جاری**؛ گزارش تاریخی **باید** asOf یا نرخ قفل‌شده تراکنش را بدهد
 - `getRatesForCurrency(currencyCode)` → نرخ‌های مرتبط با یک ارز
 
 ### Preference APIs
@@ -264,3 +264,17 @@ convertChain(amount, [c1,c2,...,cn], asOf) =
 | نقش | واحد اندازه‌گیری مبلغ | آنچه نگه داشته/معامله می‌شود |
 
 موجودی «USDT روی صرافی» = Holding روی **Asset** با quote/settlement در **Currency** USDT.
+
+---
+
+## Conversion Path Audit
+
+علاوه بر `exchangeRateToBase` (نرخ نهایی قفل‌شده):
+
+| فیلد اختیاری/توصیه | نقش |
+|---------------------|------|
+| `conversionPath` | JSON: `[{from,to,rate,asOf,source}]` برای هر leg |
+| `rateId` | FK به ردیف `cur_rates` در صورت وجود |
+
+برای زنجیره BTC→USDT→IRR هر leg در path ذخیره می‌شود تا بازسازی تاریخی ممکن باشد.  
+حداقل v1: `exchangeRateToBase` + `asOf` روی تراکنش اجباری؛ path برای multi-hop Should Have قوی / Must وقتی >1 leg.

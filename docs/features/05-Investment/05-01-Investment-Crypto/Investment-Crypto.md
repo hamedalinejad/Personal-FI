@@ -1088,3 +1088,29 @@ realizedPL = 0
 - ممنوع: ثبت disposal با `unitPrice = market` فقط به‌خاطر transfer
 
 همین اصل برای جابه‌جایی سهام بین کارگزاری‌های خود کاربر (در صورت پشتیبانی) و فلز بین پلتفرم‌های خودی صدق می‌کند مگر documentation صریح خلاف بگوید.
+
+---
+
+## feeInBase و baseCurrency دلخواه
+
+```text
+feeInBase = convert(feeAmount, feeCurrency → user.baseCurrency, asOf=tx time)
+```
+
+**ممنوع:** فرض «اگر USDT است و IRR است پس نرخ خاص» به‌عنوان تنها مسیر.  
+`feeAssetPriceToBase` / هر نرخ کمکی فقط cache همان convert است و برای **هر** جفت (USDT→EUR، BTC→USD، …) معتبر است.
+
+---
+
+## Reversal انتقال با Fee
+
+اگر transfer:
+```text
+out = gross, in = net, feeQty = gross - net (burn)
+```
+Reversal atomic باید:
+1. void/معکوس out و in
+2. **بازگرداندن fee burn** به quantity مبدأ (یا leg صریح `fee_reversal`) تا Σ quantity به state پیش از transfer برگردد
+3. journal معکوس fee
+
+بدون leg کارمزد، state اولیه بازیابی نمی‌شود.
