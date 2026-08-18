@@ -44,3 +44,9 @@
 | `services/` | سرویس‌های زیرساختی: ارز، EventBus، Storage، VersionCheck، Logger | `docs/core/services/services.md` |
 | `types/` | TypeScript Types مشترک: TransactionType، RelatedFeature، AppEvent، AssetCategory | `docs/core/types/types.md` |
 | `rounding/` | **سیاست گرد کردن اعداد — Critical Cross-Cutting** | `docs/core/rounding/Rounding-Policy.md` |
+
+## اسناد Domain مشترک
+- `Cost-Basis-Engine.md` — موتور واحد cost basis برای همه Investmentها
+- `db.md` — journal، reconcile، fixtures عددی
+- `rounding/Rounding-Policy.md` — precision
+- `types/types.md` — انواع مشترک
