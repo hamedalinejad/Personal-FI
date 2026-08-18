@@ -253,3 +253,48 @@
 - `priceAsOf = marketDate ?? fetchedAt` (اولویت marketDate برای stock/fif)
 - UI مجموع ثروت را با توضیح «بر اساس قیمت‌های as-of مختلط» نشان می‌دهد اگر تاریخ‌ها یک روز نیستند
 - ممنوع نمایش NAV دیروز به‌عنوان «قیمت لحظه‌ای امروز» بدون برچسب
+
+---
+
+## Portfolio Engine — Source of Truth
+
+```text
+Portfolio / Net Worth  =  f( live inputs )  —  هرگز port_snapshots به‌عنوان SoT
+```
+
+| ورودی | منبع حقیقت |
+|--------|------------|
+| holdings qty/cost | Domain ledgers + CostBasisEngine |
+| price | getLatestPrice (policy) |
+| FX | convert(..., asOf) |
+| bank cash | acc_transactions rebuild |
+| brokerage/platform cash | ledger نقدی همان فیچر |
+| liabilities | ln_loans remaining (+ سایر بدهی‌ها) |
+
+`port_snapshots` فقط **cache/projection تاریخی** برای نمودار است؛ rebuild از ورودی‌های بالا.  
+گزارش‌ها حق ندارند فقط از آخرین snapshot بخوانند مگر با برچسب «cached as-of».
+
+---
+
+## فرمول Net Worth (اجباری)
+
+```text
+Assets =
+  Σ bank balances (acc, base currency)
+  + Σ crypto holdings × price ( + exchange cash if includeCashInWealth )
+  + Σ stock holdings × price ( + brokerage cash if includeCashInWealth )
+  + Σ fund units × mark (nav or redemption mode)
+  + Σ metals × price
+  + Σ physical assets valuation
+  + other receivables if modeled
+
+Liabilities =
+  Σ loan remainingBalance (borrowed)
+  + credit card / debt payables if modeled
+  − (optional) exclude loans where user is lender / receivable side tracked as asset
+
+NetWorth = Assets − Liabilities
+```
+
+**ممنوع:** برچسب «Net Worth» برای فقط جمع دارایی‌ها بدون کسر بدهی.  
+UI باید `totalAssets`, `totalLiabilities`, `netWorth` را جدا نشان دهد.
