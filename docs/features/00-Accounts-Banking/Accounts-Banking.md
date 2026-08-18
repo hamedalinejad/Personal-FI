@@ -104,3 +104,26 @@
 - همه مبالغ `string` decimal در مرز TypeScript
 - `PRAGMA foreign_keys = ON`
 - تست: transfer atomic؛ void؛ archive با balance غیرصفر باید fail شود
+
+---
+
+## انتقال بین حساب‌ها — Accounting-neutral
+
+`Bank A → Bank B` فقط **تغییر محل دارایی** است.
+
+| مجاز | ممنوع |
+|------|--------|
+| دو ردیف cash ledger (transfer-out / transfer-in) | `inc_transactions` / `exp_transactions` |
+| journal با `entryKind=transfer` و `accountClass=cash` | ثبت به‌عنوان Income یا Expense |
+| fee جدا (اگر کارمزد بانک) → `entryKind=fee` / expense fee | شمردن اصل مبلغ انتقال در گزارش درآمد/هزینه |
+| Σ amountInBase debit=credit روی cash | Realized P&L / profit از انتقال |
+
+```text
+Dr cash (B)   amount
+Cr cash (A)   amount
+// optional fee:
+Dr trading_fee or bank_fee   fee
+Cr cash (A or B)             fee
+```
+
+گزارش‌های `getTotalIncome` / `getTotalExpense` **هرگز** typeهای transfer را جمع نمی‌کنند.

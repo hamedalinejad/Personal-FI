@@ -1182,3 +1182,10 @@ Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و 
 | `loan_penalty` | cap scope lifetime vs per installment | |
 
 **قانون:** تا این fixtureها در CI سبز نباشند، مسیر مالی «تأییدشده» اعلام نشود. مستند به‌تنهایی bug runtime را close نمی‌کند.
+
+### Invariant: Transfer Accounting-neutral
+
+هر `entryKind = transfer` (جابه‌جایی بین حساب‌های خود کاربر یا معادل asset-location):
+- نباید در totals درآمد/هزینه ظاهر شود
+- نباید `accountClass` برابر `income` یا `expense` برای اصل مبلغ باشد
+- Journal Engine / validate قبل از COMMIT این را enforce می‌کند
