@@ -988,4 +988,36 @@ COMMIT → persist → UI success
 2. SELL + realized PL  
 3. Transfer با fee 0.001 از asset (کل موجودی کاربر کم می‌شود)  
 4. C2C با gross/net روی BUY leg  
-5. USDT-ERC20 vs USDT-TRC20 دو holding جدا  
+5. USDT-ERC20 vs USDT-TRC20 دو holding جدا
+
+---
+
+## Canonical Crypto Asset Registry
+
+مدل مرکزی (جدول پیشنهادی `inv_crypto_assets` یا registry در Domain):
+
+| فیلد | نقش |
+|------|-----|
+| `assetId` (internal UUID) | هویت منطقی «دارایی» در سیستم |
+| `symbol` | فقط label (USDT, BTC) |
+| `standard` | مثلاً ERC20 / TRC20 / native |
+| `chainId` | شناسه زنجیره |
+| `contractAddress` | nullable برای native |
+| `assetKey` | `chainId:contract` یا `chainId:native:SYMBOL` — **کلید یکتا** |
+
+Holding:
+```text
+holding → assetKey (FK منطقی) + exchangeId + networkId?
+USDT-TRC20 و USDT-ERC20 = دو assetKey متفاوت = دو holding مجاز
+```
+
+### جداسازی Asset / Network / Address
+| مفهوم | جدول/فیلد |
+|--------|-----------|
+| Asset | assetKey / registry |
+| Network | `inv_crypto_wallet_networks` / chainId |
+| Address | `inv_crypto_wallet_addresses` |
+| Transfer validation | from/to network + assetKey سازگار؛ txHash per network |
+
+Deposit/Withdraw/Transfer **بدون** networkId معتبر (برای on-chain) رد می‌شوند.
+قیمت‌گیری و P&L همیشه روی `assetKey` نه `symbol` خام.
