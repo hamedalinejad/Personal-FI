@@ -377,3 +377,42 @@ Handler isolation (اجباری در implementation):
 handlers.forEach(h => { try { h(payload); } catch (e) { logger.error(e); } });
 ```
 یک handler throw نباید بقیه یا caller مالی را بشکند. تا تست این isolation نباشد، invariant فقط قراردادی است.
+
+---
+
+## Accounting type در برابر Domain type
+
+| لایه | نام | کجا |
+|------|-----|-----|
+| **AccountingTransactionType** | `TransactionType` در core | فقط `acc_transactions.type` |
+| **DomainEventType / domain tx type** | enum فیچر | `inv_crypto_transactions.type`, `ln_transactions.type`, … |
+
+Mapping هنگام ساخت cash leg:
+```text
+domain buy crypto → ممکن است acc type = withdrawal-investment یا مشابه از TransactionType
+domain installment_payment → acc type از enum مرکزی cash
+```
+Feature **حق ندارد** مقدار آزاد در `acc_transactions.type` بنویسد خارج از `TransactionType`.  
+Domain typeها در Union مرکزی حسابداری duplicate نمی‌شوند.
+
+---
+
+## چهار لایه Event
+
+| لایه | Bus | ماندگاری | مثال |
+|------|-----|----------|------|
+| Domain Event | DomainEventBus | in-memory؛ بعد از **persisted** | TransactionCreated |
+| Application Event | ApplicationEventBus | in-memory | PriceFetchCompleted |
+| Persisted Audit | `fin_audit_log` | DB | repair, restore, void |
+| UI Event | local component / app bus سبک | — | toast, sheet close |
+
+EventBus **جایگزین audit DB نیست**.  
+`emit` sync است: handlerها باید **سبک** باشند (invalidate query، UI).  
+reconcile / گزارش / serialize → **Worker یا queue**؛ ممنوع داخل handler sync سنگین.
+```ts
+emit(type, payload) {
+  for (const h of handlers[type]) {
+    try { h(payload); } catch (e) { logger.error(sanitize(e)); }
+  }
+}
+```

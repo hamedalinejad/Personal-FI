@@ -1240,3 +1240,35 @@ Dr expense/fee  feeAmount
 
 ### Transfer — دروازه اجرا
 قانون accounting-neutral در مستند است؛ **تا fixture `bank_transfer_neutral` در CI سبز نشود**، feature transfer «تأییدشده» اعلام نمی‌شود (همان مرز docs vs runtime).
+
+---
+
+## مدل مرکزی SoT (یکجا — بر همه feature docs مقدم است)
+
+| داده | نقش | mutable؟ | چگونه به‌روز می‌شود |
+|------|-----|----------|---------------------|
+| Domain ledger (`inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, …) | **SoT جزئیات دامنه** | فقط append + void/reversal | atomic op |
+| Cash ledger (`acc_transactions`) | **SoT پول بانکی** | همان | فقط وقتی bank cash جابه‌جا شود |
+| Journal (`fin_journal_entries`) | **SoT میان‌فیچری / audit دوطرفه** | append + void | هر atomic op |
+| Snapshot (holding qty, currentBalance, remainingBalance, …) | **Projection** | بله | **فقط** از خروجی یک محاسبه از ledger در همان op یا rebuild — نه «حقیقت موازی» |
+| port_snapshots | cache تاریخی UI | بله | derived |
+
+**قانون:** در یک گزارش، برای یک متریک فقط **یک** ستون SoT خوانده می‌شود. Snapshot هرگز expected در reconcile نیست.
+
+جریان نوشتن (تکرار الزامی):
+```text
+validate → domain rows → journal → acc (if cash) → derive snapshots from same numbers → COMMIT → persist → emit
+```
+
+### Polymorphic — enforceable application contract
+
+```text
+registry: RelatedFeature → { table, idColumn }
+before COMMIT:
+  assert relatedFeature ∈ RelatedFeature enum
+  assert EXISTS (SELECT 1 FROM registry[relatedFeature].table WHERE id = relatedId)
+  else reject op
+reconcileOrphans() scheduled + on demand
+```
+
+بدون این validate، نوشتن related* ممنوع است. FK SQL روی polymorphic ممکن نیست — این جایگزین اجباری است.
