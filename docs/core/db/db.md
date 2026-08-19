@@ -1272,3 +1272,44 @@ reconcileOrphans() scheduled + on demand
 ```
 
 بدون این validate، نوشتن related* ممنوع است. FK SQL روی polymorphic ممکن نیست — این جایگزین اجباری است.
+
+---
+
+## Persist State Machine
+
+`db_meta.persistState` یکی از:
+
+| State | معنی |
+|-------|------|
+| `IDLE` | main معتبر؛ pending خالی |
+| `PREPARED` | serialize+checksum آماده |
+| `PENDING_WRITTEN` | `db_pending` نوشته شده |
+| `MAIN_BACKED_UP` | `db_backup` ← کپی main قبلی |
+| `SWAPPED` | main ← pending در یک IDB transaction |
+| `VERIFIED` | checksum/meta با main match |
+| `COMPLETED` | = IDLE پس از پاک کردن pending |
+| `RECOVERY` | boot در حال انتخاب main/backup/pending |
+
+قوانین:
+1. گام‌های `PENDING_WRITTEN` → `MAIN_BACKED_UP` → `SWAPPED` در **یک** IDB transaction تا حد ممکن (یا flagهای durable بین steps).
+2. Crash در `PENDING_WRITTEN`: main سالم؛ pending دور انداخته یا validate جدا.
+3. Crash در `SWAPPED` قبل از VERIFIED: boot با integrity_check روی main.
+4. UI Saved فقط در `COMPLETED`.
+
+### رشد حجم sql.js
+با رشد price_history/transactions: Worker serialize، debounce غیرمالی، و در آینده partition اختیاری history — v1 همان full blob با state machine بالا.
+
+### Backup سلامت
+Backup/Recovery **همیشه**:
+```text
+checksum match
++ PRAGMA integrity_check = 'ok'
++ schemaVersion سازگار یا migratable
++ required tables present
+```
+فقط checksum کافی نیست.
+
+### Backup به‌عنوان قابلیت اصلی محصول
+- Onboarding: الزام به درک backup
+- Dashboard: وضعیت آخرین backup + CTA
+- نه فقط مدفون در Settings
