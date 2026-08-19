@@ -268,7 +268,7 @@ $ \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} \
 سرمایه‌گذاری مجدد سود به صورت تراکنش reinvest ثبت و واحد جدید به Holding اضافه می‌شود.
 این زیر‌فیچر مخصوص صندوق‌های درآمد ثابت ایران است.
 
-> **Tax metadata**: تراکنش‌های این فیچر فیلدهای مشترک مالیاتی (`isTaxableEvent`, cost basis/proceeds/realizedGain, `taxYear`, …) را طبق قرارداد `Tax-Management.md` دارند تا محاسبه مالیات بعدی بدون از دست رفتن داده ممکن باشد.
+> **Tax:** فقط `linkedTaxEventId` به `tax_events`. فیلدهای metadata محلی deprecated. Reversal/correction صندوق = `core.reverseOperation(operationId)` نه void تنها.
 
 > **exchangeRateToBase**: همیشه نرخ ارز تراکنش → `baseCurrency` کاربر است، نه الزاماً ریال/تتر. قرارداد در `Currency-CrossRate.md`.
 

@@ -107,7 +107,8 @@
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
-- **Tax metadata**: `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount` (هم‌راستا با `feeTax`), `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — قرارداد کامل در `Tax-Management.md`
+- **Tax (canonical):** `linkedTaxEventId` → `tax_events.id` (SoT در Tax-Management)
+- **Tax legacy (deprecated, read-only migrate):** `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount`, `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — کد جدید فقط linkedTaxEventId می‌نویسد
 
 **Invariant جدید:**
 
