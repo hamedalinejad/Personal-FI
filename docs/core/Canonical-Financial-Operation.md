@@ -191,8 +191,15 @@ emit only if persisted
 | `failed` | validate/write/persist خطا | خطا + retry |
 | `recovered` | پس از recovery state machine | optional banner |
 
-ذخیره اختیاری: `fin_operations.status`.  
-**Invariant:** UI و DomainEvent فقط روی `persisted` قطعی‌اند.
+ذخیره **اجباری** روی `fin_operations.status` (نه optional).
+
+| وضعیت persist fail | status |
+|--------------------|--------|
+| SQL OK، IDB fail | `committed` بماند + flag `persistError`؛ retry persist؛ UI «ثبت موقت / همگام‌سازی نشده» |
+| پس از retry موفق | `persisted` |
+| غیرقابل بازیابی | `failed` + audit |
+
+**Invariant:** UI «ثبت قطعی» و DomainEvent فقط روی `persisted`.
 
 ---
 
@@ -205,9 +212,12 @@ Balance **همیشه** روی `amountInBase` (همان `baseCurrencyAtOperation`
 | lineKind (memo یا accountClass) | نقش |
 |----------------------------------|------|
 | `asset` / `cash` / … | حرکت دارایی/نقد |
-| `fx_conversion` | تفاوت تبدیل بین دو ارز (balancing در base) |
-| `fx_rounding` | باقیمانده گرد کردن تا Σ debit=credit در base |
-| `valuation_adj` | فقط گزارش mark-to-market — **نه** داخل cost basis trade مگر صریح |
+| `fx_rounding` | فقط residual گرد کردن تا Σ amountInBase متعادل شود — **نه** سود/زیان اقتصادی |
+| `fx_conversion` | technical balancing وقتی دو ارز در یک op هستند و مبالغ base از قبل از rates قفل‌شده آمده‌اند — **نه** automatically FX gain |
+| `fx_gain` / `fx_loss` | فقط وقتی economic event صریح است (تسویه ارز، بستن position ارزی، revaluation policy کاربر) |
+| `valuation_adj` | mark-to-market گزارش — خارج از cost basis trade مگر صریح |
+
+**قانون:** اختلاف base ناشی از round → فقط `fx_rounding`. اختلاف ناشی از دو rate مختلف در یک op بدون event اقتصادی → بررسی bug plan؛ نه ثبت خودکار fx_gain.
 
 ### مثال: خرید BTC با USD (base=IRR)
 ```text
@@ -267,7 +277,7 @@ Command مشترک همه Investmentها:
 - CostBasisEngine: `acquisition` با cost = costBasis تبدیل‌شده به costCurrency pool
 - Journal **اجباری**:
   - asset/holding: `Dr asset` amountInBase = cost in base
-  - offset: `Cr opening_equity` (migration/opening_balance) **یا** `Cr income` (gift/airdrop/income) طبق economicKind
+  - offset journal طبق جدول policy زیر (deterministic — Feature تفسیر آزاد ندارد)
   - bank opening: `Dr cash` / `Cr opening_equity`
   - loan outstanding borrowed: `Dr opening_equity` / `Cr loan_liability` (یا معکوس برای lent)
 - **ممنوع:** بدون journal offset (asset بدون equity/income)
@@ -342,3 +352,28 @@ caOperation: { sources: instrumentId[], targets: instrumentId[], ratios, cashLeg
 one-to-one | one-to-many | many-to-one
 atomic under one operationId
 ```
+
+### Opening economicKind policy (canonical)
+
+| economicKind | cost basis | Journal credit | Tax event |
+|--------------|------------|----------------|-----------|
+| `opening_balance` / `migration_import` | user-entered | `opening_equity` | معمولاً نه |
+| `gift` | 0 یا FMV از settings `giftCostBasisMode` | اگر FMV>0 و income mode: `income`; وگرنه `opening_equity` | optional gift tax event |
+| `airdrop` | 0 یا FMV (`airdropIncomeMode`) | **`income`** اگر FMV به‌عنوان درآمد؛ وگرنه equity | taxable event اگر income |
+| `unknown` | **الزامی user cost** | `opening_equity` | نه تا classify |
+
+تنظیمات سراسری در Settings: `giftCostBasisMode: 'zero' | 'fmv'`, `airdropIncomeMode: 'income_fmv' | 'zero_basis'`.
+
+## Tax Event + Reversal
+
+```text
+reverseOperation(op)
+  → TaxAdapter.onDomainReversal(op):
+       if tax_events linked:
+         voidTaxEvent(id) OR insert reverseTaxEvent + link reversesTaxEventId
+         status active → voided
+  → reports exclude voided
+```
+
+API: `voidTaxEvent`, `reverseTaxEvent`, `recalculateTaxEvent` (فقط با operation جدید audited).  
+Tax event active روی reversed source operation **نمی‌ماند**.

@@ -228,3 +228,8 @@ investment tx: linkedTaxEventId? (nullable)
 ```
 
 SoT بدهی/رویداد مالیاتی = Tax feature. Investment فقط reference + حداقل فیلدهای لازم cost/proceeds برای محاسبه.
+
+### Lifecycle با Domain Reversal
+- `sourceOperationId` روی `tax_events`
+- با `reverseOperation`: `voidTaxEvent` یا `reverseTaxEvent` (immutable audit)
+- گزارش سال: `WHERE status = active` (voided حذف)
