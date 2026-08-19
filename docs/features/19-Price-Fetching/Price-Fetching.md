@@ -719,3 +719,24 @@ API Key فقط در Session Storage است → با بستن tab از بین م�
 | UX | در Settings: «برای auto-sync کلید را بعد از هر باز کردن اپ دوباره وارد کنید» |
 
 نسخه بعدی (اختیاری): encrypted remember با تأیید صریح کاربر — خارج از v1 الزام.
+
+---
+
+## PriceInstrumentIdentity مرکزی
+
+```ts
+// همه دسته‌ها:
+{ assetCategory, instrumentId }
+// mapping به provider فقط در Adapter/Holding:
++ providerSymbol?, market?, quoteMarket?
+```
+
+| دسته | instrumentId |
+|------|----------------|
+| crypto | assetKey |
+| stock | ISIN/UUID پایدار |
+| fif | fundId |
+| metal | `{metalType}_{purity}` |
+
+Feature فقط mapping می‌دهد؛ Core/getLatestPrice فقط `assetCategory+instrumentId` می‌شناسد.  
+types.md و این سند **همان** NormalizedPriceQuote / fetchPrices(refs) را دارند — symbol-array حذف شده.

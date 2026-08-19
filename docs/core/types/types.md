@@ -194,33 +194,45 @@ export interface CachedPrice {
   isStale: boolean;
 }
 
-// --- Provider Adapter Contract — تعریف کامل رفتاری در Price-Fetching.md ---
-// NormalizedPriceQuote کامل در Price-Fetching.md — اینجا فقط re-export مفهومی
-export type { /* see Price-Fetching NormalizedPriceQuote with instrumentId */ };
-
-
-export interface ProviderFetchResult {
- succeeded: NormalizedPriceQuote[];
- failed: Array<{ symbol: string; reason: string; failureKind?: PriceFailureKind; httpStatus?: number }>;
- skipped: Array<{ symbol: string; reason: string }>;
+// --- Provider Adapter — SoT مشترک با Price-Fetching.md ---
+export interface NormalizedPriceQuote {
+  assetCategory: AssetCategory;
+  instrumentId: string;
+  providerSymbol: string;
+  market?: string;
+  quoteMarket: string;
+  price: string;
+  priceCurrency: string;
+  quoteType: 'last' | 'nav' | 'close' | 'mid' | 'indicative' | 'manual' | 'other';
+  marketDate?: string;
+  fetchedAt: string;
+  sourceAdapterKey: string;
+  rawSymbol?: string;
 }
 
-// مرز عمومی اپ فقط PriceFetchResult است.
-// ProviderFetchResult خروجی خام Adapter است؛ Application آن را به PriceFetchResult نگاشت می‌کند.
-// Crypto/Stocks wrappers نباید نوع سومی با Decimal class در public API تعریف کنند.
+export interface PriceInstrumentRef {
+  assetCategory: AssetCategory;
+  instrumentId: string;
+  providerSymbol?: string;
+  market?: string;
+  quoteMarket?: string;
+}
+
+export interface ProviderFetchResult {
+  succeeded: NormalizedPriceQuote[];
+  failed: Array<{ instrumentId?: string; providerSymbol?: string; reason: string; failureKind?: PriceFailureKind; httpStatus?: number }>;
+  skipped: Array<{ instrumentId?: string; reason: string }>;
+}
 
 export interface PriceProviderAdapter {
- readonly adapterKey: string;
- readonly supportedAssetCategories: AssetCategory[];
- readonly maxBatchSize: number;
- fetchPrices(
- symbols: string[],
- options?: { apiKey?: string; signal?: AbortSignal }
- ): Promise<ProviderFetchResult>;
- normalizeSymbol(symbol: string, direction: 'toProvider' | 'toInternal'): string;
- normalizePrice(rawItem: unknown): string | null;
- validateTimestamp(rawItem: unknown): string | null;
- validateCurrency(rawItem: unknown): string | null;
+  readonly adapterKey: string;
+  readonly supportedAssetCategories: AssetCategory[];
+  readonly maxBatchSize: number;
+  fetchPrices(refs: PriceInstrumentRef[], options?: { apiKey?: string; signal?: AbortSignal }): Promise<ProviderFetchResult>;
+  normalizeSymbol(instrumentIdOrSymbol: string, direction: 'toProvider' | 'toInternal'): string;
+  normalizePrice(rawItem: unknown): string | null;
+  validateTimestamp(rawItem: unknown): string | null;
+  validateCurrency(rawItem: unknown): string | null;
 }
 ```
 
