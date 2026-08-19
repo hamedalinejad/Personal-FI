@@ -229,6 +229,11 @@ export interface PriceProviderAdapter {
   readonly supportedAssetCategories: AssetCategory[];
   readonly maxBatchSize: number;
   fetchPrices(refs: PriceInstrumentRef[], options?: { apiKey?: string; signal?: AbortSignal }): Promise<ProviderFetchResult>;
+  /**
+   * Map instrumentId ↔ providerSymbol.
+   * Public path: always pass instrumentId; providerSymbol از Holding/mapping.
+   * String که فقط display symbol است = migration-only fallback — نه Domain path جدید.
+   */
   normalizeSymbol(instrumentIdOrSymbol: string, direction: 'toProvider' | 'toInternal'): string;
   normalizePrice(rawItem: unknown): string | null;
   validateTimestamp(rawItem: unknown): string | null;
@@ -428,3 +433,10 @@ emit(type, payload) {
   }
 }
 ```
+
+### PriceInstrumentRef semantics
+- `instrumentId` اجباری
+- `providerSymbol` / `market` / `quoteMarket` از mapping Holding یا registry
+- **FIF / NAV:** `quoteType` در نتیجه باید `nav` باشد؛ `marketDate` اجباری؛ `quoteMarket` می‌تواند `NAV` یا `fundId` documented باشد
+- Stock: معمولاً `quoteType=last|close` + market
+- Crypto: `quoteType=last` + `quoteMarket` مثل `BTC-USDT`

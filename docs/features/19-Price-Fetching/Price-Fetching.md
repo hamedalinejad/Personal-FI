@@ -740,3 +740,18 @@ API Key فقط در Session Storage است → با بستن tab از بین م�
 
 Feature فقط mapping می‌دهد؛ Core/getLatestPrice فقط `assetCategory+instrumentId` می‌شناسد.  
 types.md و این سند **همان** NormalizedPriceQuote / fetchPrices(refs) را دارند — symbol-array حذف شده.
+
+---
+
+## normalizeSymbol — محدوده استفاده
+
+| مسیر | مجاز؟ |
+|------|--------|
+| `instrumentId` → providerSymbol از جدول mapping | بله |
+| providerSymbol → instrumentId برای parse response | بله |
+| فقط display `symbol` بدون registry | **migration-only** / log deprecate |
+
+Domain و UI جدید هرگز `fetchPrices(['BTC'])` نمی‌فرستند.
+
+### Fund NAV enforce
+`assetCategory='fif'` → insert/history: `quoteType='nav'` + `marketDate` required؛ وگرنه Domain validation رد می‌کند.
