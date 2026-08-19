@@ -1237,3 +1237,68 @@ reverseCryptoOperation(operationId)
 3. journal inverse
 4. rebuildHolding({exchangeId, assetKey}) for both sides
 ```
+
+---
+
+## Internal در برابر External Transfer
+
+### تفکیک اجباری
+
+| kind | معنی | ردیف‌ها | counterparty |
+|------|------|---------|--------------|
+| `internal_transfer` | هر دو طرف **مالک کاربر** (exchange/wallet در سیستم) | `transfer_out` + `transfer_in` + optional fee_burn | `counterExchangeId` پر |
+| `external_outflow` | خروج به آدرس/صرافی **خارج از سیستم** | فقط `transfer_out` (یا type صریح `external_send`) | `counterExchangeId` **null**؛ `externalAddress` / `externalLabel` |
+| `external_inflow` | ورود از خارج | فقط `transfer_in` (یا `external_receive`) | null؛ `externalAddress` / `externalLabel` |
+
+فیلدها:
+```text
+transferScope: 'internal' | 'external'
+externalAddress?: string
+externalLabel?: string  // "friend", "exchange-binance-other", …
+economicKind?: 'self_custody_move' | 'gift_in' | 'gift_out' | 'income' | 'expense' | 'unknown_acquisition' | 'unknown_disposal' | 'bridge'
+```
+
+### Cost Basis
+
+| kind | اثر |
+|------|-----|
+| internal | PL=0؛ cost منتقل out→in |
+| external_outflow + gift_out / expense | disposal با cost آزادشده؛ realized یا expense طبق economicKind |
+| external_outflow + unknown_disposal | disposal at cost (یا user-entered proceeds اگر فروش خارج سیستم) |
+| external_inflow + income | acquisition با cost = fair value user-entered یا 0 طبق policy |
+| external_inflow + gift_in | acquisition cost 0 یا FMV (تنظیمات مالیات) |
+| external_inflow + unknown_acquisition | **کاربر باید cost basis وارد کند** — بدون حدس market اجباری |
+
+Deposit از صرافی خارجی به wallet خودی در سیستم: اگر مبدأ در app نیست → `external_inflow`؛ اگر هر دو exchange در app هستند → `internal_transfer`.
+
+### API
+```text
+executeInternalTransfer({ fromExchangeId, toExchangeId, assetKey, gross, fee… })
+executeExternalSend({ fromExchangeId, assetKey, gross, fee, externalAddress, economicKind })
+executeExternalReceive({ toExchangeId, assetKey, net, costBasis?, economicKind, externalAddress? })
+```
+همه با `operationId` + journal.
+
+---
+
+## Bridge / Cross-Network (تغییر assetKey)
+
+```text
+USDT-ERC20  →bridge→  USDT-TRC20
+```
+
+این **internal_transfer ساده با یک assetKey نیست**.
+
+مدل canonical:
+```text
+operationId = B, economicKind = bridge
+1) disposal/transfer_out روی assetKey A (gross) + fee_burn
+2) acquisition/transfer_in روی assetKey B (net)
+cost: transferredCost از A به B (همان CostBasisEngine با kind bridge یا pair transfer_out A + transfer_in B با transferredCost)
+realizedPL = 0 مگر bridge provider settlement خلاف بگوید
+assert: instrumentId_A ≠ instrumentId_B
+```
+
+فیلد اختیاری: `bridgeProvider`, `bridgeTxHash`.
+
+CostBasisEngine: `kind: 'bridge_out' | 'bridge_in'` یا همان transfer_out/in با `linkedRole: 'bridge'` و `transferredCost`.

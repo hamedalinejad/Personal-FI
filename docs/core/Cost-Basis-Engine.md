@@ -125,3 +125,16 @@ Canonical transfer با fee از asset:
 ## Domain-neutral
 Interface شامل instrumentId، costCurrency، fee، rate، tradeGroupId، transfer، CA kinds است.  
 Feature فقط mapping event می‌سازد — بدون fork فرمول هسته.
+
+## External و Bridge
+
+| Event | quantity | cost | realizedPL |
+|-------|----------|------|------------|
+| external_out disposal | −qty | −cost portion | per economicKind (gift/expense/sale) |
+| external_in acquisition | +qty | +user cost or FMV or 0 | — |
+| bridge_out | −gross on asset A | −released cost | 0 |
+| bridge_in | +net on asset B | +transferredCost | 0 |
+
+```text
+CostBasisEvent.linkedRole?: 'bridge' | 'external_in' | 'external_out' | 'c2c_sell' | …
+```
