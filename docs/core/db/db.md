@@ -716,6 +716,7 @@ SQLite نمی‌تواند enforce کند که `relatedId` به جدول درس�
 3. مقایسه «همان روز بازار» با `businessDate` انجام شود نه با تبدیل خام timezone روی `createdAt`.
 4. Price snapshot: `fetchedAt` (UTC) + در صورت نیاز `marketDate` برای NAV روزانه.
 5. هیچ محاسبه سود/جریمه دیرکرد صرفاً روی timezone محلی مرورگر بدون ذخیره businessDate انجام نشود.
+6. تراکنش‌های Stock/FIF: `businessDate` (روز معامله کاربر) جدا از `marketDate` قیمت/NAV در صورت تفاوت؛ فیلد مبهم تنها به نام `date` بدون تفکیک **ممنوع** در API جدید.
 
 ---
 
