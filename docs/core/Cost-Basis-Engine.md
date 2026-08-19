@@ -138,3 +138,10 @@ Feature فقط mapping event می‌سازد — بدون fork فرمول هست
 ```text
 CostBasisEvent.linkedRole?: 'bridge' | 'external_in' | 'external_out' | 'c2c_sell' | …
 ```
+
+### Bridge cost split
+```text
+costPerUnit = totalInvested / qty
+transferredCost = costPerUnit * netQuantity
+feeBurnCost = costPerUnit * feeQuantity
+```

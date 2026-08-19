@@ -63,84 +63,22 @@
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 9a. موجودی هیچ رمزارزی (`quantity` در `inv_crypto_holdings`) و موجودی داخلی IRR/USDT هر صرافی/ولت (همان جدول، `symbol=IRR` یا `symbol=USDT`) نمی‌تواند منفی شود.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
-11. **ویرایش/حذف معاملات — Reversal Contract (الزاماً Atomic)**: تراکنش‌های رمزارز پس از ثبت غیرقابل ویرایش هستند. برای اصلاح یا حذف، از الگوی **Reversal** استفاده می‌شود:
+11. **ویرایش/حذف معاملات — فقط Core Reversal**
 
- **قانون کلی همه انواع:**
- - تراکنش اصلی با `isVoided = true` علامت‌گذاری می‌شود (حذف نمی‌شود — برای audit trail)
- - تراکنش معکوس ثبت می‌شود تا اثر تراکنش اصلی خنثی شود
- - همه این مراحل در **یک SQLite Transaction واحد** (BEGIN/COMMIT) اجرا می‌شوند
+```text
+reverseCrypto(operationId) → core.reverseOperation(operationId)
+CryptoFinancialOperationAdapter.buildReversalPlan(originalOperationId)
+```
 
- **الف) Reversal معامله معمولی (BUY یا SELL) — ۴ مرحله Atomic:**
- ```
- BEGIN TRANSACTION;
- 1. originalTx = SELECT * FROM inv_crypto_transactions WHERE id=txId AND isVoided=false
- IF NOT EXISTS → ROLLBACK + خطا
- 2. UPDATE inv_crypto_transactions SET isVoided=true WHERE id=txId
- 3. INSERT reversal_tx (type = معکوس originalTx.type، quantity، totalAmountBase همان)
- -- نتیجه: اگر originalTx یک BUY بود، reversal یک SELL با همان quantity و cost است
- 4. rebuildHolding({ exchangeId: originalTx.exchangeId, assetKey: originalTx.assetKey })
- -- همیشه Rebuild می‌کند چون averageBuyPrice ممکن است تغییر کرده باشد
- COMMIT;
- ```
+**ممنوع:** الگوریتم‌های موازی feature-local با UPDATE isVoided + INSERT مستقیم در این سند به‌عنوان مسیر پیاده‌سازی. نمونه‌های قدیمی حذف شده‌اند.
 
- **ب) Reversal معامله رمزارز-به-رمزارز (C2C با `tradeGroupId`) — ۶ مرحله Atomic (Critical):**
- > یک C2C trade شامل دو رکورد است: `SELL fromSymbol` و `BUY toSymbol`. Reversal باید هر دو را
- > به‌صورت یک عملیات واحد معکوس کند — نمی‌توان فقط یکی را void کرد.
+Adapter plan باید برگرداند:
+- void/inverse domain rows (buy/sell/C2C legs/transfer/fee_burn) با **assetKey**
+- journal inverse lines
+- cash inverse اگر بود
+- snapshotTargets برای rebuild
 
- ```
- BEGIN TRANSACTION;
-
- ── مرحله ۱: خواندن هر دو رکورد اصلی ───────────────────────────────
- sellTx = SELECT * FROM inv_crypto_transactions WHERE tradeGroupId=? AND type='sell' AND isVoided=false
- buyTx = SELECT * FROM inv_crypto_transactions WHERE tradeGroupId=? AND type='buy' AND isVoided=false
- IF NOT (sellTx AND buyTx) → ROLLBACK + خطا «تراکنش‌های C2C جفت پیدا نشد»
-
- ── مرحله ۲: void کردن هر دو رکورد اصلی ────────────────────────────
- UPDATE inv_crypto_transactions SET isVoided=true WHERE tradeGroupId=?
-
- ── مرحله ۳: ثبت reversal SELL برای fromSymbol ──────────────────────
- -- اثر: BUY fromSymbol — Cost Basis همان sellTx.totalAmountBase است
- INSERT reversal_buy (type='buy', assetKey=sellTx.assetKey, symbol=sellTx.symbol /*display only*/, exchangeId=sellTx.exchangeId,
- quantity=sellTx.quantity, totalAmountBase=sellTx.totalAmountBase,
- feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
-
- ── مرحله ۴: ثبت reversal BUY برای toSymbol ────────────────────────
- -- اثر: SELL toSymbol — مقدار BTC که کسر می‌شود همان buyTx.quantity است
- INSERT reversal_sell (type='sell', assetKey=buyTx.assetKey, symbol=buyTx.symbol /*display only*/, exchangeId=buyTx.exchangeId,
- quantity=buyTx.quantity, totalAmountBase=buyTx.totalAmountBase,
- feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
-
- ── مرحله ۵: Rebuild Holding fromSymbol ─────────────────────────────
- rebuildHolding({ exchangeId: sellTx.exchangeId, assetKey: sellTx.assetKey })
-
- ── مرحله ۶: Rebuild Holding toSymbol ───────────────────────────────
- rebuildHolding({ exchangeId: buyTx.exchangeId, assetKey: buyTx.assetKey })
-
- COMMIT;
- ```
- > **قانون طلایی**: اگر مرحله ۵ یا ۶ fail شود، کل ROLLBACK می‌شود —
- > وگرنه یکی از دو Holding اصلاح شده و دیگری نه: پرتفوی کاملاً خراب می‌شود.
- > `rebuildHolding` به جای تنظیم دستی `averageBuyPrice` استفاده می‌شود تا خطای محاسباتی نداشته باشیم.
-
- **ج) Reversal انتقال (TRANSFER با `transferGroupId`) — ۵ مرحله Atomic:**
- ```
- BEGIN TRANSACTION;
- 1. outTx = SELECT * WHERE transferGroupId=? AND type='transfer_out'
- inTx = SELECT * WHERE transferGroupId=? AND type='transfer_in'
- IF NOT (outTx AND inTx) → ROLLBACK + خطا
- 2. UPDATE SET isVoided=true WHERE transferGroupId=? (هر دو رکورد)
- 3. INSERT reversal_in (type='transfer_in', exchangeId=outTx.exchangeId, quantity=outTx.quantity)
- INSERT reversal_out (type='transfer_out', exchangeId=inTx.exchangeId, quantity=inTx.quantity)
- 4. rebuildHolding({ exchangeId: outTx.exchangeId, assetKey: outTx.assetKey })
- 5. rebuildHolding({ exchangeId: inTx.exchangeId, assetKey: inTx.assetKey })
- COMMIT;
- ```
-
- > **فیلدهای اضافی برای Reversal traceability**: در `inv_crypto_transactions` دو فیلد اضافه می‌شود:
- > - `isReversal` → boolean (پیش‌فرض `false`) — این رکورد یک Reversal است نه تراکنش اصلی
- > - `reversedTxId` → UUID (nullable) — id رکورد اصلی که این Reversal آن را خنثی می‌کند
- > - `reversedTradeId` → UUID (nullable) — برای C2C: tradeGroupId معامله اصلی
- > - `reversedTransferGroupId` → UUID (nullable) — برای Transfer: transferGroupId انتقال اصلی
+فیلدهای audit روی domain: `isReversal`, `reversedTxId`, `reversesOperationId` هم‌تراز Core.
 
 ---
 
@@ -1306,3 +1244,46 @@ CostBasisEngine: `kind: 'bridge_out' | 'bridge_in'` یا همان transfer_out/i
 ### Opening / import
 از Core `opening_position` استفاده شود — نه BUY ساختگی.  
 شامل: migration، موجودی اولیه، gift، airdrop (با economicKind).
+
+### فرمول دقیق Bridge Cost
+
+```text
+gross_A, fee_qty, net_B
+assert gross_A = net_B + fee_qty  (same economic token units)
+
+costPool_A before = totalInvested_A
+costPerUnit = costPool_A / qty_A
+releasedForOut = costPerUnit * gross_A
+
+feeBurnCost = costPerUnit * fee_qty     // cost attributed to burned units
+transferredCost = costPerUnit * net_B   // = releasedForOut - feeBurnCost
+assert transferredCost + feeBurnCost = releasedForOut
+
+bridge_out: qty_A -= gross_A; totalInvested_A -= releasedForOut
+fee_burn: realizedPL = 0; journal expense for feeBurnCost in base
+bridge_in: qty_B += net_B; totalInvested_B += transferredCost
+average_B = totalInvested_B / qty_B
+```
+
+مثال: 100 USDT-ERC20, fee 1, net 99 TRC20, cost pool 10,000 IRR برای 100 unit:
+```text
+released = 10000, feeBurnCost = 100, transferredCost = 9900
+```
+
+### فروش واقعی خارج سیستم (`economicKind = external_sale`)
+
+```text
+executeExternalSale({
+  fromExchangeId, assetKey, quantity,
+  proceedsAmount, proceedsCurrency,  // الزامی
+  exchangeRateToBase, conversionPath?,
+  recordExternalCash?: boolean, // اگر true: cash خارج سیستم فقط memo — نه acc داخلی
+  externalCounterparty?: string,
+  asOf, operationId
+})
+```
+
+- Domain: disposal (external_outflow) با proceeds
+- CostBasis: realizedPL = proceedsInBase - soldCost - fees
+- Journal: Cr crypto asset cost; Dr external_clearing یا expense/income residual; **اگر** پول به حساب بانکی داخل app واریز شد → جدا operation deposit؛ وگرنه فقط clearing/equity memo
+- proceeds currency + FX قفل روی operation
