@@ -160,3 +160,79 @@ emit only if persisted
 
 ذخیره اختیاری: `fin_operations.status`.  
 **Invariant:** UI و DomainEvent فقط روی `persisted` قطعی‌اند.
+
+---
+
+## Multi-Currency Journal
+
+Balance **همیشه** روی `amountInBase` (همان `baseCurrencyAtOperation`).
+
+علاوه بر آن، برای هر currency واقعی که در op جابه‌جا می‌شود، خطوط journal با `currency` + `amount` نوشته می‌شوند. اگر دو currency درگیرند، **legs صریح FX / rounding** لازم است:
+
+| lineKind (memo یا accountClass) | نقش |
+|----------------------------------|------|
+| `asset` / `cash` / … | حرکت دارایی/نقد |
+| `fx_conversion` | تفاوت تبدیل بین دو ارز (balancing در base) |
+| `fx_rounding` | باقیمانده گرد کردن تا Σ debit=credit در base |
+| `valuation_adj` | فقط گزارش mark-to-market — **نه** داخل cost basis trade مگر صریح |
+
+### مثال: خرید BTC با USD (base=IRR)
+```text
+Dr crypto_asset   amount=qty BTC   currency=BTC  amountInBase=X
+Cr cash           amount=USD paid  currency=USD  amountInBase=Y
+Dr/Cr fx_rounding amountInBase = X-Y residual if any
+```
+ETH→BTC (C2C): Dr BTC asset, Cr ETH asset، هر دو amountInBase از transferred cost + fees؛ residual → fx_rounding/fee lines.
+
+### same-currency
+فقط خطوط asset/cash؛ بدون fx_conversion مگر rate قفل‌شده برای گزارش base.
+
+**Invariant:** Σ amountInBase debits = credits. Conservation هر currency در domain ledger جدا (qty BTC و غیره) — journal ارز را با amount خام هم audit می‌کند.
+
+---
+
+## تغییر Base Currency و گزارش تاریخی
+
+| نوع گزارش | قرارداد |
+|-----------|---------|
+| **Historical as-booked** | همیشه با `baseCurrencyAtOperation` + `amountInBase` قفل‌شده؛ **هرگز** rebuild با base جدید |
+| **Restated to current base** | optional: تبدیل `amountInBase` از base قفل‌شده → base فعلی با FX **as-of تاریخ گزارش**؛ برچسب UI: «تبدیل‌شده» |
+| Net Worth امروز | holdings×price + FX **فعلی** |
+| Total invested تاریخی | sum amountInBase as-booked (مقارنة فقط در همان base یا با restatement صریح) |
+
+`amountInBase` روی journal/domain **immutable** پس از persist. تغییر Rounding Policy بعدی فقط txهای جدید؛ historical بدون migration version بازسازی نمی‌شود.
+
+روی `fin_operations` / conversionPath نگه دارید:
+```text
+rate, source, asOf, rateId?,
+roundingModeSnapshot, precisionSnapshot (از CurrencyRecord در لحظه)
+```
+
+---
+
+## opening_position (مهاجرت / موجودی اولیه)
+
+Command مشترک همه Investmentها:
+
+```typescript
+{
+  kind: 'opening_position';
+  instrumentId: string;
+  assetCategory: 'crypto' | 'stock' | 'fif' | 'metal';
+  locationId: string; // exchangeId | brokerageId | fund holding scope
+  quantity: string;
+  costBasis: string;
+  costCurrency: string;
+  asOf: string; // businessDate
+  economicKind?: 'migration_import' | 'opening_balance' | 'gift' | 'airdrop' | 'unknown';
+  notes?: string;
+}
+```
+
+اثر:
+- Domain: یک ردیف `type=opening_position` (یا acquisition با flag) — **نه** BUY جعلی با طرف مقابل خیالی
+- CostBasisEngine: `acquisition` با cost = costBasis تبدیل‌شده به costCurrency pool
+- Journal: Dr asset / Cr equity `opening_equity` (یا income اگر gift/airdrop طبق policy)
+- `operationId` + status lifecycle عادی
+
+API: `recordOpeningPosition(adapter, command)` از Core.

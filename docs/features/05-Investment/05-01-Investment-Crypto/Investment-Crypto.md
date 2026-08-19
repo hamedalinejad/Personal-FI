@@ -1302,3 +1302,7 @@ assert: instrumentId_A ≠ instrumentId_B
 فیلد اختیاری: `bridgeProvider`, `bridgeTxHash`.
 
 CostBasisEngine: `kind: 'bridge_out' | 'bridge_in'` یا همان transfer_out/in با `linkedRole: 'bridge'` و `transferredCost`.
+
+### Opening / import
+از Core `opening_position` استفاده شود — نه BUY ساختگی.  
+شامل: migration، موجودی اولیه، gift، airdrop (با economicKind).

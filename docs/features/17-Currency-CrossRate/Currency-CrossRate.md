@@ -278,3 +278,13 @@ convertChain(amount, [c1,c2,...,cn], asOf) =
 
 برای زنجیره BTC→USDT→IRR هر leg در path ذخیره می‌شود تا بازسازی تاریخی ممکن باشد.  
 حداقل v1: `exchangeRateToBase` + `asOf` روی تراکنش اجباری؛ path برای multi-hop Should Have قوی / Must وقتی >1 leg.
+
+---
+
+## تغییر baseCurrency
+
+Preference فقط برای **tx و valuation آینده** و restatement اختیاری است.  
+Journal/`amountInBase` تاریخی دست نخورده (`baseCurrencyAtOperation`).  
+جزئیات در `Canonical-Financial-Operation.md`.
+
+`amountInBase` پس از persist **rebuild نمی‌شود** مگر migration با `calculationVersion` صریح.
