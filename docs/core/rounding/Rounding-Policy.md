@@ -27,9 +27,19 @@
 پیش‌فرض سراسری `decimal.js` در پروژه این است:
 ```typescript
 // lib/dayjs.ts یا lib/constants.ts — یک بار در کل پروژه
-Decimal.set({ precision: 28, rounding: Decimal.ROUND_HALF_UP });
+Decimal.set({ precision: 40, rounding: Decimal.ROUND_HALF_UP }); // سقف داخلی زنجیره
 ```
-این پیش‌فرض فقط برای عملیاتی است که rounding صریح ندارند. همه توابع مهم باید rounding را **صریح** پاس دهند.
+`precision` سراسری فقط **سقف کاری** است. هر domain دقت مؤثر خودش را با `toDecimalPlaces` / قرارداد زیر اعمال می‌کند — نه اینکه همه خروجی‌ها ۲۸ رقم معنادار لازم داشته باشند.
+
+| Domain | دقت کاری پیشنهادی | یادداشت |
+|--------|-------------------|---------|
+| IRR money | 0 dp store | |
+| USD/EUR money | 2–4 | |
+| Crypto quantity | تا 18 | |
+| FX rate | 12–18 داخلی | |
+| Unit price crypto | 8–18 | |
+| Loan rate r | کامل تا round قسط | فقط از getPeriodRate |
+
 
 ---
 
@@ -160,7 +170,7 @@ const minorUnit = toMinorUnit(amountDecimal, 'USD'); // ۱۲۳۴۵۶ (floor)
 
 ```typescript
 // محاسبه قسط Declining Balance
-const r = new Decimal(annualRate).dividedBy(1200); // نرخ ماهانه — کامل
+const r = getPeriodRate(loan); // فقط از Debt-Loan getPeriodRate — هرگز /1200 hard-code برای همه frequencyها
 const n = totalInstallments;
 const P = new Decimal(principalAmount);
 
@@ -459,3 +469,7 @@ export function preserveFull(amount: Decimal): string {
 3. audit: `repair` با version قدیم→جدید
 
 Reconcile: mismatch می‌تواند به‌خاطر version باشد — در `details` ذکر شود.
+
+### وام — فقط getPeriodRate
+هر مثال Flat/Declining در این سند یا کد نمونه که `/12` یا `/1200` ثابت دارد، فقط برای **monthly+annual** است.  
+weekly/quarterly/custom: `r = getPeriodRate(loan)` از `Debt-Loan-Management.md`. کپی فرمول موازی = باگ.
