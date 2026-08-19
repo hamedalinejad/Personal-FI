@@ -215,3 +215,16 @@ withholdingTaxAmount → همان مبلغ (یا جزئی از آن) برای me
 - اگر `withholdingTaxAmount` پر است و برابر `feeTax` است → یک مبلغ اقتصادی؛ دو برچسب.
 
 در UI: feeTax زیر «هزینه معامله»؛ withholding فقط در بخش tax metadata / گزارش taxable events.
+
+---
+
+## tax_events مرکزی
+
+به‌جای تکرار کامل metadata در هر investment table:
+
+```text
+tax_events: id, taxYear, calendar, eventKind, amount, currency, sourceOperationId, linkedRecordIds…
+investment tx: linkedTaxEventId? (nullable)
+```
+
+SoT بدهی/رویداد مالیاتی = Tax feature. Investment فقط reference + حداقل فیلدهای لازم cost/proceeds برای محاسبه.

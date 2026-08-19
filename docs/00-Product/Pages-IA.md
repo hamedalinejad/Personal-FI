@@ -347,3 +347,16 @@ interface InvestmentActionSheetProps {
 4. `correct` داخل همین pattern با flow void+reversal طبق Domain.
 
 تکرار چهار صفحه Buy = نقض این قرارداد.
+
+---
+
+## Ownership: Price Fetching
+
+| سطح | مالک |
+|------|------|
+| Domain/API/tables | Feature **19-Price-Fetching** (یک implementation) |
+| دکمه دریافت قیمت در Investments | UI shell فقط صدا زدن همان Public API |
+| مدیریت sources در Settings | UI shell همان API |
+
+**ممنوع:** سه ماژول جدا برای fetch در Investment / Settings / Feature20.
+Sub-routes investment: فقط list+detail؛ actions = Sheet (قبلاً قرارداد شد).

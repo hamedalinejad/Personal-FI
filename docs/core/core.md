@@ -50,3 +50,4 @@
 - `db.md` — journal، reconcile، fixtures عددی
 - `rounding/Rounding-Policy.md` — precision
 - `types/types.md` — انواع مشترک
+- `Canonical-Financial-Operation.md` — الگوی واحد Operation→Journal→Snapshot→Persist

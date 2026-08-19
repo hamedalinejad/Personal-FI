@@ -1313,3 +1313,10 @@ checksum match
 - Onboarding: الزام به درک backup
 - Dashboard: وضعیت آخرین backup + CTA
 - نه فقط مدفون در Settings
+
+### ستون deprecated — قالب استاندارد
+برای هر تغییر schema:
+```text
+deprecated column | canonical column | read: dual | write: canonical only | drop: major+N after migrate
+```
+ثبت در migration notes؛ اصل «داده حذف نشود» = no DROP بدون دوره سازگاری.
