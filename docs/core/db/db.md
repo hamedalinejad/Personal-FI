@@ -1189,3 +1189,53 @@ Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و 
 - نباید در totals درآمد/هزینه ظاهر شود
 - نباید `accountClass` برابر `income` یا `expense` برای اصل مبلغ باشد
 - Journal Engine / validate قبل از COMMIT این را enforce می‌کند
+
+---
+
+## سلسله‌مراتب قطعی نوشتن (ضد drift)
+
+در **یک** `runAtomicFinancialOperation`:
+
+```text
+1. Domain feature rows (SoT جزئیات: qty, loan portion, …)
+2. fin_journal_entries متوازن (SoT میان‌فیچری)
+3. acc_transactions فقط اگر bank cash جابه‌جا شود (SoT cash بانکی)
+4. Snapshots = تابع خالص از (1) یا (3) — همان عدد محاسبه‌شده یک‌بار
+```
+
+| سؤال | جواب |
+|------|------|
+| qty holding از کجا؟ | Domain ledger → snapshot کپی نتیجه rebuild/apply |
+| موجودی بانک؟ | Σ acc_transactions → currentBalance |
+| گزارش Expense؟ | exp_* یا journal expense — نه هر دو |
+| Net Worth؟ | Portfolio از live inputs |
+
+**ممنوع:** سه منبع را «authoritative موازی» خواندن در یک گزارش.
+
+### Snapshot derivation
+```text
+newBalance = f(previousCanonical, txEffect)
+balanceAfterTransaction = newBalance  // همان مقدار
+currentBalance = newBalance           // همان مقدار
+```
+نه دو فرمول جدا برای `balanceAfter` و `currentBalance`.
+
+### Fee روی acc_transactions
+
+| فیلد | معنی |
+|------|------|
+| `amount` | **اصل حرکت** بدون fee (مثلاً برداشت ۱۰۰؛ amount=100) |
+| `feeAmount` | کارمزد جدا (مثلاً ۵) |
+| اثر روی موجودی | برای withdrawal: `−amount − feeAmount` (اگر fee از همین حساب) |
+
+Journal:
+```text
+Cr cash  amount
+Cr cash  feeAmount   (یا یک خط مجموع با split در journal lines)
+Dr expense/fee  feeAmount
+```
+
+**Invariant:** `amount` هرگز «شامل fee» و همزمان `feeAmount` پر نیست — در آن صورت double deduction. Validate: اگر fee از حساب کم می‌شود، `cashDelta = −(amount+fee)` یک‌بار.
+
+### Transfer — دروازه اجرا
+قانون accounting-neutral در مستند است؛ **تا fixture `bank_transfer_neutral` در CI سبز نشود**، feature transfer «تأییدشده» اعلام نمی‌شود (همان مرز docs vs runtime).

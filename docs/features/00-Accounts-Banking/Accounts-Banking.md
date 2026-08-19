@@ -127,3 +127,6 @@ Cr cash (A or B)             fee
 ```
 
 گزارش‌های `getTotalIncome` / `getTotalExpense` **هرگز** typeهای transfer را جمع نمی‌کنند.
+
+### Invariant fee
+`amount` = اصل؛ `feeAmount` جدا؛ `cashDelta = ±amount ± fee` طبق type — یک‌بار. جزئیات در `db.md`.
