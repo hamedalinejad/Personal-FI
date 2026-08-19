@@ -78,12 +78,12 @@
  2. UPDATE inv_crypto_transactions SET isVoided=true WHERE id=txId
  3. INSERT reversal_tx (type = معکوس originalTx.type، quantity، totalAmountBase همان)
  -- نتیجه: اگر originalTx یک BUY بود، reversal یک SELL با همان quantity و cost است
- 4. rebuildHolding(originalTx.exchangeId, originalTx.symbol)
+ 4. rebuildHolding({ exchangeId: originalTx.exchangeId, assetKey: originalTx.assetKey })
  -- همیشه Rebuild می‌کند چون averageBuyPrice ممکن است تغییر کرده باشد
  COMMIT;
  ```
 
- **ب) Reversal معامله رمزارز-به-رمزارز (C2C با `tradeId`) — ۶ مرحله Atomic (Critical):**
+ **ب) Reversal معامله رمزارز-به-رمزارز (C2C با `tradeGroupId`) — ۶ مرحله Atomic (Critical):**
  > یک C2C trade شامل دو رکورد است: `SELL fromSymbol` و `BUY toSymbol`. Reversal باید هر دو را
  > به‌صورت یک عملیات واحد معکوس کند — نمی‌توان فقط یکی را void کرد.
 
@@ -91,30 +91,30 @@
  BEGIN TRANSACTION;
 
  ── مرحله ۱: خواندن هر دو رکورد اصلی ───────────────────────────────
- sellTx = SELECT * FROM inv_crypto_transactions WHERE tradeId=? AND type='sell' AND isVoided=false
- buyTx = SELECT * FROM inv_crypto_transactions WHERE tradeId=? AND type='buy' AND isVoided=false
+ sellTx = SELECT * FROM inv_crypto_transactions WHERE tradeGroupId=? AND type='sell' AND isVoided=false
+ buyTx = SELECT * FROM inv_crypto_transactions WHERE tradeGroupId=? AND type='buy' AND isVoided=false
  IF NOT (sellTx AND buyTx) → ROLLBACK + خطا «تراکنش‌های C2C جفت پیدا نشد»
 
  ── مرحله ۲: void کردن هر دو رکورد اصلی ────────────────────────────
- UPDATE inv_crypto_transactions SET isVoided=true WHERE tradeId=?
+ UPDATE inv_crypto_transactions SET isVoided=true WHERE tradeGroupId=?
 
  ── مرحله ۳: ثبت reversal SELL برای fromSymbol ──────────────────────
  -- اثر: BUY fromSymbol — Cost Basis همان sellTx.totalAmountBase است
  INSERT reversal_buy (type='buy', symbol=sellTx.symbol, exchangeId=sellTx.exchangeId,
  quantity=sellTx.quantity, totalAmountBase=sellTx.totalAmountBase,
- feeAmount=0, tradeId=newReversalTradeId, isReversal=true, reversedTradeId=originalTradeId)
+ feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
 
  ── مرحله ۴: ثبت reversal BUY برای toSymbol ────────────────────────
  -- اثر: SELL toSymbol — مقدار BTC که کسر می‌شود همان buyTx.quantity است
  INSERT reversal_sell (type='sell', symbol=buyTx.symbol, exchangeId=buyTx.exchangeId,
  quantity=buyTx.quantity, totalAmountBase=buyTx.totalAmountBase,
- feeAmount=0, tradeId=newReversalTradeId, isReversal=true, reversedTradeId=originalTradeId)
+ feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
 
  ── مرحله ۵: Rebuild Holding fromSymbol ─────────────────────────────
- rebuildHolding(sellTx.exchangeId, sellTx.symbol)
+ rebuildHolding({ exchangeId: sellTx.exchangeId, assetKey: sellTx.assetKey })
 
  ── مرحله ۶: Rebuild Holding toSymbol ───────────────────────────────
- rebuildHolding(buyTx.exchangeId, buyTx.symbol)
+ rebuildHolding({ exchangeId: buyTx.exchangeId, assetKey: buyTx.assetKey })
 
  COMMIT;
  ```
@@ -131,15 +131,15 @@
  2. UPDATE SET isVoided=true WHERE transferId=? (هر دو رکورد)
  3. INSERT reversal_in (type='transfer_in', exchangeId=outTx.exchangeId, quantity=outTx.quantity)
  INSERT reversal_out (type='transfer_out', exchangeId=inTx.exchangeId, quantity=inTx.quantity)
- 4. rebuildHolding(outTx.exchangeId, outTx.symbol)
- 5. rebuildHolding(inTx.exchangeId, inTx.symbol)
+ 4. rebuildHolding({ exchangeId: outTx.exchangeId, assetKey: outTx.assetKey })
+ 5. rebuildHolding({ exchangeId: inTx.exchangeId, assetKey: inTx.assetKey })
  COMMIT;
  ```
 
  > **فیلدهای اضافی برای Reversal traceability**: در `inv_crypto_transactions` دو فیلد اضافه می‌شود:
  > - `isReversal` → boolean (پیش‌فرض `false`) — این رکورد یک Reversal است نه تراکنش اصلی
  > - `reversedTxId` → UUID (nullable) — id رکورد اصلی که این Reversal آن را خنثی می‌کند
- > - `reversedTradeId` → UUID (nullable) — برای C2C: tradeId معامله اصلی
+ > - `reversedTradeId` → UUID (nullable) — برای C2C: tradeGroupId معامله اصلی
  > - `reversedTransferId` → UUID (nullable) — برای Transfer: transferId انتقال اصلی
 
 ---
@@ -240,7 +240,7 @@
 - `totalAmount` → decimal
 - `feeAmount` → decimal
 - `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر، مثلاً قیمت BTC = ۶۵,۰۰۰ USDT)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency !== baseCurrency` و مسیر convert مستقیم در rates نیست؛ قیمت کمکی fee→base — نه شرط IRR/USDT)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
@@ -251,7 +251,7 @@
 - `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی)
 - `isReversal` → boolean (پیش‌فرض `false` — این رکورد یک تراکنش معکوس/Reversal است)
 - `reversedTxId` → UUID (nullable — برای Reversal تک‌رکوردی: id رکورد `inv_crypto_transactions` اصلی که این Reversal آن را خنثی می‌کند)
-- `reversedTradeId` → UUID (nullable — برای Reversal C2C: `tradeId` معامله اصلی)
+- `reversedTradeId` → UUID (nullable — برای Reversal C2C: `tradeGroupId` معامله اصلی)
 - `reversedTransferId` → UUID (nullable — برای Reversal انتقال: `transferId` انتقال اصلی)
 - `description` → string
 - `date` → datetime
@@ -275,7 +275,7 @@
 - `currency` → string (IRR, USDT و ...)
 - `feeAmount` → decimal
 - `feeCurrency` → string
-- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency` نه IRR و نه USDT باشد؛ قیمت لحظه‌ای آن رمزارز به تتر)
+- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency !== baseCurrency`؛ قیمت کمکی fee→base)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — )
 - `accountId` → UUID (حساب بانکی مرتبط — **اجباری**؛ بدون حساب بانکی این تراکنش نباید در این جدول باشد)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
@@ -485,7 +485,7 @@ holding.totalFeesPaidBase += feeBase
 - **`rebuildHolding(holdingId)`** یا `rebuildHolding({ exchangeId, assetKey })` → بازسازی از ledger (نه label `symbol`)
 
  ```typescript
- rebuildHolding(exchangeId: UUID, symbol: string): {
+ rebuildHolding(holdingId: UUID) یا rebuildHolding({ exchangeId, assetKey }): {
  quantity: Decimal
  totalInvested: Decimal
  averageBuyPrice: Decimal
@@ -496,7 +496,7 @@ holding.totalFeesPaidBase += feeBase
  SELECT type, quantity, totalAmountBase, feeAmount, feeCurrency,
  feeAssetPriceToBase, exchangeRateToBase, transferId, tradeId
  FROM inv_crypto_transactions
- WHERE exchangeId = ? AND symbol = ? AND isVoided = false
+ WHERE exchangeId = ? AND assetKey = ? AND isVoided = false
  ORDER BY date ASC, createdAt ASC`, [exchangeId, symbol])
 
  let qty = new Decimal(0)
@@ -1135,3 +1135,80 @@ Reversal atomic باید:
 ### نام‌گذاری C2C
 فیلد canonical: **`tradeGroupId`**.  
 `tradeId` در متون قدیمی = همان tradeGroupId (alias). کد جدید فقط `tradeGroupId` بنویسد.
+
+---
+
+# قرارداد Canonical کریپتو (بر هر بخش متناقض مقدم است)
+
+## 1. هویت
+- Holding / rebuild / ledger filter: **`exchangeId + assetKey`** (یا `holdingId`)
+- `symbol` فقط label — هرگز در WHERE rebuild
+- `instrumentId` قیمت = `assetKey`
+
+## 2. Schema تراکنش (فیلدهای الزامی)
+
+| فیلد | نقش |
+|------|-----|
+| `assetKey` | هویت دارایی این leg |
+| `type` | buy/sell/transfer_*/… |
+| `grossQuantity` | مقدار قبل از fee از asset |
+| `feeQuantity` | مقدار fee اگر از همان asset |
+| `netQuantity` | بعد از fee از asset — **Holding با این عوض می‌شود** |
+| `quantity` | **alias = netQuantity** برای سازگاری؛ کد جدید netQuantity بنویسد |
+| `quoteAmount` | مبلغ quote leg |
+| `price` | قیمت واحد به quote |
+| `feeAmount` + `feeCurrency` + `feePresence` | کارمزد |
+| `totalAmountBase` | ارزش اقتصادی این leg به **baseCurrency** در لحظه tx (قفل‌شده) |
+| `exchangeRateToBase` | **1 unit of transaction/quote currency = X base** (direction canonical) |
+| `tradeGroupId` | C2C و multi-leg — **تنها نام**؛ `tradeId` ممنوع در کد جدید |
+| `transferGroupId` | جفت transfer |
+
+## 3. Quantity و Fee — یک قانون
+
+```text
+Holding.quantity همیشه Σ netQuantity (با علامت type)
+fee_in_quote:     net = gross; fee از quote
+fee_from_base_asset / fee_from_received:
+  net = gross - feeQuantity
+  Holding += net روی BUY؛ روی transfer_out کم می‌شود gross یا طبق feePresence مستند همان tx
+```
+
+هر متن قدیمی «BUY 1 + fee 0.001 BTC ولی holding=1» فقط برای **fee_in_quote** یا fee از quote است — نه fee_from_base_asset.
+
+## 4. C2C Cost Basis (یک فرمول)
+
+```text
+releasedCost = cost basis آزادشده از SELL leg (از avg×qty نه market)
+destCost = releasedCost + feeInBase تخصیص‌یافته به acquisition
+BUY leg totalInvested += destCost
+```
+**ممنوع** به‌عنوان تنها قانون: `toTotalBase = fromTotalBase + feeBase` وقتی fromTotalBase = market value نه cost.
+`totalAmountBase` روی SELL برای C2C داخلی باید **released cost** را منعکس کند (یا فیلد جدا `transferredCost`).
+
+## 5. Transfer
+
+```text
+realizedPL = 0
+costOut proportional از totalInvested مبدأ
+costIn = همان cost (نه mark-to-market)
+fee_burn: event جدا؛ reversal باید fee_burn را هم برگرداند
+```
+
+## 6. fee → base
+
+```text
+if feeCurrency === baseCurrency: feeInBase = feeAmount
+else: feeInBase = convert(feeAmount, feeCurrency, baseCurrency, asOf)
+```
+شرط IRR/USDT حذف شد.
+
+## 7. Cash vs Asset
+
+| مفهوم | ذخیره |
+|--------|--------|
+| موجودی نقد صرافی به Currency C | Holding با `assetKey = exchange:{id}:cash:{C}` یا جدول cash جدا — **نه** قاطی با token chain |
+| USDT-TRC20 | assetKey زنجیره |
+| واحد پول USDT در feeCurrency | Currency registry |
+
+## 8. exchangeRateToBase
+همیشه: **چند واحد base per 1 واحد ارز مبدأ نرخ** (یا معکوس مستند در Currency-CrossRate با یک convention سراسری). همه featureها یک direction.
