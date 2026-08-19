@@ -152,9 +152,10 @@ feeAmount =
 
 ### Holding
 - `getHoldings(brokerageId?)`
-- `getHoldingBySymbol(symbol, brokerageId?)`
+- `getHoldingByInstrumentId(instrumentId, brokerageId?)` — **API اصلی**
+- `getHoldingBySymbol(symbol, brokerageId?)` — **deprecated**؛ فقط resolve به instrumentId فعلی از registry سپس همان lookup
 - `getPortfolioValue`
-- **`reconcileStockHolding(holdingId)`** → مقایسه `quantity` / `totalInvested` / `averageBuyPrice` snapshot با محاسبه از صفر از روی لاگ تراکنش‌ها
+- **`reconcileStockHolding(holdingId)`** → مقایسه snapshot با **`rebuildStockHolding` کامل (شامل همه CA)** — نه فقط buy/sell
 
  ```typescript
  reconcileStockHolding(holdingId: UUID): ReconcileResult & {
@@ -419,3 +420,24 @@ averageBuyPrice = qty>0 ? totalInvested/qty : 0
 
 Journal: income روی gross یا net طبق سیاست محلی — پیش‌فرض پروژه: درآمد قابل‌گزارش = gross؛ cash = net؛ withholding جدا metadata (و در صورت ایجاد tax_record لینک، نه expense دوباره از feeTax).
 `isTaxableEvent=true` معمول برای dividend.
+
+### instrumentId روی Transaction
+
+`inv_stocks_iran_transactions` فیلد **`instrumentId` اجباری** دارد (همان هویت Holding).  
+`symbol` فقط label در لحظه ثبت است و با CA عوض می‌شود؛ reconstruction همیشه با `instrumentId` (+ effective history در symbol_change).
+
+### تخصیص Fee — بدون Double Count
+
+| جزء | خرید (acquisition) | فروش (disposal) |
+|-----|--------------------|-----------------|
+| feeBrokerCommission | feeIn → totalInvested | feeFromProceeds → کاهش realized |
+| feeExchange | feeIn | feeFromProceeds |
+| feeTax | feeIn (transaction cost) — **نه** tax_records دوباره | feeFromProceeds مگر withholding جدا گزارش شود |
+| feeOther | طبق نوع | طبق نوع |
+| feeAmount | = sum؛ **فقط یک‌بار** در مسیر CostBasisEngine استفاده شود نه sum + breakdown جدا |
+
+`realizedPL = saleProceeds - soldCost - feeFromProceeds` با `feeFromProceeds = feeInTradeCurrency(sell tx)`.
+خرید: `cost += qty*price + feeInTradeCurrency` یک‌بار از feeAmount (یا sum breakdown معادل).
+
+### reconcile = rebuild کامل
+هر `reconcileStockHolding` / `rebuildStockHolding` از الگوریتم «شامل Corporate Action» در همین سند استفاده می‌کند. پیاده‌سازی فقط-buy/sell **باگ مشخصات** است.
