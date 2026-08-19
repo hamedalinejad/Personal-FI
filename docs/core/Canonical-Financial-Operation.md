@@ -33,10 +33,21 @@ User/Command
 ## Journal Schema canonical
 
 ```text
+fin_operations (header, one per atomic op):
+  id (= operationId)
+  baseCurrencyAtOperation   // **قفل** — مثلاً IRR حتی اگر بعداً preference عوض شود
+  businessDate
+  sourceFeature
+  reversesOperationId?
+  conversionPath?           // JSON legs [{from,to,rate,asOf,rateId?}] — Must اگر >1 hop
+  createdAt
+
 fin_journal_entries:
   id, operationId, lineNo
   accountClass, direction (debit|credit)
-  amount, currency, exchangeRateToBase, amountInBase
+  amount, currency
+  exchangeRateToBase        // نسبت به baseCurrencyAtOperation همان operation
+  amountInBase              // semantic = به واحد baseCurrencyAtOperation
   accountId? (bank)
   relatedFeature?, relatedId?
   businessDate, memo
@@ -44,7 +55,10 @@ fin_journal_entries:
   createdAt
 ```
 
-Σ amountInBase debit = credit per operationId.
+Σ amountInBase debit = credit per operationId **در همان baseCurrencyAtOperation**.
+
+**Invariant:** با تغییر `cur_currency_preferences.baseCurrency`، journal تاریخی بازنویسی نمی‌شود؛ گزارش cross-base با تبدیل از base قفل‌شده + rates تاریخی.
+
 
 اختیاری آینده: `fin_accounts` chart of accounts؛ v1 از `accountClass` enum کافی است.
 
