@@ -1320,3 +1320,11 @@ checksum match
 deprecated column | canonical column | read: dual | write: canonical only | drop: major+N after migrate
 ```
 ثبت در migration notes؛ اصل «داده حذف نشود» = no DROP بدون دوره سازگاری.
+
+### Restore modes
+| mode | رفتار |
+|------|--------|
+| `replace` | کل DB با backup پس از validate (پیش‌فرض ایمن) |
+| `merge` | v2+؛ نیاز به strategy: skip/rename on UUID collision، operationId collision → reject یا remap |
+
+v1: فقط **replace** پس از integrity_check. Merge بدون strategy مستند **ممنوع**.

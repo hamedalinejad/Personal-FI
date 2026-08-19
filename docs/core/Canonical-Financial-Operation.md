@@ -232,7 +232,55 @@ Command مشترک همه Investmentها:
 اثر:
 - Domain: یک ردیف `type=opening_position` (یا acquisition با flag) — **نه** BUY جعلی با طرف مقابل خیالی
 - CostBasisEngine: `acquisition` با cost = costBasis تبدیل‌شده به costCurrency pool
-- Journal: Dr asset / Cr equity `opening_equity` (یا income اگر gift/airdrop طبق policy)
+- Journal **اجباری**:
+  - asset/holding: `Dr asset` amountInBase = cost in base
+  - offset: `Cr opening_equity` (migration/opening_balance) **یا** `Cr income` (gift/airdrop/income) طبق economicKind
+  - bank opening: `Dr cash` / `Cr opening_equity`
+  - loan outstanding borrowed: `Dr opening_equity` / `Cr loan_liability` (یا معکوس برای lent)
+- **ممنوع:** بدون journal offset (asset بدون equity/income)
 - `operationId` + status lifecycle عادی
 
 API: `recordOpeningPosition(adapter, command)` از Core.
+
+---
+
+## Fee Event مرکزی (mapping از Domain)
+
+```typescript
+interface CanonicalFeeEvent {
+  operationId: string;
+  amount: string;
+  currency: string;
+  category: string; // network | broker | exchange | tax_as_cost | loan_origination | …
+  treatment: 'expense' | 'cost_basis_in' | 'proceeds_reduction' | 'fee_burn' | 'capitalized';
+  ownerFeature: string;
+  relatedDomainTxId?: string;
+}
+```
+Feature breakdown (feeBrokerCommission، feePresence، …) فقط **map** به یک یا چند CanonicalFeeEvent می‌شود.  
+Journal از treatment ساخته می‌شود؛ CostBasis از cost_basis_in / proceeds_reduction / fee_burn.
+
+### fee_burn accounting
+```text
+CostBasis: fee_burn (PL=0)
+Journal: Dr trading_fee / network_fee expense (amountInBase)
+         Cr crypto_asset (same amountInBase)
+```
+هر دو با یک operationId.
+
+---
+
+## Hierarchy سخت (تکرار)
+```text
+Financial Operation → Domain Ledger → Journal → acc_transactions (cash projection از plan) → Snapshots
+```
+`acc_transactions` SoT برای **query cash بانکی** است اما **فقط** از همان atomic plan نوشته می‌شود — نه مسیر مستقل موازی با journal.
+
+---
+
+## Corporate Action multi-target
+```text
+caOperation: { sources: instrumentId[], targets: instrumentId[], ratios, cashLegs[] }
+one-to-one | one-to-many | many-to-one
+atomic under one operationId
+```

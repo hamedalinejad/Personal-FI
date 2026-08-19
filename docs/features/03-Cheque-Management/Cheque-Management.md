@@ -150,3 +150,26 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 - `operationId` روی تراکنش‌های ساخته‌شده از چک
 - `reconcileCheque` طبق ماتریس `core/db/db.md`
 - یادآوری سررسید از Notification با `relatedFeature='cheque'`
+
+---
+
+## availableBalance — soft constraint
+
+```text
+availableBalance = currentBalance − Σ pending payable cheques
+```
+**Constraint سخت `availableBalance >= 0` در v1 اعمال نمی‌شود** (عمدی).  
+کاربر می‌تواند تعهد pending > موجودی ثبت کند → UI **هشدار** + گزارش «تعهدات بدون پوشش».
+
+### Transition matrix (فقط این‌ها مجاز)
+
+| from \ to | pending | cleared | bounced | cancelled |
+|-----------|---------|---------|---------|-----------|
+| (new) | ✓ | — | — | — |
+| pending | — | ✓ | ✓ | ✓ |
+| cleared | — | — | ✓ | — |
+| bounced | — | **✗** | — | — |
+| cancelled | — | — | — | — |
+
+`bounced → cleared` و `cancelled → *` **ممنوع** (Domain reject).  
+Enforce در `changeChequeStatus` + تست fixture.

@@ -473,3 +473,15 @@ Reconcile: mismatch می‌تواند به‌خاطر version باشد — در 
 ### وام — فقط getPeriodRate
 هر مثال Flat/Declining در این سند یا کد نمونه که `/12` یا `/1200` ثابت دارد، فقط برای **monthly+annual** است.  
 weekly/quarterly/custom: `r = getPeriodRate(loan)` از `Debt-Loan-Management.md`. کپی فرمول موازی = باگ.
+
+### Asset quantity precision (نه فقط CurrencyRecord)
+| نوع | منبع precision |
+|-----|----------------|
+| BTC/ETH/token | `asset.decimals` / registry crypto (مثلاً 8 یا 18) |
+| Stock shares | instrument rule (معمولاً 0) |
+| Fund units | fund rule |
+| Metal mg | integer mg یا 3–4 dp gram |
+| IRR money | 0 |
+| Journal amountInBase | precision ارز baseCurrencyAtOperation |
+
+Rounding Engine: `getQuantityPrecision(instrumentId)` جدا از `getMoneyPrecision(currency)`.

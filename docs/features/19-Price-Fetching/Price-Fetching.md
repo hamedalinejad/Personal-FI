@@ -755,3 +755,19 @@ Domain و UI جدید هرگز `fetchPrices(['BTC'])` نمی‌فرستند.
 
 ### Fund NAV enforce
 `assetCategory='fif'` → insert/history: `quoteType='nav'` + `marketDate` required؛ وگرنه Domain validation رد می‌کند.
+
+---
+
+## valuationAsOf
+
+گزارش باید بتواند نشان دهد:
+```text
+valuationAsOf = policy(marketDate ?? priceAsOf ?? fetchedAt)
+priceAsOf = marketDate ?? fetchedAt
+fxAsOf = same valuationAsOf unless explicit rateDate
+```
+اگر FX برای آن روز نباشد → fail یا stale label طبق settings — نه silent latest FX.
+
+### Price revision
+`price_history` **append-only**. اصلاح provider = ردیف جدید با `revisesId` / `quoteRevision` نه UPDATE قیمت قدیم.  
+getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) ؛ historical as-of از ردیف‌های ≤ asOf.
