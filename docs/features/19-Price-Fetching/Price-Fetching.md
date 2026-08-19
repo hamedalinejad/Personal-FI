@@ -21,7 +21,7 @@
 | FIF (صندوق) | `fundId` (نه symbol — چون issuance_redemption نماد بورسی ندارد) | NAV به ریال | **هیچ API عمومی یکپارچه‌ای وجود ندارد** — هر صندوق NAV را در سایت خودش منتشر می‌کند | **دستی، Fetch به‌صورت اختیاری per-fund در آینده** |
 | Metals | `metalType + purity` (نه symbol تکی) | ریال به ازای هر گرم | منابع نیمه‌رسمی قیمت طلا/سکه ایران (چند منبع رایج) | خودکار/دستی هر دو عملی |
 
-نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto **فقط** `assetKey` (هرگز symbol خام)، و برای Stocks نماد داخلی سیستم است؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش شناسه قیمت.
+نتیجه عملی: زیرساخت (`price_sources`, `price_history`, `price_sync_settings`, قوانین آفلاین/Batch/Partial-Success) برای هر چهار دسته **کاملاً یکسان** است؛ تنها چیزی که در هر زیرفیچر جدا تعریف می‌شود «شناسه قیمت‌گیری» و «منبع/الگوریتم Fetch» است. ستون `instrumentId` در `price_history` شناسه اصلی دارایی است و باید مقادیر غیر رمزارزی هم بپذیرد — برای FIF مقدار آن `fundId` (به‌صورت رشته UUID)، برای Metals مقدار آن `{metalType}_{purity}` (مثلاً `gold_18k`)، برای Crypto **فقط** `assetKey` (هرگز symbol خام)، و برای Stocks = instrumentId پایدار (ISIN/UUID؛ نه symbol نمایشی)؛ فیلد `assetCategory` در کنار `instrumentId` همیشه برای تفکیک معنایی الزامی است. ستون قدیمی `symbol` صرفاً برای نمایش/سازگاری legacy نگه داشته شده و به‌عنوان شناسه اصلی **deprecated** است (جزئیات در بخش شناسه قیمت.
 
 ---
 
@@ -128,7 +128,7 @@
 
 ## حالت خودکار (Auto-Sync) — تنظیمات
 
-Auto-Sync در سطح هر «نماد + منبع» با یک رکورد در جدول `price_sync_settings` کنترل می‌شود، نه یک سوییچ سراسری واحد — چون ممکن است کاربر بخواهد فقط چند رمزارز اصلی‌اش را خودکار تازه نگه دارد ولی بقیه را دستی بزند.
+Auto-Sync در سطح هر «instrumentId + منبع» با یک رکورد در جدول `price_sync_settings` کنترل می‌شود، نه یک سوییچ سراسری واحد — چون ممکن است کاربر بخواهد فقط چند رمزارز اصلی‌اش را خودکار تازه نگه دارد ولی بقیه را دستی بزند.
 
 - در صفحه تنظیمات، کاربر می‌تواند «به‌روزرسانی خودکار» را برای یک دسته دارایی (مثلاً «همه کریپتوهای من») یا تک‌تک نمادها روشن/خاموش کند.
 - `syncIntervalMinutes` قابل تنظیم است (پیش‌فرض پیشنهادی: ۱۵ دقیقه)؛ حداقل مجاز باید محدود شود (مثلاً حداقل ۵ دقیقه) تا فشار غیرضروری روی API نگذارد.
@@ -317,7 +317,7 @@ UI / Auto-Sync
  → fetchAndStorePrices(symbols, sourceId, triggeredBy)
  → load price_sources row
  → getAdapter(row.adapterKey) // registry
- → adapter.fetchPrices(symbols) // داخلش: normalizeSymbol → HTTP → normalizePrice/Currency/Timestamp
+ → adapter.fetchPrices(refs) // providerSymbol resolve → HTTP → NormalizedPriceQuote با instrumentId
  → write NormalizedPriceQuote[] to price_history
  → emit PriceFetchCompleted
 ```
@@ -330,10 +330,10 @@ UI / Auto-Sync
 - `getAllSources(assetCategory?)`
 - `createSource(data)` / `updateSource(id, data)`
 - `getLatestPrice({ assetCategory, instrumentId, priceCurrency?, quoteMarket?, sourceId? })` → آخرین قیمت معتبر + `{ price, priceCurrency, fetchedAt, priceAgeMs, staleAfterMs, isStale, sourceId, source }`. UI موظف است اگر `isStale` بود برچسب «قیمت قدیمی» نشان دهد.
-- `getPriceHistory(symbol, dateRange?)` → برای نمودار تاریخچه قیمت
+- `getPriceHistory({ assetCategory, instrumentId, dateRange?, quoteMarket? })` → تاریخچه
 
 ### دریافت از API (هر دو زیرحالت دستی و خودکار از همین یک تابع رد می‌شوند)
-- `fetchAndStorePrices(symbols[], sourceId?, triggeredBy: 'user_click' | 'auto_sync')`:
+- `fetchAndStorePrices(refs: Array<{ assetCategory, instrumentId, providerSymbol?, market?, quoteMarket? }>, sourceId?, triggeredBy: 'user_click' | 'auto_sync')`:
  1. تولید `fetchRequestId` (UUID) برای این اجرا.
  2. چک `navigator.onLine` — اگر `false` → `{ skipped: true, reason: 'offline' }`.
  3. اگر `sourceId` نبود → منبع `isDefault=true` همان دسته.
@@ -348,7 +348,7 @@ UI / Auto-Sync
  12. خروجی با `succeeded[]` / `failed[]` (همراه `failureKind`) / `skipped[]`.
 
 ### ثبت دستی (کاملاً آفلاین)
-- `setManualPrice(symbol, price, priceCurrency)` → رکورد جدید با `source='manual'`, `triggeredBy='manual_entry'`, `sourceId=null` در `price_history` اضافه می‌کند. هیچ چک آنلاین/آفلاین ندارد چون به شبکه نیازی ندارد.
+- `setManualPrice({ assetCategory, instrumentId, price, priceCurrency, quoteMarket?, expiresAt?, marketDate? })` → رکورد `price_history` با `source='manual'`. **بدون instrumentId رد می‌شود.** هیچ شبکه لازم نیست.
 
 ### مدیریت Auto-Sync
 - `getSyncSettings(scope, assetCategory?, symbol?)`
@@ -386,7 +386,7 @@ UI / Auto-Sync
 
 ### Price Sync Settings — یکتایی
 
-`UNIQUE(scope, assetCategory, IFNULL(symbol, ''))` روی `price_sync_settings` اجباری است تا بیش از یک رکورد برای همان کلید ساخته نشود و Rule اولویت override deterministic بماند.
+`UNIQUE(scope, assetCategory, instrumentId)` روی `price_sync_settings` اجباری است. ستون legacy `symbol` فقط مهاجرت؛ کلید منطقی = instrumentId.
 
 
 ---
@@ -662,3 +662,46 @@ Portfolio Value همیشه از همین policy — نه «آخرین ردیف �
 **Deprecated:** `getLatestPrice(symbol)` بدون category — فقط wrapper موقت که به registry resolve می‌کند و در log هشدار می‌دهد.
 
 `quoteType` یکسان در همه قراردادها: `'last' | 'nav' | 'close' | 'mid' | 'indicative' | 'manual' | 'other'`.
+
+---
+
+## قرارداد واحد Public Price API
+
+همهٔ چهار دسته (`crypto` | `stock` | `fif` | `metal`) **یک** شکل دارند:
+
+```ts
+getLatestPrice(q: {
+  assetCategory: AssetCategory;
+  instrumentId: string;
+  priceCurrency?: string;
+  quoteMarket?: string;
+  sourceId?: string;
+  preferHoldingId?: string;
+}): CachedPrice
+
+setManualPrice(q: {
+  assetCategory: AssetCategory;
+  instrumentId: string;
+  price: string;
+  priceCurrency: string;
+  quoteMarket?: string;
+  marketDate?: string;
+  expiresAt?: string;
+}): void
+
+fetchAndStorePrices(
+  refs: Array<{
+    assetCategory: AssetCategory;
+    instrumentId: string;
+    providerSymbol?: string;
+    market?: string;
+    quoteMarket?: string;
+  }>,
+  sourceId?: string,
+  triggeredBy?: 'user_click' | 'auto_sync'
+): Promise<PriceFetchResult>
+```
+
+Adapter: `fetchPrices(refs)` با `instrumentId` — نه `string[]` نماد خام.
+
+`price_sync_settings`: فیلدهای `scope`, `assetCategory`, `instrumentId`, `sourceId?`, `enabled`, `intervalMinutes` — **نه** symbol به‌عنوان کلید.
