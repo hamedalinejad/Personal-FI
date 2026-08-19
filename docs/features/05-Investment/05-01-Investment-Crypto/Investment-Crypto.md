@@ -1114,3 +1114,20 @@ Reversal atomic باید:
 3. journal معکوس fee
 
 بدون leg کارمزد، state اولیه بازیابی نمی‌شود.
+
+---
+
+## Asset در برابر Currency (Crypto)
+
+| | Currency (`cur_currencies`) | Asset (`assetKey` / instrument) |
+|--|------------------------------|----------------------------------|
+| مثال | IRR, USD, USDT به‌عنوان واحد پول | USDT-TRC20, USDT-ERC20, BTC native |
+| feeCurrency | کد Currency | — |
+| Holding | — | assetKey اجباری |
+| قیمت | quoteCurrency روی price row | instrumentId = assetKey |
+
+موجودی «تتر روی شبکه» = **Asset**؛ تسویه «مبلغ به USDT» = **Currency** در فیلدهای amount.
+
+### API هویت
+همه APIهای دامنه/قیمت کریپتو: `assetKey` / `instrumentId` — نه `symbol` خام.  
+`symbol` فقط label در UI و فیلد نمایشی.
