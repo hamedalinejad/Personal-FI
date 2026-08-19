@@ -104,24 +104,57 @@ interface FinancialOperationContext {
   command: unknown; // typed per feature command
 }
 
+interface JournalLine {
+  accountClass: AccountClass; // enum مرکزی types
+  direction: 'debit' | 'credit';
+  amount: string;
+  currency: string;
+  exchangeRateToBase: string;
+  amountInBase: string;
+  accountId?: string;
+  relatedFeature?: RelatedFeature;
+  relatedId?: string;
+  memo?: string;
+  lineKind?: 'asset' | 'cash' | 'fee' | 'fx_conversion' | 'fx_rounding' | 'equity' | 'income' | 'expense' | 'other';
+}
+
+/** Feature-specific payload — engine به Repository همان feature می‌سپارد، نه SQL خام سراسری */
+type DomainWrite =
+  | { feature: 'crypto'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: CryptoTxWrite }
+  | { feature: 'stocks'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: StockTxWrite }
+  | { feature: 'fif'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: FifTxWrite }
+  | { feature: 'metals'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: MetalTxWrite }
+  | { feature: 'loan'; action: 'insert_tx' | 'void_tx' | 'update_loan'; payload: LoanTxWrite }
+  | { feature: 'accounts' | 'income' | 'expense' | 'cheque'; action: string; payload: Record<string, string | number | boolean | null> };
+
+interface CashWrite {
+  accountId: string;
+  type: TransactionType; // فقط enum مرکزی acc
+  amount: string;
+  feeAmount?: string;
+  currency: string;
+  exchangeRateToBase: string;
+  relatedFeature?: RelatedFeature;
+  relatedId?: string;
+  description?: string;
+}
+
+interface SnapshotTarget {
+  kind: 'account' | 'crypto_holding' | 'stock_holding' | 'fif_holding' | 'metal_holding' | 'loan' | 'brokerage_cash' | 'portfolio';
+  id: string;
+}
+
 interface FinancialOperationPlan {
-  domainEntries: Array<{ table: string; row: Record<string, unknown> }>;
-  journalEntries: Array<{
-    accountClass: string;
-    direction: 'debit' | 'credit';
-    amount: string;
-    currency: string;
-    exchangeRateToBase: string;
-    amountInBase: string;
-    accountId?: string;
-    relatedFeature?: string;
-    relatedId?: string;
-    memo?: string;
-  }>;
-  cashEntries: Array<Record<string, unknown>>; // acc_transactions rows or empty
-  snapshotTargets: Array<{ kind: string; id: string }>; // holdings/accounts to rebuild after write
+  domainWrites: DomainWrite[];
+  journalLines: JournalLine[];
+  cashWrites: CashWrite[];
+  snapshotTargets: SnapshotTarget[];
+  feeEvents?: CanonicalFeeEvent[];
   conversionPath?: Array<{ from: string; to: string; rate: string; asOf?: string; rateId?: string }>;
 }
+
+// Engine: for (w of domainWrites) featureRepos[w.feature].apply(w)
+// نه INSERT INTO w.table از string آزاد
 
 interface FinancialOperationAdapter {
   readonly featureKey: string; // e.g. 'crypto' | 'loan' | 'fif'
@@ -247,15 +280,40 @@ API: `recordOpeningPosition(adapter, command)` از Core.
 ## Fee Event مرکزی (mapping از Domain)
 
 ```typescript
+export type FeeCategory =
+  | 'network'
+  | 'broker_commission'
+  | 'exchange'
+  | 'tax_as_transaction_cost'
+  | 'loan_origination'
+  | 'loan_early_payment'
+  | 'loan_monthly_service'
+  | 'loan_penalty'
+  | 'subscription'
+  | 'redemption'
+  | 'management'
+  | 'other';
+
+export type FeeTreatment =
+  | 'expense'
+  | 'cost_basis_in'
+  | 'proceeds_reduction'
+  | 'fee_burn'
+  | 'capitalized'
+  | 'reduction_of_proceeds';
+
 interface CanonicalFeeEvent {
   operationId: string;
   amount: string;
   currency: string;
-  category: string; // network | broker | exchange | tax_as_cost | loan_origination | …
-  treatment: 'expense' | 'cost_basis_in' | 'proceeds_reduction' | 'fee_burn' | 'capitalized';
-  ownerFeature: string;
+  category: FeeCategory; // فقط enum — نه string آزاد
+  treatment: FeeTreatment;
+  ownerFeature: RelatedFeature | string; // ترجیحاً RelatedFeature
   relatedDomainTxId?: string;
 }
+
+Registry: `core/fees/FeeCategory.ts` — synonymهای domain (feeBrokerCommission → broker_commission) فقط در mapper فیچر.
+
 ```
 Feature breakdown (feeBrokerCommission، feePresence، …) فقط **map** به یک یا چند CanonicalFeeEvent می‌شود.  
 Journal از treatment ساخته می‌شود؛ CostBasis از cost_basis_in / proceeds_reduction / fee_burn.
