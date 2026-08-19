@@ -149,3 +149,17 @@ Budget: تأثیر روی بودجه ماهانه
 `getTotalExpense` / گزارش‌ها: فقط `isVoided = false`.
 
 دسته‌ها: فقط از `99-Common-Categories/Categories.md` (لیست هزینه).
+
+---
+
+## تاریخ کسب‌وکار در برابر UTC
+
+فیلد اصلی کاربر: **`businessDate`** (`YYYY-MM-DD` میلادی در DB).
+
+```text
+todayBusiness = calendar date در timezone تنظیمات کاربر (نه خام Date.now() بدون TZ)
+accept if businessDate <= todayBusiness
+```
+
+`createdAt` = UTC timestamp ثبت سیستم — برای «آیا آینده است؟» استفاده **نشود**.  
+نیمه‌شب جلالی/UTC: فقط `businessDate` مبنا است.
