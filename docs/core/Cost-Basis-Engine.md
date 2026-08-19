@@ -109,3 +109,7 @@ Engine می‌تواند `applyC2cPair(sellEvent, buyEvent)` helper داشته �
 
 ## calculationVersion
 هر تغییر فرمول → bump + rebuild snapshots.
+
+## Domain-neutral
+Interface شامل instrumentId، costCurrency، fee، rate، tradeGroupId، transfer، CA kinds است.  
+Feature فقط mapping event می‌سازد — بدون fork فرمول هسته.

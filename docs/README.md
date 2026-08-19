@@ -38,3 +38,9 @@
 ## محاسبات و تست
 - `core/Cost-Basis-Engine.md` — الگوریتم مشترک
 - fixtureهای عددی اجباری در `db.md`؛ بدون CI سبز روی آن‌ها release مالی معتبر نیست
+
+## Specification در برابر Implementation
+
+حجم مستندات فعلاً از کد جلوتر است. **SoT رفتار runtime = کد + تست CI وقتی موجود شد.**  
+تا آن زمان: مستند قرارداد است؛ هر تعارض بین docs با `Naming-Glossary` و جداول SoT در `db.md` / Product-Map حل شود.  
+مسیر مالی «تأییدشده» فقط پس از سبز بودن fixtureهای عددی در CI.

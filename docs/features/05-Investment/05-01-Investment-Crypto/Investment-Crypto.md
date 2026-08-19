@@ -1131,3 +1131,7 @@ Reversal atomic باید:
 ### API هویت
 همه APIهای دامنه/قیمت کریپتو: `assetKey` / `instrumentId` — نه `symbol` خام.  
 `symbol` فقط label در UI و فیلد نمایشی.
+
+### نام‌گذاری C2C
+فیلد canonical: **`tradeGroupId`**.  
+`tradeId` در متون قدیمی = همان tradeGroupId (alias). کد جدید فقط `tradeGroupId` بنویسد.

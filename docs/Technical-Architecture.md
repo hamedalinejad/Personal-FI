@@ -260,3 +260,16 @@ Worker برای serialize DB و گزارش سنگین وقتی حجم بالا �
 | — | Price Fetch | فقط user click یا Auto-Sync صریح | بله — **استثنا نیست**؛ permission جدا |
 
 هر سند دیگر (Services، Price-Fetching) باید به **همین جدول** ارجاع دهد، نه شمارش متفاوت.
+
+## الگوی Public Feature API
+
+```text
+getX(id)
+listX(filter)
+createX(command)
+executeXAction(id, command)  // buy, pay, …
+rebuildX(id) / reconcileX(id)  // از طریق engine مرکزی وقتی مشترک است
+```
+
+شناسه موجودیت: **UUID یا instrumentId** — نه symbol.  
+Wrapperهای deprecated با symbol فقط resolve می‌کنند و در log هشدار می‌دهند.
