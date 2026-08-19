@@ -101,8 +101,22 @@ interface FinancialOperationContext {
   operationId: string;
   baseCurrencyAtOperation: string;
   businessDate: string;
-  command: unknown; // typed per feature command
+  command: FeatureCommand; // discriminated union — نه unknown
 }
+
+type FeatureCommand =
+  | { feature: 'crypto'; cmd: CryptoCommand }
+  | { feature: 'stocks'; cmd: StockCommand }
+  | { feature: 'fif'; cmd: FifCommand }
+  | { feature: 'metals'; cmd: MetalCommand }
+  | { feature: 'loan'; cmd: LoanCommand }
+  | { feature: 'accounts'; cmd: AccountsCommand }
+  | { feature: 'income'; cmd: IncomeCommand }
+  | { feature: 'expense'; cmd: ExpenseCommand }
+  | { feature: 'cheque'; cmd: ChequeCommand }
+  | { feature: 'physical_assets'; cmd: PhysicalAssetCommand }
+  | { feature: 'opening'; cmd: OpeningCommand };
+
 
 interface JournalLine {
   accountClass: AccountClass; // enum مرکزی types
@@ -115,8 +129,12 @@ interface JournalLine {
   relatedFeature?: RelatedFeature;
   relatedId?: string;
   memo?: string;
-  lineKind?: 'asset' | 'cash' | 'fee' | 'fx_conversion' | 'fx_rounding' | 'equity' | 'income' | 'expense' | 'other';
+  lineKind?: 'asset' | 'cash' | 'fee' | 'fx_conversion' | 'fx_rounding' | 'fx_gain' | 'fx_loss' | 'equity' | 'income' | 'expense' | 'other';
 }
+
+// accountClass = WHAT (طبقه حساب) | lineKind = WHY (علت تولید خط)
+// مثال: accountClass=expense + lineKind=fee ؛ accountClass=crypto_asset + lineKind=asset
+
 
 /** Feature-specific payload — engine به Repository همان feature می‌سپارد، نه SQL خام سراسری */
 type DomainWrite =
@@ -124,8 +142,12 @@ type DomainWrite =
   | { feature: 'stocks'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: StockTxWrite }
   | { feature: 'fif'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: FifTxWrite }
   | { feature: 'metals'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: MetalTxWrite }
-  | { feature: 'loan'; action: 'insert_tx' | 'void_tx' | 'update_loan'; payload: LoanTxWrite }
-  | { feature: 'accounts' | 'income' | 'expense' | 'cheque'; action: string; payload: Record<string, string | number | boolean | null> };
+  | { feature: 'loan'; action: 'insert_tx' | 'void_tx' | 'update_loan' | 'insert_opening'; payload: LoanTxWrite }
+  | { feature: 'accounts'; action: 'insert_tx' | 'void_tx'; payload: AccTxWrite }
+  | { feature: 'income'; action: 'insert_tx' | 'void_tx'; payload: IncomeTxWrite }
+  | { feature: 'expense'; action: 'insert_tx' | 'void_tx'; payload: ExpenseTxWrite }
+  | { feature: 'cheque'; action: 'insert' | 'status_change' | 'void'; payload: ChequeWrite }
+  | { feature: 'physical_assets'; action: 'insert_tx' | 'void_tx' | 'insert_opening'; payload: PhysicalAssetWrite };
 
 interface CashWrite {
   accountId: string;
@@ -139,10 +161,15 @@ interface CashWrite {
   description?: string;
 }
 
-interface SnapshotTarget {
-  kind: 'account' | 'crypto_holding' | 'stock_holding' | 'fif_holding' | 'metal_holding' | 'loan' | 'brokerage_cash' | 'portfolio';
-  id: string;
-}
+type SnapshotTarget =
+  | { kind: 'account'; id: string }
+  | { kind: 'crypto_holding'; id: string } // holdingId؛ اگر هنوز نیست create در domain write
+  | { kind: 'stock_holding'; id: string }
+  | { kind: 'fif_holding'; id: string }
+  | { kind: 'metal_holding'; id: string }
+  | { kind: 'loan'; id: string }
+  | { kind: 'brokerage_cash'; brokerageId: string }
+  | { kind: 'portfolio'; scope: 'all' | 'crypto' | 'stocks' | 'fif' | 'metals' | 'physical'; valuationAsOf?: string };
 
 interface FinancialOperationPlan {
   domainWrites: DomainWrite[];
@@ -261,8 +288,8 @@ Command مشترک همه Investmentها:
 {
   kind: 'opening_position';
   instrumentId: string;
-  assetCategory: 'crypto' | 'stock' | 'fif' | 'metal';
-  locationId: string; // exchangeId | brokerageId | fund holding scope
+  assetCategory: 'crypto' | 'stock' | 'fif' | 'metal' | 'physical' | 'cash' | 'loan';
+  locationId: string; // exchangeId | brokerageId | accountId | loanId scope
   quantity: string;
   costBasis: string;
   costCurrency: string;
@@ -293,7 +320,9 @@ API: `recordOpeningPosition(adapter, command)` از Core.
 export type FeeCategory =
   | 'network'
   | 'broker_commission'
-  | 'exchange'
+  | 'crypto_exchange_trading'
+  | 'crypto_withdrawal'
+  | 'market_fee'
   | 'tax_as_transaction_cost'
   | 'loan_origination'
   | 'loan_early_payment'
@@ -307,22 +336,25 @@ export type FeeCategory =
 export type FeeTreatment =
   | 'expense'
   | 'cost_basis_in'
-  | 'proceeds_reduction'
+  | 'proceeds_reduction' // **canonical** — reduction_of_proceeds حذف شد (alias ممنوع)
   | 'fee_burn'
-  | 'capitalized'
-  | 'reduction_of_proceeds';
+  | 'capitalized';
+
+// FeeCategory: 'exchange' حذف شد — به‌جای آن:
+// 'crypto_exchange_trading' | 'crypto_withdrawal' | 'broker_commission' | 'market_fee' | 'network' | …
 
 interface CanonicalFeeEvent {
   operationId: string;
   amount: string;
   currency: string;
-  category: FeeCategory; // فقط enum — نه string آزاد
+  category: FeeCategory;
   treatment: FeeTreatment;
-  ownerFeature: RelatedFeature | string; // ترجیحاً RelatedFeature
+  ownerFeature: RelatedFeature; // فقط enum — نه string
   relatedDomainTxId?: string;
 }
 
-Registry: `core/fees/FeeCategory.ts` — synonymهای domain (feeBrokerCommission → broker_commission) فقط در mapper فیچر.
+Registry: `core/fees/FeeCategory.ts` — mapper فیچر synonym → enum.
+
 
 ```
 Feature breakdown (feeBrokerCommission، feePresence، …) فقط **map** به یک یا چند CanonicalFeeEvent می‌شود.  
@@ -358,11 +390,18 @@ atomic under one operationId
 | economicKind | cost basis | Journal credit | Tax event |
 |--------------|------------|----------------|-----------|
 | `opening_balance` / `migration_import` | user-entered | `opening_equity` | معمولاً نه |
-| `gift` | 0 یا FMV از settings `giftCostBasisMode` | اگر FMV>0 و income mode: `income`; وگرنه `opening_equity` | optional gift tax event |
+| `gift` | طبق `giftCostBasisMode` | طبق `giftIncomeRecognitionMode` | optional |
 | `airdrop` | 0 یا FMV (`airdropIncomeMode`) | **`income`** اگر FMV به‌عنوان درآمد؛ وگرنه equity | taxable event اگر income |
 | `unknown` | **الزامی user cost** | `opening_equity` | نه تا classify |
 
-تنظیمات سراسری در Settings: `giftCostBasisMode: 'zero' | 'fmv'`, `airdropIncomeMode: 'income_fmv' | 'zero_basis'`.
+تنظیمات جدا:
+```text
+giftCostBasisMode: 'zero' | 'fmv'
+giftIncomeRecognitionMode: 'none' | 'fmv_as_income'  // مستقل از cost basis
+airdropIncomeMode: 'income_fmv' | 'zero_basis'
+```
+Journal credit = income فقط اگر recognition mode بگوید؛ cost جداگانه.
+
 
 ## Tax Event + Reversal
 
@@ -377,3 +416,27 @@ reverseOperation(op)
 
 API: `voidTaxEvent`, `reverseTaxEvent`, `recalculateTaxEvent` (فقط با operation جدید audited).  
 Tax event active روی reversed source operation **نمی‌ماند**.
+
+---
+
+## Durability بعد از SQL COMMIT
+
+`fin_operations.status` داخل SQLite است؛ اگر IDB fail/crash شود ممکن است RAM از بین برود.
+
+**Marker اجباری در IndexedDB `db_meta`:**
+```text
+pendingCommit: {
+  operationId,
+  operationCommitToken, // random
+  pendingDbChecksum,
+  status: 'committed_awaiting_persist',
+  lastPersistErrorCode?,
+  persistAttemptCount,
+  lastPersistAttemptAt?
+}
+```
+
+Boot recovery: اگر `pendingCommit` باشد → retry serialize/swap یا mark failed + UI recover.
+
+روی `fin_operations` (پس از persist موفق یا در RAM تا persist):
+`status`, `persistAttemptCount`, `lastPersistErrorCode`, `lastPersistAttemptAt` — **اجباری در schema**.
