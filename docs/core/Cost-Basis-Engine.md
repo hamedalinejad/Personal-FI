@@ -13,55 +13,99 @@
 | `acquisition` | افزایش quantity + افزایش cost pool |
 | `disposal` | کاهش quantity + آزاد کردن cost متناسب (avg یا lot) |
 | `feeIn` | کارمزد وارد cost basis (acquisition) |
-| `feeOut` | کارمزد از proceeds / realized (disposal) |
-| `corporateAction` | تغییر quantity/cost بدون خرید/فروش ساده (split, bonus, …) |
-| `transfer` | جابه‌جایی cost بین holdingها |
+| `feeOut` | کارمزد از proceeds / realized (disposal) یا fee burn quantity |
+| `corporateAction` | تغییر quantity/cost بدون خرید/فروش ساده |
+| `transfer` | جابه‌جایی cost بین holdingها — **realizedPL = 0** |
 
-نسخه v1 پیش‌فرض: **Weighted Average** cost pool per holding.  
-Lot/FIFO: Should Have با همان interface.
+نسخه v1 پیش‌فرض: **Weighted Average** cost pool per holding (مبالغ cost به **costCurrency** یکسان در state).
 
-## Interface
+## Interface (Multi-Currency)
 
 ```typescript
 interface CostBasisEvent {
   kind: 'acquisition' | 'disposal' | 'ca_bonus' | 'ca_split' | 'ca_reverse_split'
-    | 'ca_rights' | 'ca_capital' | 'transfer_out' | 'transfer_in' | 'metadata_only';
-  quantity: string;       // AssetQuantity decimal string
-  unitPrice?: string;     // for acquisition
-  grossProceeds?: string; // disposal
-  feeInCost?: string;     // money in trade currency added to cost
-  feeFromProceeds?: string;
-  ratio?: string;         // split/bonus
+    | 'ca_rights' | 'ca_capital' | 'transfer_out' | 'transfer_in'
+    | 'fee_burn' | 'fee_reversal' | 'metadata_only';
+
+  instrumentId: string;     // هویت دارایی (assetKey / ISIN / …)
+  quantity: string;         // AssetQuantity
+
+  /** ارز pool هزینه این holding پس از نرمال‌سازی */
+  costCurrency: string;     // معمولاً baseCurrency یا quote قفل‌شده
+  unitPrice?: string;       // به costCurrency (از قبل convert شده در Feature)
+  grossProceeds?: string;   // به costCurrency
+  feeInCost?: string;       // به costCurrency — وارد totalInvested
+  feeFromProceeds?: string; // به costCurrency — از realized
+  feeBurnQuantity?: string; // کارمزد از خود asset (کاهش qty بدون disposal بازاری)
+
+  /** زمینه معامله */
+  quoteCurrency?: string;
+  feeCurrency?: string;
+  exchangeRateToCost?: string; // نرخ استفاده‌شده برای نرمال‌سازی (audit)
+  asOf?: string;
+
+  /** C2C / گروه */
+  tradeGroupId?: string;
+  linkedRole?: 'c2c_sell' | 'c2c_buy' | 'transfer_pair';
+  transferredCost?: string; // برای acquisition طرف B: cost آزادشده از A
+
+  ratio?: string;
   calculationVersion: string;
 }
 
 interface CostBasisState {
+  instrumentId: string;
   quantity: string;
-  totalInvested: string;
-  averageBuyPrice: string; // totalInvested/quantity or 0
+  totalInvested: string;    // در costCurrency
+  costCurrency: string;
+  averageBuyPrice: string;  // totalInvested/quantity
 }
 
 interface CostBasisEngine {
   apply(state: CostBasisState, event: CostBasisEvent): CostBasisState;
-  applyAll(events: CostBasisEvent[]): CostBasisState; // from empty
-  realizedOnDisposal(state: CostBasisState, event: CostBasisEvent): { realizedPL: string; next: CostBasisState };
+  applyAll(events: CostBasisEvent[]): CostBasisState;
+  realizedOnDisposal(state: CostBasisState, event: CostBasisEvent): {
+    realizedPL: string; // costCurrency
+    next: CostBasisState;
+  };
 }
 ```
+
+### قانون نرمال‌سازی
+Feature **قبل از** `engine.apply` همه مبالغ پولی را با `convert(..., asOf)` به `costCurrency` می‌برد. Engine روی float خام چندارزی کار نمی‌کند.
+
+## C2C
+
+```text
+operationId = G
+1) disposal ETH: kind=disposal, tradeGroupId=G, linkedRole=c2c_sell
+   → releasedCost = sold portion of totalInvested
+2) fee events on legs as feeInCost / feeBurnQuantity / feeFromProceeds
+3) acquisition BTC: kind=acquisition, tradeGroupId=G, linkedRole=c2c_buy,
+   transferredCost = releasedCost + fees allocated to cost of B
+   unitPrice optional; totalInvested_B += transferredCost
+```
+Engine می‌تواند `applyC2cPair(sellEvent, buyEvent)` helper داشته باشد تا divergence با Crypto implementation کم شود.
+
+## Transfer و Fee (مدل واحد)
+
+| رویداد | quantity | totalInvested | realizedPL |
+|--------|----------|---------------|------------|
+| transfer_out | −gross یا −net طبق مدل | −cost متناسب | **0** |
+| transfer_in | +net | +همان cost | **0** |
+| fee_burn | −feeQty | 0 یا کاهش cost متناسب policy | **0** (هزینه = از دست رفتن asset، نه فروش بازار) |
+| fee_reversal | +feeQty | restore | **0** |
+
+**ممنوع:** transfer را به‌صورت disposal با `unitPrice = market` ثبت کردن.
 
 ## نگاشت فیچر → Event
 
 | فیچر | خرید | فروش | خاص |
 |------|------|------|-----|
-| Crypto | acquisition + feePresence | disposal + fee | C2C: disposal A + acquisition B با cost منتقل‌شده |
-| Stocks | acquisition | disposal | CA → ca_* events |
-| FIF | acquisition at transactionPrice | disposal at redemption | reinvest = acquisition؛ NAV ≠ price |
-| Metals | acquisition per mg+purity | disposal | delivery = disposal از پلتفرم |
-
-Feature **نباید** `totalInvested += qty*price` را مستقیم در UI کپی کند؛ فقط `engine.apply`.
+| Crypto | acquisition | disposal | C2C pair؛ transfer+fee_burn؛ identity=`assetKey` |
+| Stocks | acquisition | disposal | CA events |
+| FIF | acquisition @ transactionPrice | disposal @ redemption | |
+| Metals | acquisition | disposal | |
 
 ## calculationVersion
-هر تغییر فرمول → bump version + rebuild snapshots (طبق Rounding-Policy / db).
-
-## Transfer
-`transfer_out` / `transfer_in`: جابه‌جایی cost pool؛ **Realized P&L = 0**.  
-Fee شبکه = `feeOut` یا کاهش quantity جدا — نه disposal بازاری.
+هر تغییر فرمول → bump + rebuild snapshots.
