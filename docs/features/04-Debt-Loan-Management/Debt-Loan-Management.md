@@ -89,6 +89,7 @@
 **مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
+- `dayCountConvention` → enum (`actual_365` | `actual_360` | `30_360` | `actual_actual`) — **اجباری برای frequency=custom**؛ پیش‌فرض `actual_365` برای بقیه
 - `exchangeRateToBase` → decimal (نرخ ارز وام/قسط → **baseCurrency کاربر** در لحظه ثبت — / ؛ نه الزاماً ریال/تتر)
 
 **تاریخ‌ها:**
@@ -108,8 +109,9 @@
 - `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`)
 - `customIntervalDays` → integer (nullable — اجباری اگر frequency=custom)
 - `totalInstallments` → integer (تعداد کل اقساط)
-- `gracePeriodMonths` → integer (nullable — طول تنفس به **ماه تقویمی**؛ برای تبدیل به تعداد period از `gracePeriods = gracePeriodMonths × periodsPerYear / 12` — )
-- `gracePeriodCount` → integer (nullable — **جایگزین صریح**: تعداد periodهای تنفس هم‌فرکانس با `installmentFrequency`؛ اگر پر باشد بر `gracePeriodMonths` مقدم است)
+- `gracePeriods` → integer (nullable — **canonical** تعداد دوره‌های تنفس؛ 0 یا null = بدون تنفس)
+- `gracePeriodUnit` → enum (`installment` | `month`) پیش‌فرض `installment`
+- `gracePeriodMonths` / `gracePeriodCount` → **deprecated**؛ فقط مهاجرت خوانده می‌شوند و به `gracePeriods` map می‌شوند
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
 - `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
@@ -194,6 +196,7 @@
 
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
+- `accountingTreatment` → enum **اجباری** (`expense` | `reduction_of_proceeds` | `capitalized_cost` | `reduction_of_carrying_amount`)
 - `feeCategory` → enum:
  - `origination` — کارمزد صدور/ثبت (یک‌بار، در disbursement)
  - `early_payment` — کارمزد پیش‌پرداخت (هنگام early_payment)
@@ -1291,11 +1294,56 @@ interestPortion = totalInterest / n
 ## Grace Period — Invariant دیتابیس
 
 ```sql
--- حداکثر یکی از دو فیلد معنا دارد؛ count مقدم است
-CHECK (
-  gracePeriodCount IS NULL OR gracePeriodMonths IS NULL OR gracePeriodCount IS NOT NULL
-)
--- منطق Domain: if gracePeriodCount != null → use count; else months; else 0
+-- پس از migration به canonical:
+CHECK (gracePeriods IS NULL OR gracePeriods >= 0)
+CHECK (gracePeriodUnit IN ('installment', 'month'))
+-- فیلدهای deprecated در schema جدید nullable و فقط read در migrate
 ```
 
-ترجیح schema: یک فیلد canonical `gracePeriods` (integer count) + `gracePeriodUnit` (`installment`|`month`) و deprecate دو فیلد موازی در major بعدی. تا آن زمان Domain **باید** precedence را enforce کند و از نوشتن همزمان معنادار متناقض جلوگیری کند (اگر هر دو پرند، فقط count اعمال می‌شود و months نادیده در calculate).
+Domain: فقط `gracePeriods` + `gracePeriodUnit` برای محاسبه. نوشتن همزمان months/count متناقض در API create ممنوع (reject).
+
+---
+
+## Invariants قطعی ln_transactions
+
+### مبلغ
+```text
+برای type ∈ {installment_payment, early_payment}:
+  amount = principalPortion + interestPortion + coalesce(feePortion,0) + coalesce(penaltyPortion,0)
+
+برای interest_payment:
+  principalPortion = 0 یا null
+  amount = interestPortion + coalesce(feePortion,0) + coalesce(penaltyPortion,0)
+
+برای fee_payment:
+  amount = feePortion
+  principalPortion = interestPortion = 0/null
+
+برای penalty:
+  amount = penaltyPortion
+  principalPortion = 0/null
+
+برای disbursement:
+  amount = net cash حرکت؛ principal روی remainingBalance جدا
+```
+
+### Type semantics
+| type | principal | interest | معنی |
+|------|-----------|----------|------|
+| installment_payment | ≥0 | ≥0 | قسط عادی (اصل+سود در یک پرداخت) |
+| interest_payment | 0 | >0 | فقط سود (مثلاً دوره تنفس interest-only) |
+| early_payment | >0 معمولاً | طبق schedule | پیش‌پرداخت؛ ممکن است feePortion داشته باشد |
+| fee_payment | 0 | 0 | فقط کارمزد |
+| penalty | 0 | 0 | فقط جریمه |
+
+### remainingBalance — SoT
+```text
+Source of Truth = rebuild از ln_transactions:
+  start = principalAmount (پس از disbursement policy)
+  − Σ principalPortion (isVoided=false)
+snapshot remainingBalance روی ln_loans = projection پس از هر atomic pay
+```
+Ledger (`ln_transactions`) authoritative؛ snapshot برای سرعت. `rebuildLoan(loanId)` اجباری برای reconcile.
+
+### penaltyBasis
+Engine **باید** هر دو `overdue_installment` و `remaining_balance` را پشتیبانی کند؛ پیش‌فرض محصول `overdue_installment`. انتخاب در UI روی create/update loan.
