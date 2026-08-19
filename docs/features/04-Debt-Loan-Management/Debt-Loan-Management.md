@@ -120,8 +120,9 @@
 
 - `penaltyRate` → decimal (nullable — نرخ جریمه دیرکرد سالانه — مثلاً 6) ✅ **جدید**
 - `penaltyBasis` → enum (nullable — `overdue_installment` | `remaining_balance`; پیش‌فرض: `overdue_installment` — جزئیات در بخش «و) جریمه دیرکرد») ✅ **جدید**
-- `penaltyMaxCapAmount` → decimal (nullable — سقف مطلق جریمه به ریال) ✅ **جدید**
-- `penaltyMaxCapRate` → decimal (nullable — سقف جریمه به درصد از اصل — مثلاً 10) ✅ **جدید**
+- `penaltyMaxCapAmount` → decimal (nullable — سقف مطلق جریمه به **`loan.currency`**، نه hard-code ریال)
+- `penaltyMaxCapRate` → decimal (nullable — سقف جریمه به درصد از اصل — مثلاً 10)
+- `penaltyMaxCapCurrency` → string (nullable — پیش‌فرض = `loan.currency`)
 - `penaltyGraceDays` → integer (nullable, default: 0 — روزهای معافیت قبل از شروع جریمه) ✅ **جدید**
 - `serviceFeeRate` → decimal (nullable — کارمزد قرض‌الحسنه — مثلاً 4) ✅ **جدید**
 - `serviceFeeAmount` → decimal (nullable — مبلغ کارمزد محاسبه‌شده) ✅ **جدیدوضعیت:**
@@ -207,6 +208,7 @@
  - `percentage_of_remaining_balance` — درصدی از مانده وام (برای کارمزدهای ماهانه مثل بعضی وام‌های مسکن)
  - `tiered` — پلکانی (مثلاً: اگر پیش‌پرداخت ≤ ۳۰٪ → ۲٪؛ اگر > ۳۰٪ → ۴٪)
 - `amount` → decimal (nullable — مبلغ ثابت برای `feeType = 'fixed'`)
+- `amountCurrency` → string (پیش‌فرض `loan.currency`؛ اگر settlement با ارز دیگر، همراه `exchangeRateToLoanCurrency`)
 - `rate` → decimal (nullable — نرخ درصدی برای `feeType` های percentage-based — مثلاً 1.5)
 - `minAmount` → decimal (nullable — حداقل کارمزد — برای همه انواع)
 - `maxAmount` → decimal (nullable — حداکثر کارمزد — برای همه انواع)
@@ -1252,3 +1254,48 @@ interestPortion = totalInterest / n
 `n = weeks in term`, `yearsTotal = n/52`, `totalInterest = P × 0.18 × yearsTotal`.
 
 همه از `getPeriodRate` / `periodsPerYear` / `getTotalPeriods` — بدون فرمول موازی.
+
+---
+
+## Cash Linkage چندمرحله‌ای
+
+`ln_loans.accountTransactionId` فقط **disbursement اولیه (lump_sum)** را نگه می‌دارد.
+
+هر رویداد بعدی cash در **`ln_transactions.accountTransactionId`** لینک می‌شود:
+`installment_payment`, `fee_payment`, `penalty`, `early_payment`, `interest_payment`.
+
+برای facility/phased آینده: جدول `ln_disbursements` (Should Have) با چند ردیف؛ v1 فقط یک disbursement.
+
+گزارش lifecycle از join `ln_transactions` ↔ `acc_transactions` — نه از یک FK روی header وام.
+
+---
+
+## Schedule Snapshot (بازتولید تاریخی)
+
+جدول `ln_schedule_snapshots` (Must برای variable/early recalc):
+
+| فیلد | نقش |
+|------|-----|
+| `id` | UUID |
+| `loanId` | FK |
+| `generatedAt` | زمان تولید |
+| `reason` | `create` \| `rate_change` \| `early_payment` \| `recalculate` |
+| `operationId` | atomic op |
+| `payload` | JSON: لیست اقساط آینده `{ dueDate, principal, interest, fee, total }[]` |
+| `calculationVersion` | |
+
+برنامه «فعلی» = آخرین snapshot؛ تاریخچه = همه ردیف‌ها. Transaction log پرداخت‌ها را نگه می‌دارد؛ snapshot می‌گوید سیستم **چه برنامه‌ای** در آن لحظه تولید کرده بود.
+
+---
+
+## Grace Period — Invariant دیتابیس
+
+```sql
+-- حداکثر یکی از دو فیلد معنا دارد؛ count مقدم است
+CHECK (
+  gracePeriodCount IS NULL OR gracePeriodMonths IS NULL OR gracePeriodCount IS NOT NULL
+)
+-- منطق Domain: if gracePeriodCount != null → use count; else months; else 0
+```
+
+ترجیح schema: یک فیلد canonical `gracePeriods` (integer count) + `gracePeriodUnit` (`installment`|`month`) و deprecate دو فیلد موازی در major بعدی. تا آن زمان Domain **باید** precedence را enforce کند و از نوشتن همزمان معنادار متناقض جلوگیری کند (اگر هر دو پرند، فقط count اعمال می‌شود و months نادیده در calculate).
