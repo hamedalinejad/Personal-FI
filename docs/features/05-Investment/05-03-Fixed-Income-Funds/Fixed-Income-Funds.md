@@ -399,3 +399,29 @@ COMMIT
 
 ### Dividend صندوق — Gross / Net
 همان قرارداد سهام: `grossDividend`, `withholdingTaxAmount`, `netDividend`؛ `totalAmount` = خالص دریافتی.
+
+---
+
+## حالت‌های Valuation و Performance
+
+| حالت | فرمول | گزارش |
+|------|--------|--------|
+| `navValuation` | units × currentNAV | اعلامیه / tracking |
+| `liquidationValue` | units × redemptionPrice − exit fees | «اگر الان ابطال کنم» |
+| `acquisitionReference` | averageBuyPrice (از transactionPrice خرید) | cost basis |
+| `etfMarketValue` | units × last market price | ETF |
+
+**Unrealized برای نمایش کاربر (issuance/redemption):** پیش‌فرض `liquidationValue - totalInvested` نه الزاماً `(NAV - avg)×units`.  
+UI می‌تواند هر دو را نشان دهد با برچسب صریح.
+
+### Total Return / Performance واحد
+
+```text
+totalReturn =
+  realizedPL_from_sells
+  + Σ netDividend (و reinvest به‌عنوان acquisition جدا؛ dividend leg در income)
+  − fees که expense شده‌اند (نه دوبار در cost)
+  + unrealized (بر اساس valuation mode انتخابی)
+```
+
+API: `getFundPerformance(holdingId, { valuationMode, period })` یک آبجکت با breakdown برمی‌گرداند — نه فقط یک عدد مبهم.
