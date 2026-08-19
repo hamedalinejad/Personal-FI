@@ -44,3 +44,6 @@
 حجم مستندات فعلاً از کد جلوتر است. **SoT رفتار runtime = کد + تست CI وقتی موجود شد.**  
 تا آن زمان: مستند قرارداد است؛ هر تعارض بین docs با `Naming-Glossary` و جداول SoT در `db.md` / Product-Map حل شود.  
 مسیر مالی «تأییدشده» فقط پس از سبز بودن fixtureهای عددی در CI.
+
+## Release مالی
+بدون CI `financial-fixtures` سبز (فهرست کامل در `core/db/db.md`) هیچ tag release مالی معتبر نیست.

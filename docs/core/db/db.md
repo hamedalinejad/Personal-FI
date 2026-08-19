@@ -1160,29 +1160,85 @@ Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و 
 
 ### Numerical Fixtures اجباری (Must Have قبل از release مالی)
 
-مسیر پیشنهادی: `tests/fixtures/financial/*.json` + runner که Domain/Engine را صدا می‌زند — **نه** فقط mock UI.
+**Release blocker:** بدون سبز بودن این مجموعه در CI، مسیر مالی «تأییدشده» اعلام **نشود**. مستند ≠ اثبات runtime.
 
-هر fixture: `{ name, inputs, steps[], expected: { state, realizedPL?, journalBalance? } }` با decimal string.
+مسیر: `tests/fixtures/financial/**/*.json` + runner روی Domain / CostBasisEngine / Journal / Loan formulas (نه mock UI).
 
-| ID | سناریو | assert کلیدی |
-|----|--------|----------------|
-| `crypto_buy_fee_quote` | BUY 1 BTC fee 10 USDT | qty=1, cost includes feeIn |
-| `crypto_buy_fee_base` | BUY gross 1 fee 0.001 BTC | netQty=0.999 |
-| `crypto_sell` | SELL partial | realizedPL, avg unchanged on remainder |
-| `crypto_c2c` | ETH→BTC | cost moved, dual leg |
-| `crypto_transfer_fee` | transfer 1 fee 0.001 | Σ qty −0.001 |
-| `multi_currency_fee` | feeCurrency ≠ trade currency | feeInTradeCurrency |
-| `stock_split` | 1000 → 1:2 | qty=2000, totalInvested same |
-| `stock_bonus` | bonus 1:10 | qty up, invested same |
-| `stock_rights` | issue+exercise | cost + cash |
-| `fif_nav_ne_subscription` | buy @ 1010 NAV 1000 | avg from 1010 not NAV |
-| `fif_reinvest` | dual leg income+buy | units+invested+journal |
-| `loan_flat` | flat 18% 18m | totalInterest formula |
-| `loan_declining` | monthly r=getPeriodRate | portions |
-| `loan_grace` | interest-only then amort | |
-| `loan_penalty` | cap scope lifetime vs per installment | |
+هر fixture:
+```json
+{
+  "id": "crypto_bridge_fee",
+  "inputs": { },
+  "steps": [ ],
+  "expected": {
+    "holdings": {},
+    "realizedPL": null,
+    "journal": { "balanced": true, "lines": [] },
+    "operationStatus": "persisted"
+  }
+}
+```
+مقادیر مالی **string** decimal.
 
-**قانون:** تا این fixtureها در CI سبز نباشند، مسیر مالی «تأییدشده» اعلام نشود. مستند به‌تنهایی bug runtime را close نمی‌کند.
+#### Crypto
+| ID | سناریو | assert |
+|----|--------|--------|
+| `crypto_buy_then_buy_sell` | BUY → BUY → SELL partial | qty, avg, realizedPL, journal |
+| `crypto_buy_fee_quote` | fee USDT | cost includes feeIn |
+| `crypto_buy_fee_base` | fee from BTC | netQty |
+| `crypto_c2c` | ETH→BTC | transferredCost نه market |
+| `crypto_transfer_internal_fee` | internal + fee_burn | Σ qty, PL=0 |
+| `crypto_bridge` | 100→fee1→99 other assetKey | transferredCost=99/100 pool |
+| `crypto_external_sale` | proceeds+FX | realizedPL, no fake cash unless deposit |
+| `crypto_external_receive` | opening/receive + cost | acquisition |
+| `crypto_opening_position` | migration | equity journal |
+
+#### Stocks
+| ID | سناریو | assert |
+|----|--------|--------|
+| `stock_buy_sell` | | cost, realized |
+| `stock_dividend` | gross/withholding/net | income ≠ capital gain |
+| `stock_split` | 1:2 | qty×2 invested same |
+| `stock_bonus` | | |
+| `stock_rights` | issue+exercise | |
+| `stock_ca_transfer` | instrumentId change | rebuild |
+
+#### Funds
+| ID | سناریو | assert |
+|----|--------|--------|
+| `fif_sub_ne_nav` | buy @ subscription ≠ NAV | avg from transactionPrice |
+| `fif_redemption_ne_nav` | sell @ redemption | realized from price not NAV |
+| `fif_distribution` | dividend | income leg |
+| `fif_reinvest` | dual leg same operationId | units+cost+income |
+
+#### Loans
+| ID | سناریو | assert |
+|----|--------|--------|
+| `loan_declining` | getPeriodRate | portions sum |
+| `loan_flat` | | totalInterest |
+| `loan_qarz` | | principal schedule |
+| `loan_bullet` | | |
+| `loan_grace` | gracePeriods | interest-only then amort |
+| `loan_early_payment` | schedule snapshot version | remaining rebuild |
+
+#### Currency
+| ID | سناریو | assert |
+|----|--------|--------|
+| `fx_direct` | | |
+| `fx_inverse` | | |
+| `fx_multi_hop` | path locked | amountInBase immutable |
+| `fx_base_change` | report as-booked vs restated | |
+
+#### Accounting
+| ID | سناریو | assert |
+|----|--------|--------|
+| `journal_balanced` | any buy | Σ debit=credit base |
+| `reversal_balanced` | reverseOperation | journal+domain |
+| `opening_balanced` | opening_position | Dr asset Cr equity/income |
+| `fee_burn_balanced` | | expense + asset credit |
+| `bank_transfer_neutral` | | no income/expense |
+
+**CI gate:** job `financial-fixtures` must pass on main before financial release tag.
 
 ### Invariant: Transfer Accounting-neutral
 
