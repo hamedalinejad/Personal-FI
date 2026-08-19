@@ -46,10 +46,10 @@
  - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
  - هر دو تراکنش (`acc_transactions` و `inv_crypto_exchange_transactions`) ثبت و به هم لینک می‌شوند.
 6. **انتقال بین صرافی‌ها/والت‌ها**:
- - حتماً دو تراکنش لینک‌شده ثبت می‌شود، با یک `transferId` مشترک (UUID تازه، ساخته‌شده در لحظه ثبت انتقال) که در هر دو رکورد ذخیره می‌شود:
- - یکی در صرافی مبدا با `type: transfer_out`، `counterExchangeId` به مقصد و `transferId` مشترک
- - یکی در صرافی مقصد با `type: transfer_in`، `counterExchangeId` به مبدا و همان `transferId`
- - `transferId` (نه صرفاً `counterExchangeId`) مرجع قطعی برای پیدا کردن رکورد جفت است؛ این لازم است چون ممکن است چند انتقال هم‌زمان بین همان دو صرافی در یک روز ثبت شود.
+ - حتماً دو تراکنش لینک‌شده ثبت می‌شود، با یک `transferGroupId` مشترک (UUID تازه، ساخته‌شده در لحظه ثبت انتقال) که در هر دو رکورد ذخیره می‌شود:
+ - یکی در صرافی مبدا با `type: transfer_out`، `counterExchangeId` به مقصد و `transferGroupId` مشترک
+ - یکی در صرافی مقصد با `type: transfer_in`، `counterExchangeId` به مبدا و همان `transferGroupId`
+ - `transferGroupId` (نه صرفاً `counterExchangeId`) مرجع قطعی برای پیدا کردن رکورد جفت است؛ این لازم است چون ممکن است چند انتقال هم‌زمان بین همان دو صرافی در یک روز ثبت شود.
  - کارمزد شبکه/انتقال می‌تواند از مقدار ارسالی کسر شود (`feePresence = fee_from_received` یا `fee_from_base_asset`):
  - `grossQuantity` / `amountToSend` = مقدار کسرشده از مبدا
  - `feeQuantity` / `feeAmount` = سوخته‌شده (شبکه یا واسطه)
@@ -100,13 +100,13 @@
 
  ── مرحله ۳: ثبت reversal SELL برای fromSymbol ──────────────────────
  -- اثر: BUY fromSymbol — Cost Basis همان sellTx.totalAmountBase است
- INSERT reversal_buy (type='buy', symbol=sellTx.symbol, exchangeId=sellTx.exchangeId,
+ INSERT reversal_buy (type='buy', assetKey=sellTx.assetKey, symbol=sellTx.symbol /*display only*/, exchangeId=sellTx.exchangeId,
  quantity=sellTx.quantity, totalAmountBase=sellTx.totalAmountBase,
  feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
 
  ── مرحله ۴: ثبت reversal BUY برای toSymbol ────────────────────────
  -- اثر: SELL toSymbol — مقدار BTC که کسر می‌شود همان buyTx.quantity است
- INSERT reversal_sell (type='sell', symbol=buyTx.symbol, exchangeId=buyTx.exchangeId,
+ INSERT reversal_sell (type='sell', assetKey=buyTx.assetKey, symbol=buyTx.symbol /*display only*/, exchangeId=buyTx.exchangeId,
  quantity=buyTx.quantity, totalAmountBase=buyTx.totalAmountBase,
  feeAmount=0, tradeGroupId=newReversalTradeGroupId, isReversal=true, reversedTradeGroupId=originalTradeGroupId)
 
@@ -122,13 +122,13 @@
  > وگرنه یکی از دو Holding اصلاح شده و دیگری نه: پرتفوی کاملاً خراب می‌شود.
  > `rebuildHolding` به جای تنظیم دستی `averageBuyPrice` استفاده می‌شود تا خطای محاسباتی نداشته باشیم.
 
- **ج) Reversal انتقال (TRANSFER با `transferId`) — ۵ مرحله Atomic:**
+ **ج) Reversal انتقال (TRANSFER با `transferGroupId`) — ۵ مرحله Atomic:**
  ```
  BEGIN TRANSACTION;
- 1. outTx = SELECT * WHERE transferId=? AND type='transfer_out'
- inTx = SELECT * WHERE transferId=? AND type='transfer_in'
+ 1. outTx = SELECT * WHERE transferGroupId=? AND type='transfer_out'
+ inTx = SELECT * WHERE transferGroupId=? AND type='transfer_in'
  IF NOT (outTx AND inTx) → ROLLBACK + خطا
- 2. UPDATE SET isVoided=true WHERE transferId=? (هر دو رکورد)
+ 2. UPDATE SET isVoided=true WHERE transferGroupId=? (هر دو رکورد)
  3. INSERT reversal_in (type='transfer_in', exchangeId=outTx.exchangeId, quantity=outTx.quantity)
  INSERT reversal_out (type='transfer_out', exchangeId=inTx.exchangeId, quantity=inTx.quantity)
  4. rebuildHolding({ exchangeId: outTx.exchangeId, assetKey: outTx.assetKey })
@@ -140,7 +140,7 @@
  > - `isReversal` → boolean (پیش‌فرض `false`) — این رکورد یک Reversal است نه تراکنش اصلی
  > - `reversedTxId` → UUID (nullable) — id رکورد اصلی که این Reversal آن را خنثی می‌کند
  > - `reversedTradeId` → UUID (nullable) — برای C2C: tradeGroupId معامله اصلی
- > - `reversedTransferId` → UUID (nullable) — برای Transfer: transferId انتقال اصلی
+ > - `reversedTransferGroupId` → UUID (nullable) — برای Transfer: transferGroupId انتقال اصلی
 
 ---
 
@@ -245,14 +245,14 @@
 - `currency` → string
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
 - `networkId` → UUID (nullable — FK به `inv_crypto_wallet_networks.id`؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی؛ برای `buy`/`sell` داخل صرافی null — فیلد string آزاد `network` ممنوع است؛ نمایش UI از `inv_crypto_wallet_networks.name`/`chainId` می‌آید)
-- `transferId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
+- `transferGroupId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
 - `txHash` → string (nullable — شناسه تراکنش آنچین (Transaction Hash) روی بلاکچین؛ برای `transfer_in`/`transfer_out` بین والت‌ها بسیار ارزشمند است؛ برای `buy`/`sell` داخل صرافی متمرکز معمولاً null است)
 - `blockNumber` → integer (nullable — شماره بلاکی که تراکنش در آن تأیید شده؛ فقط اگر `txHash` موجود باشد معنی دارد)
 - `confirmations` → integer (nullable — تعداد تأییدیه‌های بلاکچین در لحظه ثبت؛ اختیاری برای رفرنس تاریخی)
 - `isReversal` → boolean (پیش‌فرض `false` — این رکورد یک تراکنش معکوس/Reversal است)
 - `reversedTxId` → UUID (nullable — برای Reversal تک‌رکوردی: id رکورد `inv_crypto_transactions` اصلی که این Reversal آن را خنثی می‌کند)
 - `reversedTradeId` → UUID (nullable — برای Reversal C2C: `tradeGroupId` معامله اصلی)
-- `reversedTransferId` → UUID (nullable — برای Reversal انتقال: `transferId` انتقال اصلی)
+- `reversedTransferGroupId` → UUID (nullable — برای Reversal انتقال: `transferId` انتقال اصلی)
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
@@ -696,9 +696,9 @@ holding.totalFeesPaidBase += feeBase
 
  ── مرحله ۴: ثبت دو رکورد transfer_out و transfer_in ────────────────
  INSERT inv_crypto_transactions (type='transfer_out', exchangeId=source, quantity=amountToSend,
- feeAmount, feeCurrency, feeAssetPriceToBase, transferId, counterExchangeId=dest, ...)
+ feeAmount, feeCurrency, feeAssetPriceToBase, transferGroupId, counterExchangeId=dest, ...)
  INSERT inv_crypto_transactions (type='transfer_in', exchangeId=dest, quantity=quantityReceived,
- feeAmount=0, feeCurrency=null, transferId, counterExchangeId=source, ...)
+ feeAmount=0, feeCurrency=null, transferGroupId, counterExchangeId=source, ...)
 
  ── مرحله ۵: آپدیت Holding مقصد (Weighted Average) ──────────────────
  destHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=destExchangeId AND symbol=?
@@ -816,7 +816,7 @@ averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط �
 |------|-----|
 | `networkId` | FK به `inv_crypto_wallet_networks` (نه string آزاد — ) |
 | `txHash`, `blockNumber`, `confirmations` | فقط اینجا |
-| `transferId` | جفت in/out |
+| `transferGroupId` | جفت in/out |
 | بدون `accountId` بانکی اجباری | مگر پل fiat همزمان |
 
 جریان‌ها:
@@ -962,7 +962,7 @@ assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
 |-----|------|
 | `executeBuy` / `executeSell` | یک `inv_crypto_transactions` + به‌روز holding + optional cash holding IRR/USDT + optional `acc_transactions` اگر از بانک |
 | `executeC2C` | دو رکورد با `tradeGroupId` + gross/net/fee هر leg |
-| `executeTransfer` | transfer_out + transfer_in با `transferId`؛ fee network طبق `feePresence` |
+| `executeTransfer` | transfer_out + transfer_in با `transferGroupId`؛ fee network طبق `feePresence` |
 | `depositCash` / `withdrawCash` | فقط Bank↔Exchange در `inv_crypto_exchange_transactions` + `acc_transactions` |
 
 ### ترتیب مشترک
@@ -1212,3 +1212,28 @@ else: feeInBase = convert(feeAmount, feeCurrency, baseCurrency, asOf)
 
 ## 8. exchangeRateToBase
 همیشه: **چند واحد base per 1 واحد ارز مبدأ نرخ** (یا معکوس مستند در Currency-CrossRate با یک convention سراسری). همه featureها یک direction.
+
+---
+
+## Reversal فقط از Core
+
+**ممنوع** پیاده‌سازی مستقل void+insert بدون journal.
+
+```text
+reverseCryptoOperation(operationId) 
+  → core.reverseOperation(operationId)
+  → adapter Crypto: plan domain inverse rows by assetKey (نه symbol)
+  → journal reverse / void
+  → rebuild holdings by assetKey
+```
+
+هر transfer با `transferGroupId` + **`operationId` یکسان** روی هر دو leg (+ fee_burn leg).  
+`transferId` فقط alias خواندن legacy در migration.
+
+نمونه Reversal transfer:
+```text
+1. core loads operationId (همه rows: transfer_out, transfer_in, fee_burn)
+2. void domain rows / insert inverse with new operationId, reversesOperationId
+3. journal inverse
+4. rebuildHolding({exchangeId, assetKey}) for both sides
+```

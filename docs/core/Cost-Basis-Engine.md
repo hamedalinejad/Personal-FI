@@ -91,10 +91,22 @@ Engine می‌تواند `applyC2cPair(sellEvent, buyEvent)` helper داشته �
 
 | رویداد | quantity | totalInvested | realizedPL |
 |--------|----------|---------------|------------|
-| transfer_out | −gross یا −net طبق مدل | −cost متناسب | **0** |
-| transfer_in | +net | +همان cost | **0** |
-| fee_burn | −feeQty | 0 یا کاهش cost متناسب policy | **0** (هزینه = از دست رفتن asset، نه فروش بازار) |
-| fee_reversal | +feeQty | restore | **0** |
+| transfer_out | **−grossQuantity** (همیشه) | −cost متناسب با gross از pool | **0** |
+| transfer_in | **+netQuantity** (همیشه) | +cost منتقل‌شده (از out، پس از fee) | **0** |
+| fee_burn | **−feeQuantity** | معمولاً 0 روی cost pool (هزینه = از دست رفتن asset) یا policy صریح | **0** |
+| fee_reversal | **+feeQuantity** | restore | **0** |
+
+```text
+Canonical transfer با fee از asset:
+  transfer_out.quantityEffect = -grossQuantity
+  fee_burn.quantityEffect     = -feeQuantity   // همان مقدار سوخته
+  transfer_in.quantityEffect  = +netQuantity   // net = gross - fee
+  assert gross = net + fee
+```
+
+`fee_external` / `fee_in_quote`: fee_burn quantity روی base asset صفر؛ فقط money fee.
+`fee_from_received` در مقصد: net دریافتی کمتر — out همچنان −gross از مبدأ اگر مدل «ارسال gross» باشد.
+
 
 **ممنوع:** transfer را به‌صورت disposal با `unitPrice = market` ثبت کردن.
 

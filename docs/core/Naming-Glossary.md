@@ -16,3 +16,5 @@
 1. PR جدید نباید `tradeId` و `tradeGroupId` را برای دو مفهوم مختلف استفاده کند.
 2. Public API ترجیحاً `id` / `instrumentId` / `operationId` — نه symbol خام.
 3. Migration: rename با dual-read طبق Backward Compatibility Contract.
+
+Crypto/Investment docs: write **`transferGroupId` only**; `transferId` = read-only legacy alias.
