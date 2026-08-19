@@ -1384,3 +1384,15 @@ deprecated column | canonical column | read: dual | write: canonical only | drop
 | `merge` | v2+؛ نیاز به strategy: skip/rename on UUID collision، operationId collision → reject یا remap |
 
 v1: فقط **replace** پس از integrity_check. Merge بدون strategy مستند **ممنوع**.
+
+### جدول `fin_operations` (Must)
+```text
+id, baseCurrencyAtOperation, businessDate, sourceFeature,
+reversesOperationId?, conversionPath?,
+status NOT NULL,
+persistAttemptCount DEFAULT 0,
+lastPersistErrorCode?,
+lastPersistAttemptAt?,
+createdAt
+```
+همراه `db_meta.pendingCommit` برای recovery بعد از crash بین SQL COMMIT و IDB swap — جزئیات `Canonical-Financial-Operation.md`.

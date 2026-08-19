@@ -33,13 +33,17 @@ User/Command
 ## Journal Schema canonical
 
 ```text
-fin_operations (header, one per atomic op):
+fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   id (= operationId)
-  baseCurrencyAtOperation   // **قفل** — مثلاً IRR حتی اگر بعداً preference عوض شود
+  baseCurrencyAtOperation   // **قفل**
   businessDate
   sourceFeature
   reversesOperationId?
-  conversionPath?           // JSON legs [{from,to,rate,asOf,rateId?}] — Must اگر >1 hop
+  conversionPath?           // Must اگر >1 hop
+  status                    // pending|committed|persisted|failed|recovered — NOT NULL
+  persistAttemptCount       // integer default 0
+  lastPersistErrorCode      // nullable string
+  lastPersistAttemptAt      // nullable ISO
   createdAt
 
 fin_journal_entries:
@@ -97,12 +101,16 @@ Domain tx می‌تواند `linkedTaxEventId` داشته باشد.
 موتور `runAtomicFinancialOperation` فقط این interface را صدا می‌زند — Feature حق ندارد SQL موازی بیرون از adapter بنویسد.
 
 ```typescript
-interface FinancialOperationContext {
+interface FinancialOperationContext<TCommand extends FeatureCommand = FeatureCommand> {
   operationId: string;
   baseCurrencyAtOperation: string;
   businessDate: string;
-  command: FeatureCommand; // discriminated union — نه unknown
+  command: TCommand;
 }
+
+// Adapter: FinancialOperationAdapter<TCommand>
+// buildPlan(ctx: FinancialOperationContext<TCommand>)
+
 
 type FeatureCommand =
   | { feature: 'crypto'; cmd: CryptoCommand }
@@ -440,3 +448,24 @@ Boot recovery: اگر `pendingCommit` باشد → retry serialize/swap یا mar
 
 روی `fin_operations` (پس از persist موفق یا در RAM تا persist):
 `status`, `persistAttemptCount`, `lastPersistErrorCode`, `lastPersistAttemptAt` — **اجباری در schema**.
+
+---
+
+## Checklist قراردادهای Core (حل‌شده در مشخصات)
+
+| # | مورد | وضعیت در spec |
+|---|------|----------------|
+| 1 | Durability: `db_meta.pendingCommit` + token | ✅ |
+| 2 | persist fields روی `fin_operations` | ✅ |
+| 3 | `lineKind` شامل fx_gain/fx_loss | ✅ |
+| 4 | فقط `proceeds_reduction` | ✅ |
+| 5 | `ownerFeature: RelatedFeature` | ✅ |
+| 6 | DomainWrite typed برای accounts/income/expense/cheque | ✅ |
+| 7 | Opening loan/physical/cash | ✅ |
+| 8 | `FinancialOperationContext<TCommand>` | ✅ |
+| 9 | SnapshotTarget discriminated | ✅ |
+| 10 | giftCostBasis vs giftIncomeRecognition | ✅ |
+| 11 | accountClass=WHAT / lineKind=WHY | ✅ |
+| 12 | FeeCategory taxonomy دقیق | ✅ |
+
+Runtime: تا fixture CI سبز نشود این‌ها «اثبات‌شده در کد» نیستند.
