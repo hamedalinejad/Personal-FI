@@ -89,3 +89,74 @@ Feature-specific reversal docs فقط **plan adapter** هستند؛ موتور `
 
 Domain tx می‌تواند `linkedTaxEventId` داشته باشد.  
 فیلدهای تکراری taxable metadata → ترجیحاً ردیف `tax_events` مرکزی (Tax feature SoT) + reference؛ duplicate full tax schema در هر investment table ممنوع در schema جدید.
+
+---
+
+## FinancialOperationAdapter (قرارداد اجباری هر Feature)
+
+موتور `runAtomicFinancialOperation` فقط این interface را صدا می‌زند — Feature حق ندارد SQL موازی بیرون از adapter بنویسد.
+
+```typescript
+interface FinancialOperationContext {
+  operationId: string;
+  baseCurrencyAtOperation: string;
+  businessDate: string;
+  command: unknown; // typed per feature command
+}
+
+interface FinancialOperationPlan {
+  domainEntries: Array<{ table: string; row: Record<string, unknown> }>;
+  journalEntries: Array<{
+    accountClass: string;
+    direction: 'debit' | 'credit';
+    amount: string;
+    currency: string;
+    exchangeRateToBase: string;
+    amountInBase: string;
+    accountId?: string;
+    relatedFeature?: string;
+    relatedId?: string;
+    memo?: string;
+  }>;
+  cashEntries: Array<Record<string, unknown>>; // acc_transactions rows or empty
+  snapshotTargets: Array<{ kind: string; id: string }>; // holdings/accounts to rebuild after write
+  conversionPath?: Array<{ from: string; to: string; rate: string; asOf?: string; rateId?: string }>;
+}
+
+interface FinancialOperationAdapter {
+  readonly featureKey: string; // e.g. 'crypto' | 'loan' | 'fif'
+
+  validate(ctx: FinancialOperationContext): Promise<void>; // throw = abort
+
+  buildPlan(ctx: FinancialOperationContext): Promise<FinancialOperationPlan>;
+
+  /** پس از insert plan — یا engine از snapshotTargets + rebuild* استفاده می‌کند */
+  applySnapshotHints?(ctx: FinancialOperationContext, plan: FinancialOperationPlan): Promise<void>;
+
+  buildReversalPlan(ctx: FinancialOperationContext & { originalOperationId: string }): Promise<FinancialOperationPlan>;
+}
+```
+
+جریان موتور:
+```text
+status = pending
+adapter.validate → adapter.buildPlan
+write domain + journal + cash (engine)
+derive snapshots
+SQL COMMIT → status = committed
+persist IDB → status = persisted (یا failed)
+emit only if persisted
+```
+
+## Operation Status (سراسری)
+
+| status | معنی | UI |
+|--------|------|-----|
+| `pending` | قبل از SQL COMMIT | در حال ثبت… |
+| `committed` | sql.js RAM OK، هنوز durable نیست | **نه** «ثبت قطعی» |
+| `persisted` | IndexedDB swap COMPLETED | «ثبت شد» |
+| `failed` | validate/write/persist خطا | خطا + retry |
+| `recovered` | پس از recovery state machine | optional banner |
+
+ذخیره اختیاری: `fin_operations.status`.  
+**Invariant:** UI و DomainEvent فقط روی `persisted` قطعی‌اند.
