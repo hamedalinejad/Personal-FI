@@ -361,3 +361,19 @@ domainEvents.emit('TransactionCreated', payload); // post-commit only
 - `PriceFetchResult.succeeded[]` = همان فیلدهای کامل (قبلاً مستند شد).
 - `PriceFetchStarted.payload.instrumentIds` با نتیجه fetch هم‌تراز است.
 - `quoteType` مشترک: last | nav | close | mid | indicative | manual | other.
+
+### فازهای Event (مالی) — قرارداد مرکزی
+
+| فاز | کی | چه مجاز است |
+|-----|-----|-------------|
+| `pre-commit` | داخل BEGIN — **emit عمومی ممنوع** | فقط state داخلی tx |
+| `post-commit` | بعد از SQL COMMIT در RAM | هنوز ممکن است IndexedDB pending باشد |
+| `persisted` | بعد از swap موفق `db_main` | UI «ثبت شد» + DomainEventBus.emit |
+
+`DomainEventBus.emit` فقط در فاز **`persisted`** (یا صریحاً `post-commit` اگر persist deferred و UI هنوز pending نشان می‌دهد — ترجیح v1: emit بعد از persisted).
+
+Handler isolation (اجباری در implementation):
+```ts
+handlers.forEach(h => { try { h(payload); } catch (e) { logger.error(e); } });
+```
+یک handler throw نباید بقیه یا caller مالی را بشکند. تا تست این isolation نباشد، invariant فقط قراردادی است.

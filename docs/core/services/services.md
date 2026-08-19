@@ -99,7 +99,7 @@ services/
 - فرم‌های ناتمام (Draft state) در صورت نیاز
 
 ### Version Check Service
-بررسی وجود نسخه جدیدتر از برنامه — **تنها یکی از دو استثنای مجاز Network Access Policy** (به `Technical-Architecture.md` بخش «سیاست دسترسی به شبکه» مراجعه کنید).
+بررسی نسخه — **یکی از استثناهای** Network Access Policy در `Technical-Architecture.md` (لیست کامل همان سند است؛ این سرویس آن را دوباره تعریف نمی‌کند).
 
 مسئولیت‌ها:
 - در Startup اپ، در پس‌زمینه و **بدون block کردن UI**، به یک Endpoint استاتیک درخواست می‌زند
@@ -143,3 +143,13 @@ services/
 - دو instance: `domainEventBus` و `applicationEventBus` (Price/Version روی application).
 - Handler مالی سنگین: `queueMicrotask` / job queue؛ نه کار DB طولانی sync داخل emit.
 - جزئیات در `types.md → قرارداد Event: Post-Commit`.
+
+---
+
+## Logger — بدون داده مالی
+
+LocalStorage برای log فقط metadata فنی مجاز است.
+
+**ممنوع در log/exception payload:** amount، balance، account number، tx hash کامل، API key، seed، backup blob.
+
+قبل از `logger.error`: `sanitize(error)` — حذف فیلدهای مالی از objectهای Domain.
