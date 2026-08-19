@@ -705,3 +705,17 @@ fetchAndStorePrices(
 Adapter: `fetchPrices(refs)` با `instrumentId` — نه `string[]` نماد خام.
 
 `price_sync_settings`: فیلدهای `scope`, `assetCategory`, `instrumentId`, `sourceId?`, `enabled`, `intervalMinutes` — **نه** symbol به‌عنوان کلید.
+
+---
+
+## Auto-Sync و Session Storage (Limitation v1)
+
+API Key فقط در Session Storage است → با بستن tab از بین می‌رود.
+
+| حالت | رفتار |
+|------|--------|
+| Tab باز + key در session | Auto-Sync می‌تواند fetch کند |
+| Tab بسته / key خالی | Auto-Sync آن source را `skipped: api_key_required` می‌کند — **نه** crash |
+| UX | در Settings: «برای auto-sync کلید را بعد از هر باز کردن اپ دوباره وارد کنید» |
+
+نسخه بعدی (اختیاری): encrypted remember با تأیید صریح کاربر — خارج از v1 الزام.

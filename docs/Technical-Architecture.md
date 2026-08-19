@@ -249,3 +249,14 @@ Worker برای serialize DB و گزارش سنگین وقتی حجم بالا �
 ### ممنوع
 - `FeatureA` import repository/SQL از `FeatureB`
 - expose کردن `updateRow(table, id, patch)` عمومی
+
+### لیست واحد استثناهای شبکه (SoT این سند)
+
+| # | استثنا | خودکار؟ | داده مالی؟ |
+|---|--------|---------|------------|
+| 1 | Version Check | opt-in / startup اگر کاربر فعال کرده | خیر |
+| 2 | License Validation (آینده) | با grace | خیر |
+| 3 | Service Worker / App Shell update | مرورگر | خیر |
+| — | Price Fetch | فقط user click یا Auto-Sync صریح | بله — **استثنا نیست**؛ permission جدا |
+
+هر سند دیگر (Services، Price-Fetching) باید به **همین جدول** ارجاع دهد، نه شمارش متفاوت.
