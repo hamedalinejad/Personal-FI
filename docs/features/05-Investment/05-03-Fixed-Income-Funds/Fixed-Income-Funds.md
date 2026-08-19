@@ -153,6 +153,10 @@ Domain Entities
 - `currency` → string (ارز معامله — پیش‌فرض IRR برای صندوق ایران)
 - `feeAmount` → decimal
 - `feeCurrency` → string
+- `feeCategory` → enum (`subscription` | `redemption` | `brokerage` | `management` | `other`) nullable
+- `includeInCostBasis` → boolean (**اجباری روی tx جدید با fee**؛ پیش‌فرض: subscription/brokerage buy=true؛ redemption fee on sell=false برای cost و true به‌عنوان feeFromProceeds)
+- `operationId` → UUID (**اجباری** برای atomic؛ reinvest و چند leg یکسان)
+- `operationRole` → enum nullable (`dividend_income` | `reinvest_purchase` | `standalone`)
 - `exchangeRateToBase` → decimal
 - `predictedProfit` → decimal (nullable — فقط در nav_update و dividend؛ توسط کاربر هنگام ثبت وارد می‌شود برای مقایسه با سود واقعی محاسبه‌شده توسط `getProfitComparison`)
 - `accountId` → UUID (nullable — برای واریز/برداشت مستقیم از حساب بانکی — issuance_redemption)
@@ -188,7 +192,9 @@ Domain Entities
 APIهای داخلی
 
 createFund(data) / updateFund(id, data) / getAllFunds
-createTransaction(data) → خرید، فروش، واریز/برداشت مستقیم حساب بانکی (issuance_redemption)، تقسیم سود، سرمایه‌گذاری مجدد — همگی روی `inv_fif_transactions` ثبت می‌شوند؛ برای واریز/برداشت ETF از طریق کارگزاری، به APIهای `Investment-Stocks-Iran` (`createBrokerageTransaction`) مراجعه شود.
+createTransaction(data) → تک‌رویداد (buy/sell/nav_update/…). باید `operationId` داشته باشد.
+createReinvest(data) → **الزامی دو ردیف** با یک `operationId`: (1) type=dividend + operationRole=dividend_income (2) type=reinvest + operationRole=reinvest_purchase — نه یک ردیف مبهم تنها.
+واریز/برداشت ETF از طریق کارگزاری: APIهای Investment-Stocks-Iran.
 updateNAV(fundId, nav, date) → ثبت NAV جدید (از نسخه ۱، این تابع یک Wrapper نازک روی `setManualFundNAV` فیچر `19-Price-Fetching` است تا NAV هم در `price_history` مرکزی و هم در `inv_fif_holdings.currentNAV` ثبت شود؛ جزئیات کامل در `19-03-Fund-NAV/Fund-NAV.md`)
 getHoldings / getHoldingByFund(fundId)
 getPortfolioValue → ارزش کل + معادل تتری
@@ -198,7 +204,7 @@ getProfitComparison(fundId, period) → مقایسه سود پیش‌بینی‌
  ```
  سود واقعی =
  Σ amount تراکنش‌های dividend در بازه
- + (currentNAV × currentUnits) - (avgBuyNAV × currentUnits) ← Unrealized component
+ + unrealizedByMode(holding) ← see valuation mode below
  + realizedPL تراکنش‌های sell در بازه
  ```
  **فرمول سود پیش‌بینی‌شده در بازه `period`**:
@@ -248,7 +254,9 @@ averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط �
 > - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
 > - سود تقسیمی نقدی (`dividend`) بخشی از `realizedPL` نیست؛ به‌عنوان درآمد جداگانه ثبت می‌شود (طبق Business Rules).
 > - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند.
-> - سود/زیان **تحقق‌نیافته (Unrealized P&L)** جداگانه بر اساس `(currentNAV - averageBuyPrice) × units` محاسبه می‌شود — اینجا عمداً از NAV استفاده می‌شود، نه از قیمت ابطال.
+> - **Unrealized پیش‌فرض issuance/redemption:** `liquidationValue - totalInvested` با `liquidationValue = units × lastRedemptionPrice` (یا redemption روز).
+> - **Unrealized حالت nav:** `(currentNAV - averageBuyPrice) × units` فقط وقتی `valuationMode='nav'` صریح انتخاب شود.
+> - ETF: `(marketPrice - averageBuyPrice) × units`.
 
 
 نکات طراحی
@@ -425,3 +433,27 @@ totalReturn =
 ```
 
 API: `getFundPerformance(holdingId, { valuationMode, period })` یک آبجکت با breakdown برمی‌گرداند — نه فقط یک عدد مبهم.
+
+---
+
+## Fee policy واحد صندوق
+
+| feeCategory | خرید/reinvest | فروش |
+|-------------|---------------|------|
+| subscription | includeInCostBasis=true (feeIn) | — |
+| brokerage | معمولاً true روی buy | feeFromProceeds روی sell |
+| redemption | — | feeFromProceeds (نه دوباره در cost) |
+| management | expense دوره‌ای مگر مستند capitalize | — |
+
+`feeAmount` + `feeCurrency` + `feeCategory` + `includeInCostBasis` روی هر tx با fee.
+
+## Unrealized — یک قرارداد
+
+```text
+getUnrealizedPL(holdingId, mode = 'liquidation' | 'nav' | 'etf_market')
+liquidation: units * redemptionPrice - totalInvested
+nav:         units * currentNAV - totalInvested   // equivalent to (NAV - avg)*units if avg from totalInvested/units
+etf_market:  units * marketPrice - totalInvested
+```
+
+`getProfitComparison` از `unrealizedByMode` با پیش‌فرض `liquidation` برای issuance_redemption و `etf_market` برای ETF استفاده می‌کند — **هرگز** `avgBuyNAV` (وجود ندارد؛ فقط `averageBuyPrice` / `totalInvested`).
