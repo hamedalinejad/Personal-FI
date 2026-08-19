@@ -45,7 +45,7 @@
 - `getUpcomingPayments` باید `calculationMethod` را چک کند
 - برای هر روش فرمول‌های متفاوت است
 - تاریخ اولین قسط از `firstPaymentDate` شروع می‌شود (ممکن است بعد از `disbursementDate`)
-- در صورت `gracePeriodMonths > 0`، رفتار به روش محاسبه بستگی دارد (Declining: Interest-Only / Qarz: Payment Holiday / Flat Rate و Bullet: مجاز نیستند — بخش «ز» فرمول‌های کامل)
+- در صورت `gracePeriods > 0` (canonical؛ نه gracePeriodMonths)، رفتار به روش محاسبه بستگی دارد (Declining: Interest-Only / Qarz: Payment Holiday / Flat Rate و Bullet: مجاز نیستند — بخش «ز»)
 
 ### دیگر Business Rules
 
@@ -305,7 +305,7 @@ thresholdFrom=60, thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0 
  - اگر `calculationMethod = 'flat_rate'`: اصل ثابت، سود ثابت
  - اگر `calculationMethod = 'qarz_al_hasaneh'`: اصل ثابت، سود = 0
  - اگر `calculationMethod = 'bullet'`: سود ماهانه، اصل صفر (غیر از ماه آخر)
- - اگر `gracePeriodMonths > 0`: رفتار به روش محاسبه بستگی دارد — Declining Balance: Interest-Only (فقط سود، اصل دست‌نخورده)؛ Qarz Al-Hasaneh: Payment Holiday (هیچ پرداختی)؛ Flat Rate و Bullet: مجاز نیست (خطا می‌دهد). جزئیات کامل در بخش «ز) دوره تنفس».
+ - اگر `gracePeriods > 0`: Declining = Interest-Only؛ Qarz = Payment Holiday؛ Flat/Bullet = خطا. جزئیات بخش «ز».
  - شروع از `firstPaymentDate` + `installmentFrequency`
 - `getOverduePayments(loanId)` → دریافت اقساط سررسید گذشته (مقایسه با `ln_transactions`)
 
@@ -322,7 +322,7 @@ thresholdFrom=60, thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0 
 
 ## نکات طراحی
 
-- برنامه اقساط و محاسبات پردازشی از روی فیلدهای جدول `loans` (مبلغ، نرخ سود، تعداد اقساط، `calculationMethod`، `gracePeriodMonths` و تاریخ‌ها) محاسبه می‌شود.
+- برنامه اقساط از فیلدهای `ln_loans` (شامل `gracePeriods`/`gracePeriodUnit`) + **آخرین** `ln_schedule_snapshots` محاسبه نمایشی؛ تاریخچه از snapshotهای قبلی.
 - `ln_transactions` فقط تاریخچه واقعی پرداخت‌ها را نگه می‌دارد.
 - برای محاسبه `remainingBalance`: `remainingBalance -= principalPortion` (فقط اصل تغییر می‌دهد).
 - `totalPaidPrincipal` و `totalPaidInterest` برای سرعت Dashboard به‌روزرسانی می‌شوند (بدون جمع کردن تمام ln_transactions).
@@ -1347,3 +1347,11 @@ Ledger (`ln_transactions`) authoritative؛ snapshot برای سرعت. `rebuildL
 
 ### penaltyBasis
 Engine **باید** هر دو `overdue_installment` و `remaining_balance` را پشتیبانی کند؛ پیش‌فرض محصول `overdue_installment`. انتخاب در UI روی create/update loan.
+
+### Invariant schedule جاری در برابر تاریخی
+```text
+currentSchedule = latest ln_schedule_snapshots WHERE loanId ORDER BY generatedAt DESC
+historicalSchedule(at) = snapshot با effectiveDate/generatedAt <= at
+هر regenerate: calculationVersion + operationId + reason + payload کامل
+current ≠ خواندن مجدد فرمول روی state قدیمی بدون snapshot
+```
