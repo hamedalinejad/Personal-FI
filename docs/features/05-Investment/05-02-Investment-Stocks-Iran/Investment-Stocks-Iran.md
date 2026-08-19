@@ -79,7 +79,8 @@
 
 - `id` → UUID
 - `brokerageId` → UUID
-- `symbol` → string
+- `instrumentId` → string **اجباری** — هویت پایدار (همان Holding؛ با symbol_change عوض نمی‌شود)
+- `symbol` → string — فقط label در لحظه ثبت (audit نمایش)
 - `type` → enum گسترده:
  - `buy` | `sell` | `dividend`
  - `capital_increase` — افزایش سرمایه (نقدی/از محل مطالبات)
@@ -192,7 +193,7 @@ feeAmount =
 - `createBrokerageTransaction(data)`
 - `getStockTransactions(filters)`
 - `getBrokerageTransactions(filters)`
-- `calculateProfitLoss(symbol?, brokerageId?)`
+- `calculateProfitLoss(instrumentId, brokerageId?)` — **اصلی**؛ overload با symbol فقط deprecated resolve
 
 ### Price Mapping
 - `setStockPriceMapping(holdingId, data)` → `priceProviderId`, `providerSymbol`, `market`
@@ -355,10 +356,10 @@ symbol_change فولاد → فولاد1:
 
 ```text
 qty = 0; totalInvested = 0
-برای هر tx در ORDER BY date, createdAt (isVoided=false):
+برای هر tx با `instrumentId = holding.instrumentId` (و CAهای مرتبط طبق relatedCorporateActionId) ORDER BY businessDate, createdAt (isVoided=false):
 
   buy:
-    totalInvested += qty*price + feeInTradeCurrency(tx)
+    totalInvested += quantity*price + feeInTradeCurrency(tx)
     qty += quantity
 
   sell:
@@ -441,3 +442,31 @@ Journal: income روی gross یا net طبق سیاست محلی — پیش‌ف
 
 ### reconcile = rebuild کامل
 هر `reconcileStockHolding` / `rebuildStockHolding` از الگوریتم «شامل Corporate Action» در همین سند استفاده می‌کند. پیاده‌سازی فقط-buy/sell **باگ مشخصات** است.
+
+---
+
+## جدول رسمی اثر حسابداری Corporate Action
+
+| type | quantity | totalInvested / cost | realizedPL | cash | income/tax |
+|------|----------|----------------------|------------|------|------------|
+| buy | + | + qty×price + feeIn | — | − | — |
+| sell | − | − cost portion | proceeds−cost−feeOut | + | taxable event metadata |
+| dividend | 0 | 0 | **نه** capital gain | + netDividend | **income** / gross+withholding |
+| bonus_share | +bonus | ثابت | 0 | 0 | معمولاً nontaxable event تا فروش |
+| split | ×ratio | ثابت | 0 | 0 | — |
+| reverse_split | ÷ratio | ثابت | 0 | 0 | باقیمانده طبق policy |
+| capital_increase (cash) | +new | +cashPaid+fees | 0 | − | — |
+| rights_issue | 0 روی سهم اصلی یا +حق روی instrument حق | 0 یا cost حق | 0 | 0 | — |
+| rights_exercise | +shares | +cost حق + cashPaid | 0 | − | — |
+| rights_sell | −حق | −cost حق | proceeds−cost حق | + | مانند sell حق |
+| symbol_change | 0 | 0 | 0 | 0 | metadata |
+| isin_change | 0 | 0 | 0 | 0 | metadata؛ instrumentId ثابت مگر policy ادغام |
+| transfer_ca | −src / +dst | cost منتقل | **0** | 0 | مانند transfer |
+| suspension_note | 0 | 0 | 0 | 0 | — |
+
+**rebuild** باید همه ردیف‌های بالا را اعمال کند؛ پیاده‌سازی فقط buy/sell نقض مشخصات است.
+
+### Dividend در derived data
+- `rebuild` quantity/cost را تغییر نمی‌دهد
+- `getDividendIncome(instrumentId, period)` از Σ netDividend/gross
+- `calculateProfitLoss` capital gain جدا از dividend income گزارش می‌دهد
