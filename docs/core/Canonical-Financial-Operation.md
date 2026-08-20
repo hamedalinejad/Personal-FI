@@ -19,16 +19,37 @@ User/Command
 
 **ممنوع:** هر Feature مسیر موازی (مثلاً فقط snapshot بدون journal، یا cash بدون domain).
 
-## operationId
+## operationId = Idempotency Key
 
 | فیلد | نقش |
 |------|-----|
-| `operationId` | **canonical** گروه همه ردیف‌های یک عمل اقتصادی |
-| `tradeGroupId` / `transferGroupId` | metadata دامنه؛ همیشه به همان operationId یا زیرمجموعه |
-| `accountTransactionId` | FK به یک ردیف cash؛ نه جایگزین operationId |
-| `relatedId` | polymorphic link؛ نه شناسه عمل |
+| `operationId` | **canonical** گروه رکوردها **و** کلید idempotency کلاینت |
+| `commandHash` | hash پایدار از command نرمال‌شده (بدون random) |
+| `tradeGroupId` / `transferGroupId` | metadata دامنه |
+| `accountTransactionId` | FK cash |
+| `relatedId` | polymorphic |
 
-هر BUY، C2C، reinvest، transfer، payLoan، void/reversal یک `operationId` جدید (یا برای reversal: operation جدید با `reversesOperationId`).
+```sql
+UNIQUE(fin_operations.id)  -- id = operationId
+```
+
+### رفتار double-submit
+```text
+Client generates operationId (UUID) before first click
+retry / double click → همان operationId + همان command
+
+runAtomicFinancialOperation(operationId, command):
+  if exists fin_operations where id = operationId:
+    if stored.commandHash == hash(command):
+      return previous result (success or recorded failure)  // idempotent
+    else:
+      reject IDEMPOTENCY_CONFLICT
+  else:
+      insert new operation…
+```
+
+**ممنوع:** تولید `operationId` جدید برای هر کلیک retry روی همان intent کاربر.  
+Reversal = **operationId جدید** با `reversesOperationId` به اصل.
 
 ## Journal Schema canonical
 
@@ -40,11 +61,11 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   sourceFeature
   reversesOperationId?
   conversionPath?           // Must اگر >1 hop
-  status                    // **business only**: pending | posted | voided | failed — NOT NULL
-  // ⚠️ هرگز 'persisted' داخل SQLite ننویس — durability فقط در IDB meta
-  persistAttemptCount       // integer default 0
-  lastPersistErrorCode      // nullable string
-  lastPersistAttemptAt      // nullable ISO
+  status                    // pending | posted | voided | failed — business only
+  failurePhase?             // validation | domain_write | sql_commit | null when ok
+  failureCode?              // machine code
+  commandHash               // for idempotency
+  // durability counters NOT in SQLite — see db_meta
   createdAt
 
 fin_journal_entries:
@@ -442,9 +463,26 @@ IDB fail    → db_meta.persistence = persist_failed; **SQLite را دوباره
 
 **ممنوع:** بعد از IDB موفق، UPDATE `fin_operations.status = persisted` که دوباره serialize می‌خواهد → حلقه بی‌پایان.
 
-`persistAttemptCount` / `lastPersistErrorCode` روی **`db_meta.pendingCommit`** یا `db_meta.persistStats` — نه به‌عنوان بهانه برای write دوم SQLite بعد از durable.
+### persistAttemptCount semantics (`db_meta` only)
+```text
+persistAttemptCount = total attempts ever for this pending batch (never reset to 0)
+on durable success: lastPersistErrorCode = null; count keeps historical total
+on new dirty cycle after durable: new pendingCommit may start count at 0 for that cycle
+  OR global meta.totalPersistAttempts++ (implementation choice; document in code)
+```
 
-Boot: اگر `pendingCommit` هست و main checksum match RAM intent → retry swap یا recovered UI.
+### failurePhase (business vs durability)
+| phase | کجا | retry؟ |
+|-------|-----|--------|
+| `validation` | before SQL | خیر — اصلاح ورودی |
+| `domain_write` / `sql_commit` | SQLite | نادر؛ معمولاً failed |
+| `persist` | IDB only | **بله** retry swap |
+| `recovery` | boot | بله/دستی |
+
+`fin_operations.status=failed` + `failurePhase` برای خطاهای **business/SQL**.  
+خطای IDB: `db_meta.persistence=persist_failed` در حالی که `fin_operations.status` می‌تواند `posted` بماند.
+
+Boot: اگر `pendingCommit` هست → retry swap یا UI recovered.
 
 ---
 
