@@ -1255,7 +1255,34 @@ Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و 
 | `fee_burn_balanced` | | expense + asset credit |
 | `bank_transfer_neutral` | | no income/expense |
 
-**CI gate:** job `financial-fixtures` must pass on main before financial release tag.
+#### Property / Invariant Tests (Must — علاوه بر expected ثابت)
+
+Runner: random یا parameterized seeds روی قوانین؛ fail اگر invariant نقض شود.
+
+| ID | Property |
+|----|----------|
+| `prop_internal_transfer_conservation` | بدون fee: Σ qty(assetKey) before = after روی همه locationهای کاربر |
+| `prop_bridge_cost_split` | releasedCost = transferredCost + feeBurnCost |
+| `prop_reversal_involution` | apply(op); apply(reverse(op)) ≈ state قبل از op (domain+journal+snapshots) |
+| `prop_stock_split_cost` | qty' = qty×ratio؛ totalInvested ثابت |
+| `prop_journal_balance` | ∀ operationId posted: Σ debit amountInBase = Σ credit amountInBase |
+| `prop_opening_reverse_delta` | opening + reverse(opening) → economic delta صفر (به‌جز void markers) |
+| `prop_idempotent_operationId` | دو submit با همان operationId+commandHash → یک نتیجه |
+| `prop_fee_burn_pl_zero` | fee_burn ⇒ realizedPL contribution = 0 |
+
+#### Cross-Feature Chains (Must)
+
+| ID | زنجیره | assert |
+|----|--------|--------|
+| `xf_bank_to_exchange_buy` | Bank withdraw → exchange cash → BUY crypto | journal+acc+holding؛ بدون double count |
+| `xf_bank_broker_stock` | Bank → brokerage cash → stock BUY | |
+| `xf_bank_fif_reinvest` | Bank → subscription → distribution → reinvest | operationIds و income+units |
+| `xf_loan_disburse_invest` | Loan disbursement → bank → investment | liability+cash+asset |
+| `xf_crypto_sell_withdraw_bank` | SELL on exchange → withdraw to bank | domain sale + cash legs + journal balanced |
+| `xf_transfer_neutral_chain` | bank A→B then expense | transfer not in income/expense totals |
+
+**CI gate:** job `financial-fixtures` (numeric + property + cross-feature) must pass on main before financial release tag.
+
 
 ### Invariant: Transfer Accounting-neutral
 
