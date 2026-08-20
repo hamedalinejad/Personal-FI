@@ -818,6 +818,11 @@ COMMIT;
 
 ## Multi-Tab Concurrency
 
+**v1 invariant (Critical):** `Only one active writer per databaseId`.
+
+سایر Tabها: **read-only** یا blocked برای financial write تا writer آزاد شود.
+
+
 sql.js در هر Tab یک کپی در RAM دارد. بدون هماهنگی، Last-Write-Wins می‌تواند تراکنش Tab دیگر را در IndexedDB overwrite کند.
 
 ### قرارداد نسخه ۱
@@ -828,6 +833,18 @@ sql.js در هر Tab یک کپی در RAM دارد. بدون هماهنگی، La
 5. عملیات مالی در Tab غیر-holder قفل: صف یا reject با پیام واضح — نه silent LWW.
 
 v1 عمداً multi-active-writer کامل نیست؛ هدف جلوگیری از از دست رفتن commit بدون اطلاع کاربر است.
+
+### جزئیات Writer ownership
+```text
+databaseId در db_meta
+writerTabId + heartbeat via BroadcastChannel('personal-fi')
+navigator.locks.request('personal-fi-db-writer-' + databaseId)
+```
+- Tab غیر-writer: `runAtomicFinancialOperation` → reject `WRITER_REQUIRED`
+- Stale writer (heartbeat timeout): election Tab جدید
+- Persist فقط توسط holder قفل
+- دو Tab هرگز دو serialize موازی روی همان databaseId انجام نمی‌دهند
+
 
 ---
 

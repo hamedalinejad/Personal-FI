@@ -40,7 +40,8 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   sourceFeature
   reversesOperationId?
   conversionPath?           // Must اگر >1 hop
-  status                    // pending|committed|persisted|failed|recovered — NOT NULL
+  status                    // **business only**: pending | posted | voided | failed — NOT NULL
+  // ⚠️ هرگز 'persisted' داخل SQLite ننویس — durability فقط در IDB meta
   persistAttemptCount       // integer default 0
   lastPersistErrorCode      // nullable string
   lastPersistAttemptAt      // nullable ISO
@@ -220,21 +221,16 @@ emit only if persisted
 
 | status | معنی | UI |
 |--------|------|-----|
-| `pending` | قبل از SQL COMMIT | در حال ثبت… |
-| `committed` | sql.js RAM OK، هنوز durable نیست | **نه** «ثبت قطعی» |
-| `persisted` | IndexedDB swap COMPLETED | «ثبت شد» |
-| `failed` | validate/write/persist خطا | خطا + retry |
-| `recovered` | پس از recovery state machine | optional banner |
+| لایه Business (`fin_operations`) | لایه Durability (`db_meta` فقط) | UI |
+|----------------------------------|--------------------------------|-----|
+| `pending` | — | در حال ثبت |
+| `posted` | `persisting` / هنوز durable نیست | ثبت موقت — همگام‌سازی… |
+| `posted` | `durable` | **ثبت شد** |
+| `posted` | `persist_failed` | هشدار + retry (بدون SQL rewrite status) |
+| `failed` / `voided` | — | خطا |
 
-ذخیره **اجباری** روی `fin_operations.status` (نه optional).
+**Invariant:** DomainEvent و «ثبت قطعی» فقط وقتی durability=`durable`. `persisted` داخل SQLite **وجود ندارد**.
 
-| وضعیت persist fail | status |
-|--------------------|--------|
-| SQL OK، IDB fail | `committed` بماند + flag `persistError`؛ retry persist؛ UI «ثبت موقت / همگام‌سازی نشده» |
-| پس از retry موفق | `persisted` |
-| غیرقابل بازیابی | `failed` + audit |
-
-**Invariant:** UI «ثبت قطعی» و DomainEvent فقط روی `persisted`.
 
 ---
 
@@ -427,27 +423,28 @@ Tax event active روی reversed source operation **نمی‌ماند**.
 
 ---
 
-## Durability بعد از SQL COMMIT
+## دو لایه Status (ضد حلقه persist)
 
-`fin_operations.status` داخل SQLite است؛ اگر IDB fail/crash شود ممکن است RAM از بین برود.
+| لایه | کجا | مقادیر | کی نوشته می‌شود |
+|------|-----|--------|------------------|
+| **Business** | `fin_operations.status` در SQLite | `pending` → `posted` (بعد از SQL COMMIT موفق در RAM) → `voided` / `failed` | داخل همان SQL tx یا بلافاصله قبل از COMMIT — **یک‌بار** |
+| **Durability** | **فقط** `db_meta` در IndexedDB | `dirty` / `persisting` / `durable` / `persist_failed` / `recovered` | بعد از serialize/swap — **بدون** SQL write اضافی |
 
-**Marker اجباری در IndexedDB `db_meta`:**
 ```text
-pendingCommit: {
-  operationId,
-  operationCommitToken, // random
-  pendingDbChecksum,
-  status: 'committed_awaiting_persist',
-  lastPersistErrorCode?,
-  persistAttemptCount,
-  lastPersistAttemptAt?
-}
+validate → write domain/journal (status=pending in plan)
+SQL COMMIT  → fin_operations.status = posted   // در همان commit، نه بعد از IDB
+db_meta.persistence = persisting + pendingCommit{operationIds[], checksum, token}
+IDB swap OK → db_meta.persistence = durable; clear pendingCommit
+IDB fail    → db_meta.persistence = persist_failed; **SQLite را دوباره برای فقط status ننویس**
 ```
 
-Boot recovery: اگر `pendingCommit` باشد → retry serialize/swap یا mark failed + UI recover.
+**UI «ثبت شد»** فقط وقتی `db_meta.persistence === durable` برای آن batch.
 
-روی `fin_operations` (پس از persist موفق یا در RAM تا persist):
-`status`, `persistAttemptCount`, `lastPersistErrorCode`, `lastPersistAttemptAt` — **اجباری در schema**.
+**ممنوع:** بعد از IDB موفق، UPDATE `fin_operations.status = persisted` که دوباره serialize می‌خواهد → حلقه بی‌پایان.
+
+`persistAttemptCount` / `lastPersistErrorCode` روی **`db_meta.pendingCommit`** یا `db_meta.persistStats` — نه به‌عنوان بهانه برای write دوم SQLite بعد از durable.
+
+Boot: اگر `pendingCommit` هست و main checksum match RAM intent → retry swap یا recovered UI.
 
 ---
 
@@ -455,8 +452,8 @@ Boot recovery: اگر `pendingCommit` باشد → retry serialize/swap یا mar
 
 | # | مورد | وضعیت در spec |
 |---|------|----------------|
-| 1 | Durability: `db_meta.pendingCommit` + token | ✅ |
-| 2 | persist fields روی `fin_operations` | ✅ |
+| 1 | Durability فقط در `db_meta` — نه status=persisted در SQLite | ✅ |
+| 2 | pendingCommit / persist stats در IDB | ✅ |
 | 3 | `lineKind` شامل fx_gain/fx_loss | ✅ |
 | 4 | فقط `proceeds_reduction` | ✅ |
 | 5 | `ownerFeature: RelatedFeature` | ✅ |
