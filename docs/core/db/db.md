@@ -354,49 +354,20 @@ export interface InvMetalsTransaction {
 
 > **تمایز حیاتی در Metals**: `quantityMg` = وزن ناخالص؛ وزن خالص (`fineWeightMg`) محاسبه می‌شود و ذخیره نمی‌شود؛ `purity` و `purityRatio` مستقل‌اند. `1g Gold 18K ≠ 1g pure gold`. جزئیات کامل در `Metals.md`.
 
-## قانون Minor Unit Storage (حتمی)
+## قرارداد Amount Storage (v1 — حتمی)
 
-تمام مبالغ در دیتابیس به **کوچک‌ترین واحد پول** ذخیره می‌شوند:
+**مدل رسمی DB و Domain:** `TEXT` / string با decimal (نه float، نه INTEGER minor به‌عنوان SoT).
 
-| ارز | کوچک‌ترین واحد | مثال |
-|-----|---|---|
-| **IRR (ریال)** | ۱ ریال | ۱۲۳۴۵۶۷۸ = ۱۲،۳۴۵،۶۷۸ ریال |
-| **USD** | سنت (Cent) | ۱۲۳۴۵ سنت = ۱۲۳.۴۵ دلار |
-| **EUR** | سنت | ۶۷۸۹۰ سنت = ۶۷۸.۹۰ یورو |
-| **BTC** | ۱ ساتوشی = ۱۰^-۸ BTC | ۱۲۳۴۵۶۷۸۹ ساتوشی |
-| **ETH** | ۱ Gwei = ۱۰^-۹ ETH | از Gwei برای ذخیره استفاده شود (نه Wei که بیش از حد کوچک است) |
-| **USDT** | ۱ میکرو = ۱۰^-۶ USDT | ۱۲۳۴۵۶۷۸۹۰ میکرو |
+| نوع | ذخیره |
+|-----|--------|
+| MoneyAmount | TEXT decimal string؛ precision از CurrencyRecord / Rounding-Policy |
+| AssetQuantity | TEXT decimal string (crypto decimals از asset registry) |
+| Rate / Price | TEXT decimal string |
 
-> **استثنا — قیمت دارایی‌ها در `price_history`**: فیلد `price` در جدول `price_history` **از این قانون مستثناست**؛ به‌جای Minor Unit، قیمت به‌صورت `decimal` (عدد اعشاری خام) ذخیره می‌شود. دلیل: قیمت دارایی (مثلاً قیمت طلا به ریال به ازای هر گرم، یا BTC به USDT) یک «نرخ تبدیل/مرجع» است، نه یک «مبلغ تراکنش مالی» — Minor Unit آن معنای مشخص و ثابتی ندارد (چون واحد پایه متفاوت است: «هر گرم»، «هر BTC»). همین استثنا برای `cur_exchange_rates.rate` هم صدق می‌کند.
+**Minor unit:** فقط تبدیل در Presentation یا API بانکی (`toMinorUnit`/`fromMinorUnit`) — ستون‌های مالی اصلی INTEGER نیستند.
 
-**قاعده**:
-- در مرحله **ورود** (لایه Presentation)، مقدار از کاربر به فرمت عادی (۱۲۳۴.۵۶) دریافت می‌شود
-- در مرحله **پردازش** (لایه Domain)، تبدیل به کوچک‌ترین واحد انجام می‌شود (۱۲۳۴۵۶)
-- در مرحله **ذخیره‌سازی** (Database)، صرفاً عدد صحیح ذخیره می‌شود
-- در مرحله **نمایش** (لایه Presentation)، دوباره به فرمت عادی برگردانده می‌شود
+محاسبات فقط با `decimal.js` طبق `Rounding-Policy.md`. ارجاع قدیمی Blueprint «Minor Unit integer» **باطل** است.
 
-**پیاده‌سازی**:
-```typescript
-// Domain Layer
-import Decimal from 'decimal.js';
-
-// ورود: "1234.56" → تبدیل به کوچک‌ترین واحد
-const inputAmount = new Decimal('1234.56');
-const minorUnits = inputAmount.times(100).toNumber; // 123456
-
-// ذخیره‌سازی: 123456
-database.save({ amount: minorUnits });
-
-// خروجی: 123456 → بازگرداندن به فرمت عادی
-const storedAmount = new Decimal(123456);
-const displayAmount = storedAmount.dividedBy(100); // 1234.56
-```
-
-**نکات حساس** (ریسک‌های احتمالی):
-- خیلی مهم که هیچ محاسبه درون Database انجام نشود. تمام محاسبات در Domain Layer انجام شود.
-- هنگام محاسبه Realized Profit/Loss برای کریپتو، صفاف بودن اعشار حیاتی است (مثلاً 0.00000001 BTC)
-- هنگام تبدیل بین ارزها، از decimal.js استفاده کنید (هرگز Number)
-- Snapshot موجودی (`balanceAfterTransaction`) حتمی است
 
 ## مسیر فایل‌های دیتابیس
 
@@ -417,7 +388,7 @@ core/db/
 - تمام تراکنش‌های مالی در SQLite ذخیره می‌شوند.
 - LocalStorage فقط برای تنظیمات UI و داده‌های غیرحساس استفاده شود.
 - داده‌های حساس (مثلاً API keys) هرگز ذخیره نشوند.
-- تمام مبالغ باید بر اساس قانون "Minor Unit Storage" ذخیره شوند (بخش ۱۱ Project-Blueprint).
+- تمام مبالغ باید به‌صورت **decimal string** ذخیره شوند (Amount Storage v1 — Project-Blueprint و این سند).
 
 
 ---
@@ -860,8 +831,9 @@ navigator.locks.request('personal-fi-db-writer-' + databaseId)
 |------|-----|------|
 | `id` | UUID | PK |
 | `operationId` | UUID | همان atomic op |
-| `entryKind` | enum | `cash` \| `income` \| `expense` \| `transfer` \| `investment` \| `loan` \| `fee` \| `tax` \| `adjustment` \| `other` |
-| `direction` | enum | `debit` \| `credit` (از دید حساب/پرتفوی طبق قرارداد فیچر) یا `+`/`-` amountInBase |
+| `accountClass` | enum | WHAT: `cash` \| `crypto_asset` \| `stock_asset` \| `fund_unit` \| `metal_asset` \| `loan_liability` \| `loan_receivable` \| `income` \| `expense` \| `trading_fee` \| `equity` \| `opening_equity` \| `other` |
+| `lineKind` | enum | WHY: `asset` \| `cash` \| `fee` \| `fx_conversion` \| `fx_rounding` \| `fx_gain` \| `fx_loss` \| `equity` \| `income` \| `expense` \| `other` |
+| `direction` | enum | `debit` \| `credit` |
 | `amount` | decimal string | مبلغ به ارز رویداد |
 | `currency` | string | |
 | `exchangeRateToBase` | decimal string | |
@@ -891,9 +863,10 @@ navigator.locks.request('personal-fi-db-writer-' + databaseId)
 
 | فیلد اضافه | نقش |
 |------------|-----|
-| `accountClass` | `cash` \| `crypto_asset` \| `stock_asset` \| `fund_unit` \| `metal_asset` \| `loan_liability` \| `loan_receivable` \| `income` \| `expense` \| `trading_fee` \| `equity` \| `other` |
+| `accountClass` | WHAT — طبقه حساب (بالا) |
+| `lineKind` | WHY — علت خط (fx_rounding ≠ fx_gain) |
 | `direction` | `debit` \| `credit` |
-| `amountInBase` | برای balance check: Σ debit = Σ credit در همان `operationId` |
+| `amountInBase` | Σ debit = Σ credit در همان `operationId` |
 
 مثال BUY BTC با USDT + fee USDT:
 ```text
@@ -1308,7 +1281,7 @@ assert snapshots = rebuild from ledger
 
 ### Invariant: Transfer Accounting-neutral
 
-هر `entryKind = transfer` (جابه‌جایی بین حساب‌های خود کاربر یا معادل asset-location):
+هر journal با `lineKind`/`accountClass` مربوط به transfer (جابه‌جایی بین حساب‌های خود کاربر یا معادل asset-location):
 - نباید در totals درآمد/هزینه ظاهر شود
 - نباید `accountClass` برابر `income` یا `expense` برای اصل مبلغ باشد
 - Journal Engine / validate قبل از COMMIT این را enforce می‌کند

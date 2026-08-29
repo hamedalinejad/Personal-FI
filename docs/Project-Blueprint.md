@@ -297,18 +297,11 @@ IndexedDB
 
 ---
 
-## Minor Unit Storage
+## Amount Storage (v1 — decimal string)
 
-تمام مبالغ در دیتابیس به کوچک‌ترین واحد پول ذخیره می‌شوند.
+**SoT:** تمام مبالغ مالی، نرخ‌ها و quantityها در DB به‌صورت **TEXT decimal string** با محاسبات `decimal.js` ذخیره می‌شوند — **نه** INTEGER minor-unit به‌عنوان مدل اصلی، **نه** float/number.
 
-مثال:
-
-* ریال → مقدار صحیح
-* دلار → سنت (Cent)
-* یورو → سنت
-* سایر ارزها → کوچک‌ترین واحد تعریف‌شده
-
-نمایش مبلغ فقط در لایه Presentation انجام می‌شود.
+Minor unit فقط در مرز UI/import/export بانکی از طریق `toMinorUnit` / `fromMinorUnit` (اختیاری). جزئیات: بخش «قرارداد قطعی Amount Storage (v1)» پایین همین سند و `core/db/db.md`.
 
 ---
 
