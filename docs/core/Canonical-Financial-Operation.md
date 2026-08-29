@@ -1,3 +1,7 @@
+## ارجاع الزامی
+
+قبل از پیاده‌سازی هر Feature: `docs/core/Financial-Invariants.md`.
+
 # Canonical Financial Operation Model
 
 ## الگو (همه Featureها)

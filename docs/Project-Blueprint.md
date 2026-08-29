@@ -596,3 +596,8 @@ docs/
 ستون‌های اصلی مالی v1 **INTEGER minor نیستند** مگر جدول مشخصاً اعلام کند (مثلاً `quantityMg` به‌عنوان واحد فیزیکی شمارشی).
 
 بخش قدیمی Blueprint با عنوان «همه چیز Minor Unit integer» با این قرارداد **جایگزین** می‌شود.
+
+## Financial Invariants
+
+فهرست ممنوعیت‌های مالی (float، نرخ تاریخی، fee، journal، migration، validation، multi-tab):
+`docs/core/Financial-Invariants.md`.
