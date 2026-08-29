@@ -1,3 +1,5 @@
+> **Iran Market Rules (لایه مستقل):** `Iran-Market-Rules.md` — هویت، settlement، CA.
+
 # زیر‌فیچر: Investment - Stocks Iran (سهام بورس ایران)
 
 ## توضیح کلی

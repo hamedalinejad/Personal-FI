@@ -1,3 +1,5 @@
+> **Invariant:** `NAV ≠ transactionPrice`؛ valuation و تحقق می‌توانند redemption/subscription جدا داشته باشند.
+
 نام زیر‌فیچر: Investment - Fixed Income Funds (صندوق‌های درآمد ثابت)
 توضیح کلی:
 این زیر‌فیچر مدیریت سرمایه‌گذاری در صندوق‌های درآمد ثابت ایران را پوشش می‌دهد.

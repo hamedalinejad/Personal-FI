@@ -1418,3 +1418,33 @@ current ≠ خواندن مجدد فرمول روی state قدیمی بدون sn
 | `balloon` / `step_up` | **v2** — در create وام v1 reject |
 
 محاسبات فقط از `calculationMethod` ∈ مجموعه v1.
+
+---
+
+## Financial Obligation Model (Borrowed / Lent مشترک)
+
+یک مدل `Loan` برای هر دو جهت:
+
+```text
+Loan
+ ├── direction = borrowed  → Liability (loan_liability)
+ └── direction = lent      → Receivable (loan_receivable)
+```
+
+نه دو سیستم جدا برای «وام گرفته» و «طلب از شخص».
+
+### مبالغ مفهومی (جدا نگه دارید)
+
+| مفهوم | معنی |
+|--------|------|
+| `principalAmount` | اصل تعهد قرارداد |
+| `disbursedAmount` | مبلغ پرداخت‌شده به وام‌گیرنده |
+| `netDisbursedAmount` | نقد دریافتی پس از کسر fee صدور و … |
+| `interest` / accrued | سود |
+| `fee` / `penalty` / prepayment fee | جدا از principal |
+| `outstandingPrincipal` / remainingBalance | مانده اصل (derived از ledger) |
+| `totalPayoffAmount` | برای تسویه کامل: اصل + سود معوق + fee/penalty |
+
+**مثال:** Principal=100m، Fee=4m → Net cash received=96m؛ **Outstanding liability می‌تواند 100m بماند** مگر policy صریح fee را از liability کم کند.
+
+Journal و Cost/Fee treatment این تفکیک را enforce می‌کنند.
