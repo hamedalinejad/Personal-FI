@@ -140,7 +140,7 @@ Budget: تأثیر روی بودجه ماهانه
 1. validate: amount > 0، currency == account.currency، date ≤ today، موجودی کافی (ledger mode)
 2. INSERT `exp_transactions` (isVoided=false)
 3. INSERT `acc_transactions` با `type='withdrawal-expense'`، relatedFeature=`expense`، relatedId=exp id
-4. INSERT `fin_journal_entries` (entryKind=expense)
+4. INSERT journal lines: Dr expense category `fin_accounts` / Cr bank `fin_accounts` (`lineKind=expense`)
 5. به‌روز snapshot حساب
 6. COMMIT → persist
 
@@ -163,3 +163,22 @@ accept if businessDate <= todayBusiness
 
 `createdAt` = UTC timestamp ثبت سیستم — برای «آیا آینده است؟» استفاده **نشود**.  
 نیمه‌شب جلالی/UTC: فقط `businessDate` مبنا است.
+
+---
+
+## نقش در معماری حسابداری
+
+`exp_transactions` = **Domain sub-ledger** (جزئیات UI، دسته، recurring، metadata).
+
+**SoT حسابداری و گزارش میان‌فیچری** = journal lines روی `fin_accounts` از طریق `runAtomicFinancialOperation`.
+
+```text
+Expense UI
+  → Financial Operation
+  → Domain row (exp_transactions)
+  → Journal (accountId…)
+  → acc_transactions اگر cash بانکی
+  → snapshots
+```
+
+**ممنوع:** گزارش Expense/Income کلی فقط از جدول domain بدون journal، یا جمع domain + journal با هم.

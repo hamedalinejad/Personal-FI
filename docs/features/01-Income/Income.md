@@ -139,7 +139,7 @@ Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 1. validate: amount > 0، currency == account.currency، date ≤ today، account not archived
 2. INSERT `inc_transactions` (isVoided=false)
 3. INSERT `acc_transactions` با `type='deposit-income'`، relatedFeature=`income`، relatedId=inc id
-4. INSERT `fin_journal_entries` (entryKind=income)
+4. INSERT journal lines: Dr bank `fin_accounts` / Cr income category `fin_accounts` (`lineKind=income`, `accountClass` مشتق)
 5. به‌روز `acc_accounts.currentBalance` و `balanceAfterTransaction`
 6. COMMIT → persist
 
@@ -162,3 +162,22 @@ accept if businessDate <= todayBusiness
 
 `createdAt` = UTC timestamp ثبت سیستم — برای «آیا آینده است؟» استفاده **نشود**.  
 نیمه‌شب جلالی/UTC: فقط `businessDate` مبنا است.
+
+---
+
+## نقش در معماری حسابداری
+
+`inc_transactions` = **Domain sub-ledger** (جزئیات UI، دسته، recurring، metadata).
+
+**SoT حسابداری و گزارش میان‌فیچری** = journal lines روی `fin_accounts` از طریق `runAtomicFinancialOperation`.
+
+```text
+Income UI
+  → Financial Operation
+  → Domain row (inc_transactions)
+  → Journal (accountId…)
+  → acc_transactions اگر cash بانکی
+  → snapshots
+```
+
+**ممنوع:** گزارش Expense/Income کلی فقط از جدول domain بدون journal، یا جمع domain + journal با هم.

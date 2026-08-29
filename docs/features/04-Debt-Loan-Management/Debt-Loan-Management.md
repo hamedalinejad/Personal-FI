@@ -1114,7 +1114,7 @@ ln_loan_fees:
 قوانین:
 1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `proceeds_reduction` | `reduction_of_liability`
 2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_liability` صریح (نادر).
-3. هر fee → `ln_transactions type=fee_payment` + `fin_journal_entries` با entryKind=fee.
+3. هر fee → `ln_transactions type=fee_payment` + journal line `lineKind=fee` روی `fin_accounts` مناسب.
 4. `capitalized_cost` فقط اگر محصولاً به cost of borrowing اضافه شود و در گزارش جداگانه مستند باشد.
 
 ---

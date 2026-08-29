@@ -152,42 +152,42 @@
 ```ts
 {
  accounts: {
- totalBalance: number,
- totalBalanceUSDT: number
+ totalBalance: string  // decimal,
+ totalBalanceUSDT: string  // decimal
  },
  cashFlow: {
- income: number,
- expense: number,
- net: number
+ income: string  // decimal,
+ expense: string  // decimal,
+ net: string  // decimal
  },
  netWorth: {
- current: number,
- changePercent: number,
- trend: Array<{ date: string, value: number }>
+ current: string  // decimal,
+ changePercent: string  // decimal, e.g. "12.5",
+ trend: Array<{ date: string, value: string  // decimal }>
  },
  budget: {
- totalAssigned: number,
- totalSpent: number,
- percentUsed: number,
+ totalAssigned: string  // decimal,
+ totalSpent: string  // decimal,
+ percentUsed: string  // decimal,
  criticalEnvelopes: Array<...>
  },
  goals: Array<{
  id: string,
  name: string,
- progressPercent: number,
- remaining: number
+ progressPercent: string  // decimal,
+ remaining: string  // decimal
  }>,
  upcoming: Array<{
  type: 'bill' | 'loan' | 'cheque' | 'tax',
  title: string,
  dueDate: string,
- amount: number,
+ amount: string  // decimal,
  status: string
  }>,
  investments: {
- totalValue: number,
- realizedPL: number, // سود/زیان تحقق‌یافته — جداگانه نگه داشته شود
- unrealizedPL: number // سود/زیان تحقق‌نیافته — جداگانه نگه داشته شود
+ totalValue: string  // decimal,
+ realizedPL: string  // decimal, // سود/زیان تحقق‌یافته — جداگانه نگه داشته شود
+ unrealizedPL: string  // decimal // سود/زیان تحقق‌نیافته — جداگانه نگه داشته شود
  // ممنوع: ترکیب این دو در یک فیلد profitLoss واحد (طبق قاعده سرتاسری پروژه)
  },
  notifications: {
@@ -202,3 +202,13 @@
 - Dashboard فقط aggregate از Feature APIs (Accounts, Portfolio, Notifications, …)
 - بدون business logic مالی جدید
 - layout از `stg_settings` / dash_layouts
+
+---
+
+## قرارداد نوع داده Dashboard
+
+همه **مبالغ و نرخ‌های مالی** در `getDashboardData` و ویجت‌ها: **`string` (decimal)** — نه `number`/`float`.
+
+شمارنده‌های غیرمالی (مثل `unreadCount`) می‌توانند `number` (integer count) باشند.
+
+منبع اعداد گزارش کلی: journal / projections مشتق — **نه** SUM دوباره از exp+journal.
