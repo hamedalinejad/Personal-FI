@@ -161,7 +161,21 @@ Adapter plan باید برگرداند:
 > **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. 
 > **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**: 
 > - برای IRR و USDT: 
-> - `averageBuyPrice = 1` (ثابت، چون نرخ تبدیل با خودشان ثابت است) 
+> - **نه همیشه `averageBuyPrice = 1`.**
+
+### USDT / stablecoin — دو نقش
+| نقش | رفتار Cost Basis |
+|-----|------------------|
+| **Quote/settlement cash** روی صرافی (موجودی برای معامله) | می‌تواند cash-like باشد؛ ولی اگر با IRR/EUR خریده شده، **cost واقعی در ارز خرید** حفظ شود |
+| **USDT به‌عنوان دارایی سرمایه‌گذاری** (خرید تتر برای نگهداری/P&L) | مثل هر crypto: qty + cost basis از معامله خرید |
+
+```text
+خرید 10,000 USDT با 950,000,000 IRR
+  → averageBuyPrice و totalInvested از همان خرید (نه shortcut =1)
+```
+
+فقط وقتی economicKind صریح `cash_like_par` و currency=holding unit است ممکن است par=1 معنادار باشد — پیش‌فرض **نه**.
+Acquisition/CostBasisEngine نوع ورود را تعیین می‌کند، نه hard-code symbol=USDT. 
 > - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود) 
 > - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند) 
 > - در تابع `getPortfolioValue`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی) 

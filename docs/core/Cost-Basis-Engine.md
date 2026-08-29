@@ -158,3 +158,8 @@ ORDER BY businessDate ASC, createdAt ASC, id ASC
 ```
 فقط `ORDER BY businessDate` برای FIFO **کافی نیست**.
 Rebuild باید lots را از ledger بازسازی کند نه فقط average.
+
+## Source of Funds / economicKind
+
+موتور مشترک: basis از **نوع acquisition** می‌آید (opening, gift, buy, reward, transfer carry)، نه از symbol==USDT.
+جزئیات جدول kind: `Opening-Balance.md`.
