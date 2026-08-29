@@ -868,7 +868,9 @@ SoT گزارش میان‌فیچری = fin_journal_entries (accountClass + amoun
 
 - `exp_transactions` / `inc_transactions` / domain ledgers → **UI detail و rebuild دامنه**، نه جمع دوباره در گزارش کلی
 - ممنوع: `SUM(exp) + SUM(journal expense)` در یک متریک
-- پیاده‌سازی توصیه‌شده: query/view منطقی `vw_financial_report` (یا repository `getFinancialReport`) که **فقط** از journal (+ در صورت نیاز filter) می‌خواند
+- **Must برای API گزارش عمومی:** `getFinancialReport` / `vw_financial_report` **فقط** از `fin_journal_entries` می‌خواند
+- Domain tables (`exp_*`, `inc_*`, …) فقط در detail screens همان فیچر یا rebuild — نه در aggregator گزارش کلی
+- ESLint/architecture test پیشنهادی: ممنوع import SUM از exp+journal در یک report module
 - گزارش تخصصی دامنه (مثلاً فقط P&L یک holding) از Domain ledger همان فیچر — جدا برچسب بخورد
 
 ### قوانین لایه‌ها (ضد Double-Counting)
@@ -1469,3 +1471,22 @@ createdAt
 | Archive/purge | Settings: حذف/آرشیو قیمت‌های قدیمی‌تر از N سال (پیش‌فرض پیشنهادی ۵؛ قابل تنظیم) با تأیید کاربر + audit |
 | آستانه | اگر تخمین ردیف‌ها یا حجم serialize از آستانه Settings گذشت → هشدار Dashboard/Settings |
 | Auto-Sync | فقط instrumentهای دارای holding فعال؛ نه کل جهان دارایی‌ها |
+
+---
+
+## Checklist رفع تناقض‌های ذخیره و Journal (تأیید در spec)
+
+| # | موضوع | وضعیت |
+|---|--------|--------|
+| 1 | Amount = decimal string SoT | ✅ |
+| 2 | Journal: فقط `accountClass` + `lineKind` (بدون entryKind) | ✅ |
+| 3 | FeeTreatment: فقط `proceeds_reduction` | ✅ |
+| 4 | جداول fin_operations, ref_instruments, ln_schedule_snapshots, ln_loan_collateral, acc_transaction_links در لیست مرکزی | ✅ |
+| 5 | `acc_transaction_links` **Must** + UNIQUE | ✅ |
+| 6 | getPeriodRate + dayCountConvention/yearBasis | ✅ در Loan doc |
+| 7 | grace ROUND_DOWN عمدی | ✅ |
+| 8 | AssetCategory شامل physical/cash/other | ✅ types.md |
+| 9 | Loan v1 بدون balloon/step_up؛ annuity=alias UI | ✅ |
+| 10 | ln pay: ردیف‌های جدا + invariant | ✅ |
+| 11 | فازبندی MVP Product-Map | ✅ |
+| 12 | گزارش کلی فقط journal (`vw_financial_report` / getFinancialReport) | ✅ Must |
