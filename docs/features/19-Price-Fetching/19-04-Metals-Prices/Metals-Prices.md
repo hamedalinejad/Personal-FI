@@ -2,7 +2,7 @@
 
 ## توضیح کلی
 دریافت و ذخیره قیمت لحظه‌ای فلزات (طلا، نقره، مس و ...) در `price_history` با `assetCategory = 'metal'`. 
-خروجی این زیرفیچر مستقیماً توسط `Investment-Metals` (`getPortfolioValue`, `calculateProfitLoss` بخش Unrealized) مصرف می‌شود.
+خروجی این زیرفیچر مستقیماً توسط `docs/features/05-Investment/05-04-Metals/Investment-Metals.md` (`getPortfolioValue`, `calculateProfitLoss` بخش Unrealized) مصرف می‌شود.
 
 از همان سه مسیر فیچر پدر پیروی می‌کند: **دستی/On-Demand**، **خودکار/Auto-Sync اختیاری**، و **ثبت دستی بدون شبکه**.
 

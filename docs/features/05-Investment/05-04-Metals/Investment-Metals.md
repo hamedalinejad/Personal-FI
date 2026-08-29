@@ -1,4 +1,7 @@
-> **Alias:** محتوای canonical در `Investment-Metals.md` است؛ این فایل برای سازگاری نگه داشته شده.
+# Investment — Metals (Canonical)
+
+> **Canonical path:** `docs/features/05-Investment/05-04-Metals/Investment-Metals.md`  
+> `Metals.md` = همان محتوا (alias سازگاری با لینک‌های قدیمی).
 
 نام زیر‌فیچر: Investment - Metals (سرمایه‌گذاری در فلزات اساسی بازار ایران)
 توضیح کلی:

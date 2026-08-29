@@ -471,3 +471,30 @@ etf_market:  units * marketPrice - totalInvested
 روی `inv_fif_transactions` در صورت نیاز:
 - `navStatistical`, `navSubscription`, `navRedemption` (nullable snapshot روز)
 - `transactionPrice` همچنان مبنای cost/realized
+
+---
+
+## Decision table — ETF در برابر issuance_redemption
+
+| شرط | ETF (`fundType = 'etf'`) | صدور/ابطال (`fundType = 'issuance_redemption'`) |
+|------|---------------------------|-----------------------------------------------------|
+| `brokerageId` | **اجباری** روی holding و tx | **null** (ممنوع پر کردن برای جریان پول) |
+| `accountId` روی tx خرید/فروش | nullable (پول از کارگزاری) | **اجباری** |
+| جریان نقد | `inv_stocks_iran_brokerage_transactions` | `acc_transactions` |
+| `acc_transactions.relatedFeature` | معمولاً `stocks_iran` (مسیر کارگزاری) | **`fif`** |
+| `symbol` | نماد بورسی | nullable |
+| قیمت | بازار / کارگزاری | `transactionPrice` = صدور یا ابطال |
+| valuation پیش‌فرض | market | liquidation ≈ redemptionPrice |
+
+```text
+if fundType == 'etf':
+  brokerageId mandatory
+  accountId nullable
+  cash via brokerage cash ledger (+ acc فقط اگر bank↔broker)
+if fundType == 'issuance_redemption':
+  accountId mandatory on buy/sell
+  brokerageId null
+  cash via acc_transactions relatedFeature='fif'
+```
+
+Validate در createTransaction: نقض جدول بالا → reject.
