@@ -1355,3 +1355,30 @@ historicalSchedule(at) = snapshot با effectiveDate/generatedAt <= at
 هر regenerate: calculationVersion + operationId + reason + payload کامل
 current ≠ خواندن مجدد فرمول روی state قدیمی بدون snapshot
 ```
+
+---
+
+## وثیقه — `ln_loan_collateral`
+
+| فیلد | نقش |
+|------|-----|
+| `id` | UUID |
+| `loanId` | FK |
+| `collateralType` | `property` \| `gold` \| `guarantor` \| `deposit` \| `vehicle` \| `other` |
+| `description` | متن |
+| `estimatedValue` | decimal |
+| `currency` | string |
+| `relatedAssetId` | nullable — لینک به physical/metal در صورت وجود |
+| `documentsOperationId` | nullable |
+| `createdAt` | |
+
+چند ردیف per loan مجاز.
+
+## جریمه بازپرداخت زودتر — early repayment
+
+روی `ln_loans` یا `ln_loan_fees`:
+- `earlyRepaymentPenaltyType` → `none` \| `fixed` \| `percent_of_remaining` \| `percent_of_principal`
+- `earlyRepaymentPenaltyAmount` / `earlyRepaymentPenaltyRate`
+- `accountingTreatment` طبق FeeCategory `loan_early_payment`
+
+`gracePeriods` + `gracePeriodUnit` canonical است؛ `gracePeriodMonths` فقط legacy migrate.
