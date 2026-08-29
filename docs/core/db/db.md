@@ -180,6 +180,14 @@ Invariant: هیچ `relatedId` به دادهٔ خارج از فایل بازشد�
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
 | `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
 | `fin_journal_entries` | Core Accounting | **دفتر روزنامه یکپارچه همه رویدادهای مالی** |
+| `fin_operations` | Core Accounting | header هر atomic op (operationId, commandHash, status, engineVersions) — **Must** |
+| `fin_reconcile_runs` | Core Accounting | خروجی اجرای reconcile — **Must** برای audit |
+| `ref_instruments` | Core | registry هویت دارایی (crypto/stock/fif/metal) — **Must** |
+| `ln_schedule_snapshots` | Debt & Loan | برنامه اقساط نسخه‌دار — **Must** |
+| `ln_loan_collateral` | Debt & Loan | وثیقه وام — **Must** |
+| `inv_stocks_iran_instruments` | Investment Stocks Iran | ISIN, lotSize, priceTick, firmCode |
+| `inv_stocks_iran_corporate_actions` | Investment Stocks Iran | metadata CA (merger/spin-off/…) |
+| `tax_events` | Tax Management | رویداد مالیاتی مرکزی (linkedTaxEventId) |
 | `inc_transactions` | Income | تراکنش‌های درآمد |
 | `inc_recurring` | Income | درآمدهای تکرارشونده |
 | `exp_transactions` | Expense | تراکنش‌های هزینه |
@@ -243,7 +251,7 @@ Invariant: هیچ `relatedId` به دادهٔ خارج از فایل بازشد�
 | `price_sources` | Price Fetching | منابع/Providerهای قیمت |
 | `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only؛ دستی یا از API) |
 | `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
-| `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — Should Have |
+| `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — **Should Have** (در فهرست مرکزی) |
 | `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی void/reversal/repair/import/restore — **Must Have** |
 | `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف detect→quarantine→reconcile→repair — **Must Have** |
 

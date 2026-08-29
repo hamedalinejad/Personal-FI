@@ -196,7 +196,7 @@
 
 - `id` → UUID (Primary Key)
 - `loanId` → UUID
-- `accountingTreatment` → enum **اجباری** (`expense` | `reduction_of_proceeds` | `capitalized_cost` | `reduction_of_carrying_amount`)
+- `accountingTreatment` → enum **اجباری** (`expense` | `proceeds_reduction` | `capitalized_cost` | `reduction_of_carrying_amount`)
 - `feeCategory` → enum:
  - `origination` — کارمزد صدور/ثبت (یک‌بار، در disbursement)
  - `early_payment` — کارمزد پیش‌پرداخت (هنگام early_payment)
@@ -1091,7 +1091,7 @@ ln_loan_fees:
 
 | feeCategory | treatment پیش‌فرض | اثر |
 |-------------|-------------------|-----|
-| `origination` | `expense` یا `reduction_of_proceeds` | کاهش net cash دریافتی؛ **نه** کاهش principal liability مگر صریح |
+| `origination` | `expense` یا `proceeds_reduction` | کاهش net cash دریافتی؛ **نه** کاهش principal liability مگر صریح |
 | `early_payment` | `expense` | با پیش‌پرداخت؛ remainingBalance فقط از portion اصل کم می‌شود |
 | `monthly_management` | `expense` | همراه قسط؛ به principal اضافه نمی‌شود |
 | `per_transaction` | `expense` | |
@@ -1099,7 +1099,7 @@ ln_loan_fees:
 | `tiered` (زیرگروه early) | `expense` | |
 
 قوانین:
-1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `reduction_of_proceeds` | `reduction_of_liability`
+1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `proceeds_reduction` | `reduction_of_liability`
 2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_liability` صریح (نادر).
 3. هر fee → `ln_transactions type=fee_payment` + `fin_journal_entries` با entryKind=fee.
 4. `capitalized_cost` فقط اگر محصولاً به cost of borrowing اضافه شود و در گزارش جداگانه مستند باشد.
@@ -1227,7 +1227,7 @@ disburse USD loan to IRR account:
 
 | feeCategory | treatment پیش‌فرض | توضیح |
 |-------------|-------------------|--------|
-| `origination` | `reduction_of_proceeds` یا `expense` | کاهش net cash دریافتی؛ liability = full principal مگر policy دیگر |
+| `origination` | `proceeds_reduction` یا `expense` | کاهش net cash دریافتی؛ liability = full principal مگر policy دیگر |
 | `monthly_management` / `service` | `expense` | دوره‌ای |
 | `early_payment` / prepayment | `expense` | با پیش‌پرداخت |
 | `late` / penalty | `expense` | نه افزایش principal |
