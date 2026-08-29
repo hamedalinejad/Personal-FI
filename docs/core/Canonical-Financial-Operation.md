@@ -64,7 +64,8 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   status                    // pending | posted | voided | failed — business only
   failurePhase?             // validation | domain_write | sql_commit | null when ok
   failureCode?              // machine code
-  commandHash               // for idempotency
+  commandHash               // idempotency fingerprint — **Must**
+  engineVersions            // JSON: { costBasis, rounding, fx, loanFormula, journal } calculationVersionها
   // durability counters NOT in SQLite — see db_meta
   createdAt
 
@@ -504,3 +505,15 @@ Boot: اگر `pendingCommit` هست → retry swap یا UI recovered.
 | 12 | FeeCategory taxonomy دقیق | ✅ |
 
 Runtime: تا fixture CI سبز نشود این‌ها «اثبات‌شده در کد» نیستند.
+
+### engineVersions روی Operation
+```text
+fin_operations.engineVersions = {
+  costBasis: "1.x",
+  rounding: "1.x",
+  fx: "1.x",
+  loanFormula: "1.x",
+  journal: "1.x"
+}
+```
+Rebuild تاریخی با **همان** versionهای قفل‌شده روی op؛ تغییر فرمول فقط ops جدید یا migration صریح با bump version.

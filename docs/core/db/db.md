@@ -1250,7 +1250,9 @@ Checklist پیاده‌سازی + تست در `core/reconciliation` fixtures و 
 | ID | سناریو | assert |
 |----|--------|--------|
 | `journal_balanced` | any buy | Σ debit=credit base |
-| `reversal_balanced` | reverseOperation | journal+domain |
+| `reversal_balanced` | reverseOperation | **domain + cash + journal + tax + snapshot** همه inverse/void |
+| `persist_retry_success` | SQL posted → IDB fail → pendingCommit → reboot → retry → durable | holdings intact; UI saved only after durable |
+| `persist_retry_fail_recover` | retries fail → persist_failed → user recover path | no silent data loss; marker visible |
 | `opening_balanced` | opening_position | Dr asset Cr equity/income |
 | `fee_burn_balanced` | | expense + asset credit |
 | `bank_transfer_neutral` | | no income/expense |
@@ -1281,7 +1283,27 @@ Runner: random یا parameterized seeds روی قوانین؛ fail اگر invari
 | `xf_crypto_sell_withdraw_bank` | SELL on exchange → withdraw to bank | domain sale + cash legs + journal balanced |
 | `xf_transfer_neutral_chain` | bank A→B then expense | transfer not in income/expense totals |
 
-**CI gate:** job `financial-fixtures` (numeric + property + cross-feature) must pass on main before financial release tag.
+#### Reliability / Persistence Fixtures (Must — کلاس جدا از محاسبات)
+
+| ID | جریان | assert |
+|----|--------|--------|
+| `persist_retry_success` | posted → IDB fail → `db_meta.pendingCommit` → reboot → retry swap → durable | data + operation نتیجه idempotent؛ DomainEvent فقط بعد durable |
+| `persist_retry_fail_recover` | N fail → user intervention / recover | status/marker شفاف؛ بدون overwrite کور |
+| `idempotent_double_click` | same operationId+commandHash twice | یک op |
+| `idempotent_conflict` | same operationId, different commandHash | IDEMPOTENCY_CONFLICT |
+
+#### Reversal full stack
+`reversal_balanced` برای هر xf_* نمونه (حداقل `xf_bank_to_exchange_buy` و `xf_crypto_sell_withdraw_bank`):
+```text
+assert domain inverse
+assert cash inverse (acc_transactions void/reverse)
+assert journal Σ base = 0 net after pair
+assert tax_events active → voided/reversed
+assert snapshots = rebuild from ledger
+```
+
+**CI gate:** job `financial-fixtures` (numeric + property + cross-feature + **reliability**) must pass on main before financial release tag.
+
 
 
 ### Invariant: Transfer Accounting-neutral
