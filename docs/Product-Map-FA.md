@@ -1,4 +1,6 @@
-> **SoT Scope v1:** این نقشه لیست Featureهای محصول است و بر تفسیر محدود Blueprint قدیمی مقدم است.
+> **SoT Scope محصول:** این نقشه لیست Featureهای **محصول کامل** است.
+> **SoT ترتیب پیاده‌سازی:** بخش «فازبندی پیاده‌سازی» زیر — تا از over-engineering v1 جلوگیری شود.
+
 
 نسخه فارسی - نقشه محصول
 نقشه محصول
@@ -9,6 +11,38 @@
 وضعیت: نهایی
 مقدمه
 این سند نقشه کامل محصول را توصیف می‌کند. هر فیچر به صورت کاملاً مستقل طراحی شده است.
+
+---
+
+## فازبندی پیاده‌سازی (ضد over-engineering)
+
+قرارداد معماری (Journal، Operation، decimal، offline) از ابتدا برای کل محصول نوشته می‌شود؛ **کد و UI** فازبندی می‌شود.
+
+### MVP — v1.0 (اولین release قابل استفاده مالی)
+| حوزه | محتوا |
+|------|--------|
+| Accounts | حساب، موجودی، انتقال (accounting-neutral) |
+| Income / Expense | ثبت + recurring ساده |
+| Loans | فقط `declining_balance`, `flat_rate`, `qarz_al_hasaneh` |
+| Crypto | buy/sell/transfer داخلی پایه + cost weighted average |
+| Dashboard + Reports | خلاصه موجودی، درآمد/هزینه، وام |
+| Settings | backup/restore، ارز پایه، امنیت پایه |
+| Core | fin_operations، journal، persist، single-writer |
+
+**خارج از v1.0 کد:** Stocks، FIF، Metals، Cheque، Bills، Budget، Goals، Tax کامل، Price Auto-Sync، FIFO، bullet/variable پیشرفته، balloon/step_up.
+
+### v1.1
+Stocks Iran (با settlement/CA پایه)، FIF، Metals، Cheque، Bills & Recurring
+
+### v1.2
+Tax، Budget، Goals، Notifications غنی، Price Fetching Auto-Sync، Physical Assets
+
+### v2.0
+Loan bullet/variable پیشرفته، balloon/step_up، FIFO cost basis، Cloud/multi-user/license server
+
+مستندات Feature خارج از فاز فعلی **قرارداد آینده**اند نه الزام پیاده‌سازی همزمان.
+
+---
 فیچرهای اصلی
 ۱. حساب‌های بانکی (Accounts & Banking)
 مدیریت حساب‌های بانکی، موجودی حساب‌ها و انتقال وجه بین حساب‌های بانکی.

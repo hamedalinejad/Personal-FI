@@ -78,11 +78,12 @@
 
 | سند | نقش |
 |-----|-----|
-| **`00-Product/Product-Map.md` (نسخه جاری)** | **SoT لیست Featureهای محصول** — شامل Accounting، Investment، Tax، Security، Documents، Price Fetching، Notifications، Physical Assets و بقیه |
-| **`Project-Blueprint.md`** | اصول معماری، اصول داده، Out of Scope غیرفیچری (مثلاً server-first) |
-| Feature docs | جزئیات هر فیچر |
+| **`Product-Map-FA.md` — لیست Feature** | چشم‌انداز محصول کامل |
+| **`Product-Map-FA.md` — فازبندی پیاده‌سازی** | **SoT ترتیب کد/UI** (MVP v1.0 → v1.1 → v1.2 → v2) |
+| **`Project-Blueprint.md`** | اصول معماری، داده، Offline |
+| Feature docs | قرارداد دامنه؛ پیاده‌سازی طبق فاز |
 
-بخش‌های قدیمی Blueprint که محصول را فقط به «Personal Accounting + Investment» تقلیل می‌دهند **تفسیر تاریخی**اند؛ برای scope پیاده‌سازی v1 از Product-Map پیروی کنید. در صورت تعارض، Product-Map + این جدول برنده است.
+پیاده‌سازی همزمان هر ۲۰ فیچر در یک release **ممنوع** است. تعارض «Product-Map کامل» با ظرفیت تیم با **فازبندی** حل می‌شود نه حذف مستند آینده.
 
 # 5. Out of Scope
 
