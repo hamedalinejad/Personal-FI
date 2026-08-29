@@ -102,7 +102,9 @@
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 
 **محاسبه اقساط (Core):**
-- `calculationMethod` → enum (`declining_balance` | `annuity` | `flat_rate` | `bullet` | `balloon` | `step_up` | `qarz_al_hasaneh`) — **حتمی**
+- `calculationMethod` → enum v1: (`declining_balance` | `flat_rate` | `bullet` | `qarz_al_hasaneh`) — **حتمی**
+  - `annuity` = **alias فقط UI** به `declining_balance` (قسط ثابت / سود روی مانده) — در DB ذخیره نشود
+  - `balloon` | `step_up` = **Out of Scope v1** (v2)
 - `interestType` → string (`none`, `fixed`, `variable`)
 - `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18)
 - `interestRatePeriod` → string (`annual`, `monthly`) — **فقط از طریق `getPeriodRate` وارد فرمول می‌شود**؛ هیچ فرمولی نباید `interestRate/12` را مستقیم فرض کند
@@ -1315,6 +1317,15 @@ Domain: فقط `gracePeriods` + `gracePeriodUnit` برای محاسبه. نوش�
 
 ---
 
+## ثبت پرداخت در UI (v1)
+
+**ترجیح:** یک عمل «پرداخت قسط + کارمزد + جریمه» = **چند ردیف** `ln_transactions` با یک `operationId`:
+1. `installment_payment` — فقط `principalPortion + interestPortion` (= amount)
+2. صفر یا چند `fee_payment`
+3. صفر یا چند `penalty`
+
+ترکیب fee/penalty داخل همان ردیف قسط **مجاز ولی توصیه نمی‌شود**؛ اگر ترکیب شد invariant جمع portions برقرار است.
+
 ## Invariants قطعی ln_transactions
 
 ### مبلغ
@@ -1400,12 +1411,10 @@ current ≠ خواندن مجدد فرمول روی state قدیمی بدون sn
 
 | method | رفتار |
 |--------|--------|
-| `annuity` / declining amortization | قسط ثابت: \(P \times r(1+r)^n / ((1+r)^n - 1)\) با \(r=\mathrm{getPeriodRate}\) |
-| `declining_balance` | اصل ثابت + سود روی مانده |
+| `declining_balance` (UI: «اقساط ثابت / Annuit») | قسط ثابت amortization: \(P \times r(1+r)^n / ((1+r)^n - 1)\)؛ **یا** حالت اصل‌ثابت+سود‌مانده اگر در UI انتخاب شود — هر دو زیر همین method با `amortizationStyle` اختیاری v1.1 |
 | `flat_rate` | سود کل روی اصل اولیه / n |
 | `bullet` | دوره‌ها فقط سود؛ اصل در سررسید |
-| `balloon` | اقساط کوچک + `balloonAmount` در قسط آخر (فیلد `balloonAmount` اجباری) |
-| `step_up` | جدول اقساط از `ln_loan_fee_tiers` یا `stepSchedule` JSON: سال/دوره → installment |
 | `qarz_al_hasaneh` | بدون سود؛ کارمزد جدا |
+| `balloon` / `step_up` | **v2** — در create وام v1 reject |
 
-`loanType` نمایشی می‌تواند همان `calculationMethod` باشد یا label جدا؛ محاسبات فقط از `calculationMethod` + schedule.
+محاسبات فقط از `calculationMethod` ∈ مجموعه v1.

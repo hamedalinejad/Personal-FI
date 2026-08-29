@@ -134,7 +134,9 @@ export type RelatedFeature =
 
 ```typescript
 // دسته‌بندی دارایی در price_history و price_sources
-export type AssetCategory = 'crypto' | 'stock' | 'fif' | 'metal';
+export type AssetCategory = 'crypto' | 'stock' | 'fif' | 'metal' | 'physical' | 'cash' | 'other';
+// price_history / ref_instruments: physical و cash فقط اگر صریحاً در Price Fetching پشتیبانی شوند؛
+// v1 Price Fetching عملیاتی روی crypto|stock|fif|metal است؛ physical valuation جدا (pa_valuations).
 
 // طبقه‌بندی خطای شبکه/پاسخ — فقط برای failed[]
 // api_key_required و offline در skipped[] می‌روند (نه failed[]) — به Price-Fetching.md/مراجعه شود
