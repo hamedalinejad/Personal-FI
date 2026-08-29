@@ -116,3 +116,21 @@ accountId / instrumentId معتبر
 - `core/db/*` (persist, journal, fixtures)
 - `Rounding-Policy.md`
 - `Product-Map-FA.md` فازبندی
+
+---
+
+## 9. Snapshot هرگز SoT گزارش نیست (بدون استثنا)
+
+```text
+Ledger / Journal  →  Calculation  →  Report
+Snapshot = فقط cache optimization (اختیاری)
+```
+
+| منبع | مجاز در Report API؟ |
+|------|---------------------|
+| `fin_journal_lines` + domain ledger | **بله** (SoT) |
+| `currentBalance`, `balanceAfterTransaction`, `remainingBalance`, holding qty snapshot, `port_snapshots` | **فقط** اگر همان عدد از calculation/rebuild تأیید شده باشد و به‌عنوان cache؛ **نه** به‌عنوان حقیقت مستقل |
+
+**ممنوع:** `getFinancialReport` / Dashboard / Net Worth که مستقیم از snapshot بدون مسیر ledger بخواند.
+
+Reconcile: expected همیشه از ledger؛ actual می‌تواند snapshot باشد تا drift پیدا شود.

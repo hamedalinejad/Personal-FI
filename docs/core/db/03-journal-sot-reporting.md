@@ -170,6 +170,9 @@ Dr expense/fee  feeAmount
 
 **قانون:** در یک گزارش، برای یک متریک فقط **یک** ستون SoT خوانده می‌شود. Snapshot هرگز expected در reconcile نیست.
 
+**Invariant سخت (بدون استثنا):** هیچ Report مالی SoT را از Snapshot نمی‌خواند؛ Snapshot فقط cache بعد از Calculation از Ledger/Journal است. جزئیات: `Financial-Invariants.md` §9.
+
+
 جریان نوشتن (تکرار الزامی):
 ```text
 validate → domain rows → journal → acc (if cash) → derive snapshots from same numbers → COMMIT → persist → emit

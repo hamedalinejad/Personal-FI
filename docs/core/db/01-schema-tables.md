@@ -11,6 +11,7 @@
 | `fin_operations` | Core Accounting | header هر atomic op (operationId, commandHash, status, engineVersions) — **Must** |
 | `fin_reconcile_runs` | Core Accounting | خروجی اجرای reconcile — **Must** برای audit |
 | `ref_instruments` | Core | registry هویت دارایی (crypto/stock/fif/metal) — **Must** |
+| `ref_parties` | Core | طرف حساب / اشخاص (نه CRM) — **Must برای MVP وقتی Loan/Income شخص دارد** |
 | `ln_schedule_snapshots` | Debt & Loan | برنامه اقساط نسخه‌دار — **Must** |
 | `ln_loan_collateral` | Debt & Loan | وثیقه وام — **Must** |
 | `inv_stocks_iran_instruments` | Investment Stocks Iran | ISIN, lotSize, priceTick, firmCode |
