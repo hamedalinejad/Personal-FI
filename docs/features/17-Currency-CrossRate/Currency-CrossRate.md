@@ -288,3 +288,11 @@ Journal/`amountInBase` تاریخی دست نخورده (`baseCurrencyAtOperatio
 جزئیات در `Canonical-Financial-Operation.md`.
 
 `amountInBase` پس از persist **rebuild نمی‌شود** مگر migration با `calculationVersion` صریح.
+
+---
+
+## IRR و تومان (نمایش)
+
+- **Currency در DB:** فقط `IRR`
+- **UI:** Rial یا Toman (`1 Toman = 10 Rial`)
+- ممنوع: ارز جدا `TOM`/`IRT` در ledger
