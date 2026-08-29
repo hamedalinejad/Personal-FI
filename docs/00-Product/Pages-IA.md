@@ -375,3 +375,16 @@ interface InvestmentActionSheetProps {
 
 **ممنوع:** سه ماژول جدا برای fetch در Investment / Settings / Feature20.
 Sub-routes investment: فقط list+detail؛ actions = Sheet (قبلاً قرارداد شد).
+
+---
+
+## Transactions = صفحه مرکزی تجربه
+
+یک صفحه **Transactions** همه رویدادها را از **Feature APIs** می‌خواند (نه DB جدا):
+
+Income · Expense · Transfer · Loan · Cheque · Investment · Asset · Fee · Tax · Adjustment
+
+فیلتر: Date, Account, Category, Party, Currency, Feature, Amount
+
+### Feature بدون آیتم ناوبار
+Cheque, Bills, Tax, Notifications, Documents, Currency, Price → داخل Transactions / Settings / Investments — **صفحه ناوبار جدا نه**.

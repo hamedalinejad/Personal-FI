@@ -159,3 +159,5 @@ Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = speci
 `Accounting Core` = backend/domain capability.
 
 کاربر آن را در **Transactions، Accounts، Reports** تجربه می‌کند — نه مسیر `/accounting`.
+
+**تأکید:** `accountClass` فقط classification است؛ Journal خط همیشه **`accountId` → fin_accounts** (مثلاً ۱۰۰۱ بانک ملت).

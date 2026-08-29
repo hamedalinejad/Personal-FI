@@ -148,3 +148,13 @@ COMMIT
 ---
 
 **Repair:** فقط پس از تأیید صریح کاربر + audit — هرگز auto-silent. `Financial-Invariants.md` §12.
+
+## مدل مقایسه
+
+```text
+Account → Ledger/Journal balance → Domain balance → Snapshot → (اختیاف = Integrity Issue)
+Investment: Transactions → Calculated Holding → Stored Holding → Portfolio
+0 diff → OK · ≠0 → detect → queue → user repair
+```
+
+`fin_reconcile_runs` + `ref_integrity_queue` = Core capability.
