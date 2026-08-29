@@ -126,6 +126,9 @@ export type RelatedFeature =
 // این Union منبع حقیقت TypeScript است.
 // افزودن فیچر جدید با polymorphic link = (1) افزودن literal اینجا (2) ثبت در جدول registry زیر در db.md
 // هیچ فایل فیچری حق ندارد string آزاد برای relatedFeature بنویسد.
+// v1: closed enum در core — OK و مطلوب برای type-safety.
+// آینده (v2+): جدول ref_features برای ثبت فیچر بدون تغییر اجباری همه bundleها؛ migration از enum.
+
 ```
 
 ---

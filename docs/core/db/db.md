@@ -858,6 +858,19 @@ navigator.locks.request('personal-fi-db-writer-' + databaseId)
 | `isVoided` | boolean | |
 | `createdAt` | timestamp UTC | |
 
+### گزارش‌گیری — فقط یک لایه (ضد 2×)
+
+**قانون اجباری برای همه Reports / Dashboard / Net Worth cashflow:**
+
+```text
+SoT گزارش میان‌فیچری = fin_journal_entries (accountClass + amountInBase)
+```
+
+- `exp_transactions` / `inc_transactions` / domain ledgers → **UI detail و rebuild دامنه**، نه جمع دوباره در گزارش کلی
+- ممنوع: `SUM(exp) + SUM(journal expense)` در یک متریک
+- پیاده‌سازی توصیه‌شده: query/view منطقی `vw_financial_report` (یا repository `getFinancialReport`) که **فقط** از journal (+ در صورت نیاز filter) می‌خواند
+- گزارش تخصصی دامنه (مثلاً فقط P&L یک holding) از Domain ledger همان فیچر — جدا برچسب بخورد
+
 ### قوانین لایه‌ها (ضد Double-Counting)
 
 | لایه | چیست | Source of Truth برای چه |
@@ -1447,3 +1460,12 @@ lastPersistAttemptAt?,
 createdAt
 ```
 همراه `db_meta.pendingCommit` برای recovery بعد از crash بین SQL COMMIT و IDB swap — جزئیات `Canonical-Financial-Operation.md`.
+
+## سیاست حجم price_history
+
+| کنترل | قانون |
+|--------|--------|
+| Dedupe | الزامی: همان instrumentId+source+quoteMarket+price+marketDate/fetchedAt bucket روزانه → یک ردیف |
+| Archive/purge | Settings: حذف/آرشیو قیمت‌های قدیمی‌تر از N سال (پیش‌فرض پیشنهادی ۵؛ قابل تنظیم) با تأیید کاربر + audit |
+| آستانه | اگر تخمین ردیف‌ها یا حجم serialize از آستانه Settings گذشت → هشدار Dashboard/Settings |
+| Auto-Sync | فقط instrumentهای دارای holding فعال؛ نه کل جهان دارایی‌ها |

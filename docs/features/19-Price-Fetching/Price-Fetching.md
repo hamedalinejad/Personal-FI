@@ -771,3 +771,10 @@ fxAsOf = same valuationAsOf unless explicit rateDate
 ### Price revision
 `price_history` **append-only**. اصلاح provider = ردیف جدید با `revisesId` / `quoteRevision` نه UPDATE قیمت قدیم.  
 getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) ؛ historical as-of از ردیف‌های ≤ asOf.
+
+## حجم و نگهداری تاریخچه
+
+- Dedupe روزانه الزامی (کلید: instrumentId + sourceId + quoteMarket + marketDate یا day(fetchedAt) + price)
+- Purge/archive قدیمی‌تر از N سال از Settings
+- هشدار حجم؛ Auto-Sync محدود به دارایی‌های دارای position
+جزئیات در `db.md` بخش سیاست حجم price_history.
