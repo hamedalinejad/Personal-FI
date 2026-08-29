@@ -168,3 +168,38 @@ Price Provider → فقط Valuation / نمایش پرتفوی
 `createdAt` · `eventAt` · `businessDate` · `settlementDate` · `marketDate` · `dueDate` · `paymentDate` · `fetchedAt`
 
 **Invariant:** `businessDate ≠ createdAt` ممکن و عادی است؛ گزارش کسب‌وکار روی businessDate/settlementDate است نه فقط UTC create.
+
+---
+
+## 12. Repair هرگز مخفی نیست
+
+```text
+Detect inconsistency
+  → Show (UI)
+  → Explain (expected vs actual)
+  → User explicitly approves
+  → Audit (fin_audit_log)
+  → Repair (rebuild/repair API)
+```
+
+**ممنوع:** اصلاح بی‌سروصدای `currentBalance` / holding / remainingBalance در پس‌زمینه.
+
+Reconcile می‌تواند **read-only** drift را گزارش کند؛ repair فقط با flag/API صریح کاربر.
+
+---
+
+## 13. Accounting در برابر Investment
+
+```text
+Accounting (Journal + fin_accounts)  = System of Financial Truth میان‌فیچری
+Investment / Loan / Income…        = Specialized Subledger
+```
+
+خرید BTC نمونه:
+
+```text
+Crypto subledger + Cash + Cost basis + Journal
+همه با یک operationId
+```
+
+Investment «جدا از حسابداری» به‌معنای دو حقیقت موازی **نیست**.

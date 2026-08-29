@@ -147,3 +147,4 @@ COMMIT
 
 ---
 
+**Repair:** فقط پس از تأیید صریح کاربر + audit — هرگز auto-silent. `Financial-Invariants.md` §12.
