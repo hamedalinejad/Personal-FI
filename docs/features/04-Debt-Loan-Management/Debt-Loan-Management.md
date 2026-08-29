@@ -102,7 +102,7 @@
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 
 **محاسبه اقساط (Core):**
-- `calculationMethod` → enum (declining_balance | flat_rate | bullet | qarz_al_hasaneh) ✅ **جدید — حتمی**
+- `calculationMethod` → enum (`declining_balance` | `annuity` | `flat_rate` | `bullet` | `balloon` | `step_up` | `qarz_al_hasaneh`) — **حتمی**
 - `interestType` → string (`none`, `fixed`, `variable`)
 - `interestRate` → decimal (درصد کامل: 18 برای ۱۸٪، نه 0.18)
 - `interestRatePeriod` → string (`annual`, `monthly`) — **فقط از طریق `getPeriodRate` وارد فرمول می‌شود**؛ هیچ فرمولی نباید `interestRate/12` را مستقیم فرض کند
@@ -1382,3 +1382,19 @@ current ≠ خواندن مجدد فرمول روی state قدیمی بدون sn
 - `accountingTreatment` طبق FeeCategory `loan_early_payment`
 
 `gracePeriods` + `gracePeriodUnit` canonical است؛ `gracePeriodMonths` فقط legacy migrate.
+
+---
+
+## انواع وام — فرمول‌ها (ایران)
+
+| method | رفتار |
+|--------|--------|
+| `annuity` / declining amortization | قسط ثابت: \(P \times r(1+r)^n / ((1+r)^n - 1)\) با \(r=\mathrm{getPeriodRate}\) |
+| `declining_balance` | اصل ثابت + سود روی مانده |
+| `flat_rate` | سود کل روی اصل اولیه / n |
+| `bullet` | دوره‌ها فقط سود؛ اصل در سررسید |
+| `balloon` | اقساط کوچک + `balloonAmount` در قسط آخر (فیلد `balloonAmount` اجباری) |
+| `step_up` | جدول اقساط از `ln_loan_fee_tiers` یا `stepSchedule` JSON: سال/دوره → installment |
+| `qarz_al_hasaneh` | بدون سود؛ کارمزد جدا |
+
+`loanType` نمایشی می‌تواند همان `calculationMethod` باشد یا label جدا؛ محاسبات فقط از `calculationMethod` + schedule.
