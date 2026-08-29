@@ -54,3 +54,5 @@
 - `Financial-Invariants.md` — ممنوعیت‌های مالی و الزامات release
 - `Accounting-Core.md` — fin_accounts و journal خطوط حساب‌به‌حساب
 - `Parties.md` — طرف حساب (ref_parties)
+- `Account-Layers.md` — Financial vs Accounting vs Party
+- `License-Offline.md` — license فایل امضاشده، خارج از DB مالی

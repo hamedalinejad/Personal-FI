@@ -208,3 +208,34 @@ navigator.locks.request('personal-fi-db-writer-' + databaseId)
 
 ---
 
+---
+
+## فرمت رسمی Backup: `.personalfi`
+
+First-class product artifact (نه فقط «Export SQLite» خام).
+
+```text
+archive.personalfi  (zip یا container معادل)
+  manifest.json
+  database.sqlite
+  checksums.json      // sha256 of sqlite + manifest
+  optional/
+    encrypted.payload // اگر کاربر رمز گذاشت
+```
+
+### `manifest.json` (حداقلی)
+
+```json
+{
+  "format": "personalfi-backup",
+  "formatVersion": 1,
+  "schemaVersion": 12,
+  "appVersion": "1.0.0",
+  "databaseId": "uuid",
+  "createdAt": "ISO-UTC",
+  "baseCurrencyAtExport": "IRR"
+}
+```
+
+Restore: validate manifest + checksum → temp DB → integrity_check → FK → migrate → swap.  
+Support/migration/license recovery همگی روی همین فرمت سوار می‌شوند.

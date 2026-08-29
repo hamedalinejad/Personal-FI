@@ -601,3 +601,9 @@ docs/
 
 فهرست ممنوعیت‌های مالی (float، نرخ تاریخی، fee، journal، migration، validation، multi-tab):
 `docs/core/Financial-Invariants.md`.
+
+## لایه‌های حساب و License
+
+- تفکیک Financial / Accounting / Party: `docs/core/Account-Layers.md`
+- License offline: `docs/core/License-Offline.md`
+- Backup `.personalfi`: `docs/core/db/06-migration-backup-audit.md`
