@@ -1,3 +1,9 @@
+# Price Fetching
+
+> **Invariant:** Price Fetching **secondary** است.  
+> `No external price dependency for transaction correctness.`  
+> ثبت معامله آفلاین همیشه ممکن است؛ API فقط valuation را غنی می‌کند.
+
 # فیچر: Price Fetching (دریافت قیمت‌ها)
 
 ## توضیح کلی

@@ -134,3 +134,27 @@ Snapshot = فقط cache optimization (اختیاری)
 **ممنوع:** `getFinancialReport` / Dashboard / Net Worth که مستقیم از snapshot بدون مسیر ledger بخواند.
 
 Reconcile: expected همیشه از ledger؛ actual می‌تواند snapshot باشد تا drift پیدا شود.
+
+---
+
+## 10. Price Fetching کاملاً secondary است
+
+```text
+Transaction  →  واقعیت تاریخی (SoT معامله)
+Price Provider → فقط Valuation / نمایش پرتفوی
+```
+
+### No external price dependency for transaction correctness
+
+| عمل | نیاز به اینترنت / Price API؟ |
+|-----|------------------------------|
+| ثبت BUY/SELL/انتقال/قسط/درآمد/هزینه | **خیر** — همیشه مجاز آفلاین |
+| صحت ledger / journal / cost basis معامله | فقط فیلدهای همان tx (price، qty، fee، rates ذخیره‌شده) |
+| Portfolio valuation / Unrealized | `price_history` محلی: last known یا manual؛ برچسب stale |
+
+**ممنوع:**
+- block کردن `runAtomicFinancialOperation` به‌خاطر down بودن API قیمت
+- محاسبه correctness معامله با قیمت زنده provider به‌جای قیمت ثبت‌شده در tx
+- Historical P&L با rate/price «امروز» به‌جای as-of معامله
+
+کاربر در فرم معامله **قیمت را وارد یا از suggestion اختیاری** می‌گیرد؛ پس از ثبت، آن قیمت بخشی از تاریخچه است.
