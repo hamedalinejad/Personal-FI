@@ -39,3 +39,20 @@ Raw file (CSV / JSON / exchange export)
 | v2 | connectorهای بیشتر |
 
 ماژول: `core/import/` — Featureها فقط adapter می‌دهند.
+
+---
+
+## نگهداری Raw Input (ایران / کارگزاری)
+
+قبل از Domain:
+
+```text
+Import batch
+  → Imported raw row (تمام ستون‌های فایل: تاریخ، نماد، ISIN، تعداد، قیمت، ناخالص، کارمزد، مالیات، خالص، …)
+  → Normalize / Map
+  → Financial Operation
+```
+
+**ممنوع:** CSV مستقیم → Journal بدون raw staging و بدون `sourceType=import` + `sourceReference`.
+
+گزارش معاملات کارگزاری باید فیلدهای خام قابل audit بمانند حتی بعد از normalize.
