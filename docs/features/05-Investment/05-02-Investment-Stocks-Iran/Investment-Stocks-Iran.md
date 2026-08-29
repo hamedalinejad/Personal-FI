@@ -499,3 +499,33 @@ costBasisPolicy, operationId, notes
 ```
 پوشش: افزایش سرمایه، bonus، split، rights، **merger**, **spin-off**, تجدید ارزیابی (cost ثابت)، isin/symbol change.
 Transaction rows همچنان ledger quantity؛ این جدول metadata/audit CA است.
+
+---
+
+## کارمزد و مالیات نقل‌وانتقال (ایران)
+
+ترکیب نمونه ۱۴۰۴ (قابل پیکربندی در Settings، نه hard-code ابدی):
+- خرید: کارگزار + بورس + سپرده‌گذاری + … (بدون مالیات نقل‌وانتقال)
+- فروش: کارمزدها + **مالیات نقل‌وانتقال** (مثلاً ۰٫۵٪) داخل breakdown فروش
+
+```text
+feeTax (transaction cost / transfer tax):
+  buy  → باید 0 یا null (validate reject اگر >0 بدون override صریح)
+  sell → مجاز؛ treatment = proceeds_reduction یا tax_as_transaction_cost
+با withholding/dividend tax قاطی نشود
+```
+
+### سهام عدالت
+- `stockSource`: `market` | `justice` | `ipo` | `other`
+- justice: غالباً `tradable=false` یا محدودیت؛ cost basis پیش‌فرض **0** (هدیه دولتی) مگر user override
+- dividend سالانه مثل dividend عادی با instrumentId عدالت
+
+### تقویم و جلسه بازار
+```text
+iran-market-calendar:
+  isTradingDay(date)  // پنجشنبه/جمعه + تعطیلات رسمی
+  nextSettlementDate(tradeDate) // T+2 کاری
+marketSession روی tx: 'pre_open' | 'continuous' | 'closing' | 'off_market'
+ساعت مرجع سهام: پیش‌گشایش ~08:00، پیوسته ~08:30–12:30 (قابل تنظیم)
+priceLimit: ±pct از قیمت مرجع روز — validate اختیاری warn/reject
+```
