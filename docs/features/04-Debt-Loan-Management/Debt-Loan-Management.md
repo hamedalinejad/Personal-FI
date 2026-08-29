@@ -438,28 +438,35 @@ r = interestRate / 100 // نرخ ماهانه مستقیم — بدون تقسی
  * این تنها تابع مجاز برای محاسبه r در کل سیستم وام است.
  * هیچ فرمولی نباید r را مستقیم با annual/12 محاسبه کند.
  */
+function getYearBasis(dayCountConvention: DayCountConvention): number {
+  switch (dayCountConvention) {
+    case 'actual_360': return 360;
+    case '30_360': return 360;
+    case 'actual_365': return 365;
+    case 'actual_actual': return 365; // v1 ساده؛ leap در major بعد
+    default: return 365;
+  }
+}
+
 function getPeriodRate(loan: Loan): Decimal {
- const annualRate = new Decimal(loan.interestRate).dividedBy(100);
+  const annualRate = new Decimal(loan.interestRate).dividedBy(100);
+  const annualRateNormalized =
+    loan.interestRatePeriod === 'monthly' ? annualRate.times(12) : annualRate;
+  const yearBasis = getYearBasis(loan.dayCountConvention ?? 'actual_365');
 
- // اگر نرخ ماهانه مستقیم ثبت شده، ابتدا به سالانه تبدیل می‌شود
- const annualRateNormalized =
- loan.interestRatePeriod === 'monthly'
- ? annualRate.times(12)
- : annualRate;
-
- switch (loan.installmentFrequency) {
- case 'monthly': return annualRateNormalized.dividedBy(12);
- case 'weekly': return annualRateNormalized.dividedBy(52);
- case 'quarterly': return annualRateNormalized.dividedBy(4);
- case 'custom':
- if (!loan.customIntervalDays || loan.customIntervalDays <= 0)
- throw new Error('customIntervalDays برای فرکانس custom الزامی است');
- return annualRateNormalized
- .times(loan.customIntervalDays)
- .dividedBy(365);
- default:
- throw new Error(`installmentFrequency نامعتبر: ${loan.installmentFrequency}`);
- }
+  switch (loan.installmentFrequency) {
+    case 'monthly': return annualRateNormalized.dividedBy(12);
+    case 'weekly': return annualRateNormalized.dividedBy(52);
+    case 'quarterly': return annualRateNormalized.dividedBy(4);
+    case 'custom':
+      if (!loan.customIntervalDays || loan.customIntervalDays <= 0)
+        throw new Error('customIntervalDays برای فرکانس custom الزامی است');
+      return annualRateNormalized
+        .times(loan.customIntervalDays)
+        .dividedBy(yearBasis); // NOT hard-coded 365
+    default:
+      throw new Error(`installmentFrequency نامعتبر: ${loan.installmentFrequency}`);
+  }
 }
 
 /**
@@ -856,7 +863,9 @@ interestPortion: 0
 gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12
 // monthly: gracePeriods = gracePeriodMonths × 1
 // weekly: gracePeriods = gracePeriodMonths × 52/12 ≈ gracePeriodMonths × 4.333
-// → round به عدد صحیح با ROUND_DOWN (محافظت از وام‌دهنده)
+// → round به عدد صحیح با **ROUND_DOWN عمدی** (business rule v1)
+// دلیل: تعداد دوره‌های تنفس کمتر یا مساوی ≈ ماه تقویمی → محافظت نسبی وام‌دهنده / جلوگیری از طولانی‌کردن تنفس
+// ROUND_HALF_UP یا ROUND_UP در v1 مجاز نیست مگر migration policy صریح کاربر
 // quarterly: gracePeriods = gracePeriodMonths / 3
 // → اگر نتیجه کسری شود، ROUND_DOWN
 // custom: gracePeriods = gracePeriodMonths × 30 / customIntervalDays
@@ -897,7 +906,9 @@ calculatedInstallment = P × [r(1+r)^n] / [(1+r)^n - 1]
 
 **مثال هفتگی:**
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، ۱۸٪ سالانه، ۲ ماه تنفس
-- gracePeriods = 2 × 52/12 = 8.666 → ROUND_DOWN = ۸ هفته
+- gracePeriods = 2 × 52/12 = 8.666 → **ROUND_DOWN = ۸ هفته** (~۵۶ روز < ۲ ماه تقویمی)
+  - این کوتاه‌تر شدن تنفس **عمدی** است (قرارداد v1)، نه باگ
+  - اگر کاربر دقیقاً N هفته تنفس می‌خواهد → `gracePeriods` را مستقیم با unit=installment بزند، نه از months تبدیل کند
 - هفته ۱-۸: فقط سود = 100,000,000 × (0.18/52) ≈ 346,154 ریال
 - هفته ۹-۶۰: قسط Declining کامل روی 100,000,000 با n=52
 

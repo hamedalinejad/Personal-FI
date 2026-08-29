@@ -251,7 +251,7 @@ Invariant: هیچ `relatedId` به دادهٔ خارج از فایل بازشد�
 | `price_sources` | Price Fetching | منابع/Providerهای قیمت |
 | `price_history` | Price Fetching | تاریخچه قیمت دارایی‌ها (Append-Only؛ دستی یا از API) |
 | `price_sync_settings` | Price Fetching | تنظیمات به‌روزرسانی خودکار (Auto-Sync) |
-| `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic برای گزارش/reconcile — **Should Have** (در فهرست مرکزی) |
+| `acc_transaction_links` | Accounts & Banking (مشترک) | لینک صریح polymorphic — **Must Have**؛ UNIQUE(transactionId, relatedFeature, relatedId) |
 | `fin_audit_log` | Core (مشترک همه فیچرها) | ردپای عملیاتی void/reversal/repair/import/restore — **Must Have** |
 | `ref_integrity_queue` | Core (مشترک همه فیچرها) | صف detect→quarantine→reconcile→repair — **Must Have** |
 
@@ -663,8 +663,12 @@ SQLite نمی‌تواند enforce کند که `relatedId` به جدول درس�
 
 1. **Enum بسته** `RelatedFeature` فقط از `core/types` (از قبل موجود).
 2. **Validate در Domain** داخل `runAtomicFinancialOperation`: وجود ردیف هدف قبل از INSERT در `acc_transactions`.
-3. **جدول اختیاری `acc_transaction_links` (Should Have / آماده‌سازی)**: 
- `(transactionId, relatedFeature, relatedId)` با ایندکس یکتا — برای گزارش و reconcile، نه جایگزین enum.
+3. **جدول `acc_transaction_links` (Must Have)**:
+```sql
+UNIQUE(accTransactionId, relatedFeature, relatedId)
+-- index برای join گزارش cross-feature
+```
+هر `acc_transactions` با related غیرnull باید حداقل یک ردیف لینک هم‌خوان داشته باشد (یا related روی خود tx + لینک mirror).
 4. **Reconcile**: برای هر `acc_transactions` با related غیرnull، بررسی وجود هدف؛ orphan = گزارش خطا.
 5. **ممنوع**: نوشتن `relatedFeature`/`relatedId` از UI بدون عبور از API فیچر مالک.
 
@@ -1105,7 +1109,7 @@ COMMIT
 - `docs_links` / notifications به چند نوع entity
 - `fin_journal_entries.related*` برای audit میان‌فیچری
 
-هر polymorphic: validate قبل از COMMIT + reconcile orphan + ترجیحاً `acc_transaction_links` برای روابط پرتکرار.
+هر polymorphic: validate قبل از COMMIT + reconcile orphan + **`acc_transaction_links` Must** برای روابط cash.
 
 هدف: سطح Accounting-critical با FK واقعی؛ polymorphic حداقل و کنترل‌شده.
 
