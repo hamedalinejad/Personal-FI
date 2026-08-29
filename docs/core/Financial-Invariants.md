@@ -158,3 +158,13 @@ Price Provider → فقط Valuation / نمایش پرتفوی
 - Historical P&L با rate/price «امروز» به‌جای as-of معامله
 
 کاربر در فرم معامله **قیمت را وارد یا از suggestion اختیاری** می‌گیرد؛ پس از ثبت، آن قیمت بخشی از تاریخچه است.
+
+---
+
+## 11. مدل تاریخ‌ها حفظ شود
+
+تفکیک زیر **باید بماند** (به‌ویژه ایران):
+
+`createdAt` · `eventAt` · `businessDate` · `settlementDate` · `marketDate` · `dueDate` · `paymentDate` · `fetchedAt`
+
+**Invariant:** `businessDate ≠ createdAt` ممکن و عادی است؛ گزارش کسب‌وکار روی businessDate/settlementDate است نه فقط UTC create.

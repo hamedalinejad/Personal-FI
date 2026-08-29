@@ -32,6 +32,8 @@
 **خارج از v1.0 کد:** Stocks، FIF، Metals، Cheque، Bills، Budget، Goals، Tax کامل، Price Auto-Sync، FIFO، bullet/variable پیشرفته، balloon/step_up.
 
 ### v1.1
+Stocks Iran (+ شروع Import CSV ساده در صورت ظرفیت)
+
 Stocks Iran (با settlement/CA پایه)، FIF، Metals، Cheque، Bills & Recurring
 
 ### v1.2

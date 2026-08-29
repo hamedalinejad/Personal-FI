@@ -56,3 +56,5 @@
 - `Parties.md` — طرف حساب (ref_parties)
 - `Account-Layers.md` — Financial vs Accounting vs Party
 - `License-Offline.md` — license فایل امضاشده، خارج از DB مالی
+- `Opening-Balance.md` — موجودی/پوزیشن اولیه سراسری
+- `Import-Infrastructure.md` — pipeline وارد کردن CSV/JSON
