@@ -163,3 +163,27 @@ Rebuild باید lots را از ledger بازسازی کند نه فقط average
 
 موتور مشترک: basis از **نوع acquisition** می‌آید (opening, gift, buy, reward, transfer carry)، نه از symbol==USDT.
 جزئیات جدول kind: `Opening-Balance.md`.
+
+---
+
+## CostBasisMethod (تنظیم سیستم / Portfolio)
+
+| v1 | |
+|----|--|
+| پیش‌فرض | `weighted_average` |
+| پشتیبانی | `fifo` (lots با createdAt tie-break) |
+| آینده | `specific_lot` |
+
+**ممنوع:** الگوریتم جدا hard-code داخل Crypto/Stock feature بدون فراخوانی Engine.
+
+## Cost Pool Key
+
+Basis per:
+
+```text
+(instrumentId, holdingId, costCurrency, costBasisMethod)
+```
+
+مثال: BTC در Wallet A و Exchange B = **دو pool** جدا (holdingId متفاوت) حتی اگر instrument یکسان باشد.
+
+Holding = مرز pool؛ instrument = هویت دارایی.

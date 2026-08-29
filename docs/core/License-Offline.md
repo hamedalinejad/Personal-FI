@@ -28,7 +28,10 @@ Signed License File
 | فیلد license | |
 |--------------|--|
 | `licenseId` | |
+| `productId` | |
 | `edition` | personal / pro / … |
+| `devicePolicy` | |
+| `status` | active/expired/… |
 | `issuedAt` / `expiresAt` | |
 | `features[]` | |
 | `deviceBinding?` | اختیاری |
@@ -40,3 +43,15 @@ Signed License File
 - Feature flags از license؛ داده مالی مستقل می‌ماند
 
 Domain جدا: `docs` این فایل؛ implementation در ماژول `license/` نه داخل `features/04-Debt-...`.
+
+---
+
+## مرز قطعی
+
+```text
+User Financial DB  ≠  License State
+```
+
+- License در `license.json` / License Store جدا (نه جدول داخل SQLite مالی)
+- subscription / activation / device limit / expiry / entitlement **آلوده به schema حسابداری نمی‌شوند**
+- اعتبارسنجی license برای خواندن/نوشتن history مالی **نیاز به اینترنت ندارد** (فایل امضاشده + public key)
