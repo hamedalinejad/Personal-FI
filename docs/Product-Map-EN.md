@@ -55,7 +55,7 @@ Live price fetching for all investment asset types in v1 (crypto, Iran stocks, f
 
 ## Common Categories
 
-Shared category tables used across all features (`common_categories`) — no dedicated page. These tables are the shared infrastructure for income, expense, budget, and goals, and are managed from within Settings. Documentation: `docs/features/99-Common-Categories/Categories.md`.
+Shared category tables used across all features (`cat_categories`) — no dedicated page. These tables are the shared infrastructure for income, expense, budget, and goals, and are managed from within Settings. Documentation: `docs/features/99-Common-Categories/Categories.md`.
 
 ---
 

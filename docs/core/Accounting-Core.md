@@ -133,3 +133,21 @@ Feature A جدول Feature B را مستقیم نمی‌نویسد.
 
 DB: `amount` / `quantity` / `rate` / `price` = **TEXT decimal string**.  
 Minor unit فقط conversion در مرز UI/Bank import.
+
+---
+
+## جایگاه در محصول
+
+```text
+                 PERSONAL-FI
+                      │
+       ┌──────────────┴──────────────┐
+Financial Accounting          Investment Management
+ (Accounts, Income, Expense…)  (Crypto, Stocks, FIF, Metals)
+       └──────────────┬──────────────┘
+                      │
+              Accounting Core
+           Journal / fin_accounts
+```
+
+Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = specialized subledger + همان Operation/Journal.

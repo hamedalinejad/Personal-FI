@@ -182,3 +182,5 @@ Expense UI
 ```
 
 **ممنوع:** گزارش Expense/Income کلی فقط از جدول domain بدون journal، یا جمع domain + journal با هم.
+
+> **Immutable:** «ویرایش» مبلغ/کارمزد ممنوع؛ فقط correction/reversal. Metadata غیرمالی مجاز. `Financial-Invariants` §14.

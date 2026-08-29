@@ -203,3 +203,24 @@ Crypto subledger + Cash + Cost basis + Journal
 ```
 
 Investment «جدا از حسابداری» به‌معنای دو حقیقت موازی **نیست**.
+
+---
+
+## 14. تراکنش مالی Immutable — اصلاح فقط با Reversal
+
+```text
+Original Operation
+       ↓
+Reversal Operation   (void + inverse journal/domain)
+       ↓
+Corrected Operation  (در صورت نیاز، operation جدید)
+```
+
+| عمل | مجاز؟ |
+|-----|--------|
+| `UPDATE` مبلغ / quantity / fee مالی | **خیر** |
+| «ویرایش تراکنش مالی» در UI به‌معنای overwrite | **خیر** |
+| Correction / Reversal / correctX API | **بله** |
+| ویرایش metadata غیرمالی (توضیح، category، label، پیوست) | **بله** اگر به ledger/journal/amount دست نزند |
+
+همه Featureها (Income، Expense، Crypto، …) یکسان: **اصلاح** نه **ویرایش مالی**.

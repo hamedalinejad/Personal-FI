@@ -91,7 +91,7 @@ Loan bullet/variable پیشرفته، balloon/step_up، FIFO cost basis، Cloud/
 
 ## دسته‌بندی‌های مشترک (Common Categories)
 
-جدول‌های دسته‌بندی مشترک بین همه فیچرها (`common_categories`) — بدون صفحه مستقل. این جداول زیرساخت مشترک درآمد، هزینه، بودجه و اهداف هستند و از داخل تنظیمات مدیریت می‌شوند. مستندات: `docs/features/99-Common-Categories/Categories.md`.
+جدول‌های دسته‌بندی مشترک بین همه فیچرها (**canonical:** `cat_categories` — نه common_categories) — بدون صفحه مستقل. این جداول زیرساخت مشترک درآمد، هزینه، بودجه و اهداف هستند و از داخل تنظیمات مدیریت می‌شوند. مستندات: `docs/features/99-Common-Categories/Categories.md`.
 
 ---
 
