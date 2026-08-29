@@ -151,3 +151,11 @@ Financial Accounting          Investment Management
 ```
 
 Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = specialized subledger + همان Operation/Journal.
+
+---
+
+## بدون صفحه Navigation جدا
+
+`Accounting Core` = backend/domain capability.
+
+کاربر آن را در **Transactions، Accounts، Reports** تجربه می‌کند — نه مسیر `/accounting`.

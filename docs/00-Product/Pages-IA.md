@@ -1,3 +1,18 @@
+# Pages & Information Architecture
+
+> **اصل محصول:** `20 Features ≠ 20 Navigation Items`  
+> Feature = مرز Domain · Page = مرز UX · Accounting Core = capability بدون صفحه `/accounting`
+
+## ناوبری هدف (حداکثر ~۹)
+
+```text
+Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
+```
+
+- **Transactions:** All / Income / Expense / Transfer / Cheque / Adjustment (فیلتر) — نه صفحه جدا برای هر کدام
+- **Investments:** Crypto / Stocks / Funds / Metals + عملیات در **Sheet/Drawer**
+- Income/Expense/Tax/Bills/… = Feature و فیلتر/شیت، نه آیتم ناوبار جدا
+
 # نقشه صفحات و معماری اطلاعات (Pages / Information Architecture)
 
 ## هدف این سند

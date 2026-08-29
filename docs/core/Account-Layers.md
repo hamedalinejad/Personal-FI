@@ -21,3 +21,26 @@
 
 پیوند: `fin_accounts.linkedEntityType/Id` می‌تواند به `acc_accounts` یا `ref_parties` اشاره کند.
 جزئیات journal: `Accounting-Core.md` · parties: `Parties.md`
+
+---
+
+## Financial Account در Journal (یک مفهوم)
+
+Feature می‌تواند مالکیت داده را جدا نگه دارد:
+
+| مالک Feature | مثال |
+|--------------|------|
+| Accounts | بانک واقعی (`acc_accounts`) |
+| Crypto | cash داخلی صرافی / holding |
+| Stocks | صندوق نقد کارگزاری |
+| FIF/Metals | در صورت نقد پلتفرم |
+
+**Accounting Core** همه را از طریق `fin_accounts` می‌شناسد:
+
+```text
+fin_accounts.type = asset|…
+fin_accounts.systemRole = bank_link | broker_cash | exchange_cash | crypto_holding | …
+fin_accounts.linkedEntityId = …
+```
+
+کاربر در UX ساده «حساب‌ها / سرمایه‌گذاری» می‌بیند؛ در Journal همه **Financial (accounting) Account** اند با نوع مشخص — نه چهار جهان جدا بدون COA.
