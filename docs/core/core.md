@@ -52,3 +52,4 @@
 - `types/types.md` — انواع مشترک
 - `Canonical-Financial-Operation.md` — الگوی واحد Operation→Journal→Snapshot→Persist
 - `Financial-Invariants.md` — ممنوعیت‌های مالی و الزامات release
+- `Accounting-Core.md` — fin_accounts و journal خطوط حساب‌به‌حساب

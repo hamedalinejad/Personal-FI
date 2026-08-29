@@ -1,6 +1,7 @@
 ## ارجاع الزامی
 
-قبل از پیاده‌سازی هر Feature: `docs/core/Financial-Invariants.md`.
+- `docs/core/Financial-Invariants.md`
+- `docs/core/Accounting-Core.md` (fin_accounts + journal lines)
 
 # Canonical Financial Operation Model
 
@@ -73,13 +74,13 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   // durability counters NOT in SQLite — see db_meta
   createdAt
 
-fin_journal_entries:
+fin_journal_lines (یا fin_journal_entries به‌عنوان خط):
   id, operationId, lineNo
-  accountClass, direction (debit|credit)
-  amount, currency
-  exchangeRateToBase        // نسبت به baseCurrencyAtOperation همان operation
-  amountInBase              // semantic = به واحد baseCurrencyAtOperation
-  accountId? (bank)
+  accountId                 // **FK fin_accounts — اجباری برای ops جدید**
+  direction (debit|credit)
+  amount, currency, exchangeRateToBase, amountInBase
+  lineKind                  // WHY
+  accountClass              // کش/مشتق برای فیلتر — نه جایگزین accountId
   relatedFeature?, relatedId?
   businessDate, memo
   isVoided, reversesEntryId?
@@ -90,8 +91,8 @@ fin_journal_entries:
 
 **Invariant:** با تغییر `cur_currency_preferences.baseCurrency`، journal تاریخی بازنویسی نمی‌شود؛ گزارش cross-base با تبدیل از base قفل‌شده + rates تاریخی.
 
-
-اختیاری آینده: `fin_accounts` chart of accounts؛ v1 از `accountClass` enum کافی است.
+**Chart of accounts:** `fin_accounts` — جزئیات `docs/core/Accounting-Core.md`.  
+`accountClass` تنها کافی نیست برای Trial Balance / معین / بانک ملت در برابر ملی.
 
 ## Core Reversal
 
@@ -154,21 +155,18 @@ type FeatureCommand =
 
 
 interface JournalLine {
-  accountClass: AccountClass; // enum مرکزی types
+  accountId: string; // fin_accounts.id — اجباری
   direction: 'debit' | 'credit';
   amount: string;
   currency: string;
   exchangeRateToBase: string;
   amountInBase: string;
-  accountId?: string;
+  lineKind: 'asset' | 'cash' | 'fee' | 'fx_conversion' | 'fx_rounding' | 'fx_gain' | 'fx_loss' | 'equity' | 'income' | 'expense' | 'other';
+  accountClass?: AccountClass; // optional denormalized from fin_accounts
   relatedFeature?: RelatedFeature;
   relatedId?: string;
   memo?: string;
-  lineKind?: 'asset' | 'cash' | 'fee' | 'fx_conversion' | 'fx_rounding' | 'fx_gain' | 'fx_loss' | 'equity' | 'income' | 'expense' | 'other';
 }
-
-// accountClass = WHAT (طبقه حساب) | lineKind = WHY (علت تولید خط)
-// مثال: accountClass=expense + lineKind=fee ؛ accountClass=crypto_asset + lineKind=asset
 
 
 /** Feature-specific payload — engine به Repository همان feature می‌سپارد، نه SQL خام سراسری */

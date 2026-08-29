@@ -1,3 +1,7 @@
+## ارجاع
+
+مدل کامل حساب‌ها: `docs/core/Accounting-Core.md`.
+
 # 03 journal sot reporting
 
 ## دفتر روزنامه یکپارچه — `fin_journal_entries`
@@ -32,7 +36,7 @@
 **قانون اجباری برای همه Reports / Dashboard / Net Worth cashflow:**
 
 ```text
-SoT گزارش میان‌فیچری = fin_journal_entries (accountClass + amountInBase)
+SoT گزارش میان‌فیچری = journal lines (`accountId` + amountInBase)؛ گروه‌بندی اختیاری با accountClass مشتق
 ```
 
 - `exp_transactions` / `inc_transactions` / domain ledgers → **UI detail و rebuild دامنه**، نه جمع دوباره در گزارش کلی

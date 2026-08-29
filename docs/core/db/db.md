@@ -35,3 +35,7 @@
 | سود تسعیر صریح | income | fx_gain |
 
 گزارش: فیلتر/گروه روی `accountClass`؛ `lineKind` برای تحلیل و جلوگیری از اشتباه گرفتن rounding با gain.
+
+## Chart of accounts
+
+`fin_accounts` + journal `accountId`: `docs/core/Accounting-Core.md`.

@@ -6,7 +6,8 @@
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
 | `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
-| `fin_journal_entries` | Core Accounting | **دفتر روزنامه یکپارچه همه رویدادهای مالی** |
+| `fin_accounts` | Core Accounting | **دفتر حساب‌ها (chart ساده)** — asset/liability/equity/income/expense |
+| `fin_journal_entries` / `fin_journal_lines` | Core Accounting | خطوط journal با **accountId** اجباری |
 | `fin_operations` | Core Accounting | header هر atomic op (operationId, commandHash, status, engineVersions) — **Must** |
 | `fin_reconcile_runs` | Core Accounting | خروجی اجرای reconcile — **Must** برای audit |
 | `ref_instruments` | Core | registry هویت دارایی (crypto/stock/fif/metal) — **Must** |
