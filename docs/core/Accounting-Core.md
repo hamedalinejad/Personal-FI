@@ -101,3 +101,35 @@ Persist
 | بعد | سلسله‌مراتب parentId، اشخاص، گزارش T-account غنی |
 
 **ممنوع:** بازگشت به journal فقط با enum کلاس بدون accountId برای ops جدید پس از این قرارداد.
+---
+
+## SoT حسابداری (این فایل + ارجاعات)
+
+این سند **نقطه ورود حسابداری** است. جزئیات تخصصی در فایل‌های زیر (پراکنده خواندن بدون این فهرست ممنوع برای implementer جدید):
+
+| حوزه | سند |
+|------|-----|
+| Chart of Accounts + journal lines | **همین فایل** |
+| Financial Operation / Reversal / adapter | `Canonical-Financial-Operation.md` |
+| Forbidden + release invariants | `Financial-Invariants.md` |
+| Opening balance | `Opening-Balance.md` |
+| Account layers (bank vs COA vs party) | `Account-Layers.md` |
+| Parties | `Parties.md` |
+| FX / currency | Feature Currency + CFO |
+| Reconciliation / repair | `db/04-reconciliation-integrity.md` |
+| Audit | `db/06-migration-backup-audit.md` |
+| Cost basis | `Cost-Basis-Engine.md` |
+| Schema tables | `db/01-schema-tables.md` |
+
+### معماری ماژولار (حفظ)
+
+```text
+UI → Feature Public API → Domain → Core Financial Operation → DB
+```
+
+Feature A جدول Feature B را مستقیم نمی‌نویسد.
+
+### Amount Storage (تکرار SoT)
+
+DB: `amount` / `quantity` / `rate` / `price` = **TEXT decimal string**.  
+Minor unit فقط conversion در مرز UI/Bank import.

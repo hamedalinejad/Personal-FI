@@ -52,7 +52,7 @@
 - `types/types.md` — انواع مشترک
 - `Canonical-Financial-Operation.md` — الگوی واحد Operation→Journal→Snapshot→Persist
 - `Financial-Invariants.md` — ممنوعیت‌های مالی و الزامات release
-- `Accounting-Core.md` — fin_accounts و journal خطوط حساب‌به‌حساب
+- `Accounting-Core.md` — **SoT حسابداری** (COA, journal, ارجاع Operation/Opening/Reconcile)
 - `Parties.md` — طرف حساب (ref_parties)
 - `Account-Layers.md` — Financial vs Accounting vs Party
 - `License-Offline.md` — license فایل امضاشده، خارج از DB مالی

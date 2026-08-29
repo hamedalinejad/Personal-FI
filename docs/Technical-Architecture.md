@@ -44,7 +44,7 @@ IndexedDB
 ### نکات فنی:
 
 - تمام محاسبات مالی باید با decimal.js انجام شوند
-- تمام مبالغ باید به کوچک‌ترین واحد پول ذخیره شوند (Minor Unit Storage)
+- تمام مبالغ مالی به‌صورت **TEXT decimal string** ذخیره می‌شوند (Amount Storage v1). Minor Unit فقط در مرز UI/import/export بانکی — نه مدل اصلی DB. جزئیات: Project-Blueprint + Financial-Invariants + db Amount Storage.
 - تراکنش‌ها تغییرناپذیر هستند - برای اصلاح تراکنش جدید ایجاد شود
 - تمام تاریخ‌ها باید به صورت UTC ذخیره شوند
 
