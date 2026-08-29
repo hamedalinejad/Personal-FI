@@ -145,3 +145,16 @@ costPerUnit = totalInvested / qty
 transferredCost = costPerUnit * netQuantity
 feeBurnCost = costPerUnit * feeQuantity
 ```
+
+## costBasisMethod (Settings)
+
+```text
+costBasisMethod: 'weighted_average' | 'fifo'   // v1 default weighted_average
+```
+
+FIFO: نیاز به **lots** با `acquiredAt` (UTC) + `businessDate` + `createdAt` برای tie-break همان روز.
+```text
+ORDER BY businessDate ASC, createdAt ASC, id ASC
+```
+فقط `ORDER BY businessDate` برای FIFO **کافی نیست**.
+Rebuild باید lots را از ledger بازسازی کند نه فقط average.

@@ -329,3 +329,19 @@ totalAmount = 1000 × 3000 = 3,000,000
 ```
 
 Holding جدا برای `gold`+`24k` در برابر `gold`+`18k`.
+
+---
+
+## سکه در برابر وزن
+
+| نوع holding | کمیت اصلی | وزن |
+|-------------|-----------|------|
+| طلا آب‌شده / شمش / ساخته | `quantityMg` (اجباری) | همان |
+| سکه (`gold_coin` + purity emami/bahar/…) | **`quantityCoins`** (تعداد) اجباری | `quantityMg` مشتق از وزن استاندارد سکه × تعداد یا optional override |
+
+```text
+fineWeightMg = quantityMg × purityRatio
+برای سکه: quantityMg = quantityCoins × standardWeightMg(coinType) مگر وزن واقعی ثبت شود
+قیمت سکه می‌تواند حباب داشته باشد ≠ قیمت طلای هم‌وزن
+اجرت ساخت: fee جدا (expense یا cost_basis_in طبق treatment)
+```

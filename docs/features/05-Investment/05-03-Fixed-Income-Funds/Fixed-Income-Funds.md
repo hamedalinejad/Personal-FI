@@ -457,3 +457,17 @@ etf_market:  units * marketPrice - totalInvested
 ```
 
 `getProfitComparison` از `unrealizedByMode` با پیش‌فرض `liquidation` برای issuance_redemption و `etf_market` برای ETF استفاده می‌کند — **هرگز** `avgBuyNAV` (وجود ندارد؛ فقط `averageBuyPrice` / `totalInvested`).
+
+---
+
+## سه NAV صندوق ایران
+
+| فیلد | معنی |
+|------|------|
+| `nav` / `currentNAV` | NAV آماری / گزارش |
+| `subscriptionPrice` / قیمت صدور | خرید از صندوق |
+| `redemptionPrice` / قیمت ابطال | فروش به صندوق |
+
+روی `inv_fif_transactions` در صورت نیاز:
+- `navStatistical`, `navSubscription`, `navRedemption` (nullable snapshot روز)
+- `transactionPrice` همچنان مبنای cost/realized
