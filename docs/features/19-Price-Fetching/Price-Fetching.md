@@ -784,3 +784,5 @@ getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) 
 - Purge/archive قدیمی‌تر از N سال از Settings
 - هشدار حجم؛ Auto-Sync محدود به دارایی‌های دارای position
 جزئیات در `db.md` بخش سیاست حجم price_history.
+
+**Portfolio بدون API:** last cache + stale label — محاسبه fail ممنوع.

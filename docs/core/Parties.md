@@ -35,3 +35,13 @@ Journal: می‌تواند `fin_accounts` با `systemRole` مربوط به part
 - طلب از / بدهی به هر party
 - گردش با یک شخص
 - بدون پارس کردن متن description
+
+---
+
+## مفهوم مرکزی (نه per-Feature)
+
+همه Featureها فقط `partyId → ref_parties` استفاده می‌کنند.
+
+انواع: Person · Bank · Broker · Exchange · Fund · Company · Employer · Landlord · Tenant · Other
+
+مثال‌ها: وام از علی، قرض به محمد، خرید از کارگزاری X، پرداخت به شرکت Y، خرید خودرو — همه `partyId` مشترک، نه جدول شخص جدا در هر Feature.

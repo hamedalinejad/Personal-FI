@@ -234,3 +234,40 @@ Corrected Operation  (در صورت نیاز، operation جدید)
 - **Raw** از بین نمی‌رود و SoT تاریخچه است  
 - **Derived** همیشه قابل rebuild است و SoT مستقل نیست  
 - در اختلاف snapshot و ledger: **ledger برنده است**
+
+---
+
+## 16. IRR ≠ دو ارز؛ Toman فقط نمایش
+
+| لایه | |
+|------|--|
+| **Currency code در DB** | فقط `IRR` |
+| **UI unit** | `rial` \| `toman` (ترجیح کاربر) |
+| تبدیل نمایش | `1 Toman = 10 Rial` |
+
+**ممنوع:** `TOM` / `IRT` به‌عنوان currency مستقل در ledger که با IRR موازی شود.
+
+تاریخ‌ها (حفظ): Jalali نمایش · Gregorian/UTC ذخیره · businessDate / settlementDate / marketDate / dueDate جدا.
+
+---
+
+## 17. Local-First (نه فقط Offline UI)
+
+```text
+Internet = Enhancement
+Internet ≠ Dependency
+```
+
+بدون شبکه باید کار کند: Accounts, Transactions, Accounting, Loans, Investments (ثبت), Reports, Backup, Restore.
+
+Price API فقط valuation را تازه می‌کند؛ قطعی بودن ledger به آن وابسته نیست.
+
+### Portfolio بدون اینترنت
+
+```text
+Portfolio ≠ broken
+→ آخرین price_history معتبر + برچسب «آخرین قیمت: تاریخ…»
+→ isStale
+```
+
+محاسبه fail به‌خاطر نبود API **ممنوع**.

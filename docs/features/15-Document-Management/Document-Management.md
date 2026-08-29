@@ -167,3 +167,9 @@
 ## لینک به عملیات مالی
 
 Attachment باید بتواند به **`operationId`** (و اختیاری domain tx id) وصل شود تا audit رسید/قرارداد با همان عمل اتمیک باشد — نه فقط entity پراکنده بدون operation.
+
+---
+
+## Rule
+
+Document یک **Resource مستقل** است (`docs_documents`) و با `docs_links` به هر Business Object وصل می‌شود — **بدون** blob داخل جدول وام/تراکنش/چک.
