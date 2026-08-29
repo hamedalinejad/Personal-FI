@@ -59,3 +59,4 @@
 - `Opening-Balance.md` — موجودی/پوزیشن اولیه سراسری
 - `Import-Infrastructure.md` — pipeline وارد کردن CSV/JSON
 - `Corporate-Action-Engine.md` — CA عمومی (stock/crypto/fund)
+- `Raw-vs-Derived-Data.md` — حقایق ثبت‌شده vs محاسبات

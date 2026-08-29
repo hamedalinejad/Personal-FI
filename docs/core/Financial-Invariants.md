@@ -224,3 +224,13 @@ Corrected Operation  (در صورت نیاز، operation جدید)
 | ویرایش metadata غیرمالی (توضیح، category، label، پیوست) | **بله** اگر به ledger/journal/amount دست نزند |
 
 همه Featureها (Income، Expense، Crypto، …) یکسان: **اصلاح** نه **ویرایش مالی**.
+
+---
+
+## 15. Raw Facts در برابر Derived
+
+جزئیات: `docs/core/Raw-vs-Derived-Data.md`.
+
+- **Raw** از بین نمی‌رود و SoT تاریخچه است  
+- **Derived** همیشه قابل rebuild است و SoT مستقل نیست  
+- در اختلاف snapshot و ledger: **ledger برنده است**
