@@ -471,3 +471,31 @@ Journal: income روی gross یا net طبق سیاست محلی — پیش‌ف
 - `rebuild` quantity/cost را تغییر نمی‌دهد
 - `getDividendIncome(instrumentId, period)` از Σ netDividend/gross
 - `calculateProfitLoss` capital gain جدا از dividend income گزارش می‌دهد
+
+---
+
+## Iran market microstructure (Must)
+
+### Transaction
+- `settlementDate` → date **اجباری برای buy/sell** (T+2 کاری بورس ایران مگر خلاف اعلام بازار)
+- `businessDate` = روز معامله؛ `settlementDate` = روز تسویه نقدی — **جدا**
+- تا settlementDate نرسیده: cash brokerage/bank نباید به‌عنوان settled کامل در available برای خرید بعدی فرض شود مگر policy صریح
+
+### Instrument registry (`inv_stocks_iran_instruments` یا معادل)
+- `instrumentId` (PK منطقی)
+- `isin` → string
+- `firmCode` → string nullable (کد شرکت/شناسه بازار)
+- `symbol` → display (قابل تغییر با CA)
+- `lotSize` → integer (حداقل واحد سفارش، مثلاً ۱۰۰)
+- `priceTick` → decimal (گام قیمت، ریال)
+- Validate order qty % lotSize == 0؛ price روی tick grid
+
+### `inv_stocks_iran_corporate_actions` (Must برای CA پیچیده)
+علاوه بر type روی transaction:
+```text
+id, instrumentId, actionType, effectiveDate, ratio?, cashAmount?,
+sourceInstrumentIds JSON, targetInstrumentIds JSON,
+costBasisPolicy, operationId, notes
+```
+پوشش: افزایش سرمایه، bonus، split، rights، **merger**, **spin-off**, تجدید ارزیابی (cost ثابت)، isin/symbol change.
+Transaction rows همچنان ledger quantity؛ این جدول metadata/audit CA است.
