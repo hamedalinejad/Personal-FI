@@ -350,3 +350,10 @@ fineWeightMg = quantityMg × purityRatio
 قیمت سکه می‌تواند حباب داشته باشد ≠ قیمت طلای هم‌وزن
 اجرت ساخت: fee جدا (expense یا cost_basis_in طبق treatment)
 ```
+
+---
+
+## واحد canonical
+
+**ذخیره همیشه `quantityMg` (میلی‌گرم).**  
+UI: mg / g / kg فقط تبدیل نمایش (`0.5g = 500mg`). اختلاف واحد در DB ممنوع.

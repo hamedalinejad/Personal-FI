@@ -271,3 +271,16 @@ Portfolio ≠ broken
 ```
 
 محاسبه fail به‌خاطر نبود API **ممنوع**.
+
+---
+
+## 18. Tax جدا از price/fee خام معامله
+
+```text
+Gross proceeds − cost basis − fees  →  realized gain
+taxable gain (طبق قانون) → Tax Event مستقل (tax_events)
+```
+
+**ممنوع:** گم شدن مالیات داخل فیلد price یا یکی‌گرفتن feeTax با کل tax liability بدون `tax_events`.
+
+Feature فقط mapping؛ SoT مالیات = tax domain.

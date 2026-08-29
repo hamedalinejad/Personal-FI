@@ -519,3 +519,11 @@ fin_operations.engineVersions = {
 }
 ```
 Rebuild تاریخی با **همان** versionهای قفل‌شده روی op؛ تغییر فرمول فقط ops جدید یا migration صریح با bump version.
+
+---
+
+## FeeEvent / TaxEvent مرکزی
+
+- `CanonicalFeeEvent` (از قبل) — Feature فقط map می‌کند  
+- **TaxEvent** (`tax_events`) جدا — نه کپی full tax schema داخل هر inv_* table جدید  
+- Stocks Iran fees/taxes → map به FeeEvent + TaxEvent

@@ -20,6 +20,12 @@
 
 قرارداد معماری (Journal، Operation، decimal، offline) از ابتدا برای کل محصول نوشته می‌شود؛ **کد و UI** فازبندی می‌شود.
 
+### Foundation (قفل قبل از Featureهای دامنه)
+
+Accounting Core · Decimal/Money · Currency · Financial Operation · Journal · Reversal · Audit · Reconciliation · Opening Balance · Party · Document Link
+
+**Document Future ≠ Implement Future** — قرارداد می‌تواند از الان باشد؛ کد Feature بعد از Foundation.
+
 ### MVP — v1.0 (اولین release قابل استفاده مالی)
 | حوزه | محتوا |
 |------|--------|
