@@ -77,3 +77,7 @@ Write-to-temp-then-swap → IndexedDB (db_main / db_pending / db_backup)
 | CI | fixture DB از v1 → latest migration باید سبز شود |
 
 App جدید روی schema قدیمی **بدون** migration کنترل‌شده اجرا نمی‌شود.
+
+## Cross-Feature Validation
+
+See `docs/core/Cross-Feature-Interactions.md`.

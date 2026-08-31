@@ -47,3 +47,17 @@ lib/
 ## راهنمای پیاده‌سازی
 - Wrapperهای sql.js، decimal.js، date-fns/jalali اینجا
 - تنظیمات init یک‌بار در bootstrap اپ
+
+---
+
+## کتابخانه‌های اصلی و دلیل انتخاب
+
+| Library | دلیل |
+|---------|------|
+| **decimal.js** | محاسبات مالی دقیق؛ ممنوعیت float |
+| **dayjs** (+ plugin جلالی) | تاریخ با timezone و تقویم شمسی |
+| **uuid** | PK از نوع UUID v4 |
+| **sql.js** | SQLite در مرورگر برای offline-first |
+| **zod** | اعتبارسنجی schema در مرز API/UI |
+
+نسخه‌ها در `package.json` قفل می‌شوند؛ این سند فقط نقش را ثابت می‌کند.

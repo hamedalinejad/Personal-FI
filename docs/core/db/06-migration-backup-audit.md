@@ -288,3 +288,9 @@ Document: `documentId`, `blobId`, `checksum`, `mimeType`, `originalName`, **rela
 ### Version lock
 
 `appVersion` + `schemaVersion` + migration chain. App جدید روی schema قدیمی **بدون** Backup→Migration→Integrity **فعال نمی‌شود**.
+
+### Rollback
+
+- مسیر اصلی بازیابی: **Restore از backup** گرفته‌شده قبل از migration
+- down-migration فقط وقتی script معکوس و fixture تست دارد
+- Migration شکست → DB اصلی دست‌نخورده؛ app در safe mode

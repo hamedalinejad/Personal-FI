@@ -18,3 +18,31 @@
 3. Migration: rename با dual-read طبق Backward Compatibility Contract.
 
 Crypto/Investment docs: write **`transferGroupId` only**; `transferId` = read-only legacy alias.
+
+---
+
+## Conventions
+
+### Table Naming
+`{prefix}_{entity}` — prefix مشخص‌کننده فیچر:
+- `acc_` Accounts/Cash
+- `inc_` Income
+- `exp_` Expense
+- `ln_` Loans
+- `inv_` Investment
+- `fin_` Accounting core / journal / operations
+- `cur_` Currency
+- `tax_` Tax
+- `docs_` Documents
+- `stg_` Settings
+- `ref_` Registry (instruments, parties, …)
+- `chk_` / `chq_` Cheque
+
+### Field Naming
+- TypeScript / JSON API: **camelCase** (`createdAt`, `operationId`)
+- SQL columns: ترجیحاً **camelCase** هم‌تراز با TS در این پروژه (sql.js) مگر ستون legacy
+- Enum TS: PascalCase types / string union literals
+- PK: UUID v4 به صورت TEXT
+
+### Deprecated aliases
+`transferId` → `transferGroupId` · `tradeId` → `tradeGroupId` · `common_categories` → `cat_categories`
