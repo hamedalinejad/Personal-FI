@@ -40,12 +40,15 @@ UI → API → runAtomicFinancialOperation(operationId)
 | sourceType | |
 |------------|--|
 | `manual` | ورود کاربر |
-| `import` | CSV/JSON/batch |
-| `api` | نادر برای tx؛ بیشتر قیمت |
-| `system` | مثلاً fee سیستمی |
+| `import` | CSV/JSON/batch عمومی |
+| `bank_statement` | صورت‌حساب بانک |
+| `broker_statement` | گزارش کارگزاری |
+| `exchange_api` | (نادر؛ بیشتر قیمت) |
+| `api` | generic remote |
+| `system` | fee/system generated |
 | `opening` | موجودی اولیه |
 | `correction` | بعد از reversal |
-| `migration` | |
+| `migration` | مهاجرت نسخه |
 
 اختیاری: `sourceReference` (مثلاً `statement-1405-04.csv`, `broker-report-123`).
 
@@ -65,3 +68,9 @@ feature/
 مثال: `crypto.commands.buy()` · `crypto.queries.getHolding()`
 
 یکنواختی برای Web / PWA / Electron / Mobile / REST آینده — v1 همچنان **TypeScript in-process** است نه HTTP.
+
+### Provenance fields (روی هر domain financial row)
+
+`sourceType` · `sourceReference` · `sourceDocumentId?` · `importBatchId?` · `sourceTransactionId?` (external)
+
+بدون provenance، audit «این مبلغ از کجا آمد؟» ممکن نیست.

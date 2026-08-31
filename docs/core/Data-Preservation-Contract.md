@@ -1,3 +1,5 @@
+> **Constitution پروژه:** Never silently discard financial data.
+
 # Data Preservation Contract
 
 **Never silently discard financial data.**
@@ -17,3 +19,11 @@
 نمونه Stocks: `feeAmount` حتی با breakdown جدید **حفظ** می‌شود.
 
 Repair ≠ silent rewrite. Reconcile فقط detect.
+
+## Data Provenance (مکمل Preservation)
+
+حفظ فیلد کافی نیست؛ **منشأ** هم باید بماند:
+
+`sourceType` + `sourceReference` + لینک document/import batch.
+
+Migration نباید provenance را null کند مگر ADR.
