@@ -172,7 +172,7 @@ Rebuild باید lots را از ledger بازسازی کند نه فقط average
 |----|--|
 | پیش‌فرض | `weighted_average` |
 | پشتیبانی | `fifo` (lots با createdAt tie-break) |
-| آینده | `specific_lot` |
+| آینده | `specific_lot` / `specific_identification` |
 
 **ممنوع:** الگوریتم جدا hard-code داخل Crypto/Stock feature بدون فراخوانی Engine.
 
@@ -187,3 +187,5 @@ Basis per:
 مثال: BTC در Wallet A و Exchange B = **دو pool** جدا (holdingId متفاوت) حتی اگر instrument یکسان باشد.
 
 Holding = مرز pool؛ instrument = هویت دارایی.
+
+**قفل روی تاریخچه:** `fin_operations.engineVersions.costBasis` + setting در زمان op ذخیره می‌شود. تغییر method بعداً فقط ops جدید یا rebuild صریح با version — نه silent rewrite.

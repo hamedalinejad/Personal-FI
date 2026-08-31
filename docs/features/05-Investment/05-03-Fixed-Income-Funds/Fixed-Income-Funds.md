@@ -500,3 +500,17 @@ if fundType == 'issuance_redemption':
 ```
 
 Validate در createTransaction: نقض جدول بالا → reject.
+
+---
+
+## ETF و نقد کارگزاری — یک Ledger
+
+```text
+Brokerage Cash Ledger = تنها منبع مانده نقد کارگزاری
+```
+
+- ETF **مصرف‌کننده** سرویس cash همان کارگزاری است
+- **ممنوع:** `Stock Brokerage Cash` + `FIF Brokerage Cash` دو مانده مستقل برای یک `brokerageId`
+- FIF domain فقط units/NAV/tx؛ حرکت پول ETF از همان مسیر brokerage cash (+ journal) که سهام استفاده می‌کند
+
+issuance_redemption همچنان از `acc_transactions` / حساب بانکی — جدا از مسیر ETF.

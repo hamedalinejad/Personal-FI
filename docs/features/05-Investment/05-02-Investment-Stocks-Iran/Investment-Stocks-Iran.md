@@ -531,3 +531,16 @@ marketSession روی tx: 'pre_open' | 'continuous' | 'closing' | 'off_market'
 ساعت مرجع سهام: پیش‌گشایش ~08:00، پیوسته ~08:30–12:30 (قابل تنظیم)
 priceLimit: ±pct از قیمت مرجع روز — validate اختیاری warn/reject
 ```
+
+---
+
+## Accounting (الزام)
+
+هر معامله/CA سهام از `runAtomicFinancialOperation`:
+
+- Domain: `inv_stocks_iran_transactions` (instrumentId هویت)
+- Cash: فقط از **یک** brokerage cash ledger
+- Journal: lines روی `fin_accounts` (asset + cash/fee)
+- CA از `Corporate-Action-Engine` — نه فقط update snapshot
+
+`symbol` = label؛ تغییر نماد ≠ holding جدید.
