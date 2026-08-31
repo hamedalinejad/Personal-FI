@@ -1,3 +1,5 @@
+> **این سند از مهم‌ترین قراردادهای پروژه است.** هر رویداد مالی = یک `operationId`.
+
 ## ارجاع الزامی
 
 - `docs/core/Financial-Invariants.md`
@@ -547,3 +549,9 @@ Rebuild تاریخی با **همان** versionهای قفل‌شده روی op؛
 | `fee_external` | خارج از معامله پرداخت شده |
 
 به‌همراه `FeeTreatment` حسابداری (`proceeds_reduction`, `cost_basis_in`, `fee_burn`, …) در CanonicalFeeEvent.
+
+### انواع عملیات (همه با operationId)
+
+BUY · SELL · TRANSFER · INCOME · EXPENSE · LOAN_DISBURSE · LOAN_PAYMENT · CHEQUE_CLEAR · CHEQUE_BOUNCE · ASSET_PURCHASE · ASSET_SALE · FX · FEE · TAX · OPENING · CORRECTION · …
+
+تمام domain + journal + cash + snapshot وابسته به همان operation.

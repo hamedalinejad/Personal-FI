@@ -130,3 +130,12 @@ Cr cash (A or B)             fee
 
 ### Invariant fee
 `amount` = اصل؛ `feeAmount` جدا؛ `cashDelta = ±amount ± fee` طبق type — یک‌بار. جزئیات در `db.md`.
+
+---
+
+## نقش `acc_transactions`
+
+**فقط Cash Ledger** (اثر روی بانک/نقد واقعی کاربر).
+
+- Universal financial truth = **`fin_operations`** (+ journal)
+- Income/Expense/Loan/Investment/Cheque به cash وصل می‌شوند از طریق operation + links — نه با تبدیل `acc_transactions` به جدول همه‌چیز

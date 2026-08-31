@@ -71,3 +71,4 @@
 - `iran/README.md` — Iran Core
 - `Instrument-Identity.md`
 - `Date-Semantics-Matrix.md`
+- `Canonical-Ownership-Matrix.md`
