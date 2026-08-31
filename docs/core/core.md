@@ -78,3 +78,4 @@
 - `fixtures/README.md` — Golden fixtures
 - `Data-Model-Relationship-Matrix.md`
 - `SPEC-FREEZE.md`
+- `Field-Level-SoT.md`

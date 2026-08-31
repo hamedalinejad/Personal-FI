@@ -41,3 +41,14 @@ Derived / Report
 ```
 
 اگر `snapshot ≠ ledger` → reconcile → repair فقط با تأیید کاربر.
+
+## چهار نوع فیلد (نسخه نهایی)
+
+| Kind | معنی |
+|------|------|
+| **RAW** | حقیقت ثبت‌شده کاربر/import |
+| **DERIVED** | محاسبه از RAW + engine |
+| **SNAPSHOT** | cache مشتق — rebuild |
+| **EXTERNAL_REPORTED** | عدد گزارش بیرونی (صندوق/کارگزاری) — جدا از DERIVED سیستم |
+
+جزئیات field-level: `Field-Level-SoT.md`

@@ -31,3 +31,12 @@ Feature (Stocks, Loan, Cheque, FIF, Tax, …)
 | `IranSecurityIdentifiers` | ISIN, Symbol, FirmCode |
 
 پیاده‌سازی کد می‌تواند تدریجی باشد؛ **قرارداد از الان** و Feature فقط از این API می‌خواند.
+
+## IranCurrency — قفل
+
+```text
+Stored canonical = IRR only
+Toman = display / input convention (×10)
+```
+
+Ledger، Loan، Tax، Stock، Report همگی **IRR**؛ UI می‌تواند تومان نشان دهد. دو currency موازی IRR+TOM **ممنوع**.

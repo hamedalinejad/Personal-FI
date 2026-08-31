@@ -326,3 +326,27 @@ exchangeRateToBase = basePerTransactionUnit
 ```
 
 ستون DB می‌تواند همان `exchangeRateToBase` بماند؛ در Dictionary و کد، معنی = `basePerTransactionUnit`.
+
+---
+
+## ساختار استاندارد نرخ (Canonical)
+
+به‌جای اتکا فقط به نام مبهم، هر quote نرخ:
+
+```json
+{
+  "fromCurrency": "USD",
+  "toCurrency": "IRR",
+  "rate": "1050000",
+  "rateType": "spot|manual|import",
+  "rateSource": "manual|providerId",
+  "observedAt": "ISO-UTC",
+  "rateDate": "business date if any"
+}
+```
+
+معنی: **1 fromCurrency = rate units of toCurrency**.
+
+روی transaction/operation، `exchangeRateToBase` همچنان می‌تواند scalar ذخیره‌شده باشد با semantic = `basePerTransactionUnit`، به‌همراه `fromCurrency`/`toCurrency`/`rateId` در صورت نیاز audit.
+
+**ممنوع:** تفسیر مبهم USD→IRR در برابر IRR→USD بدون direction.

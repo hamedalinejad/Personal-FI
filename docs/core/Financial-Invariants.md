@@ -288,3 +288,5 @@ taxable gain (طبق قانون) → Tax Event مستقل (tax_events)
 Feature فقط mapping؛ SoT مالیات = tax domain.
 
 **قفل:** `reconcile ≠ repair` — repair فقط پس از تأیید کاربر + audit.
+
+Field-level kinds: `Field-Level-SoT.md` (RAW/DERIVED/SNAPSHOT/EXTERNAL_REPORTED).
