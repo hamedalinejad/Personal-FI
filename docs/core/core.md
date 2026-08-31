@@ -74,3 +74,4 @@
 - `Canonical-Ownership-Matrix.md`
 - `Audit-vs-Financial-Event.md`
 - `Storage-Abstraction.md`
+- `Investment-Three-Layers.md`

@@ -247,3 +247,21 @@ Backup = **Financial Snapshot Package** — نه فقط فایل sqlite خام.
 
 Restore: validate manifest + checksum → temp DB → integrity_check → FK → migrate → swap.  
 Support/migration/license recovery همگی روی همین فرمت سوار می‌شوند.
+
+---
+
+## Migration audit row
+
+هر اعمال migration ثبت شود:
+
+| Field | |
+|-------|--|
+| `migrationId` | e.g. `003_split_cash_position` |
+| `fromVersion` / `toVersion` | |
+| `checksum` | script/content hash |
+| `executionTimeMs` | |
+| `success` | bool |
+| `appliedAt` | |
+| `errorMessage?` | |
+
+زنجیره نمونه: `001_initial` → `002_add_fee_breakdown` → `003_split_cash_position` → …

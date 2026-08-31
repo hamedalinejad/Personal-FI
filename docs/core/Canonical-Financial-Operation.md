@@ -572,3 +572,18 @@ commandHash stored on same row
 | operationId جدید | op جدید |
 
 Double-click / retry شبکه UI **نباید** دو خرید بسازد.
+
+### engineVersions روی هر Operation (قفل تاریخچه)
+
+```json
+{
+  "accountingEngineVersion": "1",
+  "costBasisEngineVersion": "1",
+  "roundingPolicyVersion": "1",
+  "fxEngineVersion": "1",
+  "loanEngineVersion": "1",
+  "valuationEngineVersion": "1"
+}
+```
+
+تغییر فرمول ۳ سال بعد **تاریخچه قدیمی را بازنویسی نمی‌کند** مگر rebuild صریح با version جدید + audit.

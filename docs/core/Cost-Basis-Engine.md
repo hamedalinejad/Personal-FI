@@ -189,3 +189,14 @@ Basis per:
 Holding = مرز pool؛ instrument = هویت دارایی.
 
 **قفل روی تاریخچه:** `fin_operations.engineVersions.costBasis` + setting در زمان op ذخیره می‌شود. تغییر method بعداً فقط ops جدید یا rebuild صریح با version — نه silent rewrite.
+
+---
+
+## Policy-driven (نه الگوریتم per-Feature)
+
+```text
+Cost Basis Engine  ←  Crypto / Stocks / FIF / Metals adapters
+```
+
+Policy: `weighted_average` | `fifo` | `specific_lot`  
+v1 می‌تواند همه را WA کند؛ **مدل data** باید policy را نگه دارد نه hard-code ابدی یک روش.

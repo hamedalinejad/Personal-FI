@@ -786,3 +786,21 @@ getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) 
 جزئیات در `db.md` بخش سیاست حجم price_history.
 
 **Portfolio بدون API:** last cache + stale label — محاسبه fail ممنوع.
+
+---
+
+## Price History fields (خط قرمز)
+
+| Field | |
+|-------|--|
+| instrumentId | |
+| quoteCurrency | |
+| price | |
+| priceDate / marketDate | Historical vs wall clock |
+| source / sourceReference | |
+| fetchedAt | |
+| quality? | |
+| isManual | |
+| isStale (derived) | |
+
+**Latest ≠ Historical.** Transaction correctness مستقل از Price API است (secondary).
