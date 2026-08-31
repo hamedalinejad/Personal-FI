@@ -1497,3 +1497,6 @@ Loan Contract → Schedule (برنامه) → Payment Event (واقعیت) → A
 | Party | `partyId` canonical؛ `contactNameSnapshot` برای تاریخچه — نه contact موازی مستقل |
 
 Loan Engine این‌ها را enforce می‌کند نه UI.
+
+> **قسط آخر:** `Implementation-Pitfalls.md` §ب — principalPortion = remainingBalance.
+> **قرض‌الحسنه disbursement:** §ج — Dr cash net + Dr fee + Cr full principal.

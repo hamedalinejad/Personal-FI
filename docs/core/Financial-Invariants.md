@@ -309,3 +309,5 @@ Domain: `amount >= 0` + `direction` IN/OUT (یا debit/credit روی journal).
 ## Query
 
 Query **DB write ندارد**. UI → Feature API only.
+
+**SQLite:** جمع مالی با SQL `SUM` روی TEXT ممنوع — `Implementation-Pitfalls.md` §الف.

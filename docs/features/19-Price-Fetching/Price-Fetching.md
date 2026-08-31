@@ -804,3 +804,5 @@ getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) 
 | isStale (derived) | |
 
 **Latest ≠ Historical.** Transaction correctness مستقل از Price API است (secondary).
+
+> Valuation: همیشه lastKnownPrice — `Implementation-Pitfalls.md` §د.
