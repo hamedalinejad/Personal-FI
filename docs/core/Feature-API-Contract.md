@@ -50,3 +50,18 @@ UI → API → runAtomicFinancialOperation(operationId)
 اختیاری: `sourceReference` (مثلاً `statement-1405-04.csv`, `broker-report-123`).
 
 **ممنوع:** گم شدن منشأ تراکنش بعد از import.
+
+---
+
+## ساختار استاندارد هر Feature
+
+```text
+feature/
+  commands/   buy, sell, transfer, correct, void, …
+  queries/    getHolding, listTransactions, getPortfolio, calculatePL, …
+  events/     (emit پس از persist)
+```
+
+مثال: `crypto.commands.buy()` · `crypto.queries.getHolding()`
+
+یکنواختی برای Web / PWA / Electron / Mobile / REST آینده — v1 همچنان **TypeScript in-process** است نه HTTP.

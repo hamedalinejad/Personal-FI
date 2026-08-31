@@ -64,3 +64,4 @@
 - `Feature-API-Contract.md` — Command/Query، TS API، sourceType
 - `Core-Engines.md` — لیست engineهای مرکزی
 - `Source-of-Truth-Matrix.md` — یک سؤال → یک منبع
+- `Loan-Component-Classification.md`

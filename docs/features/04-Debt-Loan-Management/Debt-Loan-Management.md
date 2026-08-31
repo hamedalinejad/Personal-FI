@@ -1448,3 +1448,5 @@ Loan
 **مثال:** Principal=100m، Fee=4m → Net cash received=96m؛ **Outstanding liability می‌تواند 100m بماند** مگر policy صریح fee را از liability کم کند.
 
 Journal و Cost/Fee treatment این تفکیک را enforce می‌کنند.
+
+> **Components:** `docs/core/Loan-Component-Classification.md` — Principal/Interest/Fee/Penalty جدا در journal.

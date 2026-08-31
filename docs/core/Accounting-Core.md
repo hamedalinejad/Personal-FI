@@ -44,6 +44,12 @@ fin_journal_lines     خطوط Dr/Cr با accountId
 `fin_journal_lines` ≠ سند.  
 هر خط **باید** `accountId → fin_accounts` داشته باشد.
 
+### `fin_accounts` — **Must Have از v1 (نه Future)**
+
+حداقل ستون‌ها: `id, code, name, type, parentId, currency, systemRole, linkedEntityType, linkedEntityId, isActive, createdAt, updatedAt`
+
+Seed خودکار: «بانک ملت» → `1101 بانک ملت`؛ خرید BTC → account دارایی مربوط. کاربر UI دوطرفه نمی‌بیند — complexity در Engine.
+
 ### `fin_accounts`
 
 | فیلد | نقش |
