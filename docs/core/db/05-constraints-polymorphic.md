@@ -8,7 +8,8 @@
 
 ```sql
 -- مبالغ و موجودی‌ها
-CHECK (amount > 0) -- در جدول‌های تراکنش مبلغ مطلق، در صورت signed بودن: قوانین صریح per type
+-- مبلغ مالی TEXT است؛ مقایسه عددی amount > 0 را به Domain بسپارید
+CHECK (length(trim(amount)) > 0)  -- structural only
 CHECK (feeAmount IS NULL OR feeAmount >= 0)
 CHECK (quantity >= 0) -- holdings
 CHECK (quantityMg >= 0)
@@ -163,3 +164,22 @@ Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید �
 جزئیات: `docs/core/Instrument-Identity.md`
 
 Polymorphic برای notes/tags/generic. **روابط حساس** (Loan→Party, Tx→Instrument, Line→Account): FK واقعی ترجیح.
+
+---
+
+## Decimal روی TEXT — CHECK عددی کافی نیست
+
+SQLite affinity برای TEXT مقایسه عددی قابل‌اتکا روی `CHECK (amount > 0)` نمی‌دهد.
+
+**Domain (اجباری با decimal.js):**
+```text
+input → Decimal.parse → validate (>0 / >=0) → normalize canonical string → SQLite
+```
+
+**DB فقط structural:**
+- NOT NULL
+- `CHECK(length(trim(amount)) > 0)`
+- FK / UNIQUE
+- enum-like CHECK روی type/status
+
+اعتبارسنجی `amount > 0`, `quantity >= 0`, `fee >= 0`, `rate > 0` = **Domain-level only**.

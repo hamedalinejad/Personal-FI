@@ -311,3 +311,21 @@ Domain: `amount >= 0` + `direction` IN/OUT (یا debit/credit روی journal).
 Query **DB write ندارد**. UI → Feature API only.
 
 **SQLite:** جمع مالی با SQL `SUM` روی TEXT ممنوع — `Implementation-Pitfalls.md` §الف.
+
+---
+
+## Canonical Decimal String Format
+
+همه مقادیر مالی قبل از persist و قبل از commandHash نرمال می‌شوند:
+
+| قانون | مثال |
+|--------|------|
+| base-10 | OK |
+| no scientific notation | `1e-8` ❌ → `0.00000001` |
+| no leading plus | `+100` ❌ → `100` |
+| no unnecessary leading zeros | `0100` ❌ → `100` |
+| `-0` forbidden | → `0` |
+| trailing zeros normalized for **money** | `100.00` → `100` (IRR) یا طبق scale ارز |
+| fractional leading zeros kept when significant | `0.00000001` حفظ |
+
+مقایسه و dedupe و commandHash فقط روی **canonical form**.

@@ -87,3 +87,5 @@
 ---
 
 **قانون:** فیلد مالی جدید بدون ردیف Dictionary + Migration Rule وارد schema نمی‌شود.
+
+Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
