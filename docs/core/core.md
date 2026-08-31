@@ -72,3 +72,5 @@
 - `Instrument-Identity.md`
 - `Date-Semantics-Matrix.md`
 - `Canonical-Ownership-Matrix.md`
+- `Audit-vs-Financial-Event.md`
+- `Storage-Abstraction.md`

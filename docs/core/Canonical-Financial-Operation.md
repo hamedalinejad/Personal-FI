@@ -555,3 +555,20 @@ Rebuild تاریخی با **همان** versionهای قفل‌شده روی op؛
 BUY · SELL · TRANSFER · INCOME · EXPENSE · LOAN_DISBURSE · LOAN_PAYMENT · CHEQUE_CLEAR · CHEQUE_BOUNCE · ASSET_PURCHASE · ASSET_SALE · FX · FEE · TAX · OPENING · CORRECTION · …
 
 تمام domain + journal + cash + snapshot وابسته به همان operation.
+
+---
+
+## Idempotency اجباری (قفل)
+
+```text
+UNIQUE(fin_operations.id)  -- operationId
+commandHash stored on same row
+```
+
+| سناریو | رفتار |
+|--------|--------|
+| همان operationId + همان commandHash | return previous result — **no second BUY** |
+| همان operationId + commandHash متفاوت | reject conflict |
+| operationId جدید | op جدید |
+
+Double-click / retry شبکه UI **نباید** دو خرید بسازد.

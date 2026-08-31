@@ -273,3 +273,7 @@ rebuildX(id) / reconcileX(id)  // از طریق engine مرکزی وقتی مش�
 
 شناسه موجودیت: **UUID یا instrumentId** — نه symbol.  
 Wrapperهای deprecated با symbol فقط resolve می‌کنند و در log هشدار می‌دهند.
+
+## Storage
+
+Domain storage-agnostic — `docs/core/Storage-Abstraction.md` (Web WASM vs Desktop native SQLite).
