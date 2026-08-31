@@ -31,3 +31,13 @@ Migration نباید provenance را null کند مگر ADR.
 ## Financial Data Non-Destruction Rule
 
 DROP COLUMN مالی بدون migration policy ممنوع. intentionally_removed فقط ADR.
+
+## Attachments / Documents
+
+```text
+Document → Metadata → Blob → Checksum → Source
+```
+
+- `relativePath` / `blobId` — نه absolute path
+- اگر blob گم شد، **metadata حفظ** می‌ماند + integrity flag
+- Backup package: db + attachments + checksums + manifest

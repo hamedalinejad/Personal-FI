@@ -63,3 +63,11 @@ Snapshot  =  cache
 `fin_accounts` برای exchange cash = **آینه حسابداری** با `linkedEntityType/Id` به crypto cash account — balance از domain rebuild می‌شود، نه write مستقل موازی.
 
 **تأکید:** `currentBalance`, `remainingBalance`, `quantity` holding, `averageBuyPrice`, `totalInvested`, `portfolioValue` = **cache/derived** — هرگز SoT.
+
+## Reports
+
+```text
+Ledger → Calculation → Report
+```
+
+**ممنوع:** Report مستقیم از Snapshot به‌عنوان SoT. Snapshot فقط cache؛ rebuild از ledger.

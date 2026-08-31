@@ -85,3 +85,4 @@
 - ../API-Reference.md — مرجع API
 - `Cross-Feature-Interactions.md`
 - `Feature-Independence-Contract.md`
+- `Architecture-Final.md`
