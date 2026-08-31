@@ -27,3 +27,7 @@ Repair ≠ silent rewrite. Reconcile فقط detect.
 `sourceType` + `sourceReference` + لینک document/import batch.
 
 Migration نباید provenance را null کند مگر ADR.
+
+## Financial Data Non-Destruction Rule
+
+DROP COLUMN مالی بدون migration policy ممنوع. intentionally_removed فقط ADR.
