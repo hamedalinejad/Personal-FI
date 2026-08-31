@@ -24,3 +24,14 @@ Snapshot       →  optimization فقط
 ```
 
 جزئیات: `Raw-vs-Derived-Data.md` · `Financial-Invariants` · `db/03-journal-sot-reporting.md`
+
+## جدول Raw / Derived / Rebuild
+
+| Concept | Raw Source | Derived | Rebuild From |
+|---------|------------|---------|--------------|
+| Bank Balance | acc_transactions | currentBalance | acc_transactions |
+| Journal Balance | fin_journal_lines | — | journal |
+| Crypto Qty | inv_crypto_transactions | holding | crypto ledger |
+| Loan Balance | ln_transactions | remainingBalance | ln_transactions |
+| Net Worth | ledgers + valuation | snapshot | all canonical |
+| Portfolio Value | holdings + prices + FX | snapshot | same |

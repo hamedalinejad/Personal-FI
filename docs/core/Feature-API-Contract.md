@@ -74,3 +74,32 @@ feature/
 `sourceType` · `sourceReference` · `sourceDocumentId?` · `importBatchId?` · `sourceTransactionId?` (external)
 
 بدون provenance، audit «این مبلغ از کجا آمد؟» ممکن نیست.
+
+---
+
+## featureId پایدار (نه شماره Product)
+
+| Presentation # | featureId canonical |
+|----------------|---------------------|
+| ۱ | `accounts` |
+| ۳ | `income` |
+| ۴ | `expense` |
+| ۶ | `loan` |
+| ۷ crypto | `investment.crypto` |
+| … | `investment.stocks` / `fif` / `metals` |
+
+شماره Product فقط presentation است؛ dependency و code با **featureId** پایدار.
+
+### ساختار پوشه Feature
+
+```text
+feature/
+  api/
+  commands/
+  queries/
+  domain/
+  events/     # optional
+```
+
+**ممنوع:** Feature مستقیم SQL جدول Feature دیگر را بخواند/بنویسد.  
+مجاز: Feature → Core API / Accounting Core / public API فیچر دیگر.

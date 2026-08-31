@@ -222,3 +222,5 @@ Dashboard → Application Query → Portfolio/Report Engine → Ledger
 ```
 
 **ممنوع:** SQL مستقیم از UI به چند جدول برای جمع Net Worth.
+
+Net Worth: `wealthQuery.getNetWorth(asOf)` — نه محاسبه داخل Dashboard component.

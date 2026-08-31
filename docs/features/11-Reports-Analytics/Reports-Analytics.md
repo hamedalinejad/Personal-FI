@@ -187,3 +187,7 @@
 - `getNetWorth` Wrapper روی `Portfolio.calculateNetWorth`
 - فیلتر تاریخ روی businessDate/date؛ فقط isVoided=false
 - مبالغ خروجی decimal string + تبدیل اختیاری به base
+
+## فقط Query layer
+
+Reports **Ledger جدید نمی‌سازد**. Query روی Accounting + Investment + Loan + …
