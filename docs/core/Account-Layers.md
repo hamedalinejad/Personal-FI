@@ -44,3 +44,9 @@ fin_accounts.linkedEntityId = …
 ```
 
 کاربر در UX ساده «حساب‌ها / سرمایه‌گذاری» می‌بیند؛ در Journal همه **Financial (accounting) Account** اند با نوع مشخص — نه چهار جهان جدا بدون COA.
+
+## Operational Account types (acc_*)
+
+Bank · Cash · Card · Wallet · Brokerage Cash · Crypto Cash · External — نه فقط «بانک».
+
+`fin_accounts` = Chart of Accounts حسابداری.

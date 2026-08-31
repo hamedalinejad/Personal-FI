@@ -125,3 +125,25 @@ create / list / pay / report همان دامنه
 وابستگی فقط به **Core** (Operation, Journal, Currency, Instrument) — نه به UI صفحه Accounting.
 
 Ledger همچنان مرکزی است.
+
+---
+
+## چهار بخش هر Feature API
+
+```text
+commands / queries / events / capabilities()
+```
+
+مثال:
+
+```ts
+loan.capabilities() → {
+  supportsInterest: true,
+  supportsVariableRate: true,
+  supportsCollateral: true,
+  requiresAccountingUI: false,
+  requiresBankAccount: false
+}
+```
+
+HTTP در v1 لازم نیست — TypeScript interface؛ بعداً REST/IPC/Mobile.

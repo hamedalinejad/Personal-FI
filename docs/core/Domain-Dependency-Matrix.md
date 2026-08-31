@@ -25,3 +25,15 @@ COMMON → CORE → DOMAIN FEATURES → UI
 ```
 Feature ❌ depends on Dashboard/Reports UI.
 Cross-feature write فقط via Canonical Operation.
+
+## Feature Dependency Matrix (خلاصه)
+
+| Feature | Core | Accounts | Currency | Parties | Docs | Price |
+|---------|------|----------|----------|---------|------|-------|
+| Loan | ✓ | Optional | Optional | Optional | Optional | — |
+| Crypto | ✓ | Optional | ✓ | — | Optional | Optional |
+| Stocks | ✓ | Optional | ✓ | — | Optional | Optional |
+| Funds | ✓ | Optional | ✓ | — | Optional | Optional |
+| Expense | ✓ | ✓ | ✓ | Optional | Optional | — |
+
+Circular dependency ممنوع. جزئیات استقلال: `Feature-Independence-Contract.md`

@@ -329,3 +329,9 @@ Query **DB write ندارد**. UI → Feature API only.
 | fractional leading zeros kept when significant | `0.00000001` حفظ |
 
 مقایسه و dedupe و commandHash فقط روی **canonical form**.
+
+## Offline-capable (تأکید)
+
+بدون شبکه باید کار کند: Create, Read, metadata update, Reversal, Reports, P&L, Cost Basis, Loan calc, Backup, Restore, Migration, Reconciliation.
+
+فقط اختیاری online: Price Fetch, Version Check, License refresh.

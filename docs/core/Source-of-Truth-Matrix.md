@@ -61,3 +61,5 @@ Snapshot  =  cache
 اگر `inv_crypto_cash = 1000` و journal/fin نشان دهد 998 → **reconcile**؛ Domain cash ledger برنده برای qty؛ journal برای trial balance — drift = integrity issue نه دو SoT موازی.
 
 `fin_accounts` برای exchange cash = **آینه حسابداری** با `linkedEntityType/Id` به crypto cash account — balance از domain rebuild می‌شود، نه write مستقل موازی.
+
+**تأکید:** `currentBalance`, `remainingBalance`, `quantity` holding, `averageBuyPrice`, `totalInvested`, `portfolioValue` = **cache/derived** — هرگز SoT.

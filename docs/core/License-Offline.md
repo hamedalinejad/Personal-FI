@@ -63,3 +63,5 @@ User Financial DB  ≠  License State
 
 `license expired` → حداکثر Feature disable / **Read-only**.  
 **ممنوع:** غیرقابل‌خواندن یا نابود کردن financial DB. Export/Backup همیشه ممکن.
+
+Financial DB ≠ License State. License داده مالی را wipe/قفل نابودکننده نمی‌کند.
