@@ -132,3 +132,5 @@ Loan bullet/variable پیشرفته، balloon/step_up، FIFO cost basis، Cloud/
 | — | دسته‌بندی‌های مشترک | `99-Common-Categories/` |
 
 > **ساده‌سازی v1:** Tax = جدول `tax_events` + taxable metadata روی trades؛ قوانین پیچیده ۱۴۰۴ را کامل پیاده نکن. FX = جدول `fx_rates` (from,to,rate,date,source) بدون گراف پیچیده. Cheque و Loan فیچر جدا می‌مانند اما هر دو بدهی‌اند و از Accounting Core مشترک استفاده می‌کنند.
+
+> **Standalone UI ≠ Standalone Ledger.** Feature می‌تواند تنها UI فعال باشد؛ journal همیشه از Core می‌آید. Navigation فقط ۹ صفحه.

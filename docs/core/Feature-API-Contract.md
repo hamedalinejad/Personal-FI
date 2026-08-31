@@ -111,3 +111,17 @@ feature/
 export const AccountsAPI = { createAccount, list, ... }
 // import از فیچر دیگر ❌ — فقط core و public API مجاز
 ```
+
+---
+
+## Standalone Capable (محصول)
+
+هر Feature باید بتواند بدون UI سایر Featureها:
+
+create / list / pay / report همان دامنه
+
+را ارائه دهد.
+
+وابستگی فقط به **Core** (Operation, Journal, Currency, Instrument) — نه به UI صفحه Accounting.
+
+Ledger همچنان مرکزی است.

@@ -389,3 +389,37 @@ Income · Expense · Transfer · Loan · Cheque · Investment · Asset · Fee ·
 
 ### Feature بدون آیتم ناوبار
 Cheque, Bills, Tax, Notifications, Documents, Currency, Price → داخل Transactions / Settings / Investments — **صفحه ناوبار جدا نه**.
+
+---
+
+## ۹ صفحه اصلی (قفل UX)
+
+```text
+1 Dashboard
+2 Accounts
+3 Transactions
+4 Investments
+5 Loans
+6 Planning
+7 Reports
+8 Documents   # یا Assets اگر با IA فعلی یکی شود
+9 Settings
+```
+
+**20 Feature ≠ 20 Navigation.**  
+Buy / Sell / Deposit / Withdraw / Loan Payment / New Income / … = **Sheet / Dialog / Drawer** — نه route جدا برای هر عمل.
+
+Sub-routeهای گزارش (`/reports/cashflow` و …) ترجیحاً tab/filter داخل همان صفحه Reports باشند نه navigation سطح اول.
+
+## Standalone Capable Feature ≠ Standalone Ledger
+
+| لایه | قانون |
+|------|--------|
+| **UI Feature** | می‌تواند به‌تنهایی فعال باشد (فقط Loans، فقط Crypto، فقط FIF) و تمام جریان همان دامنه را پوشش دهد بدون اینکه کاربر Accounting بشناسد |
+| **Ledger Architecture** | یکپارچه می‌ماند: Feature → Financial Core → Journal projection |
+
+```text
+Standalone UI  ≠  isolated database / isolated accounting
+```
+
+فعال بودن UI Accounting اختیاری است؛ ساخت journal پشت صحنه اجباری است وقتی رویداد مالی رخ می‌دهد.
