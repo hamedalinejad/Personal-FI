@@ -233,9 +233,17 @@ archive.personalfi  (zip یا container معادل)
   "appVersion": "1.0.0",
   "databaseId": "uuid",
   "createdAt": "ISO-UTC",
-  "baseCurrencyAtExport": "IRR"
+  "baseCurrencyAtExport": "IRR",
+  "calculationVersions": { "costBasis": "1", "rounding": "1", "fx": "1", "loanFormula": "1" },
+  "currencyPolicy": {},
+  "roundingPolicy": {},
+  "migrationState": { "lastMigrationId": "..." },
+  "integrityChecksum": "sha256:..."
 }
 ```
+
+Backup = **Financial Snapshot Package** — نه فقط فایل sqlite خام.
+
 
 Restore: validate manifest + checksum → temp DB → integrity_check → FK → migrate → swap.  
 Support/migration/license recovery همگی روی همین فرمت سوار می‌شوند.
