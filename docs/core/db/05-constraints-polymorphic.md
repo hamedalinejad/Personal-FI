@@ -52,7 +52,26 @@ CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
 
 ---
 
-## Polymorphic FK: `relatedFeature` + `relatedId`
+## لینک بین Feature و Cash — یک SoT
+
+**Canonical (Must):** جدول `acc_transaction_links`
+
+```text
+UNIQUE(accTransactionId, relatedFeature, relatedId)
+```
+
+| لایه | نقش |
+|------|-----|
+| `acc_transaction_links` | **SoT رابطه** bank tx ↔ domain event |
+| `acc_transactions.relatedFeature` + `relatedId` | **فقط سازگاری/مهاجرت یا denormalized cache** — نباید با links تناقض داشته باشد؛ در write path فقط از API نوشته می‌شود که **همزمان links را upsert** می‌کند |
+
+**ممنوع:** دو رابطه canonical مستقل که یکی چیز دیگری بگوید.
+
+اگر فقط یکی پر باشد: لینک ناقص → reconcile orphan.
+
+---
+
+## Polymorphic FK: `relatedFeature` + `relatedId` (جزئیات validate)
 
 SQLite نمی‌تواند enforce کند که `relatedId` به جدول درست اشاره می‌کند.
 

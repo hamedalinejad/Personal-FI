@@ -11,7 +11,8 @@
 | `fin_journal_entries` | Core Accounting | **سند حسابداری** (header) — معمولاً ۱ به ازای هر operation — **Must** |
 | `fin_journal_lines` | Core Accounting | **خطوط بدهکار/بستانکار** با accountId اجباری — **Must** |
 | `fin_reconcile_runs` | Core Accounting | خروجی اجرای reconcile — **Must** برای audit |
-| `ref_instruments` | Core | registry هویت دارایی (crypto/stock/fif/metal) — **Must** |
+| `ref_instruments` | Core | **تنها** registry هویت همه assetها — **Must** (نه inv_crypto_assets موازی) |
+| `inv_crypto_cash` | Crypto | CashPosition صرافی/ولت (جدا از asset holding) — **Must وقتی crypto cash داریم** |
 | `ref_parties` | Core | طرف حساب / اشخاص (نه CRM) — **Must برای MVP وقتی Loan/Income شخص دارد** |
 | `ln_schedule_snapshots` | Debt & Loan | برنامه اقساط نسخه‌دار — **Must** |
 | `ln_loan_collateral` | Debt & Loan | وثیقه وام — **Must** |

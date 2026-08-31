@@ -532,3 +532,18 @@ Rebuild تاریخی با **همان** versionهای قفل‌شده روی op؛
 - `CanonicalFeeEvent` (از قبل) — Feature فقط map می‌کند  
 - **TaxEvent** (`tax_events`) جدا — نه کپی full tax schema داخل هر inv_* table جدید  
 - Stocks Iran fees/taxes → map به FeeEvent + TaxEvent
+
+---
+
+## Fee quantity modes (Crypto و قابل map برای همه)
+
+تنها حالت‌های رسمی quantity نسبت به fee (Feature invent نکند):
+
+| Mode | معنی |
+|------|------|
+| `fee_in_quote` | کارمزد از ارز quote |
+| `fee_from_base_asset` | از دارایی پایه معامله |
+| `fee_from_received` | از مقدار دریافتی |
+| `fee_external` | خارج از معامله پرداخت شده |
+
+به‌همراه `FeeTreatment` حسابداری (`proceeds_reduction`, `cost_basis_in`, `fee_burn`, …) در CanonicalFeeEvent.

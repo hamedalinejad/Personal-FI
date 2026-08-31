@@ -1,3 +1,5 @@
+> **Identity:** فقط `ref_instruments` (Core). جدول موازی `inv_crypto_assets` به‌عنوان registry هویت **ممنوع** — metadata کریپتو = extension/columns روی instrument یا جدول `inv_crypto_instrument_meta` با FK به `ref_instruments.id`.
+
 # زیر‌فیچر: Investment - Crypto (رمزارز)
 
 ## توضیح کلی
@@ -158,7 +160,23 @@ Adapter plan باید برگرداند:
 > کلید قیمت‌گیری داخلی: `assetKey` (محاسبه‌شده یا ذخیره‌شده) = برای توکن `chainId:contractAddress`؛ برای native `chainId:native:symbol`؛ برای موجودی صرافی بدون زنجیره `exchange:symbol`.
 > دو Holding با هویت یکسان ممنوع است؛ P&L نباید دوبار شمرده شود.
 
-> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. 
+> **نکته مهم**: ~~مدل قدیمی: نقد در inv_crypto_holdings با symbol=IRR/USDT~~ — **جایگزین:** 
+
+### AssetPosition در برابر CashPosition (Domain)
+
+| | Asset Holding | Cash Position |
+|--|---------------|---------------|
+| جدول پیشنهادی | `inv_crypto_holdings` (crypto assets) | `inv_crypto_cash` یا `fin_accounts` با systemRole=exchange_cash |
+| مثال | BTC, ETH, USDT-TRC20 (توکن) | موجودی تسویه IRR/USDT روی صرافی |
+| Cost basis | Cost-Basis-Engine | معمولاً cash؛ خرید تتر سرمایه‌گذاری می‌تواند asset باشد |
+| Journal | crypto_asset account | cash account |
+
+**UI:** یک نمای صرافی (Binance → USDT, BTC, …) بدون دو «سیستم» برای کاربر.
+
+**ممنوع (canonical جدید):** نگه داشتن IRR/USDT نقد صرافی فقط با `symbol=IRR` داخل همان جدول asset holding بدون تفکیک نقش — باعث قاطی شدن P&L و Net Worth می‌شود.
+
+> (Legacy note) اگر داده قدیمی با `symbol=IRR/USDT` در holdings بود: migration به CashPosition.
+ 
 > **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**: 
 > - برای IRR و USDT: 
 > - **نه همیشه `averageBuyPrice = 1`.**
