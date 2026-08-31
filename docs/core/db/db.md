@@ -60,3 +60,20 @@ Write-to-temp-then-swap → IndexedDB (db_main / db_pending / db_backup)
 ## Fixtures / CI
 
 حداقل: BTC خرد+کارمزد · سهام+CA · قرض‌الحسنه · چک برگشتی — `07-fixtures-release-gate.md` و `fixtures/README.md`
+
+---
+
+## Migration Strategy (خلاصه اجرایی)
+
+جزئیات کامل: [06-migration-backup-audit.md](./06-migration-backup-audit.md)
+
+| جزء | |
+|-----|--|
+| Version store | `schema_version` / `db_meta` — version, appliedAt |
+| Scripts | `migrations/` — `001_….sql` زنجیره‌ای |
+| Upgrade | Backup → apply next → integrity_check → activate |
+| Rollback | ترجیحاً restore از backup قبل از migration؛ down-script فقط اگر امن و تست‌شده |
+| Data preservation | ALTER / copy — **DROP COLUMN مالی بدون policy ممنوع** |
+| CI | fixture DB از v1 → latest migration باید سبز شود |
+
+App جدید روی schema قدیمی **بدون** migration کنترل‌شده اجرا نمی‌شود.

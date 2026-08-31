@@ -279,3 +279,7 @@ Wrapperهای deprecated با symbol فقط resolve می‌کنند و در log 
 Domain storage-agnostic — `docs/core/Storage-Abstraction.md` (Web WASM vs Desktop native SQLite).
 
 See `docs/core/SPEC-FREEZE.md` for pre-coding freeze and target architecture diagram.
+
+## امنیت
+
+جزئیات: `docs/features/18-Security-Privacy/Security-Privacy.md` · Cross-feature: `docs/core/Cross-Feature-Interactions.md`

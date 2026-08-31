@@ -83,3 +83,4 @@
 - `Concept-Ownership-Matrix.md`
 - `Implementation-Pitfalls.md` — هشدارهای کدنویسی
 - ../API-Reference.md — مرجع API
+- `Cross-Feature-Interactions.md`

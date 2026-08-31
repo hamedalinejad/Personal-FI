@@ -123,3 +123,38 @@
 ## v1 کافی است
 
 Local PIN · biometric اختیاری · encrypted backup · auto-lock · audit. نه OAuth/SSO/microservices.
+
+---
+
+## Encryption-at-Rest (v1)
+
+| لایه | |
+|------|--|
+| کل Blob SQLite | قبل از نوشتن IndexedDB با **Web Crypto API** (AES-GCM) رمز می‌شود؛ کلید از PIN/password مشتق (PBKDF2/Argon2id در صورت پشتیبانی) |
+| فیلد جدا | اختیاری؛ پیش‌فرض فایل‌محور ساده‌تر است |
+| Backup | رمزنگاری اختیاری روی package |
+
+PIN/password **هرگز** plaintext ذخیره نمی‌شود — فقط hash/verifier.
+
+## Authentication (آفلاین)
+
+| | |
+|--|--|
+| PIN 4–6 رقم | hash در storage امن‌تر از plaintext localStorage؛ ترجیح IndexedDB/encrypted meta |
+| Biometric | **WebAuthn** جایی که مرورگر/OS اجازه دهد |
+| Auto-lock | timeout پس از بی‌فعالیتی |
+| Failed attempts | exponential backoff — **هرگز wipe داده** |
+
+## Audit
+
+| | |
+|--|--|
+| جدول | `fin_audit_log` / security audit |
+| فیلدها | action, at, actor (local), detail, operationId? |
+| IP | در اپ pure offline معمولاً خالی/نامربوط |
+
+Financial Event ≠ Audit — `Audit-vs-Financial-Event.md`
+
+## Export
+
+JSON/CSV + native backup؛ رمز اختیاری. License expire داده را قفل نابودکننده نمی‌کند.
