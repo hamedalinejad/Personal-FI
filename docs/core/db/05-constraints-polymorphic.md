@@ -160,3 +160,4 @@ Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید �
 
 ---
 
+جزئیات: `docs/core/Instrument-Identity.md`

@@ -1,3 +1,22 @@
+
+## Canonical: Asset vs Cash + نقش USDT
+
+```text
+Asset Position  (inv_crypto_holdings)     Cash Position (inv_crypto_cash)
+  BTC, ETH, USDT-TRC20, USDT-ERC20, …       IRR settlement, USDT settlement cash, …
+```
+
+| USDT role | جدول | Cost basis |
+|-----------|------|------------|
+| Settlement cash روی صرافی | `inv_crypto_cash` | معمولاً cash policy |
+| دارایی سرمایه‌گذاری / on-chain token (TRC20/ERC20) | `inv_crypto_holdings` + instrument | Cost-Basis-Engine از معاملات |
+
+**USDT ذاتاً نه همیشه Asset است نه همیشه Cash** — نقش از context acquisition + venue تعیین می‌شود.
+
+**هویت:** فقط `ref_instruments.id` (+ crypto metadata). نه registry موازی.
+
+**Legacy `symbol=IRR/USDT` در holdings:** فقط migration path — write جدید ممنوع.
+
 > **Identity:** فقط `ref_instruments` (Core). جدول موازی `inv_crypto_assets` به‌عنوان registry هویت **ممنوع** — metadata کریپتو = extension/columns روی instrument یا جدول `inv_crypto_instrument_meta` با FK به `ref_instruments.id`.
 
 # زیر‌فیچر: Investment - Crypto (رمزارز)
@@ -63,7 +82,7 @@
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
 8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
-9a. موجودی هیچ رمزارزی (`quantity` در `inv_crypto_holdings`) و موجودی داخلی IRR/USDT هر صرافی/ولت (همان جدول، `symbol=IRR` یا `symbol=USDT`) نمی‌تواند منفی شود.
+9a. موجودی Asset (`inv_crypto_holdings.quantity`) و CashPosition (`inv_crypto_cash.balance`) هیچ‌کدام منفی نمی‌شوند.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.
 11. **ویرایش/حذف معاملات — فقط Core Reversal**
 
@@ -197,7 +216,7 @@ Acquisition/CostBasisEngine نوع ورود را تعیین می‌کند، نه
 > - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود) 
 > - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند) 
 > - در تابع `getPortfolioValue`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی) 
-> - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با موجودی داخلی IRR/USDT صرافی در `inv_crypto_holdings` ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
+> - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با `inv_crypto_cash` صرافی ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
 
 ### ۴. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
@@ -691,7 +710,7 @@ holding.totalFeesPaidBase += feeBase
  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='withdraw'` ثبت شود
  > 2. رکورد در `acc_transactions` با `type='withdrawal-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز برداشتی)` آپدیت شود**: `quantity -= amount` (و اگر `quantity <= 0` رکورد holding غیرفعال یا حذف شود)
- > 4. اگر ارز برداشتی `IRR` یا `USDT` است (موجودی نقدی صرافی): همان holding با `symbol=IRR/USDT` آپدیت می‌شود — نه یک holding رمزارز جدید
+ > 4. اگر نقد صرافی است: آپدیت **`inv_crypto_cash`** (CashPosition) — نه `inv_crypto_holdings` با symbol ساختگی
  >
  > ⛔ **ممنوع**: ثبت withdraw بدون آپدیت `inv_crypto_holdings` — موجودی نقدی صرافی اشتباه می‌شود
 
@@ -699,7 +718,7 @@ holding.totalFeesPaidBase += feeBase
  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='deposit'` ثبت شود
  > 2. رکورد در `acc_transactions` با `type='deposit-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز واریزی)` آپدیت شود**: `quantity += amount` (اگر رکورد وجود نداشت، ایجاد شود)
- > 4. برای واریز IRR/USDT: `averageBuyPrice=1`، `totalInvested=0`، `totalFeesPaidBase=0` ثابت می‌مانند (طبق تصمیم طراحی موجودی نقدی)
+ > 4. واریز نقد به **`inv_crypto_cash`**: cost basis طبق economicKind؛ par=1 فقط اگر policy صریح cash_like_par
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
 - `getExchangeTransactions(filters)` → برای واریز/برداشت
 - `calculateProfitLoss(symbol?, exchangeId?)`
@@ -752,7 +771,7 @@ averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط �
 - موجودی و میانگین خرید و مجموع کارمزدها در جدول `inv_crypto_holdings` نگهداری می‌شود.
 - قیمت لحظه‌ای رمزارزها می‌تواند از API خارجی + کش آفلاین تأمین شود.
 
-> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. `averageBuyPrice` برای این دو ارز همیشه `1` در نظر گرفته می‌شود چون نرخ تبدیل آن‌ها با خودشان ثابت است.
+> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. ~~par=1 همیشه~~ منسوخ — CashPosition جدا؛ USDT سرمایه‌گذاری = Asset با cost واقعی.
 
 ---
 
