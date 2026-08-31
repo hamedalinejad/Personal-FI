@@ -14,7 +14,7 @@
 | operationId | UUID TEXT | N | — | — | — | — | fin_operations | N | Y | — | idempotency key |
 | commandHash | TEXT | N | — | — | — | — | fin_operations | N | Y | — | conflict detect |
 | baseCurrencyAtOperation | TEXT | N | — | currency | — | base | op | N | Y | — | lock historical base |
-| exchangeRateToBase | TEXT decimal | Y | — | rate | Rate | — | op/tx/line | N | Y | — | as-of op |
+| exchangeRateToBase (= basePerTransactionUnit) | TEXT decimal | Y | — | rate | Rate | — | op/tx/line | N | Y | — | 1 txCurrency in baseCurrency |
 | amountInBase | TEXT decimal | N | — | money | Money | base@op | journal line | N | Y | — | never rebuild silent |
 | sourceType | ENUM TEXT | N | manual | — | — | — | domain row | N | Y* | — | *immutable after post |
 | sourceReference | TEXT | Y | null | — | — | — | domain | N | Y* | — | file/batch ref |

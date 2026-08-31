@@ -296,3 +296,33 @@ Journal/`amountInBase` تاریخی دست نخورده (`baseCurrencyAtOperatio
 - **Currency در DB:** فقط `IRR`
 - **UI:** Rial یا Toman (`1 Toman = 10 Rial`)
 - ممنوع: ارز جدا `TOM`/`IRT` در ledger
+
+---
+
+## Conversion paths (v1 — بدون USDT hard-code)
+
+**ممنوع:** فرض دائمی `A → USDT → B` در Core.
+
+v1 modes:
+
+| Mode | |
+|------|--|
+| `direct` | pair موجود در rates |
+| `inverse` | 1/rate |
+| `configured_bridge` | bridge صریح در settings (می‌تواند USDT یا USD باشد) |
+| `manual` | نرخ دستی کاربر برای همان asOf |
+
+آینده: Currency Graph برای shortest path — خارج از scope پیچیدگی v1.
+
+### نام نرخ به base
+
+**Canonical semantic name:** `basePerTransactionUnit`
+
+تعریف:
+
+```text
+exchangeRateToBase = basePerTransactionUnit
+= چند واحد baseCurrency به ازای 1 واحد transactionCurrency
+```
+
+ستون DB می‌تواند همان `exchangeRateToBase` بماند؛ در Dictionary و کد، معنی = `basePerTransactionUnit`.

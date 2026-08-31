@@ -1450,3 +1450,36 @@ Loan
 Journal و Cost/Fee treatment این تفکیک را enforce می‌کنند.
 
 > **Components:** `docs/core/Loan-Component-Classification.md` — Principal/Interest/Fee/Penalty جدا در journal.
+
+---
+
+## لایه‌ها (ضد formula داخل Page)
+
+```text
+UI → Loan API → Loan Calculation Engine → Accounting Core
+```
+
+| لایه | محتوا |
+|------|--------|
+| Domain Model | contract, parties, rates, fees policy |
+| Calculation Engine | schedule generate, interest, penalty |
+| UI | فرم و نمایش — بدون hard-code فرمول |
+
+### قسط ≠ حقیقت پرداخت
+
+```text
+Loan Contract → Schedule (برنامه) → Payment Event (واقعیت) → Accounting Operation
+```
+
+| Schedule state | معنی |
+|----------------|------|
+| `scheduled` | در برنامه |
+| `due` | سررسید رسیده |
+| `paid` | پرداخت کامل ثبت شده |
+| `partially_paid` | |
+| `overdue` | |
+| `waived` | |
+| `rescheduled` | |
+
+**ممنوع:** فرض اینکه وجود ردیف schedule = پول جابه‌جا شده.  
+`remainingBalance` فقط از **payment events / ln_transactions** rebuild می‌شود نه از schedule alone.
