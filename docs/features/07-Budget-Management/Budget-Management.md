@@ -208,3 +208,5 @@
 - انتقال بین envelopeها تراکنش بانکی نمی‌سازد (accountTransactionId null)
 - هشدار BudgetExceeded فقط Event + Notification؛ قفل اجباری خرج v1 اختیاری
 - تست: ثبت هزینه → remaining کاهش؛ void هزینه → remaining برمی‌گردد
+
+Budget = Planning فقط؛ reference به Expense/Category — **fake financial transaction نمی‌سازد**.

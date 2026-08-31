@@ -9,6 +9,7 @@
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
 | `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
 | `fin_accounts` | Core Accounting | **Chart of accounts** — حساب واقعی (بانک ملت، هزینه خوراک، …) — **Must** |
+| `db_meta` / schema_version store | Infrastructure | persistence state, schemaVersion, databaseId — **Must** |
 | `fin_operations` | Core Accounting | عملیات کاربر (BUY/PAY/TRANSFER/…) — operationId, commandHash, status — **Must** |
 | `fin_journal_entries` | Core Accounting | **سند حسابداری** (header) — معمولاً ۱ به ازای هر operation — **Must** |
 | `fin_journal_lines` | Core Accounting | **خطوط بدهکار/بستانکار** با accountId اجباری — **Must** |

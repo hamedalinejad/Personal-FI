@@ -181,3 +181,8 @@
 - پرداخت occurrence → ساخت income/expense یا فقط mark paid طبق type
 - با `inc_recurring`/`exp_recurring` تداخل نکند (قانون انتخاب در Income/Expense)
 - Job: تولید occurrenceهای due؛ Notification سررسید
+
+```text
+Template → Occurrence → confirm/policy → Financial Operation
+```
+Recurring **template ≠** financial transaction.

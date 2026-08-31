@@ -216,3 +216,7 @@
 - دسته‌های `gold`/`coin` فیزیکی ≠ Metals پلتفرمی؛ انتقال از Metals با delivery باید دو فیچر را atomic لینک کند (یا دو op با related ids)
 - `exchangeRateToBase` اجباری روی تراکنش
 - rebuild از `pa_transactions`؛ snapshot ارزش روز از قیمت/ارزش‌گذاری دستی
+
+## ساده نگه دارید
+
+فقط: Asset · Acquisition · Disposal · Valuation · Document. نه ERP.

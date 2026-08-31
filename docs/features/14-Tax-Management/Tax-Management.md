@@ -233,3 +233,5 @@ SoT بدهی/رویداد مالیاتی = Tax feature. Investment فقط refere
 - `sourceOperationId` روی `tax_events`
 - با `reverseOperation`: `voidTaxEvent` یا `reverseTaxEvent` (immutable audit)
 - گزارش سال: `WHERE status = active` (voided حذف)
+
+مدل: TaxableEvent · Rule · Basis · Rate · Amount · Status · Period · Evidence. MVP ساده؛ Engine قابل گسترش.

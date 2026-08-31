@@ -76,3 +76,5 @@
 - `Storage-Abstraction.md`
 - `Investment-Three-Layers.md`
 - `fixtures/README.md` — Golden fixtures
+- `Data-Model-Relationship-Matrix.md`
+- `SPEC-FREEZE.md`

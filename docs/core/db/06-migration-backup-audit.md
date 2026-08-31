@@ -265,3 +265,10 @@ Support/migration/license recovery همگی روی همین فرمت سوار م
 | `errorMessage?` | |
 
 زنجیره نمونه: `001_initial` → `002_add_fee_breakdown` → `003_split_cash_position` → …
+
+## دو نوع خروجی
+
+| نوع | |
+|-----|--|
+| **Native Backup** `.personalfi` | restore دقیق |
+| **Human-readable export** | CSV/JSON: accounts, transactions, holdings, loans, journal, docs metadata — بدون وابستگی به اپ |

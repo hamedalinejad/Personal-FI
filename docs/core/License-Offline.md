@@ -58,3 +58,8 @@ User Financial DB  ≠  License State
 
 **ممنوع:** `licenseId` روی journal line یا financial transaction.  
 `License Layer → Application Access → Financial DB` — داده مالی به لایسنس وابسته نمی‌شود.
+
+## انقضا
+
+`license expired` → حداکثر Feature disable / **Read-only**.  
+**ممنوع:** غیرقابل‌خواندن یا نابود کردن financial DB. Export/Backup همیشه ممکن.

@@ -119,3 +119,7 @@
 - بدون ارسال داده مالی به سرور
 - License بیرون از DB مالی (مرز جدا)
 - failed attempts / lockout در تنظیمات محلی
+
+## v1 کافی است
+
+Local PIN · biometric اختیاری · encrypted backup · auto-lock · audit. نه OAuth/SSO/microservices.

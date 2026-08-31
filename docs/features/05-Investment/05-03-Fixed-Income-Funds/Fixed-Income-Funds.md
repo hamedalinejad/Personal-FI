@@ -514,3 +514,15 @@ Brokerage Cash Ledger = تنها منبع مانده نقد کارگزاری
 - FIF domain فقط units/NAV/tx؛ حرکت پول ETF از همان مسیر brokerage cash (+ journal) که سهام استفاده می‌کند
 
 issuance_redemption همچنان از `acc_transactions` / حساب بانکی — جدا از مسیر ETF.
+
+---
+
+## Distribution / Reinvestment
+
+| نوع | units | cash | cost basis |
+|-----|-------|------|------------|
+| Cash dividend | بدون تغییر اجباری | + به حساب | unchanged |
+| Reinvested dividend | ↑ units جدید | معمولاً ۰ خالص | **دو leg:** income + acquisition (یک operationId) |
+| Unit bonus | ↑ | ۰ | total cost same → avg ↓ |
+
+**NAV ≠ subscription ≠ redemption** حفظ می‌شود.

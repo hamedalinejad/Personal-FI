@@ -183,3 +183,5 @@ Income UI
 **ممنوع:** گزارش Expense/Income کلی فقط از جدول domain بدون journal، یا جمع domain + journal با هم.
 
 > **Immutable:** «ویرایش» مبلغ/کارمزد ممنوع؛ فقط `correctIncome` / reverse. ویرایش metadata غیرمالی مجاز. `Financial-Invariants` §14.
+
+Income = economic classification (`fin_accounts` income)؛ منبع نقد = bank account جدا — Accounting Core هر دو leg را می‌نویسد.
