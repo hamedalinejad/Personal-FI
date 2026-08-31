@@ -14,13 +14,16 @@ Dr بانک ملت / Cr حقوق   ← حساب واقعی
 ## مدل هدف (کوچک)
 
 ```text
-fin_accounts          chart of accounts (ساده)
-fin_operations        همان atomic op فعلی
-fin_journal_entries   header هر سند (اختیاری یک ردیف per op یا همان operation)
-fin_journal_lines     خطوط بدهکار/بستانکار با accountId
+fin_accounts          حساب واقعی (chart of accounts)
+fin_operations        عملیات کاربر (Command atomic)
+fin_journal_entries   سند حسابداری (header) — 1 per operation معمول
+fin_journal_lines     خطوط Dr/Cr با accountId
 ```
 
-v1 می‌تواند `fin_journal_entries` فعلی را به‌عنوان **خط** نگه دارد و فیلد `accountId` اضافه کند؛ یا rename مفهومی به lines. مهم: **هر خط به یک fin_accounts.id وصل است.**
+**Canonical — بدون مدل موازی:**  
+`fin_journal_entries` ≠ خط.  
+`fin_journal_lines` ≠ سند.  
+هر خط **باید** `accountId → fin_accounts` داشته باشد.
 
 ### `fin_accounts`
 
@@ -38,7 +41,20 @@ v1 می‌تواند `fin_journal_entries` فعلی را به‌عنوان **خ�
 
 **Seed:** هنگام ساخت حساب بانکی / دسته هزینه / وام، سیستم **خودکار** `fin_accounts` می‌سازد. کاربر عادی فقط «بانک ملت» و «خوراک» را می‌بیند — نه ERP.
 
-### `fin_journal_lines` (یا همان entries با accountId)
+### `fin_journal_entries` (سند)
+
+| فیلد | نقش |
+|------|-----|
+| `id` | UUID سند |
+| `operationId` | FK → fin_operations |
+| `businessDate` | |
+| `memo` | |
+| `isVoided` | |
+| `createdAt` | |
+
+معمولاً **یک entry per operation**؛ reversal = operation + entry جدید.
+
+### `fin_journal_lines` (خطوط)
 
 | فیلد | نقش |
 |------|-----|

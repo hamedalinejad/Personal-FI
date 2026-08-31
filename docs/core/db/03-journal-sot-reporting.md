@@ -4,13 +4,20 @@
 
 # 03 journal sot reporting
 
-## دفتر روزنامه یکپارچه — `fin_journal_entries`
+## دفتر روزنامه یکپارچه — `fin_journal_entries` + `fin_journal_lines`
 
 ### مشکل
 جدول‌های `inc_*`, `exp_*`, `ln_*`, `inv_*`, `pa_*` و `acc_transactions` لاگ‌های دامنه‌ای جدا هستند. `acc_transactions` فقط **Cash/Bank ledger** است، نه Journal عمومی. گزارش‌ها و Reconciliation اگر فقط یکی را ببینند ناقص می‌مانند.
 
 ### قرارداد
-هر `runAtomicFinancialOperation` **اجباری** است حداقل یک (معمولاً چند) ردیف در `fin_journal_entries` بنویسد — علاوه بر جداول دامنه فیچر.
+هر `runAtomicFinancialOperation` **اجباری** است:
+1. یک `fin_journal_entries` (سند/header) برای operation
+2. حداقل دو `fin_journal_lines` متوازن (Dr/Cr) با `accountId`
+
+علاوه بر جداول دامنه فیچر.
+
+**Canonical:** entry = سند · line = مبلغ و حساب · نه برعکس.
+
 
 | فیلد | نوع | نقش |
 |------|-----|------|
@@ -36,7 +43,7 @@
 **قانون اجباری برای همه Reports / Dashboard / Net Worth cashflow:**
 
 ```text
-SoT گزارش میان‌فیچری = journal lines (`accountId` + amountInBase)؛ گروه‌بندی اختیاری با accountClass مشتق
+SoT گزارش میان‌فیچری = **fin_journal_lines** (`accountId` + amountInBase)؛ entry فقط گروه‌بندی سند؛ accountClass اختیاری مشتق
 ```
 
 - `exp_transactions` / `inc_transactions` / domain ledgers → **UI detail و rebuild دامنه**، نه جمع دوباره در گزارش کلی
@@ -52,7 +59,7 @@ SoT گزارش میان‌فیچری = journal lines (`accountId` + amountInBase
 |------|------|-------------------------|
 | **Domain Ledger** | `inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, … | quantity، units، cost basis، loan portions، P&L دامنه همان asset |
 | **Cash Ledger** | `acc_transactions` (+ cash brokerage/platform tables) | فقط جابه‌جایی پول بانکی/نقدی حساب |
-| **Accounting Journal** | `fin_journal_entries` | گزارش میان‌فیچری، جریان وجوه یکپارچه، audit دو طرفه |
+| **Accounting Journal** | `fin_journal_entries` + `fin_journal_lines` | سند + خطوط؛ SoT مبلغ = lines |
 | **Snapshot** | `currentBalance`, holding qty، `cashBalance`، … | **فقط Projection** — مشتق از Domain/Cash ledger؛ هرگز SoT گزارش |
 
 **قانون طلایی گزارش:** هر رویداد اقتصادی **یک‌بار** از Journal (یا از Domain برای متریک تخصصی) شمرده می‌شود — نه Journal+Domain+acc با هم در یک مجموع.
@@ -79,7 +86,7 @@ Cr cash             amountInBase = fee
 
 ### قوانین
 1. جداول فیچر = جزئیات دامنه (units، NAV، portions، …).
-2. `fin_journal_entries` = SoT گزارش میان‌فیچری و Net movement یکپارچه.
+2. `fin_journal_lines` = SoT مبلغ گزارش میان‌فیچری؛ `fin_journal_entries` = header سند.
 3. `acc_transactions` = Cash/Bank ledger؛ فقط وقتی پول **حساب بانکی** جابه‌جا می‌شود.
 4. Snapshot = Projection؛ rebuild از Domain/Cash ledger.
 5. بدون journal متوازن، atomic op fail.
@@ -87,7 +94,7 @@ Cr cash             amountInBase = fee
 
 ```text
 Domain row(s)
- + fin_journal_entries (متوازن، الزامی)
+ + fin_journal_entries (header) + fin_journal_lines (متوازن، الزامی)
  + acc_transactions (فقط bank cash)
  + snapshots (projection)
 → COMMIT → persist
@@ -104,7 +111,7 @@ Domain row(s)
 | Net Worth | Portfolio API: assets از holdings×price + bank cash − loans؛ **نه** جمع خام journal+domain |
 | Expense/Income کاربر | `exp_*` / `inc_*` (isVoided=false) |
 | Tax paid | `tax_*` + acc tax types |
-| Cross-feature cashflow report | `fin_journal_entries` با فیلتر accountClass |
+| Cross-feature cashflow report | `fin_journal_lines` join accounts (+ filter type/class) |
 
 ---
 
@@ -114,7 +121,7 @@ Domain row(s)
 
 ```text
 1. Domain feature rows (SoT جزئیات: qty, loan portion, …)
-2. fin_journal_entries متوازن (SoT میان‌فیچری)
+2. fin_journal_entries + lines متوازن (SoT میان‌فیچری = lines)
 3. acc_transactions فقط اگر bank cash جابه‌جا شود (SoT cash بانکی)
 4. Snapshots = تابع خالص از (1) یا (3) — همان عدد محاسبه‌شده یک‌بار
 ```
@@ -164,7 +171,7 @@ Dr expense/fee  feeAmount
 |------|-----|----------|---------------------|
 | Domain ledger (`inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, …) | **SoT جزئیات دامنه** | فقط append + void/reversal | atomic op |
 | Cash ledger (`acc_transactions`) | **SoT پول بانکی** | همان | فقط وقتی bank cash جابه‌جا شود |
-| Journal (`fin_journal_entries`) | **SoT میان‌فیچری / audit دوطرفه** | append + void | هر atomic op |
+| Journal (`fin_journal_entries` + `fin_journal_lines`) | **SoT میان‌فیچری / audit** | append + void | هر atomic op |
 | Snapshot (holding qty, currentBalance, remainingBalance, …) | **Projection** | بله | **فقط** از خروجی یک محاسبه از ledger در همان op یا rebuild — نه «حقیقت موازی» |
 | port_snapshots | cache تاریخی UI | بله | derived |
 

@@ -6,9 +6,10 @@
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
 | `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
-| `fin_accounts` | Core Accounting | **دفتر حساب‌ها (chart ساده)** — asset/liability/equity/income/expense |
-| `fin_journal_entries` / `fin_journal_lines` | Core Accounting | خطوط journal با **accountId** اجباری |
-| `fin_operations` | Core Accounting | header هر atomic op (operationId, commandHash, status, engineVersions) — **Must** |
+| `fin_accounts` | Core Accounting | **Chart of accounts** — حساب واقعی (بانک ملت، هزینه خوراک، …) — **Must** |
+| `fin_operations` | Core Accounting | عملیات کاربر (BUY/PAY/TRANSFER/…) — operationId, commandHash, status — **Must** |
+| `fin_journal_entries` | Core Accounting | **سند حسابداری** (header) — معمولاً ۱ به ازای هر operation — **Must** |
+| `fin_journal_lines` | Core Accounting | **خطوط بدهکار/بستانکار** با accountId اجباری — **Must** |
 | `fin_reconcile_runs` | Core Accounting | خروجی اجرای reconcile — **Must** برای audit |
 | `ref_instruments` | Core | registry هویت دارایی (crypto/stock/fif/metal) — **Must** |
 | `ref_parties` | Core | طرف حساب / اشخاص (نه CRM) — **Must برای MVP وقتی Loan/Income شخص دارد** |

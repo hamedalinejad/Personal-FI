@@ -1,6 +1,7 @@
 # Pages & Information Architecture
 
 > **اصل محصول:** `20 Features ≠ 20 Navigation Items`  
+> **۹ صفحه اصلی کافی است** — حتی در آینده: Crypto/Stocks/Funds/Tax/Bills/Cheque **صفحه ناوبار جدا نمی‌شوند**؛ Feature/Domain + Tab/Sheet.  
 > Feature = مرز Domain · Page = مرز UX · Accounting Core = capability بدون صفحه `/accounting`
 
 ## ناوبری هدف (حداکثر ~۹)

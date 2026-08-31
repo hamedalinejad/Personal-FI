@@ -13,7 +13,7 @@ User/Command
   → runAtomicFinancialOperation(operationId)
        1. validate
        2. Domain ledger rows (feature tables)  [SoT دامنه]
-       3. fin_journal_entries (double-entry)   [SoT حسابداری]
+       3. fin_journal_entries + fin_journal_lines (double-entry)   [SoT حسابداری]
        4. acc_transactions (if bank cash)      [SoT نقد بانکی]
        5. derive snapshots from (2)/(4) only
        6. COMMIT sql.js
@@ -74,18 +74,23 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   // durability counters NOT in SQLite — see db_meta
   createdAt
 
-fin_journal_lines (یا fin_journal_entries به‌عنوان خط):
-  id, operationId, lineNo
-  accountId                 // **FK fin_accounts — اجباری برای ops جدید**
+fin_journal_entries (سند — header):
+  id, operationId, businessDate, memo, isVoided, createdAt
+
+fin_journal_lines (خطوط Dr/Cr):
+  id, journalEntryId, operationId, lineNo
+  accountId                 // **FK fin_accounts — اجباری**
   direction (debit|credit)
   amount, currency, exchangeRateToBase, amountInBase
   lineKind                  // WHY
-  accountClass              // کش/مشتق برای فیلتر — نه جایگزین accountId
+  accountClass?             // کش/مشتق — نه جایگزین accountId
   relatedFeature?, relatedId?
-  businessDate, memo
-  isVoided, reversesEntryId?
+  memo?
+  isVoided, reversesLineId?
   createdAt
 ```
+
+**ممنوع:** استفاده از `fin_journal_entries` به‌عنوان ردیف مبلغ؛ مبلغ فقط روی **lines**.
 
 Σ amountInBase debit = credit per operationId **در همان baseCurrencyAtOperation**.
 

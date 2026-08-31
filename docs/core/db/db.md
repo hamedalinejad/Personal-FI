@@ -17,7 +17,11 @@
 
 ## Journal — فقط دو فیلد طبقه‌بندی (نه سه)
 
-`fin_journal_entries` **ندارد** `entryKind`.
+مدل canonical چهار جدول:
+`fin_accounts` · `fin_operations` · `fin_journal_entries` (سند) · `fin_journal_lines` (خطوط).
+
+`fin_journal_entries` **ندارد** `entryKind` و **ردیف مبلغ نیست**.
+
 
 | فیلد | نقش |
 |------|-----|
