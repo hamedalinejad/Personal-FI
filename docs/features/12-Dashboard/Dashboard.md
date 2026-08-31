@@ -212,3 +212,13 @@
 شمارنده‌های غیرمالی (مثل `unreadCount`) می‌توانند `number` (integer count) باشند.
 
 منبع اعداد گزارش کلی: journal / projections مشتق — **نه** SUM دوباره از exp+journal.
+
+---
+
+## Dashboard محل محاسبات نیست
+
+```text
+Dashboard → Application Query → Portfolio/Report Engine → Ledger
+```
+
+**ممنوع:** SQL مستقیم از UI به چند جدول برای جمع Net Worth.

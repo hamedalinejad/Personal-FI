@@ -22,7 +22,7 @@
 
 ### Foundation (قفل قبل از Featureهای دامنه)
 
-Accounting Core · Decimal/Money · Currency · Financial Operation · Journal · Reversal · Audit · Reconciliation · Opening Balance · Party · Document Link
+Accounting Core · fin_accounts · Journal · Money/Decimal · Currency · Financial Operation · Reversal · Audit · Reconciliation · Opening Balance · Instrument Registry · Data Dictionary · Migration/Preservation · Iran Core · Party · Document Link
 
 **Document Future ≠ Implement Future** — قرارداد می‌تواند از الان باشد؛ کد Feature بعد از Foundation.
 

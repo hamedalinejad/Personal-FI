@@ -173,3 +173,15 @@ availableBalance = currentBalance − Σ pending payable cheques
 
 `bounced → cleared` و `cancelled → *` **ممنوع** (Domain reject).  
 Enforce در `changeChequeStatus` + تست fixture.
+
+---
+
+## State Machine رسمی
+
+```text
+pending → cleared | bounced | cancelled
+cleared → bounced   (در صورت برگشت پس از وصول — اگر policy اجازه دهد)
+سایر transitionها ممنوع
+```
+
+Reconcile state matrix همین را enforce می‌کند. Feature پیچیده لازم نیست.

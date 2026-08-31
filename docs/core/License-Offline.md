@@ -55,3 +55,6 @@ User Financial DB  ≠  License State
 - License در `license.json` / License Store جدا (نه جدول داخل SQLite مالی)
 - subscription / activation / device limit / expiry / entitlement **آلوده به schema حسابداری نمی‌شوند**
 - اعتبارسنجی license برای خواندن/نوشتن history مالی **نیاز به اینترنت ندارد** (فایل امضاشده + public key)
+
+**ممنوع:** `licenseId` روی journal line یا financial transaction.  
+`License Layer → Application Access → Financial DB` — داده مالی به لایسنس وابسته نمی‌شود.

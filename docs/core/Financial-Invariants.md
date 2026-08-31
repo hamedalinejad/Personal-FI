@@ -286,3 +286,5 @@ taxable gain (طبق قانون) → Tax Event مستقل (tax_events)
 **ممنوع:** گم شدن مالیات داخل فیلد price یا یکی‌گرفتن feeTax با کل tax liability بدون `tax_events`.
 
 Feature فقط mapping؛ SoT مالیات = tax domain.
+
+**قفل:** `reconcile ≠ repair` — repair فقط پس از تأیید کاربر + audit.

@@ -15,3 +15,5 @@
 | Import | normalize pipeline |
 
 Featureها adapter می‌دهند؛ engine را کپی نمی‌کنند.
+
+**20 Feature ≠ 20 Engine.** UI صفحات کم؛ engines محدود در Core.

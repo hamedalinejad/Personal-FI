@@ -65,3 +65,7 @@
 - `Core-Engines.md` — لیست engineهای مرکزی
 - `Source-of-Truth-Matrix.md` — یک سؤال → یک منبع
 - `Loan-Component-Classification.md`
+- `Data-Preservation-Contract.md`
+- `Data-Dictionary.md`
+- `Unit-Policy.md`
+- `iran/README.md` — Iran Core
