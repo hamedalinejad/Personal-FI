@@ -44,3 +44,7 @@ Price Fetching opt-in است.
 **ممنوع:** null/0 به‌جای قیمت وقتی API نیست → پرتفوی صفر/شکست.
 
 **الزام:** همیشه `lastKnownPrice` از `price_history` / cache؛ UI: «قیمت به‌روز نیست» / isStale — محاسبه متوقف **نشود**.
+
+## Persist پس از Operation
+
+بعد از SQL COMMIT موفق: `persist()` async (IDB/OPFS debounced) طبق storage state machine — UI «ثبت شد» فقط پس از durability policy پروژه.

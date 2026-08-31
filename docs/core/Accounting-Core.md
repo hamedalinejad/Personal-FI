@@ -202,3 +202,16 @@ Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = speci
 کاربر آن را در **Transactions، Accounts، Reports** تجربه می‌کند — نه مسیر `/accounting`.
 
 **تأکید:** `accountClass` فقط classification است؛ Journal خط همیشه **`accountId` → fin_accounts** (مثلاً ۱۰۰۱ بانک ملت).
+
+---
+
+## Journal soft lifecycle
+
+| Field | |
+|-------|--|
+| `isVoided` / void via reversal | حذف سخت DELETE ممنوع |
+| `reconciledAt` | nullable — پس از reconcile موفق |
+| `idempotencyKey` / operationId | روی fin_operations |
+
+لایه‌ها: `fin_operations` → `fin_journal_entries` → `fin_journal_lines` → domain `*_transactions` فقط **ارجاع operationId** · snapshots مشتق.
+**ممنوع:** آپدیت مستقیم snapshot بدون journal.

@@ -40,3 +40,5 @@ Toman = display / input convention (×10)
 ```
 
 Ledger، Loan، Tax، Stock، Report همگی **IRR**؛ UI می‌تواند تومان نشان دهد. دو currency موازی IRR+TOM **ممنوع**.
+
+تاریخ: **ISO Gregorian/UTC در DB** · جلالی فقط نمایش (`jalali_display` helper).

@@ -103,3 +103,11 @@ feature/
 
 **ممنوع:** Feature مستقیم SQL جدول Feature دیگر را بخواند/بنویسد.  
 مجاز: Feature → Core API / Accounting Core / public API فیچر دیگر.
+
+## قانون طلایی ماژول
+
+```ts
+// هر فیچر فقط Public API export می‌کند
+export const AccountsAPI = { createAccount, list, ... }
+// import از فیچر دیگر ❌ — فقط core و public API مجاز
+```

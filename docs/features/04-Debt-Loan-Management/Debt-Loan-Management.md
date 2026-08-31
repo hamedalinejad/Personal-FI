@@ -1500,3 +1500,14 @@ Loan Engine این‌ها را enforce می‌کند نه UI.
 
 > **قسط آخر:** `Implementation-Pitfalls.md` §ب — principalPortion = remainingBalance.
 > **قرض‌الحسنه disbursement:** §ج — Dr cash net + Dr fee + Cr full principal.
+
+## جداول اجباری (نه همه داخل loans)
+
+| Table | |
+|-------|--|
+| `ln_loan_fees` | fee_type: kar_mozd \| bime \| tax \| other + amount + is_prepaid + feeTreatment |
+| schedule / installments | due_date, principal_part, interest_part, fee_part, penalty, status — **جدا از payment event** |
+
+قسط حسابداری: اصل + سود + کارمزد **جدا** — کارمزد داخل سود قاطی نشود.
+
+`loan_type` ایرانی (qarz, morabehe, …) و `interest_method`: simple \| diminishing \| fixed_fee — نه compound غربی به‌عنوان پیش‌فرض ایران.

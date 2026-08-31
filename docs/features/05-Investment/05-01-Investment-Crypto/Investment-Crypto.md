@@ -1348,3 +1348,7 @@ executeExternalSale({
 `fin_accounts` با `systemRole=exchange_cash` = projection حسابداری (linked) — **نه** balance موازی که جدا update شود.
 
 Binance 1000 USDT settlement → یک حقیقت در crypto cash ledger + journal lines هم‌operation.
+
+## Lots
+برای FIFO: `lotId` روی هر خرید. network, txHash, wallet address برای on-chain.
+WAC می‌تواند بدون lot کار کند؛ مدل data lot را برای policy FIFO نگه می‌دارد.

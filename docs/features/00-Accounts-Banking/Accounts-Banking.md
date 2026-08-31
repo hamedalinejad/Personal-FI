@@ -141,3 +141,12 @@ Cr cash (A or B)             fee
 - Income/Expense/Loan/Investment/Cheque به cash وصل می‌شوند از طریق operation + links — نه با تبدیل `acc_transactions` به جدول همه‌چیز
 
 **Uniqueness:** روی `id` / IBAN / accountNumber / externalId — **نه** name (دو «بانک ملت» مجاز).
+
+## فیلدهای ایران (Must برای banking)
+
+| Field | |
+|-------|--|
+| `shaba` / IBAN | |
+| `cardNumberHash` | نه شماره خام |
+| `bankNameIr` | ملت، سپه، … |
+| `accountType` | qarz \| sep \| modat \| jame \| other |

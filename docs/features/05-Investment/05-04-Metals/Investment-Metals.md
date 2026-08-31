@@ -369,3 +369,5 @@ one operationId:
 ```
 
 **ممنوع:** کم کردن طلا پلتفرم بدون ثبت دارایی فیزیکی در همان op → Net Worth اشتباه.
+
+`gold_type`: seke_emami \| seke_bahar \| 18ayar \| abshode \| … · weight (canonical mg) · labor_fee · is_physical.

@@ -544,3 +544,5 @@ priceLimit: ±pct از قیمت مرجع روز — validate اختیاری warn
 - CA از `Corporate-Action-Engine` — نه فقط update snapshot
 
 `symbol` = label؛ تغییر نماد ≠ holding جدید.
+
+**fee breakdown اجباری:** کارگزاری + بورس + مالیات فروش (نیم‌درصد) + other — نه یک fee کلی.

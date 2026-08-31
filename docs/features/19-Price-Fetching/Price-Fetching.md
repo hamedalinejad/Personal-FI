@@ -806,3 +806,5 @@ getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) 
 **Latest ≠ Historical.** Transaction correctness مستقل از Price API است (secondary).
 
 > Valuation: همیشه lastKnownPrice — `Implementation-Pitfalls.md` §د.
+
+**پیش‌فرض:** auto price fetch **خاموش** (`is_enabled` per source در settings/local). کاربر صریح تیک بزند.

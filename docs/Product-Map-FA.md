@@ -130,3 +130,5 @@ Loan bullet/variable پیشرفته، balloon/step_up، FIFO cost basis، Cloud/
 | ۱۹ | امنیت و حریم خصوصی | `18-Security-Privacy/` |
 | ۲۰ | دریافت قیمت‌ها | `19-Price-Fetching/` (شامل ۴ زیرفیچر) |
 | — | دسته‌بندی‌های مشترک | `99-Common-Categories/` |
+
+> **ساده‌سازی v1:** Tax = جدول `tax_events` + taxable metadata روی trades؛ قوانین پیچیده ۱۴۰۴ را کامل پیاده نکن. FX = جدول `fx_rates` (from,to,rate,date,source) بدون گراف پیچیده. Cheque و Loan فیچر جدا می‌مانند اما هر دو بدهی‌اند و از Accounting Core مشترک استفاده می‌کنند.
