@@ -1511,3 +1511,27 @@ Loan Engine این‌ها را enforce می‌کند نه UI.
 قسط حسابداری: اصل + سود + کارمزد **جدا** — کارمزد داخل سود قاطی نشود.
 
 `loan_type` ایرانی (qarz, morabehe, …) و `interest_method`: simple \| diminishing \| fixed_fee — نه compound غربی به‌عنوان پیش‌فرض ایران.
+
+---
+
+## Snapshotهای وام = derived فقط
+
+| Field | نقش |
+|-------|-----|
+| `ln_transactions` | **SoT** |
+| `remainingBalance` | derived cache |
+| `totalPaidPrincipal` | derived cache |
+| `totalPaidInterest` | derived cache |
+
+**ممنوع:** گزارش/API authoritative از snapshot بدون rebuild از ledger.
+
+## Calendar در Schedule (قفل مدل)
+
+نه فقط توضیح فرمول — روی schedule entity:
+
+- `calendarSystem` (jalali/gregorian)
+- `businessDayAdjustment` (none / following / preceding / modified)
+- dueDate از engine با ماه ۳۰/۳۱، اسفند، کبیسه
+- IranLoanConventions برای تعطیل/روز کاری بانکی
+
+`+1 month` از businessDate قرارداد است نه UTC wall-clock ساده.

@@ -26,3 +26,10 @@ Feature فقط **adapter** می‌دهد (قواعد ratio، cash leg، instrume
 Rebuild/reconcile **باید** همه actionهای ledger را بشناسد — نه فقط buy/sell.
 
 جداول: metadata در `inv_*_corporate_actions` یا معادل؛ quantity در domain tx.
+
+## Core vs Adapter
+
+**Core Engine** = عمومی (quantity/cost transform hooks).  
+**Stocks adapter** = معنی `bonus_share`, `rights_issue`, … برای بازار ایران.
+
+Core نباید پر از منطق فقط-بورس شود.

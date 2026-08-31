@@ -25,3 +25,5 @@ Crypto/Stocks/FIF/Metals فقط attributes تخصصی اضافه می‌کنند
 | displaySymbol / symbol | label |
 | providerSymbol | mapping provider |
 | providerInstrumentId | id سمت provider |
+
+**ممنوع:** دو SoT هویت (`ref_instruments` + `inv_crypto_assets` موازی).

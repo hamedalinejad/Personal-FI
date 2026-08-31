@@ -1382,3 +1382,18 @@ totalFeesPaidBase = lifetime accumulated fee metric
 - هنگام فروش **کاهش نمی‌یابد**
 - فقط آمار تاریخی / گزارش fee
 - Cost basis از engine و totalInvested/lots می‌آید — **نه** از totalFeesPaidBase
+
+## UI ساده vs مدل غنی
+
+**ساده:** symbol نمایش، qty، ارزش، سود، [خرید][فروش][انتقال].  
+**Advanced Details:** network, contract, txHash, fee treatment, cost basis, economicKind.
+
+## یک Asset Registry
+
+`ref_instruments` = **تنها** هویت.  
+Metadata کریپتو (`chainId`, `contractAddress`, `decimals`, `assetKey`) روی instrument/metadata — **نه** registry موازی `inv_crypto_assets` به‌عنوان SoT دوم.
+
+## Currency ≠ Asset
+
+`IRR` = currency. `USDT-TRC20` = asset.  
+نقش USDT در گزارش با **economicKind** روی position کنترل می‌شود (cash_like vs investment).
