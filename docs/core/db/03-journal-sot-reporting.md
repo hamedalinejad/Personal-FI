@@ -1,3 +1,5 @@
+> ماتریس کوتاه SoT: `docs/core/Source-of-Truth-Matrix.md`
+
 ## ارجاع
 
 مدل کامل حساب‌ها: `docs/core/Accounting-Core.md`.

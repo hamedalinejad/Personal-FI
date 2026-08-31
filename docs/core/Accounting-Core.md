@@ -1,3 +1,22 @@
+# Accounting Core — قلب واقعی سیستم (نه ERP)
+
+## اصل معماری
+
+Featureها **زیرسیستم مالی موازی** نیستند. هر Feature فقط Domain تخصصی + adapter است؛ حقیقت مالی میان‌فیچری از **Accounting Core** می‌گذرد.
+
+```text
+        Feature (Crypto / Stocks / Loan / Expense / …)
+                         ↓
+              Financial Operation (atomic)
+                         ↓
+                   Accounting Core
+              fin_accounts · journal entry/lines
+                         ↓
+            Domain Projection / Snapshot (cache)
+```
+
+**ممنوع:** Crypto/Stocks/Loan/Expense هر کدام «سیستم مالی کامل» جدا بدون journal متوازن و بدون `operationId` مشترک.
+
 # Accounting Core — ساده ولی کامل (نه ERP)
 
 ## چرا فقط `accountClass` کافی نیست؟
