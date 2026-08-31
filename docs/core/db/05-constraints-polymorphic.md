@@ -161,3 +161,5 @@ Holdingها و `price_history` فقط به `ref_instruments.id` (یا کلید �
 ---
 
 جزئیات: `docs/core/Instrument-Identity.md`
+
+Polymorphic برای notes/tags/generic. **روابط حساس** (Loan→Party, Tx→Instrument, Line→Account): FK واقعی ترجیح.

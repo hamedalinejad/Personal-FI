@@ -16,3 +16,5 @@ Identity: `instrumentId`. symbol change ≠ holding جدید.
 همه از `Corporate-Action-Engine` + `operationId`. Rebuild ledger همه typeهای پشتیبانی‌شده را می‌شناسد.
 
 Fields: TradeDate, SettlementDate, MarketDate, Session, Broker, ISIN, FirmCode, Lot, Tick, Fees breakdown — در Iran-Market-Rules + Stocks doc.
+
+**Immutable:** CA تراکنش‌های قبلی را **rewrite نمی‌کند**. History ثابت + CA event + holding state جدید.

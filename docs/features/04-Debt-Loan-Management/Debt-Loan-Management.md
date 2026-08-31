@@ -1483,3 +1483,17 @@ Loan Contract → Schedule (برنامه) → Payment Event (واقعیت) → A
 
 **ممنوع:** فرض اینکه وجود ردیف schedule = پول جابه‌جا شده.  
 `remainingBalance` فقط از **payment events / ln_transactions** rebuild می‌شود نه از schedule alone.
+
+---
+
+## Fee treatment / Interest / Allocation / Early payment
+
+| Concept | |
+|---------|--|
+| `feeTreatment` | expense now / capitalize / deduct disbursement / add to due / withhold |
+| Rate | nominal vs periodic; day count ACT/365, ACT/360, 30/360; stub periods — نه فقط annual/12 |
+| `paymentAllocationPolicy` | ترتیب e.g. Penalty→Fee→Interest→Principal؛ خروجی principalPaid/interestPaid/feePaid/penaltyPaid |
+| `earlyPaymentPolicy` | reduceTerm \| reduceInstallment \| recalculateInterest \| noRecalculation |
+| Party | `partyId` canonical؛ `contactNameSnapshot` برای تاریخچه — نه contact موازی مستقل |
+
+Loan Engine این‌ها را enforce می‌کند نه UI.

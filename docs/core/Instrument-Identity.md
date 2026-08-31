@@ -17,3 +17,11 @@ ref_instruments
 | `inv_crypto_assets` موازی | **ممنوع** |
 
 Crypto/Stocks/FIF/Metals فقط attributes تخصصی اضافه می‌کنند.
+
+| Term | معنی |
+|------|------|
+| instrumentId | **تنها identity** |
+| assetKey | convenience key کریپتو — نه identity دوم |
+| displaySymbol / symbol | label |
+| providerSymbol | mapping provider |
+| providerInstrumentId | id سمت provider |

@@ -235,3 +235,5 @@ SoT بدهی/رویداد مالیاتی = Tax feature. Investment فقط refere
 - گزارش سال: `WHERE status = active` (voided حذف)
 
 مدل: TaxableEvent · Rule · Basis · Rate · Amount · Status · Period · Evidence. MVP ساده؛ Engine قابل گسترش.
+
+Rules versioned: `ruleId`, effectiveFrom/To, jurisdiction, version — تراکنش قدیم با قانون جدید recalculate silent نمی‌شود.

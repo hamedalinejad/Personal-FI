@@ -19,3 +19,9 @@ All Financial Features
 
 Currency/Price → Valuation (read).  
 **ممنوع:** import مستقیم repository داخلی Feature دیگر.
+
+```text
+COMMON → CORE → DOMAIN FEATURES → UI
+```
+Feature ❌ depends on Dashboard/Reports UI.
+Cross-feature write فقط via Canonical Operation.

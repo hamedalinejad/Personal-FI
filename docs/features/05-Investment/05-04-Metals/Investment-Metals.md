@@ -357,3 +357,15 @@ fineWeightMg = quantityMg × purityRatio
 
 **ذخیره همیشه `quantityMg` (میلی‌گرم).**  
 UI: mg / g / kg فقط تبدیل نمایش (`0.5g = 500mg`). اختلاف واحد در DB ممنوع.
+
+## Physical Delivery = Cross-Domain Atomic Operation
+
+```text
+one operationId:
+  inv_metals (platform) −qty
+  + physical_asset +qty
+  + delivery fee legs
+  + journal
+```
+
+**ممنوع:** کم کردن طلا پلتفرم بدون ثبت دارایی فیزیکی در همان op → Net Worth اشتباه.

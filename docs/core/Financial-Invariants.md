@@ -290,3 +290,22 @@ Feature فقط mapping؛ SoT مالیات = tax domain.
 **قفل:** `reconcile ≠ repair` — repair فقط پس از تأیید کاربر + audit.
 
 Field-level kinds: `Field-Level-SoT.md` (RAW/DERIVED/SNAPSHOT/EXTERNAL_REPORTED).
+
+---
+
+## Offline levels
+
+| Level | |
+|-------|--|
+| 1 Core Offline | Accounts, Tx, Loans, Investments, Reports, Accounting بدون نت |
+| 2 Optional Online | Price, FX fetch, update, license refresh |
+| 3 Recovery Offline | Backup, Restore, Export, Import بدون نت |
+
+## Sign convention
+
+Domain: `amount >= 0` + `direction` IN/OUT (یا debit/credit روی journal).  
+**ممنوع:** مخلوط signed amount و direction روی یک فیلد بدون قرارداد واحد.
+
+## Query
+
+Query **DB write ندارد**. UI → Feature API only.

@@ -23,3 +23,13 @@ UI (~9 pages) → Feature API (commands/queries)
   → Engines (FX, Cost, Rounding, Valuation, Calendar)
   → Storage API → SQLite WASM | Native Desktop | future cloud
 ```
+
+## اولویت قبل از Coding
+
+🔴 Cash SoT · Field dictionary · RAW/DERIVED/EXTERNAL · FX convention · Stock settlement · Loan fee/allocation/day-count · Crypto fee matrix · Physical delivery op · Polymorphic policy · Backup+docs · Multi-tab · Migration version · Instrument≠symbol  
+
+🟠 Tax rule version · Fund profiles · CA invariants · Price policy · License · Dependency/Ownership matrices  
+
+🟢 Cloud · Multi-user · AI · …
+
+**عمداً اضافه نمی‌کنیم v1:** event sourcing کامل، microservices، CQRS framework، multi-user RBAC، cloud backend.

@@ -526,3 +526,12 @@ issuance_redemption همچنان از `acc_transactions` / حساب بانکی �
 | Unit bonus | ↑ | ۰ | total cost same → avg ↓ |
 
 **NAV ≠ subscription ≠ redemption** حفظ می‌شود.
+
+## fundBehaviorProfile
+
+```text
+supportsCashDistribution, supportsReinvestment, usesNAV,
+usesRedemptionPrice, usesIssuePrice, accumulating?
+```
+
+رفتار محاسبه از profile — نه if/else پراکنده per fund instance.

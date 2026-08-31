@@ -139,3 +139,5 @@ Cr cash (A or B)             fee
 
 - Universal financial truth = **`fin_operations`** (+ journal)
 - Income/Expense/Loan/Investment/Cheque به cash وصل می‌شوند از طریق operation + links — نه با تبدیل `acc_transactions` به جدول همه‌چیز
+
+**Uniqueness:** روی `id` / IBAN / accountNumber / externalId — **نه** name (دو «بانک ملت» مجاز).

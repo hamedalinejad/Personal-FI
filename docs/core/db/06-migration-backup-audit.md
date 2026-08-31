@@ -272,3 +272,19 @@ Support/migration/license recovery همگی روی همین فرمت سوار م
 |-----|--|
 | **Native Backup** `.personalfi` | restore دقیق |
 | **Human-readable export** | CSV/JSON: accounts, transactions, holdings, loans, journal, docs metadata — بدون وابستگی به اپ |
+
+### Package با اسناد
+
+```text
+backup.personalfi/
+  manifest.json
+  database.sqlite
+  attachments/   # by documentId/blobId
+  checksums.json
+```
+
+Document: `documentId`, `blobId`, `checksum`, `mimeType`, `originalName`, **relativePath** — path مطلق Identity نیست.
+
+### Version lock
+
+`appVersion` + `schemaVersion` + migration chain. App جدید روی schema قدیمی **بدون** Backup→Migration→Integrity **فعال نمی‌شود**.
