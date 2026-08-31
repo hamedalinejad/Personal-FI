@@ -1338,3 +1338,13 @@ executeExternalSale({
 - CostBasis: realizedPL = proceedsInBase - soldCost - fees
 - Journal: Cr crypto asset cost; Dr external_clearing یا expense/income residual; **اگر** پول به حساب بانکی داخل app واریز شد → جدا operation deposit؛ وگرنه فقط clearing/equity memo
 - proceeds currency + FX قفل روی operation
+
+---
+
+## Cash: یک SoT
+
+`inv_crypto_cash` = **تنها** Domain SoT موجودی نقد صرافی/ولت.
+
+`fin_accounts` با `systemRole=exchange_cash` = projection حسابداری (linked) — **نه** balance موازی که جدا update شود.
+
+Binance 1000 USDT settlement → یک حقیقت در crypto cash ledger + journal lines هم‌operation.

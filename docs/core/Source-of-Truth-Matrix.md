@@ -35,3 +35,29 @@ Snapshot       →  optimization فقط
 | Loan Balance | ln_transactions | remainingBalance | ln_transactions |
 | Net Worth | ledgers + valuation | snapshot | all canonical |
 | Portfolio Value | holdings + prices + FX | snapshot | same |
+
+---
+
+## قانون: هر موجودی فقط یک Domain SoT
+
+**ممنوع:** دو جدول balance مستقل برای یک پول (مثلاً Binance $1000 هم در `inv_crypto_cash` و هم به‌عنوان balance مستقل در `fin_accounts` بدون اینکه journal projection باشد).
+
+| موجودی | Domain SoT (qty/balance) | Accounting projection |
+|--------|--------------------------|------------------------|
+| Bank Cash | `acc_transactions` | `fin_accounts` + journal lines |
+| Crypto Exchange/Wallet **Cash** | **`inv_crypto_cash` ledger/tx** | journal lines → linked `fin_accounts` (systemRole=exchange_cash) **derived** |
+| Crypto **Asset** qty | `inv_crypto_transactions` | journal asset accounts derived |
+| Brokerage Cash (سهام/ETF) | **یک** brokerage cash ledger | journal derived |
+| Stock qty | `inv_stocks_iran_transactions` | journal derived |
+| Fund units | `inv_fif_transactions` | journal derived |
+| Loan balance | `ln_transactions` | journal liability/receivable derived |
+
+```text
+Domain SoT  =  حقیقت موجودی
+fin_accounts / journal  =  نمای حسابداری همان حرکت (نه موجودی دوم)
+Snapshot  =  cache
+```
+
+اگر `inv_crypto_cash = 1000` و journal/fin نشان دهد 998 → **reconcile**؛ Domain cash ledger برنده برای qty؛ journal برای trial balance — drift = integrity issue نه دو SoT موازی.
+
+`fin_accounts` برای exchange cash = **آینه حسابداری** با `linkedEntityType/Id` به crypto cash account — balance از domain rebuild می‌شود، نه write مستقل موازی.
