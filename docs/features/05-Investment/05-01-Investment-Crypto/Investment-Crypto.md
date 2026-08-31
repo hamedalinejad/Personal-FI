@@ -1352,3 +1352,33 @@ Binance 1000 USDT settlement → یک حقیقت در crypto cash ledger + journ
 ## Lots
 برای FIFO: `lotId` روی هر خرید. network, txHash, wallet address برای on-chain.
 WAC می‌تواند بدون lot کار کند؛ مدل data lot را برای policy FIFO نگه می‌دارد.
+
+---
+
+## USDT / stablecoin — `economicKind` روی Position (نه UI)
+
+نقش را **registry/position** تعیین می‌کند، نه صفحه:
+
+| economicKind | معنی | جدول |
+|--------------|------|------|
+| `cash` / `cash_like` | موجودی تسویه صرافی/ولت | `inv_crypto_cash` |
+| `asset` / `investment` | دارایی قابل معامله با cost basis واقعی | `inv_crypto_holdings` |
+
+```text
+خرید 10,000 USDT با IRR → economicKind=investment → cost از معامله
+موجودی USDT برای جفت‌کردن سفارش → economicKind=cash_like روی CashPosition
+```
+
+گزارش Net Worth / P&L / Cost Basis / Cash Flow بر اساس **economicKind** است نه صرفاً symbol=USDT.
+
+## totalFeesPaidBase
+
+```text
+totalFeesPaidBase = lifetime accumulated fee metric
+≠ current cost basis
+≠ remaining cost
+```
+
+- هنگام فروش **کاهش نمی‌یابد**
+- فقط آمار تاریخی / گزارش fee
+- Cost basis از engine و totalInvested/lots می‌آید — **نه** از totalFeesPaidBase

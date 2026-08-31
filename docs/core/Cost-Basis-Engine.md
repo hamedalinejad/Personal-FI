@@ -200,3 +200,9 @@ Cost Basis Engine  ←  Crypto / Stocks / FIF / Metals adapters
 
 Policy: `weighted_average` | `fifo` | `specific_lot`  
 v1 می‌تواند همه را WA کند؛ **مدل data** باید policy را نگه دارد نه hard-code ابدی یک روش.
+
+## Lifetime Fee Metric ≠ Cost Basis
+
+`totalFeesPaidBase` (و مشابه) فقط **metric انباشته** است.
+
+**ممنوع:** استفاده از آن برای remaining cost یا averageBuyPrice.
