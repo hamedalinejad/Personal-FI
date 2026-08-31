@@ -47,3 +47,14 @@
 
 ## Release مالی
 بدون CI `financial-fixtures` سبز (فهرست کامل در `core/db/db.md`) هیچ tag release مالی معتبر نیست.
+
+## نقاط ورود اجباری برای Developer
+
+| موضوع | مسیر |
+|--------|------|
+| Database | `docs/core/db/db.md` (+ زیرفایل‌ها) |
+| Types | `docs/core/types/types.md` |
+| Atomic ops | `docs/core/Canonical-Financial-Operation.md` |
+| API | `docs/API-Reference.md` + `Feature-API-Contract.md` |
+| Investment | `docs/features/05-Investment/README.md` |
+| Spec freeze | `docs/core/SPEC-FREEZE.md` |

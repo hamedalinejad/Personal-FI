@@ -1,6 +1,6 @@
-# ساختار دیتابیس پروژه (Core Level)
+# ساختار دیتابیس پروژه (Core Level) — `docs/core/db/db.md`
 
-این فایل **فهرست** است. جزئیات در زیرفایل‌های هم‌پوشه:
+**این فایل SoT ورودی دیتابیس است** (فهرست + قراردادهای کلیدی). جزئیات در زیرفایل‌ها.
 
 | فایل | محتوا |
 |------|--------|
@@ -11,35 +11,52 @@
 | [04-reconciliation-integrity.md](./04-reconciliation-integrity.md) | Reconcile، integrity pipeline |
 | [05-constraints-polymorphic.md](./05-constraints-polymorphic.md) | CHECK، FK، polymorphic، instruments |
 | [06-migration-backup-audit.md](./06-migration-backup-audit.md) | Migration، backup، audit، multi-tab |
-| [07-fixtures-release-gate.md](./07-fixtures-release-gate.md) | Fixtures، CI gate، checklist |
+| [07-fixtures-release-gate.md](./07-fixtures-release-gate.md) | Fixtures، CI gate |
 
-**SoT نام فایل قدیمی:** لینک‌های خارجی به `db.md` همچنان معتبرند؛ این فایل به زیرفایل‌ها ارجاع می‌دهد.
+مرتبط: `Canonical-Financial-Operation.md` · `Accounting-Core.md` · `Storage-Abstraction.md`
 
-## Journal — فقط دو فیلد طبقه‌بندی (نه سه)
+---
 
-مدل canonical چهار جدول:
-`fin_accounts` · `fin_operations` · `fin_journal_entries` (سند) · `fin_journal_lines` (خطوط).
+## معماری ذخیره‌سازی (خلاصه)
 
-`fin_journal_entries` **ندارد** `entryKind` و **ردیف مبلغ نیست**.
+```text
+Domain / Repository
+       ↓
+sql.js (SQLite in WASM, RAM)
+       ↓
+Write-to-temp-then-swap → IndexedDB (db_main / db_pending / db_backup)
+```
 
+- Amount / quantity / rate = **TEXT decimal string** (نه INTEGER minor-unit به‌عنوان مدل اصلی)
+- بعد از SQL COMMIT: persist async طبق state machine — UI «ثبت شد» طبق durability policy
+- Desktop آینده: native SQLite file از طریق همان `FinancialRepository`
 
-| فیلد | نقش |
-|------|-----|
-| `accountClass` | **WHAT** — طبقه حساب (cash, expense, crypto_asset, …) — **SoT گزارش‌گیری** |
-| `lineKind` | **WHY** — علت خط (fee, fx_rounding, fx_gain, asset, …) |
+جزئیات: `02-storage-persistence.md`
 
-نمونه‌ها:
-| رویداد | accountClass | lineKind |
-|--------|--------------|----------|
-| هزینه بانکی | expense | expense |
-| کارمزد شبکه | expense یا trading_fee | fee |
-| خرید BTC | crypto_asset | asset |
-| پرداخت USDT | cash | cash |
-| باقیمانده گرد کردن | equity یا other | fx_rounding |
-| سود تسعیر صریح | income | fx_gain |
+## Migration / Backup
 
-گزارش: فیلتر/گروه روی `accountClass`؛ `lineKind` برای تحلیل و جلوگیری از اشتباه گرفتن rounding با gain.
+- `schemaVersion` + migration chain با audit row (`migrationId`, from/to, checksum, success)
+- Backup package: manifest + database + attachments + checksums
+- Restore: validate → temp DB → integrity_check → migrate → swap
 
-## Chart of accounts
+جزئیات: `06-migration-backup-audit.md`
 
-`fin_accounts` + journal `accountId`: `docs/core/Accounting-Core.md`.
+## Journal (چهار جدول)
+
+`fin_accounts` · `fin_operations` · `fin_journal_entries` (سند) · `fin_journal_lines` (مبالغ)
+
+| فیلد خط | نقش |
+|---------|-----|
+| `accountId` | FK حساب واقعی — اجباری |
+| `accountClass` | WHAT (کش/گزارش) |
+| `lineKind` | WHY (fee, fx_rounding, …) |
+
+`entryKind` منسوخ است.
+
+## Atomic operation
+
+همه رویدادهای مالی از `runAtomicFinancialOperation` با `operationId` + `commandHash` (idempotent).
+
+## Fixtures / CI
+
+حداقل: BTC خرد+کارمزد · سهام+CA · قرض‌الحسنه · چک برگشتی — `07-fixtures-release-gate.md` و `fixtures/README.md`

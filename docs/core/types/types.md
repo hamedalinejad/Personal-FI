@@ -1,3 +1,5 @@
+> **منبع حقیقت TypeScript مشترک:** این فایل (`docs/core/types/types.md`).
+
 # core/types/ — TypeScript Types و Interfaces مشترک
 
 TypeScript Types و Interfaces مشترکی که در کل پروژه استفاده می‌شوند. Types اختصاصی یک فیچر داخل همان فیچر تعریف می‌شوند.
