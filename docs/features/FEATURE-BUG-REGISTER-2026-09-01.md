@@ -437,7 +437,7 @@ Budget/envelope باید currency مشخص داشته باشد و allocation ا�
 Goal entity فعلاً IRR-centric است ولی contribution exchangeRate دارد. Goal باید یا تک‌ارزی v1 باشد و enforce کند، یا multi-currency را با valuation policy کامل پشتیبانی کند.
 
 ## FEAT-P1-026 — Account available balance
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — ledger vs available balance
 Available balance فعلاً soft warning برای pending cheques است. باید distinction `ledger/available/cleared/pending` در Core و Reports ثابت باشد.
 
 ## FEAT-P1-027 — Brokerage/Platform cash ledger reuse
