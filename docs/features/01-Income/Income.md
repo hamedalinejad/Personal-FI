@@ -190,3 +190,6 @@ Income = economic classification (`fin_accounts` income)؛ منبع نقد = ban
 
 Correction/reversal = new Financial Operation + `reversesOperationId`; original immutable (same as Expense P0-023).
 
+## FEAT-P0-023 DEEP (Income)
+Same as Expense: reversesOperationId; no double-count cash.
+
