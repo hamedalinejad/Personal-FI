@@ -249,7 +249,7 @@
 **راه‌حل:** performance engine سه خروجی مستقل: income, realized, unrealized; period return با opening/closing value + external cash flows. `predictedProfit` فقط comparison metadata.
 
 ## FEAT-P0-037 — Fund ETF cash dependency
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — ETF vs issuance routes
 **مشکل:** ETF از brokerage cash استفاده می‌کند و issuance از bank، ولی بعضی APIهای fund هنوز account/brokerage را هم‌زمان می‌پذیرند.
 
 **راه‌حل:** discriminator `fundType` با validation سخت: ETF → brokerage route؛ issuance/redemption → account route. SettlementPort adapter مشترک، نه FKهای اجباری.

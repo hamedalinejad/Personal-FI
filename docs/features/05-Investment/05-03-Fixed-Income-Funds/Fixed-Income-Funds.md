@@ -633,3 +633,6 @@ SettlementPort only — no dual mandatory FKs.
 Engine outputs: income, realized, unrealized separately.
 Period return uses opening, flows, closing — predictedProfit never summed into economic P&L.
 
+## FEAT-P0-037 DEEP
+fundType=ETF → brokerage cash port only. fundType=issuance/redemption → bank/account port. Validate mutually exclusive routes.
+
