@@ -373,7 +373,7 @@ FIF NAV/profit، Stock external statements، Metals provider quote و Tax extern
 همه Featureهای مالی باید roundingVersion و policy مشخص داشته باشند؛ مخصوصاً Loan installments، FX conversion، crypto quantity و metals mg.
 
 ## FEAT-P1-010 — Date semantics
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — docs_links not raw path SoT
 `createdAt`/UTC timestamp نباید با `businessDate`, `tradeDate`, `settlementDate`, `dueDate`, `marketDate` مخلوط شود. هر Feature باید date matrix مشترک Core را اجرا کند.
 
 ## FEAT-P1-011 — Report period P&L
