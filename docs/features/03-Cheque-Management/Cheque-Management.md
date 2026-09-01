@@ -255,3 +255,7 @@ Transitions with cash effect always create/link operations; status-only changes 
 After cleared, bounce = exactly one reverse cash Financial Operation linked to clear operationId.
 Forbidden: second independent deposit/withdrawal for same bounce + void without inverse economics.
 
+## FEAT-P0-019 DEEP
+Canonical status set: pending | issued | in_vault | transferred | cleared | bounced | blocked | cancelled (| draft optional).
+Cash-effect transitions require operationId; cancel-from-pending is status-only.
+

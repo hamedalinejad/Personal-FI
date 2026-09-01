@@ -141,7 +141,7 @@
 **قبولی:** fixture `pending→cleared→bounced` باید مانده نهایی را دقیقاً به قبل از clear برگرداند.
 
 ## FEAT-P0-019 — Cheque state machine drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — canonical cheque statuses
 **مشکل:** مدل اصلی `pending/cleared/bounced/cancelled` است ولی later model `draft/issued/in_vault/transferred/cashed/blocked` را معرفی می‌کند.
 
 **راه‌حل:** v1 state machine فقط یک مجموعه canonical داشته باشد؛ states آینده با namespace/version مشخص شوند، نه اینکه هم‌زمان معتبر باشند.
