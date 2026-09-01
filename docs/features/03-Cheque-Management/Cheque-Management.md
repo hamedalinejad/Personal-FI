@@ -251,3 +251,7 @@ Do not also post a second independent withdrawal/deposit for the same bounce.
 Canonical statuses: `draft? | pending | issued | in_vault | transferred | cleared | bounced | blocked | cancelled`
 Transitions with cash effect always create/link operations; status-only changes for non-cash (cancel while pending).
 
+## FEAT-P0-018 DEEP
+After cleared, bounce = exactly one reverse cash Financial Operation linked to clear operationId.
+Forbidden: second independent deposit/withdrawal for same bounce + void without inverse economics.
+

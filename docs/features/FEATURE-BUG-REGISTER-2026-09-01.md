@@ -133,7 +133,7 @@
 **راه‌حل:** `calculationMethod` و `amortizationStyle` را جدا کن. یک method نباید دو فرمول بدون discriminator داشته باشد.
 
 ## FEAT-P0-018 — Cheque reversal double-count risk
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — single reverse op on bounce
 **مشکل:** در `cleared → bounced` یک‌جا original `acc_transaction` void و هم reversal ثبت می‌شود. اگر reports void را exclude کنند، reversal ممکن است دوباره اثر معکوس بدهد.
 
 **راه‌حل:** فقط یکی از دو الگوی canonical را انتخاب کن: (A) original باقی بماند + reversal opposite؛ یا (B) original void شود و reversal صرفاً طبق Core semantics تولید شود. گزارش و journal باید دقیقاً یک اثر اقتصادی داشته باشند.
