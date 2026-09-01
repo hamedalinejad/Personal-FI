@@ -902,3 +902,6 @@ quoteType enum sole: last | nav | close | mid | indicative | manual | other. Ada
 ## FEAT-P0-028 DEEP
 Stock/FIF: marketDate required on daily quotes. Crypto: marketDate optional, fetchedAt required. Historical valuation forbids current-price fallback.
 
+## FEAT-P0-029 DEEP
+sourceKind: manual | api | import. sourceId/adapterKey: coingecko, tsetmc, csv, …. Do not overload one enum with both.
+

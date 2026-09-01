@@ -201,7 +201,7 @@
 **راه‌حل:** برای stock/FIF daily quote = required؛ crypto intraday = nullable ولی `fetchedAt` required؛ historical query نباید از current price fallback کند.
 
 ## FEAT-P0-029 — Price source enum drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — sourceKind + sourceId
 **مشکل:** entity `source = manual|api` دارد ولی انتهای سند `csv_import`, `api_coingecko`, `api_tsetmc` هم به‌عنوان source آمده‌اند.
 
 **راه‌حل:** `sourceKind` canonical (`manual|api|import`) + `sourceId/adapterKey` برای provider. یک enum دو مفهوم را حمل نکند.
