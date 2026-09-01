@@ -73,3 +73,28 @@ accountingTreatment = tax
 - رکورد دوره‌ای `tax_events` جدا می‌ماند (feeTax ≠ tax return)
 
 نرخ‌ها **hard-code در Feature نیستند**؛ versioned config (IranMarketFees / Fee Policy).
+
+---
+## P0-013 — CanonicalFeeEvent
+
+هر کارمزد:
+
+```text
+feeAmount (total, preserved)
+feeBreakdown? (broker, exchange, tax, other) — sum must equal total when present
+accountingTreatment: expense | proceeds_reduction | capitalized_cost | reduction_of_carrying_amount
+feeCurrency
+one cash/asset economic effect per fee event (no double post total + each breakdown line as separate cash)
+```
+
+## P0-014 — fee currency guard
+
+قبل از جمع با مبلغ تراکنش:
+
+```text
+if feeCurrency != legCurrency:
+  convert fee → leg or base using op-locked rates
+assert currencies aligned before arithmetic
+```
+
+جمع مستقیم `feeAmount` با `amount` بدون تبدیل وقتی currency فرق دارد = **باگ**.

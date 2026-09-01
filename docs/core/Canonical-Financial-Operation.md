@@ -794,3 +794,13 @@ Link: reversesOperationId / reversalOperationId
 ```
 
 **isVoided alone is insufficient (P0-003).** Always persist operation lineage.
+
+---
+## P0-012 — baseCurrency همیشه explicit
+
+هر `fin_operations` ردیف:
+
+- `baseCurrencyAtOperation` **NOT NULL** (هرگز implicit از settings برای دادهٔ تاریخی)
+- `exchangeRateToBase` / per-leg rates در همان op **immutable** بعد از post
+
+Rebuild تاریخی از settings.baseCurrency فعلی استفاده **نمی‌کند**.

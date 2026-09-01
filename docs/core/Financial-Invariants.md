@@ -356,3 +356,15 @@ SQLite **نباید** اعتبارسنجی مالی دقیق را با `CHECK(qu
 | Decimal Domain Validator | `> 0`, `>= 0`, scale, precision, rounding, rate validity |
 
 `Decimal("0.000000001")` و اعداد خیلی بزرگ باید deterministic با decimal.js (یا معادل) validate شوند.
+
+---
+## P0-015 — Zero / negative / precision
+
+Domain validator (نه فقط SQLite CHECK روی TEXT):
+
+- amounts: policy per account (credit accounts may go negative liability-style)
+- quantity: >= 0 unless short selling enabled
+- precision: instrument/currency scale from registry
+- reject invalid decimal strings
+
+DB: NOT NULL + structural checks؛ quant rules in Domain.

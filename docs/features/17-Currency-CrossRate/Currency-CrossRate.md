@@ -479,3 +479,10 @@ valueInBase(asOf) = price(instrument, quote, asOf) × convert(1, quote, base, as
 
 `price` و `fx` باید **هر دو** asOf هم‌تراز باشند.  
 تغییر valueInBase می‌تواند از افت/رشد price یا از افت/رشد FX بیاید — گزارش نباید این دو را یکی کند.
+
+---
+## P0-011 — نام نرخ
+
+در کد و schema: **`exchangeRateToBase`** (= basePerTransactionUnit).
+عبارت UI «نرخ تتر» فقط label نمایشی است وقتی base یا quote مرتبط با USDT است — **نه** نام فیلد canonical.
+Rate source جدا: `rateSource` / `rateId`.

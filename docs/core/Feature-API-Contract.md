@@ -224,3 +224,23 @@ v1 = TypeScript in-process (تأیید). HTTP از روز اول اجباری ن
 ```
 
 لاگ آفلاین محلی می‌تواند همین correlationId را نگه دارد تا عیب‌یابی بدون سرور ممکن باشد.
+
+---
+## P0-016 — operationId on every financial command
+
+هر command مالی Feature (create/pay/buy/sell/correct/...):
+
+```text
+operationId: required UUID
+```
+
+بدون operationId → reject قبل از write.
+
+## P0-017 — same id different command = conflict
+
+```text
+same operationId + same commandHash → return prior result
+same operationId + different commandHash → IDEMPOTENCY_CONFLICT (no write)
+```
+
+Feature docs must not imply «retry با body جدید و همان id موفق می‌شود».

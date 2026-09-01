@@ -14,3 +14,18 @@
 | P0-010 | **CLOSED** | Date-Semantics-Matrix |
 
 در تعارض با Feature prose قدیمی، این جدول و اسناد قفل برنده است.
+
+## Batch P0-011 … P0-020
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-011 | **CLOSED** | exchangeRateToBase canonical; «نرخ تتر» فقط UI |
+| P0-012 | **CLOSED** | baseCurrencyAtOperation NOT NULL + immutable rates |
+| P0-013 | **CLOSED** | CanonicalFeeEvent + one economic effect |
+| P0-014 | **CLOSED** | convert fee before aggregate; currency guard |
+| P0-015 | **CLOSED** | domain precision/sign validation |
+| P0-016 | **CLOSED** | operationId required on all financial commands |
+| P0-017 | **CLOSED** | IDEMPOTENCY_CONFLICT on hash mismatch |
+| P0-018 | **CLOSED** | accountKind canonical; bankProductType separate |
+| P0-019 | **CLOSED** | cardLast4/token only; no PAN |
+| P0-020 | **CLOSED** | available ≠ ledger; commitments once |

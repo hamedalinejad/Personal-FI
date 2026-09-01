@@ -29,11 +29,14 @@
 | `name` | string | **غیریکتا** — برچسب نمایشی کاربر |
 | `accountNumber` | string nullable | |
 | `iban` | string nullable | |
-| `cardNumber` | string nullable | |
+| `cardLast4` | string nullable | فقط ۴ رقم آخر |
+| `cardToken` | string nullable | توکن اختیاری — **نه PAN** |
+| `cardNumber` | — | **REMOVED from new schema**; migration read-only legacy only |
 | `branchName` | string nullable | |
 | `bankName` | string nullable | |
 | `currency` | string | کد ارز حساب |
-| `accountType` | enum | `current` \| `savings` \| `term_deposit` \| `other` |
+| `accountKind` | enum canonical | `cash` \| `bank_account` \| `card` \| `wallet` \| `brokerage_cash` \| `crypto_exchange_cash` \| `cash_equivalent` \| `credit_account` |
+| `bankProductType` | enum optional IR | `current`/`qarz` \| `savings`/`sep` \| `term_deposit`/`modat` \| `jame` \| `other` — **نه** جایگزین accountKind |
 | `currentBalance` | decimal string | snapshot |
 | `isArchived` | boolean | |
 | `notes` | text nullable | |
@@ -149,7 +152,7 @@ Cr cash (A or B)             fee
 | `shaba` / IBAN | |
 | `cardNumberHash` | نه شماره خام |
 | `bankNameIr` | ملت، سپه، … |
-| `accountType` | qarz \| sep \| modat \| jame \| other |
+| `bankProductType` | qarz \| sep \| modat \| jame \| other | mapping به UI ایران؛ accountKind جدا |
 
 ---
 
@@ -231,3 +234,24 @@ Feature-local type strings must map into this enum; no parallel conflicting enum
 ## FEAT-P0-021 DEEP
 Store last4 and optional token only. Full card number never in DB. Images via Document Management.
 
+---
+## P0-018 DEEP — یک accountKind
+
+Canonical storage: **`accountKind`** (لیست Core بالا).
+`current/savings/...` و `qarz/sep/...` فقط **bankProductType** یا legacy migration map — دو enum موازی برای همان فیلد ممنوع.
+
+## P0-019 DEEP — بدون PAN
+
+Schema جدید: `cardLast4`, `cardToken` only.
+`cardNumber` full: ممنوع در write path؛ در backup قدیمی read-only migrate.
+
+## P0-020 DEEP — available ≠ ledger
+
+```text
+ledgerBalance     = Σ posted cash movements (rebuild)
+pendingOut        = Σ commitments (e.g. payable cheques pending) once per cheque/op
+availableBalance  = ledgerBalance − pendingOut (− other reserved)
+```
+
+getAvailableBalance باید از **aggregation canonical commitments** استفاده کند؛ هر commitment یک‌بار (نه هم fee جدا و هم total).
+ledger برای SoT؛ available برای UI خرج‌کردن.
