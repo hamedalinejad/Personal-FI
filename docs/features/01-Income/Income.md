@@ -147,7 +147,7 @@ Reports و Dashboard: گزارش درآمد با نرخ تاریخی
 5. به‌روز `acc_accounts.currentBalance` و `balanceAfterTransaction`
 6. COMMIT → persist
 
-`correctIncome`: void هر دو لایه + reversal acc + رکوردهای جدید؛ یک operationId مشترک.
+`correctIncome` → `core.reverseOperation(original)` سپس operation جدید برای مبلغ درست؛ **بدون** void/reverse دستی موازی روی acc توسط Feature.
 
 `getTotalIncome` / گزارش‌ها: فقط `isVoided = false`.
 
