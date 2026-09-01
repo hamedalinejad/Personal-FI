@@ -228,3 +228,7 @@ One new Financial Operation with `reversesOperationId`; original immutable. Repo
 Tables/entities: operation + cashLeg + expense_lines[] with amount, categoryId, vat optional.
 Σ expense_lines (+vat) must equal cash leg (reconcile rule). Not UI-only split metadata.
 
+## FEAT-P0-023 DEEP
+Correction = new op with reversesOperationId; original immutable.
+Reports use non-reversed ops once — never void+reverse+new all counting as three cash events.
+

@@ -165,7 +165,7 @@
 **راه‌حل:** یک مدل line-level canonical بساز؛ هر operation یک CashLeg و چند ExpenseLine داشته باشد، جمع خطوط با cash leg reconcile شود.
 
 ## FEAT-P0-023 — Expense/Income correction operation semantics
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — correction one reverse op
 **مشکل:** correction هم original را void می‌کند، هم reversal می‌سازد، هم new transaction می‌سازد. اگر original domain و cash operation جداگانه شمرده شوند، double-count محتمل است.
 
 **راه‌حل:** correction = یک Financial Operation جدید با `reversesOperationId`؛ original immutable. گزارش فقط اثر اقتصادی non-void را یک‌بار می‌بیند.
