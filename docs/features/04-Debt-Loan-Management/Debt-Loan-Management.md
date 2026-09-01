@@ -1803,3 +1803,6 @@ v1 variable = ln_rate_history manual rate+effectiveDate. Index/spread/cap/floor 
 ## FEAT-P0-015 DEEP
 graceDays + graceInterestAccrues + gracePrincipalDeferred + firstPaymentDate required semantics; fixtures per combo.
 
+## FEAT-P0-016 DEEP
+One dayCountConvention on loan copied to schedule snapshot; no silent mix mid-schedule.
+

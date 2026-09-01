@@ -121,7 +121,7 @@
 **راه‌حل:** canonical فقط `graceMode + gracePeriods` یا `date_range`. فیلدهای قدیمی فقط migration/read-only. API create نباید دو مدل را همزمان بپذیرد.
 
 ## FEAT-P0-016 — Loan day-count conflict
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — day count one per version
 **مشکل:** `period_based`, `actual_365`, `actual_360`, `30_360`, `actual_actual`, `custom_days` تعریف شده ولی helper فعلی `actual_actual` را عملاً 365 می‌کند و period-based/custom مسیرهای متفاوت دارند.
 
 **راه‌حل:** Day Count Engine واحد؛ `actual_actual` واقعاً leap-aware یا صریحاً خارج از v1. برای irregular periods فقط `interestFactor(start,end)`.
