@@ -449,7 +449,7 @@ FIF ETF و Stocks نباید دو cash balance برای یک brokerage بساز�
 Featureها attachmentPathهای مستقل دارند در حالی که Document Management وجود دارد. قرارداد باید مشخص کند attachment metadata کجاست و Feature فقط documentId نگه می‌دارد یا legacy path را حفظ می‌کند.
 
 ## FEAT-P1-029 — API serialization
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — API DecimalString serialization
 تمام Public API examples باید primitive serializable باشند: DecimalString، ISO date، JSON-safe enum. `Decimal` object در response ممنوع.
 
 ## FEAT-P1-030 — Pagination/filter contract
