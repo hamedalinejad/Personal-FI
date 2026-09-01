@@ -58,8 +58,10 @@
 6. **ارزش‌گذاری دوره‌ای:**
  - کاربر می‌تواند قیمت روز دارایی را ثبت کند.
  - ارزش فعلی پرتفوی بر اساس آخرین ارزش‌گذاری محاسبه می‌شود.
-7. **وضعیت `written_off` (از دست رفته/سوخته):**
- - اگر دارایی به `written_off` تغییر وضعیت دهد، زیان تحقق‌یافته به اندازه `currentValue` ثبت می‌شود.
+7. **وضعیت `written_off` (از دست رفته/سوخته) — P0-064:**
+ - زیان تحقق‌یافته = **released carrying cost** (از cost pool / pa_transactions) منهای residual proceeds (معمولاً ۰).
+ - `currentValue` قبل از op فقط snapshot ارزش روز است و **لزوماً برابر carrying cost نیست**؛ نباید تنها مبنای loss باشد.
+ - op باید `carryingAmountBeforeWriteOff` و `lossAmount` را صریح ثبت کند؛ سپس snapshot `currentValue = 0`.
  - `currentValue` به `0` تنظیم می‌شود.
 8. هزینه‌های نگهداری (بیمه، تعمیر، مالیات) قابل ثبت هستند و در محاسبه بازده واقعی لحاظ می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
@@ -121,7 +123,7 @@
 - `id` → UUID
 - `assetId` → UUID
 - `type` → string (`purchase`, `sale`, `expense`, `write_off`)
- - `write_off`: هنگامی که دارایی به وضعیت `written_off` تغییر می‌کند؛ `amount` برابر با ارزش جاری دارایی (`currentValue`) در لحظه رونویسی است و جهت آن منفی (زیان) ثبت می‌شود
+ - `write_off` (P0-064): هنگام `written_off`؛ فیلدهای صریح `carryingAmountBeforeWriteOff` و `lossAmount` (و در صورت نیاز residual proceeds). `amount` برای سازگاری می‌تواند = −lossAmount باشد؛ **نه** الزاماً −currentValue. currentValue→0 فقط snapshot بعد از op است.
 - `amount` → decimal
 - `quantitySold` → decimal (nullable — فقط برای `type = 'sale'`؛ مقدار فروخته‌شده. اگر برابر با کل `quantity` دارایی قبل از این فروش باشد، فروش کامل محسوب می‌شود، در غیر این صورت فروش جزئی)
 - `feeAmount` → decimal
@@ -146,7 +148,7 @@
 - `updateAsset(id, data)`
 - `getAllAssets(filters)` → فیلتر بر اساس دسته، وضعیت و ...
 - `getAssetById(id)`
-- `changeAssetStatus(id, status)` → تغییر وضعیت دارایی؛ **هنگام تغییر به `written_off`**: به‌صورت atomic هم `pa_assets.status = 'written_off'` و `currentValue = 0` را به‌روز می‌کند، هم یک رکورد `pa_transactions` از نوع `write_off` با `amount = -currentValue` (مقدار قبل از صفرشدن) می‌سازد تا زیان تحقق‌یافته در Immutable Log ثبت بماند
+- `changeAssetStatus(id, status)` → تغییر وضعیت؛ **هنگام `written_off` (P0-064)**: atomic — (1) محاسبه released carrying cost از rebuild pa_transactions، (2) ثبت `pa_transactions` type=`write_off` با `carryingAmountBeforeWriteOff` + `lossAmount`، (3) `status=written_off` و `currentValue=0` (snapshot). Loss هرگز فقط از currentValue گرفته نمی‌شود.
 
 ### Valuation APIs
 - `addValuation(assetId, value, date, note?)` → ثبت ارزش‌گذاری جدید
@@ -224,9 +226,27 @@
 ## FEAT-P0 LOCK (Physical)
 
 ### Write-off (P0-042)
+
+### Write-off / Impairment (P0-064 — supersedes naive currentValue)
+- Realized loss on write-off = **released carrying cost** (from cost pool / pa_transactions rebuild) **minus any residual proceeds**.
+- `currentValue → 0` is **snapshot only** after the operation; it is **not** the loss amount.
+- Must record explicitly on the write_off transaction / operation:
+  - `carryingAmountBeforeWriteOff` (or releasedCarryingCost)
+  - `lossAmount` / impairment amount
+  - optional residual proceeds
+- Valuation adjustment (mark-to-market down) is a **separate** event type from disposal/write-off when asset remains owned.
+- Forbidden: `loss = currentValue` as the sole definition of write-off P&L.
+
 Record `carryingAmountBeforeWriteOff` and loss/impairment explicitly. Setting currentValue=0 is snapshot, not the loss amount itself.
 
 ### Acquisitions (P0-043)
+
+### Cost pool & multiple acquisitions (P0-065)
+- Header `purchasePrice` / purchaseDate on `pa_assets` = **legacy snapshot only** (first acquisition or last known).
+- **SoT cost pool** = rebuild from `pa_transactions` (all acquisition / additional purchase / impairment / partial sale legs).
+- For fungible `gold`/`coin`: multiple buys update quantity + weighted average via transactions; header fields are not authoritative for total cost.
+- API/reports that need total cost or average **must** derive from transaction log (or maintained projection rebuilt from it), never trust header alone after multi-buy.
+
 Header = identity; purchase facts in `pa_transactions` (cost, qty, date, settlement). Header price/date = legacy/snapshot only.
 
 ## FEAT-P0-041 LOCK (Physical realized P&L)
@@ -247,3 +267,11 @@ Write-off records carryingAmountBefore and lossAmount. currentValue→0 is snaps
 ## FEAT-P0-043 DEEP
 Header purchasePrice/date are legacy snapshots. All acquisition cost/qty/date live on pa_transactions.
 
+
+
+### P0-066 — Maintenance expense (no double count)
+- Maintenance / insurance / repair costs that affect asset return **must** be either:
+  1. A linked Expense operation (`relatedFeature` / `operationId` shared) referenced from `pa_transactions` type=`maintenance`, **or**
+  2. Solely recorded as expense with optional asset link for reporting.
+- **Forbidden**: create both a full `exp_transactions` expense **and** an independent unlinked maintenance amount that is also summed into asset return → double expense.
+- Asset return calculation consumes the **linked** maintenance amount once (via operationId or explicit link table).

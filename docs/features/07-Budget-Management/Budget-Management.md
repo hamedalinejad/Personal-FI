@@ -39,6 +39,8 @@
 2. روش اصلی: **Zero-Based** — مجموع تخصیص‌ها باید با درآمد قابل بودجه‌بندی برابر شود (یا کاربر آگاهانه اختلاف را بپذیرد).
 3. با ثبت هر **هزینه** (از هر منبعی: حساب بانکی، چک، وام)، مبلغ از پاکت مربوطه کسر می‌شود.
 3a. **وام و بودجه**: از نظر حسابداری، فقط بخش‌های واقعاً «هزینه» یک پرداخت وام مجاز به لینک‌شدن به `bg_envelopes` هستند — یعنی `interestPortion` (سود)، `penaltyPortion` (جریمه) و `feePortion` (کارمزد) از `ln_transactions`. **`principalPortion` (اصل وام) هرگز نباید به یک envelope لینک شود**، چون بازپرداخت اصل کاهش بدهی در ترازنامه است، نه هزینه؛ لینک‌کردن کل مبلغ (اصل+سود) به یک پاکت، گزارش بودجه واقعی را با کم‌نمایی نادرست ظرفیت مصرف مخدوش می‌کند. در `bg_transaction_links`، فیلد `amount` برای `relatedFeature = 'loan'` باید فقط برابر مجموع `interestPortion + penaltyPortion + feePortion` همان `ln_transactions` باشد، نه `amount` کامل تراکنش وام.
+   - **P0-069 LOCK**: لینک بودجه به loan payment باید `operationId` (یا ln_transactions.id) + **exact expense components** را نگه دارد (interest/fee/penalty portions immutable snapshot در link یا از op خوانده شود). تخصیص بودجه نمی‌تواند بعداً با تغییر allocation وام drift کند؛ amount لینک = همان اجزای expense در لحظه apply.
+
 4. اگر پاکت موجودی کافی نداشته باشد:
  - هشدار نمایش داده می‌شود.
  - اگر `strictMode = true`: ثبت هزینه واقعی (`exp_transactions`/`acc_transactions`) **هرگز رد نمی‌شود** — بودجه یک لایه مدیریتی است، نه قید حسابداری سخت. اما `applyTransactionToBudget` یک خطای اعتبارسنجی برمی‌گرداند و UI **باید تأیید صریح کاربر** را (با نمایش مازاد) قبل از ادامه دریافت کند.
@@ -49,7 +51,11 @@
 7. بودجه فقط روی هزینه‌ها تأثیر می‌گذارد (نه روی سرمایه‌گذاری‌ها، مگر کاربر بخواهد).
 8. **یک هزینه می‌تواند بین چند پاکت تقسیم شود** (به دلیل جدول `budget_transaction_links`).
 9. `remainingAmount` محاسبه‌ای است: `assignedAmount + rolloverAmount - spentAmount`.
-10. `totalIncome` خودکار از جمع درآمدهای بازه محاسبه می‌شود، اما امکان override دستی وجود دارد.
+10. **`totalIncome` (P0-067)**: دو mode صریح:
+    - `incomeSourceMode = calculated` → از جمع درآمدهای بازه (SoT = income txs در period).
+    - `incomeSourceMode = manual` → مقدار دستی؛ **باید** `manualIncomeAmount` + `manualIncomeSourcePeriod` (یا note/audit) ذخیره شود.
+    - بعد از override، zero-based funding از مقدار **effective** (manual یا calculated) استفاده می‌کند؛ تعریف مبهم ممنوع.
+    - تغییر mode یا مقدار manual = audit log.
 
 ---
 
@@ -64,10 +70,13 @@
 - `month` → number (برای بودجه ماهانه — nullable)
 - `startDate` → datetime
 - `endDate` → datetime
-- `totalIncome` → decimal (درآمد قابل بودجه‌بندی — خودکار محاسبه شده با امکان override)
+- `totalIncome` → decimal (effective درآمد قابل بودجه‌بندی)
+- `incomeSourceMode` → enum (`calculated` | `manual`) — P0-067
+- `manualIncomeAmount` → decimal nullable (وقتی mode=manual)
+- `manualIncomeSourcePeriod` / `manualIncomeNote` → audit وقتی override
 - `totalAssigned` → decimal (مجموع تخصیص‌داده‌شده)
 - `totalSpent` → decimal (مجموع مصرف‌شده)
-- `strictMode` → boolean (سخت‌گیری — ثبت هزینه روی سقف محدود می‌شود)
+- `strictMode` → boolean (سخت‌گیری **advisory** — P0-068: ثبت واقعی مالی هرگز reject نمی‌شود؛ فقط validation + تأیید صریح UI)
 - `rolloverEnabled` → boolean (باقی‌مانده به ماه بعد منتقل شود؟)
 - `status` → string (`active`, `closed`, `draft`)
 - `createdAt` → datetime
@@ -141,11 +150,12 @@
 - پس از override، محاسبات خودکار متوقف می‌شود.
 
 ### Rollover
-- هنگام بستن بودجه (`status = closed`) و اگر `rolloverEnabled = true`، `closeBudget(id)` به‌صورت atomic:
+- هنگام بستن بودجه (`status = closed`) و اگر `rolloverEnabled = true`، `closeBudget(id)` به‌صورت atomic **و idempotent (P0-070)**:
  1. برای هر پاکت، مقدار `remainingAmount` دوره جاری را محاسبه می‌کند (`assignedAmount + rolloverAmount - spentAmount`).
- 2. یک **بودجه دوره بعد** (در صورت عدم وجود) با همان تنظیمات (`strictMode`, `rolloverEnabled`) می‌سازد.
- 3. برای هر پاکت دوره جاری، یک پاکت جدید با همان `envelopeCategory`/`name` در بودجه دوره بعد می‌سازد: `assignedAmount = 0`، `spentAmount = 0`، `rolloverAmount = <مقدار محاسبه‌شده بند ۱>` — در نتیجه `remainingAmount` دوره جدید خودبه‌خود برابر همان مبلغ منتقل‌شده می‌شود.
- 4. دوره جاری `status = 'closed'` می‌شود و id بودجه دوره بعد را برمی‌گرداند.
+ 2. یک **بودجه دوره بعد** با کلید یکتا `(periodType, year, month)` (یا start/end) — اگر از قبل وجود دارد، همان را استفاده می‌کند (no duplicate).
+ 3. برای هر پاکت دوره جاری، پاکت متناظر در دوره بعد (unique per budgetId+envelopeCategory/name) با `rolloverAmount` تنظیم می‌شود؛ اگر قبلاً از همین close ساخته شده، no-op.
+ 4. دوره جاری `status = 'closed'`؛ `closeOperationId` / idempotency key روی close ثبت می‌شود تا تکرار closeBudget همان نتیجه را بدهد بدون بودجه تکراری.
+ 5. id بودجه دوره بعد برگردانده می‌شود.
  - **توجه**: عبارت «`remainingAmount` صفر می‌شود» در ادبیات قدیمی این سند به معنی مقداردهی مستقیم به این فیلد **نیست** (چون محاسبه‌ای است و در دیتابیس ذخیره نمی‌شود)؛ بسته‌شدن دوره جاری به خودی خود `remainingAmount` آن دوره را بی‌اثر می‌کند.
 - اگر `rolloverEnabled = false`: `closeBudget(id)` فقط `status = 'closed'` می‌کند بدون ساخت خودکار دوره بعد.
 - پاکت "آماده تخصیص" دوره جدید با مقدار `totalIncome` دوره جدید ساخته می‌شود (نه Rollover).

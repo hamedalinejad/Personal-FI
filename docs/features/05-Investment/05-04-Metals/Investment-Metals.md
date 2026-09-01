@@ -53,6 +53,12 @@ Business Rules
  - طلای عیاری: `purityRatio = karat / 24` (مثلاً ۱۸ عیار → `0.750`)
  - خلوص permille: `purityRatio = purityPermille / 1000` (مثلاً ۹۹۹ → `0.999`)
  - سکه (`gold_coin`): `purityRatio` از مشخصات استاندارد سکه؛ قیمت سکه جدا (حباب سکه).
+ - **P0-062 — gold_coin instrument class جدا**: سکه ≠ bullion.  
+   - `metalType = gold_coin` (یا instrument class جدا) با `purityCode` استاندارد سکه (`emami`, `bahar`, `half`, …).  
+   - Valuation از provider quote **سکه** (شامل حباب) استفاده می‌کند؛ نه تبدیل از قیمت طلای آب‌شده × purity.  
+   - cost basis و averageBuyPricePerMg برای سکه روی unit سکه (یا mg ناخالص سکه) است؛ قاطی کردن با bullion 18k/24k ممنوع.  
+   - quoteBasis برای سکه معمولاً `per_coin` یا `gross_coin` است و باید در price feed صریح باشد.
+
  - قیمت و میانگین خرید همیشه **به ازای همان purity همان holding** است.
  - جدول تبدیل واحد (فقط نمایش/ورود):
  | واحد نمایش | به میلی‌گرم |
@@ -124,9 +130,10 @@ Domain Entities
 
 - `id` → UUID (Primary Key)
 - `platformId` → UUID
-- `metalType` → string (`gold` | `silver` | `copper` | `gold_coin`)
-- `purity` → string (کد استاندارد؛ آزاد نیست — مثلاً `18k`, `24k`, `999`, `emami`, `bahar`, `half`, `quarter`, `gram_coin`)
-- `purityRatio` → decimal (نسبت خلوص ۰ تا ۱ برای محاسبه وزن خالص؛ مثلاً ۱۸ عیار = `0.750`، ۹۹۹ = `0.999`؛ برای سکه از مشخصات استاندارد)
+- `metalType` → string (`gold` | `silver` | `copper` | `gold_coin`) — `gold_coin` کلاس ابزار جدا (P0-062)
+- `purityCode` → string **canonical** (کد استاندارد immutable؛ آزاد نیست — مثلاً `18k`, `24k`, `999`, `emami`, `bahar`, `half`, `quarter`, `gram_coin`) — جزء UNIQUE key
+- `purity` → string nullable (label نمایشی؛ می‌تواند با purityCode یکی باشد)
+- `purityRatio` → decimal (نسبت خلوص ۰ تا ۱؛ مشتق از purityCode؛ برای identity استفاده نمی‌شود)
 - `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم — واحد پایه ذخیره‌سازی؛ هرگز گرم/اونس)
 - `averageBuyPricePerMg` → decimal (میانگین قیمت خرید به ازای **هر میلی‌گرم از همین purity** — ریال؛ نه قیمت طلای خالص)
 - `totalInvested` → decimal
@@ -144,14 +151,19 @@ Domain Entities
 >
 > `1g Gold 18K` ≠ `1g pure gold`. این دو با `purity` متفاوت‌اند و قیمت‌شان از `price_history` با کلید `metalType_purity` جدا خوانده می‌شود.
 >
-> **کلید یکتای منطقی Holding**: `(platformId, metalType, purity)` — نمی‌توان طلای ۱۸ و ۲۴ را در یک ردیف قاطی کرد.
+> **کلید یکتای منطقی Holding (P0-060)**: `UNIQUE(platformId, metalType, purityCode)`  
+> - `purity` در UI/label می‌تواند باشد؛ **canonical identity** = `purityCode` (کد استاندارد immutable از registry: `18k`, `24k`, `999`, `emami`, …).  
+> - `purityRatio` مشتق از `purityCode` است و برای identity استفاده نمی‌شود.  
+> - Enforce در schema + domain: duplicate (platformId, metalType, purityCode) = reject.  
+> - نمی‌توان طلای ۱۸ و ۲۴ یا دو تعریف متفاوت همان purityCode را در یک ردیف قاطی کرد.
 
 ۳. Metals Transaction (جدول: `inv_metals_transactions`) — لاگ خرید، فروش و تحویل فیزیکی
 
 - `id` → UUID (Primary Key)
 - `platformId` → UUID
 - `metalType` → string (`gold` | `silver` | `copper` | `gold_coin`)
-- `purity` → string (**اجباری** — همان کد استاندارد Holding؛ مثلاً `18k`, `999`, `emami`)
+- `purityCode` → string (**اجباری** — همان canonical Holding؛ مثلاً `18k`, `999`, `emami`)
+- `purity` → string nullable (label)
 - `purityRatio` → decimal (نسبت خلوص در تاریخ تراکنش — snapshot)
 - `type` → string (buy, sell, physical_delivery)
 - `quantityMg` → decimal (**وزن ناخالص** به میلی‌گرم)
@@ -169,7 +181,32 @@ Domain Entities
 > - `quantityMg` همیشه وزن ناخالص است؛ وزن خالص = `quantityMg × purityRatio` فقط برای گزارش/نمایش.
 > - `pricePerMg` قیمت همان عیار است؛ هرگز نباید قیمت ۲۴ عیار را بدون اعمال نسبت روی ۱۸ عیار اعمال کرد (مگر Fallback جهانی با برچسب «تخمینی» در `19-04-Metals-Prices`).
 >
+> ### P0-061 — Price Quote Semantics (gross vs fine)
+> هر quote قیمت فلز **باید** `quoteBasis` اعلام کند:
+> | quoteBasis | معنی | استفاده |
+> |------------|------|---------|
+> | `gross_metal` | قیمت به ازای وزن ناخالص همان purity | پیش‌فرض holding valuation وقتی pricePerMg همان purity است |
+> | `fine_metal` | قیمت به ازای وزن خالص (fine gold/silver) | فقط وقتی provider fine quote می‌دهد؛ تبدیل: `pricePerGrossMg = pricePerFineMg × purityRatio` |
+>
+> Valuation: `value = quantityMg × pricePerMg` فقط وقتی quoteBasis با semantics قیمت هم‌خوان است.  
+> بدون `quoteBasis` صریح در price_history / getLatestMetalPrice = valuation wrong (P0-061).
+
+>
 > **نکته physical_delivery**:
+>
+> ### P0-063 — Physical Delivery + Physical Asset Lineage (اجباری)
+> یک عملیات atomic `physical_delivery`:
+> 1. کاهش `quantityMg` روی `inv_metals_holdings` (همان platform/metalType/purityCode).
+> 2. کسر `deliveryFee` از cash پلتفرم (از طریق CashSettlementPort در صورت نیاز).
+> 3. **ایجاد یا لینک** دارایی در Physical Assets (`pa_assets`) با:
+>    - `sourceFeature = 'metals'`
+>    - `sourceTransactionId` / `sourceOperationId` = همین delivery operation
+>    - quantity/cost basis منتقل‌شده (carrying cost released از metals holding)
+> 4. رکورد `inv_metals_physical_deliveries` فقط لجستیک؛ lineage مالکیت در `pa_assets` + `pa_transactions` (type=acquisition_from_metals یا equivalent) است.
+>
+> بدون target physical asset creation/link = missing asset history (P0-063).  
+> دو op جدا با related ids فقط اگر transaction boundary اجبار کند؛ ترجیح یک operationId واحد.
+
 > - `deliveryFee` هزینه تحویل فیزیکی است (از موجودی نقدی پلتفرم کسر می‌شود)
 > - این مبلغ با `feeAmount` (کارمزد معامله) متفاوت است
 > - اگر `deliveryFee = 0` یا null باشد، یعنی هیچ هزینه تحویلی پرداخت نشده است

@@ -126,3 +126,18 @@ P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implemen
 - **057** NAV valuation requires priceAsOf, source, quoteType, staleState.
 - **058** ETF cash only through one CashSettlementPort route (stocks_iran_brokerage venue).
 - **059** Accumulation/Distribution P&L decomposed: NAV return, distributed income, reinvested income, realized on units.
+
+
+## FEAT-P0-060 … 070 (Metals / Physical / Budget) — LOCK 2026-09-01
+
+- **060** Metals holding unique (platformId, metalType, purityCode)
+- **061** Metal price quoteBasis gross vs fine mandatory
+- **062** gold_coin ≠ bullion; separate class + quote basis
+- **063** delivery op creates/links Physical Asset with lineage + carrying cost
+- **064** write-off uses carrying cost released, not currentValue alone
+- **065** PA cost pool from pa_transactions; header purchasePrice snapshot
+- **066** maintenance linked once; no double expense
+- **067** Budget totalIncome mode calculated|manual with audit
+- **068** strictMode advisory; never block financial operation
+- **069** loan budget link = operation + exact expense portions
+- **070** closeBudget idempotent + unique period

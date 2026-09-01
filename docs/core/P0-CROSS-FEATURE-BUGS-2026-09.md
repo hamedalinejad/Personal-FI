@@ -90,3 +90,21 @@
 | P0-059 | **CLOSED** | P&L decomposition: NAV return / distributed / reinvested / realized جدا |
 
 محل تفصیل: Investment-Stocks-Iran.md, Corporate-Actions-Spec.md, Settlement-Accounting.md, Fixed-Income-Funds.md, Corporate-Action-Engine.md
+
+## Batch P0-060 … P0-070 (Metals + Physical + Budget) — CLOSED 2026-09-01
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-060 | **CLOSED** | UNIQUE(platformId, metalType, purityCode); purityRatio not identity |
+| P0-061 | **CLOSED** | price quoteBasis: gross_metal \| fine_metal (and coin); valuation matches basis |
+| P0-062 | **CLOSED** | gold_coin separate instrument class; provider quote includes premium; not bullion×purity |
+| P0-063 | **CLOSED** | physical_delivery: one op → metals qty↓ + fee + create/link pa_assets with sourceOperationId + carrying cost |
+| P0-064 | **CLOSED** | write-off loss = released carrying cost − proceeds; currentValue=0 snapshot only; explicit carrying/loss fields |
+| P0-065 | **CLOSED** | cost pool from pa_transactions; header purchasePrice snapshot/legacy only |
+| P0-066 | **CLOSED** | maintenance = linked expense operation once; no double into expense + asset return |
+| P0-067 | **CLOSED** | incomeSourceMode calculated\|manual; manual amount + source period audited |
+| P0-068 | **CLOSED** | strictMode advisory only; financial ops never blocked by budget |
+| P0-069 | **CLOSED** | loan→budget links operation + exact interest/fee/penalty components immutable |
+| P0-070 | **CLOSED** | closeBudget idempotent; unique period; no duplicate next budget |
+
+تفصیل: Investment-Metals.md, Physical-Assets.md, Budget-Management.md
