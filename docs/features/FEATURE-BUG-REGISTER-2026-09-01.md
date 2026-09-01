@@ -341,7 +341,7 @@
 تمام transactionهای چندارزی باید `currency`, `baseCurrencyAtOperation`, `exchangeRateToBase` و در multi-hop `conversionPath/rateId` داشته باشند. نرخ تاریخی نباید از latest FX بازسازی شود.
 
 ## FEAT-P1-002 — Fee currency conversion
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — fee FX locked on operation
 هر fee باید مقدار خام، currency، rate/path و converted base value را نگه دارد. `feeAmount` بدون currency برای گزارش قابل اعتماد نیست.
 
 ## FEAT-P1-003 — Reversal uniformity
