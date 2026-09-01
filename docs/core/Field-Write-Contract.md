@@ -52,3 +52,13 @@ recordFinancialOperation / runAtomicFinancialOperation
 ```
 
 مرجع: `Field-Level-SoT.md` · `Raw-vs-Derived-Data.md` · `Source-of-Truth-Matrix.md`
+
+---
+
+## Snapshot metadata
+
+هر projection/snapshot:
+
+`projectionVersion` · `sourceLastOperationId` · `sourceHash` · `rebuiltAt`
+
+Estimated vs Actual هرگز قاطی نشوند: predictedProfit · reportedProfit · calculatedProfit · realized · unrealized.

@@ -78,3 +78,29 @@ Optional Main Accounting Integration
 - `Essential-Reports.md`
 - `Mandatory-Test-Vectors.md`
 - `Documentation-Roadmap.md`
+
+---
+
+## Forbidden (از همین حالا)
+
+- direct DB access from UI
+- Feature-to-Feature table writes
+- mutable financial history / overwrite posted
+- balance as independent truth
+- duplicate SoT
+- FLOAT / JS number for money math
+- hardcoded tax or FX rates
+- snapshot-based historical reports as SoT
+- auto-delete data on import
+- license blocking financial data access
+- feature activation requiring unrelated modules
+- current price changing historical report
+- generic polymorphic FK everywhere
+- DB row = Domain entity
+
+## v1 پیشنهادی (محدود)
+
+Foundation + Accounting Core + Money/FX + Operation + Reversal + Audit + Reconciliation + Opening + Party + Document + Instrument + Migration + Backup + Offline  
++ Accounts + Income + Expense + Loans + Crypto + Dashboard + Reports + Settings  
+
+v1.1 Stocks/Funds/Metals/Cheque · v1.2 Tax/Budget/Goals/Price · v2 advanced/cloud

@@ -85,6 +85,13 @@
 | Reconciliation Foundation | `docs/core/Reconciliation-Foundation.md` |
 | Integrity Engine | `docs/core/Integrity-Engine.md` |
 | Versioning Policy | `docs/core/Versioning-Policy.md` |
+| Operation Catalog | `docs/core/Canonical-Financial-Operation-Catalog.md` |
+| Side Effect Matrix | `docs/core/Side-Effect-Matrix.md` |
+| Invariant Catalog | `docs/core/Financial-Invariant-Catalog.md` |
+| Accounting Event Mapping | `docs/core/Accounting-Event-Mapping-Matrix.md` |
+| Feature Capability Matrix | `docs/core/Feature-Capability-Matrix.md` |
+| Scenario Catalog | `docs/core/Financial-Scenario-Catalog.md` |
+| Layer Separation | `docs/core/Layer-Separation.md` |
 | Deletion Policy Matrix | `docs/core/Deletion-Policy-Matrix.md` |
 | Offline Modes | `docs/core/Offline-Modes.md` |
 | Multi-Tab Writer | `docs/core/Multi-Tab-Writer-Contract.md` |

@@ -89,3 +89,18 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 
 - P2: `P2-P3-Risk-Register.md` — Import preview، Backup تست‌شده، attachments hash، اعداد فارسی، API errors
 - P3: گزارش stale-aware، Workspace/Role، License offline token (هسته را بلوکه نکند)
+
+---
+
+## کاتالوگ‌های اجباری قبل از کد
+
+- Canonical-Financial-Operation-Catalog
+- Financial-Invariant-Catalog
+- Side-Effect-Matrix
+- Accounting-Event-Mapping-Matrix
+- Feature-Capability-Matrix
+- Financial-Scenario-Catalog (+ golden fixtures)
+- Layer-Separation · Versioning-Policy · Field-Write-Contract
+
+PR بدون به‌روزرسانی Data Dictionary برای field مالی جدید ممنوع.
+هر endpoint جدید: Purpose, Request, Response, Errors, Idempotency, Side effects, SoT, Permissions, Offline.

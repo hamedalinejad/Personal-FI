@@ -46,3 +46,16 @@ Crypto/Investment docs: write **`transferGroupId` only**; `transferId` = read-on
 
 ### Deprecated aliases
 `transferId` → `transferGroupId` · `tradeId` → `tradeGroupId` · `common_categories` → `cat_categories`
+
+---
+
+## FinancialOperation vs DomainTransaction vs DB Transaction
+
+| Term | Meaning |
+|------|---------|
+| FinancialOperation | واحد اقتصادی اتمیک (`fin_operations`) |
+| DomainTransaction | ردیف subledger (ln_*, inv_*, acc_*) |
+| JournalEntry/Line | دفترکل |
+| DB Transaction | BEGIN/COMMIT فنی SQLite |
+
+استفادهٔ مبهم از کلمه «transaction» در کد/API ممنوع — نام صریح بگذار.
