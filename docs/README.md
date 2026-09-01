@@ -81,4 +81,9 @@
 | P0 Risk Register | `docs/core/P0-Risk-Register.md` |
 | P1 Risk Register | `docs/core/P1-Risk-Register.md` |
 | P2/P3 Risk Register | `docs/core/P2-P3-Risk-Register.md` |
+| API Requirements | `docs/core/API-Requirements.md` |
+| Offline Requirements | `docs/core/Offline-Requirements.md` |
+| Essential Reports | `docs/core/Essential-Reports.md` |
+| Mandatory Test Vectors | `docs/core/Mandatory-Test-Vectors.md` |
+| Documentation Roadmap | `docs/core/Documentation-Roadmap.md` |
 | Fiscal Period Lock | `docs/core/Fiscal-Period-Lock.md` |

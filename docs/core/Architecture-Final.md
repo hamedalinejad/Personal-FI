@@ -58,3 +58,23 @@
 - `Product-Principle.md`
 
 Gate docs: `P0-Risk-Register.md` · `P1-Risk-Register.md` · `Fiscal-Period-Lock.md`
+
+---
+
+## مدل سه‌لایه محصول
+
+```text
+Operational Data
+        ↓
+Module Sub-ledger
+        ↓
+Optional Main Accounting Integration
+```
+
+مستندات تکمیلی الزامات:
+
+- `API-Requirements.md`
+- `Offline-Requirements.md`
+- `Essential-Reports.md`
+- `Mandatory-Test-Vectors.md`
+- `Documentation-Roadmap.md`

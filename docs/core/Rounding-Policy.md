@@ -1,3 +1,5 @@
+> **Canonical کامل:** `docs/core/rounding/Rounding-Policy.md` — این فایل الحاقی‌های P0 (UI-only display، version، day_count) است.
+
 # Rounding Policy
 
 ---
