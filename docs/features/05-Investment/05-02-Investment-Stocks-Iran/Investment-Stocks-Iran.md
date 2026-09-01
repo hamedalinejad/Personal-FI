@@ -603,3 +603,6 @@ CA table: source/target instruments, ratio, effectiveDate, operationId; rebuild 
 On trade: update ledger/pending per policy; availableCash follows settlementDate.
 Fields: ledgerCash, settledCash, availableCash, pendingSettlement — never collapse to one immediate cashBalance for Iranian T+n stocks.
 
+## FEAT-P0-033 DEEP
+instrumentId type = Core UUID/id. ISIN and symbol are attributes; symbol change does not change instrumentId.
+

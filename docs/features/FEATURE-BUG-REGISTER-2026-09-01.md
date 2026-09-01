@@ -225,7 +225,7 @@
 **راه‌حل:** `ledgerCash`, `settledCash`, `availableCash`, `pendingSettlement` را تفکیک کن؛ trade date و settlement date جدا و calculation مشخص.
 
 ## FEAT-P0-033 — Stocks instrumentId type mismatch
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — instrumentId UUID Core
 **مشکل:** Stock `instrumentId` به‌صورت string/ISIN/UUID توصیف شده و در Price Fetching نیز symbol/internalSymbol جایگزین آن می‌شود.
 
 **راه‌حل:** canonical `ref_instruments.id` در Core؛ ISIN/providerSymbol metadata. Symbol change هرگز instrument identity را عوض نکند.
