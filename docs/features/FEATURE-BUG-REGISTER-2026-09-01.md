@@ -213,7 +213,7 @@
 **راه‌حل:** یک `PriceSelectionPolicy` versioned: holding-specific source → explicit source → default source → priority/confidence → freshness، با manual override طبق expiresAt.
 
 ## FEAT-P0-031 — Price history instrumentId type/meaning
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — instrumentId is Core id
 **مشکل:** `instrumentId` به‌صورت string است ولی برای crypto/metal/fif گاهی کلید synthetic است و Core instrument identity چیز دیگری است.
 
 **راه‌حل:** در storage یک `priceInstrumentRef` canonical یا `assetCategory + instrumentId` داشته باش؛ اگر synthetic key لازم است نام و type آن صریح باشد و با Core `ref_instruments.id` اشتباه نشود.

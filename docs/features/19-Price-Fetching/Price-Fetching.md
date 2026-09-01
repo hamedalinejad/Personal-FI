@@ -908,3 +908,6 @@ sourceKind: manual | api | import. sourceId/adapterKey: coingecko, tsetmc, csv, 
 ## FEAT-P0-030 DEEP
 Selection order: holding-specific source → explicit request source → default source → priority/confidence → freshness; manual wins if not expired (manualExpiresAt).
 
+## FEAT-P0-031 DEEP
+price_history.instrumentId = ref_instruments.id string form. Synthetic keys only in provider mapping tables, never confused with Core id.
+
