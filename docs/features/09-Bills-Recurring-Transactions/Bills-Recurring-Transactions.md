@@ -202,3 +202,46 @@ Accounting Operation (Income/Expense/…)
 
 Recurring **خودش** موجودی را تغییر نمی‌دهد.
 فقط قانون + occurrence است؛ پول فقط با Operation مالی جابه‌جا می‌شود.
+
+---
+## P0-025 DEEP — exclusive template source
+
+هر occurrence مالی فقط **یک** generator دارد:
+
+- `sourceKind`: `bills_recurring` | `income_recurring` | `expense_recurring` | …
+- `sourceTemplateId` + `scheduledOccurrenceKey` یکتا
+
+ممنوع: هم Bills و هم Income template برای همان تاریخ/مبلغ بدون unique link دو transaction بسازند.
+
+## P0-026 DEEP — occurrence → operation
+
+`br_occurrences` (یا معادل):
+
+- `financialOperationId` **canonical** (الزامی پس از materialize)
+- لینک domain typed: `domainFeature` + `domainTxId` با validate — نه یک `transactionId` polymorphic مبهم تنها
+
+## P0-027 DEEP — Standalone settlement
+
+`accountTransactionId` / cash result: **nullable**
+Materialize از `CashSettlementPort`؛ بدون Accounts هم occurrence+domain ledger+journal ممکن است.
+
+## P0-028 DEEP — dedupe keys
+
+```text
+UNIQUE(templateId, scheduledOccurrenceKey)
++ operationId idempotency on generate
+```
+
+Job/notification state به‌تنهایی برای جلوگیری از duplicate کافی **نیست**.
+
+## P0-029 DEEP — day-31 month clamp
+
+Policy صریح روی template:
+
+```text
+anchorDay: 1..31
+monthClamp: last_day_of_month   // 31 در فوریه → 28/29؛ در ماه ۳۰روزه → 30
+```
+
+بعد از clamp، occurrence همان ماه را «drift دائمی به 30» نمی‌کند مگر policy جدا `sticky_clamped_day`.
+پیش‌فرض پیشنهادی v1: **always from anchorDay + clamp per month** (نه sticky).

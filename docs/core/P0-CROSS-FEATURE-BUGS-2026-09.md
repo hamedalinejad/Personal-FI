@@ -29,3 +29,18 @@
 | P0-018 | **CLOSED** | accountKind canonical; bankProductType separate |
 | P0-019 | **CLOSED** | cardLast4/token only; no PAN |
 | P0-020 | **CLOSED** | available ≠ ledger; commitments once |
+
+## Batch P0-021 … P0-030
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-021 | **CLOSED** | credit_account v1 reject یا liability جدا؛ no silent overdraft |
+| P0-022 | **CLOSED** | transfer principal legs + independent fee leg |
+| P0-023 | **CLOSED** | Income correction Core-only |
+| P0-024 | **CLOSED** | Expense correction Core-only |
+| P0-025 | **CLOSED** | exclusive template source + unique occurrence link |
+| P0-026 | **CLOSED** | financialOperationId canonical on occurrence |
+| P0-027 | **CLOSED** | cash link nullable / SettlementPort |
+| P0-028 | **CLOSED** | UNIQUE(templateId, scheduledOccurrenceKey) |
+| P0-029 | **CLOSED** | anchorDay + monthClamp last_day policy |
+| P0-030 | **CLOSED** | one reverseOperation for bounce after clear |

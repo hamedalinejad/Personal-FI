@@ -246,3 +246,9 @@ UI/Feature API
 **ممنوع:** Feature در prose بگوید «acc را void کن + reversal بساز + tx جدید» به‌عنوان سه write مستقل بدون Core plan.
 
 Lineage اجباری: `operationId`, `reversesOperationId`, `reversalOperationId` روی fin_operations و در صورت نیاز روی domain row.
+
+---
+## P0-024 DEEP — correctExpense = same as Income
+
+Canonical: `core.reverseOperation` + optional new expense operation.
+Feature-local dual-layer void+reversal **ممنوع**.

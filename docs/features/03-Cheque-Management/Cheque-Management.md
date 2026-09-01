@@ -144,7 +144,7 @@ Reports و Dashboard: نمایش چک‌های در جریان و برگشتی
 | `pending` → `cleared` | INSERT `acc_transactions` (`deposit-cheque` یا `withdrawal-cheque`) + journal + لینک `accountTransactionId` |
 | `pending` → `bounced` | هیچ تراکنشی |
 | `pending` → `cancelled` | هیچ تراکنشی |
-| `cleared` → `bounced` | void تراکنش clear + INSERT reversal؛ `reversalTransactionId` پر شود |
+| `cleared` → `bounced` | **فقط** `core.reverseOperation(clearOperationId)` — یک inverse اقتصادی؛ نه void جدا + reversal جدا به‌عنوان دو حرکت |
 | سایر انتقال‌ها | در v1 ممنوع مگر مستندسازی صریح |
 
 `changeChequeStatus` همیشه Atomic + persist. ویرایش فیلدهای مالی فقط در `pending`.
@@ -259,3 +259,15 @@ Forbidden: second independent deposit/withdrawal for same bounce + void without 
 Canonical status set: pending | issued | in_vault | transferred | cleared | bounced | blocked | cancelled (| draft optional).
 Cash-effect transitions require operationId; cancel-from-pending is status-only.
 
+---
+## P0-030 DEEP — cleared → bounced
+
+دقیقاً **یک** economic inverse:
+
+```text
+core.reverseOperation(operationId_of_clear)
+cheque.status = bounced
+cheque.reversalOperationId = newReversalOpId
+```
+
+ممنوع: void ردیف clear **و** INSERT reversal جدا که هر دو cash را جابه‌جا کنند (double).
