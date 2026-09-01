@@ -81,6 +81,8 @@
 | P0 Risk Register | `docs/core/P0-Risk-Register.md` |
 | P1 Risk Register | `docs/core/P1-Risk-Register.md` |
 | P2/P3 Risk Register | `docs/core/P2-P3-Risk-Register.md` |
+| Field Write Contract | `docs/core/Field-Write-Contract.md` |
+| Feature Package Architecture | `docs/core/Feature-Package-Architecture.md` |
 | API Requirements | `docs/core/API-Requirements.md` |
 | Offline Requirements | `docs/core/Offline-Requirements.md` |
 | Essential Reports | `docs/core/Essential-Reports.md` |

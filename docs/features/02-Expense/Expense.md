@@ -184,3 +184,22 @@ Expense UI
 **ممنوع:** گزارش Expense/Income کلی فقط از جدول domain بدون journal، یا جمع domain + journal با هم.
 
 > **Immutable:** «ویرایش» مبلغ/کارمزد ممنوع؛ فقط correction/reversal. Metadata غیرمالی مجاز. `Financial-Invariants` §14.
+
+---
+
+## Split Transaction (First-Class) (P0)
+
+یک حرکت بانکی می‌تواند چند خط هزینه داشته باشد:
+
+```text
+FinancialOperation
+  ├── CashLeg          -20,000,000 IRR
+  ├── ExpenseLine      Food 5m
+  ├── ExpenseLine      Home 7m
+  ├── ExpenseLine      Internet 2m
+  ├── ExpenseLine      Electricity 1m
+  └── ExpenseLine      Other 5m
+```
+
+Split **metadata UI نیست**؛ خطوط دامنه + journal lines هستند.
+Σ expense lines (+ fees) باید با CashLeg (از نظر مبلغ) در همان operation جور شود.

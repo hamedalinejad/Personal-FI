@@ -223,3 +223,17 @@ Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = speci
 
 لایه‌ها: `fin_operations` → `fin_journal_entries` → `fin_journal_lines` → domain `*_transactions` فقط **ارجاع operationId** · snapshots مشتق.
 **ممنوع:** آپدیت مستقیم snapshot بدون journal.
+
+---
+
+## سه مفهوم جدا از یک Financial Operation
+
+| مفهوم | معنی | مثال |
+|--------|------|------|
+| **Economic Event** | رویداد اقتصادی دامنه | خرید سهم، شناسایی سود |
+| **Cash Movement** | حرکت نقد | Cash ↓ |
+| **Accounting Entry** | خطوط journal | Dr Asset / Cr Cash |
+
+- کارمزد: Expense + Cash (هر دو)
+- Unrealized P&L: اقتصادی/ارزشیابی — **بدون** حرکت نقد الزامی
+- همه از یک `operationId` وقتی ثبت می‌شوند

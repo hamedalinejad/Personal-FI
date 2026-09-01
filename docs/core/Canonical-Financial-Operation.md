@@ -720,3 +720,45 @@ calculationContext
 - UPDATE فیلدهای مالی (amount, qty, rate, dates اثرگذار) **ممنوع**
 - حذف فیزیکی ردیف ledger **ممنوع**
 - مسیر مجاز: **Reversal** و/یا **Correction** با `operationId` جدید + لینک به اصل + `fin_audit_log`
+
+---
+
+## قانون مطلق (P0)
+
+**هیچ Feature اجازه ندارد مستقیماً جدول مالی Feature دیگری را تغییر دهد.**
+
+```text
+غلط:
+  Crypto → UPDATE acc_transactions
+  Crypto → INSERT fin_journal_entries مستقیم
+  Loan → bank balance مستقیم
+  Fund → portfolio snapshot مستقیم
+
+درست:
+  Feature
+    → runAtomicFinancialOperation / Financial Operation
+    → Domain Sub-ledger همان Feature
+    → Cash via SettlementPort
+    → Journal projection (Core)
+    → Audit
+    → Snapshots (rebuild only)
+```
+
+همین برای Loan، Stock، Fund، Metal، Expense، Income.
+
+هیچ endpoint برای mutate کردن Snapshot.
+
+---
+
+## Refund / Return / Chargeback (Foundation)
+
+حالات:
+
+`purchase` · `refund` · `partial_refund` · `chargeback` · `reversal` · `correction`
+
+```text
+Original Operation = 10m purchase
+Refund Operation   = 3m   (operationId جدید، لینک به اصل)
+```
+
+**ممنوع:** ویرایش مبلغ تراکنش Posted برای «برگشت جزئی».

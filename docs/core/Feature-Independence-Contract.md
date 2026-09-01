@@ -217,3 +217,18 @@ ESLint: no-restricted-imports
 - CI باید روی نقض این قانون fail شود
 
 بدون enforce در tooling، ماژولار بودن به اسپaghetti تبدیل می‌شود.
+
+---
+
+## سه سطح قابلیت (اجرایی)
+
+### Level 1 — Fully standalone
+مثلاً فقط Loan: وام، اقساط، سود، جریمه، برنامه، پرداخت، گزارش، طرف — بدون نصب Investment/Budget/Crypto.
+
+### Level 2 — Optional integration
+Loan Payment → optional Cash Account از طریق Port.
+
+### Level 3 — Full integration
+Loan + Accounting UI + Accounts + Documents + Reports سراسری.
+
+جزئیات بسته: `Feature-Package-Architecture.md`.

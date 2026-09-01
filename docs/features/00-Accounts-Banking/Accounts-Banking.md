@@ -183,3 +183,23 @@ acc_transactions = cash movement
 
 **نه** جدول همه‌چیز برای income/expense/investment/loan/tax.  
 آن‌ها Domain ledger + journal خود را دارند؛ لینک نقد از طریق Operation / Port.
+
+---
+
+## انواع حساب و وضعیت‌ها (تقویت P0/P1)
+
+### accountKind (نمونه)
+
+`cash` · `bank_account` · `card` · `wallet` · `brokerage_cash` · `crypto_exchange_cash` · `cash_equivalent` · `credit_account`
+
+### وضعیت‌های موجودی / ردیف (در صورت نیاز)
+
+| مفهوم | معنی |
+|--------|------|
+| available | قابل برداشت/خرج |
+| ledger | موجودی دفتری |
+| pending | در انتظار |
+| cleared | وصول‌شده |
+| reconciled | مغایرت‌گیری‌شده |
+
+Cash ledger همچنان فقط از طریق operations؛ snapshot balance rebuild می‌شود.

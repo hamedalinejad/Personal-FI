@@ -36,3 +36,7 @@ Provider ممکن است روش/کارمزد/تاریخ متفاوت داشته 
 ---
 
 **ماتریس کامل مالکیت فیلد (اجباری):** `Field-Level-Data-Ownership-Matrix.md`
+
+---
+
+قرارداد اجرایی نوشتن فیلدها: `Field-Write-Contract.md` (writable/rebuildable؛ ممنوع mutate snapshot).

@@ -479,3 +479,19 @@ Dashboard · Accounts · Transactions · Investments · Loans · Assets · Plann
 - Investment = یک Shell با تب Crypto/Stock/Fund/Metals
 
 فیچر ≠ صفحه. Product-Map می‌تواند ۱۹+ فیچر داشته باشد؛ ناوبری حداکثر ۹.
+
+---
+
+## Portfolio / Documents بدون صفحه دهم
+
+قفل ناوبری:
+
+```text
+Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
+```
+
+- **Portfolio / Wealth** → Dashboard و/یا Reports (نه route سطح‌اول جدا)
+- **Documents** → Settings + لینک از داخل فیچرها (نه ناوبار دهم)
+- داخل هر صفحه: Sheet / Dialog / Drawer / Detail / Tab
+
+Investments = Crypto | Stocks | Funds | Metals — نه routeهای جدا در ناوبار.
