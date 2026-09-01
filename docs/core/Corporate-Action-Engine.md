@@ -6,7 +6,7 @@
 
 | خانواده | مثال |
 |---------|------|
-| Stock | bonus, split, reverse_split, rights, capital_increase, merger, spin-off, symbol/ISIN change |
+| Stock (Iran) | stock_split, reverse_split, bonus_share, capital_increase, rights, cash_dividend, symbol_change, isin_change, merger, spin_off, delisting |
 | Crypto | token redenomination, token swap/migrate, forced conversion |
 | Fund | fund merge, unit conversion |
 | Metal | استانداردسازی واحد (نادر) |
@@ -33,3 +33,30 @@ Rebuild/reconcile **باید** همه actionهای ledger را بشناسد — 
 **Stocks adapter** = معنی `bonus_share`, `rights_issue`, … برای بازار ایران.
 
 Core نباید پر از منطق فقط-بورس شود.
+
+
+## مدل داده از روز اول (حتی بدون UI MVP)
+
+```text
+inv_stocks_iran_corporate_actions   (Must در schema v1)
+  id, instrumentId, actionType, effectiveDate,
+  ratio?, cashAmount?, cashCurrency?,
+  sourceInstrumentIds, targetInstrumentIds,
+  costBasisPolicy, operationId, notes, createdAt
+```
+
+Quantity/cost اثر روی `inv_stocks_iran_transactions` (legs) ثبت می‌شود؛ این جدول metadata + audit + لینک operation است.
+
+**ممنوع:** اعمال CA فقط با دست‌کاری snapshot holding بدون event immutable.
+
+اقدام‌های لازم برای تاریخچه صحیح:
+- Stock Split / Reverse Split
+- Bonus
+- Capital Increase
+- Rights
+- Dividend (cash leg + optional tax)
+- Symbol Change / ISIN Change
+- Merger / Spin-off
+- Delisting
+
+UI می‌تواند بعداً بیاید؛ **حذف از مدل اولیه = اجبار به دست‌کاری موجودی تاریخی بعداً**.

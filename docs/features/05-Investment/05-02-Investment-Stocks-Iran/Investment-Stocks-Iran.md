@@ -492,17 +492,39 @@ Journal: income روی gross یا net طبق سیاست محلی — پیش‌ف
 - `priceTick` → decimal (گام قیمت، ریال)
 - Validate order qty % lotSize == 0؛ price روی tick grid
 
-### `inv_stocks_iran_corporate_actions` (Must برای CA پیچیده)
-علاوه بر type روی transaction:
+### `inv_stocks_iran_corporate_actions` (**Must در Data Model v1** — UI می‌تواند بعد از MVP باشد)
+
+علاوه بر type روی transaction ledger:
 ```text
-id, instrumentId, actionType, effectiveDate, ratio?, cashAmount?,
-sourceInstrumentIds JSON, targetInstrumentIds JSON,
-costBasisPolicy, operationId, notes
+id, instrumentId, actionType, effectiveDate,
+ratio?, cashAmount?, cashCurrency?,
+sourceInstrumentIds, targetInstrumentIds,
+costBasisPolicy, operationId, notes, createdAt
 ```
-پوشش: افزایش سرمایه، bonus، split، rights، **merger**, **spin-off**, تجدید ارزیابی (cost ثابت)، isin/symbol change.
-Transaction rows همچنان ledger quantity؛ این جدول metadata/audit CA است.
+
+| actionType (حداقل) | اثر معمول qty/cost |
+|--------------------|-------------------|
+| `stock_split` | qty×ratio؛ cost/unit ÷ |
+| `reverse_split` | qty÷؛ cost/unit × |
+| `bonus_share` | +qty؛ cost pool ثابت |
+| `capital_increase` | طبق حقوق/پرداخت نقدی |
+| `rights` | اختیاری exercise → tx |
+| `cash_dividend` | cash leg؛ qty ثابت |
+| `symbol_change` / `isin_change` | identity/label؛ instrumentId پایدار ترجیح |
+| `merger` / `spin_off` | map instrument + ratio |
+| `delisting` | وضعیت؛ بستن/تبدیل holding |
+
+Transaction rows = ledger quantity؛ این جدول metadata/audit CA است.  
+اعمال فقط از `Corporate-Action-Engine` + `operationId`.  
+**بدون این جدول از روز اول، تاریخچه بعداً قابل اعتماد نمی‌ماند.**
 
 ---
+
+
+> **فلسفه داده (کل پروژه):**  
+> `feeAmount` (legacy/total) و breakdown (`feeBrokerCommission`, `feeExchange`, `feeTax`, `feeOther`) — **RAW → Preserve forever**.  
+> برای زیباسازی schema، فیلد خام قدیمی **حذف نمی‌شود**.  
+> DERIVED rebuild می‌شود؛ SNAPSHOT disposable؛ EXTERNAL_REPORTED جدا از calculatedProfit می‌ماند.
 
 ## کارمزد و مالیات نقل‌وانتقال (ایران)
 

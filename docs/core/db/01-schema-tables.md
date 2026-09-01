@@ -20,7 +20,7 @@
 | `ln_schedule_snapshots` | Debt & Loan | برنامه اقساط نسخه‌دار — **Must** |
 | `ln_loan_collateral` | Debt & Loan | وثیقه وام — **Must** |
 | `inv_stocks_iran_instruments` | Investment Stocks Iran | ISIN, lotSize, priceTick, firmCode |
-| `inv_stocks_iran_corporate_actions` | Investment Stocks Iran | metadata CA (merger/spin-off/…) |
+| `inv_stocks_iran_corporate_actions` | Investment Stocks Iran | **Must از مدل v1** (حتی اگر UI بعداً) — metadata/audit CA: split, reverse, bonus, capital_increase, rights, dividend cash leg ref, symbol/ISIN change, merger, spin-off, delisting |
 | `tax_events` | Tax Management | رویداد مالیاتی مرکزی (linkedTaxEventId) |
 | `inc_transactions` | Income | تراکنش‌های درآمد |
 | `inc_recurring` | Income | درآمدهای تکرارشونده |

@@ -31,14 +31,19 @@
 - هر قسط: اصل = `principalAmount / totalInstallments`، سود = `principalAmount × rate × years / totalInstallments` — این دو مقدار **در داخل** `fixedInstallmentAmount` جمع می‌شوند، نه جدا از آن
 
 **3. Qarz Al-Hasaneh (قرض‌الحسنه):**
-- سود = ۰؛ کارمزد خدمات معمولاً ۴٪ یک‌بار در disbursement
-- `serviceFeeAmount = principalAmount × serviceFeeRate / 100`
+- سود = ۰
+- کارمزد خدمات **hard-code نیست** (نه ۴٪ ثابت در کد). از **`serviceFeePolicy` / ردیف‌های `ln_loan_fees`** می‌آید:
+  - `rate` یا `amount` قابل تنظیم per loan یا Product Definition
+  - `feeType`: fixed | percentage_of_principal | tiered | …
+  - زمان اخذ: at_disbursement / per schedule طبق Fee Rules
+- مثال عددی مستند (فقط نمونه، نه قانون سیستم): اگر policy بگوید ۴٪ یک‌بار → `serviceFeeAmount = principal × 0.04`؛ کاربر می‌تواند ۰٪، ۲٪، مبلغ ثابت، یا بدون کارمزد تعریف کند
 - **قرارداد اصل بدهی**:
- - `principalAmount` = اصل تعهد بازپرداخت (مثلاً ۱۰۰m) — مبنای اقساط و `remainingBalance` اولیه
- - `serviceFeeAmount` = کارمزد جدا (مثلاً ۴m) — **expense** در disbursement؛ از اصل بدهی کم **نمی‌شود**
+ - `principalAmount` = اصل تعهد بازپرداخت — مبنای اقساط و `remainingBalance` اولیه
+ - `serviceFeeAmount` (derived از policy) = کارمزد جدا — **expense** در disbursement؛ از اصل بدهی کم **نمی‌شود**
  - مبلغ نقدی خالص دریافتی کاربر اغلب `principalAmount - serviceFeeAmount` است (اگر fee از محل پرداخت کسر شود)
- - `installment = principalAmount / totalInstallments` (نه 96m)
-- **ممنوع**: `P = principal - serviceFee` در فرمول اقساط (تناقض قبلی حذف شد)
+ - `installment = principalAmount / totalInstallments`
+- **ممنوع**: `P = principal - serviceFee` در فرمول اقساط
+- **ممنوع**: `if (qarz) rate = 4` در Domain
 
 **4. Bullet:**
 - اصل کل در پایان، سود ماهانه
@@ -605,7 +610,7 @@ interestPortion = 0
 ```
 
 **مثال هفتگی:**
-- اصل تعهد ۱۰۰,۰۰۰,۰۰۰؛ کارمزد ۴٪ = ۴,۰۰۰,۰۰۰؛ خالص دریافتی ≈ ۹۶,۰۰۰,۰۰۰
+- اصل تعهد ۱۰۰,۰۰۰,۰۰۰؛ **مثال policy** کارمزد ۴٪ = ۴,۰۰۰,۰۰۰؛ خالص دریافتی ≈ ۹۶,۰۰۰,۰۰۰ (نرخ از serviceFeePolicy — نه ثابت سیستم)
 - remainingBalance اولیه = **۱۰۰,۰۰۰,۰۰۰**
 - installment = ۱۰۰,۰۰۰,۰۰۰ / ۵۲ ≈ ۱,۹۲۳,۰۷۷
 - اقساط جمعاً اصل ۱۰۰m را تسویه می‌کنند؛ fee جدا در `fee_payment` / journal
@@ -985,7 +990,7 @@ interestPortion = 0
 > **نکته**: کارمزد خدمات (`serviceFeeAmount`) در روز واریز وام (disbursement) کسر می‌شود و ربطی به دوره تنفس ندارد.
 
 **مثال:**
-- وام ۱۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه قرض‌الحسنه، کارمزد ۴٪، ۱ ماه تنفس
+- وام ۱۰,۰۰۰,۰۰۰ ریال، ۱۲ قسط ماهانه قرض‌الحسنه، کارمزد طبق serviceFeePolicy (مثال ۴٪)، ۱ ماه تنفس
 - ماه ۱: هیچ پرداختی (Payment Holiday)
 - ماه ۲-۱۳: installment = 10,000,000 / 12 ≈ 833,333 ریال
 

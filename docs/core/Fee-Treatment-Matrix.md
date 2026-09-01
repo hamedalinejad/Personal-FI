@@ -19,3 +19,11 @@
 | fee_external | full | خارج از trade |
 
 Feature invent نمی‌کند — CanonicalFeeEvent + این ماتریس.
+
+
+## Loan tiered fees SoT
+
+```text
+ln_loan_fee_tiers = تنها SoT پلکان
+ln_loan_fees.tiers JSON = Legacy / Migration Only — write جدید ممنوع
+```
