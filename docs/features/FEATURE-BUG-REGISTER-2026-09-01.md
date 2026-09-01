@@ -109,7 +109,7 @@
 **راه‌حل:** allocation ledger برای `penalty`, `fee`, `interest`, `principal` با مانده هر component و waterfall versioned.
 
 ## FEAT-P0-014 — Loan variable-rate مدل ناقص
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — variable rate v1 manual only
 **مشکل:** `rate` و `effectiveDate` کافی نیستند اگر نرخ variable بر اساس index/spread/cap/floor/reset باشد؛ همچنین accrued interest بین resetها به‌صراحت مدل نشده.
 
 **راه‌حل:** اگر v1 فقط نرخ دستی دارد، صریحاً scope را محدود کن. اگر variable واقعی لازم است: `referenceIndex`, `spread`, `cap`, `floor`, `resetFrequency`, effective interval و versioned rate snapshot.

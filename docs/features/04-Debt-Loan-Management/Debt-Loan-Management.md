@@ -1797,3 +1797,6 @@ Schedule never moves cash. Payment allocates; installment status derived from al
 ## FEAT-P0-013 DEEP
 Partial pay tracks unpaid penalty/fee/interest/principal separately under versioned waterfall.
 
+## FEAT-P0-014 DEEP
+v1 variable = ln_rate_history manual rate+effectiveDate. Index/spread/cap/floor out of v1 unless fully built.
+
