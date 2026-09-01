@@ -238,3 +238,6 @@ realized = netProceeds - carryingAmountReleased
 Not `salePrice - purchasePrice` alone when multiple acquisitions or impairments exist.
 Carrying amount from acquisition costs (± impairments) via pa_transactions rebuild.
 
+## FEAT-P0-041 DEEP
+realizedPnl = netProceeds - carryingAmountReleased (from pa_transactions), not naive sale-purchase on header.
+

@@ -273,7 +273,7 @@
 **راه‌حل:** برای fungible metal وزن canonical است؛ برای coin count canonical quantity باشد و standardWeight/purity metadata داشته باشد. دو مدل را در یک entity بدون discriminator مخلوط نکن.
 
 ## FEAT-P0-041 — Physical Asset realized P&L formula is wrong
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — realized uses carrying
 **مشکل:** `calculateProfitLoss` برای sale جمع `amount` را به‌عنوان realized P&L معرفی می‌کند، در حالی که `amount` sale proceeds است نه gain/loss.
 
 **راه‌حل:** برای sale: `proceeds - releasedCost - sellingFees`. Cost released باید از acquisition ledger/CostBasisEngine بیاید. `amount` هرگز مستقیم profit تلقی نشود.
