@@ -417,7 +417,7 @@ Dividend + NAV drop + reinvest باید در total return طوری ترکیب ش
 انتقال Digital Metal → Physical Asset باید lineage و cost basis منتقل‌شده را حفظ کند؛ cost نباید صفر یا market value جدید شود مگر policy صریح.
 
 ## FEAT-P1-021 — Recurring duplicate generation
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — recurring template generates ops
 Income/Expense recurring و Bills هر دو scheduler دارند. باید idempotency key برای occurrence داشته باشند تا یک دوره دوبار تولید نشود.
 
 ## FEAT-P1-022 — Recurring date semantics
