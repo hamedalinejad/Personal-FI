@@ -294,3 +294,16 @@ Document: `documentId`, `blobId`, `checksum`, `mimeType`, `originalName`, **rela
 - مسیر اصلی بازیابی: **Restore از backup** گرفته‌شده قبل از migration
 - down-migration فقط وقتی script معکوس و fixture تست دارد
 - Migration شکست → DB اصلی دست‌نخورده؛ app در safe mode
+
+---
+
+## تست Backup/Restore (P2 Risk)
+
+حداقل یک fixture CI:
+
+1. ساخت DB نمونه با چند operation
+2. Export backup (با و بدون رمز)
+3. Restore روی DB خالی
+4. reconcile + مقایسه checksum/counts/journal totals
+
+بدون تست سبز Restore، backup «پیاده‌سازی‌شده» محسوب نمی‌شود.

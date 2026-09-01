@@ -224,3 +224,13 @@ Journal + Subledger + Price + FX  →  Valuation / Reporting  →  UI
 گزارش‌های سنگین نباید هر بار full scan ledger روی UI thread بزنند.
 
 ترجیح: خواندن از `account_snapshots_daily` / `portfolio_snapshots_daily` (یا معادل) که با job پس‌زمینه/زمان‌بندی محلی ساخته می‌شوند؛ SoT همچنان ledger است و snapshot rebuildپذیر.
+
+---
+
+## Cache گزارش + شفافیت زمان (P3)
+
+اگر از snapshot/cache استفاده می‌شود:
+
+- UI باید `lastRebuiltAt` (یا معادل) را نشان دهد
+- در صورت stale بودن نسبت به آخرین operation → هشدار یا دکمه Rebuild
+- گزارش رسمی می‌تواند اجبار به rebuild قبل از export داشته باشد

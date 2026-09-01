@@ -82,3 +82,10 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 ## Gate P1
 
 قبل از MVP کامل: `P1-Risk-Register.md` (۱۱ مورد) — شامل Fiscal Period Lock و Lot/CA/Fund/FX history/Audit.
+
+---
+
+## Gate P2 / P3
+
+- P2: `P2-P3-Risk-Register.md` — Import preview، Backup تست‌شده، attachments hash، اعداد فارسی، API errors
+- P3: گزارش stale-aware، Workspace/Role، License offline token (هسته را بلوکه نکند)

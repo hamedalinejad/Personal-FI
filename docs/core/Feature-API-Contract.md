@@ -207,3 +207,20 @@ UI → Feature API → Capability API → Domain → Persistence
 جزئیات لیست Capabilityها: `Capability-API.md`.
 
 v1 = TypeScript in-process (تأیید). HTTP از روز اول اجباری نیست.
+
+---
+
+## Error Code و Correlation (P2)
+
+هر پاسخ خطای Feature/Capability API:
+
+```text
+{
+  errorCode: "IDEMPOTENCY_CONFLICT" | "VALIDATION" | "PERSIST_FAILED" | …
+  message: string  // کاربرپسند یا فنی جدا
+  correlationId: string  // معمولاً operationId یا request id
+  details?: …
+}
+```
+
+لاگ آفلاین محلی می‌تواند همین correlationId را نگه دارد تا عیب‌یابی بدون سرور ممکن باشد.

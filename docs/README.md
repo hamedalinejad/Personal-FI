@@ -80,4 +80,5 @@
 | Product Principle | `docs/core/Product-Principle.md` |
 | P0 Risk Register | `docs/core/P0-Risk-Register.md` |
 | P1 Risk Register | `docs/core/P1-Risk-Register.md` |
+| P2/P3 Risk Register | `docs/core/P2-P3-Risk-Register.md` |
 | Fiscal Period Lock | `docs/core/Fiscal-Period-Lock.md` |

@@ -151,3 +151,20 @@ Application لایه feature flags را اعمال می‌کند.
 چک entitlement فقط در **Capability-API / Application** (مثلاً JWT یا فایل امضاشده آفلاین)، نه داخل Loan Domain.
 
 اگر `owner_id` اضافه می‌شود: add-column با default — نه embed کردن features لایسنس داخل ledger.
+
+---
+
+## Workspace / Role / License (P3 — آینده تجاری)
+
+لایه‌های دسترسی **خارج از ledger**:
+
+```text
+Workspace (مثلاً یک فایل DB یا پروفایل)
+  └── Role (owner / viewer / …)   // وقتی multi-user شد
+License Token (امضاشده محلی)
+  └── features / edition / expiry
+```
+
+- Domain مالی Role/License را import نمی‌کند
+- Application قبل از نشان دادن UI/Command، entitlement را چک می‌کند
+- **بدون** تماس سرور برای استفاده روزمره (token محلی)

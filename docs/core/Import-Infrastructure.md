@@ -70,3 +70,18 @@ Import
 
 **ممنوع:** دور انداختن ستون‌های ناشناخته فایل بانک/کارگزاری.
 گزارش/mapper بعدی باید بتواند از staging همان raw را دوباره بخواند.
+
+---
+
+## Import Pipeline (P2 Risk)
+
+```text
+Select file
+  → Preview (نمونه ردیف‌ها + mapping)
+  → Validation (خطاها، duplicate، تاریخ، decimal)
+  → User Confirm
+  → Commit (batch operations + lineage)
+```
+
+**ممنوع:** Commit بدون Preview/Validation موفق.  
+ردیف‌های نامعتبر در گزارش validation می‌مانند؛ silent skip بدون log ممنوع.

@@ -131,3 +131,18 @@ addBusinessDays(date, n, calendarId)
 
 نسخه‌دار و configurable — hard-code داخل Loan/Stock ممنوع.
 اولویت پیاده‌سازی: **P1**؛ قرارداد مستند: **از الان**.
+
+---
+
+## نرمال‌سازی اعداد فارسی / عربی (P2)
+
+قبل از parse به MoneyString/decimal:
+
+```text
+۰۱۲۳۴۵۶۷۸۹  →  0123456789
+٠١٢٣٤٥٦٧٨٩  →  0123456789
+```
+
+و جداکنندهٔ هزارگان فارسی/ویرگول طبق `IranNumberFormat`.
+
+**Invariant:** Domain فقط ارقام ASCII + نقطه اعشار canonical می‌بیند؛ تبدیل در مرز UI/import.

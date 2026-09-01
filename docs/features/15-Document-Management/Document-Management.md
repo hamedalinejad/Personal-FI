@@ -199,3 +199,18 @@ docs_links       → پیوند polymorphic به entity (loanId, txId, …)
 **ممنوع:** کپی محتوای سند یا blob داخل جداول Domain Ledger (مثلاً داخل `ln_loans` یا `inv_*_transactions`).
 
 Ledger فقط در صورت نیاز `documentId` / لینک دارد؛ خود Document در Feature اسناد می‌ماند.
+
+---
+
+## فایل مستقل + Hash (P2)
+
+```text
+docs_documents:
+  id, fileName, mimeType, sizeBytes
+  contentHash   // e.g. SHA-256
+  storageKey    // مسیر محلی / blob id
+  createdAt, …
+docs_links: documentId ↔ entity
+```
+
+محتوای فایل داخل ledger تکرار نمی‌شود. Hash برای integrity و dedupe.
