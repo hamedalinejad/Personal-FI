@@ -90,7 +90,10 @@ USDT روی شبکه‌های مختلف = **چند instrument جدا** (هر ک
 | `feeAssetPriceToBase` | RAW | Domain tx | No | User/Provider at post | — | Preserve |
 | `exchangeRateToBase` | RAW | Domain tx | No | User/Provider at post | — | Preserve |
 | `totalFeesPaidBase` روی holding | DERIVED | Holding Engine | No | — | txs feeBase | Rebuild |
-| `averageBuyPrice` / `avgCost` | DERIVED | CostBasisEngine | No | — | txs + policy | Rebuild |
+| `averageBuyPrice` / `averageCostBase` | DERIVED | CostBasisEngine | No | — | txs converted to costCurrency | Rebuild |
+| `totalCostBase` / `totalInvested` | DERIVED | CostBasisEngine | No | — | txs in base | Rebuild |
+| `originalAmount` / `originalCurrency` / `quoteCurrency` / `exchangeRateToBase` | RAW | Domain tx | No | User/Provider at post | — | Preserve |
+| `grossQuantity` / `netQuantity` / `feeQuantity` | RAW | Domain tx | No | User | — | Preserve |
 | `totalInvested` | DERIVED | CostBasisEngine | No | — | txs | Rebuild |
 | `realizedPL` | DERIVED | CostBasisEngine | No | — | sell lots + cost | Rebuild |
 | `unrealizedPL` | DERIVED | Valuation + CostBasis | No | — | qty × price − book | Rebuild |

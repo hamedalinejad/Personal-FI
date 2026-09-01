@@ -130,10 +130,24 @@ Domain Entities
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-> **تمایز حیاتی NAV و قیمت معامله**:
-> - `currentNAV` = ارزش خالص دارایی هر واحد (برای ارزش پرتفوی و Unrealized P&L)
-> - `averageBuyPrice` = میانگین قیمت واقعی خرید/صدور (`transactionPrice`)
-> - این دو در صندوق‌های صدور/ابطال ایران اغلب متفاوت‌اند و **نباید** یکی فرض شوند.
+> **تمایز حیاتی — سه مفهوم قیمت (هرگز قاطی نشوند)**:
+> 1. `transactionPrice` = قیمت واقعی صدور/ابطال کاربر (cost basis / realized)
+> 2. `NAV` / `currentNAV` = ارزش خالص واحد (valuation / unrealized NAV)
+> 3. `externalReportedProfit` = سود اعلامی صندوق/صورتحساب — **EXTERNAL_REPORTED**؛ overwrite روی calculated ممنوع
+>
+> و مسیرهای بازده جدا (P0 برای صندوق درآمد ثابت ایران):
+>
+> | مفهوم | معنی | منبع |
+> |--------|------|------|
+> | Expected Return | سود/بازده پیش‌بینی‌شده (نمایش) | predicted / policy |
+> | Actual Return | بازده محاسبه‌شده سیستم | engine از txs + NAV path |
+> | Distributed Income | سود نقدی تقسیم‌شده به کاربر | type=dividend (cash) |
+> | Reinvested Income | سود تبدیل به واحد | type=reinvest |
+> | Unrealized NAV Gain | تغییر ارزش از NAV بدون الزام دریافت نقد | nav_update / mark |
+>
+> **مثال:** خرید ۱۰۰ واحد + رشد NAV ≠ لزوماً سود نقدی.  
+> **مثال:** `dividend` ممکن است NAV را کاهش دهد در حالی که cash وارد می‌شود.  
+> Engine باید **مسیر NAV** و **مسیر توزیع نقدی/سرمایه‌گذاری مجدد** را جدا نگه دارد.
 
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
@@ -225,6 +239,24 @@ Accounts & Banking: واریز، برداشت و دریافت سود نقدی
 Currency & Multi-Currency: نرخ تتر لحظه‌ای
 Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
 
+
+
+## Return / Price Paths (P0 — قاطی نشوند)
+
+```text
+Transaction Price     →  cost basis, realized on redeem
+NAV                   →  valuation, unrealized NAV gain/loss
+External Reported Profit →  EXTERNAL_REPORTED (statement) — never silent overwrite calculated*
+
+Expected Return       →  display / compare only
+Actual Return         →  system calculated
+Distributed Income    →  dividend cash event
+Reinvested Income     →  reinvest units event
+Unrealized NAV Gain   →  NAV path without cash distribution
+```
+
+`nav_update` بدون cash ≠ `dividend`.  
+`dividend` می‌تواند با کاهش NAV همراه باشد؛ این دو event جدا ثبت می‌شوند (یا یک atomic op با دو leg صریح).
 
 ## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
 

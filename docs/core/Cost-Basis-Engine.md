@@ -74,6 +74,51 @@ interface CostBasisEngine {
 ### قانون نرمال‌سازی
 Feature **قبل از** `engine.apply` همه مبالغ پولی را با `convert(..., asOf)` به `costCurrency` می‌برد. Engine روی float خام چندارزی کار نمی‌کند.
 
+
+## Multi-Quote Cost Basis (P0 Crypto / همه Assetها)
+
+**مشکل:** خرید اول BTC به IRR و خرید دوم به USDT — یک فیلد تنها `averageBuyPrice` بدون ارز pool خراب می‌شود.
+
+**قانون:**
+
+```text
+Cost Pool داخلی Engine = همیشه به Base Currency کاربر (یا costCurrency قفل‌شده holding)
+
+totalCostBase
+quantity
+averageCostBase = totalCostBase / quantity
+```
+
+همزمان روی **هر transaction** (RAW — Preserve):
+
+```text
+originalAmount
+originalCurrency
+quoteCurrency
+exchangeRateToBase   (at post time)
+```
+
+هرگز برای «زیبایی» حذف نشوند.
+
+نمایش اختیاری (DERIVED، نه SoT دوم):
+
+```text
+Average Cost in Base
+Average Cost in USDT   (via rates / only if all legs convertible consistently)
+Average Cost in IRR
+```
+
+```text
+Feature:
+  leg (quote) → convert to base with exchangeRateToBase on that tx
+  → CostBasisEngine.apply با مبالغ base
+  → state.totalInvested / averageBuyPrice در costCurrency=base
+
+Raw quote fields روی tx برای audit و گزارش چندارزی می‌مانند.
+```
+
+**ممنوع:** میانگین‌گیری مستقیم `100_000_000 IRR` با `1000 USDT` بدون تبدیل به base.
+
 ## C2C
 
 ```text

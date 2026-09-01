@@ -103,6 +103,43 @@ Adapter plan باید برگرداند:
 
 ---
 
+
+## Canonical Crypto Transaction Fields (P0)
+
+هر معامله رمزارز **فقط quantity/price/fee ساده نیست**. مدل کامل:
+
+```text
+Transaction
+ ├── instrumentId          (Asset identity — ref_instruments)
+ ├── Gross Quantity
+ ├── Net Quantity
+ ├── Fee Quantity
+ ├── Fee Asset (instrumentId / currency)
+ ├── Quote Asset
+ ├── Price
+ ├── Gross Value
+ ├── Net Value
+ ├── Fee Value
+ ├── exchangeRateToBase
+ ├── Cost Basis fields (via CostBasisEngine — totalCostBase)
+ └── External Reference (txHash, provider id, …)
+```
+
+| Field | Kind | Notes |
+|-------|------|-------|
+| `instrumentId` | RAW FK | هویت دارایی |
+| `grossQuantity` | RAW | قبل از fee از base |
+| `feeQuantity` | RAW | مقدار fee به واحد fee asset |
+| `netQuantity` | RAW | اثر روی holding |
+| `feeAssetInstrumentId` / `feeCurrency` | RAW | |
+| `quoteAsset` / quote instrument | RAW | |
+| `price` | RAW | به quote |
+| `grossValue` / `netValue` / `feeValue` | RAW یا derived consistent | audit |
+| `exchangeRateToBase` | RAW at post | |
+| original quote amounts | RAW | **هرگز دور نریز** برای multi-currency cost |
+
+Holding با **netQuantity** به‌روز می‌شود؛ gross/fee برای بازسازی و reconcile حفظ می‌شوند.
+
 ## Domain Entities
 
 ### ۱. Crypto Exchange / Wallet (جدول: `inv_crypto_exchanges`)
@@ -160,9 +197,10 @@ Adapter plan باید برگرداند:
 - `assetKey` → string (nullable — **ایندکس راحتی** مشتق از meta ابزار؛ نه SoT هویت؛ برای سازگاری migration)
 - `providerInstrumentId` / `assetId` → string (nullable — شناسه Provider خارجی برای mapping؛ هرگز به‌جای instrumentId)
 - `quantity` → decimal (**DERIVED** از txs — cache؛ SoT = ledger)
-- `averageBuyPrice` → decimal (**DERIVED** CostBasisEngine)
-- `currency` → string
-- `totalInvested` → decimal (**DERIVED**)
+- `averageBuyPrice` / `averageCostBase` → decimal (**DERIVED** CostBasisEngine — در **costCurrency/base**)
+- `costCurrency` → string (معمولاً baseCurrency کاربر)
+- `totalInvested` / `totalCostBase` → decimal (**DERIVED** در costCurrency)
+- `currency` → string (display context؛ نه جایگزین costCurrency)
 - `totalFeesPaidBase` → decimal (**DERIVED** — مجموع feeBase txs)
 - `createdAt` / `updatedAt` → datetime
 
@@ -177,19 +215,33 @@ Adapter plan باید برگرداند:
 
 ### ۴. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
+هر فیلد یک‌بار در این فهرست تعریف می‌شود (Canonical name / Type / Nullable در معنای فیلد).
+
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
 - `instrumentId` → UUID (**اجباری** — FK → `ref_instruments.id`)
-- `symbol` → string (**label فقط** — نه identity)
-- `type` → string (`buy`, `sell`, `transfer_in`, `transfer_out`)
-- `quantity` → decimal
-- `price` → decimal
-- `totalAmount` → decimal
+- `symbol` → string (**label فقط** — نه identity؛ یک‌بار)
+- `type` → string (`buy`, `sell`, `transfer_in`, `transfer_out`) — C2C = دو leg با type buy/sell + `tradeGroupId`/`operationId` مشترک
+- `operationId` → UUID (nullable — گروه atomic؛ برای C2C/transfer اجباری هم‌تراز tradeGroupId/transferGroupId)
+- `tradeGroupId` → UUID (nullable — C2C legs)
+- `grossQuantity` → decimal (nullable — قبل از fee؛ وقتی fee از base/received)
+- `feeQuantity` → decimal (nullable — مقدار fee به واحد fee asset)
+- `netQuantity` → decimal (**اثر روی holding**؛ اگر fee نباشد = quantity)
+- `quantity` → decimal (alias سازگاری = **netQuantity**؛ SoT عملیاتی net است)
+- `price` → decimal (به quote)
+- `quoteCurrency` / quote instrument → string/UUID (ارز یا دارایی quote)
+- `grossValue` → decimal nullable
+- `netValue` → decimal nullable  
+- `feeValue` → decimal nullable
+- `totalAmount` → decimal (معمولاً هم‌تراز gross یا net value طبق convention صرافی — در همان tx مستند شود)
+- `originalAmount` → decimal nullable — مبلغ خام quote قبل از نرمال‌سازی base
+- `originalCurrency` → string nullable — ارز خام معامله
 - `feeAmount` → decimal
-- `feeCurrency` → string (ارز کارمزد: IRR, USDT, BTC و ...)
-- `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency !== baseCurrency` و مسیر convert مستقیم در rates نیست؛ قیمت کمکی fee→base — نه شرط IRR/USDT)
-- `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — برای تبدیل نهایی به ارز پایه کاربر)
-- `currency` → string
+- `feeCurrency` → string
+- `feeAssetInstrumentId` → UUID nullable
+- `feeAssetPriceToBase` → decimal nullable
+- `exchangeRateToBase` → decimal (**RAW at post** — برای Cost pool base؛ Preserve)
+- `currency` → string (quote یا settlement context)
 - `counterExchangeId` → UUID (صرافی/ولت مقابل — برای انتقال — nullable)
 - `networkId` → UUID (nullable — FK به `inv_crypto_wallet_networks.id`؛ برای `transfer_in`/`transfer_out` بین والت‌ها الزامی؛ برای `buy`/`sell` داخل صرافی null — فیلد string آزاد `network` ممنوع است؛ نمایش UI از `inv_crypto_wallet_networks.name`/`chainId` می‌آید)
 - `transferGroupId` → UUID (نال مگر برای `type: transfer_in`/`transfer_out` — بین دو رکورد `transfer_out` و `transfer_in` متناظر یک انتقال، مقدار یکسان و مشترک دارد؛ برای تشخیص قطعی جفت رکورد و Reversal صحیح وقتی چند انتقال هم‌زمان بین همان دو صرافی رخ می‌دهد)
@@ -313,6 +365,19 @@ totalInvested -= soldPortionCost
 > **توجه**: `totalAmountBase` در رکورد تراکنش فروش = مبلغ **قبل** از کسر کارمزد است (gross amount).
 > کارمزد جداگانه در `feeBase` از P&L کسر می‌شود.
 
+
+> **P0 — انتقال Wallet A → Wallet B = `Transfer`، نه Sell+Buy.**
+>
+> ```text
+> gross source quantity
+> network fee
+> net transferred quantity
+> destination received quantity
+> ```
+>
+> هر چهار مفهوم در صورت نیاز قابل بازسازی‌اند (RAW روی legs).  
+> `realizedPL = 0` (به‌جز fee burn طبق policy). Cost basis متناسب منتقل می‌شود — ببین Cost-Basis-Engine transfer_out/in.
+
 #### ۲-ج) انتقال (TRANSFER)
 
 **قرارداد ریاضی کامل (Mathematical Contract):**
@@ -373,6 +438,22 @@ costTransferred = 0.999 × 50,000 = 49,950 USDT ← این است که به مق
 > چون در transfer، کارمزد از **ارز ارسالی خودِ BTC** برداشته می‌شود —
 > مقصد واقعاً ۰.۹۹۹ BTC دریافت کرده، نه ۱ BTC.
 > در transfer معمولاً fee_from_received است. در BUY/SELL بستگی به `feePresence` دارد — نه همیشه بدون اثر روی quantity.
+
+
+> **P0 — C2C یک Operation واقعی است، نه فقط SELL.**
+>
+> ```text
+> USDT → BTC  ≠  یک SELL تنها
+> Operation (یک operationId / tradeGroupId)
+>    ├── Leg A  (Asset A out — e.g. SELL USDT)
+>    ├── Leg B  (Asset B in  — e.g. BUY BTC)
+>    └── Fee Legs
+> ```
+>
+> مثال: Sell 1000 USDT · Receive 0.016 BTC · Fee 5 USDT  
+> بدون `operationId`/`tradeGroupId` مشترک → P&L و Cost Basis بعداً می‌شکند.
+>
+> الگوی عمومی همه صرافی‌ها: **Operation → legs** (نه دو tx مستقل بدون لینک).
 
 #### ۲-د) معامله رمزارز-به-رمزارز (C2C)
 
