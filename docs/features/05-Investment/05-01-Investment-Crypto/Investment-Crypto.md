@@ -1494,3 +1494,7 @@ releasedCost = CostBasisEngine.dispose(fromHoldingId, qty)
 destCost = releasedCost + feesCapitalizedPerPolicy
 Forbidden: market value as historical destination cost.
 
+## FEAT-P0-007 DEEP — cash vs asset
+Exchange cash-like → inv_crypto_cash. Network tokens → holdings.
+No synthetic IRR/USDT cash rows inside token holdings.
+

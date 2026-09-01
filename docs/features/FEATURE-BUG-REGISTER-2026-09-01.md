@@ -65,7 +65,7 @@
 **قبولی:** C2C هیچ‌گاه latest market price را برای بازسازی historical cost استفاده نکند.
 
 ## FEAT-P0-007 — Crypto cash/asset split
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — inv_crypto_cash is cash SoT
 **مشکل:** متن قدیمی `IRR/USDT` را داخل holdings نگه می‌دارد، در حالی که قرارداد جدید `inv_crypto_cash` را SoT cash می‌داند.
 
 **راه‌حل:** `inv_crypto_cash` تنها SoT cash position؛ token holding فقط asset. USDT-TRC20/ERC20 asset مستقل؛ cash-like position جدا.
