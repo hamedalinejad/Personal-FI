@@ -177,7 +177,7 @@
 **راه‌حل:** فقط یک semantic: `1 from = rate to`; forward = multiply، inverse = divide. تمام helperها و examples با همین قرارداد بازنویسی شوند.
 
 ## FEAT-P0-025 — Currency hard-coded USDT bridge
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — no hard-coded USDT bridge
 **مشکل:** یک بخش Core/convert مسیر USDT را به‌صورت پیش‌فرض فرض می‌کند، در حالی که قرارداد جدید `configured_bridge` دارد.
 
 **راه‌حل:** bridge فقط از settings/versioned policy. v1 modes: direct, inverse, configured_bridge, manual. USDT default فقط اگر explicitly configured.

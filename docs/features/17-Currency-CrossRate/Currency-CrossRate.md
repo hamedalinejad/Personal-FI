@@ -156,8 +156,8 @@ async function convert(
  // ۳. تبدیل چندمرحله‌ای از طریق USDT به‌عنوان ارز واسط
  // مثال: BTC → USDT → IRR
  if (fromCurrency !== 'USDT' && toCurrency !== 'USDT') {
- const toUSDT = await convert(amount, fromCurrency, 'USDT');
- return convert(toUSDT, 'USDT', toCurrency);
+ // use settings.configuredBridge if mode=configured_bridge — never hard-code USDT
+ throw new Error('Use configured_bridge policy');
  }
 
  throw new Error(
@@ -465,4 +465,7 @@ No hard-coded USDT bridge in Core.
 ## FEAT-P0-024 DEEP
 All convert helpers: amountTo = amountFrom.times(rate) when rate means 1 from = rate to.
 Inverse path uses dividedBy only when applying inverse of a stored forward rate.
+
+## FEAT-P0-025 DEEP
+Bridge currency from settings.configuredBridge only. Core must not hard-code USDT as intermediate.
 
