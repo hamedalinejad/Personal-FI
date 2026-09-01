@@ -44,3 +44,18 @@
 | P0-028 | **CLOSED** | UNIQUE(templateId, scheduledOccurrenceKey) |
 | P0-029 | **CLOSED** | anchorDay + monthClamp last_day policy |
 | P0-030 | **CLOSED** | one reverseOperation for bounce after clear |
+
+## Batch P0-031 … P0-040
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-031 | **CLOSED** | reversalOperationId canonical; acc link derived |
+| P0-032 | **CLOSED** | currentNetWorth vs committedAdjustedNetWorth |
+| P0-033 | **CLOSED** | cash via operationId; header accountTransactionId legacy |
+| P0-034 | **CLOSED** | single fee treatment enum + mapping table |
+| P0-035 | **CLOSED** | fee context scheduleVersion + base snapshot |
+| P0-036 | **CLOSED** | rate by periodStart; accrueTo policy |
+| P0-037 | **CLOSED** | interestModel + dayCount explicit |
+| P0-038 | **CLOSED** | grace capitalize/waive flags explicit |
+| P0-039 | **CLOSED** | versioned allocation waterfall |
+| P0-040 | **CLOSED** | immutable schedule snapshots referenced by payments |

@@ -98,3 +98,14 @@ assert currencies aligned before arithmetic
 ```
 
 جمع مستقیم `feeAmount` با `amount` بدون تبدیل وقتی currency فرق دارد = **باگ**.
+
+---
+## P0-034 mapping
+
+| Stored (canonical) | Journal effect (summary) |
+|--------------------|---------------------------|
+| expense | Dr fee expense / Cr cash |
+| proceeds_reduction | reduces net proceeds |
+| capitalized_cost | add to asset/loan carrying |
+| reduction_of_carrying_amount | reduce liability/carrying |
+| reduction_of_liability (legacy) | → map to reduction_of_carrying_amount |

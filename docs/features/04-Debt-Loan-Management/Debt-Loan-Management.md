@@ -1809,3 +1809,97 @@ One dayCountConvention on loan copied to schedule snapshot; no silent mix mid-sc
 ## FEAT-P0-017 DEEP
 v1 methods: declining_balance, flat_rate, bullet, qarz_al_hasaneh only.
 
+---
+## P0-033 DEEP — cash lineage
+
+Canonical cash link:
+
+```text
+ln_transactions.operationId  →  fin_operations
+cash legs از operation (SettlementPort) — نه چند معنای accountTransactionId روی header
+```
+
+`ln_loans.accountTransactionId`: **deprecated/legacy optional** فقط اشاره به disbursement leg اولیه؛ SoT نیست.
+`ln_transactions.accountTransactionId`: optional Integrated pointer به همان cash leg همان op.
+
+## P0-034 DEEP — fee accountingTreatment
+
+Canonical enum only:
+
+`expense` | `proceeds_reduction` | `capitalized_cost` | `reduction_of_carrying_amount`
+
+`reduction_of_liability` = **alias migration** → `reduction_of_carrying_amount` (journal map یکسان در Fee-Treatment-Matrix).
+
+## P0-035 DEEP — percentage fee base snapshot
+
+وقتی fee = `% of installment` و early payment schedule را عوض می‌کند:
+
+```text
+feeContext: {
+  scheduleVersion,
+  installmentId,
+  installmentBaseAmountSnapshot,  // مبلغ مبنا در لحظه محاسبه fee
+  rateOrPercent,
+  calculationVersion
+}
+```
+
+Rebuild fee از snapshot — نه از installment «فعلی» بعد از recast بدون context.
+
+## P0-036 DEEP — variable rate accrual boundary
+
+انتخاب نرخ از `ln_rate_history`:
+
+```text
+rate where effectiveDate <= periodStart (or accrual instant)
+```
+
+نه فقط `effectiveDate <= dueDate` بدون تعریف period.
+
+برای هر قسط: `[periodStart, periodEnd)` صریح؛ پرداخت زودتر/دیرتر accrual را تا تاریخ پرداخت یا تا due طبق policy جدا (`accrueTo: paymentDate | dueDate`) مشخص می‌کند.
+
+## P0-037 DEEP — rate basis vs day-count
+
+Contract روی loan/scheduleVersion:
+
+```text
+interestModel: period_rate | daily_rate
+dayCountConvention: 30/360 | actual/365 | …
+```
+
+هر دو **صریح**؛ ممنوع اعمال همزمان مبهم (مثلاً نرخ ماهانه × روز بدون فرمول اعلام‌شده).
+Rate engine یک precedence document دارد: formula = f(model, dayCount, principal, dates).
+
+## P0-038 DEEP — grace capitalization
+
+روی loan:
+
+```text
+graceInterestAccrues: boolean
+graceCapitalizeToPrincipal: boolean  // اگر true، سود تنفس در پایان grace به principal اضافه می‌شود (operation)
+graceInterestWaived: boolean
+```
+
+اگر capitalize: Financial Operation در پایان grace؛ scheduleVersion جدید.
+Default v1 اگر مشخص نشده: `graceInterestAccrues=false` برای qarz؛ برای declining طبق قرارداد صریح — **بدون** پیش‌فرض پنهان capitalize.
+
+## P0-039 DEEP — allocation waterfall
+
+Policy versioned روی loan یا global:
+
+```text
+defaultOrder: penalty → fee → interest → principal
+```
+
+هر payment: `allocationPolicyVersion` + نتایج component در ln_transactions / payment components.
+Rebuild allocation از همان version — deterministic.
+
+## P0-040 DEEP — schedule versions immutable
+
+```text
+ln_schedule_snapshots: immutable rows
+payment.scheduleVersion / installment references snapshot id
+early payment / rate change → new snapshot; old retained
+```
+
+Historical reconstruction همیشه از snapshot اشاره‌شده — نه فقط «آخرین schedule».

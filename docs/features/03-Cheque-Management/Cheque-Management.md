@@ -67,7 +67,8 @@ Domain Entities
 - `attachmentPath` → string (تصویر چک)
 - `clearedDate` → datetime (تاریخ وصول — nullable)
 - `accountTransactionId` → UUID (شناسه تراکنش مرتبط در `acc_transactions` — nullable)
-- `reversalTransactionId` → UUID (شناسه تراکنش reversal هنگام برگشت چک — nullable)
+- `reversalOperationId` → UUID (canonical — `fin_operations.id` عملیات reverse؛ nullable)
+- `reversalTransactionId` → UUID nullable **derived/legacy** لینک به acc leg در صورت Integrated — نه SoT lineage
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
@@ -271,3 +272,22 @@ cheque.reversalOperationId = newReversalOpId
 ```
 
 ممنوع: void ردیف clear **و** INSERT reversal جدا که هر دو cash را جابه‌جا کنند (double).
+
+---
+## P0-031 DEEP — reversal lineage
+
+Canonical: **`reversalOperationId`** → `fin_operations`.
+لینک `acc_transactions` فقط مشتق از cash legs همان operation (Integrated).
+گزارش/audit از operation chain استفاده می‌کنند نه فقط acc id.
+
+## P0-032 DEEP — pending cheque vs Net Worth
+
+دو metric رسمی جدا:
+
+| Metric | تعریف |
+|--------|--------|
+| **currentNetWorth** | assets − liabilities **بدون** تعهد چک pending به‌عنوان liability قطعی |
+| **committedAdjustedNetWorth** (optional view) | currentNetWorth − Σ payable pending cheques (و تعهدات مشابه) |
+
+ممنوع: کم‌کردن pending هم از available و هم به‌عنوان liability در همان عدد NW بدون برچسب — double subtraction.
+UI باید نام metric را نشان دهد.
