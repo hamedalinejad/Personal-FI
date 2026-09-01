@@ -45,19 +45,63 @@ lib/
 ---
 
 ## راهنمای پیاده‌سازی
-- Wrapperهای sql.js، decimal.js، date-fns/jalali اینجا
-- تنظیمات init یک‌بار در bootstrap اپ
+- Wrapperهای **کتابخانه‌های واقعاً مستقر در پروژه** فقط در صورت داشتن مسئولیت عمومی در این پوشه قرار می‌گیرند.
+- `sql.js` و persistence زیر مالکیت `core/db` هستند؛ `decimal.js` مالکیت محاسبات/engines را دارد؛ این پوشه فقط wrapperی را نگه می‌دارد که واقعاً در runtime نیاز به facade/config مشترک دارد.
+- `dayjs` برای presentation/date utilities این پروژه؛ منطق Canonical Date و Date-Semantics در Core/Feature docs باقی می‌ماند.
+- تنظیمات init یک‌بار در bootstrap اپ انجام می‌شود؛ init تکراری در featureها ممنوع است.
 
 ---
 
 ## کتابخانه‌های اصلی و دلیل انتخاب
 
-| Library | دلیل |
-|---------|------|
-| **decimal.js** | محاسبات مالی دقیق؛ ممنوعیت float |
-| **dayjs** (+ plugin جلالی) | تاریخ با timezone و تقویم شمسی |
-| **uuid** | PK از نوع UUID v4 |
-| **sql.js** | SQLite در مرورگر برای offline-first |
-| **zod** | اعتبارسنجی schema در مرز API/UI |
+| Library | دلیل | محل مالکیت/runtime |
+|---------|------|---------------------|
+| **decimal.js** | محاسبات مالی دقیق؛ ممنوعیت float | Core calculation/engines؛ wrapper فقط در صورت نیاز |
+| **dayjs** (+ plugin جلالی) | تاریخ و presentation تقویمی | `lib/dayjs.ts` |
+| **uuid** | PK از نوع UUID v4 | Core ID generation |
+| **sql.js** | SQLite در مرورگر برای offline-first | `core/db/`؛ **نه** `lib/` |
+| **zod** | اعتبارسنجی schema در مرز API/UI | `lib/zod.ts` برای schema مشترک |
 
-نسخه‌ها در `package.json` قفل می‌شوند؛ این سند فقط نقش را ثابت می‌کند.
+### Library Version / Ownership Contract
+
+نسخه دقیق dependencyها فقط از **manifest قفل‌شده پروژه** (`package.json` و lockfile) معتبر است. این سند نباید نسخه‌ای را حدس بزند یا نسخه را به‌صورت موازی نگه دارد.
+
+قواعد:
+
+1. برای هر dependency فقط **یک محل تعریف نسخه** وجود دارد: manifest + lockfile.
+2. `docs/lib/lib.md` فقط نقش، ownership و قرارداد استفاده را تعریف می‌کند.
+3. اضافه‌کردن dependency جدید باید هم‌زمان دلیل، scope، offline impact و محل import مجاز آن مستند شود.
+4. libraryی که فقط برای یک feature لازم است نباید بدون دلیل به shared `lib/` ارتقا پیدا کند.
+5. dependencyهای مخصوص شبکه/API خارجی باید داخل feature/infrastructure همان feature باشند، نه `lib/` عمومی.
+6. upgrade کتابخانه‌ای که روی محاسبات مالی، parsing یا persistence اثر دارد باید golden fixtureهای مرتبط را دوباره اجرا کند.
+
+### Import Boundary
+
+```text
+UI / Feature
+   ↓
+Public facade یا core utility
+   ↓
+lib wrapper (فقط اگر shared wrapper لازم باشد)
+   ↓
+external library
+```
+
+ممنوع:
+
+```text
+Feature A → internal file of Feature B
+Feature → raw package configuration
+UI → direct sql.js / raw DB
+```
+
+### Security / Env Contract
+
+`import.meta.env` در اپ مرورگری **secret store نیست**. هیچ API key، license secret، private key یا credential نباید در `env.ts` به‌عنوان مقدار قابل bundle تعریف شود. اگر feature نیاز به API key کاربر دارد، آن key طبق قرارداد `core/services/storage/sessionStorageService` مدیریت می‌شود و به bundle نهایی راه پیدا نمی‌کند.
+
+### یافته‌های ممیزی این بخش
+
+- نام `date-fns/jalali` در راهنمای قبلی با ساختار واقعی `lib/` هم‌خوان نبود و با `dayjs` تداخل مفهومی داشت؛ اصلاح شد.
+- `sql.js` و persistence قبلاً به‌عنوان wrapper احتمالی `lib/` معرفی می‌شدند در حالی که مالکیت واقعی در `core/db` است؛ اصلاح شد.
+- «نسخه‌ها در package.json قفل می‌شوند» به‌تنهایی قرارداد کافی نیست؛ lockfile و manifest تنها SoT نسخه شدند.
+- `env.ts` نباید حتی از نظر قراردادی محل نگهداری secret باشد؛ مرز bundle در سند صریح شد.
