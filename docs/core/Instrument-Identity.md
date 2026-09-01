@@ -134,3 +134,9 @@ Symbol (display current)
 - `instrument_symbol_history` با `effectiveFrom` · `effectiveTo` · `reason`
 
 تغییر نماد ≠ تغییر instrumentId.
+
+---
+## FEAT-P0-003 DEEP
+Public query/rebuild keys: `instrumentId` only.
+Forbidden: rebuild/query by `symbol` alone.
+`assetKey`/`ISIN`/`ticker` = attributes for search/provider map.

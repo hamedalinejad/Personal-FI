@@ -33,7 +33,7 @@
 **قبولی:** `rebuild*FromLedger()` باید بتواند snapshot را بدون تکیه بر snapshot قبلی بازسازی کند.
 
 ## FEAT-P0-003 — Identity drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — instrumentId only for rebuild/query
 **مشکل:** در Crypto و Price Fetching بین `instrumentId`, `assetKey`, `symbol` و در Stocks بین `instrumentId`/ISIN/symbol نقش‌های متناقض دیده می‌شود.
 
 **راه‌حل:** `ref_instruments.id` تنها identity دارایی. `assetKey` فقط mapping/index. `symbol` فقط label. Public APIهای جدید باید identity canonical بگیرند.
