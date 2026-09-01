@@ -79,3 +79,5 @@
 | Rebuild API | `docs/core/Rebuild-API-Contract.md` |
 | Product Principle | `docs/core/Product-Principle.md` |
 | P0 Risk Register | `docs/core/P0-Risk-Register.md` |
+| P1 Risk Register | `docs/core/P1-Risk-Register.md` |
+| Fiscal Period Lock | `docs/core/Fiscal-Period-Lock.md` |

@@ -76,3 +76,9 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 ## Gate اجباری
 
 قبل از code مالی: مرور `P0-Risk-Register.md` (۹ مورد). همه باید در docs ✅ و در روز اول کد enforce شوند.
+
+---
+
+## Gate P1
+
+قبل از MVP کامل: `P1-Risk-Register.md` (۱۱ مورد) — شامل Fiscal Period Lock و Lot/CA/Fund/FX history/Audit.

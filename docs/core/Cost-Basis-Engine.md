@@ -315,3 +315,12 @@ v1 پیش‌فرض: WAC؛ بقیه طبق edition/policy.
 **بدون `txHash`:** دیتا پاک نمی‌شود؛ `txHash` nullable ولی برای import/on-chain provenance توصیه قوی / Should برای sync.
 
 transfer_out بین ولت‌های خود کاربر نباید realized gain بسازد مگر policy صریح.
+
+---
+
+## Lot Tracking (P1 Risk)
+
+- **v1:** Weighted Average per `holdingId` (cost pool) کافی و اجباری است.
+- **FIFO / lots:** وقتی method=fifo، lots از ledger **rebuild** می‌شوند (`acquiredAt`, businessDate, createdAt tie-break)؛ ذخیره lot بدون قابلیت rebuild از events ممنوع به‌عنوان تنها SoT.
+- Specific lot identification: v1.1+ با انتخاب صریح هنگام disposal.
+- بدون lot/pool صحیح، Realized P&L در فروش‌های جزئی اشتباه می‌شود — fixture الزامی.

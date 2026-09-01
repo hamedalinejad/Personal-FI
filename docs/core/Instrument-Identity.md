@@ -103,3 +103,15 @@ USDT ذاتاً همیشه Cash یا همیشه Investment نیست:
 | USDT-TRC20 / USDT-ERC20 به‌عنوان holding | **Instrument / Investment** با instrumentId جدا |
 
 دو شبکه = دو `ref_instruments` جدا. این اصل Core باقی می‌ماند.
+
+---
+
+## P1 Risk: symbol as identity — ممنوع
+
+تغییر نماد بورسی یا rename نمایشی **نباید** تاریخچه holding/tx را بشکند.
+
+```text
+SoT identity = instrumentId (ref_instruments)
+ISIN = attribute پایدار وقتی موجود است
+symbol / ticker = display / search only
+```
