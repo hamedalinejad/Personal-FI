@@ -267,3 +267,6 @@ All tax snapshots key (taxYear, taxCalendar). Investment tax links use linkedTax
 ## FEAT-P0-049 DEEP
 Tax payment creates one cash leg. Expense category view may reference same operationId — no second cash tx.
 
+## FEAT-P0-050 DEEP
+feeTax on trades = cost component. tax_events = liability/payment domain. Withholding not posted twice as expense+feeTax.
+

@@ -327,7 +327,7 @@
 **راه‌حل:** Tax payment یک Financial Operation با یک cash leg tax-specific؛ Expense گزارش از همان operation category را می‌خواند، نه یک cash transaction دوم.
 
 ## FEAT-P0-050 — Tax event vs feeTax
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — feeTax vs tax event
 **مشکل:** `feeTax` transaction cost است و tax liability/event چیز دیگری، ولی metadataهای قدیمی هنوز هر دو را در بعضی Featureها مخلوط می‌کنند.
 
 **راه‌حل:** feeTax فقط trade economics؛ tax event/liability فقط Tax domain؛ withholding یک economic amount واحد و بدون double expense.
