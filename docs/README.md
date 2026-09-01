@@ -60,3 +60,4 @@
 | Spec freeze | `docs/core/SPEC-FREEZE.md` |
 | Field ownership | `docs/core/Field-Level-Data-Ownership-Matrix.md` |
 | Instrument identity | `docs/core/Instrument-Identity.md` |
+| Canonical cash (P0) | `docs/core/Canonical-Cash-Model.md` |

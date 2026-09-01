@@ -1,31 +1,52 @@
 # 05 constraints polymorphic
 
-## قرارداد CHECK Constraints در SQLite
+## قرارداد CHECK Constraints در SQLite (P0 Decimal TEXT)
 
-قوانین Domain لازم‌اند ولی کافی نیستند. Schema باید تا حد ممکن همان invariants را enforce کند تا خطای Domain نتواند `quantity = -1` را commit کند.
+مبالغ، quantity، price، rate به‌صورت **TEXT** (decimal string) ذخیره می‌شوند.  
+**SQLite مقایسه عددی قابل‌اتکا روی TEXT ندارد** — نباید به‌عنوان تنها محافظ صحت Decimal به آن تکیه کرد.
 
-### حداقل CHECKهای الزامی (نمونه — در `schema.sql` پیاده‌سازی)
+### سه لایه اعتبارسنجی (اجباری)
+
+```text
+API Validation          (shape، required، enum)
+        ↓
+Domain Decimal Validation  (decimal.js parse + rules)
+        ↓
+SQLite Structural Constraint   (NOT NULL، length، enum type — نه مقایسه عددی مالی)
+```
+
+### ممنوع به‌عنوان تنها محافظ (و گمراه‌کننده روی TEXT)
 
 ```sql
--- مبالغ و موجودی‌ها
--- مبلغ مالی TEXT است؛ مقایسه عددی amount > 0 را به Domain بسپارید
-CHECK (length(trim(amount)) > 0)  -- structural only
-CHECK (feeAmount IS NULL OR feeAmount >= 0)
-CHECK (quantity >= 0) -- holdings
-CHECK (quantityMg >= 0)
-CHECK (units >= 0)
-CHECK (currentBalance IS NOT NULL) -- علامت می‌تواند منفی نباشد مگر overdraft صریح مجاز باشد
-CHECK (price > 0) -- price_history
+-- ممنوع اتکا برای correctness مالی:
+CHECK (feeAmount >= 0)
+CHECK (quantity >= 0)
+CHECK (price > 0)
 CHECK (averageBuyPrice >= 0)
-CHECK (purityRatio > 0 AND purityRatio <= 1)
-CHECK (exchangeRateToBase IS NULL OR exchangeRateToBase > 0)
+CHECK (exchangeRateToBase > 0)
+CHECK (amount > 0)
+```
+
+روی TEXT، `" 10 "`, `"1..2"`, `"abc"`, `"--10"` یا ترتیب lexicographic ممکن است رفتار غیرعددی بدهد. **این CHECKها جایگزین Domain نیستند.**
+
+### CHECK ساختاری مجاز (نمونه schema)
+
+```sql
+-- structural only — نه correctness عددی
+CHECK (length(trim(amount)) > 0)
+CHECK (amount IS NOT NULL)
+CHECK (feeAmount IS NULL OR length(trim(feeAmount)) > 0)
+CHECK (type IN ('buy','sell','transfer_in','transfer_out'))  -- enum-like
+CHECK (currentBalance IS NOT NULL)  -- وجود فیلد cache؛ مقدار را Domain می‌نویسد
+-- purityRatio اگر REAL باشد مقایسه عددی OK؛ اگر TEXT باشد مثل بقیه در Domain
 ```
 
 ### قوانین
-1. هر فیلد کمّی مالی که در Domain «نباید منفی/صفر باشد» باید در صورت امکان CHECK داشته باشد.
-2. اگر قانون پیچیده است (مثلاً amount علامت‌دار بر اساس type)، از CHECK ترکیبی `(type IN (...) AND amount > 0) OR ...` استفاده شود.
-3. Domain همچنان validate می‌کند (پیام خطای کاربرپسند)؛ DB آخرین خط دفاع است.
-4. `PRAGMA foreign_keys = ON` در هر اتصال sql.js **اجباری** است.
+1. **تمام Decimal stringها قبل از persist** باید توسط Decimal Parser کاننیکال شوند (مثلاً `"12.500000"` → canonical طبق PrecisionPolicy).
+2. **هیچ محاسبه مالی** (`+ − × ÷`، جمع مانده، P&L، کارمزد) نباید توسط SQLite انجام شود — فقط Decimal Engine در Domain.
+3. **ممنوع:** `SUM(amount)` / `SUM(quantity)` روی ستون‌های مالی TEXT.
+4. Domain validate می‌کند (پیام کاربرپسند)؛ DB فقط structural + FK.
+5. `PRAGMA foreign_keys = ON` در هر اتصال sql.js **اجباری** است.
 
 ---
 
@@ -167,19 +188,30 @@ Polymorphic برای notes/tags/generic. **روابط حساس** (Loan→Party, 
 
 ---
 
-## Decimal روی TEXT — CHECK عددی کافی نیست
+## Decimal روی TEXT — CHECK عددی کافی نیست (P0)
 
 SQLite affinity برای TEXT مقایسه عددی قابل‌اتکا روی `CHECK (amount > 0)` نمی‌دهد.
 
 **Domain (اجباری با decimal.js):**
 ```text
-input → Decimal.parse → validate (>0 / >=0) → normalize canonical string → SQLite
+input
+  → trim
+  → Decimal.parse (رد: "abc", "1..2", "--10", " 10 " با فضای معنی‌دار غلط، خالی)
+  → validate علامت/حد (≥0, >0, …)
+  → normalize canonical string طبق PrecisionPolicy / instrument scale
+  → SQLite TEXT
 ```
 
 **DB فقط structural:**
-- NOT NULL
-- `CHECK(length(trim(amount)) > 0)`
-- FK / UNIQUE
+- `NOT NULL` روی فیلدهای اجباری
+- `CHECK (length(trim(col)) > 0)`
 - enum-like CHECK روی type/status
+- **نه** `CHECK (col >= 0)` به‌عنوان correctness مالی
 
-اعتبارسنجی `amount > 0`, `quantity >= 0`, `fee >= 0`, `rate > 0` = **Domain-level only**.
+**ممنوع در SQL:**
+- aggregation مالی با `SUM`/`AVG` روی TEXT decimal
+- مقایسه عددی برای business rule فقط در SQL
+
+**اجباری در Documentation/Code review:** هر PR که `SUM(` روی amount/quantity/price بزند رد می‌شود مگر ستون non-financial INTEGER باشد.
+
+جزئیات: `Implementation-Pitfalls.md` · `Precision-Policy.md` · `Rounding-Policy.md`

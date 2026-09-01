@@ -4,12 +4,12 @@
 
 | مفهوم | مالک Canonical |
 |--------|----------------|
-| Bank Balance | Cash Ledger (`acc_transactions` rebuild) |
+| **Any Cash Balance** | **`fin_journal_lines` + `fin_accounts`** (`Canonical-Cash-Model.md`) |
 | Income detail | Income Domain + Journal lines |
 | Expense detail | Expense Domain + Journal lines |
-| Cash movement (bank) | Accounts / `acc_transactions` |
-| Crypto platform cash | **`inv_crypto_cash`** (not parallel fin balance) |
-| Brokerage cash | single brokerage cash ledger |
+| Cash movement (bank) | Journal lines + `acc_transactions` event (نه balance موازی) |
+| Crypto / exchange / wallet **cash** | **`fin_accounts` (systemRole=exchange_cash/wallet_cash) + journal**؛ `inv_crypto_cash` فقط projection |
+| Brokerage cash | `fin_accounts` (systemRole=broker_cash) + journal |
 | Crypto Holding qty | Crypto Domain Ledger |
 | Loan Outstanding | Loan Domain Ledger (`ln_transactions`) |
 | Book Cost / average cost | Cost Basis Engine (derived from domain) |

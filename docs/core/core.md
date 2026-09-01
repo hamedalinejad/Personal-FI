@@ -64,6 +64,7 @@
 - `Feature-API-Contract.md` — Command/Query، TS API، sourceType
 - `Core-Engines.md` — لیست engineهای مرکزی
 - `Source-of-Truth-Matrix.md` — یک سؤال → یک منبع
+- `Canonical-Cash-Model.md` — **P0** تنها SoT نقد = fin_accounts + journal
 - `Loan-Component-Classification.md`
 - `Data-Preservation-Contract.md`
 - `Data-Dictionary.md`

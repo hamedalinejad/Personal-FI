@@ -1,5 +1,11 @@
 # Accounting Core — قلب واقعی سیستم (نه ERP)
 
+> **P0 Cash:** تنها SoT مانده نقد = `fin_accounts` + `fin_journal_lines`.  
+> Bank / Exchange / Broker / Wallet / Cashbox همگی Account هستند.  
+> `inv_crypto_cash` و cacheهای دامنه projection‌اند نه ledger موازی.  
+> جزئیات: `Canonical-Cash-Model.md`.
+
+
 ## اصل معماری
 
 Featureها **زیرسیستم مالی موازی** نیستند. هر Feature فقط Domain تخصصی + adapter است؛ حقیقت مالی میان‌فیچری از **Accounting Core** می‌گذرد.

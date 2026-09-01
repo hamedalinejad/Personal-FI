@@ -74,8 +74,9 @@ USDT روی شبکه‌های مختلف = **چند instrument جدا** (هر ک
 | `inv_metals_transactions.quantity` | RAW | Metals Ledger | No | User | — | Preserve |
 | `inv_metals_holdings.quantity` | DERIVED | Holding Engine | No | — | txs | Rebuild |
 | `acc_transactions.amount` | RAW | Banking Ledger | No | User | — | Preserve |
-| bank `currentBalance` | SNAPSHOT | Accounts | No | — | acc_transactions | Rebuild |
-| `inv_crypto_cash.balance` | DERIVED/SNAPSHOT | Crypto Cash | No | — | cash ledger txs | Rebuild |
+| bank / exchange / broker `currentBalance` | SNAPSHOT | Accounting cache | No | — | **fin_journal_lines** همان fin_accounts | Rebuild |
+| `inv_crypto_cash.balance` | SNAPSHOT (اختیاری) | Projection only | No | — | **همان finAccountId journal** | Rebuild یا حذف ستون |
+| `fin_journal_lines.debit/credit` (نقد) | RAW | Accounting Core | No | Atomic op | — | Preserve |
 | `ln_transactions.*` amounts | RAW | Loan Ledger | No | User | — | Preserve |
 | loan `remainingBalance` | DERIVED | Loan Engine | No | — | ln_transactions | Rebuild |
 

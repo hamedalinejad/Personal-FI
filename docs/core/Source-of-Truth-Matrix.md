@@ -4,8 +4,9 @@ Developer نباید بین لایه‌ها حدس بزند. **Snapshot هرگز
 
 | سؤال | منبع حقیقت |
 |------|------------|
-| موجودی بانک | `acc_transactions` (rebuild balance) |
-| موجودی / qty Crypto | `inv_crypto_transactions` (+ holding derived) |
+| **هر موجودی نقد** (بانک، صرافی، کارگزاری، کیف، صندوق نقد) | **`fin_journal_lines` روی `fin_accounts` نقد** (rebuild با Decimal Engine) — ببین `Canonical-Cash-Model.md` |
+| موجودی بانک (رویداد عملیاتی / UI بانک) | `acc_transactions` = event log؛ مانده = همان journal حساب `bank_cash` |
+| موجودی / qty Crypto **Asset** | `inv_crypto_transactions` (+ holding derived) |
 | تعداد سهم | `inv_stocks_iran_transactions` |
 | Units صندوق | `inv_fif_transactions` |
 | موجودی طلا (mg) | `inv_metals_transactions` |
@@ -13,14 +14,14 @@ Developer نباید بین لایه‌ها حدس بزند. **Snapshot هرگز
 | Income / Expense تخصصی UI | domain `inc_*` / `exp_*` |
 | Trial Balance / گزارش میان‌فیچری | **`fin_journal_lines`** (+ `fin_accounts`) |
 | Historical financial report | Journal lines |
-| Net Worth / Portfolio value | **محاسبه** از holdings + prices + cash − liabilities (نه port_snapshots به‌عنوان SoT) |
-| `currentBalance` / holding snapshot / `remainingBalance` | **فقط Cache** — از ledger rebuild |
+| Net Worth / Portfolio value | **محاسبه** از holdings + prices + **cash از journal** − liabilities (نه port_snapshots به‌عنوان SoT) |
+| `currentBalance` / holding snapshot / `remainingBalance` / `inv_crypto_cash.balance` | **فقط Cache** — از journal (نقد) یا asset ledger rebuild |
 
 ```text
-Domain Ledger  →  qty / cost / portions تخصصی Asset
-Journal        →  گزارش حساب‌به‌حساب و میان‌فیچری
-Cash Ledger    →  پول بانکی
-Snapshot       →  optimization فقط
+Asset Domain Ledger  →  qty / cost / portions تخصصی Asset (نه نقد)
+Journal + fin_accounts →  **تنها SoT نقد** و گزارش حساب‌به‌حساب
+Domain cash tables     →  event / projection — نه balance موازی
+Snapshot               →  optimization فقط
 ```
 
 جزئیات: `Raw-vs-Derived-Data.md` · `Financial-Invariants` · `db/03-journal-sot-reporting.md`
@@ -29,40 +30,41 @@ Snapshot       →  optimization فقط
 
 | Concept | Raw Source | Derived | Rebuild From |
 |---------|------------|---------|--------------|
-| Bank Balance | acc_transactions | currentBalance | acc_transactions |
+| Cash Balance (any) | fin_journal_lines | currentBalance / domain projection | journal lines (Decimal Engine) |
+| Bank events | acc_transactions | — | — |
 | Journal Balance | fin_journal_lines | — | journal |
-| Crypto Qty | inv_crypto_transactions | holding | crypto ledger |
+| Crypto **Asset** Qty | inv_crypto_transactions | holding | crypto asset ledger |
 | Loan Balance | ln_transactions | remainingBalance | ln_transactions |
 | Net Worth | ledgers + valuation | snapshot | all canonical |
 | Portfolio Value | holdings + prices + FX | snapshot | same |
 
 ---
 
-## قانون: هر موجودی فقط یک Domain SoT
+## قانون: نقد یک SoT — دارایی یک Domain Ledger
 
-**ممنوع:** دو جدول balance مستقل برای یک پول (مثلاً Binance $1000 هم در `inv_crypto_cash` و هم به‌عنوان balance مستقل در `fin_accounts` بدون اینکه journal projection باشد).
+**ممنوع (P0):** دو balance مستقل برای یک پول (مثلاً Binance USDT هم در `inv_crypto_cash.balance` و هم `fin_accounts` بدون اینکه یکی cache محض باشد).
 
-| موجودی | Domain SoT (qty/balance) | Accounting projection |
-|--------|--------------------------|------------------------|
-| Bank Cash | `acc_transactions` | `fin_accounts` + journal lines |
-| Crypto Exchange/Wallet **Cash** | **`inv_crypto_cash` ledger/tx** | journal lines → linked `fin_accounts` (systemRole=exchange_cash) **derived** |
-| Crypto **Asset** qty | `inv_crypto_transactions` | journal asset accounts derived |
-| Brokerage Cash (سهام/ETF) | **یک** brokerage cash ledger | journal derived |
-| Stock qty | `inv_stocks_iran_transactions` | journal derived |
-| Fund units | `inv_fif_transactions` | journal derived |
-| Loan balance | `ln_transactions` | journal liability/receivable derived |
+| موجودی | SoT مانده | نقش Domain |
+|--------|-----------|------------|
+| **همه انواع Cash** (Bank / Exchange / Broker / Wallet / Cashbox) | **`fin_journal_lines` + `fin_accounts`** | `acc_transactions` / `inv_crypto_cash` فقط event یا projection |
+| Crypto **Asset** qty | `inv_crypto_transactions` | holding derived |
+| Stock qty | `inv_stocks_iran_transactions` | holding derived |
+| Fund units | `inv_fif_transactions` | holding derived |
+| Metal qty | `inv_metals_transactions` | holding derived |
+| Loan balance | `ln_transactions` | journal liability derived |
 
 ```text
-Domain SoT  =  حقیقت موجودی
-fin_accounts / journal  =  نمای حسابداری همان حرکت (نه موجودی دوم)
-Snapshot  =  cache
+Cash SoT     = fin_accounts + fin_journal_lines
+Asset SoT    = inv_*_transactions (qty تخصصی)
+Domain cash  = projection / metadata (اختیاری) — هرگز ledger موازی
+Snapshot     = cache
 ```
 
-اگر `inv_crypto_cash = 1000` و journal/fin نشان دهد 998 → **reconcile**؛ Domain cash ledger برنده برای qty؛ journal برای trial balance — drift = integrity issue نه دو SoT موازی.
+اگر `inv_crypto_cash.balance = 1000` و journal همان `finAccountId` نشان دهد 998 → **journal برنده**؛ projection باید rebuild شود. drift = integrity bug.
 
-`fin_accounts` برای exchange cash = **آینه حسابداری** با `linkedEntityType/Id` به crypto cash account — balance از domain rebuild می‌شود، نه write مستقل موازی.
+جزئیات کامل: **`Canonical-Cash-Model.md`**
 
-**تأکید:** `currentBalance`, `remainingBalance`, `quantity` holding, `averageBuyPrice`, `totalInvested`, `portfolioValue` = **cache/derived** — هرگز SoT.
+**تأکید:** `currentBalance`, `remainingBalance`, `quantity` holding, `averageBuyPrice`, `totalInvested`, `portfolioValue`, `inv_crypto_cash.balance` = **cache/derived** — هرگز SoT.
 
 ## Reports
 

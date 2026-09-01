@@ -46,3 +46,17 @@ Round فقط در مرز نمایش یا طبق `Rounding-Policy.md` — نه و
 | Percentage | جدا |
 
 Registry = منبع precision؛ Feature نباید hard-code کند.
+
+
+---
+
+## Canonical Decimal String قبل از persist (P0)
+
+```text
+input → Decimal.parse → validate → normalize(scale, roundingMode) → TEXT canonical → SQLite
+```
+
+- هیچ محاسبه مالی در SQLite
+- هیچ `SUM` روی TEXT مالی
+- CHECK عددی روی TEXT = غیرقابل‌اتکا؛ صحت فقط Domain
+- ارجاع: `db/05-constraints-polymorphic.md` · `Implementation-Pitfalls.md`

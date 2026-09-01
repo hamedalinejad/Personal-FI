@@ -2,13 +2,25 @@
 
 این‌ها **هشدار اجباری**اند تا فیلد/محاسبه خراب نشود.
 
-## الف) SUM روی TEXT در SQLite
+## الف) SUM / CHECK عددی روی TEXT در SQLite (P0)
 
-مبالغ/qty به‌صورت **TEXT decimal** ذخیره می‌شوند.
+مبالغ/qty/price/rate به‌صورت **TEXT decimal** ذخیره می‌شوند.
 
-**ممنوع:** `SUM(quantity)` / `SUM(amount)` در SQL روی ستون‌های مالی — SQLite ممکن است cast اشتباه کند.
+**ممنوع:**
+- `SUM(quantity)` / `SUM(amount)` / هر aggregation مالی در SQL روی ستون‌های مالی
+- اتکا به `CHECK (quantity >= 0)` روی TEXT به‌عنوان صحت Decimal
+- محاسبه مانده نقد با SQL به‌جای Decimal Engine روی `fin_journal_lines`
 
-**الزام:** Fetch آرایه string → جمع فقط با **decimal.js** در Domain (حلقه).
+**الزام:**
+```text
+API validate → Domain Decimal.parse + canonical → persist TEXT
+خواندن: fetch strings → decimal.js فقط در Domain
+مانده نقد: sum journal lines در Decimal Engine (Canonical-Cash-Model)
+```
+
+ورودی‌های رد‌شده نمونه: `"abc"`, `"1..2"`, `"--10"`, `" 10 "` (فضای غیرمجاز), خالی.
+
+سه لایه: `API → Domain Decimal → SQLite structural` — ببین `db/05-constraints-polymorphic.md`.
 
 ## ب) قسط آخر وام (Residual Fix)
 
