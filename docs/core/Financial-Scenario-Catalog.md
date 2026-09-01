@@ -48,3 +48,5 @@ Input → Domain · Cash · Journal · Cost · Holding · P&L · Net Worth
 | S-CHQ-BNC | Bounce | penalty/status |
 | S-FX | Multi-currency leg | rate lock |
 | S-PA-BUY | Physical asset purchase | asset + cash |
+
+| SCN-031 | Crypto IRR buy; BTC↓ USDT, USDT/IRR↑; profit in IRR loss in USDT | dual-unit unrealized |

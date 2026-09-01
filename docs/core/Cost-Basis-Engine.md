@@ -349,3 +349,18 @@ realized P&L not recognized on fee burn alone (fee may post as expense separatel
 ```
 
 Transfer custody: cost **moves with** qty — never reset to 0.
+
+---
+
+## Asset P&L vs FX P&L (base ≠ quote)
+
+وقتی `costCurrency` / base کاربر با quote بازار فرق دارد (نمونه ایران: base=IRR، quote=USDT):
+
+```text
+totalUnrealizedBase = valueBase(asOf) − costBase
+valueBase = qty × price_quote(asOf) × fx_quote_to_base(asOf)
+```
+
+گزارش حرفه‌ای **مؤلفه دارایی (quote)** و **مؤلفه FX** را جدا می‌کند تا حالت «قیمت دلاری پایین / ریال بالا / سود ریالی» گم نشود.
+
+جزئیات و fixture: `Investment-Crypto.md` بخش «P&L چندارزی ایران».

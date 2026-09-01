@@ -469,3 +469,13 @@ Inverse path uses dividedBy only when applying inverse of a stored forward rate.
 ## FEAT-P0-025 DEEP
 Bridge currency from settings.configuredBridge only. Core must not hard-code USDT as intermediate.
 
+---
+
+## Asset vs FX P&L در valuation
+
+```text
+valueInBase(asOf) = price(instrument, quote, asOf) × convert(1, quote, base, asOf)
+```
+
+`price` و `fx` باید **هر دو** asOf هم‌تراز باشند.  
+تغییر valueInBase می‌تواند از افت/رشد price یا از افت/رشد FX بیاید — گزارش نباید این دو را یکی کند.

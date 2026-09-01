@@ -1498,3 +1498,80 @@ Forbidden: market value as historical destination cost.
 Exchange cash-like → inv_crypto_cash. Network tokens → holdings.
 No synthetic IRR/USDT cash rows inside token holdings.
 
+---
+
+## P&L چندارزی ایران: سود ریالی با افت قیمت دلاری (CRITICAL)
+
+### مسئله واقعی کاربر
+
+کاربر ممکن است **با ریال** رمزارز بخرد. بعداً:
+
+- قیمت دارایی به **تتر/دلار** افت کند  
+- ولی **نرخ تتر به ریال** (یا دلار به ریال) زیاد بالا برود  
+
+در نتیجه به **ریال** ممکن است هنوز **سود** نشان دهد، در حالی که به **تتر** زیان است.
+
+اگر سیستم فقط یک عدد «سود» بدهد، کاربر گمراه می‌شود و حسابداری نادرست است.
+
+### تفکیک اجباری (سه لایه)
+
+برای هر holding در `baseCurrency` کاربر (معمولاً IRR):
+
+| مؤلفه | معنی | تقریبی |
+|--------|------|--------|
+| **Asset P&L (quote)** | تغییر قیمت دارایی نسبت به quote (مثلاً BTC/USDT) | \(q \times (P^{q}_{now} - P^{q}_{cost})\) |
+| **FX P&L** | تغییر نرخ quote→base روی cost و روی ارزش | اثر \(\Delta FX\) روی ارزش و بهای تمام‌شده |
+| **Total P&L (base)** | سود/زیان نهایی به ارز پایه | \(Value_{base} - Cost_{base}\) |
+
+```text
+valueBase(asOf) = qty × price(quote, asOf) × fx(quote→base, asOf)
+costBase        = totalCostBase قفل‌شده از خریدها (از CostBasisEngine در costCurrency=base)
+totalUnrealizedBase = valueBase - costBase
+```
+
+**گزارش باید حداقل نشان دهد:**
+
+1. `unrealizedTotalBase` (مثلاً IRR)  
+2. `unrealizedInQuote` (مثلاً USDT) — اگر quote ≠ base  
+3. تجزیه اختیاری ولی توصیه‌شده: `pnlAssetQuote` + `pnlFxBase` طوری که جمعاً با total سازگار باشد  
+
+### مثال عددی (fixture الزامی)
+
+```text
+خرید: 1 BTC
+پرداخت: 2_000_000_000 IRR
+نرخ: 1 USDT = 50_000 IRR  →  معادل cost ≈ 40_000 USDT
+قیمت BTC همان لحظه: 40_000 USDT
+
+بعداً:
+قیمت BTC: 35_000 USDT   (افت دارایی به تتر)
+نرخ: 1 USDT = 70_000 IRR  (رشد تتر/ریال)
+
+valueBase = 1 × 35_000 × 70_000 = 2_450_000_000 IRR
+costBase  = 2_000_000_000 IRR
+totalUnrealizedBase = +450_000_000 IRR   ← هنوز سود ریالی
+
+valueQuote = 35_000 USDT
+costQuote  ≈ 40_000 USDT
+unrealizedQuote = −5_000 USDT           ← زیان دلاری/تتری
+```
+
+سیستم **حق ندارد** فقط «سود» یا فقط «زیان» بگوید بدون واحد و لایه.
+
+### قوانین پیاده‌سازی
+
+1. Cost basis برای کاربر ایرانی معمولاً در **`costCurrency = baseCurrency (IRR)`** از همان خرید ریالی (یا تبدیل قفل‌شده در operation) ساخته می‌شود — نه میانگین خام USDT با IRR.
+2. Unrealized به base همیشه: `price(asOf) × fx(asOf)` با **هر دو historical**؛ نه قیمت امروز × نرخ قدیم یا برعکس.
+3. Realized در فروش:  
+   - `proceedsBase` از cash leg واقعی یا از quote×fx قفل‌شده همان فروش  
+   - `costBaseReleased` از engine  
+   - `realizedBase = proceedsBase - costBaseReleased`  
+   - در صورت امکان `realizedQuote` جدا برای همان فروش.
+4. UI: برچسب واضح «سود/زیان به ریال» در برابر «به تتر/دلار»؛ ترجیحاً هر دو.
+5. Golden fixture: سناریوی بالا + فروش جزئی در همان شرایط.
+
+### ارتباط با اسناد دیگر
+
+- `Cost-Basis-Engine.md` — cost در costCurrency یکسان  
+- `Currency-CrossRate.md` — `valueInBase = price × fx` با asOf هم‌زمان  
+- گزارش پرتفوی نباید Net Worth را فقط از قیمت تتری بدون FX بسازد وقتی base=IRR است.
