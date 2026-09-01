@@ -462,3 +462,7 @@ Any `dividedBy(rate)` for "direct" without inverse semantic = bug.
 Modes: direct | inverse | configured_bridge | manual.
 No hard-coded USDT bridge in Core.
 
+## FEAT-P0-024 DEEP
+All convert helpers: amountTo = amountFrom.times(rate) when rate means 1 from = rate to.
+Inverse path uses dividedBy only when applying inverse of a stored forward rate.
+

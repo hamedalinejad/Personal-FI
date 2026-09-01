@@ -171,7 +171,7 @@
 **راه‌حل:** correction = یک Financial Operation جدید با `reversesOperationId`؛ original immutable. گزارش فقط اثر اقتصادی non-void را یک‌بار می‌بیند.
 
 ## FEAT-P0-024 — Currency conversion formula contradiction
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — multiply for forward rate
 **مشکل:** canonical rate می‌گوید `1 from = rate to` و `amountTo = amountFrom × rate`، اما pseudo-code direct rate را `amount.dividedBy(rate)` می‌کند.
 
 **راه‌حل:** فقط یک semantic: `1 from = rate to`; forward = multiply، inverse = divide. تمام helperها و examples با همین قرارداد بازنویسی شوند.
