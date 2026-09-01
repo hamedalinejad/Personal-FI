@@ -762,3 +762,16 @@ Refund Operation   = 3m   (operationId جدید، لینک به اصل)
 ```
 
 **ممنوع:** ویرایش مبلغ تراکنش Posted برای «برگشت جزئی».
+
+---
+
+## قانون سراسری Idempotency + Command Hash
+
+```text
+same operationId + same commandHash     → same result
+same operationId + different commandHash → INTEGRITY ERROR
+```
+
+روی هر operation نگه دار:
+
+`operationId` · `commandHash` · `createdAt` · `schemaVersion` · `calculationVersion` · `roundingVersion`

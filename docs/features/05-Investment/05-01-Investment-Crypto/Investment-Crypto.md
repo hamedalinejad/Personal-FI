@@ -1445,3 +1445,7 @@ Metadata کریپتو (`chainId`, `contractAddress`, `decimals`, `assetKey`) ر�
 - هویت: `instrumentId` / `assetKey` — نه `symbol` alone
 - USDT-TRC20 و USDT-ERC20 دو instrument جدا
 - انتقال: **gross / fee / net** تفکیک + conservation rule (gross = net + fee در واحد مربوطه)
+
+---
+
+Scope و Transfer/Fee/Network: **`Crypto-V1-Scope.md`**.

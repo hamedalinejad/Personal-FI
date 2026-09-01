@@ -26,3 +26,19 @@ Difference = Z
 **بدون** اصلاح خودکار Z. Repair فقط صریح + تأیید + audit.
 
 مرجع: `db/04-reconciliation-integrity.md` · `Financial-Invariants.md` · `Raw-vs-Derived-Data.md`
+
+---
+
+## API کامل‌تر
+
+```text
+rebuildAllSnapshots()
+rebuildAccountBalances()
+rebuildHoldings()
+rebuildLoanBalances()
+rebuildPortfolio()
+rebuildReportsCache()
+verifySnapshotsAgainstSoT()
+```
+
+Reports از Journal/Domain ledger + calculation — نه Snapshot به‌عنوان SoT.

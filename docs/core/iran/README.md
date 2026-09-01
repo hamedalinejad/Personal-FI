@@ -146,3 +146,26 @@ addBusinessDays(date, n, calendarId)
 و جداکنندهٔ هزارگان فارسی/ویرگول طبق `IranNumberFormat`.
 
 **Invariant:** Domain فقط ارقام ASCII + نقطه اعشار canonical می‌بیند؛ تبدیل در مرز UI/import.
+
+---
+
+## Tax / Fee rules versioned (نه hardcode)
+
+```text
+taxRule / feeRule
+jurisdiction
+effectiveFrom / effectiveTo
+ruleVersion
+sourceReference
+calculationMethod
+```
+
+هیچ نرخ قانونی در code Feature hardcode نشود (سهام، صندوق، وام، withholding، CGT آینده).
+
+## Provider Registry
+
+Broker / Bank / Fund Provider = metadata registry — نه منطق Domain داخل نام کارگزاری.
+
+## Date triad (یادآوری)
+
+`eventAt` (UTC) · `businessDate` · `marketDate` — جلالی فقط نمایش.

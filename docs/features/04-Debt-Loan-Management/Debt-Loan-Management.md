@@ -1655,3 +1655,67 @@ capabilities.has('banking')
 Fixture الزامی نمونه: وام ۱۰۰٫۰۰۰٫۰۰۰ ریال، ۲۳٪، ۳۶ ماه، declining — در CI.
 
 جزئیات موتور: `Loan-Schedule-Engine.md`.
+
+---
+
+## Contractual vs Accrued vs Carrying (P0)
+
+جدا کن:
+
+| مفهوم | معنی |
+|--------|------|
+| Contractual Principal | اصل قراردادی |
+| Accrued Components | سود/جریمه تعلق‌گرفته |
+| Accounting Carrying Amount | مبلغ دفتری (capitalized fee ≠ لزوماً principal) |
+
+## Payment = یک Operation
+
+```text
+Payment Operation (یک ثبت کاربر)
+  ├─ principal component
+  ├─ interest component
+  ├─ fee component
+  └─ penalty component
+```
+
+## Allocation Waterfall (قفل policy)
+
+مثال پیش‌فرض قابل تنظیم:
+
+```text
+Penalty → Fee → Interest → Principal
+```
+
+مبهم نباشد؛ در scheduleVersion / policy version قفل شود.
+
+## Partial Payment First-Class
+
+قسط 20m، پرداخت 8m → track:
+
+remaining installment · unpaid principal · unpaid interest · unpaid penalty  
+نه فقط `installmentPaid = false`.
+
+## Early Payment Policy
+
+`reduce_installment` · `reduce_term` · `recalculate_both` · `no_recast`  
++ effectiveDate · principalReduction · interestAdjustment · scheduleVersion
+
+## Schedule Hash
+
+`scheduleVersion` · `inputHash` · `calculationVersion` · `roundingVersion` · `rateVersion` · `createdAt`
+
+## Variable rate (v1 یا صریح خارج از v1)
+
+`referenceIndex` · `spread` · `cap` · `floor` · `effectiveFrom/To` · `resetFrequency`  
+اگر v1 نیست → unsupported صریح.
+
+## Grace — ریاضی دقیق + fixture
+
+interest accrues? principal starts later? payment date shifted? first payment date?
+
+## Direction → Journal
+
+| | |
+|--|--|
+| Borrowed | Cash↑ Liability↑ · interest → expense |
+| Lent | Receivable↑ Cash↓ · interest → income |

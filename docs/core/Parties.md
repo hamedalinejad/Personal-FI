@@ -65,3 +65,11 @@ Person · Company · Bank · Broker · Fund Manager · Exchange · Lender · Bor
 - Cheque → Party
 
 **ممنوع:** مخلوط کردن Party با Account (مثلاً ذخیره «بانک ملت» فقط به‌عنوان party بدون financial account وقتی موجودی دارد).
+
+---
+
+## Party مرکزی ایران
+
+Person · Company · Bank · Broker · Fund · Lender · Borrower · Payee · Payer
+
+مصرف اختیاری: `partyAccount` · `partyRelation` · `partyDocument` · `partyContact`

@@ -83,6 +83,8 @@
 | P2/P3 Risk Register | `docs/core/P2-P3-Risk-Register.md` |
 | Field Write Contract | `docs/core/Field-Write-Contract.md` |
 | Reconciliation Foundation | `docs/core/Reconciliation-Foundation.md` |
+| Integrity Engine | `docs/core/Integrity-Engine.md` |
+| Crypto v1 Scope | `docs/features/05-Investment/05-01-Investment-Crypto/Crypto-V1-Scope.md` |
 | Feature Package Architecture | `docs/core/Feature-Package-Architecture.md` |
 | API Requirements | `docs/core/API-Requirements.md` |
 | Offline Requirements | `docs/core/Offline-Requirements.md` |
