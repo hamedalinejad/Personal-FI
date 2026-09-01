@@ -264,11 +264,14 @@ const rateSnapshot = await getExchangeRate('IRR', 'USDT'); // e.g. 62345.6789012
 // → ذخیره در exchangeRateToBase: "62345.678901234"
 
 // تبدیل برای نمایش — round در آخر
-function displayInUSDT(amountIRR: Decimal, rate: Decimal): string {
- return amountIRR.dividedBy(rate)
+// اگر rate = USDT→IRR یعنی 1 USDT = rate IRR (canonical pair from=USDT,to=IRR):
+function displayInUSDT(amountIRR: Decimal, usdtToIrrRate: Decimal): string {
+ return amountIRR.dividedBy(usdtToIrrRate) // inverse of 1 USDT = rate IRR
  .toDecimalPlaces(2, Decimal.ROUND_HALF_UP)
- .toString;
+ .toString();
 }
+// اگر pair from=IRR,to=USDT با 1 IRR = rate USDT ذخیره شده: amountIRR.times(rate)
+
 
 // تبدیل زنجیره‌ای (BTC → USDT → IRR) — round فقط در انتهای زنجیره
 const btcInUSDT = btcAmount.times(btcPriceUSDT); // کامل
