@@ -204,3 +204,15 @@ Query → Ledger → Engine → Report
 جدول‌هایی مثل `profit_total` به‌عنوان حقیقت مستقل **ممنوع**اند مگر snapshot cache قابل rebuild.
 
 Profit / Cashflow / Net Worth از ledger + engines محاسبه می‌شوند؛ cache فقط performance است.
+
+---
+
+## Reporting / Valuation layer (P0)
+
+Report حسابداری را دور نمی‌زند.
+
+```text
+Journal + Subledger + Price + FX  →  Valuation / Reporting  →  UI
+```
+
+ممنوع: جمع خام `crypto.quantity` + `stock.value` + `loan.balance` بدون لایه valuation.

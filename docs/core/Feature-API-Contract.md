@@ -195,3 +195,15 @@ operationId
 
 v1: TypeScript in-process module.  
 آینده: همان contract پشت REST/IPC بدون تغییر Domain.
+
+---
+
+## لایه Capability (P0)
+
+```text
+UI → Feature API → Capability API → Domain → Persistence
+```
+
+جزئیات لیست Capabilityها: `Capability-API.md`.
+
+v1 = TypeScript in-process (تأیید). HTTP از روز اول اجباری نیست.

@@ -110,3 +110,27 @@ User Financial DB  ≠  License State
 **ممنوع:** `licenseId` روی journal line یا financial transaction.
 
 Domain: این سند؛ implementation در `license/` نه داخل Featureهای مالی.
+
+---
+
+## Product / Capabilities layers (مستند آینده — نه implementation الان)
+
+```text
+Product: Free | Personal | Professional | Custom
+  └── Capabilities: loan.basic, loan.advanced, investment.crypto, …
+```
+
+License Module فقط می‌گوید:
+
+```json
+{
+  "enabledFeatures": { "loan": true, "crypto": false, "funds": true },
+  "edition": "personal",
+  "licenseState": "active",
+  "expiry": "...",
+  "gracePeriod": "..."
+}
+```
+
+**Loan Domain هیچ چیز از License نمی‌داند.**  
+Application لایه feature flags را اعمال می‌کند.

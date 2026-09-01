@@ -172,3 +172,14 @@ externalId          = UNIQUE when present
 حساب‌های بدون IBAN/شماره (مثلاً صندوق نقدی، کیف پول دستی) فقط با `id` یکتا می‌مانند.
 
 **ممنوع:** `UNIQUE(name)` در schema.
+
+---
+
+## acc_transactions = فقط Cash Ledger (قفل)
+
+```text
+acc_transactions = cash movement
+```
+
+**نه** جدول همه‌چیز برای income/expense/investment/loan/tax.  
+آن‌ها Domain ledger + journal خود را دارند؛ لینک نقد از طریق Operation / Port.

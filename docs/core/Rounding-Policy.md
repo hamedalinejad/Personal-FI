@@ -15,3 +15,11 @@
 **یک Decimal.set سراسری برای همه دامنهها کافی نیست** — PrecisionPolicy per domain.
 
 IRR canonical storage؛ تومان فقط `isTomanDisplay` UI — نه دو currency.
+
+---
+
+## roundingPolicyVersion (P0)
+
+Policy فعلی (IRR HALF_UP، Stocks ROUND_DOWN، Crypto decimals، …) قابل قبول است.
+
+روی هر financial operation باید `roundingPolicyVersion` در calculationContext / engineVersions قفل شود تا تغییر آینده تاریخچه را silent rewrite نکند.

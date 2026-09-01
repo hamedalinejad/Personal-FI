@@ -321,3 +321,11 @@ See `docs/core/SPEC-FREEZE.md` for pre-coding freeze and target architecture dia
 ## امنیت
 
 جزئیات: `docs/features/18-Security-Privacy/Security-Privacy.md` · Cross-feature: `docs/core/Cross-Feature-Interactions.md`
+
+---
+
+## Persistence State Machine (ارجاع P0)
+
+وضعیت‌ها: CLEAN · DIRTY · PERSISTING · PERSISTED · FAILED · RECOVERING  
+فقط Storage Layer مسئول است. UI «ثبت شد» بعد از COMMIT + persist موفق.  
+جزئیات: `core/Persistence-State-Machine.md`

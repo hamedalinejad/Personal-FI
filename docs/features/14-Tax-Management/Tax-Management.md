@@ -237,3 +237,10 @@ SoT بدهی/رویداد مالیاتی = Tax feature. Investment فقط refere
 مدل: TaxableEvent · Rule · Basis · Rate · Amount · Status · Period · Evidence. MVP ساده؛ Engine قابل گسترش.
 
 Rules versioned: `ruleId`, effectiveFrom/To, jurisdiction, version — تراکنش قدیم با قانون جدید recalculate silent نمی‌شود.
+
+---
+
+## feeTax ≠ tax event (P0)
+
+`feeTax` روی معامله (مثلاً سهام) = هزینه همان trade.  
+جایگزین `tax_events` / رکورد مالیاتی دوره‌ای **نیست**.

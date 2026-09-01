@@ -430,3 +430,11 @@ rateToCurrency   // IRR
 ```
 
 نوشته می‌شود نه فقط `rate=60000`.
+
+---
+
+## IRR-first نه Iran-only (تأیید)
+
+- Default baseCurrency برای کاربر ایرانی: **IRR**
+- Domain همچنان **Multi-Currency** است
+- **Toman currency نیست** — فقط display unit روی IRR

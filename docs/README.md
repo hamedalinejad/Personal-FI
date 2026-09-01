@@ -73,3 +73,8 @@
 | Migration & Data Preservation | `docs/core/Migration-Data-Preservation.md` |
 | JSON Policy | `docs/core/JSON-Policy.md` |
 | Implementation Priority | `docs/core/Implementation-Priority.md` |
+| Capability API | `docs/core/Capability-API.md` |
+| Persistence State Machine | `docs/core/Persistence-State-Machine.md` |
+| Import Lineage | `docs/core/Import-Lineage.md` |
+| Rebuild API | `docs/core/Rebuild-API-Contract.md` |
+| Product Principle | `docs/core/Product-Principle.md` |
