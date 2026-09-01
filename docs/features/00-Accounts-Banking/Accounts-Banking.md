@@ -255,3 +255,13 @@ availableBalance  = ledgerBalance − pendingOut (− other reserved)
 
 getAvailableBalance باید از **aggregation canonical commitments** استفاده کند؛ هر commitment یک‌بار (نه هم fee جدا و هم total).
 ledger برای SoT؛ available برای UI خرج‌کردن.
+
+---
+## P0-021 — credit_account / overdraft v1
+
+Default: non-credit accounts reject negative ledger balance.
+`credit_account`: v1 **reject** create, یا liability model جدا — نه overdraft روی current balance معمولی.
+
+## P0-022 — transfer fee legs
+
+transfer-out (principal) + transfer-in (principal) + fee leg مستقل در یک operationId.

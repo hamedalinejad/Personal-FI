@@ -207,3 +207,6 @@ Same as Expense: reversesOperationId; no double-count cash.
 | فقط `isVoided=true` بدون lineage | `operationId`, `reversesOperationId`, `reversalOperationId` اجباری |
 
 `isVoided` روی ردیف domain = **projection** از وضعیت operation معکوس‌شده؛ منبع حقیقت زنجیره = `fin_operations` lineage.
+
+## P0-023 — correctIncome Core-only (reaffirm)
+No Feature-local void+acc reverse pipeline.
