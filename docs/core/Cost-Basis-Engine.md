@@ -318,7 +318,7 @@ transfer_out بین ولت‌های خود کاربر نباید realized gain �
 
 ---
 
-## Lot Tracking (P1 Risk)
+## Lot Tracking (P1)
 
 - **v1:** Weighted Average per `holdingId` (cost pool) کافی و اجباری است.
 - **FIFO / lots:** وقتی method=fifo، lots از ledger **rebuild** می‌شوند (`acquiredAt`, businessDate, createdAt tie-break)؛ ذخیره lot بدون قابلیت rebuild از events ممنوع به‌عنوان تنها SoT.

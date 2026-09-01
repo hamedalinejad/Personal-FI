@@ -103,3 +103,11 @@
 | Fiscal Period Lock | `docs/core/Fiscal-Period-Lock.md` |
 
 | Feature ID Map | `docs/00-Product/feature-id-map.json` |
+
+---
+
+## وضعیت مستندات (2026-09-01)
+
+- Spec Freeze: قراردادهای مالی و UX (۹ صفحه) قفل
+- Risk Register موقت حذف؛ SoT در Invariants / Catalogs / Core
+- قبل از کد: golden fixtures + ESLint feature boundary + markdown-link-check

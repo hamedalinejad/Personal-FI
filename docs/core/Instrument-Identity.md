@@ -106,7 +106,7 @@ USDT ذاتاً همیشه Cash یا همیشه Investment نیست:
 
 ---
 
-## P1 Risk: symbol as identity — ممنوع
+## P1: symbol as identity — ممنوع
 
 تغییر نماد بورسی یا rename نمایشی **نباید** تاریخچه holding/tx را بشکند.
 

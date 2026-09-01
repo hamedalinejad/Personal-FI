@@ -1,5 +1,8 @@
 # Pages & Information Architecture
 
+> نگاشت Feature → Route: **`feature-id-map.json`** (منبع ماشین‌خوان).
+
+
 > **اصل محصول:** `20 Features ≠ 20 Navigation Items`  
 > **۹ صفحه اصلی کافی است** — حتی در آینده: Crypto/Stocks/Funds/Tax/Bills/Cheque **صفحه ناوبار جدا نمی‌شوند**؛ Feature/Domain + Tab/Sheet.  
 > Feature = مرز Domain · Page = مرز UX · Accounting Core = capability بدون صفحه `/accounting`
@@ -495,3 +498,11 @@ Dashboard · Accounts · Transactions · Investments · Loans · Assets · Plann
 - داخل هر صفحه: Sheet / Dialog / Drawer / Detail / Tab
 
 Investments = Crypto | Stocks | Funds | Metals — نه routeهای جدا در ناوبار.
+
+---
+
+## هشدار شماره‌گذاری
+
+شمارهٔ انسانی در Product-Map ممکن است با پیشوند پوشه (`00-`, `01-`, …) یکی نباشد.
+
+**مسیر کد و import docs را از روی شماره Product-Map حدس نزنید** — فقط `feature-id-map.json` و نام پوشه.

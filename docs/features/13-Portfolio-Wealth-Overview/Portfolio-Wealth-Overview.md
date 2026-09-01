@@ -298,3 +298,8 @@ NetWorth = Assets − Liabilities
 
 **ممنوع:** برچسب «Net Worth» برای فقط جمع دارایی‌ها بدون کسر بدهی.  
 UI باید `totalAssets`, `totalLiabilities`, `netWorth` را جدا نشان دهد.
+
+---
+
+**UX:** Portfolio/Wealth صفحه ناوبار جدا نیست — Dashboard و/یا Reports.
+Portfolio = aggregation؛ Net Worth ≠ فقط Portfolio (`Layer-Separation.md`).

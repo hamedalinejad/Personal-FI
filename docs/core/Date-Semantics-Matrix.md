@@ -32,7 +32,7 @@ Historical P&L از `priceAsOf`+`rateDate` هم‌تراز — نه `fetchedAt` 
 
 ---
 
-## Trade · Settlement · Effective (P0 Risk #5)
+## Trade · Settlement · Effective (P0)
 
 | نام | نقش | مثال |
 |-----|-----|------|

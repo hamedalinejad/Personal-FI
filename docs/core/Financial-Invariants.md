@@ -340,7 +340,7 @@ Query **DB write ندارد**. UI → Feature API only.
 
 ## فهرست ریسک P0
 
-چک‌لیست یک‌صفحه‌ای ۹ ریسک مرگبار: `P0-Risk-Register.md`.
+ریسک‌های مرگبار در همین سند + `Financial-Invariant-Catalog.md` و `Layer-Separation.md` قفل شده‌اند (Risk Register موقت حذف شد).
 
 ---
 

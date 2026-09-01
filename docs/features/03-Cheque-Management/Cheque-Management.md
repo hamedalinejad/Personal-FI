@@ -49,7 +49,10 @@ Domain Entities
 - `id` → UUID (Primary Key)
 - `type` → string (payable یا receivable)
 - `chequeNumber` → string (شماره چک)
-- `sayadiTrackingCode` → string (شناسه رهگیری صیادی — nullable)
+- `sayadiTrackingCode` / `sayadId` → string (شناسه صیادی، معمولاً ۱۶ رقم — nullable)
+- `sayadInquiryStatus` → string nullable
+- `bankBranchCode` → string nullable
+- `endorsedToPartyId` → UUID nullable
 - `amount` → decimal (مبلغ چک)
 - `currency` → string (ارز چک = ارز حساب)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → `baseCurrency` کاربر در لحظه ثبت (نه الزاماً ریال/تتر — قرارداد کامل در `Currency-CrossRate.md`))

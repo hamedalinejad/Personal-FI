@@ -203,3 +203,15 @@ FinancialOperation
 
 Split **metadata UI نیست**؛ خطوط دامنه + journal lines هستند.
 Σ expense lines (+ fees) باید با CashLeg (از نظر مبلغ) در همان operation جور شود.
+
+---
+
+## VAT اختیاری روی هزینه (ایران)
+
+روی ExpenseLine (اختیاری):
+
+- `vatRate` (policy/versioned یا ورودی)
+- `vatAmount` (TEXT decimal)
+- `grossAmount` / `netAmount` در صورت تفکیک فاکتور
+
+VAT fee-like می‌تواند journal جدا داشته باشد؛ با `feeTax` معاملهٔ بورسی قاطی نشود.

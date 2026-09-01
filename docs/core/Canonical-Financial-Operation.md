@@ -713,7 +713,7 @@ calculationContext
 
 ---
 
-## Posted document immutable (P0 Risk #3)
+## Posted document immutable (P0)
 
 پس از `status = posted` (و persist موفق):
 

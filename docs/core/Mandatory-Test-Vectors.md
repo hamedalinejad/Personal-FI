@@ -50,4 +50,4 @@ Import/export round-trip preserves all fields
 Offline mode does not require external API
 ```
 
-مرجع: `db/07-fixtures-release-gate.md` · Financial-Invariants · P0-Risk-Register
+مرجع: `db/07-fixtures-release-gate.md` · Financial-Invariants · Financial-Scenario-Catalog

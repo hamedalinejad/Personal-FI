@@ -234,3 +234,7 @@ Dashboard → Queries → Reporting / Valuation
 ```
 
 نه SQL مستقیم و نه محاسبه Domain داخل ویجت. UI → Feature/Capability API → Domain.
+
+---
+
+ناوبری و جایگاه Wealth: `Pages-IA.md` — Dashboard یکی از ۹ صفحه اصلی است؛ `/wealth` route مستقل نیست.

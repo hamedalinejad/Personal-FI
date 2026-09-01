@@ -1719,3 +1719,16 @@ interest accrues? principal starts later? payment date shifted? first payment da
 |--|--|
 | Borrowed | Cash↑ Liability↑ · interest → expense |
 | Lent | Receivable↑ Cash↓ · interest → income |
+
+---
+
+## اعتبار فروشگاهی / کارت اعتباری خرد (ایران)
+
+جدا از وام بانکی رسمی:
+
+| فیلد | نقش |
+|------|-----|
+| `loanTypeIr` | شامل `store_credit` / `retail_credit` / `bnpl` (در صورت نیاز) |
+| fee/penalty policy | جدا از مرابحه بانکی — versioned |
+
+بدون hardcode نرخ؛ فقط تفکیک نوع برای گزارش و allocation.
