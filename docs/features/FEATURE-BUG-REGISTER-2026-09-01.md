@@ -231,7 +231,7 @@
 **راه‌حل:** canonical `ref_instruments.id` در Core؛ ISIN/providerSymbol metadata. Symbol change هرگز instrument identity را عوض نکند.
 
 ## FEAT-P0-034 — Stocks Corporate Action rebuild completeness
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — CA ordered rebuild
 **مشکل:** الگوریتم rebuild buy/sell را کافی نمی‌داند و CAهای متعدد دارد؛ اما ارتباط همه CAها با source/target holding و effective date هنوز کامل نیست.
 
 **راه‌حل:** `inv_stocks_iran_corporate_actions` به‌عنوان metadata/operation descriptor + source/target instruments + ratio + effectiveDate + operationId؛ rebuild باید همه CAها را ordered اعمال کند.

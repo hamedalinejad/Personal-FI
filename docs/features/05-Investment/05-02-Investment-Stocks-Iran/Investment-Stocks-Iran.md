@@ -606,3 +606,7 @@ Fields: ledgerCash, settledCash, availableCash, pendingSettlement — never coll
 ## FEAT-P0-033 DEEP
 instrumentId type = Core UUID/id. ISIN and symbol are attributes; symbol change does not change instrumentId.
 
+## FEAT-P0-034 DEEP
+Each CA: operationId, sourceInstrumentId, targetInstrumentId?, ratio, effectiveDate, and type.
+rebuildHolding applies CA chronologically after trades.
+
