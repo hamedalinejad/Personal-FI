@@ -409,7 +409,7 @@ Loan penalty formula نباید به‌عنوان حقیقت حقوقی ثابت
 Dividend + NAV drop + reinvest باید در total return طوری ترکیب شوند که یک سود دوبار شمرده نشود. Performance engine باید cash flow-aware باشد.
 
 ## FEAT-P1-019 — Metals valuation source
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — disable feature keeps data
 قیمت طلا باید market/price type/purity/unit و asOf داشته باشد. قیمت 24K نباید silently برای 18K استفاده شود.
 
 ## FEAT-P1-020 — Physical delivery continuity
