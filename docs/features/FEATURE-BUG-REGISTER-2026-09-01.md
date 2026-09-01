@@ -433,7 +433,7 @@ Income/Expense recurring و Bills هر دو scheduler دارند. باید idemp
 Budget/envelope باید currency مشخص داشته باشد و allocation از transaction با currency متفاوت بدون conversion policy ممنوع باشد.
 
 ## FEAT-P1-025 — Goal currency
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — goal currency policy
 Goal entity فعلاً IRR-centric است ولی contribution exchangeRate دارد. Goal باید یا تک‌ارزی v1 باشد و enforce کند، یا multi-currency را با valuation policy کامل پشتیبانی کند.
 
 ## FEAT-P1-026 — Account available balance
