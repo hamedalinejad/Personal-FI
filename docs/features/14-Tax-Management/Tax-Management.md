@@ -261,3 +261,6 @@ Expense reports may **categorize** that same operation — must not create a sec
 - Tax domain event/liability = separate
 - Withholding = one economic amount; never expense twice
 
+## FEAT-P0-048 DEEP
+All tax snapshots key (taxYear, taxCalendar). Investment tax links use linkedTaxEventId; calendar never implicit-only.
+

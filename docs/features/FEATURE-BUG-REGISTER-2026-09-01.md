@@ -315,7 +315,7 @@
 **راه‌حل:** withdrawal باید source allocation را reverse/consume کند؛ برای cash واقعی operation مالی، برای allocation داخلی فقط planning event. FIFO allocation با immutable links و operationId.
 
 ## FEAT-P0-048 — Tax year calendar inconsistency
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — taxYear+taxCalendar
 **مشکل:** Tax entity `taxYear + taxCalendar` را اجباری می‌کند ولی investment metadata فقط `taxYear` دارد و حتی می‌گوید v1 عدد سال businessDate است.
 
 **راه‌حل:** هر tax snapshot = `(taxYear,taxCalendar)`. Investment event فقط `linkedTaxEventId` و در صورت نیاز snapshot minimal؛ calendar هرگز implicit نباشد.
