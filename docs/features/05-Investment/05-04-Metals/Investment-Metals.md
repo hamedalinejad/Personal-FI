@@ -411,3 +411,6 @@ Canonical storage: **quantityMg** (and purity).
 ## FEAT-P0-038 DEEP
 v1: platform cashBalance is IRR-only (documented scope). Multi-currency requires cashPosition(currency) rows — not ambiguous scalar.
 
+## FEAT-P0-039 DEEP
+Physical delivery operation must: decrease digital holding, create/increase physical asset, post fees, journal — same operationId. Forbid digital-only decrease.
+

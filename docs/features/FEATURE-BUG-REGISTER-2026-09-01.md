@@ -261,7 +261,7 @@
 **راه‌حل:** اگر v1 فقط IRR است، scope را صریح کن. اگر multi-currency است، cash ledger باید currency-aware باشد (`cashPosition` per currency)، نه یک `cashBalance` scalar.
 
 ## FEAT-P0-039 — Metals physical delivery Net Worth break
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — delivery atomic NW
 **مشکل:** یک بخش فقط digital holding را کم می‌کند، بخش دیگر می‌گوید delivery باید physical asset را در همان operation ایجاد کند.
 
 **راه‌حل:** delivery = cross-feature atomic operation: digital metal out + physical asset acquisition + delivery fee + journal. اگر Physical Assets خاموش است، delivery باید standalone representation داشته باشد و بعداً قابل materialize باشد.
