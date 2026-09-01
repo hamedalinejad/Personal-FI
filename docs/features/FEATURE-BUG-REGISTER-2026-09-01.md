@@ -429,7 +429,7 @@ Income/Expense recurring و Bills هر دو scheduler دارند. باید idemp
 `totalIncome` override باید source، enteredAt، reason و version داشته باشد؛ وگرنه گزارش تاریخی قابل audit نیست.
 
 ## FEAT-P1-024 — Budget allocation currency
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — budget currency enforced
 Budget/envelope باید currency مشخص داشته باشد و allocation از transaction با currency متفاوت بدون conversion policy ممنوع باشد.
 
 ## FEAT-P1-025 — Goal currency
