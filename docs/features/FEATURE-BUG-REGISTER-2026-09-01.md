@@ -91,7 +91,7 @@
 **راه‌حل:** در هر event، `amount` = cash leg واقعی؛ components (`principal`, `interest`, `fee`, `penalty`) جدا. disbursement contract principal جدا از net proceeds.
 
 ## FEAT-P0-011 — Loan schedule snapshot ناقص
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — schedule snapshot metadata
 **مشکل:** snapshot به version/effective/input metadata کامل و یکنواخت نیاز دارد.
 
 **راه‌حل:** حداقل `generatedAt`, `effectiveFrom`, `reason`, `operationId`, `calculationVersion`, `roundingVersion`, `rateVersion`, `inputHash`, payload کامل schedule.

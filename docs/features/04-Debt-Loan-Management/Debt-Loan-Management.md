@@ -1788,3 +1788,6 @@ Header = contract. Disbursement cash on ln_transactions + operation. accountTran
 ## FEAT-P0-010 DEEP
 amount = cash leg. principal/interest/fee/penalty = components. Contract principal may differ from net proceeds.
 
+## FEAT-P0-011 DEEP
+Snapshot must include generatedAt, effectiveFrom, reason, operationId, calculationVersion, roundingVersion, rateVersion, dayCountConvention, inputHash, full payload.
+
