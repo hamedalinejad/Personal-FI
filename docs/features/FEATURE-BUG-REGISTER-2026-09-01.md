@@ -25,7 +25,7 @@
 **قبولی:** حذف capability Accounts نباید Domain Feature را از ثبت، محاسبه و گزارش اختصاصی بازدارد.
 
 ## FEAT-P0-002 — Snapshot به‌جای Ledger
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — no direct snapshot mutate; rebuild from ledger
 **مشکل:** در چند Feature snapshotهایی مثل `cashBalance`, `currentAmount`, `quantity`, `totalInvested`, `remainingBalance` همزمان کنار ledger وجود دارند و در بعضی APIها مسیر mutation مستقیم snapshot دیده می‌شود.
 
 **راه‌حل:** Ledger/domain events = SoT؛ snapshot فقط projection. هر mutation مالی = یک Financial Operation اتمیک؛ سپس snapshot rebuild/update.

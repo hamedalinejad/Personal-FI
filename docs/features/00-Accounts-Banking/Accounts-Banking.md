@@ -220,3 +220,6 @@ Feature-local synonyms map to this enum.
 ### Card numbers (P0-021)
 **Never store full PAN.** Only last4 / tokenized reference / optional masked display. Attachment image optional via Documents.
 
+---
+## FEAT-P0-002 Snapshot
+`currentBalance` / holding `quantity` / `totalInvested` = projection. Mutate only via operations + rebuild. No public setBalance API.

@@ -1773,3 +1773,7 @@ Snapshot only; rebuild from `ln_transactions.principalPortion` sum. No direct mu
 - **P0-016 day-count:** single dayCountConvention on loan/schedule version (360/365/30/360/actual).
 - **P0-017 formula scope:** calculationMethod enum is closed for v1; advanced models future without half-implementing.
 
+---
+## Snapshot mutation ban (FEAT-P0-002)
+**ممنوع:** `setRemainingBalance` / `updateCurrentAmount` / mutate مستقیم `remainingBalance`، `cashBalance`، `quantity` snapshot.
+فقط Financial Operation → ledger → `rebuildLoan` / projection.

@@ -1474,3 +1474,6 @@ destCost = sourceCostReleased + acquisitionFees (policy)
 - `inv_crypto_cash` = only SoT for exchange/fiat/cash-like balances
 - Token/network assets only in holdings (USDT-TRC20 ≠ cash row)
 
+---
+## FEAT-P0-002 Snapshot
+`currentBalance` / holding `quantity` / `totalInvested` = projection. Mutate only via operations + rebuild. No public setBalance API.
