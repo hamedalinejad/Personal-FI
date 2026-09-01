@@ -1800,3 +1800,6 @@ Partial pay tracks unpaid penalty/fee/interest/principal separately under versio
 ## FEAT-P0-014 DEEP
 v1 variable = ln_rate_history manual rate+effectiveDate. Index/spread/cap/floor out of v1 unless fully built.
 
+## FEAT-P0-015 DEEP
+graceDays + graceInterestAccrues + gracePrincipalDeferred + firstPaymentDate required semantics; fixtures per combo.
+

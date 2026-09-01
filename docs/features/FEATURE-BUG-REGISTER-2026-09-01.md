@@ -115,7 +115,7 @@
 **راه‌حل:** اگر v1 فقط نرخ دستی دارد، صریحاً scope را محدود کن. اگر variable واقعی لازم است: `referenceIndex`, `spread`, `cap`, `floor`, `resetFrequency`, effective interval و versioned rate snapshot.
 
 ## FEAT-P0-015 — Loan grace semantics چندگانه
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — grace flags
 **مشکل:** `gracePeriodMonths`, `gracePeriodCount`, `gracePeriods`, `graceMode` و `gracePeriodUnit` همزمان در متن دیده می‌شوند.
 
 **راه‌حل:** canonical فقط `graceMode + gracePeriods` یا `date_range`. فیلدهای قدیمی فقط migration/read-only. API create نباید دو مدل را همزمان بپذیرد.
