@@ -1782,3 +1782,6 @@ Snapshot only; rebuild from `ln_transactions.principalPortion` sum. No direct mu
 Canonical fee accountingTreatment: `reduction_of_carrying_amount`.
 Deprecated synonym `reduction_of_liability` maps 1:1 in migration only.
 
+## FEAT-P0-009 DEEP
+Header = contract. Disbursement cash on ln_transactions + operation. accountTransactionId on loan nullable legacy.
+

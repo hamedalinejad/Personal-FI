@@ -79,7 +79,7 @@
 **راه‌حل:** enum canonical فقط طبق Core تعریف شود؛ contractual principal، accrued components و accounting carrying amount جدا بمانند. `reduction_of_liability` فقط policy صریح.
 
 ## FEAT-P0-009 — Loan disbursement linkage ambiguity
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — disbursement cash on ln_transactions
 **مشکل:** `ln_loans.accountId/accountTransactionId` با Standalone nullable معرفی شده، ولی createLoan هنوز لینک حساب را در مسیر اصلی فرض می‌کند.
 
 **راه‌حل:** header فقط اطلاعات قراردادی؛ هر cash-bearing event در `ln_transactions.accountTransactionId` به operation cash leg لینک شود. برای v1 یک disbursement، برای phased آینده جدول `ln_disbursements`.
