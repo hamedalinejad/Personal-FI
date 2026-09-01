@@ -1149,8 +1149,8 @@ ln_loan_fees:
 | `tiered` (زیرگروه early) | `expense` | |
 
 قوانین:
-1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `proceeds_reduction` | `reduction_of_liability`
-2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_liability` صریح (نادر).
+1. فیلد `accountingTreatment`: `expense` | `capitalized_cost` | `proceeds_reduction` | `reduction_of_carrying_amount`
+2. پیش‌فرض پروژه: **هیچ feeای remainingBalance/liability را کم نمی‌کند** مگر `reduction_of_carrying_amount` صریح (نادر).
 3. هر fee → `ln_transactions type=fee_payment` + journal line `lineKind=fee` روی `fin_accounts` مناسب.
 4. `capitalized_cost` فقط اگر محصولاً به cost of borrowing اضافه شود و در گزارش جداگانه مستند باشد.
 
@@ -1753,7 +1753,7 @@ Journal: see Accounting-Calculation-Invariants §3
 
 ### accountingTreatment (P0-008)
 Canonical: **`reduction_of_carrying_amount`**
-Deprecated alias: `reduction_of_liability` → same mapping in migration (no silent drop).
+Deprecated alias: `reduction_of_carrying_amount` → same mapping in migration (no silent drop).
 
 ### Standalone (P0-001)
 `accountId` / cash linkage **nullable**; settlement via CashSettlementPort (internal|external).
@@ -1777,3 +1777,8 @@ Snapshot only; rebuild from `ln_transactions.principalPortion` sum. No direct mu
 ## Snapshot mutation ban (FEAT-P0-002)
 **ممنوع:** `setRemainingBalance` / `updateCurrentAmount` / mutate مستقیم `remainingBalance`، `cashBalance`، `quantity` snapshot.
 فقط Financial Operation → ledger → `rebuildLoan` / projection.
+
+## FEAT-P0-008 DEEP
+Canonical fee accountingTreatment: `reduction_of_carrying_amount`.
+Deprecated synonym `reduction_of_liability` maps 1:1 in migration only.
+

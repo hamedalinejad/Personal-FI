@@ -73,7 +73,7 @@
 **قبولی:** یک symbol ساختگی در holdings برای cash جدید نوشته نشود.
 
 ## FEAT-P0-008 — Loan accountingTreatment enum drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — single accountingTreatment enum
 **مشکل:** `reduction_of_carrying_amount` و `reduction_of_liability` هر دو در سند آمده‌اند ولی معنای اقتصادی/حسابداری یکسان نیست.
 
 **راه‌حل:** enum canonical فقط طبق Core تعریف شود؛ contractual principal، accrued components و accounting carrying amount جدا بمانند. `reduction_of_liability` فقط policy صریح.
