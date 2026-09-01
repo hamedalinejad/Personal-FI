@@ -1152,7 +1152,7 @@ Reversal atomic باید:
 |--|------------------------------|----------------------------------|
 | مثال | IRR, USD, USDT به‌عنوان واحد پول | USDT-TRC20, USDT-ERC20, BTC native |
 | feeCurrency | کد Currency | — |
-| Holding | — | assetKey اجباری |
+| Holding | — | instrumentId اجباری؛ assetKey اختیاری mapping |
 | قیمت | quoteCurrency روی price row | instrumentId = ref_instruments.id؛ assetKey فقط mapping |
 
 موجودی «تتر روی شبکه» = **Asset**؛ تسویه «مبلغ به USDT» = **Currency** در فیلدهای amount.

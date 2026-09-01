@@ -80,7 +80,7 @@ Business Rules
 > **نکته مهم - جریان پول صندوق‌های issuance_redemption**:
 > - برای صندوق‌های issuance_redemption (صدور و ابطالی)، تمام معاملات از طریق حساب بانکی کاربر انجام می‌شود
 > - در `inv_fif_holdings`, `brokerageId` nullable است (چون این صندوق‌ها از طریق کارگزاری نیستند)
-> - در `inv_fif_transactions`, `accountId` حتماً پر می‌شود (چون واریز/برداشت از حساب بانکی است)
+> - در `inv_fif_transactions`, `accountId` فقط در Integrated issuance پر می‌شود؛ Standalone از CashSettlementPort external/local استفاده می‌کند (nullable)
 > - در خرید issuance_redemption: `accountId` پر می‌شود و `brokerageId` nullable است
 > - در فروش issuance_redemption: مبلغ به `accountId` واریز می‌شود و `accountId` پر می‌شود
 > - تراکنش‌ها در `acc_transactions` با `type = 'deposit-investment'` یا `type = 'withdrawal-investment'` ثبت می‌شوند
@@ -310,7 +310,7 @@ $ \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} \
 
 ## حساب منبع پول برای صدور/ابطال
 
-`inv_fif_holdings` می‌تواند units را aggregate کند، ولی **منبع پول هر معامله** روی `inv_fif_transactions.accountId` (اجباری برای `fundType=issuance_redemption`) حفظ می‌شود.
+`inv_fif_holdings` می‌تواند units را aggregate کند، ولی **منبع پول هر معامله** روی `inv_fif_transactions.accountId` (Integrated issuance_redemption؛ Standalone nullable) حفظ می‌شود.
 
 قوانین:
 1. خرید/ابطال issuance بدون `accountId` ممنوع است.
@@ -358,7 +358,7 @@ sell:
 ### APIها
 - `createFund` / `buyUnits` / `sellUnits` / `registerDividend` / `reinvest` / `updateNAV`
 - NAV فقط از Price Fetching / manual؛ `transactionPrice` مبنای basis خرید/ابطال
-- issuance: `accountId` اجباری روی تراکنش
+- issuance: `accountId` در Integrated؛ Standalone nullable + SettlementPort
 
 ### Atomic buy
 ```text

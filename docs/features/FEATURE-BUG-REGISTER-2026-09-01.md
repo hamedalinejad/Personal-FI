@@ -582,3 +582,11 @@ List APIs باید pagination, sort, date range, status, source و stable orderi
 این سند عمداً **هیچ Feature اصلی را rewrite نمی‌کند**. هدف آن این است که تمام مواردی که قبل از implementation باید یک تصمیم واحد داشته باشند در یک register قرار گیرند.
 
 بعد از حل P0ها، هر Feature فقط باید بخش‌های متناقض خودش را اصلاح کند؛ مدل موجود و fieldهای فعلی حفظ می‌شوند و deprecated data فقط با migration mapping کنار گذاشته می‌شود.
+
+---
+
+## DEEP-PASS verification (2026-09-01)
+
+All FEAT-P0-001…050 and FEAT-P1-001…030 marked **DEEP-FIXED** with per-item commits.
+Residual FIF `accountId` mandatory wording and crypto holding assetKey wording cleaned in follow-up.
+Implementation must still prove with golden fixtures; this pass is documentation-only.
