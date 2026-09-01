@@ -41,7 +41,19 @@
 8. `currentAmount` نمی‌تواند منفی شود.
 9. `currentAmount` می‌تواند بیشتر از `targetAmount` شود (مثلاً اگر کاربر پس‌انداز بیشتری کند یا عوامل خارجی ارزش را افزایش دهند).
 10. وقتی `source=budget` (انتقال از پاکت به هدف)، پول واقعاً بین حساب‌ها جابه‌جا نمی‌شود؛ `accountTransactionId` باید `null` بماند (فقط یک برچسب‌گذاری داخلی است).
-10a. وقتی `source=income` (اختصاص بخشی از یک درآمد ثبت‌شده به هدف)، این نیز مانند `source=budget` صرفاً یک **برچسب‌گذاری داخلی** است، نه جابه‌جایی پول جدید: مبلغ درآمد از قبل طی تراکنش اصلی در `acc_transactions`/`inc_transactions` به حساب بانکی واریز شده؛ اختصاص آن به هدف فقط یک `fg_contributions` با `source='income'` و `accountTransactionId = null` ایجاد می‌کند (بدون رکورد جدید در `acc_transactions`). ایجاد یک تراکنش بانکی واقعی جداگانه برای این حالت **ممنوع است**، چون باعث دوبار شمارش همان مبلغ درآمد (یک‌بار در واریز اصلی، یک‌بار در تخصیص به هدف) می‌شود. تنها `source`هایی که مجازند `accountTransactionId` واقعی داشته باشند `manual` و `transfer` هستند (پول واقعاً و مستقیماً به‌خاطر همین هدف جابه‌جا می‌شود).
+10a. وقتی `source=income` (اختصاص بخشی از یک درآمد ثبت‌شده به هدف)، این نیز مانند `source=budget` صرفاً یک **برچسب‌گذاری داخلی** است، نه جابه‌جایی پول جدید: مبلغ درآمد از قبل طی تراکنش اصلی در `acc_transactions`/`inc_transactions` به حساب بانکی واریز شده؛ اختصاص آن به هدف فقط یک `fg_contributions` با `source='income'` و `accountTransactionId = null` ایجاد می‌کند (بدون رکورد جدید در `acc_transactions`). ایجاد یک تراکنش بانکی واقعی جداگانه برای این حالت **ممنوع است**، چون باعث دوبار شمارش همان مبلغ درآمد (یک‌بار در واریز اصلی، یک‌بار در تخصیص به هدف) می‌شود. تنها `source`هایی که مجازند `accountTransactionId` واقعی داشته باشند `manual` و `transfer` هستند
+>
+> ### P0-072 — Contribution source contract
+> | source | cash movement? | accountTransactionId | CashSettlementPort |
+> |--------|----------------|----------------------|--------------------|
+> | `manual` | بله (واریز واقعی به هدف) | required (or created) | yes |
+> | `transfer` | بله | required | yes |
+> | `budget` | خیر — فقط earmark | **null** | no |
+> | `income` | خیر — فقط earmark روی درآمد قبلی | **null** | no |
+>
+> فقط `manual`/`transfer` مجازند از CashSettlementPort پول واقعی جابه‌جا کنند.  
+> `budget`/`income` هرگز تراکنش بانکی جدید نمی‌سازند (جلوگیری از double count).
+ (پول واقعاً و مستقیماً به‌خاطر همین هدف جابه‌جا می‌شود).
 11. `currentAmount` در `fg_goals` یک فیلد **snapshot** است که باید همیشه با مجموع `fg_contributions.amount` همخوانی داشته باشد:
  - وقتی `addContribution` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) آپدیت می‌شود
  - وقتی `withdrawFromGoal` صدا زده می‌شود، `currentAmount` به صورت atomic (در یک transaction) کاهش می‌یابد
@@ -118,7 +130,9 @@
 
 ### Goal APIs
 - `createGoal(data)` → ایجاد هدف جدید
-- `updateGoal(id, data)` → شامل `currentAmount`, `targetAmount`, `status`
+- `updateGoal(id, data)` → metadata فقط: `targetAmount`, `status`, name, category, deadline, …  
+  **P0-071 LOCK**: تغییر مستقیم `currentAmount` از `updateGoal` **ممنوع** است.  
+  `currentAmount` فقط از مسیر `addContribution` / `withdrawFromGoal` / `rebuildGoalFromContributions` تغییر می‌کند (ledger `fg_contributions` = SoT).
 - `getAllGoals(filters)` → فیلتر بر اساس وضعیت، دسته و ...
 - `getGoalById(id)` → شامل محاسبه `progressPercentage` و `remainingAmount`
 - `changeGoalStatus(id, status)` → تغییر وضعیت
@@ -131,6 +145,13 @@
  - اگر مبلغ برداشت از کمک‌های `source ∈ {manual, transfer}` تأمین شود: یک رکورد `fg_contributions` با `type='withdraw'` و یک تراکنش واقعی در `acc_transactions` برای `accountId` می‌سازد.
  - اگر مبلغ برداشت از کمک‌های `source ∈ {budget, income}` تأمین شود (برچسب‌گذاری بدون پول واقعی): فقط یک رکورد `fg_contributions` با `type='withdraw'` و `accountTransactionId = null` می‌سازد — بدون تراکنش بانکی (پول هرگز از حساب واقعی خارج نشده بود). اگر `accountId` پاس داده شود در این حالت، **خطای اعتبارسنجی** برمی‌گرداند.
  - اگر مبلغ از هر دو نوع کمک تأمین شود: بخش «واقعی» تراکنش بانکی می‌گیرد، بخش «برچسب» `accountTransactionId = null` می‌ماند — دو رکورد جداگانه در `fg_contributions` ثبت می‌شود.
+>
+> ### P0-073 — Withdraw allocation policy (FIFO + separation)
+> - Earmarked amounts (`budget`/`income`) و real-cash amounts (`manual`/`transfer`) **جدا** تخصیص داده می‌شوند.
+> - FIFO فقط **داخل هر کلاس** (real-cash pool vs earmark pool) اعمال می‌شود؛ برداشت real-cash هرگز به contribution label earmark «متصل» نمی‌شود به‌عنوان منبع پول واقعی.
+> - نتیجه: یک یا دو ردیف `type=withdraw` با source-class مشخص؛ attribution اشتباه cash ممنوع.
+> - Policy پیش‌فرض: اول earmark (label-only) مصرف شود مگر کاربر صریحاً real-cash withdraw بخواهد؛ در هر حال کلاس‌ها مخلوط attribution نمی‌شوند.
+
 - `getContributions(goalId)` → تاریخچه کمک‌ها
 - `getGoalProgress(goalId)` → درصد پیشرفت + مبلغ باقی‌مانده
 

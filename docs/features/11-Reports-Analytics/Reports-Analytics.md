@@ -108,10 +108,11 @@
 
 - `id` → UUID
 - `date` → datetime
-- `totalAssets` → decimal
-- `totalLiabilities` → decimal
-- `netWorth` → decimal
-- `netWorthUSDT` → decimal
+- `totalAssets` → **decimal TEXT** (string) — P0-078؛ مطابق Financial-Invariants / API-Result (نه IEEE number)
+- `totalLiabilities` → decimal TEXT
+- `netWorth` → decimal TEXT
+- `netWorthUSDT` → decimal TEXT (یا netWorthInQuote با quoteCurrency)
+- هر فیلد مالی persist/API در این فیچر: decimal string؛ JSON number برای پول ممنوع.
 - `createdAt` → datetime
 
 > این جدول برای نمایش روند تاریخی Net Worth و افزایش سرعت گزارش‌گیری مفید است.
@@ -123,7 +124,13 @@
 ### Report APIs
 - `getCashFlow(startDate, endDate, accountIds?)`
 - `getIncomeExpenseReport(startDate, endDate, groupBy?)`
-- `getNetWorth(date?)` → ارزش خالص در یک تاریخ مشخص — **Wrapper** روی `Portfolio-Wealth-Overview.calculateNetWorth({ date, includeCashInWealth: true })`؛ با `includeCashInWealth = true` (تفاوت عمدی با پیش‌فرض پرتفوی که `false` است) تا تصویر کامل ثروت شامل موجودی نقدی صرافی‌ها/کارگزاری‌ها هم باشد. **هیچ منطق محاسباتی مستقلی اینجا نیست** — منبع حقیقت `calculateNetWorth` در `Portfolio-Wealth-Overview` است
+- `getNetWorth(date?)` → ارزش خالص as-of تاریخ — **Wrapper** روی `Portfolio-Wealth-Overview.calculateNetWorth({ date, includeCashInWealth: true })`.
+>
+> ### P0-079 — Historical as-of reconstruction
+> - اگر `date` داده شود، **ممنوع** است از current cash/holding snapshots خام استفاده شود.
+> - باید cash / asset / liability را as-of آن تاریخ از ledgerها (و snapshotهای validated تا آن تاریخ) reconstruct کند.
+> - `rep_net_worth_snapshots` فقط cache rebuildپذیر است؛ SoT = ledgers + price/fx as-of.
+> - Wrapper حق ندارد current balances را برای historical date برگرداند.
 - `getNetWorthTrend(startDate, endDate)` → روند Net Worth
 - `getInvestmentPerformance(startDate?, endDate?)`
 - `getTaxSummary(year?)` → خلاصه مالیات‌ها (پرداخت‌شده، در انتظار، معوق)
@@ -187,6 +194,12 @@
 - `getNetWorth` Wrapper روی `Portfolio.calculateNetWorth`
 - فیلتر تاریخ روی businessDate/date؛ فقط isVoided=false
 - مبالغ خروجی decimal string + تبدیل اختیاری به base
+>
+> ### P0-080 — Cross-currency / USDT historical conversion path
+> - وقتی خروجی چندارزی یا USDT historical است و مسیر >1 hop دارد (مثلاً IRR→USDT→USD یا asset quote → bridge → base)، باید **conversionPath** (لیست نرخ‌ها + asOf هر hop) ذخیره/برگردانده شود.
+> - فقط یک `exchangeRate` تکی وقتی مسیر چندمرحله‌ای است = cross-currency wrong.
+> - Valuation graph از Currency-CrossRate + price as-of؛ Reports مصرف‌کننده path است نه inventor نرخ.
+
 
 ## فقط Query layer
 

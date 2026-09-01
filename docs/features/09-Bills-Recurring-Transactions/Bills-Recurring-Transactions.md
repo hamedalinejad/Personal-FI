@@ -90,7 +90,7 @@
 - `amount` → decimal (مبلغ نهایی این دوره)
 - `status` → string (`pending`, `paid`, `overdue`, `skipped`)
 - `paidDate` → datetime (nullable)
-- `exchangeRateToBase` → decimal (nullable — نرخ تتر لحظه پرداخت: ریال به ازای ۱ تتر؛ هنگام `markAsPaid` پر می‌شود، مشابه الگوی سایر فیچرها)
+- `exchangeRateToBase` → decimal (nullable — **نرخ تبدیل ارز occurrence/پرداخت → baseCurrency کاربر** در لحظه پرداخت؛ asOf + source طبق Currency-CrossRate. «نرخ تتر» فقط برچسب UI است وقتی base=IRR و quote=USDT — P0-075)
 - `transactionId` → UUID (لینک به تراکنش واقعی `exp_transactions.id` یا `inc_transactions.id` — nullable)
 - `accountTransactionId` → UUID (لینک به `acc_transactions.id` — nullable)
 - `note` → string
@@ -118,8 +118,14 @@
 - `getOccurrences(brItemId)`
 - `getPendingOccurrences`
 - `getOverdueOccurrences`
-- `markAsPaid(brOccurrenceId, amount, date, accountId?, exchangeRateToBase?)`
- → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + ثبت در `acc_transactions` + پر کردن هر دو فیلد `transactionId` و `accountTransactionId` + ذخیره `exchangeRateToBase` روی Occurrence + به‌روزرسانی `nextDueDate`؛ اگر `nextDueDate` جدید بعد از `endDate` باشد → `isActive = false` (طبق Business Rule 8)
+- `markAsPaid(brOccurrenceId, amount?, date?, accountId?, exchangeRateToBase?)`
+ → ثبت پرداخت/دریافت + ایجاد تراکنش در `exp/inc_transactions` + `acc_transactions` + لینک‌ها + به‌روزرسانی `nextDueDate`؛ اگر بعد از `endDate` → `isActive = false`.
+>
+> ### P0-074 — Occurrence amount immutability / amendment
+> - مبلغ اصلی occurrence هنگام generate ذخیره می‌شود و **با markAsPaid بازنویسی خام نمی‌شود**.
+> - اگر `amount` پاس‌داده‌شده ≠ `occurrence.amount` اصلی: یک **amendment event** (یا فیلدهای `originalAmount` + `paidAmount` + `amountAmendedAt`/`amendmentReason`) ثبت می‌شود؛ original حفظ می‌گردد.
+> - `paidAmount` / effective amount برای ledger از amendment یا amount آرگومان می‌آید؛ history loss ممنوع.
+
 - `skipOccurrence(brOccurrenceId)` → رد کردن این دوره
 - `updateOccurrenceAmount(brOccurrenceId, amount)` → برای مبالغ متغیر
 
@@ -172,7 +178,7 @@
 - ثبت خودکار تراکنش بهتر است با تأیید کاربر انجام شود تا از ثبت اشتباه جلوگیری شود.
 - در Dashboard بخش «سررسیدهای نزدیک» و «معوق‌ها» باید برجسته نمایش داده شود.
 - این فیچر فقط قالب و زمان‌بندی را مدیریت می‌کند؛ تراکنش مالی واقعی همیشه از طریق Expense یا Income ثبت می‌شود.
-- نرخ تتر در زمان پرداخت در فیلد `br_occurrences.exchangeRateToBase` ذخیره می‌شود تا گزارش‌های تاریخی دقیق باشند (مشابه الگوی یکسان در سایر فیچرها مثل Physical Assets، Metals، Investments).
+- `exchangeRateToBase` در زمان پرداخت روی occurrence ذخیره می‌شود (نرخ → baseCurrency کاربر + ترجیحاً rateAsOf/source). «تتر» فقط نمایش است وقتی applicable — P0-075.
 
 ---
 

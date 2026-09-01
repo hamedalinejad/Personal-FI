@@ -50,6 +50,23 @@
 
 ---
 
+
+
+### P0-077 — category ↔ RelatedFeature mapping table (explicit)
+
+| category (notification) | RelatedFeature(s) | notes |
+|-------------------------|-------------------|--------|
+| `bills` | `bills` / `recurring` | |
+| `loan` | `loan` | |
+| `cheque` | `cheque` | |
+| `budget` | `budget` | |
+| `goals` | `goals` | |
+| `tax` | `tax` | |
+| `system` | — | no RelatedFeature |
+| `custom` | — / user-defined | no default RelatedFeature |
+
+کد نباید `category === relatedFeature` را به‌عنوان قرارداد فرض کند؛ از جدول نگاشت (یا helper `mapCategoryToRelatedFeature`) استفاده شود. مقادیر RelatedFeature ممکن است بیشتر/متفاوت باشند.
+
 ## Domain Entities
 
 ### ۱. Notification (جدول: `notif_notifications`)
@@ -61,7 +78,7 @@
 - `category` → string (`bills`, `loan`, `cheque`, `budget`, `goals`, `tax`, `system`, `custom`) — هماهنگ با مقادیر `RelatedFeature` در `types.md`؛ `system`/`custom` معادل `RelatedFeature` ندارند
 - `relatedFeature` → string (نوع `RelatedFeature` — تعریف مرکزی در `core/types/types.md`)
 
-> **نگاشت `category` ↔ `relatedFeature`**: مقادیر `category` عمداً با `RelatedFeature` هماهنگ شده‌اند تا نگاشت مستقیم (`category === relatedFeature`) کار کند — به‌جز دو استثنا: `system` (اعلان‌های داخلی سیستم) و `custom` (اعلان‌های دستی کاربر) که معادل `RelatedFeature` ندارند و `relatedFeature` آن‌ها `null` است.
+> **نگاشت `category` ↔ `relatedFeature`**: مقادیر `category` عمداً با `RelatedFeature` هماهنگ شده‌اند ولی **equality مستقیم قرارداد نیست (P0-077)** — به‌جز دو استثنا: `system` (اعلان‌های داخلی سیستم) و `custom` (اعلان‌های دستی کاربر) که معادل `RelatedFeature` ندارند و `relatedFeature` آن‌ها `null` است.
 - `relatedId` → UUID (شناسه رکورد مرتبط — nullable)
 - `dedupeKey` → string (nullable — کلید یکتایی منطقی برای جلوگیری از اعلان تکراری؛ فرمت پیشنهادی: `{category}:{relatedFeature}:{relatedId}:{dueDate-YYYY-MM}`؛ قبل از ساخت اعلان جدید در `generateDueReminders` بررسی می‌شود که اعلان فعالی با همین `dedupeKey` وجود نداشته باشد)
 - `isRead` → boolean
@@ -114,7 +131,7 @@
 - `deactivateCustomReminder(notifReminderId)`
 
 ### Scheduler APIs
-- `generateDueReminders` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق اولویت `daysBefore`**: برای هر رکورد، ابتدا مقدار سطح‌آیتم بررسی می‌شود (مثلاً `br_items.reminderDaysBefore`)؛ اگر non-null بود از آن استفاده می‌شود، در غیر این صورت از `notif_settings.daysBefore` برای `category` مربوطه به‌عنوان fallback استفاده می‌شود؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ اگر اعلانی با همین `dedupeKey` و `isRead = false` از قبل وجود داشته باشد، اعلان جدید ساخته نمی‌شود (یا فقط `scheduledAt` موجود به‌روزرسانی می‌شود)
+- `generateDueReminders` → بررسی سررسیدها و ایجاد اعلان (Job دوره‌ای)؛ **منطق اولویت `daysBefore`**: برای هر رکورد، ابتدا مقدار سطح‌آیتم بررسی می‌شود (مثلاً `br_items.reminderDaysBefore`)؛ اگر non-null بود از آن استفاده می‌شود، در غیر این صورت از `notif_settings.daysBefore` برای `category` مربوطه به‌عنوان fallback استفاده می‌شود؛ **منطق جلوگیری از تکرار**: قبل از ساخت هر اعلان، `dedupeKey` محاسبه می‌شود؛ **P0-076**: uniqueness روی `dedupeKey` (per event occurrence) در DB است و **مستقل از isRead**. اگر ردیفی با همان dedupeKey وجود داشته باشد (read یا unread)، اعلان جدید ساخته نمی‌شود — در صورت نیاز فقط update فیلدهای غیرهویتی (مثلاً scheduledAt). خواندن اعلان مجوز duplicate نمی‌دهد.
 - `checkBudgetAlerts` → بررسی وضعیت بودجه‌ها
 - `checkGoalProgress` → بررسی پیشرفت اهداف
 
@@ -162,7 +179,7 @@
 - اعلان‌ها باید سبک و غیرمزاحم باشند.
 - در حالت Offline، اعلان‌ها به صورت محلی ذخیره و نمایش داده می‌شوند.
 - Job دوره‌ای (مثلاً هر چند ساعت یک‌بار) وضعیت سررسیدها را بررسی و اعلان‌های لازم را ایجاد می‌کند؛ **اولویت `daysBefore`**: مقدار سطح‌آیتم (مثلاً `br_items.reminderDaysBefore`) بر مقدار سراسری `notif_settings.daysBefore` اولویت دارد؛ `notif_settings.daysBefore` فقط زمانی استفاده می‌شود که مقدار سطح‌آیتم `null` باشد.
-- از ایجاد اعلان تکراری برای یک رویداد جلوگیری شود — از طریق بررسی `dedupeKey` قبل از ساخت هر اعلان در `generateDueReminders` (به Domain Entity `notif_notifications`، فیلد `dedupeKey` مراجعه شود).
+- جلوگیری از تکرار: UNIQUE(dedupeKey) در DB / چک قبل از insert — مستقل از read state (P0-076).
 - در آینده می‌توان Push Notification مرورگر و اپ موبایل را اضافه کرد.
 - تعداد اعلان‌های خوانده‌نشده باید در Navigation و Dashboard نمایش داده شود.
 

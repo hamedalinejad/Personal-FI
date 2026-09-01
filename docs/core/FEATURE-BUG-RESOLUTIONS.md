@@ -141,3 +141,17 @@ P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implemen
 - **068** strictMode advisory; never block financial operation
 - **069** loan budget link = operation + exact expense portions
 - **070** closeBudget idempotent + unique period
+
+
+## FEAT-P0-071 … 080 (Goals / Bills / Notification / Reports) — LOCK 2026-09-01
+
+- **071** Goals: no direct currentAmount mutation on updateGoal; contributions/rebuild only
+- **072** Contribution sources: real cash only manual/transfer via CashSettlementPort; budget/income earmark only
+- **073** Withdraw allocation separates earmark vs real-cash pools (FIFO within class)
+- **074** Bills markAsPaid amount change = amendment; original preserved
+- **075** exchangeRateToBase generic to baseCurrency (not tether-hardcoded)
+- **076** Notification dedupeKey unique regardless of read state
+- **077** Explicit category ↔ RelatedFeature map; no === contract
+- **078** Reports money fields decimal TEXT
+- **079** Historical net worth from ledger reconstruction as-of
+- **080** Multi-hop valuation requires conversionPath

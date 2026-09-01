@@ -108,3 +108,20 @@
 | P0-070 | **CLOSED** | closeBudget idempotent; unique period; no duplicate next budget |
 
 تفصیل: Investment-Metals.md, Physical-Assets.md, Budget-Management.md
+
+## Batch P0-071 … P0-080 (Goals + Bills + Notification + Reports) — CLOSED 2026-09-01
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-071 | **CLOSED** | updateGoal metadata only; currentAmount only via contributions/rebuild |
+| P0-072 | **CLOSED** | contribution source contract; CashSettlementPort only for manual/transfer real cash |
+| P0-073 | **CLOSED** | withdraw FIFO per cash-class; earmark vs real-cash attribution separated |
+| P0-074 | **CLOSED** | markAsPaid amount override → amendment event; original occurrence amount preserved |
+| P0-075 | **CLOSED** | exchangeRateToBase = rate to user baseCurrency + asOf/source; not hard-coded tether |
+| P0-076 | **CLOSED** | dedupeKey UNIQUE independent of isRead |
+| P0-077 | **CLOSED** | explicit category↔RelatedFeature mapping table; no equality contract |
+| P0-078 | **CLOSED** | all financial persisted/API values decimal TEXT string |
+| P0-079 | **CLOSED** | getNetWorth(date) reconstructs as-of from ledgers; no current snapshot for historical |
+| P0-080 | **CLOSED** | multi-hop FX/USDT uses conversionPath; single rate insufficient |
+
+تفصیل: Financial-Goals.md, Bills-Recurring-Transactions.md, Notification-Reminder-System.md, Reports-Analytics.md
