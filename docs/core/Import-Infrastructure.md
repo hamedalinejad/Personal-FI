@@ -85,3 +85,33 @@ Select file
 
 **ممنوع:** Commit بدون Preview/Validation موفق.  
 ردیف‌های نامعتبر در گزارش validation می‌مانند؛ silent skip بدون log ممنوع.
+
+---
+
+## قانون مطلق: دو لایه Import (P0)
+
+### Raw
+دقیقاً آنچه منبع داده داده (شامل unknown fields):
+
+```json
+{
+  "date": "...",
+  "amount": "...",
+  "bank_field_x": "...",
+  "unknown_field_y": "..."
+}
+```
+
+ذخیره: `raw_payload` / `source_payload_json` + `source_type` + `source_reference` + `schema_version` + `importBatchId`
+
+### Normalized
+فیلدهای داخلی Domain:
+
+`amount` · `currency` · `date` · `category` · …
+
+```text
+RAW DATA  →  Normalized fields  →  Domain
+```
+
+Raw **همیشه باقی می‌ماند**. برای business logic از Normalized استفاده می‌شود؛ Raw دور ریخته نمی‌شود.
+Unknown fields در raw/unmapped می‌مانند — قانون مطلق Data Preservation.

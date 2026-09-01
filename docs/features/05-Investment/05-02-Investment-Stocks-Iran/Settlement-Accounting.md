@@ -18,3 +18,20 @@ tradeDate, settlementDate, cashSettlementStatus = pending|settled|failed
 - یک `operationId` می‌تواند trade + later settlement را به هم وصل کند (یا op فرزند با link)
 
 IranSettlement Core — hard-code داخل UI ممنوع.
+
+---
+
+## Trade vs Settlement (قفل)
+
+جدا نگه دار:
+
+| مفهوم | نقش |
+|--------|------|
+| order / trade date | تاریخ معامله |
+| settlement date | تاریخ تسویه |
+| cash reserved | نقد رزرو |
+| cash available | نقد آزاد |
+| position pending | موقعیت در انتظار تسویه |
+| position settled | موقعیت تسویه‌شده |
+
+بدون این تفکیک، Cash / Portfolio / P&L در بازه T+n غلط می‌شوند.

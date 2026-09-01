@@ -115,3 +115,22 @@ SoT identity = instrumentId (ref_instruments)
 ISIN = attribute پایدار وقتی موجود است
 symbol / ticker = display / search only
 ```
+
+---
+
+## شناسه‌ها و تاریخچه نماد (P1)
+
+```text
+instrumentId          // SoT
+ISIN
+Exchange / Market
+Symbol (display current)
+```
+
+جداول/ساختار پیشنهادی:
+
+- `instrument_identifiers` — ISIN, ticker فعلی، کدها
+- `instrument_aliases`
+- `instrument_symbol_history` با `effectiveFrom` · `effectiveTo` · `reason`
+
+تغییر نماد ≠ تغییر instrumentId.

@@ -341,3 +341,18 @@ Query **DB write ندارد**. UI → Feature API only.
 ## فهرست ریسک P0
 
 چک‌لیست یک‌صفحه‌ای ۹ ریسک مرگبار: `P0-Risk-Register.md`.
+
+---
+
+## SQLite و decimal TEXT (P0)
+
+مبالغ: `amount` / `quantity` / `price` = **TEXT**.
+
+SQLite **نباید** اعتبارسنجی مالی دقیق را با `CHECK(quantity >= 0)` روی TEXT انجام دهد (مقایسه lexicographic / غیرقطعی).
+
+| لایه | مسئولیت |
+|------|----------|
+| SQLite | NOT NULL, FK, UNIQUE, length, ساختار پایه |
+| Decimal Domain Validator | `> 0`, `>= 0`, scale, precision, rounding, rate validity |
+
+`Decimal("0.000000001")` و اعداد خیلی بزرگ باید deterministic با decimal.js (یا معادل) validate شوند.

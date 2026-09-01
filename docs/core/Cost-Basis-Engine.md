@@ -324,3 +324,16 @@ transfer_out بین ولت‌های خود کاربر نباید realized gain �
 - **FIFO / lots:** وقتی method=fifo، lots از ledger **rebuild** می‌شوند (`acquiredAt`, businessDate, createdAt tie-break)؛ ذخیره lot بدون قابلیت rebuild از events ممنوع به‌عنوان تنها SoT.
 - Specific lot identification: v1.1+ با انتخاب صریح هنگام disposal.
 - بدون lot/pool صحیح، Realized P&L در فروش‌های جزئی اشتباه می‌شود — fixture الزامی.
+
+---
+
+## Global engine — Feature فقط adapter (P0)
+
+```text
+CostBasisEngine (Foundation)
+  policies: weighted_average | FIFO | specific_lot | …
+       ↑
+  Crypto / Stocks / Funds / Metals adapters
+```
+
+Feature روش جدا و متناقض implement نمی‌کند؛ فقط eventها را به engine می‌دهد.

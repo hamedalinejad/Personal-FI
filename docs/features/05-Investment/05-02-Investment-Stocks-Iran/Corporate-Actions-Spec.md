@@ -59,3 +59,26 @@ averageBuyPrice' = costTotal' / quantity'
 **د) تجدید ارزیابی:** معمولاً quantity ثابت؛ اگر مقررات/مدل پروژه cost را تغییر ندهد، فقط meta/audit — در غیر این صورت policy versioned.
 
 هر فرمول نهایی در `Cost-Basis-Engine` + fixture عددی ایران؛ این بخش قرارداد است که **بدون فرمول گام‌به‌گام + تست، release سهام ایران معتبر نیست**.
+
+---
+
+## Corporate Action Lifecycle (P1)
+
+تاریخ‌های جدا (نه فقط یک effectiveDate):
+
+`announcementDate` · `recordDate` · `exDate` · `effectiveDate` · `settlementDate` · `paymentDate`
+
+### حق تقدم — حالات
+
+`rights_received` · `rights_sold` · `rights_exercised` · `rights_expired` · `subscription_payment` · `fractional_entitlement` · `cash_in_lieu`
+
+رابطه:
+
+```text
+parent security
+  → rights instrument
+  → new shares
+  → cash payment
+```
+
+بدون این روابط، cost basis خراب می‌شود. هر گام = Operation جدا یا legهای یک CA operation با لینک صریح.
