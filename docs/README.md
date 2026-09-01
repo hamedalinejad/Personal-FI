@@ -61,3 +61,4 @@
 | Field ownership | `docs/core/Field-Level-Data-Ownership-Matrix.md` |
 | Instrument identity | `docs/core/Instrument-Identity.md` |
 | Canonical cash (P0) | `docs/core/Canonical-Cash-Model.md` |
+| Loan Schedule Engine | `docs/core/Loan-Schedule-Engine.md` |

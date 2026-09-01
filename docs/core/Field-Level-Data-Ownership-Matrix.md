@@ -130,7 +130,9 @@ Domain ledger برای qty/موجودی تخصصی؛ Journal برای گزارش
 
 | Field | Kind | Owner | Editable | Source | Derived From | Migration |
 |-------|------|-------|----------|--------|--------------|-----------|
-| `ln_loans` terms (principal, rate, schedule) | RAW | Loan Domain | Limited | User | — | Preserve |
+| `ln_loans` terms (principal, rate, dayCount, graceMode, schedule rules) | RAW | Loan Domain | Limited | User | — | Preserve |
+| `dayCountConvention` / grace dates/periods | RAW | Loan Domain | Limited | User | — | Preserve |
+| schedule rows in `ln_schedule_snapshots` | DERIVED | **Schedule Engine** | No | — | terms + events | Rebuild |
 | `ln_transactions` (disburse, payment, fee, interest) | RAW | Loan Ledger | No | User | — | Preserve |
 | `remainingBalance` / portions | DERIVED | Loan Engine | No | — | ln_transactions | Rebuild |
 | schedule snapshot | SNAPSHOT | Loan Engine | No | — | terms + payments | Rebuild |

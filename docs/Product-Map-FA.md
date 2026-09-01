@@ -31,7 +31,7 @@ Accounting Core · fin_accounts · Journal · Money/Decimal · Currency · Finan
 |------|--------|
 | Accounts | حساب، موجودی، انتقال (accounting-neutral) |
 | Income / Expense | ثبت + recurring ساده |
-| Loans | فقط `declining_balance`, `flat_rate`, `qarz_al_hasaneh` |
+| Loans | Methodهای v1: `declining_balance`, `flat_rate`, `bullet`, `qarz_al_hasaneh` — فرمول در **Schedule Engine** + Day Count؛ نه دفن در loanType |
 | Crypto | buy/sell/transfer داخلی پایه + cost weighted average |
 | Dashboard + Reports | خلاصه موجودی، درآمد/هزینه، وام |
 | Settings | backup/restore، ارز پایه، امنیت پایه |

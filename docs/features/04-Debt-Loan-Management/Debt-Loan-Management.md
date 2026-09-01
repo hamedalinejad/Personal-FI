@@ -11,6 +11,10 @@
 
 ### روش‌های محاسبه اقساط (Core)
 
+> **معماری P0:** `calculationMethod` = Product/Method template است، نه محل دفن تمام فرمول‌ها.  
+> ساخت اقساط، Day Count، Grace، Rate Change، Holiday → **`docs/core/Loan-Schedule-Engine.md`**.  
+> این سند فیلدها و فرمول‌های مرجع را نگه می‌دارد؛ Engine آن‌ها را اجرا می‌کند.
+
 **1. Declining Balance (تناژل سود):**
 - نرخ سود روی مانده باقیمانده محاسبه می‌شود
 - کاربرد: وام‌های بانکی رسمی
@@ -89,13 +93,19 @@
 **مبالغ و ارز:**
 - `principalAmount` → decimal (مبلغ اصلی)
 - `currency` → string (ارز وام)
-- `dayCountConvention` → enum (`actual_365` | `actual_360` | `30_360` | `actual_actual`) — **اجباری برای frequency=custom**؛ پیش‌فرض `actual_365` برای بقیه
+- `dayCountConvention` → enum (`period_based` | `actual_365` | `actual_360` | `30_360` | `actual_actual` | `custom_days`) — **الزامی**؛ پیش‌فرض پیشنهادی: `period_based` برای monthly/weekly/quarterly منظم؛ برای `frequency=custom` حداقل `actual_365` یا `custom_days`
+- `dayCountDenominator` → decimal/integer nullable — فقط وقتی `custom_days` (مخرج قرارداد)
+> **Day Count کامل و جداسازی Product از Schedule:** `docs/core/Loan-Schedule-Engine.md` — Feature فقط پارامتر می‌دهد؛ فرمول داخل Engine.
 - `exchangeRateToBase` → decimal (نرخ ارز وام/قسط → **baseCurrency کاربر** در لحظه ثبت — / ؛ نه الزاماً ریال/تتر)
 
 **تاریخ‌ها:**
-- `disbursementDate` → datetime (تاریخ دریافت/واریز وام) ✅ **جدید**
-- `firstPaymentDate` → datetime (تاریخ اولین قسط) ✅ **جدید**
-- `endDate` → datetime (تاریخ پایان وام)
+- `disbursementDate` → datetime (تاریخ دریافت/واریز وام)
+- `firstPaymentDate` → datetime (تاریخ اولین قسط) — ورودی Schedule Engine
+- `endDate` → datetime (تاریخ پایان وام؛ یا derived از n×frequency و validate)
+- `irregularFirstPeriod` → boolean (پیش‌فرض false) — بازه اول غیرهم‌طول
+- `firstPeriodEndDate` → datetime nullable — وقتی irregular first
+- `paymentHolidayCalendarId` → nullable — اختیاری لینک به تقویم (IranCalendar)
+> جدول زمانی توسط **Schedule Engine** ساخته می‌شود (`Loan-Schedule-Engine.md`)؛ snapshot نسخه‌دار = `ln_schedule_snapshots`.
 
 **حساب:**
 - `accountId` → UUID (حساب مرتبط)
@@ -111,9 +121,13 @@
 - `installmentFrequency` → string (`monthly`, `weekly`, `quarterly`, `custom`)
 - `customIntervalDays` → integer (nullable — اجباری اگر frequency=custom)
 - `totalInstallments` → integer (تعداد کل اقساط)
-- `gracePeriods` → integer (nullable — **canonical** تعداد دوره‌های تنفس؛ 0 یا null = بدون تنفس)
-- `gracePeriodUnit` → enum (`installment` | `month`) پیش‌فرض `installment`
-- `gracePeriodMonths` / `gracePeriodCount` → **deprecated**؛ فقط مهاجرت خوانده می‌شوند و به `gracePeriods` map می‌شوند
+- `graceMode` → enum (`none` | `periods` | `date_range`) — **canonical**؛ پیش‌فرض `none`
+- `gracePeriods` → integer (nullable — تعداد **دوره‌های** تنفس با همان فرکانس وام؛ وقتی `graceMode=periods`)
+- `gracePeriodUnit` → فقط `installment` (= period) برای منطق جدید؛ `month` **deprecated**
+- `graceStartDate` / `graceEndDate` → datetime nullable — وقتی `graceMode=date_range`
+- `graceInterestPolicy` → enum (`interest_only` | `payment_holiday`) — طبق جدول Product×Grace در `Loan-Schedule-Engine.md`
+- `gracePeriodMonths` / `gracePeriodCount` → **deprecated**؛ migration → `graceMode=periods` + `gracePeriods`
+> **ممنوع اتکا به `gracePeriodMonths` تنها** برای وام weekly/quarterly/custom — همیشه period یا date_range.
 - `calculatedInstallment` → decimal (nullable — محاسبه‌شده برای Declining/Bullet) ✅ **جدید**
 - `fixedInstallmentAmount` → decimal (nullable — ثابت برای Flat Rate/Qarz)
 - `recalculateOnEarlyPayment` → boolean (فقط برای `declining_balance`؛ نحوه برخورد با پیش‌پرداخت جزئی را مشخص می‌کند — به بخش «بازمحاسبه اقساط پس از پیش‌پرداخت جزئی» مراجعه شود)
@@ -370,21 +384,31 @@ custom → periodsPerYear = 365 / customIntervalDays // مثلاً هر ۴۵ ر�
 | `quarterly` | ۴ | `annualRate / 4` | استاندارد — ۴ فصل در سال |
 | `custom` | `365 / customIntervalDays` | `annualRate × customIntervalDays / 365` | Day Count = Actual/365 — مناسب برای اکثر وام‌های ایرانی |
 
-### فیلد `dayCountConvention` روی `ln_loans` (اجباری برای custom؛ توصیه برای همه)
+### فیلد `dayCountConvention` روی `ln_loans` (اجباری)
 
 | مقدار | معنی |
 |--------|------|
-| `actual_365` | پیش‌فرض پروژه / رایج ایران — پایه ۳۶۵ |
-| `actual_360` | Actual/360 بانکی بین‌المللی |
+| `period_based` | نرخ دوره‌ای = nominal / periodsPerYear (12/52/4/…) — میان‌بر اقساط منظم |
+| `actual_365` | Actual/365 — پایه ۳۶۵؛ رایج برای custom |
+| `actual_360` | Actual/360 |
 | `30_360` | هر ماه ۳۰ روز، سال ۳۶۰ |
-| `actual_actual` | Actual/Actual (سال کبیسه) — Should Have |
+| `actual_actual` | Actual/Actual (سال کبیسه) |
+| `custom_days` | مخرج = `dayCountDenominator` قرارداد |
 
 ```text
-r_custom = annualRate × customIntervalDays / yearBasis(dayCountConvention)
-yearBasis: actual_365→365, actual_360→360, 30_360→360, actual_actual→daysInYear(asOf)
+// period_based (اقساط منظم):
+r = annualRate / periodsPerYear(frequency)
+
+// day-count path (بازه واقعی بین periodStart و periodEnd):
+interestFactor = annualRate × dayCountDays(convention, start, end) / denominator
+// Schedule Engine برای سود دوره‌ای نامنظم / irregular first-last از interestFactor استفاده می‌کند
+
+r_custom ≈ annualRate × customIntervalDays / yearBasis(dayCountConvention)
+yearBasis: actual_365→365, actual_360→360, 30_360→360, actual_actual→daysInYear(asOf), custom_days→dayCountDenominator
 ```
 
-بدون این فیلد، وام‌های مختلف با فرض ضمنی متفاوت drift می‌کنند.
+بدون این فیلد، وام‌های مختلف با فرض ضمنی متفاوت drift می‌کنند.  
+جزئیات کامل: **`docs/core/Loan-Schedule-Engine.md`**.
 
 ### تقویم اقساط و Business Date
 
@@ -440,21 +464,29 @@ r = interestRate / 100 // نرخ ماهانه مستقیم — بدون تقسی
  * این تنها تابع مجاز برای محاسبه r در کل سیستم وام است.
  * هیچ فرمولی نباید r را مستقیم با annual/12 محاسبه کند.
  */
-function getYearBasis(dayCountConvention: DayCountConvention): number {
+function getYearBasis(dayCountConvention: DayCountConvention, dayCountDenominator?: number): number {
   switch (dayCountConvention) {
+    case 'period_based': return 365; // فقط fallback برای custom؛ مسیر اصلی periodsPerYear است
     case 'actual_360': return 360;
     case '30_360': return 360;
     case 'actual_365': return 365;
     case 'actual_actual': return 365; // v1 ساده؛ leap در major بعد
+    case 'custom_days':
+      if (!dayCountDenominator || dayCountDenominator <= 0)
+        throw new Error('dayCountDenominator برای custom_days الزامی است');
+      return dayCountDenominator;
     default: return 365;
   }
 }
 
 function getPeriodRate(loan: Loan): Decimal {
+  // فقط برای dayCountConvention === 'period_based' یا میان‌بر اقساط منظم.
+  // برای actual_* روی بازه نامنظم از interestFactor(loan, start, end) در Schedule Engine استفاده شود.
   const annualRate = new Decimal(loan.interestRate).dividedBy(100);
   const annualRateNormalized =
     loan.interestRatePeriod === 'monthly' ? annualRate.times(12) : annualRate;
-  const yearBasis = getYearBasis(loan.dayCountConvention ?? 'actual_365');
+  const convention = loan.dayCountConvention ?? 'period_based';
+  const yearBasis = getYearBasis(convention);
 
   switch (loan.installmentFrequency) {
     case 'monthly': return annualRateNormalized.dividedBy(12);
@@ -859,7 +891,7 @@ interestPortion: 0
 > - **Payment Holiday**: هیچ پرداختی (نه اصل، نه سود) انجام نمی‌شود (مناسب Qarz Al-Hasaneh).
 > - **Grace Period روی Bullet**: مفهوماً بی‌معنی است (Bullet اصلاً تا قسط آخر هیچ اصلی ندارد).
 
-`gracePeriodMonths` همیشه بر اساس **ماه** تعریف شده، حتی اگر `installmentFrequency` هفتگی یا فصلی باشد. برای تبدیل:
+`gracePeriodMonths` **deprecated** است. اگر هنوز در دادهٔ مهاجرت دیده شد، تبدیل تقریبی زیر فقط برای migration است — منطق جدید = `graceMode` + `gracePeriods` یا `date_range`. تبدیل قدیمی:
 
 ```
 gracePeriods = gracePeriodMonths × periodsPerYear(loan) / 12

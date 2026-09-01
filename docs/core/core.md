@@ -66,6 +66,7 @@
 - `Source-of-Truth-Matrix.md` — یک سؤال → یک منبع
 - `Canonical-Cash-Model.md` — **P0** تنها SoT نقد = fin_accounts + journal
 - `Loan-Component-Classification.md`
+- `Loan-Schedule-Engine.md` — **P0** Product ≠ Schedule Engine؛ Day Count؛ Grace periods/date_range
 - `Data-Preservation-Contract.md`
 - `Data-Dictionary.md`
 - `Unit-Policy.md`
