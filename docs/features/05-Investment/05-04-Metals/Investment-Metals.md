@@ -408,3 +408,6 @@ If Physical Assets disabled: standalone delivery record + later materialize — 
 Canonical storage: **quantityMg** (and purity).
 `quantityCoins` = derived/display or auxiliary input that normalizes to mg — not a second SoT mass.
 
+## FEAT-P0-038 DEEP
+v1: platform cashBalance is IRR-only (documented scope). Multi-currency requires cashPosition(currency) rows — not ambiguous scalar.
+

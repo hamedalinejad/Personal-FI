@@ -255,7 +255,7 @@
 **راه‌حل:** discriminator `fundType` با validation سخت: ETF → brokerage route؛ issuance/redemption → account route. SettlementPort adapter مشترک، نه FKهای اجباری.
 
 ## FEAT-P0-038 — Metals cash currency contradiction
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — v1 IRR platform cash
 **مشکل:** سند می‌گوید همه مبالغ multi-currency ولی `inv_metals_platforms.cashBalance` صریحاً ریال است و platform cash APIs currency عمومی ندارند.
 
 **راه‌حل:** اگر v1 فقط IRR است، scope را صریح کن. اگر multi-currency است، cash ledger باید currency-aware باشد (`cashPosition` per currency)، نه یک `cashBalance` scalar.
