@@ -421,7 +421,7 @@ Dividend + NAV drop + reinvest باید در total return طوری ترکیب ش
 Income/Expense recurring و Bills هر دو scheduler دارند. باید idempotency key برای occurrence داشته باشند تا یک دوره دوبار تولید نشود.
 
 ## FEAT-P1-022 — Recurring date semantics
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — recurring businessDate semantics
 `nextOccurrence`/`nextDueDate` باید business date و timezone کاربر داشته باشد؛ `createdAt` UTC نباید مبنای schedule باشد.
 
 ## FEAT-P1-023 — Budget income override provenance
