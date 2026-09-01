@@ -49,7 +49,7 @@
 **قبولی:** `assetKey` هرگز PK/SoT نباشد.
 
 ## FEAT-P0-005 — Crypto fee/quantity contradiction
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — gross/fee/net; holding=net when fee from base
 **مشکل:** BUY با fee از base asset یک‌جا holding را `+1` و جای دیگر `+0.999` می‌کند.
 
 **راه‌حل:** `grossQuantity`, `feeQuantity`, `netQuantity`, `feePresence` اجباری. اگر fee از base/received کسر شد، holding = net؛ اگر fee در quote بود، net=gross.

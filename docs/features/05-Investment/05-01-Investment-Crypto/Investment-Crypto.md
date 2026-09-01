@@ -1482,3 +1482,10 @@ destCost = sourceCostReleased + acquisitionFees (policy)
 ## FEAT-P0-004 DEEP
 `instrumentId` never equals `assetKey` as storage PK.
 assetKey may be stored on instrument meta for provider sync only.
+
+## FEAT-P0-005 DEEP — fee/quantity
+| feePresence | holding Δ |
+| fee none / fee_in_quote | net = gross |
+| fee_from_base / fee_from_received | net = gross − feeQuantity |
+Always store gross, fee, net. Four-mode fixtures + conservation required.
+
