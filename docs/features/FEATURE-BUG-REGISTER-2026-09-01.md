@@ -219,7 +219,7 @@
 **راه‌حل:** در storage یک `priceInstrumentRef` canonical یا `assetCategory + instrumentId` داشته باش؛ اگر synthetic key لازم است نام و type آن صریح باشد و با Core `ref_instruments.id` اشتباه نشود.
 
 ## FEAT-P0-032 — Stocks T+2 vs immediate cash
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — T+2 cash layers
 **مشکل:** Stocks می‌گوید خرید فوراً `cashBalance` را کم می‌کند، ولی microstructure می‌گوید settlement در T+2 کاری و available cash باید از settled جدا باشد.
 
 **راه‌حل:** `ledgerCash`, `settledCash`, `availableCash`, `pendingSettlement` را تفکیک کن؛ trade date و settlement date جدا و calculation مشخص.

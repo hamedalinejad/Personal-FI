@@ -599,3 +599,7 @@ Journal: income = gross; cash leg = net; withholding = distinct component (not d
 ### Corporate actions (P0-034)
 CA table: source/target instruments, ratio, effectiveDate, operationId; rebuild applies CA ordered.
 
+## FEAT-P0-032 DEEP
+On trade: update ledger/pending per policy; availableCash follows settlementDate.
+Fields: ledgerCash, settledCash, availableCash, pendingSettlement — never collapse to one immediate cashBalance for Iranian T+n stocks.
+
