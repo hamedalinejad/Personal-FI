@@ -425,7 +425,7 @@ Income/Expense recurring و Bills هر دو scheduler دارند. باید idemp
 `nextOccurrence`/`nextDueDate` باید business date و timezone کاربر داشته باشد؛ `createdAt` UTC نباید مبنای schedule باشد.
 
 ## FEAT-P1-023 — Budget income override provenance
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — budget override provenance
 `totalIncome` override باید source، enteredAt، reason و version داشته باشد؛ وگرنه گزارش تاریخی قابل audit نیست.
 
 ## FEAT-P1-024 — Budget allocation currency
