@@ -393,7 +393,7 @@ Dedupe key باید حداقل `(assetCategory,instrumentId,quoteMarket,priceCur
 Merger, spin-off, rights, symbol/ISIN change باید source/target instrument و effective date داشته باشند؛ symbol change نباید historical transaction را rewrite کند.
 
 ## FEAT-P1-015 — Iranian stock market calendar
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — import dry-run required
 T+2، تعطیلات، session، lotSize، priceTick و settlement باید versioned/configurable باشند، نه hard-coded در feature logic.
 
 ## FEAT-P1-016 — Iranian loan convention scope
