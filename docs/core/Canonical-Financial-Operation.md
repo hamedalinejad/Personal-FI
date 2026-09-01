@@ -710,3 +710,13 @@ calculationContext
 **Invariant:** تغییر method یا policy بعدی فقط ops جدید یا rebuild صریح با version جدید را تحت تأثیر قرار می‌دهد — silent rewrite تاریخچه ممنوع.
 
 مرجع: `Cost-Basis-Engine.md` · `Rounding-Policy.md`
+
+---
+
+## Posted document immutable (P0 Risk #3)
+
+پس از `status = posted` (و persist موفق):
+
+- UPDATE فیلدهای مالی (amount, qty, rate, dates اثرگذار) **ممنوع**
+- حذف فیزیکی ردیف ledger **ممنوع**
+- مسیر مجاز: **Reversal** و/یا **Correction** با `operationId` جدید + لینک به اصل + `fin_audit_log`

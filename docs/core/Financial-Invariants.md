@@ -335,3 +335,9 @@ Query **DB write ندارد**. UI → Feature API only.
 بدون شبکه باید کار کند: Create, Read, metadata update, Reversal, Reports, P&L, Cost Basis, Loan calc, Backup, Restore, Migration, Reconciliation.
 
 فقط اختیاری online: Price Fetch, Version Check, License refresh.
+
+---
+
+## فهرست ریسک P0
+
+چک‌لیست یک‌صفحه‌ای ۹ ریسک مرگبار: `P0-Risk-Register.md`.

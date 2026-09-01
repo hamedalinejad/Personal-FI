@@ -56,3 +56,17 @@ Import batch
 **ممنوع:** CSV مستقیم → Journal بدون raw staging و بدون `sourceType=import` + `sourceReference`.
 
 گزارش معاملات کارگزاری باید فیلدهای خام قابل audit بمانند حتی بعد از normalize.
+
+---
+
+## Raw Payload و Unmapped Fields (P0 Risk #6)
+
+```text
+Import
+  → rawPayload (متن/JSON کامل ردیف یا فایل)
+  → mapped fields → Domain
+  → unmappedFields (JSON): هر ستونی که mapper نشناخت
+```
+
+**ممنوع:** دور انداختن ستون‌های ناشناخته فایل بانک/کارگزاری.
+گزارش/mapper بعدی باید بتواند از staging همان raw را دوباره بخواند.

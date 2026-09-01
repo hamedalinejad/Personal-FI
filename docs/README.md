@@ -78,3 +78,4 @@
 | Import Lineage | `docs/core/Import-Lineage.md` |
 | Rebuild API | `docs/core/Rebuild-API-Contract.md` |
 | Product Principle | `docs/core/Product-Principle.md` |
+| P0 Risk Register | `docs/core/P0-Risk-Register.md` |

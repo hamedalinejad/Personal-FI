@@ -70,3 +70,9 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 | **P4** | 13-Portfolio + 11-Reports + 14-Tax Iran |
 
 هر فاز فقط از public/Capability API؛ ESLint مرز فیچر از روز اول.
+
+---
+
+## Gate اجباری
+
+قبل از code مالی: مرور `P0-Risk-Register.md` (۹ مورد). همه باید در docs ✅ و در روز اول کد enforce شوند.

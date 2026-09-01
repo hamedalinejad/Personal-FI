@@ -29,3 +29,15 @@ Historical P&L از `priceAsOf`+`rateDate` هم‌تراز — نه `fetchedAt` 
 `createdAt` · `eventAt` · `businessDate` · `settlementDate` · `marketDate` · `dueDate` · `paymentDate` · `fetchedAt`
 
 تاریخ ثبت نرم‌افزار ≠ تاریخ معامله بورس ≠ تاریخ تسویه ≠ تاریخ پرداخت.
+
+---
+
+## Trade · Settlement · Effective (P0 Risk #5)
+
+| نام | نقش | مثال |
+|-----|-----|------|
+| **Trade Date** | تاریخ معامله | خرید سهم در تالار |
+| **Settlement Date** | تاریخ تسویه | T+n نقد/اوراق |
+| **Effective / Payment Date** | اثر روی موجودی یا پرداخت واقعی | paymentDate قسط |
+
+هر سه می‌توانند متفاوت باشند؛ برای موجودی نقد و P&L از فیلد درست استفاده شود نه یک date واحد.
