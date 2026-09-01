@@ -413,7 +413,7 @@ Dividend + NAV drop + reinvest باید در total return طوری ترکیب ش
 قیمت طلا باید market/price type/purity/unit و asOf داشته باشد. قیمت 24K نباید silently برای 18K استفاده شود.
 
 ## FEAT-P1-020 — Physical delivery continuity
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — sayad fields optional validated
 انتقال Digital Metal → Physical Asset باید lineage و cost basis منتقل‌شده را حفظ کند؛ cost نباید صفر یا market value جدید شود مگر policy صریح.
 
 ## FEAT-P1-021 — Recurring duplicate generation
