@@ -89,6 +89,7 @@
 | Feature Capability Matrix | `docs/core/Feature-Capability-Matrix.md` |
 | Scenario Catalog | `docs/core/Financial-Scenario-Catalog.md` |
 | Layer Separation | `docs/core/Layer-Separation.md` |
+| Accounting Calculation Invariants | `docs/core/Accounting-Calculation-Invariants.md` |
 | Deletion Policy Matrix | `docs/core/Deletion-Policy-Matrix.md` |
 | Offline Modes | `docs/core/Offline-Modes.md` |
 | Multi-Tab Writer | `docs/core/Multi-Tab-Writer-Contract.md` |

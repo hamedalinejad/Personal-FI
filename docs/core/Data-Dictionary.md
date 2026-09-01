@@ -15,7 +15,7 @@
 | commandHash | TEXT | N | — | — | — | — | fin_operations | N | Y | — | conflict detect |
 | baseCurrencyAtOperation | TEXT | N | — | currency | — | base | op | N | Y | — | lock historical base |
 | exchangeRateToBase (= basePerTransactionUnit) | TEXT decimal | Y | — | rate | Rate | — | op/tx/line | N | Y | — | 1 txCurrency in baseCurrency |
-| amountInBase | TEXT decimal | N | — | money | Money | base@op | journal line | N | Y | — | never rebuild silent |
+| amountInBase | TEXT decimal | N | — | money | Money | base@op | journal line | N | Y | — | **= amount × exchangeRateToBase** (basePerTxUnit); immutable after post |
 | sourceType | ENUM TEXT | N | manual | — | — | — | domain row | N | Y* | — | *immutable after post |
 | sourceReference | TEXT | Y | null | — | — | — | domain | N | Y* | — | file/batch ref |
 | importBatchId | UUID | Y | null | — | — | — | import | N | Y | fin_import_batches | |

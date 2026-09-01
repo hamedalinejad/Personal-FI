@@ -337,3 +337,15 @@ CostBasisEngine (Foundation)
 ```
 
 Feature روش جدا و متناقض implement نمی‌کند؛ فقط eventها را به engine می‌دهد.
+
+---
+
+## Fee-in-asset default (v1) — قفل
+
+```text
+qty decreases by fee_qty
+cost pool total unchanged → average cost per unit increases
+realized P&L not recognized on fee burn alone (fee may post as expense separately per Fee matrix)
+```
+
+Transfer custody: cost **moves with** qty — never reset to 0.

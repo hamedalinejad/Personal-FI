@@ -237,3 +237,7 @@ Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = speci
 - کارمزد: Expense + Cash (هر دو)
 - Unrealized P&L: اقتصادی/ارزشیابی — **بدون** حرکت نقد الزامی
 - همه از یک `operationId` وقتی ثبت می‌شوند
+
+---
+
+فرمول‌های قفل‌شده: **`Accounting-Calculation-Invariants.md`** (FX، WAC، وام، journal).

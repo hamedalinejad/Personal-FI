@@ -57,17 +57,17 @@
 - `id` → UUID (Primary Key)
 - `fromCurrencyCode` → string (مثلاً IRR)
 - `toCurrencyCode` → string (مثلاً USDT)
-- `rate` → decimal (نرخ تبدیل عمومی: `amountTo = amountFrom / rate`)
- - برای IRR → USDT: ریال به ازای ۱ تتر (مثال: ۶۰,۰۰۰)
- - برای EUR → USD: یورو به ازای ۱ دلار
- - برای هر جفت ارز: مقدار ارز From به ازای ۱ واحد ارز To
+- `rate` → decimal — **canonical:** `1 × fromCurrency = rate × toCurrency`
+ - مثال: from=USDT, to=IRR, rate=60000 → ۱ USDT = ۶۰٬۰۰۰ IRR
+ - محاسبه: `amountTo = amountFrom × rate` (نه تقسیم مبهم بدون direction)
+ - جزئیات و ممنوعیت فرمول قدیمی: `Accounting-Calculation-Invariants.md`
 - `source` → string (api, manual, cached)
 - `lastUpdated` → datetime
 - `isValid` → boolean
 - `createdAt` → datetime
 
 > **نکته توضیحی**: این جدول **عمومی** برای هر جفت‌ارزی است. 
-> برای محاسبه: `amountTo = amountFrom / rate` (یا `amountFrom = amountTo * rate`). 
+> برای محاسبه: `amountTo = amountFrom × rate` و `amountFrom = amountTo ÷ rate` وقتی **1 from = rate to**. 
 > **یکسان‌سازی**: در تراکنش‌های واقعی (Income, Expense, Loan, Stocks, Crypto و غیره)، نرخ تبدیل لحظه‌ای نسبت به **ارز پایه کاربر** (`baseCurrency` در `cur_currency_preferences`) ثبت می‌شود (فیلد `exchangeRateToBase` در جداول مربوطه)، نه صرفاً نسبت به تتر. این جدول (`cur_exchange_rates`) برای ذخیره تمام نرخ‌های ارزی بین هر جفت ارز دلخواه است و نام‌گذاری عمومی `rate` آن را روشن‌تر می‌کند.
 
 ### ۳. User Currency Preference (جدول: `cur_currency_preferences`)
@@ -132,7 +132,7 @@
 import Decimal from 'decimal.js';
 
 // rate در cur_exchange_rates: مقدار ارز From به ازای ۱ واحد ارز To
-// یعنی: amountTo = amountFrom / rate
+// canonical: amountTo = amountFrom * rate  when 1 from = rate to
 
 async function convert(
  amount: Decimal,
@@ -396,7 +396,7 @@ Historical Price (instrument)  ×  Historical FX (quote→base, same asOf)
 
 ## Explicit Rate Model (P0) — کاهش خطای انسانی
 
-نرخ مبهم فقط با یک عدد `rate` و فرمول `amountTo = amountFrom / rate` مستعد اشتباه است.
+نرخ مبهم فقط با یک عدد `rate` بدون from/to و بدون semantic (1 from = rate to) مستعد اشتباه است. فرمول `/` قدیمی ممنوع است مگر rate با تعریف معکوس صریح ذخیره شده باشد — در Personal-FI استفاده نکن.
 
 حداقل یکی از این مدل‌ها **اجباری** است (ترجیح: هر دو در metadata):
 

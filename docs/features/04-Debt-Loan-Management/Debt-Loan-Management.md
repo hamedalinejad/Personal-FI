@@ -1732,3 +1732,19 @@ interest accrues? principal starts later? payment date shifted? first payment da
 | fee/penalty policy | جدا از مرابحه بانکی — versioned |
 
 بدون hardcode نرخ؛ فقط تفکیک نوع برای گزارش و allocation.
+
+---
+
+## قفل محاسبه مانده (حسابداری)
+
+```text
+remainingPrincipal (DB: remainingBalance) -= only principalPortion
+```
+
+سود/کارمزد/جریمهٔ پرداخت‌شده **مانده اصل را کم نمی‌کنند**.  
+سود تعلق‌گرفته پرداخت‌نشده = component جدا (accrued) — داخل `remainingBalance` قاطی نشود.
+
+```text
+cashLeg = Σ portions (principal + interest + fee + penalty)
+Journal: see Accounting-Calculation-Invariants §3
+```

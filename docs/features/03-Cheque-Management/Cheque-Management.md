@@ -228,3 +228,15 @@ Cheque = **Domain مستقل** با Ledger خودش؛ Integration فقط از ط
 
 سررسید: `dueDate` در UTC/ISO؛ نمایش جلالی فقط UI.  
 وصول/برگشت → Financial Operation + SettlementPort (نه تغییر موازی بدون operationId).
+
+---
+
+## قفل حسابداری چک (رفع ابهام void)
+
+پس از `cleared`، برگشت = **Reversal Financial Operation** (مبلغ معکوس + لینک به op/tx اصلی).
+
+- ترجیح: journal/cash lines جدید معکوس؛ وضعیت op اصلی `reversed`
+- اگر پیاده‌سازی از `isVoided` روی ردیف cash استفاده می‌کند: باید معادل اقتصادی reverse کامل باشد و در گزارش‌ها exclude شود — **نه** پاک کردن یا ویرایش amount
+- چک pending که مستقیم bounce می‌شود: بدون cash op
+
+هم‌تراز `Canonical-Financial-Operation` و INV-004.
