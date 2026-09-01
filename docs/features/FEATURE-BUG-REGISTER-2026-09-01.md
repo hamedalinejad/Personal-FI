@@ -85,7 +85,7 @@
 **راه‌حل:** header فقط اطلاعات قراردادی؛ هر cash-bearing event در `ln_transactions.accountTransactionId` به operation cash leg لینک شود. برای v1 یک disbursement، برای phased آینده جدول `ln_disbursements`.
 
 ## FEAT-P0-010 — Loan transaction amount semantics
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — amount is cash leg
 **مشکل:** `amount` گاهی مبلغ نقد واقعی، گاهی مجموع components و در disbursement «net cash» تعریف شده؛ بدون تفکیک contractual principal/reported cash ممکن است journal اشتباه شود.
 
 **راه‌حل:** در هر event، `amount` = cash leg واقعی؛ components (`principal`, `interest`, `fee`, `penalty`) جدا. disbursement contract principal جدا از net proceeds.

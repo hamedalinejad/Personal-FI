@@ -1785,3 +1785,6 @@ Deprecated synonym `reduction_of_liability` maps 1:1 in migration only.
 ## FEAT-P0-009 DEEP
 Header = contract. Disbursement cash on ln_transactions + operation. accountTransactionId on loan nullable legacy.
 
+## FEAT-P0-010 DEEP
+amount = cash leg. principal/interest/fee/penalty = components. Contract principal may differ from net proceeds.
+
