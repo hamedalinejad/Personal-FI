@@ -453,7 +453,7 @@ Featureها attachmentPathهای مستقل دارند در حالی که Docume
 تمام Public API examples باید primitive serializable باشند: DecimalString، ISO date، JSON-safe enum. `Decimal` object در response ممنوع.
 
 ## FEAT-P1-030 — Pagination/filter contract
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — list pagination filter contract
 List APIs باید pagination, sort, date range, status, source و stable ordering داشته باشند؛ مخصوصاً transaction historyهای بزرگ.
 
 ---
