@@ -14,8 +14,8 @@
 | operationId | UUID TEXT | N | — | — | — | — | fin_operations | N | Y | — | idempotency key |
 | commandHash | TEXT | N | — | — | — | — | fin_operations | N | Y | — | conflict detect |
 | baseCurrencyAtOperation | TEXT | N | — | currency | — | base | op | N | Y | — | lock historical base |
-| exchangeRateToBase (= basePerTransactionUnit) | TEXT decimal | Y | — | rate | Rate | — | op/tx/line | N | Y | — | 1 txCurrency in baseCurrency |
-| amountInBase | TEXT decimal | N | — | money | Money | base@op | journal line | N | Y | — | **= amount × exchangeRateToBase** (basePerTxUnit); immutable after post |
+| exchangeRateToBase (= basePerTransactionUnit) | TEXT decimal | Y | — | rate | Rate | — | op/tx/line | N | Y | 1 txCurrency in baseCurrency |
+| amountInBase | TEXT decimal | N | — | money | Money | base@op | journal line | N | Y | **= amount × exchangeRateToBase** (basePerTxUnit); immutable after post |
 | sourceType | ENUM TEXT | N | manual | — | — | — | domain row | N | Y* | — | *immutable after post |
 | sourceReference | TEXT | Y | null | — | — | — | domain | N | Y* | — | file/batch ref |
 | importBatchId | UUID | Y | null | — | — | — | import | N | Y | fin_import_batches | |
@@ -27,7 +27,7 @@
 
 | Field | Type | Null | Default | Unit | Prec | CCY | SoT | Der | Imm | Notes |
 |-------|------|------|---------|------|------|-----|-----|-----|-----|-------|
-| amount | TEXT decimal | N | — | money | CurrencyRecord | tx | domain/journal | N | Y | usually >0 |
+| amount | TEXT decimal | N | — | money | CurrencyRecord | tx | domain/operation line | N | Y | positive magnitude; direction is separate |
 | quantity | TEXT decimal | N | — | asset qty | instrument | — | domain | N | Y | |
 | grossQuantity | TEXT decimal | Y | — | asset qty | instrument | — | domain | N | Y | crypto |
 | netQuantity | TEXT decimal | Y | — | asset qty | instrument | — | domain | N | Y | after fee |
@@ -39,24 +39,24 @@
 | feeTax | TEXT decimal | Y | 0 | money | | | domain | N | Y | transaction cost tax ≠ tax_events |
 | feeOther | TEXT decimal | Y | 0 | money | | | domain | N | Y | |
 
-## Derived (never report SoT alone)
+## Derived / Snapshot (never report as SoT alone)
 
 | Field | Type | Der | Imm | Rebuild from | Notes |
 |-------|------|-----|-----|--------------|-------|
 | averageBuyPrice | TEXT decimal | Y | N | ledger + cost engine | |
 | totalInvested | TEXT decimal | Y | N | ledger | |
-| currentBalance | TEXT decimal | Y | N | acc_transactions | |
-| balanceAfterTransaction | TEXT decimal | Y | N | running calc | snapshot only |
-| remainingBalance | TEXT decimal | Y | N | ln_transactions | |
+| currentBalance | TEXT decimal | Y | N | **fin_journal_lines on fin_accounts** | `acc_transactions` is an operational/event log, not the balance SoT |
+| balanceAfterTransaction | TEXT decimal | Y | N | running calc from journal/domain ledger | snapshot only |
+| remainingBalance | TEXT decimal | Y | N | ln_transactions | principal/portfolio policy |
 | realizedPL / unrealizedPL | TEXT decimal | Y | N | cost engine + prices | |
-| portfolioValue | TEXT decimal | Y | N | holdings+price+FX | |
+| portfolioValue | TEXT decimal | Y | N | holdings+price+FX+cash journal−liabilities | |
 
 ## Identity / Accounts
 
 | Field | Type | Null | SoT | FK | Notes |
 |-------|------|------|-----|-----|-------|
 | instrumentId | UUID | N | ref_instruments | ref_instruments.id | not symbol |
-| accountId (journal) | UUID | N | fin_accounts | fin_accounts.id | |
+| accountId (journal) | UUID | N | fin_accounts | fin_accounts.id | canonical accounting account |
 | partyId | UUID | Y | ref_parties | ref_parties.id | |
 | symbol | TEXT | Y | display | — | mutable label |
 | assetKey | TEXT | Y | derived/label | — | crypto convenience |
@@ -67,8 +67,8 @@
 |-------|------|-----------|
 | createdAt | ISO UTC | system write time |
 | eventAt | ISO UTC | when economic event occurred if known |
-| businessDate | DATE | books / reporting day |
-| settlementDate | DATE | cash settle (e.g. T+2) |
+| businessDate | DATE | books / reporting day; **not** an ISO timestamp |
+| settlementDate | DATE | cash settle (e.g. T+2); market/business calendar date |
 | marketDate | DATE | market session date of price/trade |
 | dueDate | DATE | obligation due |
 | paymentDate | DATE | actual payment |
@@ -87,5 +87,11 @@
 ---
 
 **قانون:** فیلد مالی جدید بدون ردیف Dictionary + Migration Rule وارد schema نمی‌شود.
+
+**Cash SoT rule (P0):** مانده هر حساب نقد از `fin_journal_lines` روی `fin_accounts` بازسازی می‌شود. `acc_transactions`, `inv_crypto_cash.balance` و سایر currentBalanceها فقط event/projection/snapshot هستند و هرگز SoT مستقل نیستند.
+
+**Date rule (P0):** timestampها در UTC ذخیره می‌شوند؛ فیلدهای تقویمی `DATE` مانند `businessDate`, `settlementDate`, `dueDate`, `paymentDate`, `marketDate` معنای روزانه دارند و نباید به timestamp UTC تبدیلِ معنایی شوند.
+
+**Standalone rule (P0):** `accountId`های حسابداری canonical به `fin_accounts` اشاره می‌کنند؛ لینک‌های integration مانند `accountTransactionId → acc_transactions` در editionهای بدون Accounts می‌توانند nullable باشند و شرط صحت domain نیستند.
 
 Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
