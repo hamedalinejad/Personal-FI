@@ -180,3 +180,6 @@
 If real reserved cash needed: separate account + financial operations.
 Withdrawal: reverse allocation links; cash only if real money moved.
 
+## FEAT-P0-046 DEEP
+fg_goals.currentAmount is progress metric excluded from Net Worth asset sum.
+

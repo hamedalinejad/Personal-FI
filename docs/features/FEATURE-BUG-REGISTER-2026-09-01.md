@@ -303,7 +303,7 @@
 **راه‌حل:** link باید `operationId`, `sourceLineId` و وضعیت/void یا derived بودن داشته باشد؛ correction/reversal با source operation reconcile شود.
 
 ## FEAT-P0-046 — Goal currentAmount can double-count wealth
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — currentAmount not asset
 **مشکل:** `source=income|budget` پول جدید ایجاد نمی‌کند، اما `fg_goals.currentAmount` به‌عنوان جمع پول هدف ذخیره می‌شود. اگر Portfolio آن را دارایی حساب کند، همان پول دوباره شمرده می‌شود.
 
 **راه‌حل:** Goal را planning/allocation projection نگه دار؛ `currentAmount` را «progress/allocation» تعریف کن، نه cash asset. اگر cash واقعی reserve لازم است، account/goal wallet واقعی و operation جدا لازم است.
