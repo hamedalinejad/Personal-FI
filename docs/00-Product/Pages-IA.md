@@ -63,7 +63,7 @@ Dashboard · Accounts · Transactions · Investments · Loans · Assets · Plann
 ### صفحه ۱ — داشبورد (`/`)
 ```
 / ← داشبورد اصلی (ویجت‌ها، خلاصه تراکنش‌های اخیر، هشدار بکاپ)
-/wealth ← Portfolio & Wealth Overview کامل (نمودار Net Worth، همه دارایی‌ها)
+/ (بخش/تب Wealth · Net Worth) ← Portfolio & Wealth Overview کامل — **نه route سطح‌اول جدا**
 ```
 
 ### صفحه ۲ — حساب‌ها (`/accounts`)
@@ -92,6 +92,12 @@ Dashboard · Accounts · Transactions · Investments · Loans · Assets · Plann
 ```
 
 ### صفحه ۴ — سرمایه‌گذاری (`/investments`)
+
+> **قفل UI (P0):** Investments **یک Shell واحد** است.
+> تب‌ها / state داخلی: Overview · Crypto · Stocks · Funds · Metals
+> مسیرهایی مثل `/investments/crypto` فقط **Tab/State** هستند، نه صفحه مستقل ناوبری.
+> Add Transaction / Edit / View Details / Corporate Action = **Drawer · Modal · Sheet · Side Panel** — نه ده‌ها route صفحه جدا.
+
 ```
 /investments ← تب پیش‌فرض (آخرین تب انتخاب‌شده)
 
@@ -400,11 +406,17 @@ Cheque, Bills, Tax, Notifications, Documents, Currency, Price → داخل Trans
 3 Transactions
 4 Investments
 5 Loans
-6 Planning
-7 Reports
-8 Documents   # یا Assets اگر با IA فعلی یکی شود
+6 Assets
+7 Planning
+8 Reports
 9 Settings
 ```
+
+**قفل‌های مرتبط:**
+- `/wealth` = بخش/تب داخل **Dashboard** یا **Reports > Net Worth** — صفحه دهم نیست.
+- Investments = یک Shell با تب‌های Overview / Crypto / Stocks / Funds / Metals.
+- عملیات سرمایه‌گذاری و تراکنش = Sheet / Drawer / Modal / Side Panel.
+
 
 **20 Feature ≠ 20 Navigation.**  
 Buy / Sell / Deposit / Withdraw / Loan Payment / New Income / … = **Sheet / Dialog / Drawer** — نه route جدا برای هر عمل.

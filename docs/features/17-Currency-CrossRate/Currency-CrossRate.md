@@ -350,3 +350,35 @@ exchangeRateToBase = basePerTransactionUnit
 روی transaction/operation، `exchangeRateToBase` همچنان می‌تواند scalar ذخیره‌شده باشد با semantic = `basePerTransactionUnit`، به‌همراه `fromCurrency`/`toCurrency`/`rateId` در صورت نیاز audit.
 
 **ممنوع:** تفسیر مبهم USD→IRR در برابر IRR→USD بدون direction.
+
+---
+
+## قفل P0: Transaction FX · Historical FX · Current FX
+
+نرخ تبدیل مثل قیمت باید **تاریخی و جدا** باشد.
+
+```text
+Transaction FX   = نرخ قفل‌شده داخل همان Operation / تراکنش
+Historical FX    = جدول/سری نرخ‌های گذشته (asOf)
+Current FX       = نرخ لحظه‌ای برای نمایش جاری
+```
+
+### قوانین اجباری
+
+1. نرخ هر Operation در لحظه ثبت **lock** می‌شود (`exchangeRateToBase` + asOf / rate metadata).
+2. گزارش و valuation تاریخی **هرگز** از Current FX استفاده نمی‌کند.
+3. برای as-of تاریخی: نزدیک‌ترین نرخ معتبر با `rateDate`/`observedAt` ≤ asOf (همان منطق closest historical).
+4. مثال نقض:
+   - BTC = 2,000,000,000 IRR **امروز**
+   - نباید برای Transaction سال ۲۰۲۴ استفاده شود.
+5. این جداسازی برای **تمام Assetها** (Crypto, Stocks, Funds, Metals, Loan flows چندارزی، …) enforce می‌شود.
+
+### ارتباط با Price
+
+```text
+Historical Price (instrument)  ×  Historical FX (quote→base, same asOf)
+```
+
+بدون هم‌زمانی asOf، P&L تاریخی معتبر نیست.
+
+مرجع: `Price-Fetching.md` (قفل Historical Price) · `Canonical-Financial-Operation.md`.

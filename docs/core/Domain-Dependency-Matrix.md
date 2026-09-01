@@ -37,3 +37,16 @@ Cross-feature write فقط via Canonical Operation.
 | Expense | ✓ | ✓ | ✓ | Optional | Optional | — |
 
 Circular dependency ممنوع. جزئیات استقلال: `Feature-Independence-Contract.md`
+
+---
+
+## Cash path (P0)
+
+Writes نقدی از Loan / Crypto / Stocks / Funds / Metals به Accounts **فقط** از طریق:
+
+```text
+Feature → CashSettlementPort → AccountsCashAdapter | LocalSettlementAdapter
+```
+
+`Feature A → Feature B tables` برای Accounts همچنان **N**.  
+جزئیات: `Cash-Settlement-Adapter.md`.

@@ -63,4 +63,5 @@
 | Canonical cash (P0) | `docs/core/Canonical-Cash-Model.md` |
 | Loan Schedule Engine | `docs/core/Loan-Schedule-Engine.md` |
 | Module architecture | `docs/core/Module-Architecture.md` |
+| Cash Settlement Adapter | `docs/core/Cash-Settlement-Adapter.md` |
 | Feature independence | `docs/core/Feature-Independence-Contract.md` |

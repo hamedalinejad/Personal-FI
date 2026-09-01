@@ -805,6 +805,51 @@ getLatest: جدیدترین non-void برای (instrument, quoteMarket, source) 
 
 **Latest ≠ Historical.** Transaction correctness مستقل از Price API است (secondary).
 
+---
+
+## قفل P0: Current Price ≠ Historical Price
+
+Current Price و Historical Price **یکی نیستند** و نباید در یک lookup ساده مخلوط شوند.
+
+### حداقل فیلدهای اجباری هر رکورد قیمت (`price_history`)
+
+| فیلد | الزام |
+|------|--------|
+| `instrumentId` | Must |
+| `price` | Must (decimal string) |
+| `currency` / `priceCurrency` | Must |
+| `timestamp` / `fetchedAt` | Must |
+| `marketDate` | Must (تاریخ بازار؛ برای as-of) |
+| `source` | Must (`manual` / `api` / …) |
+| `sourceReference` | Should (شناسه منبع/پاسخ) |
+| `isOfficial` | Should (رسمی بودن quote) |
+
+### قانون valuation تاریخی (اجباری)
+
+```text
+Transaction Date (یا asOf گزارش)
+        ↓
+closest valid historical price  با  marketDate ≤ asOf
+        ↓
+هرگز Current / Latest price
+```
+
+- گزارش پرتفوی تاریخی، P&L تاریخی، و هر محاسبه as-of **فقط** از historical lookup استفاده می‌کند.
+- `getLatestPrice` فقط برای نمایش جاری / Unrealized لحظه‌ای است و باید stale-aware باشد.
+- نبود historical price برای یک تاریخ = missing data صریح؛ نه silent fallback به قیمت امروز.
+
+### PriceProvider (Local First)
+
+```text
+PriceProvider (interface)
+ ├── ManualPriceProvider
+ ├── CachedPriceProvider
+ └── OnlinePriceProvider
+```
+
+Offline = Manual + Cached کافی است. Online هرگز شرط صحت تراکنش نیست.
+
+
 > Valuation: همیشه lastKnownPrice — `Implementation-Pitfalls.md` §د.
 
 **پیش‌فرض:** auto price fetch **خاموش** (`is_enabled` per source در settings/local). کاربر صریح تیک بزند.

@@ -12,6 +12,44 @@ Privacy-First (تمام داده‌ها محلی بمانند)
 قابلیت تبدیل آسان به اپ موبایل و دسکتاپ
 نگهداری و توسعه آسان در بلندمدت
 
+### اصل قفل: 100% Local First (P0)
+
+```text
+App
+ ↓
+Local API
+ ↓
+Domain
+ ↓
+SQLite
+```
+
+بدون هیچ سرور اجباری برای Core.
+
+حتی این موارد **نباید Core را وابسته کنند**:
+
+- Price Fetching
+- Notifications
+- License
+- Cloud Backup
+
+`PriceProvider` باید interface باشد:
+
+```text
+PriceProvider
+ ├── ManualPriceProvider
+ ├── CachedPriceProvider
+ └── OnlinePriceProvider
+```
+
+در حالت offline فقط `Manual + Cached` کافی است.
+
+**Invariant:** هیچ Featureی نباید بگوید «اینترنت نداریم → سیستم کار نمی‌کند».
+
+ثبت تراکنش، محاسبه قسط، cost basis، گزارش از ledger محلی، و valuation با قیمت کش‌شده همیشه ممکن است.
+
+جزئیات شبکه: بخش «سیاست دسترسی به شبکه» همین سند + `Price-Fetching.md` + `License-Offline.md`.
+
 ۲. پایه دیتابیس
 
 نسخه اول پروژه از **SQLite** با کتابخانه **sql.js** استفاده می‌کند.
