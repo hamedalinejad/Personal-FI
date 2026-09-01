@@ -207,7 +207,7 @@
 **راه‌حل:** `sourceKind` canonical (`manual|api|import`) + `sourceId/adapterKey` برای provider. یک enum دو مفهوم را حمل نکند.
 
 ## FEAT-P0-030 — Price manual/API selection ambiguity
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — PriceSelectionPolicy order
 **مشکل:** اولویت manual، priority source، confidence و freshness در چند بخش با ترتیب‌های مختلف آمده‌اند.
 
 **راه‌حل:** یک `PriceSelectionPolicy` versioned: holding-specific source → explicit source → default source → priority/confidence → freshness، با manual override طبق expiresAt.

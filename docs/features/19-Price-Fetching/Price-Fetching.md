@@ -905,3 +905,6 @@ Stock/FIF: marketDate required on daily quotes. Crypto: marketDate optional, fet
 ## FEAT-P0-029 DEEP
 sourceKind: manual | api | import. sourceId/adapterKey: coingecko, tsetmc, csv, …. Do not overload one enum with both.
 
+## FEAT-P0-030 DEEP
+Selection order: holding-specific source → explicit request source → default source → priority/confidence → freshness; manual wins if not expired (manualExpiresAt).
+
