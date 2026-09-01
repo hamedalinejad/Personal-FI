@@ -15,7 +15,7 @@
 # P0 — باید قبل از کدنویسی حل شود
 
 ## FEAT-P0-001 — Standalone leakage
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** (schema accountId nullable; CashSettlementPort) — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
 **مشکل:** بعضی Featureها standalone معرفی شده‌اند ولی مدل بعضی مسیرها هنوز `accountId`/`accountTransactionId` را اجباری می‌داند.
 
 **اثر:** Loan-only / Investment-only بدون Accounts می‌شکند.

@@ -276,7 +276,7 @@ Holding با **netQuantity** به‌روز می‌شود؛ gross/fee برای ب
 - `feeCurrency` → string
 - `feeAssetPriceToBase` → decimal (فقط وقتی `feeCurrency !== baseCurrency`؛ قیمت کمکی fee→base)
 - `exchangeRateToBase` → decimal (نرخ تبدیل ارز تراکنش → baseCurrency کاربر در لحظه ثبت — )
-- `accountId` → UUID (حساب بانکی مرتبط — **اجباری**؛ بدون حساب بانکی این تراکنش نباید در این جدول باشد)
+- `accountId` → UUID **nullable** (فقط وقتی settlement از Accounts/CashSettlementPort نوع internal است؛ Standalone/LocalSettlement بدون `acc_*`)
 - `accountTransactionId` → UUID (لینک به `acc_transactions`)
 - `description` → string
 - `date` → datetime

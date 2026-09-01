@@ -113,8 +113,8 @@
 > جدول زمانی توسط **Schedule Engine** ساخته می‌شود (`Loan-Schedule-Engine.md`)؛ snapshot نسخه‌دار = `ln_schedule_snapshots`.
 
 **حساب:**
-- `accountId` → UUID (حساب مرتبط)
-- `accountTransactionId` → UUID (لینک به `acc_transactions`)
+- `accountId` → UUID **nullable** (فقط حالت Integrated؛ Standalone = null)
+- `accountTransactionId` → UUID **nullable** (لینک cash leg در Integrated؛ Standalone بدون `acc_*`)
 
 **محاسبه اقساط (Core):**
 - `calculationMethod` → enum v1: (`declining_balance` | `flat_rate` | `bullet` | `qarz_al_hasaneh`) — **حتمی**
@@ -187,7 +187,7 @@
 - `installmentNumber` → integer (nullable — شماره قسط برای tracking) ✅ **جدید**
 - `description` → string
 - `exchangeRateToBase` → decimal (نرخ ارز قسط → baseCurrency کاربر — )
-- `accountTransactionId` → UUID (ارتباط با `acc_transactions`)
+- `accountTransactionId` → UUID **nullable** (Integrated cash leg؛ Standalone null)
 - `createdAt` → datetime
 
 > این جدول فقط لاگ تراکنش‌های واقعی است و هیچ داده پردازشی در آن نگهداری نمی‌شود. 
@@ -271,7 +271,7 @@ thresholdFrom=60, thresholdTo=null,thresholdUnit=percent_of_principal, rate=3.0 
 
 ### Loan APIs
 - `createLoan(data)` 
- → ثبت وام در `ln_loans` (شامل `accountTransactionId`) 
+ → ثبت وام در `ln_loans` (`accountTransactionId` فقط اگر Integrated و cash leg موجود باشد) 
  → ثبت لاگ در `ln_transactions` با `type = 'disbursement'` 
  → ثبت در `acc_transactions` با نوع مناسب (`deposit-loan` یا `withdrawal-loan`) 
  → به‌روزرسانی موجودی حساب
