@@ -1,0 +1,30 @@
+{
+  "$schema_comment": "Product-Map number vs docs/features folder vs featureKey vs primary route",
+  "features": [
+    {"productMap": 1, "folder": "00-Accounts-Banking", "key": "accounts", "route": "accounts"},
+    {"productMap": 2, "folder": "01-Income", "key": "income", "route": "transactions"},
+    {"productMap": 3, "folder": "02-Expense", "key": "expense", "route": "transactions"},
+    {"productMap": 4, "folder": "03-Cheque-Management", "key": "cheque", "route": "accounts"},
+    {"productMap": 5, "folder": "04-Debt-Loan-Management", "key": "loans", "route": "loans"},
+    {"productMap": 6, "folder": "05-Investment", "key": "investments", "route": "investments"},
+    {"productMap": 7, "folder": "05-Investment/05-01-Investment-Crypto", "key": "crypto", "route": "investments"},
+    {"productMap": 8, "folder": "05-Investment/05-02-Investment-Stocks-Iran", "key": "stocks", "route": "investments"},
+    {"productMap": 9, "folder": "05-Investment/05-03-Fixed-Income-Funds", "key": "funds", "route": "investments"},
+    {"productMap": 10, "folder": "05-Investment/05-04-Metals", "key": "metals", "route": "investments"},
+    {"productMap": 11, "folder": "06-Physical-Assets", "key": "physical_assets", "route": "assets"},
+    {"productMap": 12, "folder": "07-Budget-Management", "key": "budget", "route": "planning"},
+    {"productMap": 13, "folder": "08-Goals-Planning", "key": "goals", "route": "planning"},
+    {"productMap": 14, "folder": "09-Bills-Recurring", "key": "bills", "route": "transactions"},
+    {"productMap": 15, "folder": "10-Notifications-Alerts", "key": "notifications", "route": "settings"},
+    {"productMap": 16, "folder": "11-Reports-Analytics", "key": "reports", "route": "reports"},
+    {"productMap": 17, "folder": "12-Import-Export", "key": "import_export", "route": "settings"},
+    {"productMap": 18, "folder": "13-Portfolio-Management", "key": "portfolio", "route": "reports"},
+    {"productMap": 19, "folder": "14-Tax-Management", "key": "tax", "route": "reports"},
+    {"productMap": 20, "folder": "15-Document-Management", "key": "documents", "route": "settings"},
+    {"productMap": 21, "folder": "16-Settings-Tools", "key": "settings", "route": "settings"},
+    {"productMap": 22, "folder": "17-Currency-CrossRate", "key": "currency", "route": "settings"},
+    {"productMap": 23, "folder": "18-Data-Backup-Restore", "key": "backup", "route": "settings"},
+    {"productMap": 24, "folder": "19-Price-Fetching", "key": "prices", "route": "settings"}
+  ],
+  "note": "Product-Map may number 1-based; folders are 00-based. Always resolve via this map."
+}

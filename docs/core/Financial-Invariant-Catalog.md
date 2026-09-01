@@ -1,3 +1,5 @@
+> **این فقط فهرست ID برای رفرنس سریع است؛ شرح کامل در [`Financial-Invariants.md`](./Financial-Invariants.md) است.**
+
 # Financial Invariant Catalog (P0)
 
 | ID | Invariant |

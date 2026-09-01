@@ -78,9 +78,6 @@
 | Import Lineage | `docs/core/Import-Lineage.md` |
 | Rebuild API | `docs/core/Rebuild-API-Contract.md` |
 | Product Principle | `docs/core/Product-Principle.md` |
-| P0 Risk Register | `docs/core/P0-Risk-Register.md` |
-| P1 Risk Register | `docs/core/P1-Risk-Register.md` |
-| P2/P3 Risk Register | `docs/core/P2-P3-Risk-Register.md` |
 | Field Write Contract | `docs/core/Field-Write-Contract.md` |
 | Reconciliation Foundation | `docs/core/Reconciliation-Foundation.md` |
 | Integrity Engine | `docs/core/Integrity-Engine.md` |
@@ -104,3 +101,5 @@
 | Mandatory Test Vectors | `docs/core/Mandatory-Test-Vectors.md` |
 | Documentation Roadmap | `docs/core/Documentation-Roadmap.md` |
 | Fiscal Period Lock | `docs/core/Fiscal-Period-Lock.md` |
+
+| Feature ID Map | `docs/00-Product/feature-id-map.json` |

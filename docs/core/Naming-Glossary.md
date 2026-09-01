@@ -59,3 +59,9 @@ Crypto/Investment docs: write **`transferGroupId` only**; `transferId` = read-on
 | DB Transaction | BEGIN/COMMIT فنی SQLite |
 
 استفادهٔ مبهم از کلمه «transaction» در کد/API ممنوع — نام صریح بگذار.
+
+---
+
+## Feature number ↔ folder
+
+ماشین‌خوان: `docs/00-Product/feature-id-map.json`

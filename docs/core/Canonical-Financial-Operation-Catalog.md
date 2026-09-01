@@ -1,3 +1,5 @@
+> **این فقط فهرست ID برای رفرنس سریع است؛ شرح کامل در [`Canonical-Financial-Operation.md`](./Canonical-Financial-Operation.md) است.**
+
 # Canonical Financial Operation Catalog (P0)
 
 هر عملیات رسمی محصول یک کد دارد. پیاده‌سازی بدون ردیف در این کاتالوگ ممنوع است.

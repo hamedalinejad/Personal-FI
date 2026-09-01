@@ -57,7 +57,7 @@
 - `Rebuild-API-Contract.md`
 - `Product-Principle.md`
 
-Gate docs: `P0-Risk-Register.md` · `P1-Risk-Register.md` · `Fiscal-Period-Lock.md`
+Gate docs: `
 
 ---
 

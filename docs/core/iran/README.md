@@ -169,3 +169,17 @@ Broker / Bank / Fund Provider = metadata registry — نه منطق Domain دا�
 ## Date triad (یادآوری)
 
 `eventAt` (UTC) · `businessDate` · `marketDate` — جلالی فقط نمایش.
+
+---
+
+## شکاف‌های دامنه ایران (ثبت برای تکمیل بعدی)
+
+| موضوع | وضعیت | اقدام پیشنهادی |
+|--------|--------|----------------|
+| مثقال | تبدیل به گرم | ۱ مثقال ≈ ۴.۶۰۸۳ گرم — در Metals Unit |
+| اعتبار فروشگاهی / کارت اعتباری خرد | نه وام بانکی کلاسیک | `loanType` جدا + fee/penalty policy |
+| سهام عدالت | قوانین خاص | زیرنوع Stocks یا instrumentType جدا |
+| چک صیادی | sayadId و وضعیت‌ها | تکمیل schema در Cheque-Management |
+| VAT روی هزینه | اختیاری | `vatAmount` / `vatRate` روی expense lines |
+
+این‌ها Scope گسترش‌اند، نه نقض Core فعلی.
