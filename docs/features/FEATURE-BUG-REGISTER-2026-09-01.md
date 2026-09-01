@@ -445,7 +445,7 @@ Available balance فعلاً soft warning برای pending cheques است. با�
 FIF ETF و Stocks نباید دو cash balance برای یک brokerage بسازند؛ Metals/Crypto نیز باید cash ledger مستقل و قابل reconcile داشته باشند.
 
 ## FEAT-P1-028 — Attachment ownership
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — attachment documentId ownership
 Featureها attachmentPathهای مستقل دارند در حالی که Document Management وجود دارد. قرارداد باید مشخص کند attachment metadata کجاست و Feature فقط documentId نگه می‌دارد یا legacy path را حفظ می‌کند.
 
 ## FEAT-P1-029 — API serialization
