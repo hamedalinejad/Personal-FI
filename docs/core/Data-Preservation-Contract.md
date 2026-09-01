@@ -41,3 +41,30 @@ Document → Metadata → Blob → Checksum → Source
 - `relativePath` / `blobId` — نه absolute path
 - اگر blob گم شد، **metadata حفظ** می‌ماند + integrity flag
 - Backup package: db + attachments + checksums + manifest
+
+---
+
+## Field Lifecycle Status (Schema-level contract) (P0)
+
+برای هر فیلد مالی (حداقل در Data Dictionary / migration notes):
+
+| Status | معنی |
+|--------|------|
+| **ACTIVE** | SoT جاری؛ write جدید مجاز |
+| **LEGACY** | خوانده می‌شود؛ write جدید ترجیحاً canonical |
+| **DEPRECATED** | فقط dual-read؛ migration به replacement |
+| **MIGRATED** | داده منتقل شده؛ ستون ممکن است بعداً drop شود |
+| **UNKNOWN** | نیاز به بررسی قبل از هر تغییر |
+
+### DROP COLUMN
+
+فقط وقتی **هر سه** موجود باشد:
+
+1. `replacementField` (یا تأیید صریح «داده دیگر لازم نیست»)
+2. `migrationRule` مستند و تست‌شده
+3. `dataVerification` (checksum / row count / fixture)
+
+بدون این‌ها: **DROP ممنوع**.
+
+این از policy متنی به **قرارداد schema/migration** ارتقا یافته است.
+مرجع: `Migration-Data-Preservation.md` · `Raw-vs-Derived-Data.md`

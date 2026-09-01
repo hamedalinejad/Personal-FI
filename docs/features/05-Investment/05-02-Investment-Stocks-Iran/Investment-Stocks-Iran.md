@@ -568,3 +568,17 @@ priceLimit: ±pct از قیمت مرجع روز — validate اختیاری warn
 `symbol` = label؛ تغییر نماد ≠ holding جدید.
 
 **fee breakdown اجباری:** کارگزاری + بورس + مالیات فروش (نیم‌درصد) + other — نه یک fee کلی.
+
+---
+
+## Fee total + breakdown (P0)
+
+```text
+feeAmount              = total (همیشه حفظ — حتی اگر breakdown باشد)
+feeBrokerCommission
+feeExchange
+feeTax
+feeOther
+```
+
+داده قدیمی فقط با `feeAmount` معتبر است. Breakdown اختیاری است و جایگزین total نمی‌شود.

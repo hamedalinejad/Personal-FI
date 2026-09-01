@@ -391,3 +391,42 @@ Historical Price (instrument)  ×  Historical FX (quote→base, same asOf)
 مالکیت دارایی‌های کریپتو/سهام/صندوق/فلز = `ref_instruments` + domain holdings.
 کد BTC/USDT در جدول ارز برای نرخ و نمایش است؛ SoT تملک نیست.
 جزئیات: `Instrument-Identity.md`.
+
+---
+
+## Explicit Rate Model (P0) — کاهش خطای انسانی
+
+نرخ مبهم فقط با یک عدد `rate` و فرمول `amountTo = amountFrom / rate` مستعد اشتباه است.
+
+حداقل یکی از این مدل‌ها **اجباری** است (ترجیح: هر دو در metadata):
+
+### گزینه A — نسبت صریح
+
+```text
+1 USDT = 60,000 IRR
+baseCurrency: USDT
+quoteCurrency: IRR
+rate: 60000
+meaning: 1 base = rate quote
+```
+
+Canonical semantic (قبلاً): `basePerTransactionUnit` روی operation = چند واحد base به ازای ۱ واحد ارز تراکنش.
+
+### گزینه B — numerator / denominator
+
+```text
+rateFromAmount   // e.g. 1
+rateFromCurrency // USDT
+rateToAmount     // 60000
+rateToCurrency   // IRR
+```
+
+**ممنوع:** ذخیره rate بدون direction صریح (from/to یا base/quote).
+
+در UI و docs مثال همیشه به شکل:
+
+```text
+1 USDT = 60,000 IRR
+```
+
+نوشته می‌شود نه فقط `rate=60000`.

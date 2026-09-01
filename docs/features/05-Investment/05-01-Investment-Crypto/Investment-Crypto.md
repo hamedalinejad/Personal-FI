@@ -1437,3 +1437,11 @@ Metadata کریپتو (`chainId`, `contractAddress`, `decimals`, `assetKey`) ر�
 
 `IRR` = currency. `USDT-TRC20` = asset.  
 نقش USDT در گزارش با **economicKind** روی position کنترل می‌شود (cash_like vs investment).
+
+---
+
+## identity و conservation (تأیید P0)
+
+- هویت: `instrumentId` / `assetKey` — نه `symbol` alone
+- USDT-TRC20 و USDT-ERC20 دو instrument جدا
+- انتقال: **gross / fee / net** تفکیک + conservation rule (gross = net + fee در واحد مربوطه)

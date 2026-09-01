@@ -1585,3 +1585,34 @@ Loan Engine این‌ها را enforce می‌کند نه UI.
 | Standalone (Accounts off) | null یا Local Settlement ref — صحت Loan به وجود Accounts وابسته نیست |
 
 مرجع: `Cash-Settlement-Adapter.md` · `Feature-Independence-Contract.md`
+
+
+---
+
+## Source of Truth: یک Operation نه دو Transaction موازی (P0)
+
+**ممنوع به‌عنوان مدل ذهنی:**
+
+```text
+ln_transaction  +  acc_transaction   =  دو حقیقت مستقل موازی
+```
+
+**مدل قفل‌شده:**
+
+```text
+Loan Payment / Disbursement Event
+        ↓
+Financial Operation (operationId)
+        ↓
+        ├── Loan Subledger   (ln_transactions — principal/interest/fee/penalty)
+        ├── Journal          (fin_journal_*)
+        └── Cash Settlement  (CashSettlementPort → Accounts یا Local)
+```
+
+سه view از **یک** operation هستند، نه سه transaction مستقل.
+
+- `accountTransactionId` فقط لینک به leg نقد در حالت Integrated است
+- صحت Loan از `ln_transactions` + journal + schedule rebuild می‌شود
+- `remainingBalance` از payment events بازسازی می‌شود؛ schedule ≠ payment event
+
+مرجع: `Canonical-Financial-Operation.md` · `Cash-Settlement-Adapter.md`

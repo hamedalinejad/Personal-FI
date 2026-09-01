@@ -27,3 +27,32 @@ Feature invent نمی‌کند — CanonicalFeeEvent + این ماتریس.
 ln_loan_fee_tiers = تنها SoT پلکان
 ln_loan_fees.tiers JSON = Legacy / Migration Only — write جدید ممنوع
 ```
+
+---
+
+## Core Fee Engine (P0)
+
+Fee فقط loan/crypto/stock نیست. در محصول لایسنسی همه جا ظاهر می‌شود:
+
+Bank · Loan · Broker · Exchange · Network · Fund · Delivery · Withdrawal · Subscription · Tax-like charge
+
+```text
+Core Fee Engine
+  ├── Fee Policy
+  ├── Fee Calculation
+  ├── Fee Allocation
+  └── Fee Accounting Treatment
+         ↑
+    Crypto / Stocks / Funds / Loans / Metals / Banking
+```
+
+هر Feature فقط **policy** خودش را تعریف می‌کند؛ محاسبه و ثبت حسابداری از Core می‌آید.
+
+`feeAmount` (total) همیشه حفظ می‌شود حتی وقتی breakdown وجود دارد:
+
+```text
+feeAmount = total (canonical sum)
+feeBrokerCommission / feeExchange / feeTax / feeOther = breakdown اختیاری
+```
+
+داده قدیمی با فقط `feeAmount` معتبر می‌ماند. هیچ فیلدی به‌خاطر schema جدید DROP نمی‌شود.

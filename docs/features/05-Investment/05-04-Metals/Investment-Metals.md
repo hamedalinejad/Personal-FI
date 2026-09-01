@@ -371,3 +371,17 @@ one operationId:
 **ممنوع:** کم کردن طلا پلتفرم بدون ثبت دارایی فیزیکی در همان op → Net Worth اشتباه.
 
 `gold_type`: seke_emami \| seke_bahar \| 18ayar \| abshode \| … · weight (canonical mg) · labor_fee · is_physical.
+
+---
+
+## وزن داخلی: milligram (تأیید)
+
+```text
+quantityMg
+purityRatio
+fineWeightMg = quantityMg × purityRatio
+```
+
+1g طلای ۱۸ عیار ≠ 1g طلای خالص.
+
+ذخیره canonical فقط **mg**؛ تبدیل g/kg/oz فقط در UI/import. از ذخیره هم‌زمان چند واحد جلوگیری می‌شود.

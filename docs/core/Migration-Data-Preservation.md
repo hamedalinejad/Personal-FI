@@ -42,3 +42,10 @@ Validation
 - migration بدون backup قابل rollback
 
 مرجع: `db/06-migration-backup-audit.md` · `Data-Preservation-Contract.md` · `Raw-vs-Derived-Data.md`
+
+---
+
+## Field Lifecycle
+
+قبل از هر migration ستون‌ها را با statusهای ACTIVE / LEGACY / DEPRECATED / MIGRATED / UNKNOWN علامت بزن.
+جزئیات: `Data-Preservation-Contract.md` § Field Lifecycle Status.

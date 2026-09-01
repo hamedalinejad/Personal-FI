@@ -19,3 +19,13 @@
 
 **Invariant:** `businessDate ≠ createdAt` عادی است.  
 Historical P&L از `priceAsOf`+`rateDate` هم‌تراز — نه `fetchedAt` alone.
+
+---
+
+## Date model — دست نخور (تأیید)
+
+فیلدهای زمانی جدا می‌مانند و در implementation به یک date تقلیل **نمی‌یابند**:
+
+`createdAt` · `eventAt` · `businessDate` · `settlementDate` · `marketDate` · `dueDate` · `paymentDate` · `fetchedAt`
+
+تاریخ ثبت نرم‌افزار ≠ تاریخ معامله بورس ≠ تاریخ تسویه ≠ تاریخ پرداخت.

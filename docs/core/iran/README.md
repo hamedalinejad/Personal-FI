@@ -97,3 +97,37 @@ UI display preference = ریال | تومان
 تاریخ: **ISO Gregorian/UTC در DB** · جلالی فقط نمایش (`jalali_display` helper).
 
 پیاده‌سازی کد می‌تواند تدریجی باشد؛ **قرارداد از الان** است.
+
+---
+
+## IranBusinessCalendar (P1 — قرارداد از الان)
+
+تاریخ‌های due / settlement / business فقط ISO date نیستند؛ به **تقویم کاری** وابسته‌اند.
+
+```text
+IranBusinessCalendar
+ ├── weekend (پنجشنبه/جمعه — policy)
+ ├── officialHolidays
+ ├── marketHolidays
+ ├── exchangeTradingDays
+ └── settlementDays
+```
+
+مصرف‌کننده‌ها:
+
+- اقساط وام (dueDate shift)
+- بورس ایران (marketDate / settlement T+n)
+- صندوق
+- چک (سررسید)
+- سود / تسویه بانکی
+
+API مفهومی:
+
+```text
+isBusinessDay(date, calendarId)
+nextBusinessDay(date, calendarId)
+addBusinessDays(date, n, calendarId)
+```
+
+نسخه‌دار و configurable — hard-code داخل Loan/Stock ممنوع.
+اولویت پیاده‌سازی: **P1**؛ قرارداد مستند: **از الان**.

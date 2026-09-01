@@ -108,3 +108,18 @@ Decimal · Money · FX · Valuation · CostBasis · LoanSchedule · Accounting �
 | Currency ≠ Instrument | denomination vs ownership (ref_instruments) |
 | USDT | cash در صرافی یا holding per network — دو نقش |
 | calculationContext | روی هر operation قفل (method + versions) |
+
+---
+
+## تکمیلی Domain (Loan / Fee / Fund / FX / Calendar)
+
+| موضوع | قانون |
+|--------|--------|
+| Loan Operation SoT | یک operation → subledger + journal + cash؛ نه دو tx موازی |
+| Core Fee Engine | policy per feature؛ feeAmount total همیشه |
+| NAV ≠ transactionPrice | صندوق ایران |
+| Metals | quantityMg + purity → fineWeightMg |
+| Crypto identity | assetKey/instrumentId؛ gross/fee/net |
+| Date fields | جدا بمانند؛ IranBusinessCalendar برای due/settlement |
+| FX rate | direction صریح: 1 USDT = 60,000 IRR |
+| Field lifecycle | ACTIVE…UNKNOWN؛ DROP فقط با replacement+rule+verify |
