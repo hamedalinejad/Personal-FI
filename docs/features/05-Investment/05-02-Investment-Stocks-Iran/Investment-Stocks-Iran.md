@@ -610,3 +610,7 @@ instrumentId type = Core UUID/id. ISIN and symbol are attributes; symbol change 
 Each CA: operationId, sourceInstrumentId, targetInstrumentId?, ratio, effectiveDate, and type.
 rebuildHolding applies CA chronologically after trades.
 
+## FEAT-P0-035 DEEP
+Store grossDividend, withholdingTax, netDividend.
+Journal: Dr receivable/cash net, Dr tax withholding, Cr dividend income gross — one economic story without double income.
+

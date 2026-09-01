@@ -237,7 +237,7 @@
 **راه‌حل:** `inv_stocks_iran_corporate_actions` به‌عنوان metadata/operation descriptor + source/target instruments + ratio + effectiveDate + operationId؛ rebuild باید همه CAها را ordered اعمال کند.
 
 ## FEAT-P0-035 — Stocks dividend accounting ambiguity
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — dividend gross net
 **مشکل:** `totalAmount=netDividend` ولی journal پیش‌فرض income=gross و withholding جداست؛ بدون componentهای دقیق امکان double count یا mismatch وجود دارد.
 
 **راه‌حل:** `grossDividend`, `withholdingTax`, `netDividend` و cash leg جدا؛ tax event فقط reference. Income = gross، cash = net، withholding یک component اقتصادی واحد.
