@@ -441,7 +441,7 @@ Goal entity فعلاً IRR-centric است ولی contribution exchangeRate دا�
 Available balance فعلاً soft warning برای pending cheques است. باید distinction `ledger/available/cleared/pending` در Core و Reports ثابت باشد.
 
 ## FEAT-P1-027 — Brokerage/Platform cash ledger reuse
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — shared brokerage cash ledger
 FIF ETF و Stocks نباید دو cash balance برای یک brokerage بسازند؛ Metals/Crypto نیز باید cash ledger مستقل و قابل reconcile داشته باشند.
 
 ## FEAT-P1-028 — Attachment ownership
