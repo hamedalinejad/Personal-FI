@@ -345,7 +345,7 @@
 هر fee باید مقدار خام، currency، rate/path و converted base value را نگه دارد. `feeAmount` بدون currency برای گزارش قابل اعتماد نیست.
 
 ## FEAT-P1-003 — Reversal uniformity
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — Core-only reversal path
 Crypto/Stocks/FIF/Metals/Loan/Cheque/Income/Expense باید فقط از Core reversal استفاده کنند؛ هیچ Feature-local `void + insert` مستقل نباشد.
 
 ## FEAT-P1-004 — OperationId propagation
