@@ -353,7 +353,7 @@ Crypto/Stocks/FIF/Metals/Loan/Cheque/Income/Expense باید فقط از Core re
 هر multi-row operation باید یک operationId واحد داشته باشد: domain rows، journal، cash settlement، tax/fee/CA در صورت ارتباط.
 
 ## FEAT-P1-005 — External vs internal transfer
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — internal vs external transfer semantics
 Crypto به‌درستی این مفهوم را معرفی کرده ولی باید به Stocks/Metals و هر transfer آینده تعمیم داده شود. Internal = same owner؛ external = counterparty خارج از system.
 
 ## FEAT-P1-006 — Opening balance/import distinction
