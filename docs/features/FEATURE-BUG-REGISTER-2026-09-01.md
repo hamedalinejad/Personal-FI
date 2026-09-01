@@ -401,7 +401,7 @@ T+2، تعطیلات، session، lotSize، priceTick و settlement باید vers
 مرابحه، قرض‌الحسنه، فروش اقساطی، جعاله و سایر loanTypeIrها نباید صرفاً label باشند اگر فرمول/fee/penalty متفاوت دارند. هر type باید policy/profile مشخص یا explicit unsupported داشته باشد.
 
 ## FEAT-P1-017 — Penalty legal/policy version
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — offline core without network
 Loan penalty formula نباید به‌عنوان حقیقت حقوقی ثابت hard-code شود. باید policy/version/effectiveDate و امکان manual override مستند داشته باشد.
 
 ## FEAT-P1-018 — Fund performance double-count
