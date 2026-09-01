@@ -357,7 +357,7 @@ Crypto/Stocks/FIF/Metals/Loan/Cheque/Income/Expense باید فقط از Core re
 Crypto به‌درستی این مفهوم را معرفی کرده ولی باید به Stocks/Metals و هر transfer آینده تعمیم داده شود. Internal = same owner؛ external = counterparty خارج از system.
 
 ## FEAT-P1-006 — Opening balance/import distinction
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — opening vs import sourceType
 Opening position نباید BUY ساختگی باشد. باید source=`opening|import|migration` و cost basis provenance داشته باشد.
 
 ## FEAT-P1-007 — Historical valuation
