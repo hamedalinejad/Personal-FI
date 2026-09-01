@@ -3,7 +3,7 @@
 ## توضیح کلی
 این فیچر مدیریت کامل بدهی‌ها، مطالبات و وام‌ها را بر عهده دارد. 
 اطلاعات اصلی وام در جدول `ln_loans` نگهداری می‌شود. 
-تمام جابه‌جایی‌های مالی واقعی مرتبط با وام در جدول `ln_transactions` به صورت **لاگ** ثبت می‌شوند و همزمان در جدول `acc_transactions` نیز ثبت شده و موجودی حساب را تغییر می‌دهد.
+تمام جابه‌جایی‌های مالی واقعی مرتبط با وام در جدول `ln_transactions` به صورت **لاگ** ثبت می‌شوند. جابه‌جایی نقد از طریق **CashSettlementPort** انجام می‌شود: اگر Accounts فعال باشد → `AccountsCashAdapter` و در صورت نیاز `acc_transactions`؛ اگر نباشد (Loan-only) → `LocalSettlementAdapter` بدون وابستگی اجباری به جداول Accounts.
 
 ---
 
@@ -65,16 +65,16 @@
 5. هنگام ثبت وام **دریافتی (borrowed)**:
  - مبلغ اصلی به حساب مرتبط واریز می‌شود.
  - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
- - یک رکورد در `acc_transactions` با نوع `deposit-loan` ثبت می‌شود.
- - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
+ - نقد از طریق CashSettlementPort: در حالت Integrated → `acc_transactions` (مثلاً deposit-loan) و `accountTransactionId`؛ در حالت Standalone → Local Settlement (بدون اجبار Accounts).
+ - journal همیشه از Core نوشته می‌شود.
  - موجودی حساب افزایش می‌یابد.
 6. هنگام ثبت وام **پرداختی (lent)**:
  - مبلغ اصلی از حساب مرتبط برداشت می‌شود.
  - یک رکورد در `ln_transactions` با `type = 'disbursement'` ثبت می‌شود.
- - یک رکورد در `acc_transactions` با نوع `withdrawal-loan` ثبت می‌شود.
- - در جدول `ln_loans`، فیلد `accountTransactionId` به `acc_transactions.id` لینک می‌شود.
+ - نقد از طریق CashSettlementPort (Integrated → withdrawal-loan در Accounts؛ Standalone → Local Settlement).
+ - journal همیشه از Core نوشته می‌شود.
  - موجودی حساب کاهش می‌یابد.
-7. تمام پرداخت‌های بعدی (قسط، سود، جریمه، کارمزد پیش‌پرداخت، کارمزد صدور) نیز هم در `ln_transactions` و هم در `acc_transactions` ثبت می‌شوند و موجودی حساب را تغییر می‌دهند.
+7. تمام پرداخت‌های بعدی در `ln_transactions` ثبت می‌شوند؛ اثر نقد فقط از طریق CashSettlementPort (Integrated و/یا Local Settlement) و journal Core — نه import مستقیم اجباری Accounts.
 8. کارمزدهای وام (صدور، پیش‌پرداخت، تأخیر) مستقل از سود ثبت می‌شوند و تنها موجودی حساب را تغییر می‌دهند، نه `remainingBalance`.
 9. جدول `ln_transactions` فقط لاگ است و داده‌های پردازشی (مثل برنامه اقساط) در آن ذخیره نمی‌شود.
 10. موجودی حساب نمی‌تواند منفی شود.
@@ -1572,3 +1572,16 @@ Loan Engine این‌ها را enforce می‌کند نه UI.
 - IranLoanConventions برای تعطیل/روز کاری بانکی
 
 `+1 month` از businessDate قرارداد است نه UTC wall-clock ساده.
+
+---
+
+## Standalone Loan (P0)
+
+فیلدهای `accountId` و `accountTransactionId`:
+
+| حالت | رفتار |
+|------|--------|
+| Integrated (Accounts on) | به Financial Account / acc_transactions لینک می‌شوند |
+| Standalone (Accounts off) | null یا Local Settlement ref — صحت Loan به وجود Accounts وابسته نیست |
+
+مرجع: `Cash-Settlement-Adapter.md` · `Feature-Independence-Contract.md`

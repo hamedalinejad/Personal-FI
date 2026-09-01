@@ -9,7 +9,7 @@
 1. موجودی حساب نمی‌تواند منفی شود (حساب اعتباری خارج از نسخه ۱).
 2. ارز حساب (`currency`) ثابت است؛ انتقال فقط بین حساب‌های **هم‌ارز** مجاز است مگر مسیر تبدیل صریح (نسخه ۱: هم‌ارز اجباری).
 3. انتقال وجه = دو ردیف `acc_transactions` (transfer-out + transfer-in) در یک `runAtomicFinancialOperation`.
-4. نام حساب یکتا است (`UNIQUE(name)` در میان حساب‌های غیرآرشیو).
+4. نام حساب **یکتا نیست** — چند «بانک ملت» مجاز است (شخصی / کاری / سپرده). یکتایی روی شناسه‌های واقعی است (پایین).
 5. حذف فیزیکی حساب ممنوع — فقط `isArchived = true`؛ آرشیو فقط اگر `currentBalance` (ledger) صفر باشد.
 6. ردیف‌های `acc_transactions` پس از ثبت از نظر مبلغ/حساب/نوع immutable هستند؛ اصلاح فقط با void + reversal.
 7. `currentBalance` و `balanceAfterTransaction` **snapshot مشتق**اند. منبع حقیقت = مجموع اثر ledger غیرvoid.
@@ -26,7 +26,7 @@
 | فیلد | نوع | توضیح |
 |------|-----|--------|
 | `id` | UUID | PK |
-| `name` | string | یکتا بین غیرآرشیوها |
+| `name` | string | **غیریکتا** — برچسب نمایشی کاربر |
 | `accountNumber` | string nullable | |
 | `iban` | string nullable | |
 | `cardNumber` | string nullable | |
@@ -150,3 +150,25 @@ Cr cash (A or B)             fee
 | `cardNumberHash` | نه شماره خام |
 | `bankNameIr` | ملت، سپه، … |
 | `accountType` | qarz \| sep \| modat \| jame \| other |
+
+---
+
+## Uniqueness Policy (P0) — رفع تناقض UNIQUE(name)
+
+```text
+account.id          = always UNIQUE
+account.name        = NOT unique
+iban                = UNIQUE when present (non-null)
+accountNumber       = UNIQUE when present within same institution policy (optional)
+externalId          = UNIQUE when present
+```
+
+کاربر می‌تواند داشته باشد:
+
+- بانک ملت - شخصی
+- بانک ملت - کاری
+- بانک ملت - سپرده
+
+حساب‌های بدون IBAN/شماره (مثلاً صندوق نقدی، کیف پول دستی) فقط با `id` یکتا می‌مانند.
+
+**ممنوع:** `UNIQUE(name)` در schema.

@@ -286,3 +286,11 @@ v1 می‌تواند همه را WA کند؛ **مدل data** باید policy ر�
 `totalFeesPaidBase` (و مشابه) فقط **metric انباشته** است.
 
 **ممنوع:** استفاده از آن برای remaining cost یا averageBuyPrice.
+
+---
+
+## calculationContext (هم‌تراز Operation)
+
+علاوه بر `calculationVersion` و `costBasisMethod` روی holding/op، هر financial operation باید context کامل را در `fin_operations` قفل کند (costBasisMethod, calculationVersion, roundingPolicyVersion, currencyConversionPolicyVersion, …).
+
+جزئیات فیلدها: `Canonical-Financial-Operation.md` § calculationContext.

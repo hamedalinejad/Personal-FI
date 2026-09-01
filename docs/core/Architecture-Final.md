@@ -94,3 +94,17 @@ Decimal · Money · FX · Valuation · CostBasis · LoanSchedule · Accounting �
 - `Migration-Data-Preservation.md`
 - `JSON-Policy.md`
 - `Implementation-Priority.md`
+
+---
+
+## تکمیلی (Standalone / Isolation / Nav / Identity)
+
+| موضوع | قانون |
+|--------|--------|
+| Feature Availability + Nav Visibility | Edition می‌تواند فقط Loans+Settings نشان دهد |
+| Feature Isolation | بدون UI/route/store/repo فیچر دیگر؛ فقط Port/Adapter |
+| Standalone A / Integrated B | LocalSettlement vs AccountsCashAdapter |
+| Account name | NOT unique؛ unique = id / iban when present |
+| Currency ≠ Instrument | denomination vs ownership (ref_instruments) |
+| USDT | cash در صرافی یا holding per network — دو نقش |
+| calculationContext | روی هر operation قفل (method + versions) |

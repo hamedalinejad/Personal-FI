@@ -382,3 +382,12 @@ Historical Price (instrument)  ×  Historical FX (quote→base, same asOf)
 بدون هم‌زمانی asOf، P&L تاریخی معتبر نیست.
 
 مرجع: `Price-Fetching.md` (قفل Historical Price) · `Canonical-Financial-Operation.md`.
+
+---
+
+## مرز با Instrument (P0)
+
+`cur_currencies` = denomination / FX.
+مالکیت دارایی‌های کریپتو/سهام/صندوق/فلز = `ref_instruments` + domain holdings.
+کد BTC/USDT در جدول ارز برای نرخ و نمایش است؛ SoT تملک نیست.
+جزئیات: `Instrument-Identity.md`.

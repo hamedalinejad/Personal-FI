@@ -130,3 +130,73 @@ Feature
 اتصال به Accounts فقط از طریق **CashSettlementPort**.
 
 جزئیات لایه‌بندی کل سیستم: `Module-Architecture.md` · `Cash-Settlement-Adapter.md`.
+
+
+---
+
+## Feature Isolation Invariant (P0)
+
+A feature must be fully functional without:
+
+- another feature **UI**
+- another feature **route**
+- another feature **state store**
+- another feature **repository**
+
+Optional integrations only via **Public APIs / Ports / Adapters**.
+
+```text
+ممنوع:
+  Loan → import AccountsRepository / جداول داخلی Accounts
+
+مجاز:
+  Loan → SettlementPort
+            ├── LocalSettlementAdapter
+            └── AccountsCashAdapter
+```
+
+این invariant شرط فروش ماژولی و Edition محدود است.
+
+---
+
+## Standalone Feature vs Integrated Feature (قفل معنایی)
+
+### حالت A — Standalone Feature
+
+مثلاً فقط Loan Module فعال است (Accounts خاموش):
+
+```text
+Loan
+  ↓
+LocalSettlementAdapter
+  ↓
+Loan Ledger + Journal (Core)
+```
+
+بدون UI Accounts، بدون route Accounts، بدون وابستگی به `acc_accounts` به‌عنوان شرط صحت.
+
+### حالت B — Integrated Feature
+
+اگر Accounts فعال باشد:
+
+```text
+Loan
+  ↓
+CashSettlementPort
+  ↓
+AccountsCashAdapter
+  ↓
+Bank / Financial Account
+```
+
+### جمع‌بندی
+
+```text
+Loan Core
+   ├── Local Settlement   (Standalone)
+   └── Accounts Settlement (Integrated)
+```
+
+همان الگو برای **Crypto · Stocks · Funds · Metals** اجباری است.
+
+**توجه مستندسازی:** هر جا در Feature doc هنوز `accountId → acc_transactions` به‌صورت اجباری نوشته شده، باید به‌معنی «وقتی Accounts فعال است / از طریق Port» خوانده شود؛ نه وابستگی compile-time به Accounts. مرجع اجرایی: `Cash-Settlement-Adapter.md`.

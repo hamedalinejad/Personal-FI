@@ -435,3 +435,33 @@ Standalone UI  ≠  isolated database / isolated accounting
 ```
 
 فعال بودن UI Accounting اختیاری است؛ ساخت journal پشت صحنه اجباری است وقتی رویداد مالی رخ می‌دهد.
+
+
+---
+
+## Feature Availability + Navigation Visibility (P0)
+
+۹ صفحهٔ اصلی سقف ناوبری کامل است — **نه** اینکه همه همیشه روشن باشند.
+
+دو مفهوم جدا:
+
+| مفهوم | معنی |
+|--------|------|
+| **Feature Availability** | آیا Domain/API/Ledger آن فیچر در edition/license فعال است؟ |
+| **Navigation Visibility** | آیا آیتم ناوبری در UI نشان داده می‌شود؟ |
+
+```text
+Feature Availability  (edition / license / user enable)
+        +
+Navigation Visibility (derived from availability + user prefs)
+```
+
+مثال:
+
+- فقط Loans فعال → ناوبری می‌تواند فقط `Loans` + `Settings` (+ در صورت نیاز Dashboard خلاصه) نشان دهد.
+- فقط Funds → `Investments` (فقط تب Funds) + `Settings`.
+- Full → هر ۹ صفحه.
+
+**Invariant:** Installed/Enabled یک مفهوم **معماری** است (feature flags + module registry)، نه فقط مخفی‌کردن دکمه در UI.
+
+Routeهای غیرفعال نباید load شوند؛ API فیچر خاموش reject می‌کند.

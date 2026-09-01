@@ -116,3 +116,18 @@ Income / Expense / Cheque / Transfer در صورت نیاز همین Port را �
 | Full + Accounting UI | روشن | AccountsCashAdapter | بله + UI ledger |
 
 **Standalone UI ≠ isolated database.** یک SQLite؛ مرز فقط در Port و feature flags است.
+
+---
+
+## Standalone vs Integrated (هم‌تراز با Feature docs)
+
+| حالت | نام | مسیر |
+|------|-----|------|
+| A | Standalone Feature | Feature → LocalSettlementAdapter → Domain Ledger + Journal |
+| B | Integrated Feature | Feature → CashSettlementPort → AccountsCashAdapter → Financial Account |
+
+فیلدهایی مثل `accountId` / `accountTransactionId` در Loan یا Crypto:
+
+- در حالت B پر می‌شوند (لینک به Accounts)
+- در حالت A یا null هستند یا به Local Settlement Account همان دامنه اشاره می‌کنند
+- **هرگز** شرط وجود جدول کامل Accounts برای صحت Domain نیستند

@@ -678,3 +678,35 @@ Transaction / Domain row = حقیقت ثبت‌شده (immutable)
 
 این‌ها **Fixture Test** در CI هستند، نه فقط متن مستند.
 بدون سبز بودن این fixtureها، release مالی معتبر نیست (`db.md` / financial-fixtures).
+
+
+---
+
+## calculationContext روی هر Financial Operation (P0)
+
+نتیجه محاسبه به‌تنهایی کافی نیست؛ **context محاسبه** هم باید روی operation قفل شود تا ۵ سال بعد با تغییر policy تاریخچه قابل بازتولید بماند.
+
+```text
+calculationContext
+ ├── costBasisMethod
+ ├── calculationVersion
+ ├── roundingPolicyVersion
+ ├── currencyConversionPolicyVersion
+ ├── taxPolicyVersion?
+ └── instrumentDefinitionVersion?
+```
+
+ذخیره‌سازی پیشنهادی: فیلد `engineVersions` / `calculationContext` روی `fin_operations` (JSON ساختاریافته با کلیدهای بالا).
+
+| فیلد | نقش |
+|------|-----|
+| costBasisMethod | weighted_average / fifo / … در زمان op |
+| calculationVersion | نسخه الگوریتم همان engine |
+| roundingPolicyVersion | نسخه Rounding-Policy |
+| currencyConversionPolicyVersion | نسخه FX path / lock rules |
+| taxPolicyVersion | در صورت اعمال مالیات روی op |
+| instrumentDefinitionVersion | نسخه تعریف instrument در زمان op |
+
+**Invariant:** تغییر method یا policy بعدی فقط ops جدید یا rebuild صریح با version جدید را تحت تأثیر قرار می‌دهد — silent rewrite تاریخچه ممنوع.
+
+مرجع: `Cost-Basis-Engine.md` · `Rounding-Policy.md`

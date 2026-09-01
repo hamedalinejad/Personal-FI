@@ -71,3 +71,35 @@ Adapter: instrumentId → providerSymbol / assetKey mapping
 
 جزئیات فیلد: `Field-Level-Data-Ownership-Matrix.md`  
 Schema: `db/05-constraints-polymorphic.md` · `db/01-schema-tables.md`
+
+
+---
+
+## Currency ≠ Instrument (P0)
+
+دو مفهوم Domain جدا که نباید قاطی شوند:
+
+| مفهوم | معنی | مثال |
+|--------|------|------|
+| **Currency** | واحد پول / valuation denomination | IRR, USD, EUR |
+| **Instrument** | چیزی که کاربر **مالک** آن است | BTC, ETH, USDT-TRC20, شبندر, طلا ۱۸ عیار, واحد صندوق X |
+
+```text
+Currency  = واحد اندازه‌گیری و گزارش
+Instrument = دارایی قابل تملک (ref_instruments)
+```
+
+- لیست `cur_currencies` می‌تواند کدهایی مثل USDT/BTC برای **نرخ و نمایش** داشته باشد.
+- هویت مالکیت و cost basis و holding همیشه از **`instrumentId`** می‌آید.
+- Application logic موجودی سرمایه‌گذاری را از Currency table به‌عنوان asset registry نمی‌خواند.
+
+### USDT (تأیید تصمیم فعلی)
+
+USDT ذاتاً همیشه Cash یا همیشه Investment نیست:
+
+| زمینه | نقش |
+|--------|------|
+| موجودی نقد صرافی (quote cash) | می‌تواند **Cash** باشد (`inv_crypto_cash` / settlement) |
+| USDT-TRC20 / USDT-ERC20 به‌عنوان holding | **Instrument / Investment** با instrumentId جدا |
+
+دو شبکه = دو `ref_instruments` جدا. این اصل Core باقی می‌ماند.
