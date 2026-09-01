@@ -1806,3 +1806,6 @@ graceDays + graceInterestAccrues + gracePrincipalDeferred + firstPaymentDate req
 ## FEAT-P0-016 DEEP
 One dayCountConvention on loan copied to schedule snapshot; no silent mix mid-schedule.
 
+## FEAT-P0-017 DEEP
+v1 methods: declining_balance, flat_rate, bullet, qarz_al_hasaneh only.
+

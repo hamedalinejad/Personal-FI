@@ -127,7 +127,7 @@
 **راه‌حل:** Day Count Engine واحد؛ `actual_actual` واقعاً leap-aware یا صریحاً خارج از v1. برای irregular periods فقط `interestFactor(start,end)`.
 
 ## FEAT-P0-017 — Loan formula scope conflict
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — closed method set
 **مشکل:** `declining_balance` هم annuity ثابت را پوشش می‌دهد و هم در انتهای سند «اصل‌ثابت+سود‌مانده» را زیر همان method قرار می‌دهد.
 
 **راه‌حل:** `calculationMethod` و `amortizationStyle` را جدا کن. یک method نباید دو فرمول بدون discriminator داشته باشد.
