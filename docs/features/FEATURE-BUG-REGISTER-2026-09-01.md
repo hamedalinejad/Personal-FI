@@ -405,7 +405,7 @@ T+2، تعطیلات، session، lotSize، priceTick و settlement باید vers
 Loan penalty formula نباید به‌عنوان حقیقت حقوقی ثابت hard-code شود. باید policy/version/effectiveDate و امکان manual override مستند داشته باشد.
 
 ## FEAT-P1-018 — Fund performance double-count
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — license gates features not data
 Dividend + NAV drop + reinvest باید در total return طوری ترکیب شوند که یک سود دوبار شمرده نشود. Performance engine باید cash flow-aware باشد.
 
 ## FEAT-P1-019 — Metals valuation source
