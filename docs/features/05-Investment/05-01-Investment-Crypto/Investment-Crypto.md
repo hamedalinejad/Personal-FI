@@ -1153,12 +1153,12 @@ Reversal atomic باید:
 | مثال | IRR, USD, USDT به‌عنوان واحد پول | USDT-TRC20, USDT-ERC20, BTC native |
 | feeCurrency | کد Currency | — |
 | Holding | — | assetKey اجباری |
-| قیمت | quoteCurrency روی price row | instrumentId = assetKey |
+| قیمت | quoteCurrency روی price row | instrumentId = ref_instruments.id؛ assetKey فقط mapping |
 
 موجودی «تتر روی شبکه» = **Asset**؛ تسویه «مبلغ به USDT» = **Currency** در فیلدهای amount.
 
 ### API هویت
-همه APIهای دامنه/قیمت کریپتو: `assetKey` / `instrumentId` — نه `symbol` خام.  
+همه APIهای دامنه/قیمت کریپتو: **`instrumentId` یا holdingId**؛ `assetKey` فقط lookup/provider — نه `symbol` خام.  
 `symbol` فقط label در UI و فیلد نمایشی.
 
 ### نام‌گذاری C2C

@@ -141,8 +141,9 @@ averageBuyPrice = (totalInvested / totalQuantity).toFixed(4); // بعد از چ�
 ```typescript
 // ✅ درست
 function convertForDisplay(amount: Decimal, from: string, to: string): Decimal {
+ // rate semantic: 1 from = rate to  →  amountTo = amountFrom × rate
  const rate = getRate(from, to); // بدون round
- const result = amount.dividedBy(rate); // بدون round
+ const result = amount.times(rate); // نه dividedBy برای مسیر direct
  return result.toDecimalPlaces(displayDecimals(to), Decimal.ROUND_HALF_UP); // فقط اینجا
 }
 
