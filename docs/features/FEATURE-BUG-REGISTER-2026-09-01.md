@@ -389,7 +389,7 @@ Staleness باید per assetCategory/quoteType/source باشد؛ «قیمت قد
 Dedupe key باید حداقل `(assetCategory,instrumentId,quoteMarket,priceCurrency,sourceId,time bucket)` باشد. Symbol-only dedupe ممنوع.
 
 ## FEAT-P1-014 — Corporate actions source/target
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — reports via query API
 Merger, spin-off, rights, symbol/ISIN change باید source/target instrument و effective date داشته باشند؛ symbol change نباید historical transaction را rewrite کند.
 
 ## FEAT-P1-015 — Iranian stock market calendar
