@@ -228,3 +228,6 @@ Feature-local synonyms map to this enum.
 Single Core enum accountKind: cash, bank_account, card, wallet, brokerage_cash, crypto_exchange_cash, cash_equivalent, credit_account.
 Feature-local type strings must map into this enum; no parallel conflicting enums.
 
+## FEAT-P0-021 DEEP
+Store last4 and optional token only. Full card number never in DB. Images via Document Management.
+

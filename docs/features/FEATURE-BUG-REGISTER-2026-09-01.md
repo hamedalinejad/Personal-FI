@@ -153,7 +153,7 @@
 **راه‌حل:** `accountKind`/`accountType` را تفکیک کن: canonical internal enum + `iranAccountSubtype` در صورت نیاز. Mapping legacy مستند شود.
 
 ## FEAT-P0-021 — Accounts raw card number conflict
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — no full PAN storage
 **مشکل:** entity هنوز `cardNumber` خام دارد ولی بخش ایران `cardNumberHash` را policy امن معرفی می‌کند.
 
 **راه‌حل:** write جدید فقط token/hash/masked value. `cardNumber` قدیمی فقط migration compatibility و هرگز در log/export عمومی.
