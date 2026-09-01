@@ -203,3 +203,20 @@ acc_transactions = cash movement
 | reconciled | مغایرت‌گیری‌شده |
 
 Cash ledger همچنان فقط از طریق operations؛ snapshot balance rebuild می‌شود.
+
+## FEAT-P0 LOCK (Accounts)
+
+Provides CashSettlementPort implementation when enabled.
+Other features must not require Accounts tables for core domain math.
+Balances: ledger / available / cleared / pending (P1-026 aligned).
+
+## FEAT-P0-020/021 LOCK (Accounts types & cards)
+
+### accountType / accountKind (P0-020)
+Single enum owner in Core Accounts:
+`cash | bank_account | card | wallet | brokerage_cash | crypto_exchange_cash | cash_equivalent | credit_account`
+Feature-local synonyms map to this enum.
+
+### Card numbers (P0-021)
+**Never store full PAN.** Only last4 / tokenized reference / optional masked display. Attachment image optional via Documents.
+

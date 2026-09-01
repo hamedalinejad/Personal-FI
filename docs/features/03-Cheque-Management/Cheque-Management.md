@@ -240,3 +240,14 @@ Cheque = **Domain مستقل** با Ledger خودش؛ Integration فقط از ط
 - چک pending که مستقیم bounce می‌شود: بدون cash op
 
 هم‌تراز `Canonical-Financial-Operation` و INV-004.
+
+## FEAT-P0 LOCK (Cheque P0-018/019)
+
+### Reversal (P0-018)
+cleared → bounced: **one** reverse cash Financial Operation linked to original clear op.
+Do not also post a second independent withdrawal/deposit for the same bounce.
+
+### State machine (P0-019)
+Canonical statuses: `draft? | pending | issued | in_vault | transferred | cleared | bounced | blocked | cancelled`
+Transitions with cash effect always create/link operations; status-only changes for non-cash (cancel while pending).
+

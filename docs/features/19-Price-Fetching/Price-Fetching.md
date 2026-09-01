@@ -874,3 +874,22 @@ Lineage: `Import-Lineage.md`.
 هر price point: raw provider value + normalized + source + asOf + retrievedAt + currency + unit · stale flag.
 
 Net Worth at date D: valuationDate + priceAsOf + FXAsOf — نه قیمت امروز برای گزارش تاریخی.
+
+## FEAT-P0 LOCK (Price)
+
+### Identity (P0-026/031)
+Key: `assetCategory` + `instrumentId` (Core id). Provider maps separate. No symbol-only history key for new data.
+
+### quoteType (P0-027)
+Enum: `last | nav | close | mid | indicative | manual | other`
+
+### source (P0-029)
+`sourceKind`: `manual | api | import` + `sourceId`/`adapterKey` (e.g. coingecko, tsetmc, csv).
+
+### marketDate (P0-028)
+Stock/FIF daily: marketDate **required**. Crypto intraday: nullable + `fetchedAt` required.
+Historical valuation: never fallback to current price.
+
+### Selection (P0-030)
+PriceSelectionPolicy versioned: holding source → explicit → default → priority/confidence → freshness; manual expiresAt override.
+

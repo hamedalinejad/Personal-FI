@@ -244,3 +244,20 @@ Rules versioned: `ruleId`, effectiveFrom/To, jurisdiction, version — تراک�
 
 `feeTax` روی معامله (مثلاً سهام) = هزینه همان trade.  
 جایگزین `tax_events` / رکورد مالیاتی دوره‌ای **نیست**.
+
+## FEAT-P0 LOCK (Tax)
+
+Tax period key: **`(taxYear, taxCalendar)`** everywhere (snapshots and investment tax metadata).
+v1 may default calendar from settings but field must not be dropped.
+
+## FEAT-P0-049/050 LOCK (Tax payment & feeTax)
+
+### Payment (P0-049)
+Tax payment = **one** Financial Operation with one cash leg (tax-specific).
+Expense reports may **categorize** that same operation — must not create a second cash movement.
+
+### feeTax vs tax event (P0-050)
+- `feeTax` on trade = transaction cost economics only
+- Tax domain event/liability = separate
+- Withholding = one economic amount; never expense twice
+

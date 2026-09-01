@@ -447,3 +447,18 @@ rateToCurrency   // IRR
 Registry ارز ≠ registry مالکیت instrument.
 
 Rate: value + source + sourceReference + rateDate + fetchedAt + conversionPath (BTC→USDT→IRR).
+
+## FEAT-P0 LOCK (Currency)
+
+### Formula (P0-024)
+```text
+1 × fromCurrency = rate × toCurrency
+amountTo = amountFrom × rate
+inverse: amountFrom = amountTo ÷ rate
+```
+Any `dividedBy(rate)` for "direct" without inverse semantic = bug.
+
+### Bridge (P0-025)
+Modes: direct | inverse | configured_bridge | manual.
+No hard-coded USDT bridge in Core.
+

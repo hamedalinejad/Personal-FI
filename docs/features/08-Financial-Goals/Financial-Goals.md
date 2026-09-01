@@ -173,3 +173,10 @@
 - پیشرفت هدف = Σ واریزهای هدف؛ منبع بودجه ممکن است envelope باشد بدون `acc_transactions`
 - تکمیل هدف status را عوض می‌کند؛ پول را خودکار جابه‌جا نمی‌کند مگر API صریح
 - تست: contribute از حساب vs از بودجه؛ progress درصد
+
+## FEAT-P0 LOCK (Goal)
+
+`currentAmount` = **progress/allocation**, not a cash asset in Net Worth/Portfolio.
+If real reserved cash needed: separate account + financial operations.
+Withdrawal: reverse allocation links; cash only if real money moved.
+

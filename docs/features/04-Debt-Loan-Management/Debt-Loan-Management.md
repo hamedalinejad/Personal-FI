@@ -1748,3 +1748,28 @@ remainingPrincipal (DB: remainingBalance) -= only principalPortion
 cashLeg = Σ portions (principal + interest + fee + penalty)
 Journal: see Accounting-Calculation-Invariants §3
 ```
+
+## FEAT-P0 LOCK (Loan)
+
+### accountingTreatment (P0-008)
+Canonical: **`reduction_of_carrying_amount`**
+Deprecated alias: `reduction_of_liability` → same mapping in migration (no silent drop).
+
+### Standalone (P0-001)
+`accountId` / cash linkage **nullable**; settlement via CashSettlementPort (internal|external).
+
+### remainingBalance (P0-002)
+Snapshot only; rebuild from `ln_transactions.principalPortion` sum. No direct mutate API.
+
+## FEAT-P0-009…017 LOCK (Loan details)
+
+- **P0-009 Disbursement:** loan header = contract only; cash-bearing events link via `ln_transactions` + operation cash leg; `accountId` optional.
+- **P0-010 amount:** `amount` = actual cash leg; components principal/interest/fee/penalty separate; contract principal ≠ always net proceeds.
+- **P0-011 schedule snapshot:** generatedAt, effectiveFrom, reason, operationId, calculationVersion, roundingVersion, rateVersion, inputHash, full payload.
+- **P0-012:** Schedule = plan; Payment = fact; installment status derived from allocations.
+- **P0-013 partial:** per-component remaining under waterfall policy.
+- **P0-014 variable:** v1 = manual rate changes via rate_history only unless full index/spread/cap/floor scoped in.
+- **P0-015 grace:** each loan defines interestAccrues / principalDeferral / firstPaymentShift explicitly + fixture.
+- **P0-016 day-count:** single dayCountConvention on loan/schedule version (360/365/30/360/actual).
+- **P0-017 formula scope:** calculationMethod enum is closed for v1; advanced models future without half-implementing.
+

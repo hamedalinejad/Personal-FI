@@ -225,3 +225,11 @@ Expense Operation  →  تغییر واقعی پول
 
 Budget نباید ledger نقد یا journal را مستقیماً تغییر دهد.
 مصرف بودجه از روی تراکنش‌های واقعی (query) محاسبه می‌شود.
+
+## FEAT-P0 LOCK (Budget)
+
+Budget is **not** a financial ledger.
+- Actual spend: query source expense/ops (non-void)
+- `bg_transaction_links`: allocation links with `operationId`, `sourceLineId`, void/status
+- Reversal of source op must reconcile links (no double spend / zero spend silently)
+

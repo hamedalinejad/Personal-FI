@@ -617,3 +617,15 @@ opening value
 ### ETF vs Issue/Redemption dependency
 - صدور/ابطال: Fund + Core کافی (standalone)
 - ETF: conditional dependency به Broker + Stock Settlement — نه global اجباری
+
+## FEAT-P0 LOCK (Funds)
+
+### NAV vs price (P0-036)
+Cost/realized from **transactionPrice**; valuation from **NAV** / liquidation.
+Performance outputs independent: **income | realized | unrealized**.
+`predictedProfit` = comparison metadata only — never add into period economic P&L with unrealized.
+
+### ETF vs issuance (P0-037)
+`fundType` discriminator: ETF → brokerage settlement route; issuance/redemption → account route.
+SettlementPort only — no dual mandatory FKs.
+

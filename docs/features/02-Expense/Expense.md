@@ -215,3 +215,12 @@ Split **metadata UI نیست**؛ خطوط دامنه + journal lines هستند.
 - `grossAmount` / `netAmount` در صورت تفکیک فاکتور
 
 VAT fee-like می‌تواند journal جدا داشته باشد؛ با `feeTax` معاملهٔ بورسی قاطی نشود.
+
+## FEAT-P0 LOCK (Expense)
+
+### Split (P0-022)
+CashLeg + N ExpenseLines; Σ lines (+tax) = cash leg. First-class lines not UI-only metadata.
+
+### Correction (P0-023)
+One new Financial Operation with `reversesOperationId`; original immutable. Reports count economic effect once.
+

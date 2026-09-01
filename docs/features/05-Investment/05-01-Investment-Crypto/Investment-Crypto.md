@@ -1449,3 +1449,28 @@ Metadata کریپتو (`chainId`, `contractAddress`, `decimals`, `assetKey`) ر�
 ---
 
 Scope و Transfer/Fee/Network: **`Crypto-V1-Scope.md`**.
+
+## FEAT-P0 LOCK (Crypto)
+
+### Identity (P0-003/004)
+- `instrumentId` = FK `ref_instruments.id` only (SoT)
+- `assetKey` = provider/mapping index only — **never PK/SoT**
+- `symbol` = display label only
+- APIs: `holdingId` or `instrumentId` — never symbol-only rebuild
+
+### Quantity / fee (P0-005)
+Mandatory: `grossQuantity`, `feeQuantity`, `netQuantity`, `feePresence`
+- fee from base/received → holding Δ = **net**
+- fee in quote → holding Δ = **gross** (=net)
+
+### C2C cost (P0-006)
+```text
+sourceCostReleased = CostBasisEngine.release(fromHolding, qty)
+destCost = sourceCostReleased + acquisitionFees (policy)
+```
+**Forbidden:** using latest market price to set destination historical cost.
+
+### Cash vs asset (P0-007)
+- `inv_crypto_cash` = only SoT for exchange/fiat/cash-like balances
+- Token/network assets only in holdings (USDT-TRC20 ≠ cash row)
+

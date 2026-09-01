@@ -582,3 +582,20 @@ feeOther
 ```
 
 داده قدیمی فقط با `feeAmount` معتبر است. Breakdown اختیاری است و جایگزین total نمی‌شود.
+
+## FEAT-P0 LOCK (Stocks)
+
+### instrumentId (P0-033)
+Always `ref_instruments.id`. ISIN/symbol = metadata. Symbol change ≠ new identity.
+
+### Cash T+2 (P0-032)
+Separate: `ledgerCash`, `settledCash`, `availableCash`, `pendingSettlement`.
+Trade date may reserve/ledger; available follows settlement date rules.
+
+### Dividend (P0-035)
+`grossDividend`, `withholdingTax`, `netDividend` separate.
+Journal: income = gross; cash leg = net; withholding = distinct component (not double income).
+
+### Corporate actions (P0-034)
+CA table: source/target instruments, ratio, effectiveDate, operationId; rebuild applies CA ordered.
+

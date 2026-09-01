@@ -220,3 +220,21 @@
 ## ساده نگه دارید
 
 فقط: Asset · Acquisition · Disposal · Valuation · Document. نه ERP.
+
+## FEAT-P0 LOCK (Physical)
+
+### Write-off (P0-042)
+Record `carryingAmountBeforeWriteOff` and loss/impairment explicitly. Setting currentValue=0 is snapshot, not the loss amount itself.
+
+### Acquisitions (P0-043)
+Header = identity; purchase facts in `pa_transactions` (cost, qty, date, settlement). Header price/date = legacy/snapshot only.
+
+## FEAT-P0-041 LOCK (Physical realized P&L)
+
+On disposal/sale:
+```text
+realized = netProceeds - carryingAmountReleased
+```
+Not `salePrice - purchasePrice` alone when multiple acquisitions or impairments exist.
+Carrying amount from acquisition costs (± impairments) via pa_transactions rebuild.
+

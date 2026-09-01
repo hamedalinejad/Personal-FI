@@ -393,3 +393,18 @@ fineWeightMg = quantityMg × purityRatio
 ذخیره canonical همچنان **mg**.  
 ورودی/نمایش اختیاری: مثقال با ضریب ثابت versioned (تقریباً ۱ مثقال ≈ ۴.۶۰۸۳ گرم ≈ ۴۶۰۸.۳ mg).  
 تبدیل فقط در مرز UI/import — نه واحد موازی در ledger.
+
+## FEAT-P0 LOCK (Metals)
+
+### Cash (P0-038)
+v1 platform cash: **IRR-only** unless `cashPosition(currency)` multi-currency enabled.
+Scalar `cashBalance` without currency = IRR-only scope explicit.
+
+### Physical delivery (P0-039)
+One atomic operation: digital holding ↓ + physical asset ↑ + fees + journal.
+If Physical Assets disabled: standalone delivery record + later materialize — do not drop NW.
+
+### Coin qty (P0-040)
+Canonical storage: **quantityMg** (and purity).
+`quantityCoins` = derived/display or auxiliary input that normalizes to mg — not a second SoT mass.
+

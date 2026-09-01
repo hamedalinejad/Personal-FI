@@ -185,3 +185,8 @@ Income UI
 > **Immutable:** «ویرایش» مبلغ/کارمزد ممنوع؛ فقط `correctIncome` / reverse. ویرایش metadata غیرمالی مجاز. `Financial-Invariants` §14.
 
 Income = economic classification (`fin_accounts` income)؛ منبع نقد = bank account جدا — Accounting Core هر دو leg را می‌نویسد.
+
+## FEAT-P0 LOCK (Income)
+
+Correction/reversal = new Financial Operation + `reversesOperationId`; original immutable (same as Expense P0-023).
+
