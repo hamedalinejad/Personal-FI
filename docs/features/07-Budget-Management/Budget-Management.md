@@ -233,3 +233,6 @@ Budget is **not** a financial ledger.
 - `bg_transaction_links`: allocation links with `operationId`, `sourceLineId`, void/status
 - Reversal of source op must reconcile links (no double spend / zero spend silently)
 
+## FEAT-P0-044 DEEP
+Actual spend = source expense operations. bg_transaction_links = allocation only.
+

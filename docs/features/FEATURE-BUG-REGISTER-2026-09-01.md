@@ -291,7 +291,7 @@
 **راه‌حل:** header فقط identity؛ تمام acquisition facts در `pa_transactions` با operation/account/cost/quantity. Header fields snapshot/legacy باشند.
 
 ## FEAT-P0-044 — Budget SoT ambiguity
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — budget links not spend SoT
 **مشکل:** یک بخش می‌گوید مصرف budget از `bg_transaction_links` است، راهنمای implementation می‌گوید از `exp_transactions` غیرvoid snapshot می‌شود.
 
 **راه‌حل:** Budget خودش ledger مالی نیست؛ `bg_transaction_links` = allocation/plan ledger. Actual spend از source operations query می‌شود و links فقط allocation هستند. یک source of truth برای هر مفهوم.
