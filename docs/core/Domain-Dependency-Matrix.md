@@ -2,11 +2,14 @@
 
 | From → To | reads | writes | creates-operation |
 |-----------|-------|--------|-------------------|
-| Income → Accounts | Y | via Core only | Y (cash) |
-| Expense → Accounts | Y | via Core | Y |
-| Cheque → Accounts | Y | via Core | Y |
-| Loan → Accounts | Y | via Core | Y |
-| Crypto → Accounts | Y bank only | via Core | Y |
+| Income → Accounts | via CashSettlementPort only | via Core/Port only | Y (cash) |
+| Expense → Accounts | via CashSettlementPort only | via Core/Port only | Y |
+| Cheque → Accounts | via CashSettlementPort only | via Core/Port only | Y |
+| Loan → Accounts | via CashSettlementPort only | via Core/Port only | Y |
+| Crypto → Accounts | via CashSettlementPort only (when integrated) | via Core/Port only | Y |
+| Stocks → Accounts | via CashSettlementPort only (when integrated) | via Core/Port only | Y |
+| Funds → Accounts | via CashSettlementPort only (when integrated) | via Core/Port only | Y |
+| Metals → Accounts | via CashSettlementPort only (when integrated) | via Core/Port only | Y |
 | Investment → Currency/Price | Y | N | N |
 | All financial → Accounting Core | Y | journal via Op | Y |
 | Feature A → Feature B tables | **N** | **N** | — |
@@ -34,7 +37,10 @@ Cross-feature write فقط via Canonical Operation.
 | Crypto | ✓ | Optional | ✓ | — | Optional | Optional |
 | Stocks | ✓ | Optional | ✓ | — | Optional | Optional |
 | Funds | ✓ | Optional | ✓ | — | Optional | Optional |
-| Expense | ✓ | ✓ | ✓ | Optional | Optional | — |
+| Metals | ✓ | Optional | ✓ | — | Optional | Optional |
+| Expense | ✓ | Optional for standalone; integrated via adapter | ✓ | Optional | Optional | — |
+
+**Accounts Optional** یعنی هیچ Domain feature نباید `acc_accounts` یا `acc_transactions` را برای correctness خود mandatory فرض کند. اگر Accounts فعال باشد، اتصال فقط با `CashSettlementPort` و `AccountsCashAdapter` است؛ در غیر این صورت `LocalSettlementAdapter`.
 
 Circular dependency ممنوع. جزئیات استقلال: `Feature-Independence-Contract.md`
 
