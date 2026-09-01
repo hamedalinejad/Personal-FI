@@ -168,3 +168,24 @@ License Token (امضاشده محلی)
 - Domain مالی Role/License را import نمی‌کند
 - Application قبل از نشان دادن UI/Command، entitlement را چک می‌کند
 - **بدون** تماس سرور برای استفاده روزمره (token محلی)
+
+---
+
+## DATA ACCESS ≠ FEATURE ACCESS (P0 تجاری)
+
+```text
+DATA ACCESS     = مستقل از LICENSE  (خواندن/export تاریخچه همیشه)
+FEATURE ACCESS  = وابسته به LICENSE / capability gates
+```
+
+Expired license → داده inaccessible **نمی‌شود**؛ حداکثر featureهای جدید محدود.
+
+مشخص کن: expiry behavior · grace · clock tampering policy · restore other device · offline activation.
+
+Capability Gate در Application/UI:
+
+`loan.basic` · `loan.advanced` · `crypto.basic` · …
+
+**نه** داخل Core Ledger: `if premium: calculate...`
+
+فقط Loan license → سیستم سالم بدون dependency اجباری به Investment.

@@ -307,3 +307,27 @@ Document: `documentId`, `blobId`, `checksum`, `mimeType`, `originalName`, **rela
 4. reconcile + مقایسه checksum/counts/journal totals
 
 بدون تست سبز Restore، backup «پیاده‌سازی‌شده» محسوب نمی‌شود.
+
+---
+
+## Backup Manifest کامل (Self-Contained) (P0)
+
+علاوه بر schema/checksum/sqlite:
+
+```text
+appVersion
+schemaVersion
+dataModelVersion
+calculationVersions
+locale
+baseCurrency
+calendarPolicy
+roundingPolicy
+licenseState          // وضعیت entitlement — نه embed در journal
+featuresEnabled
+encryptionState
+```
+
+Backup = **Data + Configuration** (categories, tax rules, loan policies, display prefs) نه فقط ردیف تراکنش.
+
+Migration هر تغییر schema: BEGIN → VERIFY → COMMIT؛ failure → ROLLBACK / SAFE MODE.

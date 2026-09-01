@@ -112,3 +112,15 @@ Loan / Crypto / Stock / Fund / Metal
 UI → Feature public API → Capability → Domain → db همان فیچر/core shared helpers.
 
 جزئیات استقلال: `Feature-Independence-Contract.md`.
+
+---
+
+## Repository Interface (P0)
+
+```text
+Feature → API → Application → Domain → Repository → DB
+```
+
+`LoanRepository` · `AccountRepository` · `JournalRepository` · …  
+Schema = private implementation. Cross-feature فقط از API.  
+`foreign_keys=ON` برای هر connection — invariant قابل تست.

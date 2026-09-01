@@ -253,3 +253,13 @@ closing valuation
 ```
 
 مثال: Buy 100 → Sell 50 → hold 50 — realized فقط روی 50 فروخته‌شده در دوره.
+
+---
+
+## Report Query API (نه SQL مستقیم)
+
+`getNetWorth` · `getInvestmentPerformance` · `getLoanSummary` · Income Statement · Cash Flow · Trial Balance · …
+
+UI گزارش به جداول `ln_*` / `inv_*` وابسته نیست — فقط Report/Feature/Capability API.
+
+Global Search و Advanced Filter در Query Contract: dateFrom/To, account, party, instrument, currency, type, source, status + pagination.

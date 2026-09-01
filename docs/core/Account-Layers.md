@@ -87,3 +87,16 @@ UI می‌تواند فقط زیرمجموعهٔ کاربرپسند را نشا�
 | Financial Account (نقد واقعی کاربر) | `acc_accounts` + cash صرافی/کارگزاری |
 | Accounting Account (دفتر) | `fin_accounts` |
 | Party | `ref_parties` — مستقل از Account |
+
+---
+
+## Account Tree ≠ Category Tree (P0)
+
+| Accounting Account | Expense/Income Category |
+|--------------------|-------------------------|
+| Assets, Liabilities, Income, Expense, Equity | Food, Rent, Car, … |
+
+UI می‌تواند فقط «Food» نشان دهد؛ زیر سیستم: Category + optional accounting mapping.  
+یکی کردن این دو گزارش را خراب می‌کند.
+
+Accounting Core کاربر را مجبور به bookkeeping دستی نمی‌کند — یک ثبت «کارت ملت / سوپرمارکت» → Expense + Cash + Journal.

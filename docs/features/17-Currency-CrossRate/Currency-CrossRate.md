@@ -438,3 +438,12 @@ rateToCurrency   // IRR
 - Default baseCurrency برای کاربر ایرانی: **IRR**
 - Domain همچنان **Multi-Currency** است
 - **Toman currency نیست** — فقط display unit روی IRR
+
+---
+
+## economicKind (Currency vs Asset)
+
+روشن نگه دار: `currency` · `asset` · `commodity` · `security` · `fund_unit` · `crypto`  
+Registry ارز ≠ registry مالکیت instrument.
+
+Rate: value + source + sourceReference + rateDate + fetchedAt + conversionPath (BTC→USDT→IRR).

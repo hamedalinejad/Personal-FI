@@ -485,3 +485,15 @@ weekly/quarterly/custom: `r = getPeriodRate(loan)` از `Debt-Loan-Management.md
 | Journal amountInBase | precision ارز baseCurrencyAtOperation |
 
 Rounding Engine: `getQuantityPrecision(instrumentId)` جدا از `getMoneyPrecision(currency)`.
+
+---
+
+## Context-sensitive rounding (P0)
+
+Contextهای جدا:
+
+`money` · `quantity` · `price` · `tax` · `interest` · `NAV` · `broker_fee`
+
+هر کدام policy/scale خود را می‌توانند داشته باشند.
+
+روی Operation: `roundingPolicyVersion` snapshot — گزارش قدیمی با policy جدید silent rewrite نمی‌شود.

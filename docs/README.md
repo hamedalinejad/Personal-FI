@@ -84,6 +84,11 @@
 | Field Write Contract | `docs/core/Field-Write-Contract.md` |
 | Reconciliation Foundation | `docs/core/Reconciliation-Foundation.md` |
 | Integrity Engine | `docs/core/Integrity-Engine.md` |
+| Versioning Policy | `docs/core/Versioning-Policy.md` |
+| Deletion Policy Matrix | `docs/core/Deletion-Policy-Matrix.md` |
+| Offline Modes | `docs/core/Offline-Modes.md` |
+| Multi-Tab Writer | `docs/core/Multi-Tab-Writer-Contract.md` |
+| API Result & Errors | `docs/core/API-Result-and-Errors.md` |
 | Crypto v1 Scope | `docs/features/05-Investment/05-01-Investment-Crypto/Crypto-V1-Scope.md` |
 | Feature Package Architecture | `docs/core/Feature-Package-Architecture.md` |
 | API Requirements | `docs/core/API-Requirements.md` |

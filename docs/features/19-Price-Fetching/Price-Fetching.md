@@ -862,3 +862,15 @@ Offline = Manual + Cached کافی است. Online هرگز شرط صحت ترا�
 
 آفلاین: آخرین قیمت موجود + برچسب **stale** — پورتفوی صفر نمی‌شود و سیستم کار می‌کند.
 Lineage: `Import-Lineage.md`.
+
+---
+
+## IPriceProvider (optional adapters)
+
+`ManualPriceProvider` · `CSVPriceProvider` · `OfflineImportProvider` · `RemoteProvider`
+
+هسته به API قیمت وابسته نیست.
+
+هر price point: raw provider value + normalized + source + asOf + retrievedAt + currency + unit · stale flag.
+
+Net Worth at date D: valuationDate + priceAsOf + FXAsOf — نه قیمت امروز برای گزارش تاریخی.

@@ -42,3 +42,12 @@
 **ممنوع:** deposit خام بدون kind که همیشه cost=0 یا همیشه par فرض کند.
 
 Cost-Basis-Engine از kind استفاده می‌کند — الگوریتم جدا per asset نه.
+
+---
+
+## Opening = Financial Operation (P0)
+
+`sourceType = opening` · `OPENING_BALANCE` operation — نه populate خام جداول.
+
+برای Asset در صورت نیاز: acquisition date/cost/lot/source.  
+برای Loan: original principal · remaining · accrued at asOf.

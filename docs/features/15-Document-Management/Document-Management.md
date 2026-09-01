@@ -214,3 +214,12 @@ docs_links: documentId ↔ entity
 ```
 
 محتوای فایل داخل ledger تکرار نمی‌شود. Hash برای integrity و dedupe.
+
+---
+
+## Storage abstraction (نه path خام)
+
+metadata + binary + hash + mimeType + size + createdAt  
+logical `docs_links` به entity.
+
+یک document می‌تواند به چند entity لینک شود (Loan + Party + Import batch) با validation؛ polymorphic بی‌حد ممنوع.
