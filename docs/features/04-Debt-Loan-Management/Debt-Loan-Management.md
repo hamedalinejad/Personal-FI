@@ -1794,3 +1794,6 @@ Snapshot must include generatedAt, effectiveFrom, reason, operationId, calculati
 ## FEAT-P0-012 DEEP
 Schedule never moves cash. Payment allocates; installment status derived from allocations.
 
+## FEAT-P0-013 DEEP
+Partial pay tracks unpaid penalty/fee/interest/principal separately under versioned waterfall.
+

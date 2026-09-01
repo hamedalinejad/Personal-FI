@@ -103,7 +103,7 @@
 **راه‌حل:** Schedule = قرارداد/پیش‌بینی؛ Payment = واقعیت. وضعیت installment از payment allocations مشتق شود؛ وجود schedule هرگز cash movement تلقی نشود.
 
 ## FEAT-P0-013 — Loan partial payment first-class نیست
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — partial component remainders
 **مشکل:** پرداخت جزئی باید component-level باقی‌مانده داشته باشد، نه فقط paid/unpaid.
 
 **راه‌حل:** allocation ledger برای `penalty`, `fee`, `interest`, `principal` با مانده هر component و waterfall versioned.
