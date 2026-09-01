@@ -349,7 +349,7 @@
 Crypto/Stocks/FIF/Metals/Loan/Cheque/Income/Expense باید فقط از Core reversal استفاده کنند؛ هیچ Feature-local `void + insert` مستقل نباشد.
 
 ## FEAT-P1-004 — OperationId propagation
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — operationId on all child rows
 هر multi-row operation باید یک operationId واحد داشته باشد: domain rows، journal، cash settlement، tax/fee/CA در صورت ارتباط.
 
 ## FEAT-P1-005 — External vs internal transfer
