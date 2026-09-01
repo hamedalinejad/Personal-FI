@@ -183,3 +183,6 @@ Withdrawal: reverse allocation links; cash only if real money moved.
 ## FEAT-P0-046 DEEP
 fg_goals.currentAmount is progress metric excluded from Net Worth asset sum.
 
+## FEAT-P0-047 DEEP
+Withdrawal reverses allocation links with operationId; cash movement only if real account transfer exists.
+

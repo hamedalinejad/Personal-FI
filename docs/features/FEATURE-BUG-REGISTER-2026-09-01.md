@@ -309,7 +309,7 @@
 **راه‌حل:** Goal را planning/allocation projection نگه دار؛ `currentAmount` را «progress/allocation» تعریف کن، نه cash asset. اگر cash واقعی reserve لازم است، account/goal wallet واقعی و operation جدا لازم است.
 
 ## FEAT-P0-047 — Goal withdrawal semantics ambiguous
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — withdrawal reverses allocation
 **مشکل:** برداشت از contributionهای `income/budget` گاهی بدون cash operation انجام می‌شود ولی معنای برگشت allocation، budget و source income مشخص نیست.
 
 **راه‌حل:** withdrawal باید source allocation را reverse/consume کند؛ برای cash واقعی operation مالی، برای allocation داخلی فقط planning event. FIFO allocation با immutable links و operationId.
