@@ -50,3 +50,40 @@ fin_accounts.linkedEntityId = …
 Bank · Cash · Card · Wallet · Brokerage Cash · Crypto Cash · External — نه فقط «بانک».
 
 `fin_accounts` = Chart of Accounts حسابداری.
+
+
+---
+
+## Account در Core ≠ فقط Bank Account (P0)
+
+در Accounting Core، **Account** یک Financial Account عام است. زیر‌انواع مفهومی:
+
+```text
+Bank
+Brokerage
+Exchange
+Wallet
+Cashbox
+Liability
+Equity
+Income
+Expense
+Investment
+```
+
+UI می‌تواند فقط زیرمجموعهٔ کاربرپسند را نشان دهد:
+
+- Bank Accounts
+- Cash
+- Brokerages
+- Exchanges
+
+ولی مدل Core نباید به «فقط بانک» محدود شود تا journal و chart of accounts تمیز بماند.
+
+تفکیک اجباری قبلی برقرار است:
+
+| لایه | جدول |
+|------|------|
+| Financial Account (نقد واقعی کاربر) | `acc_accounts` + cash صرافی/کارگزاری |
+| Accounting Account (دفتر) | `fin_accounts` |
+| Party | `ref_parties` — مستقل از Account |

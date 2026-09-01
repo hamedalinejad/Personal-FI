@@ -210,3 +210,18 @@
 - تست: ثبت هزینه → remaining کاهش؛ void هزینه → remaining برمی‌گردد
 
 Budget = Planning فقط؛ reference به Expense/Category — **fake financial transaction نمی‌سازد**.
+
+
+---
+
+## Budget ≠ تغییر موجودی (P0)
+
+Budget فقط **Planning / Projection** است.
+
+```text
+Budget  →  allocation / envelope tracking
+Expense Operation  →  تغییر واقعی پول
+```
+
+Budget نباید ledger نقد یا journal را مستقیماً تغییر دهد.
+مصرف بودجه از روی تراکنش‌های واقعی (query) محاسبه می‌شود.

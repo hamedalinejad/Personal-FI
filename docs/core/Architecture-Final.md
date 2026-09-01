@@ -1,99 +1,96 @@
 # معماری نهایی (خلاصه قفل)
 
 ```text
-UI / PWA  +  Feature Public APIs (commands / queries)
-        ↓
-   Feature Layer (Accounts, Loans, Crypto, Stocks, Funds, …)
-        ↓
-   CashSettlementPort  (Adapter: Accounts | Local Settlement)
-        ↓
-   Financial Core (Operation Graph · Journal · Audit)
-        ↓
-   Domain Ledgers + IranCore (versioned rules)
-        ↓
-   SQLite / sql.js → IndexedDB
+                         PERSONAL-FI
+                              │
+                   ┌──────────┴──────────┐
+                   │                     │
+             Financial Core        Application Core
+                   │                     │
+        ┌──────────┼──────────┐          │
+        │          │          │          │
+     Accounting  Money       FX       Documents / License
+        │
+        ├── Loans
+        ├── Crypto
+        ├── Stocks
+        ├── Funds
+        ├── Metals
+        └── Assets
 ```
 
-| | |
-|--|--|
-| Price API | Valuation only — secondary |
-| Internet | Optional enhancement — Core هرگز وابسته نیست |
-| License | Separate from financial data |
-| Report | Ledger → calc → report |
-| Snapshot | Cache only — rebuildable |
-| Cash path | فقط از طریق CashSettlementPort + Adapter |
-| Local First | App → Local API → Domain → SQLite — بدون سرور اجباری |
-| API | Transport-agnostic: Request / Response / Error / operationId |
+```text
+UI → Feature API (commands/queries) → Domain → CashSettlementPort → Core → SQLite
+```
 
-## اصول قفل‌شده P0 (۲۱–۳۹)
+**UI ناوبری (فقط ۹):**
 
-### Integration = Adapter
-Loan / Crypto / Stock / Fund / Metal → `CashSettlementPort` → Accounts یا Local Settlement.
-سند: `Cash-Settlement-Adapter.md`
+```text
+Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
+```
 
-### صفحات = ۹ Shell + Sheet
-Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings  
-Investments = یک Shell + تب‌ها؛ `/wealth` زیر Dashboard/Reports.
+## Database Layers
 
-### 100% Local First
-PriceProvider = Manual | Cached | Online. Offline = Manual + Cached.
-
-### Historical Price / FX
-Current ≠ Historical. closest ≤ asOf. Transaction FX · Historical FX · Current FX جدا.
-
-### IranCore (قوی، نه پیچیده)
-Calendar · MarketDate · MarketSession · Holiday · SettlementRule · CurrencyDisplay · Toman/Rial · NumberFormat · Market Rules  
-قواعد Settlement / Fee / Tax / Holiday / Trading Calendar = **versioned/configurable** — نه hard-code در Feature.
-
-### ریال / تومان
-DB = **IRR فقط**. UI = ریال | تومان (display preference). هیچ Money بدون Currency.
-
-### Documents
-`docs_documents` + `docs_links` — پیوست Invoice/Contract/Receipt/Statements بدون تکرار در Domain Ledger.
-
-### Audit
-Who · When · Which Operation · Before · After · Why · Source · Reference — حتی در Single User.
-
-### operationId در DB
-UNIQUE در `fin_operations` + idempotency در `runAtomicFinancialOperation` — double-submit = یک نتیجه.
-
-### Transaction = Event immutable
-اصلاح = REVERSAL / CORRECTION / ADJUSTMENT جدید.
-
-### Operation Graph
-همه legهای یک عمل (cash, asset, fee, tax, journal) یک `operationId` دارند.
-
-### Fixture تراز
-Σ Debit = Σ Credit · Qty · Cash · Loan principal · Net Worth — در CI.
-
-### Reconciliation همه‌جانبه
-Bank · Crypto · Stocks · Funds · Metals · Loans · Assets · Journal · Portfolio — drift = Error نه silent accept.
-
-### Snapshot قابل rebuild
-حذف snapshot نباید دادهٔ غیرقابل‌ساخت از ledger را از بین ببرد.
-
-### EXTERNAL_REPORTED ≠ DERIVED
-سود گزارش‌شده کارگزاری/صندوق جدا از calculatedProfit حفظ می‌شود.
-
-### Feature API
-`commands/` + `queries/` — Transport-agnostic.
-
-## وضعیت Documentation
-
-| مورد | وضعیت |
+| لایه | محتوا |
 |------|--------|
-| Cash Settlement Adapter | ✅ |
-| Pages IA (۹ + Shell) | ✅ |
-| Local First + PriceProvider | ✅ |
-| Historical Price / FX | ✅ |
-| IranCore versioned | ✅ `core/iran/README.md` |
-| IRR vs Toman display | ✅ |
-| Documents links model | ✅ |
-| Audit fields | ✅ `Audit-vs-Financial-Event.md` |
-| operationId UNIQUE + Graph | ✅ `Canonical-Financial-Operation.md` |
-| Immutable events + fixtures | ✅ |
-| Reconcile all features | ✅ `db/04-reconciliation-integrity.md` |
-| Snapshot rebuild + EXTERNAL | ✅ `Raw-vs-Derived-Data.md` |
-| commands/queries + transport | ✅ `Feature-API-Contract.md` |
+| 01 CORE | operations, journal, fin accounts, parties, currency, audit |
+| 02 DOMAIN LEDGERS | loans, crypto, stocks, funds, metals, … |
+| 03 PROJECTIONS | holdings, balances, snapshots — rebuildable |
+| 04 SUPPORT | documents, settings, categories, notifications, prices |
 
-جزئیات: SPEC-FREEZE.md · اسناد لینک‌شده بالا
+**01+02 = Canonical · 03 = Rebuildable · 04 = Supporting**
+
+## License / Edition
+
+```text
+Core  →  License Manager  →  License File (local verify)
+```
+
+Server فقط activation/renewal. روزمره offline.  
+Edition = feature flags روی **Same Core**. Accounting UI اختیاری؛ Core اجباری.
+
+## Engines
+
+Decimal · Money · FX · Valuation · CostBasis · LoanSchedule · Accounting · Reconciliation · Operation · Audit
+
+## قفل‌های کلیدی (۲۱–۵۶ خلاصه)
+
+| موضوع | قانون |
+|--------|--------|
+| Adapter | CashSettlementPort — Loan-only واقعی |
+| Pages | ۹ shell + sheet؛ نه /wealth دهم |
+| Local First | بدون سرور برای Core |
+| Historical Price/FX | closest ≤ asOf؛ سه لایه FX |
+| IranCore | versioned rules نه hard-code |
+| IRR/Toman | DB=IRR؛ UI display |
+| Documents | docs_documents + links |
+| Audit | Who/When/Before/After/Why/Source |
+| operationId | UNIQUE + Operation Graph |
+| Events | immutable + reversal |
+| Fixtures | تراز journal/qty/cash/loan/NW |
+| Reconcile | همه featureها؛ drift=error |
+| Snapshot | rebuildable |
+| EXTERNAL | ≠ DERIVED |
+| API | commands/queries؛ transport-agnostic |
+| License | local verify؛ edition flags |
+| Migration | no DROP without preservation |
+| JSON | نه SoT برای money/qty/schedule/tiers |
+| Account | financial account عام؛ UI زیرمجموعه |
+| Party | مستقل از Account |
+| Cheque | domain مستقل |
+| Recurring/Budget | نه transaction source / نه تغییر ledger |
+| Reports | query ledger+engine؛ نه SoT جدا |
+
+## اولویت
+
+`Implementation-Priority.md` — P0 قبل از code، P1 قبل از MVP، P2 بعد از هسته.
+
+اسناد این بسته:
+
+- `License-Offline.md`
+- `Database-Layers.md`
+- `Financial-Operation-Matrix.md`
+- `Calculation-Engines.md`
+- `Migration-Data-Preservation.md`
+- `JSON-Policy.md`
+- `Implementation-Priority.md`

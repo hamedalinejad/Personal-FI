@@ -191,3 +191,16 @@
 ## فقط Query layer
 
 Reports **Ledger جدید نمی‌سازد**. Query روی Accounting + Investment + Loan + …
+
+
+---
+
+## Report ≠ SoT مالی مستقل (P0)
+
+```text
+Query → Ledger → Engine → Report
+```
+
+جدول‌هایی مثل `profit_total` به‌عنوان حقیقت مستقل **ممنوع**اند مگر snapshot cache قابل rebuild.
+
+Profit / Cashflow / Net Worth از ledger + engines محاسبه می‌شوند؛ cache فقط performance است.

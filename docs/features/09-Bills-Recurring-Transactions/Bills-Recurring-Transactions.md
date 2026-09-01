@@ -186,3 +186,19 @@
 Template → Occurrence → confirm/policy → Financial Operation
 ```
 Recurring **template ≠** financial transaction.
+
+
+---
+
+## Recurring ≠ Transaction Source مستقل (P0)
+
+```text
+Recurring Rule
+     ↓
+Generate / Confirm Transaction
+     ↓
+Accounting Operation (Income/Expense/…)
+```
+
+Recurring **خودش** موجودی را تغییر نمی‌دهد.
+فقط قانون + occurrence است؛ پول فقط با Operation مالی جابه‌جا می‌شود.

@@ -45,3 +45,23 @@ Journal: می‌تواند `fin_accounts` با `systemRole` مربوط به part
 انواع: Person · Bank · Broker · Exchange · Fund · Company · Employer · Landlord · Tenant · Other
 
 مثال‌ها: وام از علی، قرض به محمد، خرید از کارگزاری X، پرداخت به شرکت Y، خرید خودرو — همه `partyId` مشترک، نه جدول شخص جدا در هر Feature.
+
+
+---
+
+## Party مستقل از Account (P0)
+
+```text
+Person · Company · Bank · Broker · Fund Manager · Exchange · Lender · Borrower
+```
+
+همه می‌توانند **Party** باشند (`ref_parties`).
+
+سپس:
+
+- Loan → Party (lender/borrower)
+- Document → Party
+- Transaction → Party
+- Cheque → Party
+
+**ممنوع:** مخلوط کردن Party با Account (مثلاً ذخیره «بانک ملت» فقط به‌عنوان party بدون financial account وقتی موجودی دارد).

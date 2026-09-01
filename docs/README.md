@@ -67,3 +67,9 @@
 | Iran Core | `docs/core/iran/README.md` |
 | Canonical Financial Operation | `docs/core/Canonical-Financial-Operation.md` |
 | Feature independence | `docs/core/Feature-Independence-Contract.md` |
+| Database Layers | `docs/core/Database-Layers.md` |
+| Financial Operation Matrix | `docs/core/Financial-Operation-Matrix.md` |
+| Calculation Engines | `docs/core/Calculation-Engines.md` |
+| Migration & Data Preservation | `docs/core/Migration-Data-Preservation.md` |
+| JSON Policy | `docs/core/JSON-Policy.md` |
+| Implementation Priority | `docs/core/Implementation-Priority.md` |

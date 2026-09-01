@@ -3,8 +3,16 @@
 ## مرز
 
 ```text
+Personal-FI Core
+       │
+License Manager
+       │
+License File (signed, local)
+```
+
+```text
 Application
-  → License Validator (مستقل)
+  → License Validator (محلی)
   → در صورت مجاز: باز کردن Database File کاربر
   → All financial data داخل SQLite آن کاربر
 ```
@@ -13,38 +21,80 @@ Application
 - License **هرگز** داخل جداول حسابداری/تراکنش embed نمی‌شود
 - شکست license ≠ invalidate کردن history مالی روی دیسک
 
-## مدل Offline (پیشنهادی محصول)
+## License Verification = کاملاً Local (P0)
 
-**نه:** هر startup → license server (نقض offline).
-
-**بله:**
+کاربر برای استفاده روزمره **نیاز به اینترنت ندارد**.
 
 ```text
-Signed License File
-  → verify با Public Key embed در اپ
-  → edition / features / expiry
+license.json (یا معادل باینری امضاشده)
+  signature
+  product
+  edition
+  features[]
+  expiry
+  deviceBinding?
 ```
 
-| فیلد license | |
-|--------------|--|
-| `licenseId` | |
-| `productId` | |
-| `edition` | personal / pro / … |
-| `devicePolicy` | |
-| `status` | active/expired/… |
+| فیلد | نقش |
+|------|-----|
+| `licenseId` | شناسه |
+| `productId` | Personal-FI |
+| `edition` | free / pro / investor / loan / accounting / … |
+| `features[]` | مثلاً `loans`, `funds`, `crypto` |
 | `issuedAt` / `expiresAt` | |
-| `features[]` | |
 | `deviceBinding?` | اختیاری |
 | `customerId?` | |
-| `signature` | |
+| `signature` | امضا با private key سرور؛ verify با public key داخل اپ |
 
 - **Private key هیچ‌وقت داخل برنامه نیست**
-- Validation آینده (آنلاین) فقط opt-in / renewal — نه شرط هر خواندن DB
-- Feature flags از license؛ داده مالی مستقل می‌ماند
+- Verify = cryptographic local فقط
+- Server فقط برای: **activation · renewal · analytics · support** (opt-in)
+- Startup روزمره → **بدون** تماس سرور
 
-Domain جدا: `docs` این فایل؛ implementation در ماژول `license/` نه داخل `features/04-Debt-...`.
+**Invariant:** License آینده نباید Core را آنلاین کند.
 
----
+## Edition System (P0)
+
+همان Core برای همه؛ تفاوت فقط در feature flags و UI:
+
+| Edition (نمونه) | UI فعال (نمونه) | Accounting Core |
+|-----------------|-----------------|-----------------|
+| Personal-FI Free | Accounts پایه + Transactions | بله (پشت‌صحنه) |
+| Personal-FI Pro | + Reports پیشرفته | بله |
+| Personal-FI Investor | Crypto / Stocks / Funds / Metals | بله |
+| Personal-FI Loan | Loans + Reports | بله |
+| Personal-FI Accounting | + Accounting UI (CoA, Journal browser) | بله + UI |
+
+```json
+{
+  "edition": "investor",
+  "features": ["loans", "funds", "crypto"],
+  "accountingUi": false
+}
+```
+
+`Accounting UI = disabled` ≠ خاموش بودن journal.  
+Accounting Core همیشه برای صحت مالی وجود دارد.
+
+## Standalone Module (Edition محدود)
+
+```text
+فقط وام:
+  Core + Loans + Reports
+
+فقط صندوق:
+  Core + Funds + Reports
+
+فقط Crypto:
+  Core + Crypto + Reports
+
+کامل:
+  Core + Accounts + Income + Expense + Loans + Crypto + Stocks + Funds + Metals + Planning + …
+```
+
+Featureها **optional** هستند؛ **Financial Integrity Core همیشه یکی است**.
+
+اتصال نقدی: `CashSettlementPort` → LocalSettlement یا Accounts (طبق edition).
 
 ## مرز قطعی
 
@@ -52,16 +102,11 @@ Domain جدا: `docs` این فایل؛ implementation در ماژول `license/
 User Financial DB  ≠  License State
 ```
 
-- License در `license.json` / License Store جدا (نه جدول داخل SQLite مالی)
-- subscription / activation / device limit / expiry / entitlement **آلوده به schema حسابداری نمی‌شوند**
-- اعتبارسنجی license برای خواندن/نوشتن history مالی **نیاز به اینترنت ندارد** (فایل امضاشده + public key)
+- License در store جدا (نه جدول داخل SQLite مالی)
+- اعتبارسنجی روزمره بدون اینترنت
+- انقضا → حداکثر Feature disable / Read-only — **نه** wipe یا قفل نابودکننده DB
+- Export/Backup همیشه ممکن
 
-**ممنوع:** `licenseId` روی journal line یا financial transaction.  
-`License Layer → Application Access → Financial DB` — داده مالی به لایسنس وابسته نمی‌شود.
+**ممنوع:** `licenseId` روی journal line یا financial transaction.
 
-## انقضا
-
-`license expired` → حداکثر Feature disable / **Read-only**.  
-**ممنوع:** غیرقابل‌خواندن یا نابود کردن financial DB. Export/Backup همیشه ممکن.
-
-Financial DB ≠ License State. License داده مالی را wipe/قفل نابودکننده نمی‌کند.
+Domain: این سند؛ implementation در `license/` نه داخل Featureهای مالی.

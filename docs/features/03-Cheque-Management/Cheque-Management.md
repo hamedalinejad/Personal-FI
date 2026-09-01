@@ -185,3 +185,26 @@ cleared → bounced   (در صورت برگشت پس از وصول — اگر po
 ```
 
 Reconcile state matrix همین را enforce می‌کند. Feature پیچیده لازم نیست.
+
+
+---
+
+## استقلال Domain چک (P0)
+
+چک به Loan یا Accounting UI **گره خورده نیست**.
+
+چک می‌تواند در خدمت این‌ها باشد:
+
+- Income
+- Expense
+- Loan
+- Purchase / Sale
+- Guarantee
+
+Cheque = **Domain مستقل** با Ledger خودش؛ Integration فقط از طریق:
+
+- Feature API / Operation
+- CashSettlementPort هنگام وصول
+- Accounting Core (journal)
+
+نه import مستقیم جداول Loan.
