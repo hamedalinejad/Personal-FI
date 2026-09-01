@@ -208,3 +208,20 @@ Cheque = **Domain مستقل** با Ledger خودش؛ Integration فقط از ط
 - Accounting Core (journal)
 
 نه import مستقیم جداول Loan.
+
+---
+
+## مدل چک ایران (گسترش)
+
+| فیلد | نقش |
+|------|-----|
+| `chequeType` | صیاد / بانکی / … |
+| `sayadId` | شناسه ۱۶ رقمی (nullable برای چک قدیمی) |
+| `bankBranchCode` | |
+| `isIsf` / ضمانت | در صورت نیاز |
+| `endorsedTo` / Party | خرج‌کردن چک |
+
+وضعیت‌ها (نمونه): `draft` · `issued` · `in_vault` · `transferred` · `cashed` · `bounced` · `blocked`
+
+سررسید: `dueDate` در UTC/ISO؛ نمایش جلالی فقط UI.  
+وصول/برگشت → Financial Operation + SettlementPort (نه تغییر موازی بدون operationId).

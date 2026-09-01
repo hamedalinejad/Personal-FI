@@ -37,3 +37,17 @@ Policy فعلی (IRR HALF_UP، Stocks ROUND_DOWN، Crypto decimals، …) قاب
 | UI | می‌تواند برای نمایش تومان/ریال گرد کند؛ edit/commit دوباره از مقدار canonical |
 
 **Invariant:** اگر UI-rounded در DB ذخیره شود، Reconcile کلان اختلاف کاذب می‌دهد.
+
+---
+
+## day_count_convention per asset_class
+
+علاوه بر rounding، قرارداد روزشمار جدا:
+
+| کلاس | نمونه |
+|------|--------|
+| Loan | 365 / 360 / 30/360 / actual (policy) |
+| FIF / صندوق درآمد ثابت | اغلب 30/360 (نه لزوماً actual/actual) — versioned |
+| Stocks interest-like | طبق Iran/market rule |
+
+در calculationContext روی operation قفل می‌شود.

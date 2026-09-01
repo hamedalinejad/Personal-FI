@@ -49,3 +49,13 @@ Validation
 
 قبل از هر migration ستون‌ها را با statusهای ACTIVE / LEGACY / DEPRECATED / MIGRATED / UNKNOWN علامت بزن.
 جزئیات: `Data-Preservation-Contract.md` § Field Lifecycle Status.
+
+---
+
+## sql.js محدودیت (P0)
+
+ترجیح: **فقط ADD COLUMN با DEFAULT** در migrationهای رایج.
+
+- DROP / RENAME بدون اسکریپت rebuild + verification **ممنوع**
+- پس از تغییر schema معنایی: `rebuildAllDerivedState()` از journal/domain
+- sql.js نباید بهانه wipe دیتا باشد — backup قبل از migration اجباری

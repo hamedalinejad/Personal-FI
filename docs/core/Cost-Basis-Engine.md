@@ -294,3 +294,24 @@ v1 می‌تواند همه را WA کند؛ **مدل data** باید policy ر�
 علاوه بر `calculationVersion` و `costBasisMethod` روی holding/op، هر financial operation باید context کامل را در `fin_operations` قفل کند (costBasisMethod, calculationVersion, roundingPolicyVersion, currencyConversionPolicyVersion, …).
 
 جزئیات فیلدها: `Canonical-Financial-Operation.md` § calculationContext.
+
+---
+
+## گسترش event / method (کریپتو و عمومی)
+
+### lot_method (v1+)
+
+`FIFO` · `LIFO` · `WAC` (weighted_average) · `HIFO` · `SpecificID`  
+v1 پیش‌فرض: WAC؛ بقیه طبق edition/policy.
+
+### event_type
+
+`buy` · `sell` · `airdrop` (income) · `fork` · `staking_reward` (income) · `transfer_in` · `transfer_out` (non-taxable جابه‌جایی) · `fee`
+
+### روی trade کریپتو (حفظ داده)
+
+`baseAsset` · `quoteAsset` · `feeAsset` · `feeAmount` · `networkFee` · `txHash` · `network` (ERC20/TRC20/BEP20/…)
+
+**بدون `txHash`:** دیتا پاک نمی‌شود؛ `txHash` nullable ولی برای import/on-chain provenance توصیه قوی / Should برای sync.
+
+transfer_out بین ولت‌های خود کاربر نباید realized gain بسازد مگر policy صریح.

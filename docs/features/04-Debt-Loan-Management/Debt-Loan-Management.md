@@ -1616,3 +1616,42 @@ Financial Operation (operationId)
 - `remainingBalance` از payment events بازسازی می‌شود؛ schedule ≠ payment event
 
 مرجع: `Canonical-Financial-Operation.md` · `Cash-Settlement-Adapter.md`
+
+---
+
+## settlement دو حالت (اجباری برای Loan-only)
+
+```text
+settlement: { type: 'internal', accountId }   // Accounts فعال — Banking capability
+settlement: { type: 'external', note }        // بدون ماژول Accounts
+```
+
+```text
+capabilities.has('banking')
+  ? AccountsCashAdapter
+  : LocalSettlementAdapter  // external note / local settlement account
+```
+
+**ممنوع:** FK اجباری `loan_payments.account_id → accounts.id` که بدون Banking ماژول را بشکند.
+در schema: `accountId` nullable؛ صحت Domain به وجود ردیف Accounts وابسته نیست.
+
+---
+
+## انواع وام ایران (گسترش مدل — P0/P1)
+
+علاوه بر `calculationMethod` (declining / flat / bullet / qarz_al_hasaneh)، فیلدهای دامنه:
+
+| فیلد | نقش |
+|------|-----|
+| `loanTypeIr` | قرض‌الحسنه، مرابحه، فروش اقساطی، جعاله، مضاربه، مشارکت مدنی، اجاره به شرط تملیک، … |
+| `profitCalculation` | simple / compound / islamic_jala (policy versioned) |
+| `rateType` | fixed / variable (+ `ln_rate_history`) |
+| `penaltyFormula` | وجه التزام / جریمه تأخیر (نسخه‌دار) |
+| `graceDays` / `moratoriumMonths` | |
+| `earlyRepaymentFee` policy | |
+| `dayCountConvention` | 365 / 360 / 30/360 / actual — از Loan-Schedule-Engine |
+| بیمه / هزینه تشکیل پرونده | به‌صورت fee lines جدا در `ln_loan_fees` |
+
+Fixture الزامی نمونه: وام ۱۰۰٫۰۰۰٫۰۰۰ ریال، ۲۳٪، ۳۶ ماه، declining — در CI.
+
+جزئیات موتور: `Loan-Schedule-Engine.md`.

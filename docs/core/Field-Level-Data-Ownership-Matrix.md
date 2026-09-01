@@ -162,3 +162,25 @@ Domain ledger برای qty/موجودی تخصصی؛ Journal برای گزارش
 | `Instrument-Identity.md` | فقط `ref_instruments.id` |
 | `Raw-vs-Derived-Data.md` | فلسفه RAW vs DERIVED |
 | `Data-Preservation-Contract.md` | حفظ داده در migration |
+
+---
+
+## Standard row columns (P0) — هیچ فیلدی خاموش پاک نشود
+
+برای جداول دامنه مالی (حداقل ledgerها)، الگوی ستونی:
+
+| فیلد | نقش |
+|------|-----|
+| `id` | ULID/UUID |
+| `createdAt` | |
+| `updatedAt` | |
+| `deletedAt` | soft delete |
+| `archivedAt` | اختیاری |
+| `importId` / `importBatchId` | lineage |
+| `source` / `sourceType` | provenance |
+| `note` | |
+| `tagsJson` | اختیاری support |
+| `metaJson` | گسترش آینده — **نه** license entitlement |
+
+Hard DELETE فیزیکی فقط پس از archive policy + backup.  
+`metaJson` جایگزین ستون‌های پولی typed نمی‌شود (`JSON-Policy.md`).

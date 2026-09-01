@@ -465,3 +465,17 @@ Navigation Visibility (derived from availability + user prefs)
 **Invariant:** Installed/Enabled یک مفهوم **معماری** است (feature flags + module registry)، نه فقط مخفی‌کردن دکمه در UI.
 
 Routeهای غیرفعال نباید load شوند؛ API فیچر خاموش reject می‌کند.
+
+---
+
+## یادآوری نقشه ۹ صفحه (ثابت)
+
+```text
+Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
+```
+
+- **Cheque** فیچر است نه صفحه دهم — زیر Accounts و/یا Transactions (تب/فیلتر/Sheet)
+- **Income/Expense** صفحه جدا نیستند — زیر Transactions
+- Investment = یک Shell با تب Crypto/Stock/Fund/Metals
+
+فیچر ≠ صفحه. Product-Map می‌تواند ۱۹+ فیچر داشته باشد؛ ناوبری حداکثر ۹.

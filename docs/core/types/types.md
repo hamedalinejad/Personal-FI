@@ -447,3 +447,20 @@ emit(type, payload) {
 - **FIF / NAV:** `quoteType` در نتیجه باید `nav` باشد؛ `marketDate` اجباری؛ `quoteMarket` می‌تواند `NAV` یا `fundId` documented باشد
 - Stock: معمولاً `quoteType=last|close` + market
 - Crypto: `quoteType=last` + `quoteMarket` مثل `BTC-USDT`
+
+---
+
+## تاریخ: ISO UTC فقط در SoT (P0)
+
+**ممنوع:** ذخیره تاریخ جلالی به‌عنوان منبع حقیقت (باگ تقویم و DST/تبدیل).
+
+| لایه | قانون |
+|------|--------|
+| DB / Domain | ISO 8601 **UTC** (یا date-only business در فیلدهای businessDate جدا) |
+| نمایش | `j_date_cache` یا helper جلالی فقط برای UI |
+| کتابخانه | یک `date_lib` مرکزی — Intl + jalaali-js **آفلاین** |
+
+```text
+SoT: 2026-09-01T08:00:00.000Z
+UI:  ۱۴۰۵/۰۶/۱۰
+```

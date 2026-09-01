@@ -853,3 +853,12 @@ Offline = Manual + Cached کافی است. Online هرگز شرط صحت ترا�
 > Valuation: همیشه lastKnownPrice — `Implementation-Pitfalls.md` §د.
 
 **پیش‌فرض:** auto price fetch **خاموش** (`is_enabled` per source در settings/local). کاربر صریح تیک بزند.
+
+---
+
+## منابع price_history (تأکید)
+
+`source`: `manual` · `csv_import` · `api_coingecko` · `api_tsetmc` · …  
+
+آفلاین: آخرین قیمت موجود + برچسب **stale** — پورتفوی صفر نمی‌شود و سیستم کار می‌کند.
+Lineage: `Import-Lineage.md`.

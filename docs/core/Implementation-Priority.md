@@ -56,3 +56,17 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 - [ ] Reconcile job برای orphan polymorphic links → `ref_integrity_queue`
 - [ ] CA stocks: fixture break-even افزایش سرمایه / حق تقدم
 - [ ] Rounding نمایشی فقط UI؛ DB full precision
+
+---
+
+## ترتیب پیشنهادی پیاده‌سازی کد
+
+| فاز | محتوا |
+|-----|--------|
+| **P0** | core/db + types + Canonical-Cash + rounding + Persistence SM + MoneyString |
+| **P1** | 00-Accounts + Income + Expense |
+| **P2** | 04-Loan + Loan-Engine + 03-Cheque |
+| **P3** | 17-Currency + 19-Price + 05-Investment + Cost-Basis |
+| **P4** | 13-Portfolio + 11-Reports + 14-Tax Iran |
+
+هر فاز فقط از public/Capability API؛ ESLint مرز فیچر از روز اول.

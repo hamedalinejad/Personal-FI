@@ -96,3 +96,19 @@ UI → Feature Public API → Domain → runAtomicFinancialOperation → DB
 ## OpenAPI
 
 برای v1 لازم نیست. در صورت نیاز آینده، از همین TypeScript interfaces تولید می‌شود.
+
+---
+
+## FeatureAPI جدا (P0)
+
+هر فیچر یک facade:
+
+```text
+loanAPI = { createLoan, simulateSchedule, payInstallment, restructure, … }
+goldAPI / metalsAPI = { addWeight, sell, … }
+cryptoAPI = { executeBuy, executeSell, … }
+```
+
+UI **فقط** این‌ها (و Capability API) را صدا می‌زند.
+
+**ممنوع در UI:** `db.exec("SELECT * FROM loans")` یا SQL خام.

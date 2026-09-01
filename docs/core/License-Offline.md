@@ -134,3 +134,20 @@ License Module فقط می‌گوید:
 
 **Loan Domain هیچ چیز از License نمی‌داند.**  
 Application لایه feature flags را اعمال می‌کند.
+
+---
+
+## آمادگی آینده بدون آلوده کردن Journal به License (P0)
+
+**همچنان:** `licenseId` روی journal line یا تراکنش مالی **ممنوع**.
+
+برای چند پروفایل محلی / migration آینده بدون wipe:
+
+| مکان | فیلد |
+|------|------|
+| اختیاری در ردیف‌های دامنه | `owner_id` پیش‌فرض `'default'` (پروفایل منطقی داخل همان فایل DB) |
+| جدا از DB مالی | جدول/فایل `licenses` : `{ id, features[], signature, edition, expiry }` |
+
+چک entitlement فقط در **Capability-API / Application** (مثلاً JWT یا فایل امضاشده آفلاین)، نه داخل Loan Domain.
+
+اگر `owner_id` اضافه می‌شود: add-column با default — نه embed کردن features لایسنس داخل ledger.

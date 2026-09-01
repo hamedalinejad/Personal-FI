@@ -216,3 +216,11 @@ Journal + Subledger + Price + FX  →  Valuation / Reporting  →  UI
 ```
 
 ممنوع: جمع خام `crypto.quantity` + `stock.value` + `loan.balance` بدون لایه valuation.
+
+---
+
+## گزارش سنگین آفلاین (P1)
+
+گزارش‌های سنگین نباید هر بار full scan ledger روی UI thread بزنند.
+
+ترجیح: خواندن از `account_snapshots_daily` / `portfolio_snapshots_daily` (یا معادل) که با job پس‌زمینه/زمان‌بندی محلی ساخته می‌شوند؛ SoT همچنان ledger است و snapshot rebuildپذیر.

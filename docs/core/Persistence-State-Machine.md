@@ -2,12 +2,14 @@
 
 sql.js در RAM است؛ persistence به IndexedDB باید **متمرکز** باشد.
 
-## States
+## States (بسط‌یافته)
 
 ```text
-CLEAN → DIRTY → PERSISTING → PERSISTED
+CLEAN → DIRTY → PERSISTING → PERSISTED → (idle)
                       ↓
                    FAILED → RECOVERING → CLEAN | FAILED
+
+PERSISTED → RECONCILING → CLEAN | FAILED   # در startup / پس از recover
 ```
 
 | State | معنی |
@@ -16,28 +18,35 @@ CLEAN → DIRTY → PERSISTING → PERSISTED
 | DIRTY | پس از COMMIT sql موفق؛ هنوز swap IndexedDB نشده |
 | PERSISTING | write-to-temp-then-swap در جریان |
 | PERSISTED | swap موفق |
-| FAILED | persist شکست |
-| RECOVERING | بازیابی از backup/temp |
+| RECONCILING | مقایسه journal/ledger با snapshot پس از load |
+| FAILED | persist یا reconcile شکست |
+| RECOVERING | بازیابی از backup/temp/WAL |
 
-## قوانین
+## WAL قبل از Atomic (الزامی)
 
-1. **فقط Storage Layer** state machine را مدیریت می‌کند — هیچ Featureای persistence logic ندارد.
-2. UI «ثبت شد» فقط بعد از مسیر مالی موفق: **SQL COMMIT + persist به PERSISTED** (یا policy صریح documented برای edge case).
-3. `beforeunload` / `visibilitychange` فقط best-effort flush هستند.
-4. integrity_check قبل از قبول restore.
+قبل از شروع `runAtomicFinancialOperation` (یا بلافاصله پس از validate و قبل از writes سنگین):
 
-مرجع: `Technical-Architecture.md` · `db/02-storage-persistence.md`
-
----
-
-## UI «ثبت شد» = فقط بعد از IndexedDB swap موفق (P0)
-
-sql.js در RAM است. روی موبایل ضعیف یا kill شدن Tab، دادهٔ DIRTY ممکن است از بین برود.
+1. نوشتن **intent/WAL** سبک در `localStorage` (یا store معادل): `operationId`, commandHash, phase, timestamp
+2. اجرای atomic در sql.js (RAM)
+3. COMMIT sql
+4. state = DIRTY → PERSISTING → IndexedDB swap
+5. موفقیت → PERSISTED؛ پاک کردن WAL
+6. اگر بین snapshot و persist قطع شود: در **لود بعدی** اپ، WAL + RECONCILING اجباری
 
 ```text
-SQL COMMIT (RAM)  ≠  داده امن روی دیسک
-UI «ثبت شد»      =  فقط پس از PERSISTED (swap IndexedDB موفق)
+reconcileOnLoad():
+  - اگر WAL باقی مانده → recover / mark FAILED / user prompt
+  - مقایسه fin_journal_entries (و domain ledgers) با snapshots
+  - drift → ref_integrity_queue ؛ silent fix ممنوع
 ```
 
-- نمایش موفقیت بعد از فقط COMMIT حافظه **ممنوع**
-- timeout/خطای persist → FAILED + پیام خطا؛ نه تیک سبز گمراه‌کننده
+این در `db.md` ذکر شده بود؛ **پیاده‌سازی در P0 کد الزامی است** نه اختیاری.
+
+## قوانین UI
+
+1. فقط Storage Layer state machine را مدیریت می‌کند
+2. UI «ثبت شد» فقط وقتی state = **PERSISTED** (نه فقط SQL COMMIT در RAM)
+3. `beforeunload` فقط best-effort
+4. integrity_check قبل از restore
+
+مرجع: `Technical-Architecture.md` · `db/02-storage-persistence.md` · `db/04-reconciliation-integrity.md`
