@@ -365,7 +365,7 @@ Opening position نباید BUY ساختگی باشد. باید source=`opening|
 Reports/Portfolio/Performance باید priceAsOf و fxAsOf یکسان یا صریح داشته باشند. Latest price برای historical report ممنوع.
 
 ## FEAT-P1-008 — Source of reported vs calculated values
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — external reported never overwritten
 FIF NAV/profit، Stock external statements، Metals provider quote و Tax external assessments باید `EXTERNAL_REPORTED` جدا از calculated نگه داشته شوند.
 
 ## FEAT-P1-009 — Rounding per component
