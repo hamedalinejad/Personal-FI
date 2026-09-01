@@ -97,7 +97,7 @@
 **راه‌حل:** حداقل `generatedAt`, `effectiveFrom`, `reason`, `operationId`, `calculationVersion`, `roundingVersion`, `rateVersion`, `inputHash`, payload کامل schedule.
 
 ## FEAT-P0-012 — Loan payment vs schedule
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — schedule plan vs payment fact
 **مشکل:** schedule row و payment event در بعضی توضیحات بیش از حد به هم نزدیک شده‌اند.
 
 **راه‌حل:** Schedule = قرارداد/پیش‌بینی؛ Payment = واقعیت. وضعیت installment از payment allocations مشتق شود؛ وجود schedule هرگز cash movement تلقی نشود.

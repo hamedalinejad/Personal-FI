@@ -1791,3 +1791,6 @@ amount = cash leg. principal/interest/fee/penalty = components. Contract princip
 ## FEAT-P0-011 DEEP
 Snapshot must include generatedAt, effectiveFrom, reason, operationId, calculationVersion, roundingVersion, rateVersion, dayCountConvention, inputHash, full payload.
 
+## FEAT-P0-012 DEEP
+Schedule never moves cash. Payment allocates; installment status derived from allocations.
+
