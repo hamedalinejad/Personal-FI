@@ -21,8 +21,9 @@
  - `feeExchange` = کارمزد/هزینه بورس و ارکان بازار.
  - `feeTax` = **مالیات/عوارض به‌عنوان هزینه معامله** (transaction cost) — نه جایگزین `tax_records` / بدهی مالیاتی دوره‌ای (قرارداد در Tax-Management.md).
  - `feeOther` = سایر هزینه‌ها و کارمزدهای قابل گزارش.
- - برای تراکنش‌های جدید: `feeAmount = feeBrokerCommission + feeExchange + feeTax + feeOther`.
- - برای داده‌های قدیمی که Breakdown ندارند، `feeAmount` اصلی بدون تغییر حفظ می‌شود و اجزای Breakdown می‌توانند null/0 باشند؛ هیچ داده‌ای نباید حذف یا بازنویسی شود.
+ - برای تراکنش‌های جدید: `feeAmount = sum(non-null breakdown components)` و invariant اجباری است.
+ - برای داده‌های قدیمی (legacy): `feeAmount` اصلی **بدون تغییر** حفظ می‌شود؛ breakdownها **nullable** هستند. صفر کردن اجباری breakdown ممنوع است چون معنای historical را عوض می‌کند (P0-052).
+ - `feeTax` فقط هزینه معامله است؛ رویداد بدهی مالیاتی جدا در Tax Feature (P0-053).
 7. سود نقدی با `type = 'dividend'` ثبت می‌شود و جزو Realized P&L خرید/فروش نیست.
 8. موجودی حساب بانکی، cashBalance کارگزاری و quantity سهم نمی‌توانند منفی شوند.
 9. تراکنش ثبت‌شده قابل ویرایش/حذف مستقیم نیست و اصلاح با void/reversal انجام می‌شود.
@@ -60,7 +61,7 @@
 
 - `id` → UUID
 - `brokerageId` → UUID
-- `instrumentId` → string (**اجباری — **؛ هویت پایدار داخلی، ترجیحاً ISIN یا UUID ثابت سیستم؛ با تغییر نماد عوض **نمی‌شود**)
+- `instrumentId` → UUID (**اجباری**؛ FK واقعی به `ref_instruments.id` — هویت پایدار Core؛ با تغییر نماد عوض **نمی‌شود**. ISIN در فیلد جداگانه `isin`)
 - `isin` → string nullable — ISIN رسمی وقتی شناخته شده
 - `symbol` → string — **نماد نمایشی فعلی** (فولاد، …)؛ با corporate action قابل تغییر است
 - `name` → string
@@ -73,7 +74,7 @@
 - `totalFeesPaidBase` → decimal (به baseCurrency — )
 - `createdAt` / `updatedAt` → datetime
 
-> **هویت**: کلید منطقی Holding = `brokerageId + instrumentId` (نه `brokerageId + symbol`). 
+> **هویت**: کلید منطقی Holding = `brokerageId + instrumentId` (نه `brokerageId + symbol`). `instrumentId` همیشه UUID و FK به `ref_instruments.id` است (نه string آزاد یا ISIN خام). 
 > `symbol` / `market` / `providerSymbol` metadata قابل‌تغییرند. تاریخچه تغییر نماد در `inv_stocks_iran_symbol_history` یا event corporate action ثبت می‌شود. 
 > Mapping قیمت: `priceProviderId + providerSymbol + market`؛ Provider هرگز `symbol` داخلی را هویت فرض نکند.
 
@@ -81,7 +82,7 @@
 
 - `id` → UUID
 - `brokerageId` → UUID
-- `instrumentId` → string **اجباری** — هویت پایدار (همان Holding؛ با symbol_change عوض نمی‌شود)
+- `instrumentId` → UUID **اجباری** — FK به `ref_instruments.id` (همان Holding؛ با symbol_change عوض نمی‌شود)
 - `symbol` → string — فقط label در لحظه ثبت (audit نمایش)
 - `type` → enum گسترده:
  - `buy` | `sell` | `dividend`
@@ -99,20 +100,37 @@
 - `quantity` → decimal nullable برای dividend
 - `price` → decimal nullable برای dividend
 - `totalAmount` → decimal
-- `feeAmount` → decimal — Total و سازگار با مدل قبلی
-- `feeBrokerCommission` → decimal nullable/default 0
-- `feeExchange` → decimal nullable/default 0
-- `feeTax` → decimal nullable/default 0
-- `feeOther` → decimal nullable/default 0
+- `feeAmount` → decimal — Total (همیشه preserved؛ برای legacy SoT است)
+- `feeBrokerCommission` → decimal **nullable** (null = unknown/legacy؛ نه zero اجباری)
+- `feeExchange` → decimal **nullable**
+- `feeTax` → decimal **nullable** — **فقط transaction cost** (کارمزد/عوارض معامله)؛ بدهی مالیاتی دوره‌ای از Tax Feature است
+- `feeOther` → decimal **nullable**
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal
 - `description` → string
 - `date` → datetime
 - `createdAt` → datetime
-- **Tax (canonical):** `linkedTaxEventId` → `tax_events.id` (SoT در Tax-Management)
+- **Tax (canonical):** `linkedTaxEventId` → `tax_events.id` (SoT در Tax-Management) — جدا از `feeTax`
 - **Tax legacy (deprecated, read-only migrate):** `isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount`, `taxLotId`, `linkedTaxRecordId`, `taxExemptReason` — کد جدید فقط linkedTaxEventId می‌نویسد
 
-**Invariant جدید:**
+**Invariant (P0-052 + P0-053):**
+
+```text
+# New rows (created after this contract):
+feeAmount = (feeBrokerCommission ?? 0) + (feeExchange ?? 0) + (feeTax ?? 0) + (feeOther ?? 0)
+# و حداقل یکی از breakdownها non-null اگر feeAmount > 0
+
+# Legacy rows:
+# feeAmount محفوظ می‌ماند حتی اگر sum(breakdown) != feeAmount یا breakdownها null باشند.
+# هرگز breakdown را به 0 force نکنید تا معنای historical عوض نشود.
+# Migration فقط می‌تواند breakdown را پر کند اگر منبع معتبر داشته باشد؛ در غیر این صورت null بماند.
+
+# feeTax = transaction cost only (هزینه معامله).
+# Tax liability / withholding / capital-gains tax event = Tax Feature (linkedTaxEventId یا tax_events).
+# دو مفهوم نباید double-count شوند.
+```
+
+**Invariant قبلی (برای سازگاری):**
 
 ```text
 feeAmount =
@@ -171,23 +189,35 @@ feeAmount =
  }
  ```
 
- **الگوریتم محاسبه** (Weighted Average از صفر از `inv_stocks_iran_transactions` غیر‌void، به‌ترتیب `date ASC`):
- ```
- qty = 0 | totalInvested = 0
+ **الگوریتم محاسبه** (Weighted Average از صفر — **همه typeهای پشتیبانی‌شده** از طریق `CorporateActionEngine` + `CostBasisEngine`، نه فقط buy/sell):
 
- برای هر تراکنش:
- buy: totalInvested += (quantity × price) + feeAmount
- qty += quantity
- sell: soldCost = quantity × (totalInvested / qty)
- totalInvested -= soldCost
- qty -= quantity
+```text
+qty = 0; totalInvested = 0
+برای هر tx مرتبط با holding.instrumentId (و relatedCorporateActionId) ORDER BY businessDate, createdAt (isVoided=false):
 
- averageBuyPrice = qty > 0 ? totalInvested / qty : 0
- ```
+  buy / acquisition:
+    totalInvested += quantity*price + feeInTradeCurrency
+    qty += quantity
+
+  sell / disposal:
+    cost = qty==0 ? 0 : quantity * (totalInvested/qty)
+    totalInvested -= cost
+    qty -= quantity
+
+  bonus_share / split / reverse_split / capital_increase / rights_* / transfer_ca:
+    → از طریق CorporateActionEngine.apply + CostBasisEngine (همان منطق کامل بخش «الگوریتم کامل rebuildStockHolding»)
+
+  dividend / symbol_change / isin_change / suspension_note:
+    metadata یا cash جدا — qty/totalInvested طبق جدول CA
+
+averageBuyPrice = qty > 0 ? totalInvested / qty : 0
+```
+
+**Invariant P0-050**: هر rebuild/reconcile **باید** همه CAهای پشتیبانی‌شده را بشناسد. Snippet فقط buy/sell = باگ. مسیر واحد: `CorporateActionEngine` → domain legs → CostBasisEngine.
 
  **در صورت Mismatch**: ثبت در `fin_audit_log` + هشدار به کاربر + گزینه Repair (بازسازی snapshot از لاگ با تأیید کاربر).
 
-- **`rebuildStockHolding(holdingId)`** → بازسازی کامل `quantity` / `totalInvested` / `averageBuyPrice` از لاگ تراکنش‌ها و آپدیت atomic در `inv_stocks_iran_holdings`
+- **`rebuildStockHolding(holdingId)`** → بازسازی کامل `quantity` / `totalInvested` / `averageBuyPrice` از لاگ تراکنش‌ها (شامل همه CA) و آپدیت atomic در `inv_stocks_iran_holdings`. مسیر اجباری از `CorporateActionEngine`.
 
  **زمان استفاده الزامی**: پس از هر Reversal (void) تراکنش سهام، پس از Migration، پس از Import/Restore.
 

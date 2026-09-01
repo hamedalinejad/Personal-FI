@@ -73,3 +73,20 @@
 | P0-047 | **CLOSED** | USDT cash ≠ USDT token instrument |
 | P0-048 | **CLOSED** | feePresence mutually exclusive |
 | P0-049 | **CLOSED** | address must match wallet+network |
+
+## Batch P0-050 … P0-059 (Stocks + Funds) — CLOSED 2026-09-01
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-050 | **CLOSED** | rebuildStockHolding / reconcile از CorporateActionEngine + همه CA types؛ snippet فقط buy/sell ممنوع |
+| P0-051 | **CLOSED** | instrumentId: UUID + FK واقعی به ref_instruments.id (نه string آزاد) |
+| P0-052 | **CLOSED** | feeAmount legacy preserved؛ breakdown nullable؛ new rows invariant sum |
+| P0-053 | **CLOSED** | feeTax = transaction cost only؛ tax liability از Tax Feature / linkedTaxEventId جدا |
+| P0-054 | **CLOSED** | tradeDate + settlementDate + effectiveCashDate/actualCashDate برای as-of reconstruction |
+| P0-055 | **CLOSED** | CA lifecycle dates کامل (announcement/record/ex/effective/settlement/payment) روی entity |
+| P0-056 | **CLOSED** | fractionalPolicy + cash-in-lieu operation صریح |
+| P0-057 | **CLOSED** | priceAsOf + source + quoteType + staleState mandatory برای NAV/valuation |
+| P0-058 | **CLOSED** | یک CashSettlementPort route per venue برای ETF cash (stocks_iran_brokerage) |
+| P0-059 | **CLOSED** | P&L decomposition: NAV return / distributed / reinvested / realized جدا |
+
+محل تفصیل: Investment-Stocks-Iran.md, Corporate-Actions-Spec.md, Settlement-Accounting.md, Fixed-Income-Funds.md, Corporate-Action-Engine.md

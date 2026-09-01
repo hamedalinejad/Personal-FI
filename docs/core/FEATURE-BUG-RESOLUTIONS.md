@@ -112,3 +112,17 @@ P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implemen
 | P1-028 | Attachments = documentId; path legacy only |
 | P1-029 | API DecimalString ISO dates JSON-safe enums only |
 | P1-030 | List APIs: page, sort, dateFrom/To, status, source, stable order |
+
+
+## FEAT-P0-050 … 059 (Stocks + Funds) — LOCK 2026-09-01
+
+- **050** rebuild must include all CA types via CorporateActionEngine (no buy/sell-only snippet).
+- **051** instrumentId = UUID FK → ref_instruments.id everywhere (holdings, txs, CA).
+- **052** feeAmount total always preserved for legacy; breakdown components nullable; new rows require sum invariant.
+- **053** feeTax is transaction cost only; tax events / liabilities live in Tax Feature (linkedTaxEventId).
+- **054** tradeDate, settlementDate, effective/actual cash date separated for historical as-of cash & position.
+- **055** CA entity stores full lifecycle dates (announcement, record, ex, effective, settlement, payment).
+- **056** fractionalPolicy + explicit cash-in-lieu operation; no orphan fractional value.
+- **057** NAV valuation requires priceAsOf, source, quoteType, staleState.
+- **058** ETF cash only through one CashSettlementPort route (stocks_iran_brokerage venue).
+- **059** Accumulation/Distribution P&L decomposed: NAV return, distributed income, reinvested income, realized on units.

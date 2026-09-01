@@ -39,11 +39,13 @@ Core نباید پر از منطق فقط-بورس شود.
 
 ```text
 inv_stocks_iran_corporate_actions   (Must در schema v1)
-  id, instrumentId, actionType, effectiveDate,
+  id, instrumentId (UUID FK → ref_instruments), actionType,
+  announcementDate, recordDate, exDate, effectiveDate, settlementDate, paymentDate,
   ratio?, cashAmount?, cashCurrency?,
   sourceInstrumentIds, targetInstrumentIds,
-  costBasisPolicy, operationId, notes, createdAt
+  costBasisPolicy, fractionalPolicy, operationId, notes, createdAt
 ```
+(P0-055 lifecycle dates + P0-056 fractionalPolicy اجباری)
 
 Quantity/cost اثر روی `inv_stocks_iran_transactions` (legs) ثبت می‌شود؛ این جدول metadata + audit + لینک operation است.
 

@@ -62,11 +62,32 @@ averageBuyPrice' = costTotal' / quantity'
 
 ---
 
-## Corporate Action Lifecycle (P1)
+## Corporate Action Lifecycle Dates (P0-055 — اجباری)
 
-تاریخ‌های جدا (نه فقط یک effectiveDate):
+تاریخ‌های جدا **اجباری** هستند (نه فقط یک `date`/`effectiveDate` روی entity اصلی).
 
-`announcementDate` · `recordDate` · `exDate` · `effectiveDate` · `settlementDate` · `paymentDate`
+| فیلد | معنی | حداقل برای |
+|------|------|------------|
+| `announcementDate` | اعلام رسمی | همه |
+| `recordDate` | تاریخ ثبت سهامداران واجد شرایط | dividend, rights, bonus, capital |
+| `exDate` | تاریخ ex (بدون حق) | dividend, rights, split |
+| `effectiveDate` | تاریخ اعمال quantity/cost | همه CAهای quantity-affecting |
+| `settlementDate` | تسویه نقدی/اوراق | cash legs, rights exercise |
+| `paymentDate` | پرداخت واقعی وجه | dividend, cash-in-lieu |
+
+### مدل داده
+
+`inv_stocks_iran_corporate_actions` (یا payload CA روی operation):
+
+```text
+id, instrumentId (UUID FK ref_instruments), actionType,
+announcementDate, recordDate, exDate, effectiveDate, settlementDate, paymentDate,
+ratio, cashAmount, cashCurrency, costBasisPolicy,
+sourceInstrumentIds, targetInstrumentIds,
+fractionalPolicy, operationId, notes, createdAt
+```
+
+Entity اصلی CA نباید فقط یک `date` داشته باشد. Rebuild از `effectiveDate` برای quantity و از `settlementDate`/`paymentDate` برای cash استفاده می‌کند.
 
 ### حق تقدم — حالات
 
@@ -82,3 +103,35 @@ parent security
 ```
 
 بدون این روابط، cost basis خراب می‌شود. هر گام = Operation جدا یا legهای یک CA operation با لینک صریح.
+
+
+---
+
+## P0-056 — Fractional Entitlement & Cash-in-Lieu (اجباری)
+
+برای rights / bonus / split / reverse_split که entitlement کسری تولید می‌کند:
+
+### Policy فیلد
+
+`fractionalPolicy` روی CA:
+
+| مقدار | رفتار |
+|--------|--------|
+| `round_down` | سهم کسری دور ریخته می‌شود (پیش‌فرض محافظه‌کار) |
+| `round_nearest` | رند به نزدیک‌ترین واحد مجاز |
+| `cash_in_lieu` | ارزش کسری به صورت نقد پرداخت/دریافت می‌شود |
+| `carry_forward` | کسری به entitlement بعدی منتقل (نادر؛ نیاز policy version) |
+
+### الزامات
+
+1. **Precision**: quantity entitlement با precision تعریف‌شده instrument (معمولاً integer share یا 0.01) محاسبه شود؛ بدون policy صریح، سیستم نباید سهم/پول یتیم تولید کند.
+2. **Cash-in-lieu operation**: اگر `cash_in_lieu`، یک leg نقدی جدا با `operationId` همان CA یا child op ثبت شود؛ مبلغ = fractionalQty × referencePrice (قیمت اعلام‌شده یا close روز effective).
+3. **Rebuild**: CorporateActionEngine باید fractionalPolicy را اعمال کند و نتیجه qty نهایی + هر cash-in-lieu را در ledger بنویسد.
+4. **بدون policy**: reject یا default به `round_down` + warning audit (قابل پیکربندی در settings ولی default امن).
+
+```text
+entitlement = floor(holdingQty * ratio)   // or per policy
+fractional = holdingQty * ratio - entitlement
+if fractional > 0 and policy == cash_in_lieu:
+  create cash leg (cash-in-lieu)
+```

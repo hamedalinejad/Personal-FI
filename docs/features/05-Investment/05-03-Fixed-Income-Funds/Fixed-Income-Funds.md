@@ -144,10 +144,48 @@ Domain Entities
 > | Distributed Income | سود نقدی تقسیم‌شده به کاربر | type=dividend (cash) |
 > | Reinvested Income | سود تبدیل به واحد | type=reinvest |
 > | Unrealized NAV Gain | تغییر ارزش از NAV بدون الزام دریافت نقد | nav_update / mark |
+
+### P0-059 — Explicit P&L Decomposition (Accumulation vs Distribution)
+
+بازگشت/سود صندوق **باید** به اجزای زیر تجزیه شود (نه یک عدد واحد «سود»):
+
+| جزء | Accumulation | Distribution | منبع |
+|------|--------------|--------------|------|
+| NAV return (price appreciation) | اصلی مسیر بازده | پس از ex-div ممکن است کاهش | nav_update path |
+| Distributed income | معمولاً صفر یا نادر | type=dividend (cash) | dividend txs |
+| Reinvested income | type=reinvest | type=reinvest | reinvest txs |
+| Realized P&L on units | sell vs averageBuyPrice | sell vs averageBuyPrice | sell txs |
+| External reported profit | metadata only | metadata only | externalReportedProfit |
+
+**قفل:**
+- `getProfitComparison` / reports باید این اجزا را جدا برگردانند.
+- Accumulation: رشد NAV ≠ income تحقق‌یافته تا sell یا explicit distribution.
+- Distribution: دریافت نقدی = income؛ همزمان NAV ممکن است drop کند — هر دو ثبت می‌شوند و double-count نمی‌شوند.
+- predictedProfit فقط metadata مقایسه است، نه SoT حسابداری.
+
 >
 > **مثال:** خرید ۱۰۰ واحد + رشد NAV ≠ لزوماً سود نقدی.  
 > **مثال:** `dividend` ممکن است NAV را کاهش دهد در حالی که cash وارد می‌شود.  
 > Engine باید **مسیر NAV** و **مسیر توزیع نقدی/سرمایه‌گذاری مجدد** را جدا نگه دارد.
+
+### P0-057 — Valuation as-of & Stale Policy (اجباری)
+
+هر مقدار NAV / valuation / mark **باید** این فیلدها را داشته باشد (روی `nav_update`، `currentNAV` projection، و price_history):
+
+| فیلد | معنی | الزام |
+|------|------|--------|
+| `priceAsOf` / `navAsOf` | تاریخ/زمان ارزش‌گذاری | mandatory |
+| `source` / `sourceKind` | manual \| api \| import | mandatory |
+| `quoteType` | `nav` \| `last` \| `close` \| `indicative` \| `manual` | mandatory |
+| `staleState` | `fresh` \| `stale` \| `unknown` | mandatory در projection |
+| `staleAfter` | threshold (مثلاً 1 business day) | از settings یا fund policy |
+
+**قوانین:**
+- Unrealized P&L و portfolio value فقط با `priceAsOf` و `staleState` معتبر گزارش می‌شوند.
+- اگر `staleState=stale`، UI/API باید flag کند؛ silent use of old NAV = باگ.
+- `transactionPrice` جدا از NAV است و `priceAsOf` خودش را دارد (تاریخ معامله).
+- `externalReportedProfit` هم `asOf` + source دارد و هرگز overwrite calculated نمی‌شود.
+
 
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
@@ -155,6 +193,30 @@ Domain Entities
 > - در خرید ETF: `cashBalance -= (amount + fees)` در `inv_stocks_iran_brokerages`
 > - در فروش ETF: `cashBalance += (amount - fees)` در `inv_stocks_iran_brokerages`
 > - این قانون مانند `inv_stocks_iran_brokerages` در فیچر Stocks Iran است
+
+
+
+### P0-058 — یک مسیر CashSettlementPort برای هر venue (اجباری)
+
+ETF و هر جریان نقدی مرتبط با کارگزاری **فقط** از مسیر واحد عبور می‌کند:
+
+```text
+Feature (FIF ETF buy/sell/dividend cash)
+  → CashSettlementPort.route(venue="stocks_iran_brokerage", brokerageId, …)
+  → Stocks Iran brokerage cash legs / inv_stocks_iran_brokerage_transactions
+  → (optional) acc_transactions link
+```
+
+**ممنوع:**
+- نوشتن مستقیم `cashBalance` روی `inv_stocks_iran_brokerages` از داخل FIF بدون Port
+- دو semantics متفاوت برای `brokerageId` (یکی در FIF یکی در Stocks) بدون adapter واحد
+- مسیر موازی که cash را دوبار یا اصلاً ثبت نکند
+
+**قفل:**
+- `brokerageId` در `inv_fif_*` وقتی پر است = همان UUID کارگزاری Stocks.
+- همه cash effects ETF از `CashSettlementPort` با `venue = stocks_iran_brokerage` (یا معادل documented).
+- issuance_redemption از `venue = bank_account` یا `external` / Standalone mode استفاده می‌کند (nullable accountId).
+- یک CashSettlementPort route per venue → جلوگیری از duplicate/missing cash (P0-058).
 
 ۳. Fixed Income Transaction (جدول: `inv_fif_transactions`) — لاگ رویدادها
 
