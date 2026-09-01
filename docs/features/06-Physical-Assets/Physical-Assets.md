@@ -241,3 +241,6 @@ Carrying amount from acquisition costs (± impairments) via pa_transactions rebu
 ## FEAT-P0-041 DEEP
 realizedPnl = netProceeds - carryingAmountReleased (from pa_transactions), not naive sale-purchase on header.
 
+## FEAT-P0-042 DEEP
+Write-off records carryingAmountBefore and lossAmount. currentValue→0 is snapshot after op.
+

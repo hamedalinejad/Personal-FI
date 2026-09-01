@@ -279,7 +279,7 @@
 **راه‌حل:** برای sale: `proceeds - releasedCost - sellingFees`. Cost released باید از acquisition ledger/CostBasisEngine بیاید. `amount` هرگز مستقیم profit تلقی نشود.
 
 ## FEAT-P0-042 — Physical Asset write-off loss formula ambiguous
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — write-off carrying loss
 **مشکل:** write-off `amount=-currentValue` ثبت می‌کند ولی carrying/acquisition cost آزادشده مشخص نیست.
 
 **راه‌حل:** write-off باید `carryingAmountBeforeWriteOff` و impairment/loss را طبق policy مشخص کند؛ `currentValue=0` snapshot است، نه خودِ loss amount.
