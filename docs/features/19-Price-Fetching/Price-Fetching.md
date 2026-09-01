@@ -899,3 +899,6 @@ History key = (assetCategory, instrumentId). Provider maps symbol→instrumentId
 ## FEAT-P0-027 DEEP
 quoteType enum sole: last | nav | close | mid | indicative | manual | other. Adapters normalize into this set.
 
+## FEAT-P0-028 DEEP
+Stock/FIF: marketDate required on daily quotes. Crypto: marketDate optional, fetchedAt required. Historical valuation forbids current-price fallback.
+

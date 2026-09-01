@@ -195,7 +195,7 @@
 **راه‌حل:** یک enum مرکزی: `last | nav | close | mid | indicative | manual | other` و همه Providerها فقط همین را برگردانند.
 
 ## FEAT-P0-028 — Price marketDate contradiction
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — marketDate rules
 **مشکل:** marketDate در entity برای بعضی دسته‌ها nullable و در انتها برای historical valuation Must معرفی شده است.
 
 **راه‌حل:** برای stock/FIF daily quote = required؛ crypto intraday = nullable ولی `fetchedAt` required؛ historical query نباید از current price fallback کند.
