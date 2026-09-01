@@ -629,3 +629,7 @@ Performance outputs independent: **income | realized | unrealized**.
 `fundType` discriminator: ETF → brokerage settlement route; issuance/redemption → account route.
 SettlementPort only — no dual mandatory FKs.
 
+## FEAT-P0-036 DEEP
+Engine outputs: income, realized, unrealized separately.
+Period return uses opening, flows, closing — predictedProfit never summed into economic P&L.
+

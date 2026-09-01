@@ -243,7 +243,7 @@
 **راه‌حل:** `grossDividend`, `withholdingTax`, `netDividend` و cash leg جدا؛ tax event فقط reference. Income = gross، cash = net، withholding یک component اقتصادی واحد.
 
 ## FEAT-P0-036 — Fund NAV/transaction price separation incomplete
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — performance three outputs
 **مشکل:** خوب تفکیک شده ولی `predictedProfit` و actual return هنوز با NAV/dividend/sell در یک بازه جمع می‌شوند و احتمال double-count وجود دارد.
 
 **راه‌حل:** performance engine سه خروجی مستقل: income, realized, unrealized; period return با opening/closing value + external cash flows. `predictedProfit` فقط comparison metadata.
