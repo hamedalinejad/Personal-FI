@@ -1477,3 +1477,8 @@ destCost = sourceCostReleased + acquisitionFees (policy)
 ---
 ## FEAT-P0-002 Snapshot
 `currentBalance` / holding `quantity` / `totalInvested` = projection. Mutate only via operations + rebuild. No public setBalance API.
+
+---
+## FEAT-P0-004 DEEP
+`instrumentId` never equals `assetKey` as storage PK.
+assetKey may be stored on instrument meta for provider sync only.

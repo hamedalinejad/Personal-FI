@@ -41,7 +41,7 @@
 **قبولی:** هیچ rebuild/query جدیدی با `symbol` تنها انجام نشود.
 
 ## FEAT-P0-004 — Crypto final canonical contract هنوز متناقض است
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — instrumentId != assetKey PK
 **مشکل:** ابتدای Crypto می‌گوید identity = `instrumentId`، بخش‌هایی rebuild را با `assetKey` انجام می‌دهند و انتهای سند دوباره `instrumentId = assetKey` تعریف می‌کند.
 
 **راه‌حل:** `instrumentId` = FK به Core instrument. `assetKey` = external/provider mapping index. همه APIهای جدید `holdingId` یا `instrumentId` بگیرند.
