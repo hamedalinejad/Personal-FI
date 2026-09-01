@@ -361,7 +361,7 @@ Crypto به‌درستی این مفهوم را معرفی کرده ولی با�
 Opening position نباید BUY ساختگی باشد. باید source=`opening|import|migration` و cost basis provenance داشته باشد.
 
 ## FEAT-P1-007 — Historical valuation
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — historical valuation asOf only
 Reports/Portfolio/Performance باید priceAsOf و fxAsOf یکسان یا صریح داشته باشند. Latest price برای historical report ممنوع.
 
 ## FEAT-P1-008 — Source of reported vs calculated values
