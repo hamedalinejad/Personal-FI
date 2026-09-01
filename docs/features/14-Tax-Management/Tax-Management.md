@@ -264,3 +264,6 @@ Expense reports may **categorize** that same operation — must not create a sec
 ## FEAT-P0-048 DEEP
 All tax snapshots key (taxYear, taxCalendar). Investment tax links use linkedTaxEventId; calendar never implicit-only.
 
+## FEAT-P0-049 DEEP
+Tax payment creates one cash leg. Expense category view may reference same operationId — no second cash tx.
+

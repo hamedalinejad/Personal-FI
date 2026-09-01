@@ -321,7 +321,7 @@
 **راه‌حل:** هر tax snapshot = `(taxYear,taxCalendar)`. Investment event فقط `linkedTaxEventId` و در صورت نیاز snapshot minimal؛ calendar هرگز implicit نباشد.
 
 ## FEAT-P0-049 — Tax payment double-count boundary
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — one cash leg tax payment
 **مشکل:** Tax correctly says one cash transaction، ولی رابطه با Expense هنوز در بخش روابط به‌صورت «Expense transaction» آمده است.
 
 **راه‌حل:** Tax payment یک Financial Operation با یک cash leg tax-specific؛ Expense گزارش از همان operation category را می‌خواند، نه یک cash transaction دوم.
