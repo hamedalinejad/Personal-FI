@@ -2,9 +2,44 @@
 
 ## هدف
 مفاهیم مشترک acquisition / disposal / fee / cost basis / realized / unrealized **یک موتور** دارند.  
-فیچرهای Crypto، Stocks، FIF، Metals فقط **قوانین و نگاشت رویداد** را می‌دهند — نه چهار الگوریتم کاملاً مستقل.
+فیچرهای Crypto، Stocks، FIF، Metals فقط **Policy + نگاشت رویداد** می‌دهند — **نه** چهار الگوریتم کاملاً مستقل.
 
 مسیر پیشنهادی کد: `core/domain/costBasis/` یا `core/services/costBasisEngine.ts`.
+
+
+## یک Engine — چند Policy (P0)
+
+**ممنوع:** چهار موتور جدا با رفتار ناسازگار:
+```text
+Crypto Cost Engine ≠ Stock Cost Engine ≠ Fund Cost Engine ≠ Metal Cost Engine
+```
+
+**الزام:**
+```text
+CostBasisEngine (Core)
+     ↑ policy + events
+Crypto | Stocks | FIF | Metals  (adapters only)
+```
+
+Feature فقط **Policy** و نگاشت رویداد می‌دهد؛ الگوریتم مشترک در Core است.
+
+### enum `costBasisMethod` (per holding / instrument / user default)
+
+| Method | معنی | v1 |
+|--------|------|-----|
+| `weighted_average` | میانگین موزون — پیش‌فرض پروژه | ✅ Must |
+| `fifo` | اولین ورود، اولین خروج (lots) | Should / v1.1 |
+| `specific_identification` | انتخاب lot صریح هنگام disposal | Should / v1.1+ |
+| `no_cost_basis` | بدون pool هزینه (مثلاً برخی هدایا/عدالت با override) | ✅ محدود |
+
+```text
+settings.defaultCostBasisMethod = weighted_average
+holding.costBasisMethod override nullable
+Feature adapter: map domain tx → CostBasisEvent
+Engine.apply(state, event, method)
+```
+
+**Invariant:** همان `operationId` / fee rules / transfer semantics برای همه Assetها؛ فقط method محاسبه lot/pool فرق می‌کند.
 
 ## مفاهیم مشترک
 

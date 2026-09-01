@@ -88,4 +88,5 @@
 - ../API-Reference.md — مرجع API
 - `Cross-Feature-Interactions.md`
 - `Feature-Independence-Contract.md`
+- `Module-Architecture.md` — Core vs Feature modules؛ Accounting Core ≠ UI
 - `Architecture-Final.md`

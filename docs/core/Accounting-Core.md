@@ -1,3 +1,5 @@
+> **P0:** `Accounting Core ≠ Accounting UI`. Journal پشت‌صحنه برای صحت مالی؛ UI دفترکل/تراز آزمایشی اختیاری است. ببین `Feature-Independence-Contract.md` · `Module-Architecture.md`.
+
 # Accounting Core — قلب واقعی سیستم (نه ERP)
 
 > **P0 Cash:** تنها SoT مانده نقد = `fin_accounts` + `fin_journal_lines`.  

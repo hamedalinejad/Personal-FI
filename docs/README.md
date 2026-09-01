@@ -62,3 +62,5 @@
 | Instrument identity | `docs/core/Instrument-Identity.md` |
 | Canonical cash (P0) | `docs/core/Canonical-Cash-Model.md` |
 | Loan Schedule Engine | `docs/core/Loan-Schedule-Engine.md` |
+| Module architecture | `docs/core/Module-Architecture.md` |
+| Feature independence | `docs/core/Feature-Independence-Contract.md` |
