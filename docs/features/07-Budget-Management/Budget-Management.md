@@ -236,3 +236,6 @@ Budget is **not** a financial ledger.
 ## FEAT-P0-044 DEEP
 Actual spend = source expense operations. bg_transaction_links = allocation only.
 
+## FEAT-P0-045 DEEP
+Each link: operationId, sourceLineId, status/void. Reversal of source clears or voids links.
+

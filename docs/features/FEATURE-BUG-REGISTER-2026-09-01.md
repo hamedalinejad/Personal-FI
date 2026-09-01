@@ -297,7 +297,7 @@
 **راه‌حل:** Budget خودش ledger مالی نیست؛ `bg_transaction_links` = allocation/plan ledger. Actual spend از source operations query می‌شود و links فقط allocation هستند. یک source of truth برای هر مفهوم.
 
 ## FEAT-P0-045 — Budget links lack reversal/version semantics
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — links have operationId
 **مشکل:** `bg_transaction_links` operationId/reversal linkage ندارد و correction/void می‌تواند مصرف بودجه را دو بار یا صفر کند.
 
 **راه‌حل:** link باید `operationId`, `sourceLineId` و وضعیت/void یا derived بودن داشته باشد؛ correction/reversal با source operation reconcile شود.
