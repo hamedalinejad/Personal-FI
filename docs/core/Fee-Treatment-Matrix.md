@@ -56,3 +56,20 @@ feeBrokerCommission / feeExchange / feeTax / feeOther = breakdown اختیاری
 ```
 
 داده قدیمی با فقط `feeAmount` معتبر می‌ماند. هیچ فیلدی به‌خاطر schema جدید DROP نمی‌شود.
+
+---
+
+## Tax-like charges در Fee Engine (P0)
+
+مالیات نقل‌وانتقال سهام (مثلاً نرخ مقرراتی ۰.۵٪ / ۰.۰۱٪ طبق قانون جاری — **نسخه‌دار در IranCore/Fee policy**) و در آینده عایدی سرمایه کریپتو/طلا:
+
+```text
+feeCategory = tax   (یا tax_like)
+accountingTreatment = tax
+```
+
+- از ورود دستی تکراری جلوگیری می‌شود: policy نرخ + base محاسبه → FeeAPI
+- `feeTax` روی trade = هزینه همان معامله است
+- رکورد دوره‌ای `tax_events` جدا می‌ماند (feeTax ≠ tax return)
+
+نرخ‌ها **hard-code در Feature نیستند**؛ versioned config (IranMarketFees / Fee Policy).

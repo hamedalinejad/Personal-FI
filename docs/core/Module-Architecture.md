@@ -101,3 +101,14 @@ Loan / Crypto / Stock / Fund / Metal
 4. روشن کردن AccountsCashAdapter وقتی ماژول Accounts فعال است
 
 مرجع: `Cash-Settlement-Adapter.md` · `Feature-Independence-Contract.md` · `Accounting-Core.md` · `Cost-Basis-Engine.md` · `Feature-API-Contract.md`
+
+
+---
+
+## Code boundary enforce (P0)
+
+`no-restricted-imports` (ESLint) + در صورت امکان path aliases فقط به `public-api`.
+
+UI → Feature public API → Capability → Domain → db همان فیچر/core shared helpers.
+
+جزئیات استقلال: `Feature-Independence-Contract.md`.

@@ -27,3 +27,17 @@ CLEAN → DIRTY → PERSISTING → PERSISTED
 4. integrity_check قبل از قبول restore.
 
 مرجع: `Technical-Architecture.md` · `db/02-storage-persistence.md`
+
+---
+
+## UI «ثبت شد» = فقط بعد از IndexedDB swap موفق (P0)
+
+sql.js در RAM است. روی موبایل ضعیف یا kill شدن Tab، دادهٔ DIRTY ممکن است از بین برود.
+
+```text
+SQL COMMIT (RAM)  ≠  داده امن روی دیسک
+UI «ثبت شد»      =  فقط پس از PERSISTED (swap IndexedDB موفق)
+```
+
+- نمایش موفقیت بعد از فقط COMMIT حافظه **ممنوع**
+- timeout/خطای persist → FAILED + پیام خطا؛ نه تیک سبز گمراه‌کننده

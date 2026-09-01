@@ -200,3 +200,20 @@ Loan Core
 همان الگو برای **Crypto · Stocks · Funds · Metals** اجباری است.
 
 **توجه مستندسازی:** هر جا در Feature doc هنوز `accountId → acc_transactions` به‌صورت اجباری نوشته شده، باید به‌معنی «وقتی Accounts فعال است / از طریق Port» خوانده شود؛ نه وابستگی compile-time به Accounts. مرجع اجرایی: `Cash-Settlement-Adapter.md`.
+
+
+---
+
+## Enforce در Code (P0 — روز اول پیاده‌سازی)
+
+مستند به‌تنهایی مرز را نگه نمی‌دارد. از **روز اول کد**:
+
+```text
+ESLint: no-restricted-imports
+```
+
+- Feature A **نمی‌تواند** از مسیرهای داخلی Feature B یا `db` خام فیچر دیگر import کند
+- فقط `features/<B>/public-api` یا Capability API مجاز است
+- CI باید روی نقض این قانون fail شود
+
+بدون enforce در tooling، ماژولار بودن به اسپaghetti تبدیل می‌شود.

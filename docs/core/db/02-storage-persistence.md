@@ -157,3 +157,16 @@ createdAt
 ```
 همراه `db_meta.pendingCommit` برای recovery بعد از crash بین SQL COMMIT و IDB swap — جزئیات `Canonical-Financial-Operation.md`.
 
+---
+
+## UI «ثبت شد» = فقط بعد از IndexedDB swap موفق (P0)
+
+sql.js در RAM است. روی موبایل ضعیف یا kill شدن Tab، دادهٔ DIRTY ممکن است از بین برود.
+
+```text
+SQL COMMIT (RAM)  ≠  داده امن روی دیسک
+UI «ثبت شد»      =  فقط پس از PERSISTED (swap IndexedDB موفق)
+```
+
+- نمایش موفقیت بعد از فقط COMMIT حافظه **ممنوع**
+- timeout/خطای persist → FAILED + پیام خطا؛ نه تیک سبز گمراه‌کننده

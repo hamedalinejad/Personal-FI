@@ -23,3 +23,17 @@ IRR canonical storage؛ تومان فقط `isTomanDisplay` UI — نه دو curr
 Policy فعلی (IRR HALF_UP، Stocks ROUND_DOWN، Crypto decimals، …) قابل قبول است.
 
 روی هر financial operation باید `roundingPolicyVersion` در calculationContext / engineVersions قفل شود تا تغییر آینده تاریخچه را silent rewrite نکند.
+
+---
+
+## UI-only display rounding (P0) — ایران
+
+گرد کردن نمایشی (مثلاً نزدیک‌ترین ۱۰ یا ۱۰۰ ریال برای نمایش تومان) **فقط در لایه UI** است.
+
+| لایه | قانون |
+|------|--------|
+| DB / Journal / Ledger | مقدار **کامل** decimal string — هرگز دادهٔ از‌قبل‌گرد‌شدهٔ نمایشی ذخیره نشود |
+| Reconcile / جمع‌ها | روی مقادیر ذخیره‌شده (غیرگرد‌شدهٔ UI) |
+| UI | می‌تواند برای نمایش تومان/ریال گرد کند؛ edit/commit دوباره از مقدار canonical |
+
+**Invariant:** اگر UI-rounded در DB ذخیره شود، Reconcile کلان اختلاف کاذب می‌دهد.

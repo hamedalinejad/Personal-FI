@@ -186,3 +186,18 @@ Rebuild Holding ≠ Cached Holding  →  Error (گزارش)
 
 سیستم **silently** مقدار جدید را به‌عنوان درست قبول نمی‌کند.
 Repair فقط با عملیات صریح و تأیید (و audit) انجام می‌شود.
+
+---
+
+## Orphan polymorphic links (P0)
+
+روابطی مثل `acc_transaction_links` در SQLite با FK کامل enforce نمی‌شوند.
+
+**قرارداد RECONCILE دوره‌ای:**
+
+1. یافتن لینک‌هایی که `relatedId` / `transactionId` دیگر در جدول هدف وجود ندارد (orphan)
+2. ثبت در `ref_integrity_queue` با kind مناسب (مثلاً `orphan_link`)
+3. **قبل از گزارش مالی نهایی** queue باید خالی یا acknowledged باشد
+4. Repair فقط صریح — نه حذف خودکار خاموش
+
+همین الگو برای هر polymorphic link دیگر (documents links، party refs ضعیف، …) قابل تعمیم است.

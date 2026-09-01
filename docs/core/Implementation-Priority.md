@@ -46,3 +46,13 @@ License · Cloud Sync · Multi-device · Mobile · Desktop · Advanced Tax · Ad
 | License future | جهت درست |
 | ایران / Calendar | خوب؛ Calendar قرارداد P1 |
 | خطر پیچیدگی | متوسط اگر Capability تثبیت نشود |
+
+---
+
+## Day-1 code checklist (اضافه)
+
+- [ ] ESLint `no-restricted-imports` بین Featureها
+- [ ] UI success فقط state PERSISTED
+- [ ] Reconcile job برای orphan polymorphic links → `ref_integrity_queue`
+- [ ] CA stocks: fixture break-even افزایش سرمایه / حق تقدم
+- [ ] Rounding نمایشی فقط UI؛ DB full precision
