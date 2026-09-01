@@ -147,3 +147,51 @@ loan.capabilities() → {
 ```
 
 HTTP در v1 لازم نیست — TypeScript interface؛ بعداً REST/IPC/Mobile.
+
+
+---
+
+## ساختار توصیه‌شده هر Feature: commands / queries (P0)
+
+هر Feature دو سطح اصلی دارد — نه صدها endpoint ریز:
+
+```text
+loans.commands.createLoan
+loans.commands.recordPayment
+loans.commands.reversePayment
+
+loans.queries.getLoan
+loans.queries.getSchedule
+loans.queries.getStatement
+```
+
+همین الگو برای crypto / stocks / funds / metals / accounts / …
+
+| سطح | نقش | مثال |
+|-----|------|------|
+| `*.commands.*` | تغییر state مالی (atomic) | createBuy, recordPayment |
+| `*.queries.*` | فقط خواندن / محاسبه | getHolding, getSchedule |
+
+Command همیشه از `runAtomicFinancialOperation` می‌گذرد.
+
+---
+
+## Transport-Agnostic (P0)
+
+Domain و Feature API **نمی‌دانند** transport چیست:
+
+```text
+REST · IPC · Electron · Desktop · Mobile · Cloud
+```
+
+Contract فقط:
+
+```text
+Request
+Response
+Error
+operationId
+```
+
+v1: TypeScript in-process module.  
+آینده: همان contract پشت REST/IPC بدون تغییر Domain.

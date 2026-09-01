@@ -64,4 +64,6 @@
 | Loan Schedule Engine | `docs/core/Loan-Schedule-Engine.md` |
 | Module architecture | `docs/core/Module-Architecture.md` |
 | Cash Settlement Adapter | `docs/core/Cash-Settlement-Adapter.md` |
+| Iran Core | `docs/core/iran/README.md` |
+| Canonical Financial Operation | `docs/core/Canonical-Financial-Operation.md` |
 | Feature independence | `docs/core/Feature-Independence-Contract.md` |

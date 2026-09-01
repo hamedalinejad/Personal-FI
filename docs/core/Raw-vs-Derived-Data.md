@@ -52,3 +52,41 @@ Derived / Report
 | **EXTERNAL_REPORTED** | عدد گزارش بیرونی (صندوق/کارگزاری) — جدا از DERIVED سیستم |
 
 جزئیات field-level: `Field-Level-SoT.md`
+
+
+---
+
+## Snapshot قابل نابودی / rebuild (P0)
+
+جداول snapshot مثل:
+
+- `inv_crypto_holdings` (کش)
+- `currentBalance` / `remainingBalance`
+- `portfolioSnapshot` / `port_snapshots`
+- `rep_net_worth_snapshots`
+
+**نباید** تنها منبع حقیقتی داشته باشند که در transactions نیست.
+
+اگر holding/snapshot پاک شود، سیستم باید بتواند از ledger **rebuild** کند.
+
+```text
+Snapshot = cache مشتق
+Ledger / Journal = SoT
+```
+
+در drift: Snapshot خراب است، نه Ledger.
+
+---
+
+## همه چیز Derived نیست — EXTERNAL_REPORTED
+
+اعدادی که از بیرون سیستم آمده‌اند حفظ می‌شوند و با محاسبه سیستم قاطی نمی‌شوند:
+
+| EXTERNAL_REPORTED (نمونه) | جدا از |
+|---------------------------|--------|
+| externalReportedProfit | calculatedProfit |
+| broker statement quantity | holding rebuild از trades |
+| bank statement balance | balance از acc_transactions |
+| fund manager reported profit | P&L engine |
+
+Field-Level SoT این تفکیک را enforce می‌کند. Import نباید EXTERNAL را به‌عنوان DERIVED بنویسد.

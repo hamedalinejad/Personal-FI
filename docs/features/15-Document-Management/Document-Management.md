@@ -173,3 +173,29 @@ Attachment باید بتواند به **`operationId`** (و اختیاری domai
 ## Rule
 
 Document یک **Resource مستقل** است (`docs_documents`) و با `docs_links` به هر Business Object وصل می‌شود — **بدون** blob داخل جدول وام/تراکنش/چک.
+
+
+---
+
+## قفل P0: پیوست برای ایران — بدون تکرار در Ledger
+
+برای Loan · Cheque · Stock · Fund · Gold/Metals · Expense · Income · Tax باید بتوان این‌ها را attach کرد:
+
+- Invoice
+- Contract
+- Receipt
+- Bank Statement
+- Broker Statement
+- Fund Statement
+- Loan Document
+
+مدل ذخیره‌سازی:
+
+```text
+docs_documents   → فایل + metadata
+docs_links       → پیوند polymorphic به entity (loanId, txId, …)
+```
+
+**ممنوع:** کپی محتوای سند یا blob داخل جداول Domain Ledger (مثلاً داخل `ln_loans` یا `inv_*_transactions`).
+
+Ledger فقط در صورت نیاز `documentId` / لینک دارد؛ خود Document در Feature اسناد می‌ماند.

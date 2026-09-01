@@ -37,8 +37,17 @@ User/Command
 | `relatedId` | polymorphic |
 
 ```sql
-UNIQUE(fin_operations.id)  -- id = operationId
+-- Enforce در schema SQLite (نه فقط قرارداد API):
+UNIQUE(fin_operations.id)           -- id = operationId
+-- پیشنهاد قوی: UNIQUE(commandHash) وقتی status=posted برای همان sourceFeature
+-- یا حداقل: UNIQUE(idempotencyKey) اگر جدا از id نگهداری شود
 ```
+
+**قفل P0 — DB enforce:**
+- `operationId` در `fin_operations.id` با **UNIQUE** در schema
+- retry پس از COMMIT + UI timeout با همان `operationId` → نتیجه قبلی، نه تراکنش دوم
+- `runAtomicFinancialOperation` قبل از INSERT وجود ردیف را چک می‌کند؛ conflict = `IDEMPOTENCY_CONFLICT`
+
 
 ### رفتار double-submit
 ```text
@@ -587,3 +596,85 @@ Double-click / retry شبکه UI **نباید** دو خرید بسازد.
 ```
 
 تغییر فرمول ۳ سال بعد **تاریخچه قدیمی را بازنویسی نمی‌کند** مگر rebuild صریح با version جدید + audit.
+
+
+---
+
+## Operation Graph (P0)
+
+هر Financial Operation یک گراف اتمیک است؛ همهٔ اثرها همان `operationId` را دارند.
+
+### مثال خرید سهام
+
+```text
+Operation #123
+│
+├── Brokerage Cash -100,500,000 IRR
+├── Stock +100 shares
+├── Fee Broker 300,000 IRR
+├── Tax 200,000 IRR
+└── Journal Entry (lines متوازن)
+```
+
+### مثال Crypto
+
+```text
+Operation #456
+│
+├── USDT -1000
+├── BTC +0.016
+├── Fee -5 USDT
+├── FX snapshot (locked)
+└── Journal Entry
+```
+
+### مثال Loan disbursement
+
+```text
+Operation #789
+│
+├── Cash +96,000,000 IRR
+├── Fee 4,000,000 IRR
+├── Loan Principal 100,000,000 IRR
+└── Journal Entry
+```
+
+**Invariant:** یک `operationId` = یک واحد atomic قابل reverse / audit / reconcile.
+هیچ leg مالی خارج از operation بدون `operationId` ثبت نمی‌شود.
+
+---
+
+## Transaction = Event-like (Immutable Fact)
+
+```text
+Transaction / Domain row = حقیقت ثبت‌شده (immutable)
+اصلاح = رویداد جدید:
+  REVERSAL
+  CORRECTION
+  ADJUSTMENT
+```
+
+انواع مفهومی رویداد (نمونه‌ها):
+
+`BUY` · `SELL` · `TRANSFER` · `FEE` · `DIVIDEND` · `REVERSAL` · `CORRECTION` · `PAYMENT` · `DISBURSEMENT`
+
+- ویرایش in-place مبلغ/qty پس از post **ممنوع**
+- Correction = void/reversal اصل + operation جدید
+- Audit از توالی operationها خوانده می‌شود، نه از overwrite
+
+---
+
+## Balance / Fixture Tests per Operation (P0)
+
+هر Operation باید در fixture بتواند ثابت کند:
+
+| دامنه | تساوی اجباری |
+|--------|----------------|
+| Journal | Σ Debit Base = Σ Credit Base (همان baseCurrencyAtOperation) |
+| Asset qty | Opening Qty + In − Out = Closing Qty |
+| Cash | Opening Balance + In − Out = Closing Balance |
+| Loan | Opening Principal + New Principal − Principal Paid = Remaining Principal |
+| Portfolio | Holdings + Cash − Liabilities = Net Worth (در سطح گزارش) |
+
+این‌ها **Fixture Test** در CI هستند، نه فقط متن مستند.
+بدون سبز بودن این fixtureها، release مالی معتبر نیست (`db.md` / financial-fixtures).

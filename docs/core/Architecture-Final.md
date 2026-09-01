@@ -1,15 +1,15 @@
 # معماری نهایی (خلاصه قفل)
 
 ```text
-UI / PWA  +  Feature Public APIs
+UI / PWA  +  Feature Public APIs (commands / queries)
         ↓
    Feature Layer (Accounts, Loans, Crypto, Stocks, Funds, …)
         ↓
    CashSettlementPort  (Adapter: Accounts | Local Settlement)
         ↓
-   Financial Core (Operation · Journal · Audit)
+   Financial Core (Operation Graph · Journal · Audit)
         ↓
-   Domain Ledgers
+   Domain Ledgers + IranCore (versioned rules)
         ↓
    SQLite / sql.js → IndexedDB
 ```
@@ -20,72 +20,80 @@ UI / PWA  +  Feature Public APIs
 | Internet | Optional enhancement — Core هرگز وابسته نیست |
 | License | Separate from financial data |
 | Report | Ledger → calc → report |
-| Snapshot | Cache only |
+| Snapshot | Cache only — rebuildable |
 | Cash path | فقط از طریق CashSettlementPort + Adapter |
 | Local First | App → Local API → Domain → SQLite — بدون سرور اجباری |
+| API | Transport-agnostic: Request / Response / Error / operationId |
 
-## اصول قفل‌شده (P0)
+## اصول قفل‌شده P0 (۲۱–۳۹)
 
-### ۱. Integration = Adapter
-Loan / Crypto / Stock / Fund / Metal **مستقیماً** به Accounts وابسته نیستند.
-فقط `CashSettlementPort` → `AccountsCashAdapter` یا `LocalSettlementAdapter`.
-→ Loan-only و Editionهای مشابه واقعاً کار می‌کنند.
+### Integration = Adapter
+Loan / Crypto / Stock / Fund / Metal → `CashSettlementPort` → Accounts یا Local Settlement.
 سند: `Cash-Settlement-Adapter.md`
 
-### ۲. صفحات = ۹ Shell + Sheet
-```text
-Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
-```
-Investments = یک Shell با تب‌های Overview / Crypto / Stocks / Funds / Metals.
-عملیات = Drawer / Modal / Sheet / Side Panel — نه ده‌ها صفحه مستقل.
-`/wealth` = زیر Dashboard یا Reports — **صفحه دهم نیست**.
+### صفحات = ۹ Shell + Sheet
+Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings  
+Investments = یک Shell + تب‌ها؛ `/wealth` زیر Dashboard/Reports.
 
-### ۳. 100% Local First
-```text
-App → Local API → Domain → SQLite
-```
-Price Fetching، Notifications، License، Cloud Backup **Core را وابسته نمی‌کنند**.
-`PriceProvider` = interface: Manual + Cached + Online.
-Offline = Manual + Cached کافی است.
-هیچ Featureی نباید بگوید: اینترنت نداریم → سیستم کار نمی‌کند.
+### 100% Local First
+PriceProvider = Manual | Cached | Online. Offline = Manual + Cached.
 
-### ۴. Historical Price مستقل
-Current Price ≠ Historical Price.
-حداقل فیلدها: instrumentId, price, currency, timestamp, marketDate, source, sourceReference, isOfficial.
-Valuation تاریخی: Transaction Date → closest valid historical price (≤ date) — نه current.
+### Historical Price / FX
+Current ≠ Historical. closest ≤ asOf. Transaction FX · Historical FX · Current FX جدا.
 
-### ۵. Exchange Rate تاریخی
-Transaction FX (قفل در operation) · Historical FX · Current FX — کاملاً جدا.
-گزارش تاریخی هرگز از نرخ فعلی استفاده نمی‌کند.
+### IranCore (قوی، نه پیچیده)
+Calendar · MarketDate · MarketSession · Holiday · SettlementRule · CurrencyDisplay · Toman/Rial · NumberFormat · Market Rules  
+قواعد Settlement / Fee / Tax / Holiday / Trading Calendar = **versioned/configurable** — نه hard-code در Feature.
 
-## اولویت Documentation (وضعیت)
+### ریال / تومان
+DB = **IRR فقط**. UI = ریال | تومان (display preference). هیچ Money بدون Currency.
 
-### P0 — قبل از Feature implementation
-| مورد | وضعیت تقریبی |
-|------|----------------|
-| Crypto Cash SoT | ✅ SoT Matrix + crypto cash |
-| Gross/Fee/Net qty | ✅ Fee matrix + crypto |
-| Asset Registry یکسان | ✅ ref_instruments only |
-| Account layers تفکیک | ✅ Account-Layers |
-| Standalone Feature Contract | ✅ Feature-Independence |
-| **Cash Settlement Adapter** | ✅ Cash-Settlement-Adapter.md |
-| Dependency Matrix | ✅ Domain-Dependency |
-| Raw/Derived/Snapshot | ✅ Field-Level-SoT |
-| Data Preservation | ✅ + attachments |
-| Currency vs Asset | ✅ economicKind |
-| Historical Price / FX | ✅ Price-Fetching + Currency docs |
-| Local First + PriceProvider | ✅ Technical-Architecture |
-| Pages IA (۹ + Shell) | ✅ Pages-IA.md |
+### Documents
+`docs_documents` + `docs_links` — پیوست Invoice/Contract/Receipt/Statements بدون تکرار در Domain Ledger.
 
-### P1
+### Audit
+Who · When · Which Operation · Before · After · Why · Source · Reference — حتی در Single User.
+
+### operationId در DB
+UNIQUE در `fin_operations` + idempotency در `runAtomicFinancialOperation` — double-submit = یک نتیجه.
+
+### Transaction = Event immutable
+اصلاح = REVERSAL / CORRECTION / ADJUSTMENT جدید.
+
+### Operation Graph
+همه legهای یک عمل (cash, asset, fee, tax, journal) یک `operationId` دارند.
+
+### Fixture تراز
+Σ Debit = Σ Credit · Qty · Cash · Loan principal · Net Worth — در CI.
+
+### Reconciliation همه‌جانبه
+Bank · Crypto · Stocks · Funds · Metals · Loans · Assets · Journal · Portfolio — drift = Error نه silent accept.
+
+### Snapshot قابل rebuild
+حذف snapshot نباید دادهٔ غیرقابل‌ساخت از ledger را از بین ببرد.
+
+### EXTERNAL_REPORTED ≠ DERIVED
+سود گزارش‌شده کارگزاری/صندوق جدا از calculatedProfit حفظ می‌شود.
+
+### Feature API
+`commands/` + `queries/` — Transport-agnostic.
+
+## وضعیت Documentation
+
 | مورد | وضعیت |
 |------|--------|
-| Loan Schedule + Calendar | ✅ در Loan doc |
-| Iran business dates | ✅ Iran Core + Date matrix |
-| Accounting Core / Journal | ✅ Accounting-Core |
-| Reversal مشترک | ✅ Canonical Operation |
-| Import/Export | ✅ Import + backup docs |
-| Backup/Restore | ✅ 06-migration-backup |
-| Document preservation | ✅ این سند |
+| Cash Settlement Adapter | ✅ |
+| Pages IA (۹ + Shell) | ✅ |
+| Local First + PriceProvider | ✅ |
+| Historical Price / FX | ✅ |
+| IranCore versioned | ✅ `core/iran/README.md` |
+| IRR vs Toman display | ✅ |
+| Documents links model | ✅ |
+| Audit fields | ✅ `Audit-vs-Financial-Event.md` |
+| operationId UNIQUE + Graph | ✅ `Canonical-Financial-Operation.md` |
+| Immutable events + fixtures | ✅ |
+| Reconcile all features | ✅ `db/04-reconciliation-integrity.md` |
+| Snapshot rebuild + EXTERNAL | ✅ `Raw-vs-Derived-Data.md` |
+| commands/queries + transport | ✅ `Feature-API-Contract.md` |
 
-جزئیات: SPEC-FREEZE.md
+جزئیات: SPEC-FREEZE.md · اسناد لینک‌شده بالا

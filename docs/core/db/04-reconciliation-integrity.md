@@ -158,3 +158,31 @@ Investment: Transactions → Calculated Holding → Stored Holding → Portfolio
 ```
 
 `fin_reconcile_runs` + `ref_integrity_queue` = Core capability.
+
+
+---
+
+## Reconciliation برای همه Featureها (P0)
+
+Reconcile فقط Bank نیست. همهٔ دامنه‌های زیر باید قابل reconcile باشند:
+
+| دامنه | مثال چک |
+|--------|----------|
+| Bank / Accounts | ledger cash vs snapshot balance |
+| Crypto | rebuild holding ≠ cached holding → Error |
+| Stocks | qty / cost vs ledger |
+| Funds | units / NAV-derived vs ledger |
+| Metals | weight / cash platform vs ledger |
+| Loans | remaining principal vs schedule + payments |
+| Physical Assets | value/cost vs recorded events |
+| Journal | Σ debit = Σ credit per operation |
+| Portfolio / Net Worth | composed from reconciled parts |
+
+**قانون:**
+
+```text
+Rebuild Holding ≠ Cached Holding  →  Error (گزارش)
+```
+
+سیستم **silently** مقدار جدید را به‌عنوان درست قبول نمی‌کند.
+Repair فقط با عملیات صریح و تأیید (و audit) انجام می‌شود.
