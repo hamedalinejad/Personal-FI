@@ -1489,3 +1489,8 @@ assetKey may be stored on instrument meta for provider sync only.
 | fee_from_base / fee_from_received | net = gross − feeQuantity |
 Always store gross, fee, net. Four-mode fixtures + conservation required.
 
+## FEAT-P0-006 DEEP — C2C cost basis
+releasedCost = CostBasisEngine.dispose(fromHoldingId, qty)
+destCost = releasedCost + feesCapitalizedPerPolicy
+Forbidden: market value as historical destination cost.
+

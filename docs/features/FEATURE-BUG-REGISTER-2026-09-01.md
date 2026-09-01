@@ -57,7 +57,7 @@
 **قبولی:** یک fixture برای هر چهار fee mode و conservation check.
 
 ## FEAT-P0-006 — Crypto C2C cost basis اشتباه/متناقض
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — C2C cost from engine release not market
 **مشکل:** در یک الگوریتم `toTotalBase = fromTotalBase + feeBase` آمده، در حالی که `fromTotalBase` می‌تواند market value باشد نه released cost. این می‌تواند cost basis مقصد را غلط کند.
 
 **راه‌حل:** C2C باید `sourceCostReleased` را از CostBasisEngine بگیرد؛ destination basis = released cost + acquisition fees طبق policy. Market value فقط برای valuation است.
