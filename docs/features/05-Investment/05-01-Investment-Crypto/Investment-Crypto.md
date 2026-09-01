@@ -94,7 +94,7 @@ CryptoFinancialOperationAdapter.buildReversalPlan(originalOperationId)
 **ممنوع:** الگوریتم‌های موازی feature-local با UPDATE isVoided + INSERT مستقیم در این سند به‌عنوان مسیر پیاده‌سازی. نمونه‌های قدیمی حذف شده‌اند.
 
 Adapter plan باید برگرداند:
-- void/inverse domain rows (buy/sell/C2C legs/transfer/fee_burn) با **assetKey**
+- void/inverse domain rows (buy/sell/C2C legs/transfer/fee_burn) با **instrumentId** (و location)
 - journal inverse lines
 - cash inverse اگر بود
 - snapshotTargets برای rebuild
@@ -152,77 +152,35 @@ Adapter plan باید برگرداند:
 ### ۳. Crypto Holding (جدول: `inv_crypto_holdings`)
 
 - `id` → UUID (Primary Key)
-- `exchangeId` → UUID (کلید خارجی به `inv_crypto_exchanges.id`)
-- `networkId` → UUID (nullable — کلید خارجی به `inv_crypto_wallet_networks.id`؛ فقط برای wallet‌ها؛ برای صرافی null است)
-- `symbol` → string (BTC, ETH, USDT, IRR و ...)
-- `name` → string
-- `chainId` → string (nullable — شناسه شبکه بلاکچین؛ مثلاً `1` برای Ethereum Mainnet، `56` برای BSC، `728126428` برای Tron؛ برای tokenهای native مثل BTC یا ETH از نام شبکه مادر استفاده می‌شود)
-- `contractAddress` → string (nullable — آدرس قرارداد هوشمند توکن؛ برای native tokenهایی مثل BTC و ETH که آدرس قرارداد ندارند null است؛ برای USDT-TRC20، USDT-ERC20، و هر ERC20/BEP20/TRC20 Token دیگری الزامی است)
-- `decimals` → integer (nullable — تعداد اعشار توکن؛ مثلاً 18 برای USDT-ERC20، 6 برای USDT-TRC20؛ اگر null باشد فرض می‌شود هسته اصلی شبکه — مثلاً 18 برای ETH؛ برای IRR و USDT داخلی صرافی null قابل قبول است)
-- `assetKey` → string (**اجباری — **؛ هویت پایدار داخلی: `chainId:contractAddress` یا `chainId:native:SYMBOL` یا `exchange:{exchangeId}:SYMBOL` برای موجودی داخلی صرافی)
-- `assetId` → string (nullable فقط به‌عنوان **شناسه Provider خارجی** برای mapping؛ هرگز به‌جای assetKey برای uniqueness استفاده نشود)
-- `symbol` → string (**فقط label نمایشی** — نه هویت یکتا)
-- `quantity` → decimal (موجودی فعلی)
-- `averageBuyPrice` → decimal
+- `exchangeId` → UUID (FK → `inv_crypto_exchanges.id`)
+- `instrumentId` → UUID (**اجباری** — FK → `ref_instruments.id`؛ **تنها هویت دارایی**)
+- `networkId` → UUID (nullable — FK → `inv_crypto_wallet_networks.id`؛ فقط برای wallet‌ها؛ برای صرافی null)
+- `symbol` → string (**فقط label نمایشی** — نه هویت؛ از instrument.displaySymbol قابل کپی در UI)
+- `name` → string (label؛ از instrument)
+- `assetKey` → string (nullable — **ایندکس راحتی** مشتق از meta ابزار؛ نه SoT هویت؛ برای سازگاری migration)
+- `providerInstrumentId` / `assetId` → string (nullable — شناسه Provider خارجی برای mapping؛ هرگز به‌جای instrumentId)
+- `quantity` → decimal (**DERIVED** از txs — cache؛ SoT = ledger)
+- `averageBuyPrice` → decimal (**DERIVED** CostBasisEngine)
 - `currency` → string
-- `totalInvested` → decimal
-- `totalFeesPaidBase` → decimal (مجموع تجمیعی کارمزدها به **baseCurrency کاربر** )
-- `createdAt` → datetime
-- `updatedAt` → datetime
+- `totalInvested` → decimal (**DERIVED**)
+- `totalFeesPaidBase` → decimal (**DERIVED** — مجموع feeBase txs)
+- `createdAt` / `updatedAt` → datetime
 
-> **نکته `networkId`**: این فیلد فقط برای والت‌ها معنی دارد. مثلاً کاربری که USDT دارد روی هر دو شبکه TRC20 و ERC20 در یک والت، **دو ردیف جداگانه** در `inv_crypto_holdings` خواهد داشت (هر کدام با `networkId` متفاوت)؛ این تفکیک برای محاسبه صحیح انتقال بین شبکه‌ها الزامی است.
+> **هویت:** chainId / contractAddress / decimals روی `inv_crypto_instrument_meta` (FK به همان `instrumentId`) ذخیره می‌شوند، نه به‌عنوان SoT موازی روی holding. Holding فقط location (`exchangeId`, `networkId`) + `instrumentId` دارد.
 
-> **Unique Identity Holding**: یکتایی منطقی و DB:
-> - صرافی: `UNIQUE(exchangeId, symbol)` وقتی `networkId` و `contractAddress` هر دو null (دارایی داخلی صرافی)
-> - والت توکن: `UNIQUE(exchangeId, networkId, contractAddress)` با `contractAddress` non-null
-> - والت native: `UNIQUE(exchangeId, networkId, symbol)` با `contractAddress` IS NULL
-> کلید قیمت‌گیری داخلی: `assetKey` (محاسبه‌شده یا ذخیره‌شده) = برای توکن `chainId:contractAddress`؛ برای native `chainId:native:symbol`؛ برای موجودی صرافی بدون زنجیره `exchange:symbol`.
-> دو Holding با هویت یکسان ممنوع است؛ P&L نباید دوبار شمرده شود.
+> **نکته `networkId`**: برای والت، USDT روی TRC20 و ERC20 = دو `instrumentId` متفاوت (دو ردیف ref_instruments) و در نتیجه دو holding جدا — حتی روی یک والت.
 
-> **نکته مهم**: ~~مدل قدیمی: نقد در inv_crypto_holdings با symbol=IRR/USDT~~ — **جایگزین:** 
-
-### AssetPosition در برابر CashPosition (Domain)
-
-| | Asset Holding | Cash Position |
-|--|---------------|---------------|
-| جدول پیشنهادی | `inv_crypto_holdings` (crypto assets) | `inv_crypto_cash` یا `fin_accounts` با systemRole=exchange_cash |
-| مثال | BTC, ETH, USDT-TRC20 (توکن) | موجودی تسویه IRR/USDT روی صرافی |
-| Cost basis | Cost-Basis-Engine | معمولاً cash؛ خرید تتر سرمایه‌گذاری می‌تواند asset باشد |
-| Journal | crypto_asset account | cash account |
-
-**UI:** یک نمای صرافی (Binance → USDT, BTC, …) بدون دو «سیستم» برای کاربر.
-
-**ممنوع (canonical جدید):** نگه داشتن IRR/USDT نقد صرافی فقط با `symbol=IRR` داخل همان جدول asset holding بدون تفکیک نقش — باعث قاطی شدن P&L و Net Worth می‌شود.
-
-> (Legacy note) اگر داده قدیمی با `symbol=IRR/USDT` در holdings بود: migration به CashPosition.
- 
-> **نکته مهم ۲ - جلوگیری از تکرار در محاسبه ثروت**: 
-> - برای IRR و USDT: 
-> - **نه همیشه `averageBuyPrice = 1`.**
-
-### USDT / stablecoin — دو نقش
-| نقش | رفتار Cost Basis |
-|-----|------------------|
-| **Quote/settlement cash** روی صرافی (موجودی برای معامله) | می‌تواند cash-like باشد؛ ولی اگر با IRR/EUR خریده شده، **cost واقعی در ارز خرید** حفظ شود |
-| **USDT به‌عنوان دارایی سرمایه‌گذاری** (خرید تتر برای نگهداری/P&L) | مثل هر crypto: qty + cost basis از معامله خرید |
-
-```text
-خرید 10,000 USDT با 950,000,000 IRR
-  → averageBuyPrice و totalInvested از همان خرید (نه shortcut =1)
-```
-
-فقط وقتی economicKind صریح `cash_like_par` و currency=holding unit است ممکن است par=1 معنادار باشد — پیش‌فرض **نه**.
-Acquisition/CostBasisEngine نوع ورود را تعیین می‌کند، نه hard-code symbol=USDT. 
-> - `totalInvested = 0` (مبلغ واریزی در این فیلد ثبت نمی‌شود) 
-> - `totalFeesPaidBase = 0` (کارمزدها در `inv_crypto_exchange_transactions` ذخیره می‌شوند) 
-> - در تابع `getPortfolioValue`، موجودی IRR و USDT **به صورت اختیاری** در محاسبه ارزش پرتفوی لحاظ می‌شود (با کنترل `includeCashInWealth` در تنظیمات پرتفوی) 
-> - **مهم**: صرافی/ولت هرگز رکورد مستقل در `acc_accounts` ندارد. تنها زمانی که واریز/برداشت واقعی بین یک حساب بانکی و صرافی رخ می‌دهد، یک تراکنش در `acc_transactions` (با `relatedFeature = 'crypto_exchange'`) برای همان حساب بانکی موجود ثبت می‌شود؛ این ثبت هیچ ارتباطی با `inv_crypto_cash` صرافی ندارد و نباید با آن یکی در نظر گرفته شود. ایجاد یک رکورد موازی در `acc_accounts` برای هر صرافی باعث شمارش دوگانه در محاسبه ثروت خالص می‌شود.
+> **Unique Identity Holding (DB):**
+> - `UNIQUE(exchangeId, instrumentId)` وقتی networkId null (صرافی / موجودی داخلی)
+> - `UNIQUE(exchangeId, networkId, instrumentId)` وقتی network برای والت لازم است
+> **ممنوع:** UNIQUE بر اساس `symbol` تنها. قیمت‌گیری و rebuild با `instrumentId`.
 
 ### ۴. Crypto Transaction (جدول: `inv_crypto_transactions`) — لاگ معاملات رمزارز
 
 - `id` → UUID (Primary Key)
 - `exchangeId` → UUID
-- `symbol` → string
+- `instrumentId` → UUID (**اجباری** — FK → `ref_instruments.id`)
+- `symbol` → string (**label فقط** — نه identity)
 - `type` → string (`buy`, `sell`, `transfer_in`, `transfer_out`)
 - `quantity` → decimal
 - `price` → decimal
@@ -889,16 +847,20 @@ Valuation با `priceCurrency` (اغلب USDT در price_history) **جدا** ا�
 ## Asset Registry هویت
 
 ```text
-identity = assetKey = f(chainId, contractAddress | native, symbol-for-native-only)
-symbol = label only
-assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
+Canonical identity = ref_instruments.id  (instrumentId)
+assetKey           = convenience index only (derived from chain+contract / native)
+symbol             = label only
+providerInstrumentId / assetId (provider) = mapping aid, not PK
 ```
 
-قوانین:
-1. `assetKey` روی هر Holding **NOT NULL** و بخشی از UNIQUE است.
-2. Fallback قیمت‌گیری به `symbol` تنها **ممنوع** است (حذف collision path).
-3. اگر Provider فقط symbol می‌فهمد، Adapter از `assetKey` → `normalizeSymbol` / `assetId` mapping می‌سازد؛ Application هرگز با symbol خام fetch نمی‌کند.
-4. IRR/USDT داخلی صرافی: `assetKey = exchange:{exchangeId}:IRR` و `exchange:{exchangeId}:USDT`.
+قوانین (هم‌راستا با `Instrument-Identity.md` و `Field-Level-Data-Ownership-Matrix.md`):
+1. هر Holding و هر Transaction **الزاماً** `instrumentId` (FK → `ref_instruments.id`) دارد.
+2. `assetKey` اختیاری/ایندکس است؛ **نه** SoT هویت و نه جایگزین instrumentId.
+3. Fallback قیمت‌گیری به `symbol` تنها **ممنوع** است.
+4. اگر Provider فقط symbol می‌فهمد، Adapter از `instrumentId` → meta/`assetKey` → `providerSymbol` mapping می‌سازد؛ Application هرگز با symbol خام به‌عنوان identity fetch نمی‌کند.
+5. USDT-ERC20 و USDT-TRC20 = دو `ref_instruments` جدا = دو instrumentId.
+6. موجودی location روی Holding است: `exchangeId` + اختیاری `networkId` — نه روی تعریف instrument.
+7. IRR/USDT **cash** صرافی در `inv_crypto_cash` است نه به‌عنوان asset identity موازی در holdings با symbol خام.
 
 ---
 
@@ -958,7 +920,7 @@ assetId = optional provider external id (CoinGecko etc.) — mapping aid, not PK
 ```text
 validate holdings / balances / feePresence fields
 BEGIN
-  write domain txs (with assetKey, quoteAsset, gross/net/fee quantities)
+  write domain txs (with instrumentId, optional assetKey index, quoteAsset, gross/net/fee quantities)
   update holdings by netQuantity
   totalFeesPaidBase += feeBase
   fin_journal_entries
@@ -967,10 +929,10 @@ COMMIT → persist → UI success
 ```
 
 ### Invariants
-- `assetKey` NOT NULL + UNIQUE rules per exchange/network/contract
+- `instrumentId` NOT NULL (FK → ref_instruments) + UNIQUE(exchangeId, instrumentId) یا UNIQUE(exchangeId, networkId, instrumentId)
 - Holding quantity هرگز از net effects منفی نشود
-- Price fetch فقط با instrumentId/assetKey
-- rebuild/reconcile با holdingId یا assetKey — نه symbol تنها
+- Price fetch فقط با instrumentId (mapping به provider از meta)
+- rebuild/reconcile با holdingId یا (exchangeId, instrumentId) — نه symbol تنها
 
 ### تست حداقل
 1. BUY با fee_in_quote و fee_from_base_asset  
@@ -983,33 +945,30 @@ COMMIT → persist → UI success
 
 ## Canonical Crypto Asset Registry
 
-مدل مرکزی (جدول پیشنهادی `inv_crypto_assets` یا registry در Domain):
+**تنها registry هویت:** `ref_instruments` (Core). جدول موازی `inv_crypto_assets` به‌عنوان SoT **ممنوع**.
 
-| فیلد | نقش |
+| لایه | نقش |
 |------|-----|
-| `assetId` (internal UUID) | هویت منطقی «دارایی» در سیستم |
-| `symbol` | فقط label (USDT, BTC) |
-| `standard` | مثلاً ERC20 / TRC20 / native |
-| `chainId` | شناسه زنجیره |
-| `contractAddress` | nullable برای native |
-| `assetKey` | `chainId:contract` یا `chainId:native:SYMBOL` — **کلید یکتا** |
+| `ref_instruments.id` | **instrumentId** — هویت Canonical |
+| `inv_crypto_instrument_meta` | chainId, contractAddress, decimals, standard — FK به instrumentId |
+| `externalRef.assetKey` یا ستون ایندکس | `chainId:contract` / `chainId:native:SYMBOL` — convenience فقط |
 
 Holding:
 ```text
-holding → assetKey (FK منطقی) + exchangeId + networkId?
-USDT-TRC20 و USDT-ERC20 = دو assetKey متفاوت = دو holding مجاز
+holding → instrumentId (FK اجباری) + exchangeId + networkId?
+USDT-TRC20 و USDT-ERC20 = دو instrumentId متفاوت = دو holding مجاز
 ```
 
 ### جداسازی Asset / Network / Address
 | مفهوم | جدول/فیلد |
 |--------|-----------|
-| Asset | assetKey / registry |
+| Asset (identity) | `ref_instruments.id` / instrumentId |
 | Network | `inv_crypto_wallet_networks` / chainId |
 | Address | `inv_crypto_wallet_addresses` |
-| Transfer validation | from/to network + assetKey سازگار؛ txHash per network |
+| Transfer validation | from/to network + **همان instrumentId**؛ txHash per network |
 
 Deposit/Withdraw/Transfer **بدون** networkId معتبر (برای on-chain) رد می‌شوند.
-قیمت‌گیری و P&L همیشه روی `assetKey` نه `symbol` خام.
+قیمت‌گیری و P&L همیشه روی `instrumentId` (نه `symbol` خام؛ assetKey فقط کمک mapping).
 
 ---
 

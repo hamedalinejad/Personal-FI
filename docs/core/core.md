@@ -79,6 +79,7 @@
 - `Data-Model-Relationship-Matrix.md`
 - `SPEC-FREEZE.md`
 - `Field-Level-SoT.md`
+- `Field-Level-Data-Ownership-Matrix.md` — مالک فیلد به فیلد (RAW/DERIVED/editable/migration)
 - `Fee-Treatment-Matrix.md`
 - `Concept-Ownership-Matrix.md`
 - `Implementation-Pitfalls.md` — هشدارهای کدنویسی

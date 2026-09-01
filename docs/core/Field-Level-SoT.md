@@ -31,3 +31,8 @@ EXTERNAL_REPORTED ≠ DERIVED system profit
 ```
 
 Provider ممکن است روش/کارمزد/تاریخ متفاوت داشته باشد — هرگز silent overwrite روی calculated.
+
+
+---
+
+**ماتریس کامل مالکیت فیلد (اجباری):** `Field-Level-Data-Ownership-Matrix.md`

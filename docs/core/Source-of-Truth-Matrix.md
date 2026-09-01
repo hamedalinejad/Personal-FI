@@ -71,3 +71,6 @@ Ledger → Calculation → Report
 ```
 
 **ممنوع:** Report مستقیم از Snapshot به‌عنوان SoT. Snapshot فقط cache؛ rebuild از ledger.
+
+
+جزئیات فیلد: `Field-Level-Data-Ownership-Matrix.md` · هویت دارایی: `Instrument-Identity.md`

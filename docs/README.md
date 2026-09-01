@@ -58,3 +58,5 @@
 | API | `docs/API-Reference.md` + `Feature-API-Contract.md` |
 | Investment | `docs/features/05-Investment/README.md` |
 | Spec freeze | `docs/core/SPEC-FREEZE.md` |
+| Field ownership | `docs/core/Field-Level-Data-Ownership-Matrix.md` |
+| Instrument identity | `docs/core/Instrument-Identity.md` |
