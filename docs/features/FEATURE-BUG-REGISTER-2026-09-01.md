@@ -337,7 +337,7 @@
 # P1 — باید قبل از Freeze هر Feature حل شود
 
 ## FEAT-P1-001 — Multi-currency field completeness
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — money fields always currency-tagged
 تمام transactionهای چندارزی باید `currency`, `baseCurrencyAtOperation`, `exchangeRateToBase` و در multi-hop `conversionPath/rateId` داشته باشند. نرخ تاریخی نباید از latest FX بازسازی شود.
 
 ## FEAT-P1-002 — Fee currency conversion

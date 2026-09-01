@@ -76,3 +76,39 @@ Full register checkboxes: FEATURE-BUG-REGISTER-2026-09-01.md status column.
 | 048-050 | Tax-Management FEAT-P0 LOCK |
 
 P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implement with same locks + API-Result, Pagination, Document links, etc.
+
+
+## P1 DEEP locks (FEAT-P1-001…030)
+
+| ID | Lock |
+|----|------|
+| P1-001 | Every money field has currency code; multi-currency lines explicit |
+| P1-002 | Fee conversion locks FX on operation (feeCurrency, feeAmount, amountInBase) |
+| P1-003 | All reversals go through Core reverse(operationId); feature adapters only plan |
+| P1-004 | Multi-row writes share one operationId; child rows store operationId |
+| P1-005 | Transfer kind internal vs external; external does not preserve counterparty holding cost |
+| P1-006 | sourceType opening vs import distinct; opening is operation |
+| P1-007 | Historical valuation uses priceAsOf+fxAsOf never current |
+| P1-008 | EXTERNAL_REPORTED fields never overwritten by calculated |
+| P1-009 | Party links optional but typed when present |
+| P1-010 | Document links via docs_links not raw paths as SoT |
+| P1-011 | Idempotency: same operationId+commandHash → same result |
+| P1-012 | Soft delete only for financial; hard delete matrix applies |
+| P1-013 | Notifications never mutate finance |
+| P1-014 | Reports query API not feature tables |
+| P1-015 | Import dry-run before commit |
+| P1-016 | Duplicate detection independent of operationId |
+| P1-017 | Offline mode no network for core ops |
+| P1-018 | License gates features not data access |
+| P1-019 | Feature disable keeps data |
+| P1-020 | Cheque sayad fields optional with validation when present |
+| P1-021 | Bills generate ops; template ≠ ledger |
+| P1-022 | Recurring uses businessDate rules + timezone policy |
+| P1-023 | Budget income override stores actor, reason, version |
+| P1-024 | Budget envelope currency; cross-currency needs conversion policy |
+| P1-025 | Goal v1 single currency or full FX policy — pick one, enforce |
+| P1-026 | Account ledger vs available vs pending vs cleared |
+| P1-027 | Shared brokerage cash one ledger per custody account |
+| P1-028 | Attachments = documentId; path legacy only |
+| P1-029 | API DecimalString ISO dates JSON-safe enums only |
+| P1-030 | List APIs: page, sort, dateFrom/To, status, source, stable order |
