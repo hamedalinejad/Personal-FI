@@ -285,7 +285,7 @@
 **راه‌حل:** write-off باید `carryingAmountBeforeWriteOff` و impairment/loss را طبق policy مشخص کند؛ `currentValue=0` snapshot است، نه خودِ loss amount.
 
 ## FEAT-P0-043 — Physical Asset acquisition history insufficient
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — acquisitions on pa_transactions
 **مشکل:** برای gold/coin چند خرید روی یک asset ممکن است، ولی `purchasePrice/purchaseDate/accountId` روی header باقی می‌ماند.
 
 **راه‌حل:** header فقط identity؛ تمام acquisition facts در `pa_transactions` با operation/account/cost/quantity. Header fields snapshot/legacy باشند.

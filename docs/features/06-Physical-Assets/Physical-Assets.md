@@ -244,3 +244,6 @@ realizedPnl = netProceeds - carryingAmountReleased (from pa_transactions), not n
 ## FEAT-P0-042 DEEP
 Write-off records carryingAmountBefore and lossAmount. currentValue→0 is snapshot after op.
 
+## FEAT-P0-043 DEEP
+Header purchasePrice/date are legacy snapshots. All acquisition cost/qty/date live on pa_transactions.
+
