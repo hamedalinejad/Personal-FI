@@ -215,3 +215,13 @@ input
 **اجباری در Documentation/Code review:** هر PR که `SUM(` روی amount/quantity/price بزند رد می‌شود مگر ستون non-financial INTEGER باشد.
 
 جزئیات: `Implementation-Pitfalls.md` · `Precision-Policy.md` · `Rounding-Policy.md`
+
+---
+## P0-007 — Polymorphic link enforce
+
+On every write of relatedFeature/relatedId:
+
+1. relatedFeature ∈ closed enum (`types.md`)
+2. relatedId exists in mapped table (runtime validate inside operation)
+3. Prefer real FK when single-target; polymorphic only for docs/notifications/generic links
+4. Periodic reconcile for orphans → ref_integrity_queue

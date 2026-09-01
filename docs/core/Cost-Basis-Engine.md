@@ -364,3 +364,11 @@ valueBase = qty × price_quote(asOf) × fx_quote_to_base(asOf)
 گزارش حرفه‌ای **مؤلفه دارایی (quote)** و **مؤلفه FX** را جدا می‌کند تا حالت «قیمت دلاری پایین / ریال بالا / سود ریالی» گم نشود.
 
 جزئیات و fixture: `Investment-Crypto.md` بخش «P&L چندارزی ایران».
+
+---
+## P0-009 — Deterministic rebuild order (all features)
+
+```text
+ORDER BY effectiveOrBusinessDate ASC, createdAt ASC, id ASC
+```
+Date alone is **forbidden** as sole sort for rebuild/FIFO/schedule application.

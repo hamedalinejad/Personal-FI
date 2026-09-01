@@ -28,3 +28,14 @@ Warning ≠ Error:
 API Domain **فیلد UI-specific ندارد** (`selectedTab`, `isExpanded`, …).
 
 UI State (Zustand و مشابه) ≠ Financial SoT. Balance در store فقط cache است.
+
+---
+## P0-005 — Public API primitives only
+
+Response/request JSON:
+
+- Money/qty/rate: **string** decimal (`"1234.56"`)
+- Dates: ISO string
+- Enums: string unions
+
+**Forbidden in Public API samples:** `Decimal` class instances, `number` for money.

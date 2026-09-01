@@ -102,8 +102,12 @@ APIهای داخلی (Internal APIs)
 Income Transaction APIs:
 
 createIncome(data) → ثبت درآمد + گرفتن نرخ تبدیل + ایجاد تراکنش + به‌روزرسانی مانده حساب
-correctIncome(id, data) → اصلاح درآمد — **الزاماً Atomic (BEGIN/COMMIT)**:
- 1. `inc_transactions[id].isVoided = true` + `acc_transactions[accountTransactionId].isVoided = true`
+correctIncome(id, data) → اصلاح درآمد — **فقط از طریق Core Financial Operation**:
+ 1. **ممنوع:** Feature خودش acc را void/reverse دستی کند
+ 2. یک `runAtomicFinancialOperation` با `reversesOperationId = original.operationId`
+ 3. Core: `buildReversalPlan` + apply معکوس همه legs (domain + cash + journal)
+ 4. سپس (در همان یا op بعدی طبق product UX) ثبت income اصلاح‌شده به‌عنوان operation جدید
+ 5. Domain flags مثل `isVoided` فقط **derived از** status عملیات معکوس‌شده‌اند — نه موتور مستقل reversal
  2. INSERT تراکنش Reversal در `acc_transactions` (برای درست کردن موجودی حساب)
  3. INSERT رکورد جدید در `inc_transactions` با داده اصلاح‌شده، `reversedIncomeId=id`، و `accountTransactionId` اشاره به تراکنش جدید `acc_transactions`
  4. INSERT تراکنش جدید در `acc_transactions` برای مبلغ صحیح
@@ -193,3 +197,13 @@ Correction/reversal = new Financial Operation + `reversesOperationId`; original 
 ## FEAT-P0-023 DEEP (Income)
 Same as Expense: reversesOperationId; no double-count cash.
 
+---
+## P0-001/002/003 LOCK — Reversal ownership (Income)
+
+| ممنوع | درست |
+|--------|------|
+| Feature void + manual acc reversal + new tx به‌صورت مراحل جدا | `core.reverseOperation(operationId)` |
+| double reverse (Feature یک‌بار، Core یک‌بار) | فقط Core |
+| فقط `isVoided=true` بدون lineage | `operationId`, `reversesOperationId`, `reversalOperationId` اجباری |
+
+`isVoided` روی ردیف domain = **projection** از وضعیت operation معکوس‌شده؛ منبع حقیقت زنجیره = `fin_operations` lineage.

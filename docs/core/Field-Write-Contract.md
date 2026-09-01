@@ -62,3 +62,9 @@ recordFinancialOperation / runAtomicFinancialOperation
 `projectionVersion` · `sourceLastOperationId` · `sourceHash` · `rebuiltAt`
 
 Estimated vs Actual هرگز قاطی نشوند: predictedProfit · reportedProfit · calculatedProfit · realized · unrealized.
+
+---
+## P0-004 — Prose must not call snapshot «موجودی جاری SoT»
+
+در Feature docs، عباراتی مثل «موجودی فعلی حساب = فیلد currentBalance» **غلط**اند مگر بگویند derived/rebuild.
+SoT = ledger events + journal؛ snapshot = projection.

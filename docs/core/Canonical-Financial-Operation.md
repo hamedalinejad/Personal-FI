@@ -775,3 +775,22 @@ same operationId + different commandHash → INTEGRITY ERROR
 روی هر operation نگه دار:
 
 `operationId` · `commandHash` · `createdAt` · `schemaVersion` · `calculationVersion` · `roundingVersion`
+
+---
+## P0-001 — Core sole owner of reversal
+
+```text
+Feature MUST NOT implement its own void+reversal cash pipeline.
+Feature MAY: FinancialOperationAdapter.buildReversalPlan(ctx)
+Core MUST: reverseOperation(operationId) applying the plan atomically
+```
+
+Correction pattern (P0-002):
+
+```text
+1. reverseOperation(originalId)           // exact inverse all legs once
+2. optional new operation (corrected facts)
+Link: reversesOperationId / reversalOperationId
+```
+
+**isVoided alone is insufficient (P0-003).** Always persist operation lineage.

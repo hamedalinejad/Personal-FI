@@ -464,3 +464,10 @@ emit(type, payload) {
 SoT: 2026-09-01T08:00:00.000Z
 UI:  ۱۴۰۵/۰۶/۱۰
 ```
+
+---
+## P0-008 — relatedFeature enum ownership
+
+**Sole source:** this file (`types.md`).
+Feature docs must not invent local string lists for relatedFeature.
+Unknown value → validation error at operation boundary.

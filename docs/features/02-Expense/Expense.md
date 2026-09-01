@@ -232,3 +232,17 @@ Tables/entities: operation + cashLeg + expense_lines[] with amount, categoryId, 
 Correction = new op with reversesOperationId; original immutable.
 Reports use non-reversed ops once — never void+reverse+new all counting as three cash events.
 
+---
+## P0-001/002/003 LOCK — Reversal ownership (Expense)
+
+`correctExpense` / delete با اثر مالی:
+
+```text
+UI/Feature API
+  → core.reverseOperation(originalOperationId)   // تنها مالک reverse
+  → (اختیاری) operation جدید برای مبلغ/دستهٔ درست
+```
+
+**ممنوع:** Feature در prose بگوید «acc را void کن + reversal بساز + tx جدید» به‌عنوان سه write مستقل بدون Core plan.
+
+Lineage اجباری: `operationId`, `reversesOperationId`, `reversalOperationId` روی fin_operations و در صورت نیاز روی domain row.

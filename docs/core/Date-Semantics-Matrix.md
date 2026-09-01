@@ -41,3 +41,14 @@ Historical P&L از `priceAsOf`+`rateDate` هم‌تراز — نه `fetchedAt` 
 | **Effective / Payment Date** | اثر روی موجودی یا پرداخت واقعی | paymentDate قسط |
 
 هر سه می‌توانند متفاوت باشند؛ برای موجودی نقد و P&L از فیلد درست استفاده شود نه یک date واحد.
+
+---
+## P0-010 — businessDate vs createdAt (all Features)
+
+| Use | Field |
+|-----|--------|
+| Business reports, P&L period, tax period | **businessDate** (or domain equivalent: tradeDate, paymentDate) |
+| Audit «when entered in app» | createdAt |
+| Ordering same-day events | businessDate + createdAt + id |
+
+No Feature may use createdAt as the primary axis of historical financial reports.

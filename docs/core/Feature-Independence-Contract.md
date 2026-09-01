@@ -232,3 +232,9 @@ Loan Payment → optional Cash Account از طریق Port.
 Loan + Accounting UI + Accounts + Documents + Reports سراسری.
 
 جزئیات بسته: `Feature-Package-Architecture.md`.
+
+---
+## P0-006 — Standalone vs required accountId
+
+اگر Feature «Standalone» است، **هیچ** ستون `accountId`/`accountTransactionId` نباید NOT NULL یا «اجباری» در schema/prose باشد.
+Linkage فقط از طریق SettlementPort و nullable FK.
