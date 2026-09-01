@@ -223,3 +223,8 @@ Feature-local synonyms map to this enum.
 ---
 ## FEAT-P0-002 Snapshot
 `currentBalance` / holding `quantity` / `totalInvested` = projection. Mutate only via operations + rebuild. No public setBalance API.
+
+## FEAT-P0-020 DEEP
+Single Core enum accountKind: cash, bank_account, card, wallet, brokerage_cash, crypto_exchange_cash, cash_equivalent, credit_account.
+Feature-local type strings must map into this enum; no parallel conflicting enums.
+

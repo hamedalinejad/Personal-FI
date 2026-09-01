@@ -147,7 +147,7 @@
 **راه‌حل:** v1 state machine فقط یک مجموعه canonical داشته باشد؛ states آینده با namespace/version مشخص شوند، نه اینکه هم‌زمان معتبر باشند.
 
 ## FEAT-P0-020 — Accounts accountType drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — unified accountKind enum
 **مشکل:** `current/savings/term_deposit/other` در entity و `qarz/sep/modat/jame/other` در بخش ایران آمده است.
 
 **راه‌حل:** `accountKind`/`accountType` را تفکیک کن: canonical internal enum + `iranAccountSubtype` در صورت نیاز. Mapping legacy مستند شود.
