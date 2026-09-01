@@ -381,7 +381,7 @@ FIF NAV/profit، Stock external statements، Metals provider quote و Tax extern
 Current holding نباید برای P&L یک period استفاده شود. Opening position + flows + realized + closing valuation لازم است.
 
 ## FEAT-P1-012 — Price source stale policy
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — soft-delete financial matrix
 Staleness باید per assetCategory/quoteType/source باشد؛ «قیمت قدیمی» باید در API output قابل مشاهده باشد.
 
 ## FEAT-P1-013 — Price dedupe identity
