@@ -397,7 +397,7 @@ Merger, spin-off, rights, symbol/ISIN change باید source/target instrument �
 T+2، تعطیلات، session، lotSize، priceTick و settlement باید versioned/configurable باشند، نه hard-coded در feature logic.
 
 ## FEAT-P1-016 — Iranian loan convention scope
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — duplicate detection beyond operationId
 مرابحه، قرض‌الحسنه، فروش اقساطی، جعاله و سایر loanTypeIrها نباید صرفاً label باشند اگر فرمول/fee/penalty متفاوت دارند. هر type باید policy/profile مشخص یا explicit unsupported داشته باشد.
 
 ## FEAT-P1-017 — Penalty legal/policy version
