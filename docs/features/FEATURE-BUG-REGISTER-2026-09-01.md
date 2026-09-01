@@ -385,7 +385,7 @@ Current holding نباید برای P&L یک period استفاده شود. Openi
 Staleness باید per assetCategory/quoteType/source باشد؛ «قیمت قدیمی» باید در API output قابل مشاهده باشد.
 
 ## FEAT-P1-013 — Price dedupe identity
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — notifications non-authoritative
 Dedupe key باید حداقل `(assetCategory,instrumentId,quoteMarket,priceCurrency,sourceId,time bucket)` باشد. Symbol-only dedupe ممنوع.
 
 ## FEAT-P1-014 — Corporate actions source/target
