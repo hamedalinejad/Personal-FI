@@ -896,3 +896,6 @@ PriceSelectionPolicy versioned: holding source → explicit → default → prio
 ## FEAT-P0-026 DEEP
 History key = (assetCategory, instrumentId). Provider maps symbol→instrumentId externally. No new rows keyed by symbol alone.
 
+## FEAT-P0-027 DEEP
+quoteType enum sole: last | nav | close | mid | indicative | manual | other. Adapters normalize into this set.
+

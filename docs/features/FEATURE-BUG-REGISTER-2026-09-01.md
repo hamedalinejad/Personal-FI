@@ -189,7 +189,7 @@
 **راه‌حل:** `CanonicalPriceInstrument {assetCategory,instrumentId,...}` تنها ورودی/کلید history. Provider mapping جدا.
 
 ## FEAT-P0-027 — Price quoteType drift
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — quoteType enum unified
 **مشکل:** entity و adapter مجموعه‌های متفاوتی از quoteType دارند (`last/nav/close/manual/indicative` در برابر `mid/other`).
 
 **راه‌حل:** یک enum مرکزی: `last | nav | close | mid | indicative | manual | other` و همه Providerها فقط همین را برگردانند.
