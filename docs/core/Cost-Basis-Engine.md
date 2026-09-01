@@ -372,3 +372,9 @@ valueBase = qty × price_quote(asOf) × fx_quote_to_base(asOf)
 ORDER BY effectiveOrBusinessDate ASC, createdAt ASC, id ASC
 ```
 Date alone is **forbidden** as sole sort for rebuild/FIFO/schedule application.
+
+---
+## P0-043/044 — C2C and transfer fee burn
+
+Transfer/C2C with fee in asset: split quantity into **moved** and **burned**; allocate cost pool proportionally unless policy says otherwise.
+Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-off) without inflating dest average incorrectly.

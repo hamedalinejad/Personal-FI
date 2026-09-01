@@ -1575,3 +1575,81 @@ unrealizedQuote = −5_000 USDT           ← زیان دلاری/تتری
 - `Cost-Basis-Engine.md` — cost در costCurrency یکسان  
 - `Currency-CrossRate.md` — `valueInBase = price × fx` با asOf هم‌زمان  
 - گزارش پرتفوی نباید Net Worth را فقط از قیمت تتری بدون FX بسازد وقتی base=IRR است.
+
+---
+## P0-042 DEEP — rebuild quantity = net
+
+Raw on tx: `grossQuantity`, `feeQuantity`, `netQuantity` (all required when fee possible).
+
+```text
+rebuild holding.quantity = Σ signed netQuantity (active ops only)
+```
+
+**Forbidden:** summing legacy `tx.quantity` when gross/net exist without mapping quantity→net.
+
+## P0-043 DEEP — C2C fee in base asset
+
+C2C = **one** Financial Operation with multiple legs:
+
+- dispose leg on from-asset (qty + released cost)
+- fee leg if fee in BTC/from-asset (`feePresence=fee_from_base` / burn)
+- acquire leg on to-asset with dest cost = released − feeBurnCostPolicy + quote fees
+
+CostBasisEngine must document: fee-from-base reduces source qty and allocates cost to fee-burn vs transferred remainder **before** assigning dest basis.
+
+## P0-044 DEEP — transfer fee vs moved cost
+
+Internal transfer with network fee from source:
+
+```text
+qty_moved = gross − fee_burn
+cost_moved = proportional cost of qty_moved
+cost_fee_burn = cost of fee_burn qty (policy: proportional)
+realized on fee_burn: usually 0 or expense per Fee matrix — NOT mixed into dest average silently
+```
+
+Dest holding receives **only** cost_moved. Fee economic effect separate.
+
+## P0-045 DEEP — totalFeesPaidBase
+
+**Forbidden as independent ever-increasing SoT.**
+
+```text
+totalFeesPaidBase = DERIVED Σ feeBase from active (non-reversed) operations
+```
+
+Optional snapshot OK if rebuildable. Distinguish report modes: `feesGrossEver` (includes reversed for audit) vs `feesNetEffective` (active only).
+
+## P0-046 DEEP — identity
+
+`holding.instrumentId` / tx.instrumentId = `ref_instruments.id` only.
+`assetKey` = migration/provider alias only — never rebuild key.
+
+## P0-047 DEEP — USDT cash vs USDT token
+
+| Role | Where |
+|------|--------|
+| Settlement cash-like (exchange balance in USDT) | `inv_crypto_cash` / cash account currency USDT |
+| On-chain USDT-TRC20 / ERC20 | instrument holdings |
+
+Valuation: cash USDT → FX to base; token USDT → price of instrument (often ~1 USDT) × FX.
+**Forbidden:** counting same economic USDT once as cash and once as token without distinct custody rows.
+
+## P0-048 DEEP — feePresence exclusive
+
+Enum/state **mutually exclusive** per leg (validation):
+
+`none | fee_in_quote | fee_from_base | fee_from_received | fee_external`
+
+Cannot combine `fee_from_base` + `fee_from_received` on same leg. Network fee is either modeled as one of these or a **separate leg** with its own feePresence — not double-applied to same qty.
+
+## P0-049 DEEP — address ownership
+
+On chain tx write:
+
+```text
+assert address ∈ wallet.addresses for selected networkId
+assert network matches instrument/network of holding
+```
+
+Reject mismatched address/network/wallet attribution.

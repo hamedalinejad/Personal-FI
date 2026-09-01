@@ -1903,3 +1903,13 @@ early payment / rate change → new snapshot; old retained
 ```
 
 Historical reconstruction همیشه از snapshot اشاره‌شده — نه فقط «آخرین schedule».
+
+---
+## P0-041 DEEP — cancelLoan
+
+| وضعیت وام | رفتار |
+|-----------|--------|
+| بعد از هر payment | **cancel ممنوع** — فقط reverse/correct payments یا settle |
+| بعد از disbursement و **بدون** payment | cancel مجاز = `core.reverseOperation(disbursementOperationId)` + status `cancelled` |
+
+Cancel هرگز فقط `status=cancelled` بدون reverse اقتصادی disbursement نیست.

@@ -59,3 +59,17 @@
 | P0-038 | **CLOSED** | grace capitalize/waive flags explicit |
 | P0-039 | **CLOSED** | versioned allocation waterfall |
 | P0-040 | **CLOSED** | immutable schedule snapshots referenced by payments |
+
+## Batch P0-041 … P0-049
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-041 | **CLOSED** | cancel after disbursement only via Core reverse; no cancel after payments |
+| P0-042 | **CLOSED** | rebuild uses netQuantity |
+| P0-043 | **CLOSED** | C2C one op; fee-from-base cost policy explicit |
+| P0-044 | **CLOSED** | transfer cost_moved vs cost_fee_burn split |
+| P0-045 | **CLOSED** | totalFeesPaidBase derived from active ops |
+| P0-046 | **CLOSED** | instrumentId sole identity |
+| P0-047 | **CLOSED** | USDT cash ≠ USDT token instrument |
+| P0-048 | **CLOSED** | feePresence mutually exclusive |
+| P0-049 | **CLOSED** | address must match wallet+network |
