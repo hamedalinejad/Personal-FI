@@ -15,6 +15,7 @@ v1 = **in-process TypeScript Feature API** (نه HTTP اجباری). همان Co
 | هر Command مالی: `operationId` (+ idempotency) | |
 | Query **write ندارد** | |
 | Feature فقط public API export می‌کند | |
+| هر Response نسخه Schema را اعلام می‌کند | |
 
 ## Common types
 
@@ -22,26 +23,66 @@ v1 = **in-process TypeScript Feature API** (نه HTTP اجباری). همان Co
 type DecimalString = string; // canonical money/qty/rate
 type UUID = string;
 
-interface ApiResult<T> {
-  ok: true;
+type ApiSuccess<T> = {
+  success: true;
   data: T;
-  operationId?: UUID;
-}
-interface ApiError {
-  ok: false;
-  error: { code: string; message: string; details?: unknown };
-}
-type ApiResponse<T> = ApiResult<T> | ApiError;
+  errors: [];
+  meta: {
+    request_id: UUID;
+    operation_id?: UUID;
+    schema_version: string;
+  };
+};
+
+type ApiFailure = {
+  success: false;
+  data: null;
+  errors: Array<{
+    code: string;
+    message: string;
+    field?: string | null;
+    details?: unknown;
+  }>;
+  meta: {
+    request_id: UUID;
+    operation_id?: UUID;
+    schema_version: string;
+  };
+};
+
+type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
 
 interface PaginationParams {
   page?: number;
   pageSize?: number;
 }
 interface DateRange {
-  from: string; // ISO
+  from: string; // ISO timestamp or canonical DATE according to endpoint contract
   to: string;
 }
 ```
+
+### Response contract
+
+`docs/core/API-Requirements.md` و این فایل باید یک envelope واحد داشته باشند:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "errors": [],
+  "meta": {
+    "request_id": "...",
+    "operation_id": "...",
+    "schema_version": "1.0"
+  }
+}
+```
+
+- `request_id` شناسه request/trace است؛ لزوماً با `operation_id` یکی نیست.
+- Commandهای مالی باید `operation_id` داشته باشند.
+- Queryهای read-only می‌توانند `operation_id` نداشته باشند.
+- خطاهای domain/API همیشه `errors[].code` ماشین‌خوان دارند.
 
 ## الگوی هر Feature
 
@@ -57,8 +98,8 @@ feature/
 ```typescript
 interface CreateAccountRequest {
   name: string;
-  currency: string; // IRR canonical
-  accountType: 'qarz' | 'sep' | 'modat' | 'jame' | 'other';
+  currency: string; // canonical ISO/custom currency code
+  accountType: 'current' | 'savings' | 'term_deposit' | 'joint' | 'other';
 }
 interface CreateAccountResponse {
   id: UUID;
@@ -112,3 +153,17 @@ cryptoAPI = { executeBuy, executeSell, … }
 UI **فقط** این‌ها (و Capability API) را صدا می‌زند.
 
 **ممنوع در UI:** `db.exec("SELECT * FROM loans")` یا SQL خام.
+
+## Standalone Module API
+
+هر Feature باید بتواند با همان Public API در دو حالت bootstrap شود:
+
+```text
+Standalone Edition:
+  Feature API → Core → Local Settlement Adapter → local DB
+
+Integrated Edition:
+  Feature API → Core → Accounts/Cash Adapter → local DB
+```
+
+Public API نباید نوع UI، route یا وجود Accounts را پیش‌شرط قرارداد خود قرار دهد.
