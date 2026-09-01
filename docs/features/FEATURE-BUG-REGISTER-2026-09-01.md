@@ -159,7 +159,7 @@
 **راه‌حل:** write جدید فقط token/hash/masked value. `cardNumber` قدیمی فقط migration compatibility و هرگز در log/export عمومی.
 
 ## FEAT-P0-022 — Expense split transaction بدون entity canonical
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — ExpenseLine first-class
 **مشکل:** Split Transaction به‌عنوان P0 معرفی شده ولی entity/table مستقل برای ExpenseLine/operation allocation تعریف نشده.
 
 **راه‌حل:** یک مدل line-level canonical بساز؛ هر operation یک CashLeg و چند ExpenseLine داشته باشد، جمع خطوط با cash leg reconcile شود.

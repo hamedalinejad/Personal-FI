@@ -224,3 +224,7 @@ CashLeg + N ExpenseLines; Σ lines (+tax) = cash leg. First-class lines not UI-o
 ### Correction (P0-023)
 One new Financial Operation with `reversesOperationId`; original immutable. Reports count economic effect once.
 
+## FEAT-P0-022 DEEP
+Tables/entities: operation + cashLeg + expense_lines[] with amount, categoryId, vat optional.
+Σ expense_lines (+vat) must equal cash leg (reconcile rule). Not UI-only split metadata.
+
