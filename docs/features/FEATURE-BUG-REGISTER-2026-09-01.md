@@ -369,7 +369,7 @@ Reports/Portfolio/Performance باید priceAsOf و fxAsOf یکسان یا صر�
 FIF NAV/profit، Stock external statements، Metals provider quote و Tax external assessments باید `EXTERNAL_REPORTED` جدا از calculated نگه داشته شوند.
 
 ## FEAT-P1-009 — Rounding per component
-**STATUS: RESOLVED** — decision locked; implement per resolution doc.
+**STATUS: DEEP-FIXED** — typed optional party links
 همه Featureهای مالی باید roundingVersion و policy مشخص داشته باشند؛ مخصوصاً Loan installments، FX conversion، crypto quantity و metals mg.
 
 ## FEAT-P1-010 — Date semantics
