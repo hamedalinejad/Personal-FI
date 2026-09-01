@@ -183,7 +183,7 @@
 **راه‌حل:** bridge فقط از settings/versioned policy. v1 modes: direct, inverse, configured_bridge, manual. USDT default فقط اگر explicitly configured.
 
 ## FEAT-P0-026 — Price identity contradictions
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — price key instrumentId
 **مشکل:** Price Fetching در جدول مشترک یک‌جا Crypto را `symbol` و جای دیگر `assetKey` و Stocks را symbol/internalSymbol معرفی می‌کند.
 
 **راه‌حل:** `CanonicalPriceInstrument {assetCategory,instrumentId,...}` تنها ورودی/کلید history. Provider mapping جدا.

@@ -893,3 +893,6 @@ Historical valuation: never fallback to current price.
 ### Selection (P0-030)
 PriceSelectionPolicy versioned: holding source → explicit → default → priority/confidence → freshness; manual expiresAt override.
 
+## FEAT-P0-026 DEEP
+History key = (assetCategory, instrumentId). Provider maps symbol→instrumentId externally. No new rows keyed by symbol alone.
+
