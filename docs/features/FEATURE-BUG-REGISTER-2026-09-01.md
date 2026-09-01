@@ -267,7 +267,7 @@
 **راه‌حل:** delivery = cross-feature atomic operation: digital metal out + physical asset acquisition + delivery fee + journal. اگر Physical Assets خاموش است، delivery باید standalone representation داشته باشد و بعداً قابل materialize باشد.
 
 ## FEAT-P0-040 — Metals coin quantity model conflict
-**STATUS: RESOLVED** — see `docs/core/FEATURE-BUG-RESOLUTIONS.md` and feature patches.
+**STATUS: DEEP-FIXED** — coins derive mg
 **مشکل:** canonical storage فقط `quantityMg` است، اما برای coin در انتها `quantityCoins` را اجباری معرفی می‌کند.
 
 **راه‌حل:** برای fungible metal وزن canonical است؛ برای coin count canonical quantity باشد و standardWeight/purity metadata داشته باشد. دو مدل را در یک entity بدون discriminator مخلوط نکن.

@@ -414,3 +414,6 @@ v1: platform cashBalance is IRR-only (documented scope). Multi-currency requires
 ## FEAT-P0-039 DEEP
 Physical delivery operation must: decrease digital holding, create/increase physical asset, post fees, journal — same operationId. Forbid digital-only decrease.
 
+## FEAT-P0-040 DEEP
+quantityMg is SoT mass. quantityCoins is input helper: mg = coins × mgPerCoin(coinType). Never dual SoT.
+
