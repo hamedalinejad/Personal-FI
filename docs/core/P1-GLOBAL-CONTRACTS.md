@@ -173,3 +173,7 @@ Rebuild/reconcile against journal. See `Canonical-Cash-Model.md`, P0-091.
 Iranian detail, IA performance pattern, golden fixture pack, acceptance matrix:  
 `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md`
 
+## P0-FINAL-025 / 026
+
+Cash FX translation vs investment P&L; snapshot watermark expanded — see `P0-FINAL-021-026-LOCKS.md`.
+

@@ -39,3 +39,8 @@ CA golden numbers · transfer/bridge/swap split · EconomicKind journals · open
 ## P0-FINAL-015…020 (LOCKED)
 
 Immutability delete/update · Kind enum + SYSTEM_INDEX · fee currency vs instrument · holding partial unique · acc_tx vs journal.
+
+## P0-FINAL-021…026 (LOCKED)
+
+costCurrency immutability · fee allocation equations · transfer fee pools · Period Return v1 · cash FX wealth · full snapshot watermark.
+

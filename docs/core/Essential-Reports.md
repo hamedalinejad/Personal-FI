@@ -73,3 +73,7 @@ Do not aggregate the same fact from domain + journal + cash snapshots. Each repo
 
 Global `ValuationContext`; multi-currency attribution; wealth change ≠ investment P&L. See `P1-GLOBAL-CONTRACTS.md` §§21–23.
 
+## P0-FINAL-024…026
+
+Period Return v1 formula; cash FX wealth matrix; full SnapshotWatermark — `P0-FINAL-021-026-LOCKS.md`.
+

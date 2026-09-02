@@ -391,3 +391,7 @@ Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-
 
 CA numeric vectors, C2C vs bridge, economic kinds, opening cost: `P0-FINAL-011-014-LOCKS.md`.
 
+## P0-FINAL-021…023
+
+costCurrency immutable per pool; CostBasisFeeAllocation v1; transfer fee source/dest split — `P0-FINAL-021-026-LOCKS.md`.
+
