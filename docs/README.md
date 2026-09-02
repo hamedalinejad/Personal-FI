@@ -124,3 +124,10 @@
 - Spec Freeze: قراردادهای مالی و UX (۹ صفحه) قفل
 - Documentation Audit: cross-document audit انجام شد و تناقض‌های P0 اصلی اصلاح/یکسان‌سازی شدند
 - قبل از کد: golden fixtures + ESLint feature boundary + markdown-link-check
+
+
+## P2 documentation quality
+
+- Naming: [`core/NAMING-GLOSSARY.md`](core/NAMING-GLOSSARY.md)
+- Style: [`core/DOCUMENTATION-STYLE-P2.md`](core/DOCUMENTATION-STYLE-P2.md)
+- Feature README template: [`features/_FEATURE-README-TEMPLATE.md`](features/_FEATURE-README-TEMPLATE.md)

@@ -265,3 +265,9 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-5.md`
 8. Cross-feature writes only via operation/CashSettlementPort
 9. Reference tables seed/migration contract
 10. Partial unique indexes for nullable identifiers
+
+
+## P2 — Documentation quality
+
+- `NAMING-GLOSSARY.md` — transaction/operation/event/ledger/journal/cash/snapshot; voided/reversed/cancelled/archived
+- `DOCUMENTATION-STYLE-P2.md` — legacy aliases, Feature README, formulas→engines, decimal strings, diagrams from matrix

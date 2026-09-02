@@ -18,3 +18,7 @@
 ## Authority (CROSS-CUTTING §4)
 
 All Features follow this matrix only. No feature-local hard-delete policy for posted financial data. Cancel vs void/reverse distinguished as above.
+
+## Vocabulary
+
+Use voided / reversed / cancelled / archived as defined in `NAMING-GLOSSARY.md`.

@@ -22,3 +22,7 @@ docs_documents → docs_links → any entity
 ```
 
 FK واقعی جایی که ممکن؛ polymorphic فقط از طریق links + validate.
+
+## P2
+
+Dependency/ER diagrams in docs **must** be generated from this matrix (and Domain-Dependency-Matrix). Hand-maintained diagrams that diverge are invalid.
