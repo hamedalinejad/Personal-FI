@@ -395,3 +395,9 @@ Authority: `P0-FINAL-015-020-LOCKS.md`
 
 Authority: `P0-FINAL-021-026-LOCKS.md`
 
+
+
+## P0-FINAL-027…035 / P1-FINAL-030…032 — LOCKED
+
+Authority: `P0-FINAL-027-035-LOCKS.md`
+

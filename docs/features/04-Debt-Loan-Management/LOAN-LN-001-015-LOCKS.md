@@ -194,3 +194,8 @@ Money remains reportable on a canonical fin_account; not an invisible side pocke
 | ID | Status |
 |----|--------|
 | LN-001 … LN-015 | **LOCKED** 2026-09-02 |
+
+## P0-FINAL-027…029
+
+scheduled vs accrued vs settled; variable-rate mid-period fixture; multi-currency repayment journal roles — `docs/core/P0-FINAL-027-035-LOCKS.md`.
+

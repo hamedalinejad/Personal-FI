@@ -143,3 +143,8 @@ monthly declining · weekly · custom day count · variable rate · grace · par
 - `Mandatory-Test-Vectors.md`
 - `Pages-IA.md`
 - Feature `*-LOCKS.md` files
+
+## P0-FINAL-033…035 Fixture gate
+
+Schema for numeric fixtures, failure vectors, reversal before/after pairs: `P0-FINAL-027-035-LOCKS.md`. Inventory alone is not release-green.
+

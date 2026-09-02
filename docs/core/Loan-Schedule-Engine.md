@@ -244,3 +244,7 @@ remainingBalance = DERIVED از ln_transactions
 
 Variable rate by **accrual interval**; explicit dayCount vs period mode; grace capitalize/forgive flags; component-level outstanding; immutable schedule versions on early pay/restructure; final principal exact; explicit penalty accrual policy. See `LOAN-LN-001-015-LOCKS.md`.
 
+## P0-FINAL-027/028
+
+Schedule = projection; accrual posts only via accrual/payment events. Variable-rate fixture: `P0-FINAL-027-035-LOCKS.md`.
+

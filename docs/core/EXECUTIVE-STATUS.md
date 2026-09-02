@@ -44,3 +44,9 @@ Immutability delete/update · Kind enum + SYSTEM_INDEX · fee currency vs instru
 
 costCurrency immutability · fee allocation equations · transfer fee pools · Period Return v1 · cash FX wealth · full snapshot watermark.
 
+## P0-FINAL-027…035 / P1-FINAL-030…032 (LOCKED)
+
+Loan schedule/accrual/settled · var-rate vector · FX loan journals · Feature authority chain · canonical file pointers · spec.md role · fixture schema + negatives + reversal pairs.
+
+**Largest remaining gap to coding green:** numeric fixture pack fill-out (033–035).
+
