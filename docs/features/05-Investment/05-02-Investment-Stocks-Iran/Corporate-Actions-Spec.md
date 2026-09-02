@@ -144,3 +144,7 @@ Rebuild via CorporateActionEngine only. Fractional + cash-in-lieu explicit. Symb
 
 gross / withholding / net with incomeRecognitionDate vs paymentDate journals — see `P0-FINAL-005-010-LOCKS.md` §010.
 
+## P0-FINAL-011 numeric vectors
+
+Bonus/split/reverse/capital increase/rights+CIL golden numbers: `docs/core/P0-FINAL-011-014-LOCKS.md` §011.
+

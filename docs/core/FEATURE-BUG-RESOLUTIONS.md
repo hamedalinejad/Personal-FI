@@ -377,3 +377,9 @@ See `P0-FINAL-001-004-LOCKS.md` and `EXECUTIVE-STATUS.md`.
 
 Authority: `P0-FINAL-005-010-LOCKS.md`
 
+
+
+## P0-FINAL-011…014 — LOCKED
+
+Authority: `P0-FINAL-011-014-LOCKS.md`
+

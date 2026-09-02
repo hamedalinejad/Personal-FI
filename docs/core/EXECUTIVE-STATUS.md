@@ -31,3 +31,7 @@ Deterministic attribution v1 · FX path composition · price/FX no-observation p
 
 Still not full coding green until numeric fixture pack expands; **these algorithms are no longer optional prose**.
 
+## P0-FINAL-011…014 (LOCKED)
+
+CA golden numbers · transfer/bridge/swap split · EconomicKind journals · opening equity (not fake buy).
+

@@ -386,3 +386,8 @@ Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-
 
 - Default cost basis method is **per asset class** (settings) with optional per-holding override.
 - Operations store `engineVersions.costBasis` (and rounding policy version). Replay uses the version on the operation, not the current default only.
+
+## P0-FINAL-011…014
+
+CA numeric vectors, C2C vs bridge, economic kinds, opening cost: `P0-FINAL-011-014-LOCKS.md`.
+

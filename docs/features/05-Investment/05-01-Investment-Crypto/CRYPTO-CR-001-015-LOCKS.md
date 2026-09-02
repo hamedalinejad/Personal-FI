@@ -180,3 +180,8 @@ Raw lot identity must not be discarded solely because current method is WA.
 ## P0-FINAL fee vocabulary
 
 feePresence legacy maps to feeFundingAsset table in `docs/core/P0-FINAL-001-004-LOCKS.md`. Burn math: P0-FINAL-004.
+
+## P0-FINAL-012 / 013 / 014
+
+C2C = economic_trade_or_swap (realized). Bridge/transfer realized=0. EconomicKind matrix + opening equity journals: `docs/core/P0-FINAL-011-014-LOCKS.md`.
+
