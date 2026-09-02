@@ -50,3 +50,9 @@ reconcileOnLoad():
 4. integrity_check قبل از restore
 
 مرجع: `Technical-Architecture.md` · `db/02-storage-persistence.md` · `db/04-reconciliation-integrity.md`
+
+## Atomic ops & dual-store recovery (CROSS-CUTTING BATCH-4 §9–§10)
+
+- Financial operation commit is atomic across domain + journal + cash (or explicit recovery-aware 2-phase).
+- If primary (SQLite) and secondary (e.g. IndexedDB) layers both exist: write intent → primary commit → secondary persist → mark fully durable. Startup reconciles pending intents. UI success only after defined durable state.
+

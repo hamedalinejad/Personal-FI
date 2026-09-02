@@ -42,3 +42,8 @@ verifySnapshotsAgainstSoT()
 ```
 
 Reports از Journal/Domain ledger + calculation — نه Snapshot به‌عنوان SoT.
+
+## Snapshot watermark (CROSS-CUTTING BATCH-4 §2–§3)
+
+Snapshots must store `sourceWatermark` (`lastOperationId`, optional journal sequence, `rebuiltAt`, `schemaVersion`). Rebuild is **deterministic and offline** — no live provider/network; uses stored prices/FX only.
+

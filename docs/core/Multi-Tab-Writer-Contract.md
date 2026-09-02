@@ -17,3 +17,8 @@ sql.js: **یک active writer**.
 بعد از crash وسط Operation→Journal→Snapshot→IndexedDB:
 
 detect incomplete → verify → recover/WAL → rebuild deterministic.
+
+## Financial writes (CROSS-CUTTING BATCH-4 §6)
+
+All financial writes (operations, journal, domain financial tables) **must** acquire the single-writer lock. Read-only paths do not take exclusive write lock.
+

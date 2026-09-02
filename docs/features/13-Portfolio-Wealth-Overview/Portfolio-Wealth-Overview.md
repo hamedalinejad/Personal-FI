@@ -345,3 +345,7 @@ Portfolio = aggregation؛ Net Worth ≠ فقط Portfolio (`Layer-Separation.md`)
 
 `calculateWealthView` requires explicit `liabilityScope`: `principal_only` | `principal_plus_accrued` | `full_carrying`. Response includes the scope used so UI does not mislabel net wealth.
 
+## Pending cheques vs Net Worth (CROSS-CUTTING BATCH-4 §1)
+
+Default `netWealth` does **not** include pending outgoing cheques as hard liabilities. Optional separate metric (e.g. `committedAdjustedNetWorth` / pending payables breakdown) only when requested.
+

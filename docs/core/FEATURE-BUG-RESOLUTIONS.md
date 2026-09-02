@@ -233,3 +233,19 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-3.md`
 8. budgetChequeRecognition single policy (pending vs cleared)
 9. Goals v1 earmark unless segregated cash account
 10. Wealth view explicit liabilityScope
+
+
+## Cross-Cutting Contracts Batch 4
+
+Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-4.md`
+
+1. Net Worth excludes pending cheques unless separate metric
+2. Snapshots require source watermark / lastOperationId
+3. Rebuild deterministic + offline (no live providers)
+4. Import raw immutable; normalization derived
+5. Migration rollback documented per schema version
+6. Single-writer lock on all financial writes
+7. Optimistic UI confirmed only after durable persist
+8. Canonical API error codes
+9. Atomic domain + journal + cash operations
+10. SQLite↔secondary persist crash recovery protocol

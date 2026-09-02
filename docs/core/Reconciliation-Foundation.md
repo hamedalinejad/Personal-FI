@@ -42,3 +42,8 @@ ReconciliationResult
 - Repair of mismatches is **permissioned**, creates audit + `repairOperationId` (or equivalent).
 - Repair **never** silently rewrites ledger/journal lines; corrections use reverse + new operations when financial truth changes.
 - Snapshot-only fix without audit = forbidden. Snapshot may be rebuilt from ledger after an audited repair.
+
+## Snapshot watermark & offline rebuild (CROSS-CUTTING BATCH-4 §2–§3)
+
+Financial snapshots carry source watermark (lastOperationId / sequence / rebuiltAt). Rebuild paths are offline-only and deterministic from local SoT + engineVersions.
+

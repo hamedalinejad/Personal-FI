@@ -804,3 +804,8 @@ Link: reversesOperationId / reversalOperationId
 - `exchangeRateToBase` / per-leg rates در همان op **immutable** بعد از post
 
 Rebuild تاریخی از settings.baseCurrency فعلی استفاده **نمی‌کند**.
+
+## Atomicity (CROSS-CUTTING BATCH-4 §9)
+
+One operationId commit spans domain effects + journal + cash settlement atomically from the caller’s perspective; partial persistence requires recovery protocol (see Persistence-State-Machine / BATCH-4).
+

@@ -180,3 +180,10 @@ See `CROSS-CUTTING-CONTRACTS-BATCH-2.md`.
 Funds fee vs income · metals→PA cost · PA revaluation · loan accrual/fees/reverse · cheque dates · budget↔cheque policy · goals earmark · wealth liabilityScope.
 
 See `CROSS-CUTTING-CONTRACTS-BATCH-3.md`.
+
+
+## Cross-Cutting Contracts Batch 4 — LOCKED 2026-09-02
+
+Net worth vs pending cheques · snapshot watermarks · offline rebuild · import raw · migration rollback · single-writer · optimistic UI · error codes · atomic ops · dual-store recovery.
+
+See `CROSS-CUTTING-CONTRACTS-BATCH-4.md`.
