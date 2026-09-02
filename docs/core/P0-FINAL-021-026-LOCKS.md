@@ -187,3 +187,11 @@ Reproducibility: same ledger watermark + same price/fx dataset versions + same e
 ## P0-002 single release
 
 `TransferCostResult` — one release of gross carrying cost, split to dest+fee. See `P0-COST-BASIS-PNL-001-005-LOCK.md`.
+
+## P0-FINAL-006 supersession
+
+Period Return additive bridge: **only** wealth bridge + investmentReturn bridge in `P0-FINAL-006-015-LOCKS.md`. Old mixed flow+return equations are void.
+
+## P0-FINAL-009
+
+costCurrency immutable per pool; default baseCurrencyAtFirstCostBearingEvent — `P0-FINAL-006-015-LOCKS.md`.

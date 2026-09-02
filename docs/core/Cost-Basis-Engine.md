@@ -404,3 +404,6 @@ CA numeric vectors, C2C vs bridge, economic kinds, opening cost: `P0-FINAL-011-0
 
 costCurrency immutable per pool; CostBasisFeeAllocation v1; transfer fee source/dest split — `P0-FINAL-021-026-LOCKS.md`.
 
+## costCurrency (P0-009)
+
+Pool `costCurrency` immutable; default `baseCurrencyAtFirstCostBearingEvent`. Report valuation may convert to user base; pool currency does not rewrite.

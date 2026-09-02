@@ -110,3 +110,4 @@ Nullable external/provider identifiers participate in uniqueness only via partia
 relatedFeature+relatedId: validate atomically, link tables, reconcile orphans (orphan=0 in fixtures).  
 Shared enums (`relatedFeature`, account kinds) have a **single Core owner** — no feature-local forks.
 
+**businessDate storage (P0-011):** Gregorian DATE-only `YYYY-MM-DD`.

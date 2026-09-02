@@ -51,7 +51,16 @@ Ambiguous single `quantity` on C2C buy leg without gross/net is forbidden.
 
 ---
 
-## CR-005 — C2C destination cost
+## CR-005 — C2C destination cost (P0-010 LOCKED)
+
+**Canonical:**
+```text
+economic_trade_or_swap → destination basis = trade consideration (+ capitalized fees)
+internal_transfer | same_owner_bridge → transferred / carrying cost
+```
+Any formula `destinationCost = costReleasedFromSource` applies **only** to transfer/bridge, **not** economic C2C.
+
+## CR-005 — (legacy section retained for history; rules above win)
 
 ```text
 transferredCost = costReleasedFromSource  // from CostBasisEngine on sell/disposal leg

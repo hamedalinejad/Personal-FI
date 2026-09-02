@@ -5,7 +5,7 @@ Entity-level کافی نیست. هر فیلد مهم:
 | attribute | |
 |-----------|--|
 | entity.field | |
-| sourceType | RAW / DERIVED / SNAPSHOT / EXTERNAL_REPORTED |
+| sourceType | RAW / DERIVED / SNAPSHOT / EXTERNAL_REPORTED / LABEL / SYSTEM_INDEX |
 | owner | feature/engine |
 | editable? | |
 | calculatedBy | engine name if derived |

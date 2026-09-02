@@ -291,3 +291,13 @@ exact | degraded | unavailable
 
 WA multi-quote without unique FX history: `attributionStatus=degraded`; dimension fields null; total P&L still exact.  
 UI must not invent synthetic FX split. Full rules: `P0-COST-BASIS-PNL-001-005-LOCK.md`.
+
+## P0-FINAL-012 / 013 / 014
+
+- T+n fee at trade date matrix: `P0-FINAL-006-015-LOCKS.md`
+- Observation tie-break: applicability → sourcePriorityRank → observationTime → sourceId → id ASC
+- `sourcePriorityRank` derived from versioned `sourcePriorityOrder` only
+
+## P0-FINAL-015 status
+
+`VALID | STALE | MISSING_INPUT | DEGRADED | FAILED`

@@ -149,3 +149,8 @@ No aspirational `[ ]` left on P0/P1-GLOBAL items in scope for v1 coding gate.
 ## P1-FINAL-051 — Canonical Page/Route/Sheet table
 
 See `docs/00-Product/Pages-IA.md` § Canonical IA Table — counts are **computed**, not “~9”.
+
+## P0-FINAL-011 refine
+
+**DB `businessDate` = Gregorian `YYYY-MM-DD` only.**  
+UI Jalali is presentation. UTC instants for createdAt/eventAt/fetchedAt.

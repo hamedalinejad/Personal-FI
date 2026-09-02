@@ -188,3 +188,7 @@ Cash FX translation vs investment P&L; snapshot watermark expanded — see `P0-F
 - Primary buckets ≠ attribution dimensions; never flat-sum both axes.
 - `attributionStatus`: exact | degraded | unavailable
 - degraded: total exact; dimension fields **null** when non-identifiable (WA multi-quote)
+
+## Field Kind (P0-008)
+
+`RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX` — must match Field-Level-SoT and P0-015-020.

@@ -53,3 +53,5 @@ Core Decimal / Money / FX
 ## Architecture test (ongoing)
 
 Only mutation path: Feature Command → Operation Builder → Core → Journal/Cash → projection.
+
+036–040 index: `P0-FINAL-036-040-LOCKS.md` · 006–015: `P0-FINAL-006-015-LOCKS.md`
