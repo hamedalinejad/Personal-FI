@@ -47,3 +47,7 @@ Reports از Journal/Domain ledger + calculation — نه Snapshot به‌عنو
 
 Snapshots must store `sourceWatermark` (`lastOperationId`, optional journal sequence, `rebuiltAt`, `schemaVersion`). Rebuild is **deterministic and offline** — no live provider/network; uses stored prices/FX only.
 
+## Ordering (X-015)
+
+Rebuild order: business/effective date → createdAt → stable id. Same-day events are deterministic.
+

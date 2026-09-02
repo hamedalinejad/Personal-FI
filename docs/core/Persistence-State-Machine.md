@@ -56,3 +56,7 @@ reconcileOnLoad():
 - Financial operation commit is atomic across domain + journal + cash (or explicit recovery-aware 2-phase).
 - If primary (SQLite) and secondary (e.g. IndexedDB) layers both exist: write intent → primary commit → secondary persist → mark fully durable. Startup reconciles pending intents. UI success only after defined durable state.
 
+## No lost ops (X-014)
+
+pendingCommit + recovery across primary/secondary stores. Crash between SQLite and IDB must not drop an acknowledged financial operation.
+

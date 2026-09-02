@@ -68,3 +68,8 @@ Document → Metadata → Blob → Checksum → Source
 
 این از policy متنی به **قرارداد schema/migration** ارتقا یافته است.
 مرجع: `Migration-Data-Preservation.md` · `Raw-vs-Derived-Data.md`
+
+## Legacy vs canonical (X-017)
+
+New writes → canonical only; legacy read-only; raw import preserved. Roundtrip field loss target = 0.
+

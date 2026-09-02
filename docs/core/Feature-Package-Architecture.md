@@ -59,3 +59,7 @@ Standalone UI ≠ بدون Sub-ledger / Journal
 
 Feature packages must not circularly depend. Cross-feature **writes** only via Financial Operation adapters / CashSettlementPort / public commands — never direct foreign feature repository access.
 
+## CI boundaries (X-020)
+
+No direct cross-feature repository imports — enforced by ESLint/architecture tests in CI, not documentation alone.
+

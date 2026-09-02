@@ -289,3 +289,11 @@ Authority: `CROSS-FEATURE-X-001-010-LOCKS.md`
 - X-009 FX-attributed P&L components
 - X-010 Historical asOf/priceAsOf/fxAsOf
 
+
+
+## X-011 … X-020 — LOCKED
+
+Authority: `CROSS-FEATURE-X-011-020-LOCKS.md`
+
+Fee single effect · rounding engine · offline rebuild · dual-store durability · deterministic order · one SoT per metric · data preservation · audit on repair · projection rebuild · CI architecture boundaries.
+

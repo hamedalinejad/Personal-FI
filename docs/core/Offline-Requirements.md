@@ -35,3 +35,7 @@ Offline ≠ ساختن قیمت لحظه‌ای از هیچ.
 
 Optimistic financial UI must show pending state and confirm only after durable persist ACK; on failure, UI rolls back. Final financial values before persist are forbidden.
 
+## Rebuild offline (X-013)
+
+Valuation/rebuild use local last-known or manual prices with stale flags. Airplane mode must allow transaction + rebuild.
+

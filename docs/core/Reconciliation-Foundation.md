@@ -47,3 +47,7 @@ ReconciliationResult
 
 Financial snapshots carry source watermark (lastOperationId / sequence / rebuiltAt). Rebuild paths are offline-only and deterministic from local SoT + engineVersions.
 
+## Rebuild path required (X-019)
+
+Every projection has reconcile + rebuildFromLedger. Intentional corruption must surface as mismatch.
+

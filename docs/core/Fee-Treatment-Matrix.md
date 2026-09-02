@@ -109,3 +109,8 @@ assert currencies aligned before arithmetic
 | capitalized_cost | add to asset/loan carrying |
 | reduction_of_carrying_amount | reduce liability/carrying |
 | reduction_of_liability (legacy) | → map to reduction_of_carrying_amount |
+
+## One effect (X-011)
+
+CanonicalFeeEvent + explicit treatment: each fee has exactly one economic effect in cost/P&L. feeAmount and breakdown must not double-apply.
+

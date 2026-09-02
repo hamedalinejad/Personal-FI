@@ -203,3 +203,9 @@ Reversal Core-only · correction graph · instrument identity · snapshot≠SoT 
 
 See `CROSS-FEATURE-X-001-010-LOCKS.md`.
 
+
+
+## X-011 … X-020 — LOCKED 2026-09-02
+
+See `CROSS-FEATURE-X-011-020-LOCKS.md`.
+
