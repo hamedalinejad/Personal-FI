@@ -60,3 +60,8 @@ Full fixture: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`
 - assetPriceEffectBase = -100_000_000; fxEffectBase = +450_000_000
 - Acceptance cases 1–6 in that file are mandatory for Crypto valuation release.
 
+## P1 Golden Fixture Pack
+
+Full inventory (Core, Crypto, Stocks, Funds, Metals, Loan): `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` §27.  
+Acceptance matrix before SPEC freeze: §28 same doc.
+

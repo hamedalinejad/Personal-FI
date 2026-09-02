@@ -359,3 +359,9 @@ Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
 Authority: `docs/core/P1-GLOBAL-CONTRACTS.md`  
 Field matrix · commands/queries · reversal plan · rebuild determinism · ValuationContext · attribution · wealth vs P&L · cash ownership.
 
+
+
+## P1 Iran / Performance / Fixtures / Acceptance
+
+Authority: `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md`
+

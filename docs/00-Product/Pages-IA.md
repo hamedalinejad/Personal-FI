@@ -506,3 +506,8 @@ Investments = Crypto | Stocks | Funds | Metals — نه routeهای جدا در 
 شمارهٔ انسانی در Product-Map ممکن است با پیشوند پوشه (`00-`, `01-`, …) یکی نباشد.
 
 **مسیر کد و import docs را از روی شماره Product-Map حدس نزنید** — فقط `feature-id-map.json` و نام پوشه.
+
+## P1 — Page budget
+
+Prefer ~9 main pages + sheets/drawers; Feature logic via APIs/engines — not one main page per Feature. Heavy reports: local rebuild → watermarked snapshot → UI. See `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` §26.
+

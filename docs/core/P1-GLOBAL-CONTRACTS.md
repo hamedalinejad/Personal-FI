@@ -166,5 +166,10 @@ Rebuild/reconcile against journal. See `Canonical-Cash-Model.md`, P0-091.
 - [ ] ValuationContext mapped on all valuation queries  
 - [ ] Attribution fields when quote path ≠ base  
 - [ ] Wealth vs P&L separation in reports  
-- [ ] Cash projections linked to fin_accounts / ports  
+- [ ] Cash projections linked to fin_accounts / ports
+
+## Related P1 deliverables
+
+Iranian detail, IA performance pattern, golden fixture pack, acceptance matrix:  
+`P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md`
 

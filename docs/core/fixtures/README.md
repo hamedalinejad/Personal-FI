@@ -1,39 +1,13 @@
-# Financial Golden Fixtures
+# Golden fixtures
 
-**قبل از coding آماده شوند.** Implementation فقط expected را پاس می‌کند.
+## Specified
 
-```text
-fixtures/
-  crypto/buy-with-fee.json
-  crypto/transfer-fee-in-asset.json
-  stocks/weighted-average.json
-  loan/declining-balance.json
-  fx/cross-rate.json
-  cheque/bounce.json
-```
+| ID | Path |
+|----|------|
+| CRYPTO-BTC-USDT-IRR-PNL | `GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md` |
 
-هر فایل:
+## Required pack (inventory)
 
-```json
-{
-  "id": "S-CRYPTO-BUY",
-  "input": { },
-  "expected": {
-    "domain": {},
-    "journal": {},
-    "balances": {},
-    "holding": {},
-    "pl": {},
-    "netWorthDelta": {}
-  }
-}
-```
+See `docs/core/P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` §27 for full Core / Crypto / Stocks / Funds / Metals / Loan lists.
 
-CI: بدون سبز شدن goldenهای مالی، مسیر مالی release نیست.
-
-## چهار تست اجباری قبل از release مالی
-
-1. خرید `0.0000001` BTC + فروش جزئی با کارمزد  
-2. خرید سهام + افزایش سرمایه / bonus  
-3. وام قرض‌الحسنه ۴٪ + کارمزد (journal net disbursement)  
-4. چک برگشتی (status bounce + گزارش)
+Add new fixtures here or under `docs/features/<feature>/fixtures/` and link from `Mandatory-Test-Vectors.md`.
