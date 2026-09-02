@@ -142,7 +142,8 @@
 - امکان اتصال به سال مالیاتی مشخص (مثلاً ۱۴۰۴) برای گزارش‌گیری بهتر وجود داشته باشد.
 - در Dashboard می‌توان مجموع مالیات‌های در انتظار و نزدیک به سررسید را نمایش داد.
 - `exchangeRateToBase` در زمان ثبت/پرداخت ذخیره می‌شود.
-- پرداخت مالیات فقط از `payTax`: **یک** `acc_transactions` با type اختصاصی tax (نه Expense عمومی جدا + Tax جدا).
+- پرداخت مالیات فقط از `payTax` (**P0-085**): **یک** financial operation / یک `acc_transactions` با type اختصاصی tax (`withdrawal-expense-tax` / `deposit-income-tax`).
+  - مسیر Expense عمومی (`withdrawal-expense`) برای پرداخت tax **reject** یا **delegate به payTax** — دو INSERT موازی ممنوع (duplicate ledger).
 - در نسخه‌های بعدی می‌توان قالب‌های آماده برای انواع رایج مالیات اضافه کرد.
 
 ---
@@ -186,7 +187,9 @@ Tax Feature جداست، ولی **دادهٔ لازم برای محاسبه بع
 
 ---
 
-## feeTax در برابر Tax Liability
+## feeTax در برابر Tax Liability (P0-084 LOCK)
+
+feeTax = transaction cost only. Tax liability = tax_events / tax_records. Explicit relationship via linkedTaxEventId only; never sum feeTax into tax paid.
 
 | مفهوم | کجا | نقش حسابداری |
 |--------|-----|----------------|
@@ -270,3 +273,10 @@ Tax payment creates one cash leg. Expense category view may reference same opera
 ## FEAT-P0-050 DEEP
 feeTax on trades = cost component. tax_events = liability/payment domain. Withholding not posted twice as expense+feeTax.
 
+
+
+### P0-086 — Investment tax metadata: single SoT
+
+- **New writes**: only central tax event (`tax_events` / `linkedTaxEventId` on the investment operation). Feature-local tax metadata fields on inv_* transactions are **not** written by new code.
+- **Legacy fields** (`isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount`, `taxLotId`, `linkedTaxRecordId`, …): **read-only** for migration/display; migration job may backfill `linkedTaxEventId`.
+- Competing SoT (writing both legacy columns and tax_events as authority) = forbidden.

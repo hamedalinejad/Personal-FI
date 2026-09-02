@@ -113,8 +113,9 @@
 ## APIهای داخلی
 
 ### Dashboard APIs
-- `getDashboardData` → دریافت یکجای داده‌های اصلی داشبورد
-- `getWidgetData(widgetKey)` → دریافت داده یک ویجت خاص
+- `getDashboardData(ctx?: { asOf?: Date; businessDate?: Date })` → دریافت یکجای داده‌های داشبورد  
+  **P0-087**: یک context مشترک `asOf` / `businessDate` به **همه** widget queryها پاس داده می‌شود. ویجت‌ها حق ندارند هر کدام «الان» جداگانه بخوانند مگر asOf صریح همان ctx.
+- `getWidgetData(widgetKey, ctx?)` → همان context؛ در صورت نبود، از ctx آخرین getDashboardData یا now مستند.
 - `getDashboardLayout` → دریافت چیدمان ذخیره‌شده کاربر
 - `updateDashboardLayout(layout)` → ذخیره چیدمان جدید
 
@@ -146,6 +147,21 @@
 - **Currency**: نمایش معادل تتری
 
 ---
+
+
+
+### P0-088 — Offline / cache freshness (per widget)
+
+هر widget در پاسخ dashboard باید بتواند نشان دهد:
+
+| field | معنی |
+|-------|------|
+| `asOf` | لحظه/تاریخ داده |
+| `lastRebuiltAt` | آخرین rebuild از SoT |
+| `stale` | boolean |
+| `staleReason?` | cache age / offline / missing price |
+
+Cached dashboard **نباید** همه ویجت‌ها را یکجا «تازه» نشان دهد وقتی یکی stale است. UI می‌تواند badge per-widget نشان دهد.
 
 ## ساختار پیشنهادی داده خروجی `getDashboardData`
 
@@ -238,3 +254,12 @@ Dashboard → Queries → Reporting / Valuation
 ---
 
 ناوبری و جایگاه Wealth: `Pages-IA.md` — Dashboard یکی از ۹ صفحه اصلی است؛ `/wealth` route مستقل نیست.
+
+
+### P0-089 — Fast summary / snapshot not sole truth
+
+- APIهای خلاصه سریع می‌توانند از projection/snapshot بخوانند **فقط اگر** آن projection:
+  1. از ledger/SoT قابل rebuild باشد، و
+  2. با `asOf` / `lastRebuiltAt` / نسخه schema مشخص باشد، و
+  3. در صورت mismatch با reconcile، flag یا rebuild path داشته باشد.
+- Dashboard **مجاز نیست** snapshot را به‌عنوان حقیقت غیرقابل‌اعتبارسنجی مصرف کند (هم‌راستا با Core: snapshot projection only).

@@ -155,3 +155,16 @@ P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implemen
 - **078** Reports money fields decimal TEXT
 - **079** Historical net worth from ledger reconstruction as-of
 - **080** Multi-hop valuation requires conversionPath
+
+
+## FEAT-P0-081 … 089 (Portfolio / Tax / Dashboard) — LOCK 2026-09-02
+
+- **081** calculateWealthView + explicit cashScope; typed wealth components
+- **082** port snapshot JSON money fields decimal strings
+- **083** component registry prevents brokerage cash double count
+- **084** feeTax vs tax liability separation
+- **085** one payTax operation only
+- **086** linkedTaxEventId SoT; legacy tax metadata read-only
+- **087** shared asOf context across dashboard widgets
+- **088** widget-level stale / lastRebuiltAt
+- **089** dashboard projections must be rebuildable/validated

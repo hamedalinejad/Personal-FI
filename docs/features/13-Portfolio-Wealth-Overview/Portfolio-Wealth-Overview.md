@@ -101,19 +101,19 @@
  ```json
  {
  "investments": {
- "total": number,
- "profitLoss": number,
- "unrealized": number,
- "realized": number,
+ "total": "string decimal",  /* P0-082 */
+ "profitLoss": "string decimal",
+ "unrealized": "string decimal",
+ "realized": "string decimal",
  "sections": {
- "crypto": { "value": number, "profitLoss": number },
- "stocksIran": { "value": number, "profitLoss": number },
- "fixedIncome": { "value": number, "profitLoss": number },
- "metals": { "value": number, "profitLoss": number }
+ "crypto": { "value": "string decimal", "profitLoss": number },
+ "stocksIran": { "value": "string decimal", "profitLoss": number },
+ "fixedIncome": { "value": "string decimal", "profitLoss": number },
+ "metals": { "value": "string decimal", "profitLoss": number }
  }
  },
  "physicalAssets": {
- "total": number,
+ "total": "string decimal",  /* P0-082 */
  "profitLoss": number
  },
  "cash": {
@@ -125,8 +125,8 @@
  "allocation": Array<{
  "key": string,
  "label": string,
- "value": number,
- "percent": number
+ "value": "string decimal",
+ "percent": "string decimal"
  }>
  }
  ```
@@ -148,7 +148,24 @@
 ## APIهای داخلی
 
 ### Portfolio APIs
-- `calculateNetWorth(options?: { date?: Date; includeCashInWealth?: boolean })` → **تابع Domain مشترک — منبع حقیقت واحد محاسبه ثروت خالص** (هم `getPortfolioOverview` و هم `Reports-Analytics.getNetWorth` این تابع را صدا می‌زنند)؛ خروجی: `{ totalWealth, netWealth, totalWealthUSDT, netWealthUSDT, breakdown }` — `includeCashInWealth` کنترل می‌کند موجودی نقدی صرافی/کارگزاری لحاظ شود یا نه (پیش‌فرض `false` در پرتفوی، `true` در گزارش Net Worth)
+- `calculateWealthView(options: { asOf?: Date; cashScope: 'investments_only' | 'include_platform_cash' | 'full' })` → **تابع Domain مشترک (P0-081)**  
+  نام `calculateNetWorth` به‌عنوان alias منسوخ با mapping:
+  - `includeCashInWealth: false` → `cashScope: 'investments_only'`
+  - `includeCashInWealth: true` → `cashScope: 'include_platform_cash'` (یا `full` وقتی bank cash هم صریح باشد)
+>
+> خروجی **typed** (نه یک عدد مبهم «Net Worth»):
+> ```text
+> {
+>   asOf, cashScope,
+>   investmentValue,          // holdings only
+>   platformCashTotal,        // brokerage/exchange cash if in scope
+>   bankCashTotal,            // acc cash if in scope
+>   totalAssets, totalLiabilities,
+>   netWealth,                // assets − liabilities under chosen scope
+>   breakdown, conversionPath?
+> }
+> ```
+> UI **باید** برچسب متناسب با `cashScope` نشان دهد («ارزش پرتفوی» vs «ثروت با نقد صرافی» vs «ثروت کامل»). یک برچسب واحد برای دو semantic ممنوع.
 - `getPortfolioOverview` → خلاصه کامل پرتفوی و ثروت (از `calculateNetWorth({ includeCashInWealth: false })` می‌خواند)
 - `getInvestmentBreakdown` → تفکیک سرمایه‌گذاری‌ها
 - `getPhysicalAssetsBreakdown` → تفکیک دارایی‌های فیزیکی
@@ -170,15 +187,15 @@
 
 ```ts
 {
- totalWealth: number,
- netWealth: number,
- totalWealthUSDT: number,
- netWealthUSDT: number,
- changePercent: number, // نسبت به دوره قبل
+ totalWealth: string, /* decimal */
+ netWealth: string,
+ totalWealthUSDT: string,
+ netWealthUSDT: string,
+ changePercent: string, // نسبت به دوره قبل
  investments: {
- total: number,
- profitLoss: number,
- unrealized: number,
+ total: string,
+ profitLoss: string,
+ unrealized: string,
  realized: number,
  sections: {
  crypto: { value: number, profitLoss: number },
@@ -188,7 +205,7 @@
  }
  },
  physicalAssets: {
- total: number,
+ total: string,
  profitLoss: number
  },
  cash: {
@@ -303,3 +320,23 @@ UI باید `totalAssets`, `totalLiabilities`, `netWorth` را جدا نشان �
 
 **UX:** Portfolio/Wealth صفحه ناوبار جدا نیست — Dashboard و/یا Reports.
 Portfolio = aggregation؛ Net Worth ≠ فقط Portfolio (`Layer-Separation.md`).
+
+
+### P0-083 — Canonical wealth component registry (anti double-count)
+
+هر جزء ثروت یک بار با `componentId` + `cashScope` + ownership ثبت می‌شود:
+
+| componentId | ownership | default cashScope | notes |
+|-------------|-----------|-------------------|--------|
+| bank_cash | Accounts | full | always when full |
+| stocks_brokerage_cash | Stocks venue | include_platform_cash | never also inside stocks investment value |
+| crypto_exchange_cash | Crypto venue | include_platform_cash | never also inside crypto token value |
+| stocks_holdings | Stocks | investments_only+ | market value of positions only |
+| crypto_holdings | Crypto | investments_only+ | tokens only; cash separate |
+| fif_holdings | Funds | investments_only+ | |
+| metals_holdings | Metals | investments_only+ | |
+| physical_assets | PA | investments_only+ | |
+| loans_liability | Loans | full | |
+
+**ممنوع:** جمع کردن brokerage/platform cash هم در «ارزش سرمایه‌گذاری» و هم در بخش cash بدون scope جدا.  
+`calculateWealthView` از registry استفاده می‌کند؛ feature adapters فقط component را اعلام می‌کنند.

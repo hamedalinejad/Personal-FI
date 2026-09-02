@@ -125,3 +125,19 @@
 | P0-080 | **CLOSED** | multi-hop FX/USDT uses conversionPath; single rate insufficient |
 
 تفصیل: Financial-Goals.md, Bills-Recurring-Transactions.md, Notification-Reminder-System.md, Reports-Analytics.md
+
+## Batch P0-081 … P0-089 (Portfolio + Tax + Dashboard) — CLOSED 2026-09-02
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-081 | **CLOSED** | calculateWealthView + cashScope typed outputs; Net Worth label not ambiguous |
+| P0-082 | **CLOSED** | snapshot/API money = decimal strings |
+| P0-083 | **CLOSED** | canonical component registry; platform cash not double-counted with holdings |
+| P0-084 | **CLOSED** | feeTax = transaction cost; tax liability = tax event/records only |
+| P0-085 | **CLOSED** | single payTax financial operation; generic expense rejected/delegated |
+| P0-086 | **CLOSED** | new writes → linkedTaxEventId only; legacy inv tax fields read-only |
+| P0-087 | **CLOSED** | one asOf/businessDate context for all dashboard widgets |
+| P0-088 | **CLOSED** | per-widget asOf, lastRebuiltAt, stale flag |
+| P0-089 | **CLOSED** | snapshot/projection only if rebuildable + validated; not sole truth |
+
+تفصیل: Portfolio-Wealth-Overview.md, Tax-Management.md, Dashboard.md
