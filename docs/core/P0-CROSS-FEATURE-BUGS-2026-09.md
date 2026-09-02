@@ -265,3 +265,9 @@ See feature lock files under Accounts-Banking and Income.
 
 See respective feature `*-LOCKS.md` files.
 
+
+
+## NO / RP / TX locks — LOCKED 2026-09-02
+
+See Notification, Reports-Analytics, Tax-Management `*-LOCKS.md` files.
+

@@ -196,3 +196,8 @@
 
 - `dedupeKey` schema stable: `{category}:{relatedFeature}:{relatedId}:{eventKind}:{occurrenceKey?}`.
 - Optional `expiresAt`; retention/purge policy in settings (does not delete financial audit).
+
+## Notification NO locks (P0)
+
+Full NO-001…NO-005: `NOTIFICATION-NO-001-005-LOCKS.md`
+

@@ -276,3 +276,8 @@ closing valuation
 UI گزارش به جداول `ln_*` / `inv_*` وابسته نیست — فقط Report/Feature/Capability API.
 
 Global Search و Advanced Filter در Query Contract: dateFrom/To, account, party, instrument, currency, type, source, status + pagination.
+
+## Reports/Portfolio/Dashboard RP locks (P0)
+
+Full RP-001…RP-009: `REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
+

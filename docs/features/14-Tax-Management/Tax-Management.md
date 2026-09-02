@@ -285,3 +285,8 @@ feeTax on trades = cost component. tax_events = liability/payment domain. Withho
 ## Tax period calendar (CROSS-CUTTING BATCH-2 §2)
 
 `taxYear` always paired with `calendar` (`jalali` | `gregorian` | …) and stable `periodKey` (e.g. `jalali:1404`). Year number alone is invalid for tax reports and records.
+
+## Tax TX locks (P0)
+
+Full TX-001…TX-006: `TAX-TX-001-006-LOCKS.md`
+

@@ -349,3 +349,7 @@ Portfolio = aggregation؛ Net Worth ≠ فقط Portfolio (`Layer-Separation.md`)
 
 Default `netWealth` does **not** include pending outgoing cheques as hard liabilities. Optional separate metric (e.g. `committedAdjustedNetWorth` / pending payables breakdown) only when requested.
 
+## Reports/Portfolio/Dashboard RP locks (P0)
+
+Full RP-001…RP-009: `docs/features/11-Reports-Analytics/REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
+

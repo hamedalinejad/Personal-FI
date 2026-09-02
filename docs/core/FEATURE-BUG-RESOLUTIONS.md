@@ -344,3 +344,11 @@ Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
 - GO: `GOALS-GO-001-006-LOCKS.md`
 - BR: `BILLS-BR-001-007-LOCKS.md`
 
+
+
+## Notification / Reports-Portfolio / Tax locks — LOCKED
+
+- NO: `NOTIFICATION-NO-001-005-LOCKS.md`
+- RP: `REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
+- TX: `TAX-TX-001-006-LOCKS.md`
+

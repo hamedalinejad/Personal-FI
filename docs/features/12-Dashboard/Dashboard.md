@@ -263,3 +263,8 @@ Dashboard → Queries → Reporting / Valuation
   2. با `asOf` / `lastRebuiltAt` / نسخه schema مشخص باشد، و
   3. در صورت mismatch با reconcile، flag یا rebuild path داشته باشد.
 - Dashboard **مجاز نیست** snapshot را به‌عنوان حقیقت غیرقابل‌اعتبارسنجی مصرف کند (هم‌راستا با Core: snapshot projection only).
+
+## Reports/Portfolio/Dashboard RP locks (P0)
+
+Full RP-001…RP-009: `docs/features/11-Reports-Analytics/REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
+
