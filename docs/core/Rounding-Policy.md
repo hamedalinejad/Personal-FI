@@ -53,3 +53,10 @@ Policy فعلی (IRR HALF_UP، Stocks ROUND_DOWN، Crypto decimals، …) قاب
 | Stocks interest-like | طبق Iran/market rule |
 
 در calculationContext روی operation قفل می‌شود.
+
+
+---
+
+## P0-099 — Single engine
+
+One Core RoundingPolicy engine; `policyVersion` stored on financial operations. Features must not implement independent intermediate/final rounding rules. See CROSS-FEATURE-P0-090-100-LOCKS.md.

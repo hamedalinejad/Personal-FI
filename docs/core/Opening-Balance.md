@@ -51,3 +51,10 @@ Cost-Basis-Engine از kind استفاده می‌کند — الگوریتم ج
 
 برای Asset در صورت نیاز: acquisition date/cost/lot/source.  
 برای Loan: original principal · remaining · accrued at asOf.
+
+
+---
+
+## P0-092 — Canonical opening operation
+
+Opening balances and opening positions are created only through a canonical **opening** financial operation (`operationKind=opening`) with `asOf`, provenance (`manual|import|migration`), and full amount/currency fields. Feature-local opening without `operationId` is forbidden.

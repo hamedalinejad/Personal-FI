@@ -122,3 +122,15 @@ inv_crypto_transactions / inv_stocks_* / inv_fif_* / inv_metals_*
 - `Canonical-Ownership-Matrix.md`
 - `Field-Level-Data-Ownership-Matrix.md`
 - `db/03-journal-sot-reporting.md`
+
+
+---
+
+## P0-091 — Ownership split
+
+| Cash kind | Owner SoT | Snapshot |
+|-----------|-----------|----------|
+| Bank / user cash accounts | Accounts + `fin_journal_lines` | projection only |
+| Venue cash (brokerage, exchange, metals platform) | Venue feature ledger/journal for that venue account | projection only |
+
+Both sides linked only via Financial Operation + CashSettlementPort. Two independent balance systems for the same money = forbidden.

@@ -115,3 +115,11 @@ RAW DATA  →  Normalized fields  →  Domain
 
 Raw **همیشه باقی می‌ماند**. برای business logic از Normalized استفاده می‌شود؛ Raw دور ریخته نمی‌شود.
 Unknown fields در raw/unmapped می‌مانند — قانون مطلق Data Preservation.
+
+
+---
+
+## P0-093 / P0-094 — Operation identity & source separation
+
+- Every imported financial row **must** receive an `operationId` (batch import operation and/or per-leg child ops). External IDs preserved for idempotency.
+- `operationSource` / provenance (`user` | `import` | `migration` | `system` | `repair`) lives on the operation and is **not** the same enum as domain transaction `source` fields (e.g. goal contribution source).

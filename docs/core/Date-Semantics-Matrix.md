@@ -52,3 +52,15 @@ Historical P&L از `priceAsOf`+`rateDate` هم‌تراز — نه `fetchedAt` 
 | Ordering same-day events | businessDate + createdAt + id |
 
 No Feature may use createdAt as the primary axis of historical financial reports.
+
+
+---
+
+## P0-095 / P0-096 — Price timing
+
+| Field | Use |
+|-------|-----|
+| priceAsOf / marketDate | **Primary** for historical valuation |
+| fetchedAt | Provenance only (download time) |
+
+Provider failure: do not block transaction registration; allow manual or last-known price with stale flag (P0-095). Offline-first preserved.

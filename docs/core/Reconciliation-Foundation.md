@@ -33,3 +33,12 @@ ReconciliationResult
 4. API: `ReconciliationAPI` در Capability layer
 
 مرجع: `db/04-reconciliation-integrity.md` · Import-Infrastructure · Import-Lineage
+
+
+---
+
+## P0-100 — Repair is explicit
+
+- Repair of mismatches is **permissioned**, creates audit + `repairOperationId` (or equivalent).
+- Repair **never** silently rewrites ledger/journal lines; corrections use reverse + new operations when financial truth changes.
+- Snapshot-only fix without audit = forbidden. Snapshot may be rebuilt from ledger after an audited repair.

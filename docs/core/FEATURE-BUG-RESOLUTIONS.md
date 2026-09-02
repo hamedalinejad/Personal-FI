@@ -168,3 +168,20 @@ P1 items: accepted decisions in FEATURE-BUG-REGISTER (STATUS RESOLVED); implemen
 - **087** shared asOf context across dashboard widgets
 - **088** widget-level stale / lastRebuiltAt
 - **089** dashboard projections must be rebuildable/validated
+
+
+## FEAT-P0-090 … 100 (Cross-feature) — LOCK 2026-09-02
+
+Full text: `CROSS-FEATURE-P0-090-100-LOCKS.md`
+
+- **090** Canonical metrics + shared query for P&L/wealth
+- **091** Bank cash vs venue cash ownership split
+- **092** Opening only via canonical opening operation
+- **093** Import always has operationId
+- **094** operationSource separate from domain source
+- **095** Price failure does not block ops; manual/last-known OK
+- **096** priceAsOf primary vs fetchedAt provenance
+- **097** Immutable amountInBase / baseCurrencyAtOperation
+- **098** Persist multi-hop conversionPath
+- **099** One RoundingPolicy + version on operation
+- **100** Reconcile repair explicit/audited; no silent mutation

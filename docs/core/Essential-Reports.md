@@ -44,3 +44,10 @@
 - مقایسه برنامه اولیه با اصلاح‌شده
 
 UI: زیر صفحه **Reports** (و گزارش‌های تخصصی ماژول در همان Shell/Sheet) — نه صفحه ناوبار جدا برای هر گزارش.
+
+
+---
+
+## P0-090 — Canonical metrics
+
+P&L and wealth metrics used by Reports, Portfolio, and Dashboard share **one definition catalog** and shared query path. Divergent formulas for the same metric name are forbidden. See CROSS-FEATURE-P0-090-100-LOCKS.md.

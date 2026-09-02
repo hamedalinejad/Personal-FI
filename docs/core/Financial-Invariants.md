@@ -368,3 +368,14 @@ Domain validator (نه فقط SQLite CHECK روی TEXT):
 - reject invalid decimal strings
 
 DB: NOT NULL + structural checks؛ quant rules in Domain.
+
+
+---
+
+## Cross-feature locks (P0-097 / P0-098 / P0-099)
+
+- **P0-097**: `baseCurrencyAtOperation` and `amountInBase` (and locked rates) are **immutable** after operation commit. Base currency change of user settings does not rewrite history.
+- **P0-098**: Multi-hop FX must persist `conversionPath` (hops + rates + asOf + source).
+- **P0-099**: All features use Core `RoundingPolicy` with `policyVersion` on the operation; no per-feature ad-hoc rounding.
+
+See `CROSS-FEATURE-P0-090-100-LOCKS.md`.

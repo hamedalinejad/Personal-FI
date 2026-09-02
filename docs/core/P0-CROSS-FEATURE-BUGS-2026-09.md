@@ -141,3 +141,21 @@
 | P0-089 | **CLOSED** | snapshot/projection only if rebuildable + validated; not sole truth |
 
 تفصیل: Portfolio-Wealth-Overview.md, Tax-Management.md, Dashboard.md
+
+## Batch P0-090 … P0-100 (Cross-feature) — CLOSED 2026-09-02
+
+| ID | وضعیت | قفل |
+|----|--------|-----|
+| P0-090 | **CLOSED** | canonical metric definitions + shared query engine (Reports/Portfolio/Dashboard) |
+| P0-091 | **CLOSED** | Accounts owns bank cash; venue owns venue cash; link via operation only |
+| P0-092 | **CLOSED** | canonical opening operation with asOf + provenance |
+| P0-093 | **CLOSED** | import/restore always assigns operationId; external IDs preserved |
+| P0-094 | **CLOSED** | operationSource/provenance ≠ domain transaction source |
+| P0-095 | **CLOSED** | price provider secondary; manual/last-known allowed; no block offline |
+| P0-096 | **CLOSED** | priceAsOf/marketDate primary; fetchedAt provenance only |
+| P0-097 | **CLOSED** | amountInBase + baseCurrencyAtOperation immutable after commit |
+| P0-098 | **CLOSED** | multi-hop conversionPath persisted |
+| P0-099 | **CLOSED** | single RoundingPolicy engine + policyVersion on operation |
+| P0-100 | **CLOSED** | repair explicit, audited, permissioned; never silent ledger rewrite |
+
+مرجع واحد: `docs/core/CROSS-FEATURE-P0-090-100-LOCKS.md`
