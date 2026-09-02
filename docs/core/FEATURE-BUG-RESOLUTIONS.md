@@ -309,3 +309,9 @@ Authority: `docs/features/05-Investment/05-01-Investment-Crypto/CRYPTO-CR-001-01
 
 Authority: `docs/features/05-Investment/05-02-Investment-Stocks-Iran/STOCKS-ST-001-012-LOCKS.md`
 
+
+
+## Funds FI-001 … FI-010 — LOCKED
+
+Authority: `docs/features/05-Investment/05-03-Fixed-Income-Funds/FUNDS-FI-001-010-LOCKS.md`
+

@@ -707,3 +707,8 @@ Redemption/subscription **fees** and exit **tax/withholding** are separate from:
 
 Never fold feeTax or redemption fees into distribution income or NAV return buckets.
 
+## Funds FI locks (P0)
+
+Full FI-001…FI-010: `FUNDS-FI-001-010-LOCKS.md`  
+NAV≠transactionPrice · valuationMode · income vs unrealized · reinvest one op two legs · FeeTreatment · settlement dates · predictedProfit external only · shared broker cash · immutable NAV history · period return bridge.
+

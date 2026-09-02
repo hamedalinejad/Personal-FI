@@ -221,3 +221,9 @@ See `docs/features/05-Investment/05-01-Investment-Crypto/CRYPTO-CR-001-015-LOCKS
 
 See `STOCKS-ST-001-012-LOCKS.md` under Investment-Stocks-Iran.
 
+
+
+## Funds FI-001 … FI-010 — LOCKED 2026-09-02
+
+See `FUNDS-FI-001-010-LOCKS.md` under Fixed-Income-Funds.
+
