@@ -212,3 +212,8 @@ Withdrawal reverses allocation links with operationId; cash movement only if rea
 ## Monthly recommendation policy (CROSS-CUTTING BATCH-2 §4)
 
 `recommendedMonthly` uses explicit `monthCountPolicy` / day-count policy (`calendar_months` default). Policy version stored with goal or settings; API returns policy id with the recommendation.
+
+## Earmark vs segregated cash (CROSS-CUTTING BATCH-3 §9)
+
+**v1 default:** goals are **earmarks** (progress via contributions), not segregated cash — unless `fundingMode=segregated_cash` and `dedicatedAccountId` is set. budget/income sources are always earmark-only.
+

@@ -173,3 +173,10 @@ See `CROSS-CUTTING-CONTRACTS-BATCH.md`.
 StalePolicy · tax calendar · budget TZ · goal month policy · bills catch-up · notification retention/dedupe schema · report modes · P&L bridge · cost basis versions · CA fractional precision.
 
 See `CROSS-CUTTING-CONTRACTS-BATCH-2.md`.
+
+
+## Cross-Cutting Contracts Batch 3 — LOCKED 2026-09-02
+
+Funds fee vs income · metals→PA cost · PA revaluation · loan accrual/fees/reverse · cheque dates · budget↔cheque policy · goals earmark · wealth liabilityScope.
+
+See `CROSS-CUTTING-CONTRACTS-BATCH-3.md`.

@@ -454,3 +454,9 @@ Physical delivery operation must: decrease digital holding, create/increase phys
 ## FEAT-P0-040 DEEP
 quantityMg is SoT mass. quantityCoins is input helper: mg = coins × mgPerCoin(coinType). Never dual SoT.
 
+
+## Delivery cost basis to Physical Assets (CROSS-CUTTING BATCH-3 §2)
+
+On `physical_delivery`, PA acquisition cost = **historical carrying cost released** from the metals holding for delivered qty (cost-basis method on that holding).  
+`deliveryFee` is cash only; include in PA basis only if `include_delivery_fee_in_basis=true` (default **false**). Always set `sourceOperationId` + cost on `pa_transactions`.
+

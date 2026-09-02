@@ -340,3 +340,8 @@ Portfolio = aggregation؛ Net Worth ≠ فقط Portfolio (`Layer-Separation.md`)
 
 **ممنوع:** جمع کردن brokerage/platform cash هم در «ارزش سرمایه‌گذاری» و هم در بخش cash بدون scope جدا.  
 `calculateWealthView` از registry استفاده می‌کند؛ feature adapters فقط component را اعلام می‌کنند.
+
+## Liability scope (CROSS-CUTTING BATCH-3 §10)
+
+`calculateWealthView` requires explicit `liabilityScope`: `principal_only` | `principal_plus_accrued` | `full_carrying`. Response includes the scope used so UI does not mislabel net wealth.
+

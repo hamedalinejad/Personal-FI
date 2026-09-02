@@ -291,3 +291,8 @@ Canonical: **`reversalOperationId`** → `fin_operations`.
 
 ممنوع: کم‌کردن pending هم از available و هم به‌عنوان liability در همان عدد NW بدون برچسب — double subtraction.
 UI باید نام metric را نشان دهد.
+
+## Clear / bounce dates (CROSS-CUTTING BATCH-3 §7)
+
+Clearing sets `clearedDate` / paymentDate / `effectiveCashDate` without erasing issue/due history. Bounce records `bouncedDate` and reversal linkage; prior dates remain for audit.
+

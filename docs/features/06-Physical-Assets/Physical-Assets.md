@@ -275,3 +275,8 @@ Header purchasePrice/date are legacy snapshots. All acquisition cost/qty/date li
   2. Solely recorded as expense with optional asset link for reporting.
 - **Forbidden**: create both a full `exp_transactions` expense **and** an independent unlinked maintenance amount that is also summed into asset return → double expense.
 - Asset return calculation consumes the **linked** maintenance amount once (via operationId or explicit link table).
+
+## Revaluation vs realized (CROSS-CUTTING BATCH-3 §3)
+
+Revaluation/mark updates `currentValue` only. **Does not** create realized P&L unless explicit policy `revaluation_realizes=true` (default **false**). Realized only via sale/write_off with carrying released.
+

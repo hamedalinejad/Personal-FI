@@ -1913,3 +1913,10 @@ Historical reconstruction همیشه از snapshot اشاره‌شده — نه 
 | بعد از disbursement و **بدون** payment | cancel مجاز = `core.reverseOperation(disbursementOperationId)` + status `cancelled` |
 
 Cancel هرگز فقط `status=cancelled` بدون reverse اقتصادی disbursement نیست.
+
+## Accrual, fees, payment reverse (CROSS-CUTTING BATCH-3 §4–§6)
+
+- **§4** Unpaid accrued interest is separate from principal outstanding and from cash payments.
+- **§5** `feeDue` and `feePaid` are independent amounts; outstanding = due − paid (− waived).
+- **§6** Reversing a payment **must** reverse schedule allocations (principal/interest/fee/penalty portions) and restore schedule state; one reverse operationId.
+

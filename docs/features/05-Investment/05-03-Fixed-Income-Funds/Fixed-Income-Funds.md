@@ -698,3 +698,12 @@ Period return uses opening, flows, closing — predictedProfit never summed into
 ## FEAT-P0-037 DEEP
 fundType=ETF → brokerage cash port only. fundType=issuance/redemption → bank/account port. Validate mutually exclusive routes.
 
+
+## Redemption fee/tax vs returns (CROSS-CUTTING BATCH-3 §1)
+
+Redemption/subscription **fees** and exit **tax/withholding** are separate from:
+- **realized return** on units (vs averageBuyPrice), and
+- **distribution income** (dividend / reinvest).
+
+Never fold feeTax or redemption fees into distribution income or NAV return buckets.
+

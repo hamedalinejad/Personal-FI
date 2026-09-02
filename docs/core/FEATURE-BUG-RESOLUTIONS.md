@@ -217,3 +217,19 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-2.md`
 8. Investment P&L bridge: opening/period/realized/closing valuation
 9. Cost basis method per asset class + engineVersions on operations
 10. Stock CA fractional rounding via instrument precision + market rules
+
+
+## Cross-Cutting Contracts Batch 3
+
+Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-3.md`
+
+1. Fund redemption fee/tax separated from realized return and distribution income
+2. Metals delivery transfers historical carrying cost to PA
+3. PA revaluation does not auto-realize (default)
+4. Loan accrued interest ≠ principal ≠ cash payment
+5. Loan feeDue vs feePaid independent
+6. Loan payment reverse undoes schedule allocation
+7. Cheque clear/bounce preserve date history
+8. budgetChequeRecognition single policy (pending vs cleared)
+9. Goals v1 earmark unless segregated cash account
+10. Wealth view explicit liabilityScope

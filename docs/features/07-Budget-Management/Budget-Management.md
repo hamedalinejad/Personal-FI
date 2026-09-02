@@ -254,3 +254,8 @@ Each link: operationId, sourceLineId, status/void. Reversal of source clears or 
 ## Period timezone (CROSS-CUTTING BATCH-2 §3)
 
 Budget period boundaries use the **user timezone** from settings. `periodKey` includes TZ (or calendar tag). Rollover inherits the same TZ/calendar policy.
+
+## Cheque recognition policy (CROSS-CUTTING BATCH-3 §8)
+
+Single setting `budgetChequeRecognition`: `on_pending` | `on_cleared` (default recommended: `on_cleared`). If `on_pending`, bounce/cancel must release envelope spend.
+
