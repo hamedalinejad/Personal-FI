@@ -108,7 +108,7 @@ export interface AccAccount {
  accountNumber: string;
  iban: string;
  currency: string;
- currentBalance: Decimal; // استفاده از decimal.js
+ currentBalance: string /* DecimalString */; // استفاده از decimal.js
  isArchived: boolean;
 }
 
@@ -116,11 +116,11 @@ export interface AccTransaction {
  id: string;
  date: string;
  type: string;
- amount: Decimal; // استفاده از decimal.js — صفاف و دقیق
- feeAmount?: Decimal;
+ amount: string /* DecimalString */; // استفاده از decimal.js — صفاف و دقیق
+ feeAmount?: string /* DecimalString */;
  feeCurrency?: string;
- exchangeRateToBase?: Decimal; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
- balanceAfterTransaction: Decimal; // derived snapshot only — ledger authoritative
+ exchangeRateToBase?: string /* DecimalString */; // نرخ تبدیل نسبت به baseCurrency تنظیم‌شده در cur_currency_preferences (مثال: اگر baseCurrency=IRR باشد، ریال به ازای ۱ واحد ارز تراکنش)
+ balanceAfterTransaction: string /* DecimalString */; // derived snapshot only — ledger authoritative
  accountId: string;
  isVoided: boolean;
 }
@@ -130,13 +130,13 @@ export interface InvFifHolding {
  id: string;
  fundId: string;
  brokerageId?: string;
- units: Decimal;
- averageBuyPrice: Decimal; // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
- totalInvested: Decimal;
- totalFeesPaidBase: Decimal;
- currentNAV: Decimal; // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
- lastSubscriptionPrice?: Decimal;
- lastRedemptionPrice?: Decimal;
+ units: string /* DecimalString */;
+ averageBuyPrice: string /* DecimalString */; // میانگین قیمت خرید/صدور (بر اساس transactionPrice)
+ totalInvested: string /* DecimalString */;
+ totalFeesPaidBase: string /* DecimalString */;
+ currentNAV: string /* DecimalString */; // فقط NAV — برای Unrealized P&L و ارزش پرتفوی
+ lastSubscriptionPrice?: string /* DecimalString */;
+ lastRedemptionPrice?: string /* DecimalString */;
 }
 
 export interface InvFifTransaction {
@@ -144,15 +144,15 @@ export interface InvFifTransaction {
  fundId: string;
  brokerageId?: string;
  type: 'buy' | 'sell' | 'dividend' | 'reinvest' | 'nav_update';
- units?: Decimal;
- nav?: Decimal; // NAV در تاریخ تراکنش
- transactionPrice?: Decimal; // قیمت واقعی معامله (صدور در buy، ابطال در sell)
- amount?: Decimal;
- feeAmount?: Decimal;
+ units?: string /* DecimalString */;
+ nav?: string /* DecimalString */; // NAV در تاریخ تراکنش
+ transactionPrice?: string /* DecimalString */; // قیمت واقعی معامله (صدور در buy، ابطال در sell)
+ amount?: string /* DecimalString */;
+ feeAmount?: string /* DecimalString */;
  feeCurrency?: string;
- exchangeRateToBase?: Decimal;
- predictedProfit?: Decimal;
- actualProfit?: Decimal;
+ exchangeRateToBase?: string /* DecimalString */;
+ predictedProfit?: string /* DecimalString */;
+ actualProfit?: string /* DecimalString */;
  accountId?: string;
  accountTransactionId?: string;
  description?: string;
@@ -169,11 +169,11 @@ export interface InvMetalsHolding {
  platformId: string;
  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
  purity: string; // کد استاندارد: 18k, 24k, 999, emami, ...
- purityRatio: Decimal; // 0..1 — fineWeightMg = quantityMg × purityRatio
- quantityMg: Decimal; // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
- averageBuyPricePerMg: Decimal; // میانگین همان purity (نه طلای خالص)
- totalInvested: Decimal;
- totalFeesPaidBase: Decimal;
+ purityRatio: string /* DecimalString */; // 0..1 — fineWeightMg = quantityMg × purityRatio
+ quantityMg: string /* DecimalString */; // وزن ناخالص به میلی‌گرم (هرگز گرم/اونس)
+ averageBuyPricePerMg: string /* DecimalString */; // میانگین همان purity (نه طلای خالص)
+ totalInvested: string /* DecimalString */;
+ totalFeesPaidBase: string /* DecimalString */;
 }
 
 export interface InvMetalsTransaction {
@@ -181,18 +181,30 @@ export interface InvMetalsTransaction {
  platformId: string;
  metalType: 'gold' | 'silver' | 'copper' | 'gold_coin';
  purity: string; // اجباری
- purityRatio: Decimal; // snapshot
+ purityRatio: string /* DecimalString */; // snapshot
  type: 'buy' | 'sell' | 'physical_delivery';
- quantityMg: Decimal; // وزن ناخالص
- pricePerMg: Decimal; // قیمت همان purity
- totalAmount?: Decimal;
- feeAmount?: Decimal;
+ quantityMg: string /* DecimalString */; // وزن ناخالص
+ pricePerMg: string /* DecimalString */; // قیمت همان purity
+ totalAmount?: string /* DecimalString */;
+ feeAmount?: string /* DecimalString */;
  feeCurrency?: string;
- exchangeRateToBase?: Decimal;
- deliveryFee?: Decimal;
+ exchangeRateToBase?: string /* DecimalString */;
+ deliveryFee?: string /* DecimalString */;
  date: string;
 }
 ```
 
 > **تمایز حیاتی در Metals**: `quantityMg` = وزن ناخالص؛ وزن خالص (`fineWeightMg`) محاسبه می‌شود و ذخیره نمی‌شود؛ `purity` و `purityRatio` مستقل‌اند. `1g Gold 18K ≠ 1g pure gold`. جزئیات کامل در `Metals.md`.
 
+## P0-FINAL-017 — Persist/API money types
+
+All persisted and public API financial fields are **decimal strings**:
+
+```text
+amount: string
+quantity: string
+rate: string
+price: string
+```
+
+`Decimal` (decimal.js) is **only** inside domain engines after parse at boundary. TypeScript examples in this file that still show objects are non-authoritative — use string.

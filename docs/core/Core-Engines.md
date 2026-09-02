@@ -1,19 +1,7 @@
-# Core Engines (ضد Logic تکراری)
+# Core-Engines.md
 
-تعداد جداول Domain زیاد قابل قبول است؛ **تکرار منطق** نه.
+**LEGACY path / alias.**
 
-| Engine | نقش |
-|--------|-----|
-| Transaction / Financial Operation | atomic op |
-| Journal | double-entry + fin_accounts |
-| Cost Basis | acquisition/disposal |
-| FX | convert as-of |
-| Rounding / Precision | scale per domain |
-| Reconciliation | ledger vs snapshot |
-| Audit | fin_audit_log |
-| Corporate Action | structural qty/cost |
-| Import | normalize pipeline |
+Canonical engine catalog: **`Calculation-Engines.md`**.
 
-Featureها adapter می‌دهند؛ engine را کپی نمی‌کنند.
-
-**20 Feature ≠ 20 Engine.** UI صفحات کم؛ engines محدود در Core.
+Do not add new engine definitions here.

@@ -1,3 +1,5 @@
+> **LEGACY compatibility path.** Canonical catalog: fixtures + CROSS-FEATURE scenario locks. No new normative content here.
+
 # Financial-Scenarios (Alias)
 
 **SoT:** [Financial-Scenario-Catalog.md](./Financial-Scenario-Catalog.md)

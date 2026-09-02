@@ -40,3 +40,7 @@ Each vector **must** define expected: domain · journal · cash · holding · co
 Standalone (P1-FINAL-047): `STANDALONE-CRYPTO` · `STANDALONE-LOAN` · `STANDALONE-FUND`
 
 **Gate C:** all release-scope goldens green in harness before feature implementation beyond core.
+
+## P0-FINAL-018
+
+Harness: `HARNESS.md`. Skeletons `GOLDEN-CORE-*` / `GOLDEN-CRYPTO-*`. Gate C blocked until green CI.

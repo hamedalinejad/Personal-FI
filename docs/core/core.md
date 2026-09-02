@@ -95,3 +95,10 @@
 - `P0-COST-BASIS-PNL-001-005-LOCK.md` — C2C/trade vs transfer; fee roles; P&L axes
 - `P0-FINAL-006-015-LOCKS.md`
 - `P0-FINAL-036-040-LOCKS.md`
+
+## P1-005 — Implementation paths
+
+Exact source paths (`utils/money/round.ts`, package pins) are **non-authoritative** until runtime tree exists.  
+Contracts here are technology-neutral; ADRs/tech decision docs own framework choices.
+- `DOC-AUTHORITY-CHAIN.md`
+- `fixtures/HARNESS.md`

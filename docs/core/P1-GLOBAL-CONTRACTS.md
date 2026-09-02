@@ -159,16 +159,16 @@ Rebuild/reconcile against journal. See `Canonical-Cash-Model.md`, P0-091.
 
 ---
 
-## Feature completion checklist (P1)
+## Feature completion checklist (P1) — P1-FINAL-050
 
-- [ ] Field matrix 20.1 for all persisted fields  
-- [ ] commands/queries only; operationId on financial commands  
-- [ ] Reversal plan table per operation kind  
-- [ ] Rebuild deterministic tests (engineVersions + asOf)  
-- [ ] ValuationContext mapped on all valuation queries  
-- [ ] Attribution fields when quote path ≠ base  
-- [ ] Wealth vs P&L separation in reports  
-- [ ] Cash projections linked to fin_accounts / ports
+- **GREEN (contract)** Field matrix 20.1 defined; per-feature fill = Gate B/D work for in-scope features  
+- **GREEN** commands/queries + operationId (Feature-API-Contract)  
+- **GREEN (contract)** reverseOperation; per-feature tables required before that feature codes  
+- **EXPLICITLY_OUT_OF_SCOPE until Gate C** harness green  
+- **GREEN (contract)** ValuationContext in P0 locks; feature wiring at implement  
+- **GREEN (contract)** two-axis P&L + attributionStatus  
+- **GREEN** P0-004 / Period Return dual bridges  
+- **GREEN (contract)** Canonical-Cash-Model; acc_transactions event-only
 
 ## Related P1 deliverables
 

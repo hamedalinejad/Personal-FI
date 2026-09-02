@@ -1,114 +1,45 @@
 # معماری نهایی (خلاصه قفل)
 
+**Canonical routes (P1-003):** `docs/00-Product/Pages-IA.md` only.
+
 ```text
-                ┌──────────────────────┐
-                │     Presentation     │
-                └──────────┬───────────┘
-                           │
-                ┌──────────▼───────────┐
-                │    Feature Public    │
-                │        APIs          │
-                └──────────┬───────────┘
-                           │
-        ┌──────────────────┼───────────────────┐
-        │                  │                   │
-        ▼                  ▼                   ▼
-     Loan Core        Investment Core      Accounting UI
-        │                  │
-        └──────────┬───────┘
-                   ▼
-           Capability APIs
-                   │
-       ┌───────────┼────────────┐
-       ▼           ▼            ▼
-   Accounting    Pricing      Currency
-   Settlement    CostBasis    Fee
-       │           │            │
-       └───────────┼────────────┘
-                   ▼
-                  DB
+/  /accounts  /transactions  /investments  /loans
+/planning  /reports  /documents  /settings
 ```
 
-**UI (۹):** Dashboard · Accounts · Transactions · Investments · Loans · Assets · Planning · Reports · Settings
-
-## لایه‌ها
-
-- Feature API → Capability API → Domain → Persistence
-- Persistence State Machine: CLEAN…RECOVERING (فقط Storage Layer)
-- License خارج از Core مالی؛ Domain از License بی‌خبر
-- acc_transactions = **فقط cash**
-- Snapshot derived؛ Rebuild + Reconcile بدون silent repair
-- Reports/Dashboard = consumer of Valuation، نه SQL خام
-- UX: Simple by default؛ journal/operation از چشم کاربر پنهان
-
-## اصل محصول
-
-`Product-Principle.md` — Complexity in Domain, not UI.
-
-## اولویت
-
-`Implementation-Priority.md`
-
-## اسناد کلیدی این بسته
-
-- `Capability-API.md`
-- `Persistence-State-Machine.md`
-- `Import-Lineage.md`
-- `Rebuild-API-Contract.md`
-- `Product-Principle.md`
-
-Gate docs: `
-
----
-
-## مدل سه‌لایه محصول
+**No top-level `/assets`.** Physical assets live under Planning/Investments/Documents per IA — not a 9th alternate name.
 
 ```text
-Operational Data
+UI (9 pages) + Feature Public APIs
         ↓
-Module Sub-ledger
+Feature Layer (domain features)
         ↓
-Optional Main Accounting Integration
+Financial Core (Operation · Journal · Audit · Engines)
+        ↓
+Domain ledgers + projections
+        ↓
+SQLite/sql.js → IndexedDB
 ```
 
-مستندات تکمیلی الزامات:
+| | |
+|--|--|
+| Cash SoT | `fin_accounts` + `fin_journal_lines` |
+| `acc_transactions` | operational/event view only |
+| Price API | valuation only |
+| Internet | optional |
+| License | outside financial DB |
+| Report | Ledger → calculation → report |
+| Snapshot | cache only |
+| Mutation path | Command → Builder → Core → Journal/Cash → projection |
 
-- `API-Requirements.md`
-- `Offline-Requirements.md`
-- `Essential-Reports.md`
-- `Mandatory-Test-Vectors.md`
-- `Documentation-Roadmap.md`
+## Scope authority
 
----
+**Product-Map-FA.md** = sole release scope. This file mirrors Product Map; does not invent alternate phase lists.
 
-## Forbidden (از همین حالا)
+## Engines
 
-- direct DB access from UI
-- Feature-to-Feature table writes
-- mutable financial history / overwrite posted
-- balance as independent truth
-- duplicate SoT
-- FLOAT / JS number for money math
-- hardcoded tax or FX rates
-- snapshot-based historical reports as SoT
-- auto-delete data on import
-- license blocking financial data access
-- feature activation requiring unrelated modules
-- current price changing historical report
-- generic polymorphic FK everywhere
-- DB row = Domain entity
+Canonical list: **`Calculation-Engines.md`**. `Core-Engines.md` is a pointer only.
 
-## v1 پیشنهادی (محدود)
+## Legacy note
 
-Foundation + Accounting Core + Money/FX + Operation + Reversal + Audit + Reconciliation + Opening + Party + Document + Instrument + Migration + Backup + Offline  
-+ Accounts + Income + Expense + Loans + Crypto + Dashboard + Reports + Settings  
-
-v1.1 Stocks/Funds/Metals/Cheque · v1.2 Tax/Budget/Goals/Price · v2 advanced/cloud
-
-## P1-FINAL-046 — Single financial mutation path
-
-```text
-Feature Command → Operation Builder → Core engines → Journal/Cash → projection rebuild
-```
-
-Any alternate write path = architecture violation.
+Any older “Module Sub-ledger → Optional Main Accounting” narrative is **LEGACY — not authority**.

@@ -55,3 +55,5 @@ Core Decimal / Money / FX
 Only mutation path: Feature Command → Operation Builder → Core → Journal/Cash → projection.
 
 036–040 index: `P0-FINAL-036-040-LOCKS.md` · 006–015: `P0-FINAL-006-015-LOCKS.md`
+
+**P0-018:** Until fixture harness is green, **Gate C = BLOCKED** — see `fixtures/HARNESS.md`.

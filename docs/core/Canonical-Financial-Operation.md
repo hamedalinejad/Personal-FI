@@ -16,7 +16,8 @@ User/Command
        1. validate
        2. Domain ledger rows (feature tables)  [SoT دامنه]
        3. fin_journal_entries + fin_journal_lines (double-entry)   [SoT حسابداری]
-       4. acc_transactions (if bank cash)      [SoT نقد بانکی]
+       4. acc_transactions (if bank cash)      [operational/event view ONLY — not cash SoT]
+       4b. fin_accounts + fin_journal_lines   [cash SoT]
        5. derive snapshots from (2)/(4) only
        6. COMMIT sql.js
   → persist IndexedDB (state machine)
@@ -418,7 +419,7 @@ Journal: Dr trading_fee / network_fee expense (amountInBase)
 ```text
 Financial Operation → Domain Ledger → Journal → acc_transactions (cash projection از plan) → Snapshots
 ```
-`acc_transactions` SoT برای **query cash بانکی** است اما **فقط** از همان atomic plan نوشته می‌شود — نه مسیر مستقل موازی با journal.
+`acc_transactions` = operational/event representation only (UX/query convenience). **Cash SoT = fin_accounts + fin_journal_lines only.** Written only from the same atomic plan — never a parallel cash SoT.
 
 ---
 
@@ -857,3 +858,7 @@ Journal is accounting SoT. acc_transactions is Accounts UX/event view linked by 
 same operationId + same commandHash → return prior result
 same operationId + different commandHash → CONFLICT
 ```
+
+## P0-FINAL-016
+
+Cash SoT = journal lines + fin_accounts. `acc_transactions` = event/UX projection. See Canonical-Cash-Model.

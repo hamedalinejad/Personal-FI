@@ -111,3 +111,5 @@ relatedFeature+relatedId: validate atomically, link tables, reconcile orphans (o
 Shared enums (`relatedFeature`, account kinds) have a **single Core owner** — no feature-local forks.
 
 **businessDate storage (P0-011):** Gregorian DATE-only `YYYY-MM-DD`.
+
+**P0-017:** persisted types = decimal **string**, not Decimal object.
