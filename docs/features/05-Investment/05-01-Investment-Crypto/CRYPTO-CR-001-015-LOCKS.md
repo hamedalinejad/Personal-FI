@@ -63,8 +63,9 @@ Any formula `destinationCost = costReleasedFromSource` applies **only** to trans
 ## CR-005 — (legacy section retained for history; rules above win)
 
 ```text
-transferredCost = costReleasedFromSource  // from CostBasisEngine on sell/disposal leg
-destinationCost = transferredCost + allocatedAcquisitionFees
+// VOID for economic_trade_or_swap — see P0-FINAL-010 / P0-COST-BASIS-PNL lock
+// economic_trade_or_swap: destinationCost = trade consideration + capitalized fees
+// internal_transfer | same_owner_bridge: destinationCost = transferred/carried cost
 ```
 
 **Forbidden:** setting destination cost from current market value of received asset.

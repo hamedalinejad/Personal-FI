@@ -301,3 +301,10 @@ UI must not invent synthetic FX split. Full rules: `P0-COST-BASIS-PNL-001-005-LO
 ## P0-FINAL-015 status
 
 `VALID | STALE | MISSING_INPUT | DEGRADED | FAILED`
+
+## P0-013/014 / 015 (canonical)
+
+Observation order + `sourcePriorityRank` from `sourcePriorityOrder` + snapshot statuses VALID|STALE|MISSING_INPUT|DEGRADED|FAILED:  
+**`P0-FINAL-006-015-LOCKS.md`**
+
+Replace bare `attributionDegraded=true` with `attributionStatus: exact|degraded|unavailable` (P0-005 / 015).

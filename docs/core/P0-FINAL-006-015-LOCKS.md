@@ -1,3 +1,5 @@
+> **Authority for P0-FINAL-006 … 015.** Conflicting older equations/enums elsewhere are void.
+
 # P0-FINAL-006 … 015 — Period return, field kinds, costCurrency, dates, T+n fee, selection
 
 ---

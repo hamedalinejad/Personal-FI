@@ -6,7 +6,7 @@
 |------|--|
 | `businessDate` timezone | **user profile timezone** (default: Asia/Tehran for Iran installs) |
 | Cutoff | **local midnight** in that timezone |
-| Storage type | **DATE-only** (calendar day string `YYYY-MM-DD` in civil calendar of the profile, or explicit Gregorian date-only) — **not** a UTC timestamp truncated |
+| Storage type | **Gregorian DATE-only `YYYY-MM-DD` only** — not UTC timestamp truncated; UI may show Jalali |
 | Near midnight | Event at 23:50 local → businessDate = that local calendar day; event at 00:10 next day → next businessDate |
 | `createdAt` / `eventAt` | always **UTC instant** (ISO-8601 with Z) |
 | Conversion | UTC instant → businessDate via profile TZ only at boundary |
@@ -154,3 +154,5 @@ See `docs/00-Product/Pages-IA.md` § Canonical IA Table — counts are **compute
 
 **DB `businessDate` = Gregorian `YYYY-MM-DD` only.**  
 UI Jalali is presentation. UTC instants for createdAt/eventAt/fetchedAt.
+
+**P0-FINAL-011 cross-lock:** storage = Gregorian DATE-only only — `P0-FINAL-006-015-LOCKS.md`.
