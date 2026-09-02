@@ -245,3 +245,17 @@ See `LOAN-LN-001-015-LOCKS.md` under Debt-Loan-Management.
 
 See feature lock files under Accounts-Banking and Income.
 
+## Market data quality (56–65)
+
+| ID | وضعیت | سند |
+|----|--------|-----|
+| 56 Pipeline order | **CLOSED** | Market-Data-Quality-Pipeline.md |
+| 57 OHLC invariants | **CLOSED** | same |
+| 58 Duplicate composite key | **CLOSED** | same |
+| 59 Timeframe enum | **CLOSED** | same |
+| 60 Effectively-once live | **CLOSED** | same |
+| 61 Crash-safe checkpoint | **CLOSED** | same |
+| 62 Shutdown order | **CLOSED** | same |
+| 63 Recovery startup | **CLOSED** | same |
+| 64 Event-driven observability | **CLOSED** | same |
+| 65 Immutable event log | **CLOSED** | same |

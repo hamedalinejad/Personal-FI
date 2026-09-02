@@ -131,3 +131,4 @@
 - Naming: [`core/NAMING-GLOSSARY.md`](core/NAMING-GLOSSARY.md)
 - Style: [`core/DOCUMENTATION-STYLE-P2.md`](core/DOCUMENTATION-STYLE-P2.md)
 - Feature README template: [`features/_FEATURE-README-TEMPLATE.md`](features/_FEATURE-README-TEMPLATE.md)
+| Market Data Quality Pipeline | `docs/core/Market-Data-Quality-Pipeline.md` |

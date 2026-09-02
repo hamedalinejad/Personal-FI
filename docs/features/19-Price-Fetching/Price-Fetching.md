@@ -922,3 +922,11 @@ price_history.instrumentId = ref_instruments.id string form. Synthetic keys only
 ## StalePolicy per asset class (CROSS-CUTTING BATCH-2 §1)
 
 Canonical configurable `StalePolicy` per asset class (freshWithin, staleAfter, onStale, calendar, version). Valuation returns `staleState` + policy version. No single global stale for all classes.
+
+---
+## Data Quality before use (56–65)
+
+هر ingest زنده یا تاریخی (CSV/API/MT5/…) باید از  
+`docs/core/Market-Data-Quality-Pipeline.md` عبور کند قبل از Canonical price/candle.
+
+AI یا سیگنال روی Raw/Rejected **ممنوع** است.
