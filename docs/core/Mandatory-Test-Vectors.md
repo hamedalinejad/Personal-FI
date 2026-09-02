@@ -51,3 +51,12 @@ Offline mode does not require external API
 ```
 
 مرجع: `db/07-fixtures-release-gate.md` · Financial-Invariants · Financial-Scenario-Catalog
+
+## Golden: Crypto BTC/USDT/IRR P&L attribution (P0)
+
+Full fixture: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`
+
+- costAtBookBase = 1_000_000_000 IRR; valueAtAsOfBase = 1_350_000_000 IRR; pnlBase = +350_000_000
+- assetPriceEffectBase = -100_000_000; fxEffectBase = +450_000_000
+- Acceptance cases 1–6 in that file are mandatory for Crypto valuation release.
+

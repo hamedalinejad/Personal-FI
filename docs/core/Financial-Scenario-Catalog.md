@@ -50,3 +50,8 @@ Input → Domain · Cash · Journal · Cost · Holding · P&L · Net Worth
 | S-PA-BUY | Physical asset purchase | asset + cash |
 
 | SCN-031 | Crypto IRR buy; BTC↓ USDT, USDT/IRR↑; profit in IRR loss in USDT | dual-unit unrealized |
+
+## SC-CRYPTO-FX-IRR-001
+
+Multi-hop crypto valuation P&L attribution (BTC priced USDT, base IRR). See `fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`.
+

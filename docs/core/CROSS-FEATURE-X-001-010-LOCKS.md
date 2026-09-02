@@ -116,3 +116,7 @@ Historical reports **must** use:
 |----|--------|
 | X-001 … X-010 | **LOCKED** 2026-09-02 |
 
+## Golden fixture (X-009)
+
+BTC/USDT/IRR worked example with assetPriceEffect + fxEffect adding to pnlBase: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`.
+

@@ -1653,3 +1653,12 @@ assert network matches instrument/network of holding
 ```
 
 Reject mismatched address/network/wallet attribution.
+
+## Multi-currency P&L (P0 golden)
+
+When quote path involves USDT (or other) and user `baseCurrency` is IRR (or any third currency), **do not** report `(Δ price in USDT)×qty` as final base P&L.
+
+Required decomposition: `assetPriceEffectBase`, `fxEffectBase`, `feeEffectBase`, `externalCashFlowEffectBase`, plus totals.
+
+Golden numbers and acceptance tests: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`.
+
