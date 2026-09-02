@@ -134,3 +134,8 @@ inv_crypto_transactions / inv_stocks_* / inv_fif_* / inv_metals_*
 | Venue cash (brokerage, exchange, metals platform) | Venue feature ledger/journal for that venue account | projection only |
 
 Both sides linked only via Financial Operation + CashSettlementPort. Two independent balance systems for the same money = forbidden.
+
+## P1 cash ownership (24)
+
+Feature cash tables are projections with optional `finAccountId`; SoT remains fin_accounts + journal_lines. See `P1-GLOBAL-CONTRACTS.md` §24.
+

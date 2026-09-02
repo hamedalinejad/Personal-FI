@@ -815,3 +815,7 @@ One operationId commit spans domain effects + journal + cash settlement atomical
 - One reverse inverts domain + journal + cash **once**.
 - **Correction:** original → reverse (`reversesOperationId`) → new operation; no double cash effect. See `CROSS-FEATURE-X-001-010-LOCKS.md`.
 
+## P1 reversal plan (20.3)
+
+Each financial Feature documents: domain rows, journal lines, cash legs, snapshot targets, reverse plan for Core. See `P1-GLOBAL-CONTRACTS.md` §20.3.
+

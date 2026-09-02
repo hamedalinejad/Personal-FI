@@ -281,3 +281,7 @@ Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See CROSS-CU
 
 API/DB field names are semantic and stable. User-facing labels come from i18n/mapping docs only and must not rename domain fields.
 
+## P1 API (20.2)
+
+Commands vs queries only. Financial commands require `operationId`; atomic op; result returns `operationId`. Public JSON decimal strings. See `P1-GLOBAL-CONTRACTS.md.md`.
+

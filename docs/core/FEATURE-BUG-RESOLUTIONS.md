@@ -352,3 +352,10 @@ Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
 - RP: `REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
 - TX: `TAX-TX-001-006-LOCKS.md`
 
+
+
+## P1 Global Contracts
+
+Authority: `docs/core/P1-GLOBAL-CONTRACTS.md`  
+Field matrix · commands/queries · reversal plan · rebuild determinism · ValuationContext · attribution · wealth vs P&L · cash ownership.
+

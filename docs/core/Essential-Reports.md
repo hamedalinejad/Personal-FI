@@ -69,3 +69,7 @@ Pipeline keeps decimal **strings** — no IEEE float conversion before write.
 
 Do not aggregate the same fact from domain + journal + cash snapshots. Each report metric names a single SoT path.
 
+## P1 ValuationContext & attribution (21–23)
+
+Global `ValuationContext`; multi-currency attribution; wealth change ≠ investment P&L. See `P1-GLOBAL-CONTRACTS.md` §§21–23.
+

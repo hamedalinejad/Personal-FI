@@ -59,3 +59,8 @@ Wallet/chain · tx hash · gas/fee asset · staking/airdrop · License offline �
 - Maintenance style: `DOCUMENTATION-STYLE-P2.md`
 - Each Feature: short README (SoT, dependencies) from `_FEATURE-README-TEMPLATE.md`
 - Diagrams derived from Data-Model-Relationship-Matrix, not hand-drawn drift
+
+## P1 global
+
+Feature authors complete `P1-GLOBAL-CONTRACTS.md` checklist (field matrices, reverse plans, ValuationContext mapping).
+
