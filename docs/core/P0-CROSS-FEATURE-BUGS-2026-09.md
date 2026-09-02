@@ -159,3 +159,10 @@
 | P0-100 | **CLOSED** | repair explicit, audited, permissioned; never silent ledger rewrite |
 
 مرجع واحد: `docs/core/CROSS-FEATURE-P0-090-100-LOCKS.md`
+
+
+## Cross-Cutting Contracts Batch — LOCKED 2026-09-02
+
+Date semantics · shared pagination · getById/list/reconcile/rebuild · Deletion matrix · docs_links only · category registry · ref_parties · namespaced external IDs · price mapping lifecycle · quoteType on price_history.
+
+See `CROSS-CUTTING-CONTRACTS-BATCH.md`.

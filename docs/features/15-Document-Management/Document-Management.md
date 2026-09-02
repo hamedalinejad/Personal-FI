@@ -223,3 +223,10 @@ metadata + binary + hash + mimeType + size + createdAt
 logical `docs_links` به entity.
 
 یک document می‌تواند به چند entity لینک شود (Loan + Party + Import batch) با validation؛ polymorphic بی‌حد ممنوع.
+
+
+## Domain must not own storage paths (CROSS-CUTTING §5)
+
+- Domain entities store `documentId` or rows in `docs_links` only.
+- `attachmentPath` / filesystem paths are owned exclusively by Document Management.
+- Linking: `(relatedFeature, entityType, entityId, documentId)`.

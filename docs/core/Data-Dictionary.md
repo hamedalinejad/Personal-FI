@@ -95,3 +95,8 @@
 **Standalone rule (P0):** `accountId`های حسابداری canonical به `fin_accounts` اشاره می‌کنند؛ لینک‌های integration مانند `accountTransactionId → acc_transactions` در editionهای بدون Accounts می‌توانند nullable باشند و شرط صحت domain نیستند.
 
 Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
+
+## Parties & external refs (CROSS-CUTTING §7–§8)
+
+- Party identity: `ref_parties.id` only; payee/payer text = display snapshot.
+- External IDs: namespaced `(sourceKind, providerId, namespace?, externalId)` — not a single global externalId.

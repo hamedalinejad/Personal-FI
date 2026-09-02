@@ -911,3 +911,9 @@ Selection order: holding-specific source → explicit request source → default
 ## FEAT-P0-031 DEEP
 price_history.instrumentId = ref_instruments.id string form. Synthetic keys only in provider mapping tables, never confused with Core id.
 
+
+
+## Price mapping lifecycle & quoteType (CROSS-CUTTING §9–§10)
+
+- Mappings: status `active|invalid|expired|disabled` + optional validFrom/validTo; invalid/expired not used for new fetches.
+- `price_history.quoteType` required: `last|close|nav|indicative|manual|mid|other` with priceAsOf/marketDate primary, fetchedAt provenance only.

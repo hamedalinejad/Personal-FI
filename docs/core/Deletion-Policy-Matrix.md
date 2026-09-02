@@ -11,3 +11,10 @@
 | Import batch | NO after commit | YES | — | — | — | NO |
 
 **Feature disable ≠ data delete.** غیرفعال کردن Investments داده crypto را پاک نمی‌کند.
+
+
+---
+
+## Authority (CROSS-CUTTING §4)
+
+All Features follow this matrix only. No feature-local hard-delete policy for posted financial data. Cancel vs void/reverse distinguished as above.

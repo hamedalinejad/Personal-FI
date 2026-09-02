@@ -244,3 +244,35 @@ same operationId + different commandHash → IDEMPOTENCY_CONFLICT (no write)
 ```
 
 Feature docs must not imply «retry با body جدید و همان id موفق می‌شود».
+
+
+---
+
+## Shared list contract (CROSS-CUTTING §2)
+
+```ts
+interface ListQuery {
+  cursor?: string
+  offset?: number
+  limit: number
+  sort?: { field: string; direction: 'asc' | 'desc' }[]
+  filters?: Record<string, unknown>
+  asOf?: string
+}
+interface ListResult<T> {
+  items: T[]
+  nextCursor?: string
+  totalCount?: number
+}
+```
+
+## Standard Feature surface (CROSS-CUTTING §3)
+
+| Method | Rule |
+|--------|------|
+| getById | required for primary entities |
+| list(ListQuery) | required |
+| reconcile | required if feature has projections/snapshots |
+| rebuild | required if feature has projections/snapshots |
+
+Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See CROSS-CUTTING-CONTRACTS-BATCH.md.

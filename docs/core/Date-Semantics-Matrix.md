@@ -64,3 +64,14 @@ No Feature may use createdAt as the primary axis of historical financial reports
 | fetchedAt | Provenance only (download time) |
 
 Provider failure: do not block transaction registration; allow manual or last-known price with stale flag (P0-095). Offline-first preserved.
+
+
+---
+
+## Entity field checklist (CROSS-CUTTING §1)
+
+Every financial/domain entity documents which of these apply:
+
+`createdAt` · `updatedAt` · `eventAt` · `businessDate` · `settlementDate` · `dueDate` · `marketDate` · `paymentDate` · `fetchedAt` · `priceAsOf`/`rateDate`
+
+See `CROSS-CUTTING-CONTRACTS-BATCH.md` §1.

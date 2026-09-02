@@ -185,3 +185,19 @@ Full text: `CROSS-FEATURE-P0-090-100-LOCKS.md`
 - **098** Persist multi-hop conversionPath
 - **099** One RoundingPolicy + version on operation
 - **100** Reconcile repair explicit/audited; no silent mutation
+
+
+## Cross-Cutting Contracts Batch (non-numbered P0 hygiene)
+
+Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH.md`
+
+1. Entity date semantics (createdAt/updatedAt/eventAt/businessDate/settlementDate/dueDate/marketDate/paymentDate/fetchedAt)
+2. Shared ListQuery / ListResult pagination+filter
+3. Feature surface: getById, list, reconcile, rebuild (when projections)
+4. Deletion/archive/cancel only via Deletion-Policy-Matrix
+5. No domain attachmentPath — Document Management + docs_links
+6. Categories from central registry only
+7. Party identity = ref_parties; payee text = snapshot
+8. External IDs namespaced (source/provider/namespace/id)
+9. Price mappings invalid/expired lifecycle
+10. price_history.quoteType required (last/close/nav/indicative/manual/…)
