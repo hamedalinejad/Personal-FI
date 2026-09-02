@@ -280,3 +280,8 @@ feeTax on trades = cost component. tax_events = liability/payment domain. Withho
 - **New writes**: only central tax event (`tax_events` / `linkedTaxEventId` on the investment operation). Feature-local tax metadata fields on inv_* transactions are **not** written by new code.
 - **Legacy fields** (`isTaxableEvent`, `costBasisAmount`, `proceedsAmount`, `realizedGainAmount`, `taxYear`, `withholdingTaxAmount`, `taxLotId`, `linkedTaxRecordId`, …): **read-only** for migration/display; migration job may backfill `linkedTaxEventId`.
 - Competing SoT (writing both legacy columns and tax_events as authority) = forbidden.
+
+
+## Tax period calendar (CROSS-CUTTING BATCH-2 §2)
+
+`taxYear` always paired with `calendar` (`jalali` | `gregorian` | …) and stable `periodKey` (e.g. `jalali:1404`). Year number alone is invalid for tax reports and records.

@@ -201,3 +201,19 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH.md`
 8. External IDs namespaced (source/provider/namespace/id)
 9. Price mappings invalid/expired lifecycle
 10. price_history.quoteType required (last/close/nav/indicative/manual/…)
+
+
+## Cross-Cutting Contracts Batch 2
+
+Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-2.md`
+
+1. StalePolicy per asset class (configurable, versioned)
+2. Tax year + calendar (jalali/gregorian) + periodKey
+3. Budget period uses user timezone/business calendar policy
+4. Goal monthly recommendation monthCount/dayCount policy
+5. Recurring catchUpPolicy (single_latest | all_missed | skip_missed)
+6. Notification dedupe schema + expiresAt/retention
+7. Reports API modes: current | asOf | period | sinceInception
+8. Investment P&L bridge: opening/period/realized/closing valuation
+9. Cost basis method per asset class + engineVersions on operations
+10. Stock CA fractional rounding via instrument precision + market rules

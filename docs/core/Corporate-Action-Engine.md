@@ -62,3 +62,10 @@ Quantity/cost اثر روی `inv_stocks_iran_transactions` (legs) ثبت می‌
 - Delisting
 
 UI می‌تواند بعداً بیاید؛ **حذف از مدل اولیه = اجبار به دست‌کاری موجودی تاریخی بعداً**.
+
+
+---
+
+## Fractional rounding (CROSS-CUTTING BATCH-2 §10)
+
+Entitlement rounding uses: ratio → **instrument quantity precision** → `fractionalPolicy` → optional cash-in-lieu. Market-rule adapter (e.g. Iran) supplies lot/tick constraints. See also Corporate-Actions-Spec / P0-056.

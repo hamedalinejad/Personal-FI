@@ -51,3 +51,11 @@ UI: زیر صفحه **Reports** (و گزارش‌های تخصصی ماژول د
 ## P0-090 — Canonical metrics
 
 P&L and wealth metrics used by Reports, Portfolio, and Dashboard share **one definition catalog** and shared query path. Divergent formulas for the same metric name are forbidden. See CROSS-FEATURE-P0-090-100-LOCKS.md.
+
+
+---
+
+## Report modes (CROSS-CUTTING BATCH-2 §7–§8)
+
+API queries declare `mode`: `current` | `asOf` | `period` | `sinceInception`.  
+Investment period P&L exposes opening qty/cost, period txs, realized, closing valuation/unrealized separately (bridge), not a single opaque number.

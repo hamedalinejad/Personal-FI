@@ -190,3 +190,9 @@
 - `relatedFeature` + `relatedId` از enum مرکزی
 - category با RelatedFeature هم‌نقشه (جدول نگاشت در همین سند)
 - مصرف‌کننده: Cheque due، Budget، Loan installment، Bills
+
+
+## Expiration & retention (CROSS-CUTTING BATCH-2 §6)
+
+- `dedupeKey` schema stable: `{category}:{relatedFeature}:{relatedId}:{eventKind}:{occurrenceKey?}`.
+- Optional `expiresAt`; retention/purge policy in settings (does not delete financial audit).

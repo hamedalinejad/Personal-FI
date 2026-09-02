@@ -917,3 +917,8 @@ price_history.instrumentId = ref_instruments.id string form. Synthetic keys only
 
 - Mappings: status `active|invalid|expired|disabled` + optional validFrom/validTo; invalid/expired not used for new fetches.
 - `price_history.quoteType` required: `last|close|nav|indicative|manual|mid|other` with priceAsOf/marketDate primary, fetchedAt provenance only.
+
+
+## StalePolicy per asset class (CROSS-CUTTING BATCH-2 §1)
+
+Canonical configurable `StalePolicy` per asset class (freshWithin, staleAfter, onStale, calendar, version). Valuation returns `staleState` + policy version. No single global stale for all classes.

@@ -251,3 +251,8 @@ monthClamp: last_day_of_month   // 31 در فوریه → 28/29؛ در ماه ۳
 
 بعد از clamp، occurrence همان ماه را «drift دائمی به 30» نمی‌کند مگر policy جدا `sticky_clamped_day`.
 پیش‌فرض پیشنهادی v1: **always from anchorDay + clamp per month** (نه sticky).
+
+
+## Catch-up policy (CROSS-CUTTING BATCH-2 §5)
+
+If scheduler misses days: `catchUpPolicy` = `single_latest` | `all_missed` | `skip_missed` (per item or global default). Occurrences keep unique `scheduledOccurrenceKey`.

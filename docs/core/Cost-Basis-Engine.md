@@ -378,3 +378,11 @@ Date alone is **forbidden** as sole sort for rebuild/FIFO/schedule application.
 
 Transfer/C2C with fee in asset: split quantity into **moved** and **burned**; allocate cost pool proportionally unless policy says otherwise.
 Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-off) without inflating dest average incorrectly.
+
+
+---
+
+## Method versioning (CROSS-CUTTING BATCH-2 §9)
+
+- Default cost basis method is **per asset class** (settings) with optional per-holding override.
+- Operations store `engineVersions.costBasis` (and rounding policy version). Replay uses the version on the operation, not the current default only.

@@ -249,3 +249,8 @@ Actual spend = source expense operations. bg_transaction_links = allocation only
 ## FEAT-P0-045 DEEP
 Each link: operationId, sourceLineId, status/void. Reversal of source clears or voids links.
 
+
+
+## Period timezone (CROSS-CUTTING BATCH-2 §3)
+
+Budget period boundaries use the **user timezone** from settings. `periodKey` includes TZ (or calendar tag). Rollover inherits the same TZ/calendar policy.

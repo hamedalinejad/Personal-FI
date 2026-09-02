@@ -207,3 +207,8 @@ fg_goals.currentAmount is progress metric excluded from Net Worth asset sum.
 ## FEAT-P0-047 DEEP
 Withdrawal reverses allocation links with operationId; cash movement only if real account transfer exists.
 
+
+
+## Monthly recommendation policy (CROSS-CUTTING BATCH-2 §4)
+
+`recommendedMonthly` uses explicit `monthCountPolicy` / day-count policy (`calendar_months` default). Policy version stored with goal or settings; API returns policy id with the recommendation.

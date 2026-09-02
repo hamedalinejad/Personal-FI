@@ -166,3 +166,10 @@
 Date semantics · shared pagination · getById/list/reconcile/rebuild · Deletion matrix · docs_links only · category registry · ref_parties · namespaced external IDs · price mapping lifecycle · quoteType on price_history.
 
 See `CROSS-CUTTING-CONTRACTS-BATCH.md`.
+
+
+## Cross-Cutting Contracts Batch 2 — LOCKED 2026-09-02
+
+StalePolicy · tax calendar · budget TZ · goal month policy · bills catch-up · notification retention/dedupe schema · report modes · P&L bridge · cost basis versions · CA fractional precision.
+
+See `CROSS-CUTTING-CONTRACTS-BATCH-2.md`.
