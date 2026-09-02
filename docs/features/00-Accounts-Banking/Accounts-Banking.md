@@ -265,3 +265,8 @@ Default: non-credit accounts reject negative ledger balance.
 ## P0-022 — transfer fee legs
 
 transfer-out (principal) + transfer-in (principal) + fee leg مستقل در یک operationId.
+
+## Accounts AC locks (P0)
+
+Full AC-001…AC-006: `ACCOUNTS-AC-001-006-LOCKS.md`
+

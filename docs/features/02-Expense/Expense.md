@@ -252,3 +252,8 @@ Lineage اجباری: `operationId`, `reversesOperationId`, `reversalOperationId
 
 Canonical: `core.reverseOperation` + optional new expense operation.
 Feature-local dual-layer void+reversal **ممنوع**.
+
+## Income/Expense IE locks (P0)
+
+Shared IE-001…IE-007: `docs/features/01-Income/INCOME-EXPENSE-IE-001-007-LOCKS.md`
+

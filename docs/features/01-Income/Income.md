@@ -210,3 +210,8 @@ Same as Expense: reversesOperationId; no double-count cash.
 
 ## P0-023 — correctIncome Core-only (reaffirm)
 No Feature-local void+acc reverse pipeline.
+
+## Income/Expense IE locks (P0)
+
+Shared IE-001…IE-007: `docs/features/01-Income/INCOME-EXPENSE-IE-001-007-LOCKS.md`
+

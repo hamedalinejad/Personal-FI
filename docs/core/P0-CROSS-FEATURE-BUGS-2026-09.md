@@ -239,3 +239,9 @@ See feature lock files under Metals and Physical-Assets.
 
 See `LOAN-LN-001-015-LOCKS.md` under Debt-Loan-Management.
 
+
+
+## Accounts AC-001…006 & IE-001…007 — LOCKED 2026-09-02
+
+See feature lock files under Accounts-Banking and Income.
+

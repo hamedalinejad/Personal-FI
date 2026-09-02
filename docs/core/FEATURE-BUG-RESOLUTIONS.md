@@ -328,3 +328,10 @@ Authority: `docs/features/05-Investment/05-03-Fixed-Income-Funds/FUNDS-FI-001-01
 
 Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
 
+
+
+## Accounts AC-001…006 / Income-Expense IE-001…007 — LOCKED
+
+- Accounts: `ACCOUNTS-AC-001-006-LOCKS.md`
+- I/E: `INCOME-EXPENSE-IE-001-007-LOCKS.md`
+
