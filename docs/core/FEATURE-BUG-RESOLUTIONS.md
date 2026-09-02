@@ -322,3 +322,9 @@ Authority: `docs/features/05-Investment/05-03-Fixed-Income-Funds/FUNDS-FI-001-01
 - Metals: `METALS-ME-001-010-LOCKS.md`
 - Physical: `PHYSICAL-PA-001-009-LOCKS.md`
 
+
+
+## Loan LN-001 … LN-015 — LOCKED
+
+Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
+

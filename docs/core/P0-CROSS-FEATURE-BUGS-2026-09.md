@@ -233,3 +233,9 @@ See `FUNDS-FI-001-010-LOCKS.md` under Fixed-Income-Funds.
 
 See feature lock files under Metals and Physical-Assets.
 
+
+
+## Loan LN-001 … LN-015 — LOCKED 2026-09-02
+
+See `LOAN-LN-001-015-LOCKS.md` under Debt-Loan-Management.
+

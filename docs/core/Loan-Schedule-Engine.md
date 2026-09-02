@@ -239,3 +239,8 @@ remainingBalance = DERIVED از ln_transactions
 2. Grace جدید → `graceMode` periods یا date_range؛ نه فقط months.
 3. هر rate change / reschedule → snapshot version جدید.
 4. fixtureهای `loan_*` در `db/07-fixtures-release-gate.md` باید day count و grace periods را پوشش دهند.
+
+## Cross-locks (LN-001…007, 011, 012)
+
+Variable rate by **accrual interval**; explicit dayCount vs period mode; grace capitalize/forgive flags; component-level outstanding; immutable schedule versions on early pay/restructure; final principal exact; explicit penalty accrual policy. See `LOAN-LN-001-015-LOCKS.md`.
+
