@@ -315,3 +315,10 @@ Authority: `docs/features/05-Investment/05-02-Investment-Stocks-Iran/STOCKS-ST-0
 
 Authority: `docs/features/05-Investment/05-03-Fixed-Income-Funds/FUNDS-FI-001-010-LOCKS.md`
 
+
+
+## Metals ME-001…ME-010 / Physical PA-001…PA-009 — LOCKED
+
+- Metals: `METALS-ME-001-010-LOCKS.md`
+- Physical: `PHYSICAL-PA-001-009-LOCKS.md`
+

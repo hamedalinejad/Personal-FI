@@ -227,3 +227,9 @@ See `STOCKS-ST-001-012-LOCKS.md` under Investment-Stocks-Iran.
 
 See `FUNDS-FI-001-010-LOCKS.md` under Fixed-Income-Funds.
 
+
+
+## Metals ME-001…010 & Physical PA-001…009 — LOCKED 2026-09-02
+
+See feature lock files under Metals and Physical-Assets.
+

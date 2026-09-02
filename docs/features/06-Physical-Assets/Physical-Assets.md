@@ -280,3 +280,7 @@ Header purchasePrice/date are legacy snapshots. All acquisition cost/qty/date li
 
 Revaluation/mark updates `currentValue` only. **Does not** create realized P&L unless explicit policy `revaluation_realizes=true` (default **false**). Realized only via sale/write_off with carrying released.
 
+## Physical Assets PA locks (P0)
+
+Full PA-001…PA-009: `PHYSICAL-PA-001-009-LOCKS.md`
+

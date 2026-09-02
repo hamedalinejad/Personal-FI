@@ -460,3 +460,7 @@ quantityMg is SoT mass. quantityCoins is input helper: mg = coins × mgPerCoin(c
 On `physical_delivery`, PA acquisition cost = **historical carrying cost released** from the metals holding for delivered qty (cost-basis method on that holding).  
 `deliveryFee` is cash only; include in PA basis only if `include_delivery_fee_in_basis=true` (default **false**). Always set `sourceOperationId` + cost on `pa_transactions`.
 
+## Metals ME locks (P0)
+
+Full ME-001…ME-010: `METALS-ME-001-010-LOCKS.md`
+
