@@ -102,3 +102,4 @@ Exact source paths (`utils/money/round.ts`, package pins) are **non-authoritativ
 Contracts here are technology-neutral; ADRs/tech decision docs own framework choices.
 - `DOC-AUTHORITY-CHAIN.md`
 - `fixtures/HARNESS.md`
+- `CANONICAL-FINANCIAL-REQUIREMENTS.md`

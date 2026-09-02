@@ -384,3 +384,6 @@ See `CROSS-FEATURE-P0-090-100-LOCKS.md`.
 
 Public contracts and JSON examples use decimal **strings** only for financial quantities. No number/Decimal in public API surface.
 
+## Canonical implementable list
+
+**`CANONICAL-FINANCIAL-REQUIREMENTS.md`** (§4.1–4.13).
