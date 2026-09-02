@@ -22,3 +22,8 @@ All Features follow this matrix only. No feature-local hard-delete policy for po
 ## Vocabulary
 
 Use voided / reversed / cancelled / archived as defined in `NAMING-GLOSSARY.md`.
+
+
+## P0-FINAL-015
+
+Posted financial operations: reverse only — never soft-delete via deletedAt. Master/reference soft-delete OK. Drafts: draft policy.

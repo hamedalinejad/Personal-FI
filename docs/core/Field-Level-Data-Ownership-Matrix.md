@@ -32,7 +32,7 @@
 | `ref_instruments.assetCategory` | RAW | Core | No after create | User/System | — | Preserve |
 | `ref_instruments.displaySymbol` | LABEL | Core | Yes | User | — | Preserve |
 | `ref_instruments.name` | LABEL | Core | Yes | User | — | Preserve |
-| `ref_instruments.externalRef.assetKey` | LABEL / INDEX | Core | No (system-derived) | System from chain+contract | chainId + contract/native | Preserve + rebuild index |
+| `ref_instruments.externalRef.assetKey` | SYSTEM_INDEX | Core | No (system-derived) | System from chain+contract | chainId + contract/native | Preserve + rebuild index |
 | `inv_crypto_instrument_meta.instrumentId` | RAW (FK) | Crypto meta | No | System | — | Preserve |
 | `inv_crypto_instrument_meta.chainId` | RAW | Crypto meta | No after create | User/Provider | — | Preserve |
 | `inv_crypto_instrument_meta.contractAddress` | RAW | Crypto meta | No after create | User/Provider | — | Preserve |
@@ -40,7 +40,7 @@
 | `inv_*_holdings.instrumentId` | RAW (FK) | Domain Holding | No (set on create) | System resolve | ref_instruments | Preserve |
 | `inv_*_transactions.instrumentId` | RAW (FK) | Domain Ledger | No | System resolve | ref_instruments | Preserve |
 | `symbol` روی holding/tx | LABEL | Domain | Yes (display) | User | — | Preserve |
-| `assetKey` روی holding/tx | LABEL / INDEX | Domain | No | System | instrument + meta | Map از instrumentId |
+| `assetKey` روی holding/tx | SYSTEM_INDEX | Domain | No | System | instrument + meta | Map از instrumentId |
 | `contractAddress` / `networkId` روی holding | RAW context | Domain | No after create | User | — | Preserve (location context) |
 | `price_history.instrumentId` | RAW (FK) | Price Engine | No | System | — | Preserve |
 | `providerSymbol` / `providerInstrumentId` | EXTERNAL mapping | Adapter | Yes (mapping) | Provider | — | Preserve |
@@ -184,3 +184,13 @@ Domain ledger برای qty/موجودی تخصصی؛ Journal برای گزارش
 
 Hard DELETE فیزیکی فقط پس از archive policy + backup.  
 `metaJson` جایگزین ستون‌های پولی typed نمی‌شود (`JSON-Policy.md`).
+
+
+## Kind enum (P0-FINAL-017)
+
+`RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX` only. `assetKey` = SYSTEM_INDEX.
+
+
+## deletedAt / updatedAt (P0-FINAL-015/016)
+
+Posted financial rows: no deletedAt path; financial fields immutable; updatedAt frozen or metadata-only. See `P0-FINAL-015-020-LOCKS.md`.

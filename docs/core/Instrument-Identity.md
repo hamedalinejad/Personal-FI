@@ -145,3 +145,12 @@ Forbidden: rebuild/query by `symbol` alone.
 
 `ref_instruments.id` is the only canonical identity. `assetKey` is index/label for providers; `symbol` is mutable display. Rebuild/query must not treat assetKey/symbol as primary identity.
 
+
+
+## Holding uniqueness (P0-FINAL-019)
+
+```text
+venue_offchain: UNIQUE(exchangeId, instrumentId) WHERE networkId IS NULL
+wallet_onchain: UNIQUE(exchangeId, networkId, instrumentId) WHERE networkId IS NOT NULL
+```
+Partial unique indexes required — see `P0-FINAL-015-020-LOCKS.md`.

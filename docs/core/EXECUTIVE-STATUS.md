@@ -35,3 +35,7 @@ Still not full coding green until numeric fixture pack expands; **these algorith
 
 CA golden numbers · transfer/bridge/swap split · EconomicKind journals · opening equity (not fake buy).
 
+
+## P0-FINAL-015…020 (LOCKED)
+
+Immutability delete/update · Kind enum + SYSTEM_INDEX · fee currency vs instrument · holding partial unique · acc_tx vs journal.

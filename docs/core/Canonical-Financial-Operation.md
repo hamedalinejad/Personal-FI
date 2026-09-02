@@ -819,3 +819,8 @@ One operationId commit spans domain effects + journal + cash settlement atomical
 
 Each financial Feature documents: domain rows, journal lines, cash legs, snapshot targets, reverse plan for Core. See `P1-GLOBAL-CONTRACTS.md` §20.3.
 
+
+
+## acc_transactions (P0-FINAL-020)
+
+Journal is accounting SoT. acc_transactions is Accounts UX/event view linked by operationId — not a second cash SoT.
