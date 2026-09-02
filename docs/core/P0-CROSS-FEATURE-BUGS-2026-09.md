@@ -259,3 +259,9 @@ See feature lock files under Accounts-Banking and Income.
 | 63 Recovery startup | **CLOSED** | same |
 | 64 Event-driven observability | **CLOSED** | same |
 | 65 Immutable event log | **CLOSED** | same |
+
+
+## CH / BU / GO / BR locks — LOCKED 2026-09-02
+
+See respective feature `*-LOCKS.md` files.
+

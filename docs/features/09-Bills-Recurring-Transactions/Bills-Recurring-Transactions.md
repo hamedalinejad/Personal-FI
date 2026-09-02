@@ -256,3 +256,8 @@ monthClamp: last_day_of_month   // 31 در فوریه → 28/29؛ در ماه ۳
 ## Catch-up policy (CROSS-CUTTING BATCH-2 §5)
 
 If scheduler misses days: `catchUpPolicy` = `single_latest` | `all_missed` | `skip_missed` (per item or global default). Occurrences keep unique `scheduledOccurrenceKey`.
+
+## Bills BR locks (P0)
+
+Full BR-001…BR-007: `BILLS-BR-001-007-LOCKS.md`
+

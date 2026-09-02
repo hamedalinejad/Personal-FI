@@ -217,3 +217,7 @@ Withdrawal reverses allocation links with operationId; cash movement only if rea
 
 **v1 default:** goals are **earmarks** (progress via contributions), not segregated cash — unless `fundingMode=segregated_cash` and `dedicatedAccountId` is set. budget/income sources are always earmark-only.
 
+## Goals GO locks (P0)
+
+Full GO-001…GO-006: `GOALS-GO-001-006-LOCKS.md`
+

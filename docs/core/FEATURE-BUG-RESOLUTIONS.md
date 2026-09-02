@@ -335,3 +335,12 @@ Authority: `docs/features/04-Debt-Loan-Management/LOAN-LN-001-015-LOCKS.md`
 - Accounts: `ACCOUNTS-AC-001-006-LOCKS.md`
 - I/E: `INCOME-EXPENSE-IE-001-007-LOCKS.md`
 
+
+
+## Cheque/Budget/Goals/Bills feature locks — LOCKED
+
+- CH: `CHEQUE-CH-001-007-LOCKS.md`
+- BU: `BUDGET-BU-001-007-LOCKS.md`
+- GO: `GOALS-GO-001-006-LOCKS.md`
+- BR: `BILLS-BR-001-007-LOCKS.md`
+

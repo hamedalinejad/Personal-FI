@@ -296,3 +296,7 @@ UI باید نام metric را نشان دهد.
 
 Clearing sets `clearedDate` / paymentDate / `effectiveCashDate` without erasing issue/due history. Bounce records `bouncedDate` and reversal linkage; prior dates remain for audit.
 
+## Cheque CH locks (P0)
+
+Full CH-001…CH-007: `CHEQUE-CH-001-007-LOCKS.md`
+

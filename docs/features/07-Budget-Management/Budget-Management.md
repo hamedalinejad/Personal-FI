@@ -259,3 +259,7 @@ Budget period boundaries use the **user timezone** from settings. `periodKey` in
 
 Single setting `budgetChequeRecognition`: `on_pending` | `on_cleared` (default recommended: `on_cleared`). If `on_pending`, bounce/cancel must release envelope spend.
 
+## Budget BU locks (P0)
+
+Full BU-001…BU-007: `BUDGET-BU-001-007-LOCKS.md`
+
