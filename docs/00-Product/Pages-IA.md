@@ -511,3 +511,20 @@ Investments = Crypto | Stocks | Funds | Metals — نه routeهای جدا در 
 
 Prefer ~9 main pages + sheets/drawers; Feature logic via APIs/engines — not one main page per Feature. Heavy reports: local rebuild → watermarked snapshot → UI. See `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` §26.
 
+---
+
+## Canonical IA Table (P1-FINAL-051)
+
+| # | Page (route) | Type | Sheets/Drawers (not pages) |
+|---|--------------|------|----------------------------|
+| 1 | `/` Dashboard | page | widgets |
+| 2 | `/accounts` | page | new account, transfer, cheque actions |
+| 3 | `/transactions` | page | income, expense, filter, detail |
+| 4 | `/investments` | page | crypto/stocks/fif/metals tabs; buy/sell/deposit sheets |
+| 5 | `/loans` | page | create loan, pay installment sheets |
+| 6 | `/planning` | page | budget/goals/bills sheets |
+| 7 | `/reports` | page | report type **tabs/filters** (not separate nav roots) |
+| 8 | `/documents` | page | upload/link sheets |
+| 9 | `/settings` | page | backup, security, currency display, price sources |
+
+**Page budget = 9.** Additional URLs may exist as modal state or query params, not top-level nav items.

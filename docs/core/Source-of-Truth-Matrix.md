@@ -76,3 +76,8 @@ Ledger → Calculation → Report
 
 
 جزئیات فیلد: `Field-Level-Data-Ownership-Matrix.md` · هویت دارایی: `Instrument-Identity.md`
+
+## P0-FINAL-048 / 049 — Report integrity
+
+- Every historical report carries `ReportCalculationContext` (asOf, priceAsOf, fxAsOf, engineVersions, staleStatus, …) — see `P0-FINAL-041-051-LOCKS.md`.
+- `calculatedProfit` ≠ `externalReportedProfit`; export keeps both separate.

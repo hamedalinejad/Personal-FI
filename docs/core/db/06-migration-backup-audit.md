@@ -331,3 +331,9 @@ encryptionState
 Backup = **Data + Configuration** (categories, tax rules, loan policies, display prefs) نه فقط ردیف تراکنش.
 
 Migration هر تغییر schema: BEGIN → VERIFY → COMMIT؛ failure → ROLLBACK / SAFE MODE.
+
+## P1-FINAL-045 — Backup manifest (tamper evidence)
+
+Required keys: `createdAt`, `appVersion`, `schemaVersion`, `dataChecksum`, `attachmentManifest[]`, `engineVersions`, `databaseId`.
+
+Restore verifies all checksums **before** swap; failure aborts.

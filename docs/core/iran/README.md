@@ -183,3 +183,16 @@ Broker / Bank / Fund Provider = metadata registry — نه منطق Domain دا�
 | VAT روی هزینه | اختیاری | `vatAmount` / `vatRate` روی expense lines |
 
 این‌ها Scope گسترش‌اند، نه نقض Core فعلی.
+
+## P0-FINAL-043 — ورودی تومان/ریال
+
+```text
+UI unit (rial|toman) → normalizer on submit → Command amount always IRR decimal string
+1 Toman = 10 Rial = 10 IRR storage units in integer rial terms
+```
+
+UI **هرگز** داخل Operation مبلغ را scale نمی‌کند.
+
+## P1-FINAL-044 — نرمال‌سازی شناسه بانکی
+
+رقم فارسی/عربی → ASCII، حذف فاصله و خط تیره، IBAN uppercase، سپس UNIQUE روی فرم نرمال.

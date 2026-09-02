@@ -357,3 +357,7 @@ interface FinancialError {
 | PERSISTENCE_FAILURE | **true** | false |
 
 Feature-specific codes فقط به‌صورت `details.featureCode` — **نه** جایگزین taxonomy مرکزی.
+
+## P1-FINAL-046
+
+Mutation only via Operation Builder → Core. See `CODING-GATE.md`.

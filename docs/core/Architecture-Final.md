@@ -104,3 +104,11 @@ Foundation + Accounting Core + Money/FX + Operation + Reversal + Audit + Reconci
 + Accounts + Income + Expense + Loans + Crypto + Dashboard + Reports + Settings  
 
 v1.1 Stocks/Funds/Metals/Cheque · v1.2 Tax/Budget/Goals/Price · v2 advanced/cloud
+
+## P1-FINAL-046 — Single financial mutation path
+
+```text
+Feature Command → Operation Builder → Core engines → Journal/Cash → projection rebuild
+```
+
+Any alternate write path = architecture violation.

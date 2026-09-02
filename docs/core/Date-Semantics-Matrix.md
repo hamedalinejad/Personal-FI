@@ -75,3 +75,15 @@ Every financial/domain entity documents which of these apply:
 `createdAt` · `updatedAt` · `eventAt` · `businessDate` · `settlementDate` · `dueDate` · `marketDate` · `paymentDate` · `fetchedAt` · `priceAsOf`/`rateDate`
 
 See `CROSS-CUTTING-CONTRACTS-BATCH.md` §1.
+
+---
+
+## P0-FINAL-041 / 042 (قفل)
+
+- `businessDate`: DATE-only، مرز = نیمه‌شب **timezone پروفایل کاربر** (پیش‌فرض Asia/Tehran)
+- نزدیک نیمه‌شب: civil local date — نه `UTC.slice(0,10)` خام
+- `createdAt`/`eventAt`: UTC instant
+- Jalali فقط presentation / قوانین صریح Iran adapter — نه interval arithmetic هسته
+- Financial Date ≠ Event Timestamp
+
+جزئیات: `P0-FINAL-041-051-LOCKS.md`

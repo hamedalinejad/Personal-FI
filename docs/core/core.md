@@ -90,3 +90,5 @@
 - `Feature-Independence-Contract.md`
 - `Module-Architecture.md` — Core vs Feature modules؛ Accounting Core ≠ UI
 - `Architecture-Final.md`
+- `P0-FINAL-041-051-LOCKS.md`
+- `CODING-GATE.md`

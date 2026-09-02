@@ -243,3 +243,4 @@ Linkage فقط از طریق SettlementPort و nullable FK.
 
 Features remain operable via API alone; no hard dependency on a parent shell UI for domain operations.
 
+Fixtures: STANDALONE-CRYPTO / LOAN / FUND — `fixtures/README.md` (P1-FINAL-047).

@@ -33,3 +33,10 @@ UI (~9 pages) → Feature API (commands/queries)
 🟢 Cloud · Multi-user · AI · …
 
 **عمداً اضافه نمی‌کنیم v1:** event sourcing کامل، microservices، CQRS framework، multi-user RBAC، cloud backend.
+
+## آخرین اصلاحیه
+
+- `P0-FINAL-041-051-LOCKS.md`
+- `CODING-GATE.md` — ترتیب اجباری قبل از کد
+- Golden 12 vectors در `fixtures/README.md`
+- P1-FINAL-050: هر چک‌لیست = GREEN یا EXPLICITLY_OUT_OF_SCOPE
