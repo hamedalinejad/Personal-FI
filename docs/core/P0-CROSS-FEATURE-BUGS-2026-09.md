@@ -187,3 +187,10 @@ See `CROSS-CUTTING-CONTRACTS-BATCH-3.md`.
 Net worth vs pending cheques · snapshot watermarks · offline rebuild · import raw · migration rollback · single-writer · optimistic UI · error codes · atomic ops · dual-store recovery.
 
 See `CROSS-CUTTING-CONTRACTS-BATCH-4.md`.
+
+
+## Cross-Cutting Contracts Batch 5 — LOCKED 2026-09-02
+
+Audit fields · audit≠financial · export preflight/precision · label mapping · headless capability · no circular features · port-only cross writes · ref seeds · partial unique indexes.
+
+See `CROSS-CUTTING-CONTRACTS-BATCH-5.md`.

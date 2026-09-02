@@ -249,3 +249,19 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-4.md`
 8. Canonical API error codes
 9. Atomic domain + journal + cash operations
 10. SQLite↔secondary persist crash recovery protocol
+
+
+## Cross-Cutting Contracts Batch 5
+
+Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-5.md`
+
+1. Audit log: actor, source, reason, operationId
+2. Audit log ≠ financial event
+3. Report export stale detect/rebuild preflight
+4. Excel/PDF keep decimal strings (no float)
+5. UI labels mapped; semantic field names stable
+6. Modules runnable via Capability API without parent UI
+7. No circular feature package dependencies
+8. Cross-feature writes only via operation/CashSettlementPort
+9. Reference tables seed/migration contract
+10. Partial unique indexes for nullable identifiers

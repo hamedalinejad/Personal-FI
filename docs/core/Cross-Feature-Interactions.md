@@ -114,3 +114,8 @@ runAtomicFinancialOperation
 ```
 
 Reconcile دوره‌ای: orphan links → integrity queue.
+
+## Write path (CROSS-CUTTING BATCH-5 §8)
+
+Cross-feature state changes go through operation + port/adapter only. Direct cross-feature repository calls are forbidden.
+

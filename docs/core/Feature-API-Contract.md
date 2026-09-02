@@ -276,3 +276,8 @@ interface ListResult<T> {
 | rebuild | required if feature has projections/snapshots |
 
 Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See CROSS-CUTTING-CONTRACTS-BATCH.md.
+
+## Labels vs semantic names (CROSS-CUTTING BATCH-5 §5)
+
+API/DB field names are semantic and stable. User-facing labels come from i18n/mapping docs only and must not rename domain fields.
+

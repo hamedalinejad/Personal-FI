@@ -36,3 +36,8 @@ Persistence
 - v1 transport: TypeScript **in-process**. آینده: همان contract پشت REST / IPC / Mobile / Cloud.
 
 مرجع: `Feature-API-Contract.md` · `Module-Architecture.md`
+
+## Headless modules (CROSS-CUTTING BATCH-5 §6)
+
+Every Feature/Capability module exposes API usable **without** parent UI (tests, jobs, import, limited license modules). UI is a client, not a runtime requirement.
+

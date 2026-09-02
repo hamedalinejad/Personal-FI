@@ -238,3 +238,8 @@ Loan + Accounting UI + Accounts + Documents + Reports سراسری.
 
 اگر Feature «Standalone» است، **هیچ** ستون `accountId`/`accountTransactionId` نباید NOT NULL یا «اجباری» در schema/prose باشد.
 Linkage فقط از طریق SettlementPort و nullable FK.
+
+## Capability without UI (CROSS-CUTTING BATCH-5 §6)
+
+Features remain operable via API alone; no hard dependency on a parent shell UI for domain operations.
+

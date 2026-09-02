@@ -55,3 +55,9 @@ calculationVersion?
 - انقضای لایسنس یا تغییر UI، ردیف‌های audit را پاک نمی‌کند.
 - Audit جایگزین journal نیست؛ journal SoT مالی است.
 - مدل از الان multi-user-ready است حتی اگر v1 تک‌کاربره باشد (مثلاً «User A changed loan fee»).
+
+## Required audit fields (CROSS-CUTTING BATCH-5 §1–§2)
+
+Audit rows include at least: `actor`, `source`, `reason` (or coded eventKind), `operationId` when financial, entity ref, action, timestamp.  
+Audit log remains separate from financial events/operations (not the same store or meaning).
+

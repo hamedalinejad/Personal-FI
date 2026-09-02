@@ -100,3 +100,8 @@ Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
 
 - Party identity: `ref_parties.id` only; payee/payer text = display snapshot.
 - External IDs: namespaced `(sourceKind, providerId, namespace?, externalId)` — not a single global externalId.
+
+## Partial unique indexes (CROSS-CUTTING BATCH-5 §10)
+
+Nullable external/provider identifiers participate in uniqueness only via partial unique constraints; document each in schema.
+
