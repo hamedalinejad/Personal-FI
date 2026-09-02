@@ -283,3 +283,11 @@ Gross income **not** recognized on paymentDate if recognition date is earlier â€
 | P0-FINAL-009 | **LOCKED** T+n journal + metrics |
 | P0-FINAL-010 | **LOCKED** Dividend journal + dates |
 
+## P0-FINAL-005 â€” attributionStatus enum
+
+```text
+exact | degraded | unavailable
+```
+
+WA multi-quote without unique FX history: `attributionStatus=degraded`; dimension fields null; total P&L still exact.  
+UI must not invent synthetic FX split. Full rules: `P0-COST-BASIS-PNL-001-005-LOCK.md`.

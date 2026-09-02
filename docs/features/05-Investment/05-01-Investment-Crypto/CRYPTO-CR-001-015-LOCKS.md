@@ -185,3 +185,12 @@ feePresence legacy maps to feeFundingAsset table in `docs/core/P0-FINAL-001-004-
 
 C2C = economic_trade_or_swap (realized). Bridge/transfer realized=0. EconomicKind matrix + opening equity journals: `docs/core/P0-FINAL-011-014-LOCKS.md`.
 
+---
+
+## CR-005 / C2C — SUPERSEDED BY CORE LOCK
+
+Any CR-005 text that sets C2C destination cost = source carrying cost is **void**.
+
+Use `economicKind` + `P0-COST-BASIS-PNL-001-005-LOCK.md`:
+- trade/swap → consideration-based dest cost + source realized
+- transfer/bridge → carry cost only

@@ -92,3 +92,4 @@
 - `Architecture-Final.md`
 - `P0-FINAL-041-051-LOCKS.md`
 - `CODING-GATE.md`
+- `P0-COST-BASIS-PNL-001-005-LOCK.md` — C2C/trade vs transfer; fee roles; P&L axes

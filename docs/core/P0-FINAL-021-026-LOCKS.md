@@ -183,3 +183,7 @@ Reproducibility: same ledger watermark + same price/fx dataset versions + same e
 | ID | Status |
 |----|--------|
 | P0-FINAL-021…026 | **LOCKED** |
+
+## P0-002 single release
+
+`TransferCostResult` — one release of gross carrying cost, split to dest+fee. See `P0-COST-BASIS-PNL-001-005-LOCK.md`.

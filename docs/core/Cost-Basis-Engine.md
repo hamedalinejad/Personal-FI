@@ -154,18 +154,27 @@ Raw quote fields روی tx برای audit و گزارش چندارزی می‌م
 
 **ممنوع:** میانگین‌گیری مستقیم `100_000_000 IRR` با `1000 USDT` بدون تبدیل به base.
 
-## C2C
+## C2C / economicKind (canonical — P0-COST-BASIS-PNL-001-005)
 
+**Authority:** `docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md`
+
+Command sets `economicKind`: `internal_transfer` | `same_owner_bridge` | `economic_trade_or_swap`.
+
+### `economic_trade_or_swap` (true C2C)
 ```text
 operationId = G
-1) disposal ETH: kind=disposal, tradeGroupId=G, linkedRole=c2c_sell
-   → releasedCost = sold portion of totalInvested
-2) fee events on legs as feeInCost / feeBurnQuantity / feeFromProceeds
-3) acquisition BTC: kind=acquisition, tradeGroupId=G, linkedRole=c2c_buy,
-   transferredCost = releasedCost + fees allocated to cost of B
-   unitPrice optional; totalInvested_B += transferredCost
+1) disposal source: realized from trade consideration − cost released − sale fees
+2) acquisition dest: cost = destinationConsiderationBase + capitalized fees
+   — NOT source carrying cost; transferredCost NOT used as dest book cost
 ```
-Engine می‌تواند `applyC2cPair(sellEvent, buyEvent)` helper داشته باشد تا divergence با Crypto implementation کم شود.
+
+### `internal_transfer` / `same_owner_bridge`
+```text
+realized = 0
+destinationCost = carrying cost moved (see transfer single-release graph)
+```
+
+Acceptance: BTC cost 100m, swap consideration 140m → realized 40m, ETH cost 140m — not 100m.
 
 ## Transfer و Fee (مدل واحد)
 
@@ -177,11 +186,11 @@ Engine می‌تواند `applyC2cPair(sellEvent, buyEvent)` helper داشته �
 | fee_reversal | **+feeQuantity** | restore | **0** |
 
 ```text
-Canonical transfer با fee از asset:
-  transfer_out.quantityEffect = -grossQuantity
-  fee_burn.quantityEffect     = -feeQuantity   // همان مقدار سوخته
-  transfer_in.quantityEffect  = +netQuantity   // net = gross - fee
-  assert gross = net + fee
+Canonical transfer با fee از asset (ONE cost release — P0-002):
+  quantity: out −gross, in +net, fee qty −fee; assert gross = net + fee
+  cost: release avg*gross ONCE → split to dest (avg*net) + feeCarrying (avg*fee)
+  fee_burn must NOT independently releaseCost again
+  Engine returns TransferCostResult { releasedCostTotal, transferredCostToDestination, feeCarryingCost }
 ```
 
 `fee_external` / `fee_in_quote`: fee_burn quantity روی base asset صفر؛ فقط money fee.

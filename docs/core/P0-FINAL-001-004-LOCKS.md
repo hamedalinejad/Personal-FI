@@ -183,3 +183,10 @@ totalInvested += quotePaidBase + quoteFeeBase (if any)
 | P0-FINAL-004 | **LOCKED** — v1 fee burn closed form |
 
 Overall coding readiness remains **near freeze** until golden fixture pack is mostly numeric-green; these four remove dual interpretation on cash, identity, fee presence, and fee burn.
+
+---
+
+## P0-FINAL-003 extension — economicFeeRole
+
+See `P0-COST-BASIS-PNL-001-005-LOCK.md`.  
+`acquisition_fee_from_received` ≠ `standalone_asset_burn`.

@@ -165,3 +165,4 @@ No buy trade is synthesized. Rebuild treats opening as acquisition event with gi
 | P0-FINAL-013 | **LOCKED** EconomicKind matrix |
 | P0-FINAL-014 | **LOCKED** opening ≠ purchase |
 
+> **Superseding detail for C2C cost math:** `P0-COST-BASIS-PNL-001-005-LOCK.md` (P0-FINAL-001). Cost-Basis-Engine must not use transferredCost on trade/swap path.
