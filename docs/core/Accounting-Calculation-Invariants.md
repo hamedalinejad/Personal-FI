@@ -209,3 +209,7 @@ never store mixed rial/toman in same column without currency
 - P&L in base should attribute asset price vs FX vs fee vs cash-flow effects where multi-currency.
 - Historical reports use asOf + priceAsOf + fxAsOf (+ settlement cutoff); never latest market data for past dates.
 
+## P0-FINAL-005…008
+
+Attribution Algorithm v1, FX Conversion Path v1, PriceSelectionPolicy v1, FxSelectionPolicy v1: `P0-FINAL-005-010-LOCKS.md`.
+

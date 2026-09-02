@@ -65,3 +65,7 @@ Available cash as-of D     = settled − commitments/reservations still open at 
 
 P&L/position timing → tradeDate; cash → settlementDate / effectiveCashDate. Do not conflate in reports.
 
+## P0-FINAL-009 — T+n Core mapping
+
+TradeDate: position + broker payable/receivable. SettlementDate: cash vs payable. availableCash / committedCash / NW defined in `P0-FINAL-005-010-LOCKS.md` §009. Settlement failure = explicit operation/reverse chain.
+

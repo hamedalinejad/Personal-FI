@@ -136,3 +136,8 @@ All money fields in fixtures/API: **decimal strings**.
 - CostBasisEngine + valuation adapter produce cost/qty; FX attribution in valuation/report layer using locked path rates.
 - Crypto Feature: contract + this fixture; no parallel ad-hoc P&L formula.
 - Reports / Portfolio: expose decomposition fields when `conversionPath` length ≥ 1 or quote ≠ base.
+
+## Algorithm version
+
+Uses **P&L Attribution Algorithm v1** (`P0-FINAL-005-010-LOCKS.md`): asset price effect with FX0, FX effect with P1.
+

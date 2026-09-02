@@ -24,3 +24,10 @@ Authority: `P0-FINAL-001-004-LOCKS.md`
 - P0-FINAL-001…004 remain uncontradicted in all Core docs  
 - Acceptance matrix §28 in `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` for scoped release  
 - Critical path fixtures green (Core + scoped Features)
+
+## P0-FINAL-005…010 (LOCKED)
+
+Deterministic attribution v1 · FX path composition · price/FX no-observation policies · T+n settlement journals · dividend journal dates.
+
+Still not full coding green until numeric fixture pack expands; **these algorithms are no longer optional prose**.
+

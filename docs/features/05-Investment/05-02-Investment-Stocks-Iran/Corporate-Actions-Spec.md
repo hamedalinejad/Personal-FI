@@ -140,3 +140,7 @@ if fractional > 0 and policy == cash_in_lieu:
 
 Rebuild via CorporateActionEngine only. Fractional + cash-in-lieu explicit. Symbol change keeps instrumentId. Delisting/worthless = explicit disposal/write-off operation.
 
+## P0-FINAL-010 — Dividend journal
+
+gross / withholding / net with incomeRecognitionDate vs paymentDate journals — see `P0-FINAL-005-010-LOCKS.md` §010.
+

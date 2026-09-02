@@ -276,3 +276,10 @@ See Notification, Reports-Analytics, Tax-Management `*-LOCKS.md` files.
 ## P0-FINAL-001…004 — LOCKED 2026-09-02
 
 Cash SoT single · instrumentId in CostBasis · fee funding vocabulary · fee burn closed form. See `P0-FINAL-001-004-LOCKS.md`.
+
+
+
+## P0-FINAL-005…010 — LOCKED 2026-09-02
+
+Attribution · FX path · price/FX selection · T+n · dividend journals. See `P0-FINAL-005-010-LOCKS.md`.
+
