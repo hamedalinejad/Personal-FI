@@ -271,3 +271,21 @@ Authority: `docs/core/CROSS-CUTTING-CONTRACTS-BATCH-5.md`
 
 - `NAMING-GLOSSARY.md` — transaction/operation/event/ledger/journal/cash/snapshot; voided/reversed/cancelled/archived
 - `DOCUMENTATION-STYLE-P2.md` — legacy aliases, Feature README, formulas→engines, decimal strings, diagrams from matrix
+
+
+
+## X-001 … X-010 (Cross-feature) — LOCKED
+
+Authority: `CROSS-FEATURE-X-001-010-LOCKS.md`
+
+- X-001 Core-only reverseOperation; Feature buildReversalPlan
+- X-002 Correction graph: reverse + new op; no double cash
+- X-003 ref_instruments.id identity only
+- X-004 Snapshot projection; ledger SoT
+- X-005 Public API decimal strings
+- X-006 Polymorphic links + orphan reconcile
+- X-007 Single Core enum owner
+- X-008 exchangeRateToBase canonical; tether label UI-only
+- X-009 FX-attributed P&L components
+- X-010 Historical asOf/priceAsOf/fxAsOf
+

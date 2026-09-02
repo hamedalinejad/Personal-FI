@@ -194,3 +194,12 @@ See `CROSS-CUTTING-CONTRACTS-BATCH-4.md`.
 Audit fields · audit≠financial · export preflight/precision · label mapping · headless capability · no circular features · port-only cross writes · ref seeds · partial unique indexes.
 
 See `CROSS-CUTTING-CONTRACTS-BATCH-5.md`.
+
+
+
+## X-001 … X-010 — LOCKED 2026-09-02
+
+Reversal Core-only · correction graph · instrument identity · snapshot≠SoT · decimal string API · polymorphic links · Core enums · FX naming · FX attribution · historical asOf.
+
+See `CROSS-FEATURE-X-001-010-LOCKS.md`.
+

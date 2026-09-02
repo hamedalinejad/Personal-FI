@@ -140,3 +140,8 @@ Symbol (display current)
 Public query/rebuild keys: `instrumentId` only.
 Forbidden: rebuild/query by `symbol` alone.
 `assetKey`/`ISIN`/`ticker` = attributes for search/provider map.
+
+## Canonical identity (X-003)
+
+`ref_instruments.id` is the only canonical identity. `assetKey` is index/label for providers; `symbol` is mutable display. Rebuild/query must not treat assetKey/symbol as primary identity.
+

@@ -809,3 +809,9 @@ Rebuild تاریخی از settings.baseCurrency فعلی استفاده **نمی
 
 One operationId commit spans domain effects + journal + cash settlement atomically from the caller’s perspective; partial persistence requires recovery protocol (see Persistence-State-Machine / BATCH-4).
 
+## Reversal & correction (X-001 / X-002)
+
+- **Reverse:** only `core.reverseOperation(operationId)`. Features supply `buildReversalPlan`; they do not hand-roll void+cash paths.
+- One reverse inverts domain + journal + cash **once**.
+- **Correction:** original → reverse (`reversesOperationId`) → new operation; no double cash effect. See `CROSS-FEATURE-X-001-010-LOCKS.md`.
+

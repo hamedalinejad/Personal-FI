@@ -40,3 +40,8 @@ Provider ممکن است روش/کارمزد/تاریخ متفاوت داشته 
 ---
 
 قرارداد اجرایی نوشتن فیلدها: `Field-Write-Contract.md` (writable/rebuildable؛ ممنوع mutate snapshot).
+
+## Snapshot vs SoT (X-004)
+
+Ledger/journal (and immutable domain events) are SoT. balance/holding/cashBalance fields are projections; reconcile detects drift; rebuild from SoT.
+

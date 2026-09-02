@@ -379,3 +379,8 @@ DB: NOT NULL + structural checks؛ quant rules in Domain.
 - **P0-099**: All features use Core `RoundingPolicy` with `policyVersion` on the operation; no per-feature ad-hoc rounding.
 
 See `CROSS-FEATURE-P0-090-100-LOCKS.md`.
+
+## Public API decimals (X-005)
+
+Public contracts and JSON examples use decimal **strings** only for financial quantities. No number/Decimal in public API surface.
+

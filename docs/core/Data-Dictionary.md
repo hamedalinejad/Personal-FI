@@ -105,3 +105,8 @@ Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
 
 Nullable external/provider identifiers participate in uniqueness only via partial unique constraints; document each in schema.
 
+## Polymorphic links (X-006) & enums (X-007)
+
+relatedFeature+relatedId: validate atomically, link tables, reconcile orphans (orphan=0 in fixtures).  
+Shared enums (`relatedFeature`, account kinds) have a **single Core owner** — no feature-local forks.
+

@@ -202,3 +202,10 @@ storage always IRR
 displayToman = amountIRR / 10   // UI only
 never store mixed rial/toman in same column without currency
 ```
+
+## FX (X-008 / X-009 / X-010)
+
+- Canonical rate field: `exchangeRateToBase`; UI «نرخ تتر» is label only when applicable.
+- P&L in base should attribute asset price vs FX vs fee vs cash-flow effects where multi-currency.
+- Historical reports use asOf + priceAsOf + fxAsOf (+ settlement cutoff); never latest market data for past dates.
+
