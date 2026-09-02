@@ -508,12 +508,12 @@ holding.totalFeesPaidBase += feeBase
 ### Holding APIs
 - `getHoldings(exchangeId?)`
 - `getHoldingByAssetKey(assetKey, exchangeId?)` / `getHoldingById(holdingId)`
-- `getHoldingBySymbol` فقط برای UI جستجو — هویت اصلی `assetKey` است
+- `getHoldingBySymbol` فقط برای UI جستجو — هویت اصلی `instrumentId` است (`assetKey` فقط index — CR-001)
 - `getPortfolioValue(targetCurrency?)`
-- **`rebuildHolding(holdingId)`** یا `rebuildHolding({ exchangeId, assetKey })` → بازسازی از ledger (نه label `symbol`)
+- **`rebuildHolding(holdingId)`** یا `rebuildHolding({ exchangeId, instrumentId }) /* CR-006; assetKey resolve→instrumentId only */` → بازسازی از ledger (نه label `symbol`)
 
  ```typescript
- rebuildHolding(holdingId: UUID) یا rebuildHolding({ exchangeId, assetKey }): {
+ rebuildHolding(holdingId: UUID) یا rebuildHolding({ exchangeId, instrumentId }) /* CR-006; assetKey resolve→instrumentId only */: {
  quantity: Decimal
  totalInvested: Decimal
  averageBuyPrice: Decimal

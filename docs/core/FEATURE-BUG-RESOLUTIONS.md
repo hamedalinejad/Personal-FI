@@ -297,3 +297,8 @@ Authority: `CROSS-FEATURE-X-011-020-LOCKS.md`
 
 Fee single effect · rounding engine · offline rebuild · dual-store durability · deterministic order · one SoT per metric · data preservation · audit on repair · projection rebuild · CI architecture boundaries.
 
+
+
+## Crypto CR-001 … CR-015 — LOCKED
+
+Authority: `docs/features/05-Investment/05-01-Investment-Crypto/CRYPTO-CR-001-015-LOCKS.md`

@@ -209,3 +209,8 @@ See `CROSS-FEATURE-X-001-010-LOCKS.md`.
 
 See `CROSS-FEATURE-X-011-020-LOCKS.md`.
 
+
+
+## Crypto CR-001 … CR-015 — LOCKED 2026-09-02
+
+See `docs/features/05-Investment/05-01-Investment-Crypto/CRYPTO-CR-001-015-LOCKS.md`.
