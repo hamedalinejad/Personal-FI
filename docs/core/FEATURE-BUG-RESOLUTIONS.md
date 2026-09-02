@@ -302,3 +302,10 @@ Fee single effect · rounding engine · offline rebuild · dual-store durability
 ## Crypto CR-001 … CR-015 — LOCKED
 
 Authority: `docs/features/05-Investment/05-01-Investment-Crypto/CRYPTO-CR-001-015-LOCKS.md`
+
+
+
+## Stocks ST-001 … ST-012 — LOCKED
+
+Authority: `docs/features/05-Investment/05-02-Investment-Stocks-Iran/STOCKS-ST-001-012-LOCKS.md`
+

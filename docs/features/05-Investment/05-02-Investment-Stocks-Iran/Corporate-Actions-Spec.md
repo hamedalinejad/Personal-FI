@@ -135,3 +135,8 @@ fractional = holdingQty * ratio - entitlement
 if fractional > 0 and policy == cash_in_lieu:
   create cash leg (cash-in-lieu)
 ```
+
+## ST-002 / ST-003 / ST-004 / ST-009
+
+Rebuild via CorporateActionEngine only. Fractional + cash-in-lieu explicit. Symbol change keeps instrumentId. Delisting/worthless = explicit disposal/write-off operation.
+

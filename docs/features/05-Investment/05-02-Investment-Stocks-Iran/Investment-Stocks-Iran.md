@@ -644,3 +644,8 @@ rebuildHolding applies CA chronologically after trades.
 Store grossDividend, withholdingTax, netDividend.
 Journal: Dr receivable/cash net, Dr tax withholding, Cr dividend income gross — one economic story without double income.
 
+## Stocks ST locks (P0)
+
+Full ST-001…ST-012: `STOCKS-ST-001-012-LOCKS.md`  
+trade vs settlement dates · CA in rebuild · fractional/cash-in-lieu · stable instrumentId · raw≠adjusted prices · feeTax vs tax_events · dividend gross/withholding/net · transfer cost carry · delisting write-off · registry lot/tick · P&L decomposition · providerSymbol mapping.
+

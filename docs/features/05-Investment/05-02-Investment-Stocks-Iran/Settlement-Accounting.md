@@ -60,3 +60,8 @@ Available cash as-of D     = settled − commitments/reservations still open at 
 - `asOf` query بدون این تفکیک = باگ P0 (portfolio/cash غلط در بازه T+n).
 
 **ممنوع:** استفاده از یک فیلد `date` واحد برای همه semantics.
+
+## ST-001
+
+P&L/position timing → tradeDate; cash → settlementDate / effectiveCashDate. Do not conflate in reports.
+
