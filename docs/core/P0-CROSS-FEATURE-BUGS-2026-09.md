@@ -271,3 +271,8 @@ See respective feature `*-LOCKS.md` files.
 
 See Notification, Reports-Analytics, Tax-Management `*-LOCKS.md` files.
 
+
+
+## P0-FINAL-001…004 — LOCKED 2026-09-02
+
+Cash SoT single · instrumentId in CostBasis · fee funding vocabulary · fee burn closed form. See `P0-FINAL-001-004-LOCKS.md`.

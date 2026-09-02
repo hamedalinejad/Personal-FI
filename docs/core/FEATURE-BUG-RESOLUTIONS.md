@@ -365,3 +365,8 @@ Field matrix · commands/queries · reversal plan · rebuild determinism · Valu
 
 Authority: `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md`
 
+
+
+## P0-FINAL-001…004
+
+See `P0-FINAL-001-004-LOCKS.md` and `EXECUTIVE-STATUS.md`.

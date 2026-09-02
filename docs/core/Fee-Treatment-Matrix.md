@@ -114,3 +114,6 @@ assert currencies aligned before arithmetic
 
 CanonicalFeeEvent + explicit treatment: each fee has exactly one economic effect in cost/P&L. feeAmount and breakdown must not double-apply.
 
+## P0-FINAL-003/004
+
+Canonical feeFundingAsset / feeIncludedInReceivedQuantity and burn closed form: `P0-FINAL-001-004-LOCKS.md`.

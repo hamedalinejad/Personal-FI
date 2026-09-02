@@ -176,3 +176,7 @@ Raw lot identity must not be discarded solely because current method is WA.
 | ID | Status |
 |----|--------|
 | CR-001 … CR-015 | **LOCKED** 2026-09-02 |
+
+## P0-FINAL fee vocabulary
+
+feePresence legacy maps to feeFundingAsset table in `docs/core/P0-FINAL-001-004-LOCKS.md`. Burn math: P0-FINAL-004.

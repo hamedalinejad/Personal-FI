@@ -62,7 +62,7 @@ interface CostBasisEvent {
     | 'ca_rights' | 'ca_capital' | 'transfer_out' | 'transfer_in'
     | 'fee_burn' | 'fee_reversal' | 'metadata_only';
 
-  instrumentId: string;     // هویت دارایی (assetKey / ISIN / …)
+  instrumentId: string;     // canonical = ref_instruments.id ONLY (P0-FINAL-002); not assetKey
   quantity: string;         // AssetQuantity
 
   /** ارز pool هزینه این holding پس از نرمال‌سازی */
@@ -194,7 +194,7 @@ Canonical transfer با fee از asset:
 
 | فیچر | خرید | فروش | خاص |
 |------|------|------|-----|
-| Crypto | acquisition | disposal | C2C pair؛ transfer+fee_burn؛ identity=`assetKey` |
+| Crypto | acquisition | disposal | C2C pair؛ transfer+fee_burn؛ identity=`instrumentId` |
 | Stocks | acquisition | disposal | CA events |
 | FIF | acquisition @ transactionPrice | disposal @ redemption | |
 | Metals | acquisition | disposal | |

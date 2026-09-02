@@ -126,14 +126,21 @@ inv_crypto_transactions / inv_stocks_* / inv_fif_* / inv_metals_*
 
 ---
 
-## P0-091 — Ownership split
+## P0-091 / P0-FINAL-001 — Ownership split (ONE cash SoT)
 
-| Cash kind | Owner SoT | Snapshot |
-|-----------|-----------|----------|
-| Bank / user cash accounts | Accounts + `fin_journal_lines` | projection only |
-| Venue cash (brokerage, exchange, metals platform) | Venue feature ledger/journal for that venue account | projection only |
+**LOCKED:** Only `fin_accounts` + `fin_journal_lines` are cash **balance** SoT.
 
-Both sides linked only via Financial Operation + CashSettlementPort. Two independent balance systems for the same money = forbidden.
+| Layer | Role |
+|-------|------|
+| Core journal | Canonical balance |
+| Venue/Feature cash table | Projection + `finAccountId` + metadata |
+| Domain cash events | Event source for ops/reconcile — not independent balance SoT |
+
+Venue features emit journal lines through operations / CashSettlementPort.  
+Dual Model A (journal) vs Model B (independent venue balance SoT) is **forbidden**.
+
+See `P0-FINAL-001-004-LOCKS.md`.
+
 
 ## P1 cash ownership (24)
 
