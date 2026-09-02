@@ -824,3 +824,36 @@ Each financial Feature documents: domain rows, journal lines, cash legs, snapsho
 ## acc_transactions (P0-FINAL-020)
 
 Journal is accounting SoT. acc_transactions is Accounts UX/event view linked by operationId — not a second cash SoT.
+
+---
+
+## P1-FINAL-038 — Idempotency persistence boundaries
+
+`operationId` = client-generated idempotency key · `UNIQUE(fin_operations.id)` · `commandHash` on same row.
+
+### Timeline
+
+```text
+1. Command received (UI/API)
+   → client supplies operationId + commandHash
+2. Durable idempotency reservation (same SQL txn as op start)
+   → INSERT fin_operations (id, commandHash, status=pending) OR reject conflict
+3. Domain + journal + cash writes
+4. SQL COMMIT  → status=committed (in RAM DB)
+5. IndexedDB persist  → status lifecycle per durability policy
+6. UI response
+```
+
+| Crash window | Behavior |
+|--------------|----------|
+| After receive, before durable INSERT | Retry با همان operationId → op جدید یک‌بار |
+| After INSERT pending, before COMMIT | Retry → همان pending/resume یا fail clean؛ **نه** duplicate domain rows |
+| After COMMIT, before UI response | Retry → **DUPLICATE_OPERATION** / return previous result |
+| After COMMIT, before IDB persist | Retry recovery path؛ financial op یک‌بار؛ persist retry |
+
+**Acceptance:** Retry بعد از crash **هرگز** دو financial operation اقتصادی جدا با همان `operationId`+`commandHash` نمی‌سازد.
+
+```text
+same operationId + same commandHash → return prior result
+same operationId + different commandHash → CONFLICT
+```

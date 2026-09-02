@@ -285,3 +285,75 @@ API/DB field names are semantic and stable. User-facing labels come from i18n/ma
 
 Commands vs queries only. Financial commands require `operationId`; atomic op; result returns `operationId`. Public JSON decimal strings. See `P1-GLOBAL-CONTRACTS.md`.
 
+---
+
+## P1-FINAL-036 — Result contract schema versions
+
+هر **Command/Query result** (نه فقط body داده) باید شامل:
+
+```typescript
+interface ApiEnvelope<T> {
+  apiVersion: string;       // e.g. "1"
+  schemaVersion: number;    // result shape version for this command
+  data: T;
+  operationId?: string;     // commands that mutate finance
+  engineVersions?: {        // when result includes calculations
+    accounting?: string;
+    costBasis?: string;
+    rounding?: string;
+    fx?: string;
+    loan?: string;
+    valuation?: string;
+  };
+}
+```
+
+- `apiVersion` = قرارداد سراسری Feature API
+- `schemaVersion` = نسخه shape همان endpoint (migration کلاینت)
+- `engineVersions` فقط وقتی خروجی محاسباتی است (P&L، schedule، portfolio)
+
+## P1-FINAL-037 — Error taxonomy (feature-independent)
+
+```typescript
+type FinancialErrorCode =
+  | 'VALIDATION_ERROR'
+  | 'CONFLICT'
+  | 'DUPLICATE_OPERATION'
+  | 'WRITER_REQUIRED'
+  | 'STALE_DATA'
+  | 'INSUFFICIENT_BALANCE'
+  | 'MISSING_RATE'
+  | 'MISSING_PRICE'
+  | 'CURRENCY_MISMATCH'
+  | 'REVERSAL_NOT_ALLOWED'
+  | 'DEPENDENCY_BLOCKED'
+  | 'INTEGRITY_VIOLATION'
+  | 'PERSISTENCE_FAILURE';
+
+interface FinancialError {
+  code: FinancialErrorCode;
+  message: string;          // human, localizable key optional
+  details?: unknown;
+  retryable: boolean;
+  userActionRequired: boolean;
+  correlationId?: string;
+}
+```
+
+| Code | retryable (typical) | userActionRequired |
+|------|---------------------|--------------------|
+| VALIDATION_ERROR | false | true |
+| CONFLICT | false | true |
+| DUPLICATE_OPERATION | false | false (return prior result) |
+| WRITER_REQUIRED | true (after lock) | maybe |
+| STALE_DATA | true (refresh) | true |
+| INSUFFICIENT_BALANCE | false | true |
+| MISSING_RATE | false / fetch opt-in | true |
+| MISSING_PRICE | false | true (or use lastKnown) |
+| CURRENCY_MISMATCH | false | true |
+| REVERSAL_NOT_ALLOWED | false | true |
+| DEPENDENCY_BLOCKED | false | true |
+| INTEGRITY_VIOLATION | false | true |
+| PERSISTENCE_FAILURE | **true** | false |
+
+Feature-specific codes فقط به‌صورت `details.featureCode` — **نه** جایگزین taxonomy مرکزی.

@@ -128,3 +128,42 @@ Unknown fields در raw/unmapped می‌مانند — قانون مطلق Data 
 
 Raw import payloads are immutable. Normalization is derived and may be re-run under a new `mapperVersion` without overwriting raw bytes/records.
 
+---
+
+## P0-FINAL-039 — Unknown-field preservation envelope
+
+فیلدهای ناشناخته **وارد domain calculation نمی‌شوند**؛ در envelope حفظ و در export دوباره برمی‌گردند:
+
+```typescript
+interface ImportRawEnvelope {
+  unknownFieldsJson: string;    // JSON object of unrecognized keys
+  sourceSchemaVersion: string;  // provider/file schema
+  sourceProvider: string;       // bank | broker | exchange | csv | ...
+  rawRecordHash: string;        // hash of raw line/object for audit
+}
+```
+
+| قانون | |
+|--------|--|
+| Domain engines | فقط فیلدهای mapped |
+| Round-trip export | envelope + mapped fields |
+| Migration | unknownFieldsJson preserve مگر ADR |
+
+## P0-FINAL-040 — Import deduplication identity hierarchy
+
+قبل از ساخت operation جدید، هویت duplicate به این ترتیب:
+
+```text
+1. providerTransactionId     (اگر provider بدهد)
+2. txHash + logIndex         (on-chain)
+3. externalReference         (شماره پیگیری بانک/کارگزاری)
+4. commandHash               (از payload نرمال‌شده)
+5. user confirmation         (UI: «این همان است؟»)
+```
+
+صرفاً `operationId` برای import خارجی کافی نیست — provider ID ممکن است متفاوت باشد.
+
+```text
+match at level N → skip insert / link to existing operationId
+no match → new operationId + store provider ids on domain row
+```

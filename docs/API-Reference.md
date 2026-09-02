@@ -167,3 +167,12 @@ Integrated Edition:
 ```
 
 Public API نباید نوع UI، route یا وجود Accounts را پیش‌شرط قرارداد خود قرار دهد.
+
+## Envelope / Errors / Idempotency
+
+جزئیات قفل‌شده:
+
+- Result `apiVersion` + `schemaVersion` + optional `engineVersions` → `Feature-API-Contract.md` (P1-FINAL-036)
+- Error taxonomy + retryable → همان سند (P1-FINAL-037)
+- Idempotency crash windows → `Canonical-Financial-Operation.md` (P1-FINAL-038)
+- Import unknown fields + dedup hierarchy → `Import-Infrastructure.md` (P0-FINAL-039/040)
