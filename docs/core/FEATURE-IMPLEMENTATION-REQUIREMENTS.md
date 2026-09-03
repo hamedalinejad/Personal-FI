@@ -228,3 +228,16 @@ Canonical: TX locks.
 ## Coding order reminder
 
 Implement only after CODING-GATE A–D. Feature lists above do **not** override Core cash/journal/operation rules.
+
+## Final Audit §§9–28 — Missing-requirement index
+
+Treat as **pre-implementation checklists** (not new lock files):
+
+- §9 Accounting foundation (journal, account, reconcile, correction)
+- §10 Usability (quick entry, split, tags, opening)
+- §11 Iran money/dates/calendar policy layer
+- §12–16 Crypto / Stocks / Funds / Loans / Metals matrices
+- §17–18 Physical assets / Tax separation
+- §19–21 Valuation/FX, price hierarchy, import provenance
+- §22–23 Offline proofs + standalone editions
+- §24–28 API freeze, schema integrity, no-field-loss, generated artifacts, code gates

@@ -689,3 +689,8 @@ Standalone stock/brokerage without Accounts UI must be runnable.
 | Stocks Feature | fields, commands, queries, presentation |
 
 **Invariant:** one formula = one owner. No copied CA math in feature prose as implementation authority.
+
+## Schema note (P0-DOC-013)
+
+`accountId` on brokerage transactions: **nullable** at schema level for standalone/local/external settlement.
+Command validation may require it only for integrated bank route.
