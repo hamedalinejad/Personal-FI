@@ -349,7 +349,7 @@ Provider mapping جدا از identity است و با `setStockPriceMapping` عو
 ## راهنمای پیاده‌سازی
 
 ### APIهای اصلی (Atomic + journal + persist)
-- `createBrokerage` / cash deposit-withdraw ↔ `acc_transactions` + brokerage cash ledger
+- `createBrokerage` / cash deposit-withdraw ↔ `acc_transactions` (event link) + brokerage cash **projection** via CashSettlementPort → journal
 - `executeBuy` / `executeSell` / `registerDividend`
 - `applyCorporateAction(type, payload)` برای همه CAها
 - `setStockPriceMapping(holdingId, { priceProviderId, providerSymbol, market })`
@@ -591,7 +591,7 @@ priceLimit: ±pct از قیمت مرجع روز — validate اختیاری warn
 هر معامله/CA سهام از `runAtomicFinancialOperation`:
 
 - Domain: `inv_stocks_iran_transactions` (instrumentId هویت)
-- Cash: فقط از **یک** brokerage cash ledger
+- Cash: فقط از **یک** مسیر Port → journal؛ cashBalance = projection (P0-DOC-012)
 - Journal: lines روی `fin_accounts` (asset + cash/fee)
 - CA از `Corporate-Action-Engine` — نه فقط update snapshot
 

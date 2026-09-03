@@ -467,7 +467,7 @@ costTransferred = 0.999 × 50,000 = 49,950 USDT ← این است که به مق
 
 رکورد BUY (BTC):
  quantity = مقدار BTC دریافتی ✅
- toTotalBase = fromTotalBase + feeBase (Cost Basis BTC شامل کارمزد)
+ toTotalBase = explicitSwapConsideration + capitalizedFees  /* P0-DOC-006; NOT market mark */
  holdings.quantity += مقدار BTC دریافتی ✅ (کامل، نه کسر کارمزد)
 ```
 
@@ -635,7 +635,7 @@ holding.totalFeesPaidBase += feeBase
  ── مرحله ۱: محاسبه مقادیر ──────────────────────────────────────────
  feeBase = convertFeeToBase(feeAmount, feeCurrency, feeAssetPriceToBase)
  fromTotalBase = fromQuantity × fromPriceBase
- toTotalBase = fromTotalBase + feeBase // Cost Basis رمزارز دریافتی
+ toTotalBase = explicitSwapConsideration + capitalizedFees // P0-DOC-006 economic_trade_or_swap only
 
  ── مرحله ۲: بررسی موجودی کافی (Guard) ──────────────────────────────
  fromHolding = SELECT * FROM inv_crypto_holdings WHERE id=? /* holdingId */ FOR UPDATE
@@ -1388,7 +1388,7 @@ executeExternalSale({
 
 `fin_accounts` با `systemRole=exchange_cash` = projection حسابداری (linked) — **نه** balance موازی که جدا update شود.
 
-Binance 1000 USDT settlement → یک حقیقت در crypto cash ledger + journal lines هم‌operation.
+Binance 1000 USDT settlement → یک حقیقت در fin_accounts + fin_journal_lines؛ crypto cash فقط projection (P0-DOC-001).
 
 ## Lots
 برای FIFO: `lotId` روی هر خرید. network, txHash, wallet address برای on-chain.
@@ -1670,8 +1670,10 @@ Golden numbers and acceptance tests: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-
 **Forbidden in new implementation:**
 
 ```sql
-WHERE assetKey = ?   -- as rebuild identity
-WHERE symbol = ?     -- as reconstruction key
+-- FORBIDDEN rebuild identity (P0-DOC-003):
+-- WHERE assetKey = ?
+-- WHERE symbol = ?
+-- USE: holdingId OR (exchangeId + instrumentId [+ networkId])
 ```
 
 **Forbidden keys for holding identity:** `symbol`, `assetKey` as logical PK.
