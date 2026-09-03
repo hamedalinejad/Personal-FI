@@ -270,3 +270,34 @@ standalone_asset_burn
 One CanonicalFeeEvent → **one** economic allocation only.
 
 Adapters must not call `transferCost` / burn / pool release without a resolved role.
+
+---
+
+## P0-FIX-006 — C2C destination cost from economic consideration only
+
+**Forbidden:**
+
+```text
+source market mark  →  destination historical cost
+toTotalBase = fromTotalBase + feeBase   // when fromTotalBase is mark-to-market
+```
+
+**Required pattern (`economic_trade_or_swap`):**
+
+```text
+one operationId
+  SELL source leg
+  BUY destination leg
+  fee leg(s)
+  source released cost (book)
+  explicit swap consideration (trade/economic)
+```
+
+```text
+sourceRealized = consideration − sourceCostReleased − saleFees
+destinationCost = consideration + capitalized acquisition fees
+```
+
+Carry-forward of source book cost applies **only** to `internal_transfer` and `same_owner_bridge`.
+
+Any Crypto example still using market mark as dest cost is **LEGACY — SUPERSEDED**.

@@ -1732,3 +1732,25 @@ Before any cost mutation, set **one** of:
 `acquisition_fee_from_received` | `post_acquisition_network_burn` | `sale_fee_from_proceeds` | `standalone_asset_burn`
 
 No role → no pool change.
+
+---
+
+## P0-FIX-006 — C2C cost (implementation)
+
+`economic_trade_or_swap` only: destination cost from **explicit consideration**, not source mark.
+
+Forbidden example: `toTotalBase = fromTotalBase + feeBase` when `fromTotalBase` is market value.
+
+---
+
+## P0-FIX-007 — totalFeesPaidBase is DERIVED
+
+```text
+totalFeesPaidBase = Σ feeBase of active (non-voided) fee events for the holding/pool
+```
+
+- Recomputed on **rebuild** / after reversal
+- **Not** an independent SoT on the holding row
+- **No** `setTotalFeesPaidBase()` public API
+
+Stored column (if present) = cache only; mismatch → rebuild wins.

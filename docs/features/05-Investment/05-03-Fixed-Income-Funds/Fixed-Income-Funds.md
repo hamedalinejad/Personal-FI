@@ -375,7 +375,7 @@ $ \text{سود} = \dfrac{\text{سرمایه} \times \text{نرخ سالانه} \
 `inv_fif_holdings` می‌تواند units را aggregate کند، ولی **منبع پول هر معامله** روی `inv_fif_transactions.accountId` (Integrated issuance_redemption؛ Standalone nullable) حفظ می‌شود.
 
 قوانین:
-1. خرید/ابطال issuance بدون `accountId` ممنوع است.
+1. خرید/ابطال issuance: Integrated bank settlement → `accountId` required؛ Standalone / local / external via CashSettlementPort → `accountId` **nullable** (P0-FIX-009).
 2. اگر کاربر همان صندوق را از دو حساب بخرد، Holding می‌تواند یکی بماند؛ تاریخچه per-account از ledger تراکنش‌ها و `acc_transactions` بازیابی می‌شود.
 3. برای Audit/Report «از کدام حساب خرید شده» باید از transactions استفاده شود نه فقط Holding.
 4. Should Have: نمای تفکیک units per account از Σ تراکنش‌ها (بدون اجباری کردن Holding جدا per account در v1).
@@ -575,7 +575,7 @@ etf_market:  units * marketPrice - totalInvested
 | شرط | ETF (`fundType = 'etf'`) | صدور/ابطال (`fundType = 'issuance_redemption'`) |
 |------|---------------------------|-----------------------------------------------------|
 | `brokerageId` | **اجباری** روی holding و tx | **null** (ممنوع پر کردن برای جریان پول) |
-| `accountId` روی tx خرید/فروش | nullable (پول از کارگزاری) | **اجباری** |
+| `accountId` روی tx خرید/فروش | nullable (پول از کارگزاری) | Integrated: required · Standalone: nullable (P0-FIX-009) |
 | جریان نقد | `inv_stocks_iran_brokerage_transactions` | `acc_transactions` |
 | `acc_transactions.relatedFeature` | معمولاً `stocks_iran` (مسیر کارگزاری) | **`fif`** |
 | `symbol` | نماد بورسی | nullable |
@@ -588,7 +588,7 @@ if fundType == 'etf':
   accountId nullable
   cash via brokerage cash ledger (+ acc فقط اگر bank↔broker)
 if fundType == 'issuance_redemption':
-  accountId mandatory on buy/sell
+  accountId required only when Integrated bank settlement; else nullable (P0-FIX-009)
   brokerageId null
   cash via acc_transactions relatedFeature='fif'
 ```
@@ -712,3 +712,4 @@ Never fold feeTax or redemption fees into distribution income or NAV return buck
 Full FI-001…FI-010: `FUNDS-FI-001-010-LOCKS.md`  
 NAV≠transactionPrice · valuationMode · income vs unrealized · reinvest one op two legs · FeeTreatment · settlement dates · predictedProfit external only · shared broker cash · immutable NAV history · period return bridge.
 
+**P0-FIX-007:** `totalFeesPaidBase` = Σ active fee events (DERIVED); rebuild-owned; no independent setter.

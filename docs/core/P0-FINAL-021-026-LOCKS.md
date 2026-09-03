@@ -195,3 +195,31 @@ Period Return additive bridge: **only** wealth bridge + investmentReturn bridge 
 ## P0-FINAL-009
 
 costCurrency immutable per pool; default baseCurrencyAtFirstCostBearingEvent — `P0-FINAL-006-015-LOCKS.md`.
+
+---
+
+## P0-FIX-008 — Period Return bridges (sole valid version)
+
+### Wealth bridge
+
+```text
+Wealth = Opening Wealth
+       + External Flows
+       + Investment Return
+       + Cash FX Translation
+       + Liability FX Translation
+       + Other Policy Effects
+```
+
+### Investment Return bridge
+
+```text
+Investment Return = Realized
+                  + Unrealized
+                  + Recognized Income
+                  − Recognized Investment Expense
+```
+
+Asset-price / FX **attribution** = child detail of a return component — **not** an additive peer on the wealth equation.
+
+Any older mixed formula (`start + purchases − sales + income + realized + unrealized + fees = end`) is **LEGACY — SUPERSEDED**.
