@@ -45,3 +45,5 @@ Standalone features remain first-class: Loan/Crypto/Fund/etc. must work without 
 ## Coding gate
 
 Do not move to Feature implementation until the P0/P1 blockers in `FINAL-AUDIT-2026-09.md` are explicitly resolved and the numeric/standalone fixture gate is green.
+
+**Current final audit:** `FINAL-THINK-TANK-AUDIT-2026-09-03.md` + `GO-NO-GO.md`.

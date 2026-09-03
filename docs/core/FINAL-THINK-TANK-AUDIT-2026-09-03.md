@@ -1723,9 +1723,9 @@ They must not be treated as canonical sources by developers.
 These look like audit snapshots rather than long-term implementation authority:
 
 ```text
-docs/core/P0-FINAL-AUD-001-004.md
-docs/core/P0-FINAL-AUD-005-008.md
-docs/core/P1-FINAL-AUD-001-008.md
+docs/core/fixtures/HARNESS.md / P0-COST-BASIS-PNL-001-005-LOCK.md
+docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md
+docs/core/P1-FIX-001-009-THINK-TANK.md / CANONICAL-FINANCIAL-REQUIREMENTS.md
 ```
 
 ### Deletion condition

@@ -1,8 +1,10 @@
-# P0-FINAL-AUD-005 … 008
+# P0-COST-BASIS-PNL-001-005-LOCK.md (REMOVED BODY)
 
-See `P0-COST-BASIS-PNL-001-005-LOCK.md`.
+**LEGACY audit snapshot.** Rules live in:
 
-| 005 | Single TransferCostResult; no double pool mutation |
-| 006 | acquisition_fee_from_received ≠ standalone burn |
-| 007 | PnlReport two-axis object |
-| 008 | degraded → null dimensions |
+- `CANONICAL-FINANCIAL-REQUIREMENTS.md`
+- `P0-COST-BASIS-PNL-001-005-LOCK.md`
+- `ARCHITECTURAL-PROHIBITIONS.md`
+- `FINAL-THINK-TANK-AUDIT-2026-09-03.md`
+
+Git history retains full prior text.

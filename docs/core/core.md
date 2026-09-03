@@ -107,8 +107,8 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `fixtures/GOLDEN-GATE.md`
 - `db/SCHEMA-FREEZE-REQUIREMENTS.md`
 - `ARCHIVE-NOTE-BATCH-LOCKS.md`
-- `P0-FINAL-AUD-005-008.md`
-- `P1-FINAL-AUD-001-008.md`
+- `P0-COST-BASIS-PNL-001-005-LOCK.md`
+- `P1-FIX-001-009-THINK-TANK.md / CANONICAL-FINANCIAL-REQUIREMENTS.md`
 - `P0-FIX-001-005-THINK-TANK.md`
 - `P0-FIX-006-010-THINK-TANK.md`
 - `P0-FIX-011-016-THINK-TANK.md`
@@ -118,3 +118,4 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `DOC-CONSOLIDATION-POLICY.md`
 - `ARCHITECTURAL-PROHIBITIONS.md`
 - `FINAL-THINK-TANK-AUDIT-2026-09-03.md`
+- `GO-NO-GO.md`
