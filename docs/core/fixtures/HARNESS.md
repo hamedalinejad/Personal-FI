@@ -1,19 +1,35 @@
-# Fixture Harness Contract (P0-FINAL-018)
+# Fixture Harness (P0-FINAL-AUD-001)
 
-## Requirement
-Scoped release goldens must be **executable** and **green** before Gate C.
+## Executable now
+
+```bash
+npm install
+npx vitest run src/core/fixtures
+```
+
+| Layer | Path |
+|-------|------|
+| JSON fixtures | `/fixtures/*.json` |
+| Harness | `src/core/fixtures/harness.ts` |
+| Tests | `src/core/fixtures/criticalFixtures.test.ts` |
+| CI | `.github/workflows/ci.yml` |
 
 ## Rules
-- Inputs and expected financial values are **decimal strings**
-- Compare with string equality after Canonical Decimal normalize
-- One command: e.g. `pnpm test:fixtures` (when source exists) runs all scoped IDs
-- Fail on missing expected field or non-string money
 
-## Scoped minimum (must be green)
-Core: INCOME, EXPENSE, TRANSFER, REVERSAL, CORRECTION, FEE, MULTI-CURRENCY  
-Crypto: FX gain, FX opposite, quote fee, same-asset acq fee, internal transfer, network fee burn, C2C swap, bridge, external gift, opening
+- money/qty/rate = **string**
+- `canonicalDecimalString` before compare
+- missing expected field → fail
+- JSON numbers for money in fixture files → **forbidden** (use strings)
 
-**Current:** SPEC_READY skeletons in `GOLDEN-*.md`. Numeric fill + harness implementation = Gate C work — **not** claimed green until CI exists.
+## Green today (critical math)
 
-## CODING-GATE clarification
-Gate C text “implemented and green” applies **only after** harness exists. Until then Gate C = **BLOCKED**.
+- CRITICAL-TOMAN-INPUT
+- CRITICAL-TRANSFER-FEE
+- CRITICAL-C2C-SWAP
+- CRYPTO-BTC-USDT-IRR-PNL
+
+## Not green yet
+
+Full Core/Loan/Stock/Recovery operation graphs — require Domain/Operation implementation.
+
+**Gate C full = BLOCKED** until those exist. Critical subset = **executable**.

@@ -1,0 +1,30 @@
+{
+  "id": "CRITICAL-TRANSFER-FEE",
+  "engineVersions": {
+    "costBasis": "1"
+  },
+  "input": {
+    "beforeCostIRR": "100000000",
+    "gross": "1",
+    "feeQty": "0.001",
+    "net": "0.999",
+    "economicKind": "internal_transfer"
+  },
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {
+      "sourceCostReleased": "100000000",
+      "destinationCarrying": "99900000",
+      "feeCarrying": "100000"
+    },
+    "realizedPnl": {
+      "base": "0"
+    },
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

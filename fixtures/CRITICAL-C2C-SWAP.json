@@ -1,0 +1,27 @@
+{
+  "id": "CRITICAL-C2C-SWAP",
+  "engineVersions": {
+    "costBasis": "1"
+  },
+  "input": {
+    "economicKind": "economic_trade_or_swap",
+    "btcCarryingReleased": "100000000",
+    "btcSwapConsideration": "140000000",
+    "saleFee": "2000000"
+  },
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {
+      "ethDestinationCost": "140000000"
+    },
+    "realizedPnl": {
+      "btc": "38000000"
+    },
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

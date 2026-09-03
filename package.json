@@ -1,0 +1,19 @@
+{
+  "name": "personal-fi",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:fixtures": "vitest run src/core/fixtures",
+    "test:unit": "vitest run",
+    "test:architecture": "vitest run src/architecture",
+    "lint": "echo 'lint: add eslint when source grows'",
+    "test": "pnpm test:fixtures"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "decimal.js": "^10.6.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
+  }
+}

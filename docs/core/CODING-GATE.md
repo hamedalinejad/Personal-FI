@@ -64,3 +64,12 @@ Per-feature must-support: `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`.
 
 Schema freeze checklist: `db/SCHEMA-FREEZE-REQUIREMENTS.md`.
 Golden gate: `fixtures/GOLDEN-GATE.md`.
+
+## P0-FINAL-AUD-001…004
+
+See `P0-FINAL-AUD-001-004.md`.
+
+- Critical fixture harness: **exists** (`npm test` / vitest fixtures)
+- Full Gate C: still blocked for non-critical families
+- Gate D: blocked until schema.sql + drift test
+- Cost helpers: only `src/core/costBasis/{transferCost,bridgeCost,applyEconomicSwap}.ts`

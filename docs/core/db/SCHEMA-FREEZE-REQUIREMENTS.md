@@ -27,3 +27,15 @@ Before schema implementation is frozen, **every table** must document:
 | delete/archive/void policy | |
 
 **P0:** numeric financial fields are TEXT; SQLite CHECKs are not the only correctness layer.
+
+## P0-FINAL-AUD-003
+
+Freeze is **not** real until:
+
+```text
+schema.sql
+migrations/0001_...
+schema-drift-test (docs tables vs SQL = 0 diff)
+```
+
+exist and CI runs the drift check.

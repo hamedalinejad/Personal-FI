@@ -1,0 +1,39 @@
+{
+  "id": "CRYPTO-BTC-USDT-IRR-PNL",
+  "engineVersions": {
+    "valuation": "1",
+    "fx": "1",
+    "attribution": "v1"
+  },
+  "input": {
+    "qty": "0.2",
+    "buyUsdtPerBtc": "50000",
+    "fx0": "100000",
+    "markUsdtPerBtc": "45000",
+    "fx1": "150000"
+  },
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {
+      "qty": "0.2"
+    },
+    "costBasis": {
+      "totalInvestedIRR": "1000000000"
+    },
+    "realizedPnl": {},
+    "unrealizedPnl": {
+      "totalBase": "350000000"
+    },
+    "attribution": {
+      "status": "exact",
+      "assetPriceEffectBase": "-100000000",
+      "fxEffectBase": "450000000",
+      "quoteOnlyUsdt": "-1000"
+    },
+    "wealthDelta": {
+      "unrealized": "350000000"
+    }
+  }
+}

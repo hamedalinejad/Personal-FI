@@ -1,0 +1,24 @@
+{
+  "id": "CRITICAL-TOMAN-INPUT",
+  "engineVersions": {
+    "money": "1"
+  },
+  "input": {
+    "uiUnit": "toman",
+    "uiAmount": "1000000"
+  },
+  "expected": {
+    "domain": {
+      "amount": "10000000",
+      "currency": "IRR"
+    },
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}
