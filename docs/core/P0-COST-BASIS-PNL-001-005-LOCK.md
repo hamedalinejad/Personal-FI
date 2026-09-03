@@ -251,3 +251,22 @@ interface PnlReport {
 | unavailable | valuation cannot run |
 
 **Forbidden:** inventing synthetic FX split when history is non-identifiable.
+
+---
+
+## P0-FIX-005 — economicFeeRole before any cost mutation
+
+Roles (exactly one per CanonicalFeeEvent):
+
+```text
+acquisition_fee_from_received
+post_acquisition_network_burn
+sale_fee_from_proceeds
+standalone_asset_burn
+```
+
+**Rule:** No cost-pool mutation until `economicFeeRole` is set on the fee event.
+
+One CanonicalFeeEvent → **one** economic allocation only.
+
+Adapters must not call `transferCost` / burn / pool release without a resolved role.

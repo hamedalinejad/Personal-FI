@@ -7,7 +7,7 @@
 | جدول | فیچر | توضیح |
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
-| `acc_transactions` | Accounts & Banking | تراکنش‌های نقدی/بانکی (Cash ledger) |
+| `acc_transactions` | Accounts & Banking | **Bank/account event log + projection** (linked by operationId). **Cash balance SoT = journal lines, not this table.** |
 | `fin_accounts` | Core Accounting | **Chart of accounts** — حساب واقعی (بانک ملت، هزینه خوراک، …) — **Must** |
 | `db_meta` / schema_version store | Infrastructure | persistence state, schemaVersion, databaseId — **Must** |
 | `fin_operations` | Core Accounting | عملیات کاربر (BUY/PAY/TRANSFER/…) — operationId, commandHash, status — **Must** |
@@ -208,3 +208,14 @@ price: string
 ```
 
 `Decimal` (decimal.js) is **only** inside domain engines after parse at boundary. TypeScript examples in this file that still show objects are non-authoritative — use string.
+
+## P0-FIX-002 — acc_transactions terminology
+
+```text
+acc_transactions = operational event log / UX projection
+cash balance     = fin_accounts + fin_journal_lines ONLY
+```
+
+**Forbidden for one pocket:** `SUM(acc_transactions) + SUM(journal)`.
+
+Use one: journal (authoritative) or a single projection rebuilt from journal — never both summed.

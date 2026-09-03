@@ -524,8 +524,9 @@ holding.totalFeesPaidBase += feeBase
  SELECT type, quantity, totalAmountBase, feeAmount, feeCurrency,
  feeAssetPriceToBase, exchangeRateToBase, transferId, tradeId
  FROM inv_crypto_transactions
- WHERE exchangeId = ? AND assetKey = ? AND isVoided = false
- ORDER BY date ASC, createdAt ASC`, [exchangeId, symbol])
+ WHERE holdingId = ? AND isVoided = false
+ ORDER BY date ASC, createdAt ASC`, [holdingId])
+ -- OR: WHERE exchangeId = ? AND instrumentId = ? [AND networkId = ?] AND isVoided = false
 
  let qty = new Decimal(0)
  let totalInvested = new Decimal(0)
@@ -569,7 +570,7 @@ holding.totalFeesPaidBase += feeBase
 - **`reconcileHolding(holdingId | { exchangeId, assetKey })`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
 
  ```typescript
- reconcileHolding(exchangeId: UUID, symbol: string): {
+ reconcileHolding(holdingId: UUID): // or { exchangeId, instrumentId, networkId? } {
  status: 'ok' | 'mismatch'
  fields: {
  quantity: { stored: Decimal, calculated: Decimal, match: boolean }
@@ -637,7 +638,7 @@ holding.totalFeesPaidBase += feeBase
  toTotalBase = fromTotalBase + feeBase // Cost Basis رمزارز دریافتی
 
  ── مرحله ۲: بررسی موجودی کافی (Guard) ──────────────────────────────
- fromHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=fromSymbol FOR UPDATE
+ fromHolding = SELECT * FROM inv_crypto_holdings WHERE id=? /* holdingId */ FOR UPDATE
  IF fromHolding.quantity < fromQuantity → ROLLBACK + خطا «موجودی کافی نیست»
 
  ── مرحله ۳: محاسبه Realized P&L برای رمزارز پرداختی ────────────────
@@ -673,7 +674,7 @@ holding.totalFeesPaidBase += feeBase
  )
 
  ── مرحله ۷: آپدیت Holding رمزارز دریافتی (Weighted Average) ────────
- toHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=? AND symbol=toSymbol
+ toHolding = SELECT * FROM inv_crypto_holdings WHERE id=? /* holdingId */ OR (exchangeId=? AND instrumentId=?)
  IF toHolding EXISTS:
  newQuantity = toHolding.quantity + toQuantity
  newTotalInvested = toHolding.totalInvested + toTotalBase
@@ -1662,3 +1663,72 @@ Required decomposition: `assetPriceEffectBase`, `fxEffectBase`, `feeEffectBase`,
 
 Golden numbers and acceptance tests: `docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md`.
 
+---
+
+## P0-FIX-003 — Identity (implementation prose lock)
+
+**Forbidden in new implementation:**
+
+```sql
+WHERE assetKey = ?   -- as rebuild identity
+WHERE symbol = ?     -- as reconstruction key
+```
+
+**Forbidden keys for holding identity:** `symbol`, `assetKey` as logical PK.
+
+**Canonical rebuild key:**
+
+```text
+rebuild = holdingId
+       OR (exchangeId + instrumentId [+ networkId])
+```
+
+| Field | Role |
+|-------|------|
+| `instrumentId` | canonical identity (`ref_instruments.id`) |
+| `symbol` | display label only |
+| `assetKey` | SYSTEM_INDEX / provider convenience only |
+
+Any remaining legacy snippet that still shows `symbol`/`assetKey` in WHERE for rebuild is **LEGACY — superseded** by this section.
+
+---
+
+## P0-FIX-004 — Quantity / fee semantics (single truth table)
+
+**Raw fields (always persist — never drop):**
+
+```text
+feePresence
+grossQuantity
+feeQuantity
+netQuantity
+```
+
+| feePresence | Holding quantity effect |
+|-------------|-------------------------|
+| `none` | gross = net; feeQuantity = 0 |
+| `fee_in_quote` | gross = net; fee in quote asset |
+| `fee_from_base` | net = gross − feeQuantity |
+| `fee_from_received` | net = gross − feeQuantity |
+| `fee_external` | gross = net; fee separate funding |
+
+Equations:
+
+```text
+if feePresence ∈ {none, fee_in_quote, fee_external}:
+  netQuantity = grossQuantity
+else: /* fee_from_base | fee_from_received */
+  netQuantity = grossQuantity − feeQuantity
+```
+
+**gross and fee are never discarded.** Only this table is authoritative; older conflicting matrices are LEGACY.
+
+---
+
+## P0-FIX-005 — economicFeeRole gate
+
+Before any cost mutation, set **one** of:
+
+`acquisition_fee_from_received` | `post_acquisition_network_burn` | `sale_fee_from_proceeds` | `standalone_asset_burn`
+
+No role → no pool change.

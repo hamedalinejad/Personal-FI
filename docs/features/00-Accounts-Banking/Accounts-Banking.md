@@ -116,7 +116,7 @@
 
 | مجاز | ممنوع |
 |------|--------|
-| دو ردیف cash ledger (transfer-out / transfer-in) | `inc_transactions` / `exp_transactions` |
+| دو ردیف bank event log (cash SoT = journal) (transfer-out / transfer-in) | `inc_transactions` / `exp_transactions` |
 | journal: Dr destination bank account / Cr source bank account (`lineKind` transfer/cash) | ثبت به‌عنوان Income یا Expense |
 | fee جدا → journal line `lineKind=fee` روی expense fee account | شمردن اصل مبلغ انتقال در گزارش درآمد/هزینه |
 | Σ amountInBase debit=credit روی cash | Realized P&L / profit از انتقال |
@@ -205,7 +205,7 @@ acc_transactions = cash movement
 | cleared | وصول‌شده |
 | reconciled | مغایرت‌گیری‌شده |
 
-Cash ledger همچنان فقط از طریق operations؛ snapshot balance rebuild می‌شود.
+bank event log (cash SoT = journal) همچنان فقط از طریق operations؛ snapshot balance rebuild می‌شود.
 
 ## FEAT-P0 LOCK (Accounts)
 
