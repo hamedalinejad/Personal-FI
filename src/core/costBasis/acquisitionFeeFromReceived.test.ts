@@ -72,3 +72,29 @@ describe('cost-basis input validation', () => {
     })).toThrow();
   });
 });
+
+describe('P0-CODE negative guards', () => {
+  it('rejects fee >= gross', () => {
+    expect(() =>
+      acquisitionCostFromReceived({
+        consideration: '100',
+        grossQty: '1',
+        feeQty: '1',
+      }),
+    ).toThrow();
+  });
+  it('rejects non-positive consideration', () => {
+    expect(() =>
+      acquisitionCostFromReceived({
+        consideration: '0',
+        grossQty: '1',
+        feeQty: '0',
+      }),
+    ).toThrow();
+  });
+  it('rejects invalid transfer gross', () => {
+    expect(() =>
+      transferCost({ beforeCost: '100', gross: '0', net: '0', feeQty: '0' }),
+    ).toThrow();
+  });
+});

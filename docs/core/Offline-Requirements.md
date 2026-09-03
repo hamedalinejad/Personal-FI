@@ -39,3 +39,14 @@ Optimistic financial UI must show pending state and confirm only after durable p
 
 Valuation/rebuild use local last-known or manual prices with stale flags. Airplane mode must allow transaction + rebuild.
 
+## Final Audit §22 — Offline acceptance proofs
+
+1. airplane mode: ordinary financial writes
+2. airplane mode: rebuild + reports from local data
+3. missing online prices → STALE/MISSING_INPUT, never invented zero
+4. crash mid-persist → no half-posted operation
+5. recovery preserves history
+6. backup restore on clean machine
+7. attachments survive backup/restore
+8. license expiry does not wipe financial history
+9. export works when feature license-disabled

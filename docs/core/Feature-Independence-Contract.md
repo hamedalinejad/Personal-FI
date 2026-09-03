@@ -244,3 +244,11 @@ Linkage فقط از طریق SettlementPort و nullable FK.
 Features remain operable via API alone; no hard dependency on a parent shell UI for domain operations.
 
 Fixtures: STANDALONE-CRYPTO / LOAN / FUND — `fixtures/README.md` (P1-FINAL-047).
+
+## Final Audit §23 — Standalone editions (acceptance-tested)
+
+```text
+Loan-only · Fund-only · Crypto-only · Stocks-only · Metals-only
+```
+
+Feature UI independence ≠ removal of Accounting Core / journal truth.

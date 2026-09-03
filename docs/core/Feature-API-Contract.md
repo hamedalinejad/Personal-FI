@@ -365,3 +365,10 @@ Mutation only via Operation Builder → Core. See `CODING-GATE.md`.
 **P1-FIX-003 envelope:** `{ apiVersion, schemaVersion, data, operationId?, engineVersions? }`
 
 **P1-FIX-004 query:** cursor | offset | limit | sort | filters | asOf — queries read-only.
+
+## Final Audit §24 — Idempotency invariant (locked)
+
+```text
+same operationId + same commandHash → return prior result
+same operationId + different commandHash → IDEMPOTENCY_CONFLICT (no financial write)
+```
