@@ -73,3 +73,5 @@ See `P0-FINAL-AUD-001-004.md`.
 - Full Gate C: still blocked for non-critical families
 - Gate D: blocked until schema.sql + drift test
 - Cost helpers: only `src/core/costBasis/{transferCost,bridgeCost,applyEconomicSwap}.ts`
+
+P1 final audit: `P1-FINAL-AUD-001-008.md`.

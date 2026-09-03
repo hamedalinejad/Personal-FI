@@ -146,3 +146,4 @@ See `P0-FINAL-001-004-LOCKS.md`.
 
 Feature cash tables are projections with optional `finAccountId`; SoT remains fin_accounts + journal_lines. See `P1-GLOBAL-CONTRACTS.md` §24.
 
+**P1-AUD-005:** Sole cash SoT = fin_accounts + fin_journal_lines.

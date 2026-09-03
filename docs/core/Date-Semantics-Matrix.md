@@ -87,3 +87,5 @@ See `Date-Semantics-Matrix.md / P0-FINAL locks` §1.
 - Financial Date ≠ Event Timestamp
 
 جزئیات: `P0-FINAL-041-051-LOCKS.md`
+
+**P1-AUD-003:** See P1-FINAL-AUD-001-008.md — no UTC slice without TZ policy.

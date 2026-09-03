@@ -113,3 +113,5 @@ Shared enums (`relatedFeature`, account kinds) have a **single Core owner** — 
 **businessDate storage (P0-011):** Gregorian DATE-only `YYYY-MM-DD`.
 
 **P0-017:** persisted types = decimal **string**, not Decimal object.
+
+**P1-AUD-001:** New financial fields require a dictionary row (kind, owner, precision, SoT, migration).
