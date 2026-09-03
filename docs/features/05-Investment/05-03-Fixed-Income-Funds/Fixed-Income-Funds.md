@@ -712,3 +712,18 @@ Full FI-001…FI-010: `FUNDS-FI-001-010-LOCKS.md`
 NAV≠transactionPrice · valuationMode · income vs unrealized · reinvest one op two legs · FeeTreatment · settlement dates · predictedProfit external only · shared broker cash · immutable NAV history · period return bridge.
 
 **P0-FIX-007:** `totalFeesPaidBase` = Σ active fee events (DERIVED); rebuild-owned; no independent setter.
+
+---
+
+## P0-DOC-009 / P0-DOC-010 (Final Audit lock)
+
+```text
+Integrated bank settlement → accountId required at command time
+Standalone / local / external → accountId nullable
+```
+
+```text
+Fund entity → instrumentId → ref_instruments.id
+```
+
+Price, holding, cost basis, reports use **instrumentId** only. Dual identity forbidden.

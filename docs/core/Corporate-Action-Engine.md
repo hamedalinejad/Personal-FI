@@ -69,3 +69,5 @@ UI می‌تواند بعداً بیاید؛ **حذف از مدل اولیه = �
 ## Fractional rounding (CROSS-CUTTING BATCH-2 §10)
 
 Entitlement rounding uses: ratio → **instrument quantity precision** → `fractionalPolicy` → optional cash-in-lieu. Market-rule adapter (e.g. Iran) supplies lot/tick constraints. See also Corporate-Actions-Spec / P0-056.
+
+**P0-DOC-014:** This engine is the **sole owner** of CA quantity/cost formulas. Features must call it, not reimplement.

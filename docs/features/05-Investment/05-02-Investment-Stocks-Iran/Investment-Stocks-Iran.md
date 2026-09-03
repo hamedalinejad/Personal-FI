@@ -677,3 +677,15 @@ Standalone stock/brokerage without Accounts UI must be runnable.
 | **Stocks Feature** | required fields + API boundary only |
 
 **Forbidden:** copy CA quantity/cost formulas into multiple feature files.
+
+---
+
+## P0-DOC-014 — Ownership split (Final Audit)
+
+| Owner | Owns |
+|-------|------|
+| Corporate-Action-Engine | quantity/cost transformation formulas |
+| Iran Market Adapter | session, calendar, T+2, lot/tick, market dates |
+| Stocks Feature | fields, commands, queries, presentation |
+
+**Invariant:** one formula = one owner. No copied CA math in feature prose as implementation authority.

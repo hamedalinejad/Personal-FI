@@ -223,3 +223,21 @@ Investment Return = Realized
 Asset-price / FX **attribution** = child detail of a return component — **not** an additive peer on the wealth equation.
 
 Any older mixed formula (`start + purchases − sales + income + realized + unrealized + fees = end`) is **LEGACY — SUPERSEDED**.
+
+---
+
+## P0-DOC-008 — SUPERSEDED mixed period bridge (do not implement)
+
+```text
+LEGACY / SUPERSEDED — DO NOT USE:
+start + purchases - sales + income + realized + unrealized + fees = end
+```
+
+**Canonical only:**
+
+```text
+Wealth = Opening + ExternalFlows + InvestmentReturn + CashFX + LiabilityFX + OtherPolicy
+InvestmentReturn = Realized + Unrealized + RecognizedIncome - RecognizedInvestmentExpense
+```
+
+Attribution (asset price / FX) is **child detail**, not a wealth peer term.
