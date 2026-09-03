@@ -59,3 +59,5 @@ Only mutation path: Feature Command → Operation Builder → Core → Journal/C
 **P0-018:** Until fixture harness is green, **Gate C = BLOCKED** — see `fixtures/HARNESS.md`.
 
 Implement against **`CANONICAL-FINANCIAL-REQUIREMENTS.md`** — non-negotiable regardless of UI.
+
+Per-feature must-support: `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`.

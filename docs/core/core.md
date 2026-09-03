@@ -103,3 +103,4 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `DOC-AUTHORITY-CHAIN.md`
 - `fixtures/HARNESS.md`
 - `CANONICAL-FINANCIAL-REQUIREMENTS.md`
+- `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`
