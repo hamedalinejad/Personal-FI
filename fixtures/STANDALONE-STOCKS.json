@@ -1,0 +1,19 @@
+{
+  "id": "STANDALONE-STOCKS",
+  "engineVersions": {},
+  "input": {
+    "accountsUi": false,
+    "settlement": "LocalSettlementAdapter"
+  },
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

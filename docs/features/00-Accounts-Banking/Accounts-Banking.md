@@ -270,3 +270,4 @@ transfer-out (principal) + transfer-in (principal) + fee leg مستقل در ی�
 
 Full AC-001…AC-006: `ACCOUNTS-AC-001-006-LOCKS.md`
 
+**P1-FIX-006:** Normalize IBAN/Shaba/account numbers before unique/store (Persian digits→ASCII, strip spaces/hyphens/ZW, IBAN upper, keep leading zeros).

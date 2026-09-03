@@ -361,3 +361,7 @@ Feature-specific codes فقط به‌صورت `details.featureCode` — **نه**
 ## P1-FINAL-046
 
 Mutation only via Operation Builder → Core. See `CODING-GATE.md`.
+
+**P1-FIX-003 envelope:** `{ apiVersion, schemaVersion, data, operationId?, engineVersions? }`
+
+**P1-FIX-004 query:** cursor | offset | limit | sort | filters | asOf — queries read-only.

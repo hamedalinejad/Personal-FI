@@ -87,3 +87,5 @@ No feature may write another feature's tables directly. No feature may maintain 
 **Do not remove this block by changing status text. Change status only after evidence is green.**
 
 P0-FIX-017…020: `P0-FIX-017-020-THINK-TANK.md`.
+
+P1-FIX-001…009: `P1-FIX-001-009-THINK-TANK.md`.

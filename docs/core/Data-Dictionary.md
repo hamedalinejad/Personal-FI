@@ -115,3 +115,5 @@ Shared enums (`relatedFeature`, account kinds) have a **single Core owner** — 
 **P0-017:** persisted types = decimal **string**, not Decimal object.
 
 **P1-AUD-001:** New financial fields require a dictionary row (kind, owner, precision, SoT, migration).
+
+**P1-FIX-001:** One dictionary row per persisted field (Kind, Owner, Currency, Precision, SoT, Editable, Migration, FK, Index/Unique). Acceptance: zero undocumented financial fields.
