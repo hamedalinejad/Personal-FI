@@ -249,13 +249,15 @@ interface FinancialOperationAdapter {
 
 جریان موتور:
 ```text
-status = pending
+status = pending  (business, in plan)
 adapter.validate → adapter.buildPlan
 write domain + journal + cash (engine)
 derive snapshots
-SQL COMMIT → status = committed
-persist IDB → status = persisted (یا failed)
-emit only if persisted
+SQL COMMIT → fin_operations.status = posted
+             db_meta.durabilityState = sql_committed
+persist IDB → db_meta.durabilityState = persisted | persist_failed
+emit only if durabilityState = persisted
+// NEVER write fin_operations.status = 'committed' or 'persisted'
 ```
 
 ## Operation Status (سراسری)
@@ -840,8 +842,8 @@ Journal is accounting SoT. acc_transactions is Accounts UX/event view linked by 
 2. Durable idempotency reservation (same SQL txn as op start)
    → INSERT fin_operations (id, commandHash, status=pending) OR reject conflict
 3. Domain + journal + cash writes
-4. SQL COMMIT  → status=committed (in RAM DB)
-5. IndexedDB persist  → status lifecycle per durability policy
+4. SQL COMMIT  → fin_operations.status=posted + db_meta.durabilityState=sql_committed
+5. IndexedDB persist  → durabilityState=persisted | persist_failed (never SQLite status=persisted)
 6. UI response
 ```
 

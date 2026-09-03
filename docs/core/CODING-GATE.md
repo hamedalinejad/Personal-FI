@@ -1,12 +1,14 @@
 # Coding Gate — Final Order
 
-**Status:** BLOCKED until the canonical documentation contradictions in `FINAL-AUDIT-2026-09.md` are resolved and the scoped golden fixture pack is green.
+**Status:** Gate A (P0-DOC contracts) largely closed — see `P0-DOC-001-014-VERIFY.md`. **Still BLOCKED** on Gate C (full golden fixtures executable) and Gate D (schema freeze + relationship coverage). Authority: `GO-NO-GO.md` + `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical) + concept homes.
 
 ## Gate A — Contract cleanup
 
 Resolve all P0 items in:
 
-- `docs/core/FINAL-AUDIT-2026-09.md`
+- `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical audit)
+- `docs/core/GO-NO-GO.md`
+- `docs/core/P0-DOC-001-014-VERIFY.md`
 - `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.md`
 - Core identity / cash / fee / FX / loan / valuation contracts
 
@@ -79,7 +81,7 @@ No feature may write another feature's tables directly. No feature may maintain 
 
 ## Current blockers
 
-1. Documentation contradictions listed in `FINAL-AUDIT-2026-09.md`.
+1. Residual OPEN items in `docs/core/OPEN-ISSUES-REGISTER.md` (schema freeze, fixtures, relationship matrix).
 2. Full field-level dictionary/relationship coverage is not yet provable for every Feature field.
 3. Full numeric golden pack is not yet implemented.
 4. Feature implementations do not yet exist, so runtime verification is necessarily limited to Core helpers/fixtures.

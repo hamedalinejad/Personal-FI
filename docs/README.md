@@ -7,7 +7,7 @@
 1. `Project-Blueprint.md` — اصول محصول
 2. `Technical-Architecture.md` — آفلاین، شبکه، لایه‌ها
 3. `00-Product/Pages-IA.md` — ۹ صفحه و Sheet نه Route انبوه
-4. `core/ARCHIVE-NOTE-BATCH-LOCKS.md` — ممیزی فعلی و تناقض‌های کشف‌شده
+4. `core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` — ممیزی فعلی و تناقض‌های کشف‌شده
 5. `core/db/db.md` — sql.js، persist، journal، reconcile، migration، backup
 6. `core/types/types.md` — Decimal string، enumها، Eventها
 7. `core/rounding/Rounding-Policy.md` — گرد کردن پول
@@ -49,7 +49,7 @@
 
 تا زمان وجود کد و تست، هر تعارض در مستندات باید با این اولویت حل شود:
 
-1. `ARCHIVE-NOTE-BATCH-LOCKS.md` برای تناقض‌های شناخته‌شده تا زمان ادغام آن‌ها در سند اصلی
+1. `FINAL-THINK-TANK-AUDIT-2026-09-03.md` برای تناقض‌های شناخته‌شده تا زمان ادغام آن‌ها در سند اصلی
 2. قراردادهای canonical در `core/`، مخصوصاً Accounting Calculation Invariants / Canonical Cash / Source of Truth
 3. Feature spec و سپس Product/UX docs
 
@@ -63,7 +63,7 @@
 
 | موضوع | مسیر |
 |--------|------|
-| Documentation Audit | `docs/core/ARCHIVE-NOTE-BATCH-LOCKS.md` |
+| Documentation Audit | `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` |
 | Database | `docs/core/db/db.md` (+ زیرفایل‌ها) |
 | Types | `docs/core/types/types.md` |
 | Atomic ops | `docs/core/Canonical-Financial-Operation.md` |

@@ -1171,15 +1171,17 @@ Reversal atomic باید:
 # قرارداد Canonical کریپتو (بر هر بخش متناقض مقدم است)
 
 ## 1. هویت
-- Holding / rebuild / ledger filter: **`exchangeId + assetKey`** (یا `holdingId`)
+- Holding / rebuild / ledger filter: **`holdingId`** یا **`exchangeId + instrumentId`** (+ network context اگر لازم)
 - `symbol` فقط label — هرگز در WHERE rebuild
-- `instrumentId` قیمت = `assetKey`
+- `assetKey` = SYSTEM_INDEX / provider convenience only — نه identity
+- `instrumentId` قیمت = `ref_instruments.id`
 
 ## 2. Schema تراکنش (فیلدهای الزامی)
 
 | فیلد | نقش |
 |------|-----|
-| `assetKey` | هویت دارایی این leg |
+| `instrumentId` | هویت canonical دارایی این leg (`ref_instruments.id`) |
+| `assetKey` | SYSTEM_INDEX فقط — نه identity |
 | `type` | buy/sell/transfer_*/… |
 | `grossQuantity` | مقدار قبل از fee از asset |
 | `feeQuantity` | مقدار fee اگر از همان asset |
@@ -1756,3 +1758,22 @@ totalFeesPaidBase = Σ feeBase of active (non-voided) fee events for the holding
 - **No** `setTotalFeesPaidBase()` public API
 
 Stored column (if present) = cache only; mismatch → rebuild wins.
+
+---
+
+## OPEN-012 / P0 identity — Holding uniqueness (locked)
+
+```text
+Canonical:
+  holdingId
+  OR UNIQUE(exchangeId, instrumentId [, networkId when multi-network custody])
+
+Index only (non-identity):
+  assetKey   // SYSTEM_INDEX
+  symbol     // LABEL
+
+Forbidden in new implementation:
+  WHERE symbol = ?
+  WHERE assetKey = ?   as sole rebuild key
+  PK logical = assetKey
+```

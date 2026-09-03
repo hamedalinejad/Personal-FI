@@ -740,3 +740,17 @@ instrumentId    = ref_instruments.id — canonical investment identity for price
 **Rule:** every holding/transaction/price path uses `instrumentId`.  
 `fundId` links the product row to `instrumentId` (FK).  
 **Not** `fundId === instrumentId` unless a future migration explicitly collapses them (v1: separate).
+
+---
+
+## OPEN-011 — Schema lock
+
+```text
+inv_fif_funds.instrumentId NOT NULL REFERENCES ref_instruments(id)
+UNIQUE(instrumentId)
+
+holdings.instrumentId / transactions.instrumentId / price_history.instrumentId
+= investment identity
+
+fundId = product entity only
+```

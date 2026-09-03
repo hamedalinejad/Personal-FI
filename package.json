@@ -7,8 +7,9 @@
     "test:fixtures": "vitest run src/core/fixtures",
     "test:unit": "vitest run",
     "test:architecture": "vitest run src/architecture",
-    "lint": "echo 'lint: add eslint when source grows'",
-    "test": "pnpm test:fixtures"
+    "lint": "node -e \"console.log('lint: ESLint deferred until Feature source packages exist; boundary rules live in docs/core/Feature-Package-Architecture.md');\"",
+    "test": "npm run test:unit",
+    "test:coverage-gate": "vitest run"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",

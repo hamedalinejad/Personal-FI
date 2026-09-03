@@ -12,5 +12,5 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
-      - run: npx vitest run src/core/fixtures src/architecture
-      - run: npx tsc --noEmit
+      - run: npm run test:unit
+      - run: npm run typecheck

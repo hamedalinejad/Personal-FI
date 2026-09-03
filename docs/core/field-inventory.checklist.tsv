@@ -1,0 +1,20 @@
+table	column	fieldKind	owner	sot	nullable	inDictionary	inSchemaFreeze	migration
+fin_operations	id	SYSTEM_INDEX	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
+fin_operations	status	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
+fin_operations	commandHash	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
+fin_operations	baseCurrencyAtOperation	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
+fin_journal_lines	amount	RAW	Accounting Core	journal	NO	YES	REQUIRED	preserve
+fin_journal_lines	amountInBase	RAW	Accounting Core	journal	NO	YES	REQUIRED	preserve
+fin_journal_lines	exchangeRateToBase	RAW	Accounting Core	journal	YES	YES	REQUIRED	preserve
+fin_accounts	id	SYSTEM_INDEX	Accounting Core	fin_accounts	NO	YES	REQUIRED	preserve
+ref_instruments	id	SYSTEM_INDEX	Identity	ref_instruments	NO	YES	REQUIRED	preserve
+inv_crypto_transactions	instrumentId	RAW	Crypto	ref_instruments	NO	YES	REQUIRED	preserve
+inv_crypto_transactions	grossQuantity	RAW	Crypto	ledger	NO	YES	REQUIRED	preserve
+inv_crypto_transactions	feeQuantity	RAW	Crypto	ledger	YES	YES	REQUIRED	preserve
+inv_crypto_transactions	netQuantity	RAW	Crypto	ledger	NO	YES	REQUIRED	preserve
+inv_crypto_holdings	quantity	DERIVED	Crypto	inv_crypto_transactions	NO	YES	REQUIRED	rebuild
+inv_crypto_holdings	totalFeesPaidBase	DERIVED	Crypto	fee events	YES	YES	REQUIRED	rebuild
+inv_fif_funds	id	SYSTEM_INDEX	FIF	inv_fif_funds	NO	YES	REQUIRED	preserve
+inv_fif_funds	instrumentId	RAW	FIF	ref_instruments	NO	YES	REQUIRED	preserve
+acc_transactions	amount	RAW	Accounts	projection event	NO	YES	REQUIRED	preserve
+acc_accounts	currentBalance	SNAPSHOT	Accounts	fin_journal_lines via Port	NO	YES	REQUIRED	rebuild

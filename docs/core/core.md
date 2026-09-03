@@ -115,3 +115,7 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `GO-NO-GO.md`
 - `AUDIT-HISTORY-NOTE.md`
 - `P0-DOC-001-014-VERIFY.md`
+- `OPEN-ISSUES-REGISTER.md`
+- `FIELD-PRESERVATION-PROOF.md`
+- `db/SCHEMA-FREEZE-COVERAGE.md`
+- `fixtures/OPEN-004-FIXTURE-GAP.md`

@@ -5,7 +5,8 @@
 
 **Audited branch:** `main`
 
-**Audited HEAD:** `cbfd5c49e68031b9e0c80287b409416bd771f56f`
+**Original audited HEAD (2026-09-03 baseline):** `cbfd5c49e68031b9e0c80287b409416bd771f56f`  
+**Verification refresh note:** contracts re-verified against later HEADs; live status → `docs/core/OPEN-ISSUES-REGISTER.md` + `GO-NO-GO.md`. This file is **historical authority for findings**, not live HEAD metadata.
 
 **Audit nature:** documentation-first architecture audit + executable Core/fixtures audit + cross-document consistency audit.
 
@@ -2144,7 +2145,7 @@ That is the design target that should govern every implementation decision from 
 
 # 44. Audit provenance
 
-This report was prepared against the current repository head `cbfd5c49e68031b9e0c80287b409416bd771f56f` on 2026-09-03.
+This report was prepared against repository head `cbfd5c49e68031b9e0c80287b409416bd771f56f` on 2026-09-03 (baseline). Subsequent commits closed many P0-DOC items; treat OPEN register + GO-NO-GO as live status.
 
 The prior `FINAL-AUDIT-2026-09.md` was itself created at an earlier baseline. The repository advanced nine commits after that baseline, including documentation consolidation and multiple P0/P1 fix/thinking-tank commits. Therefore this report intentionally treats the **current HEAD** and the newer consolidation policy as the authoritative state.
 

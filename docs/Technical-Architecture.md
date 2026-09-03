@@ -84,7 +84,9 @@ IndexedDB
 - تمام محاسبات مالی باید با decimal.js انجام شوند
 - تمام مبالغ مالی به‌صورت **TEXT decimal string** ذخیره می‌شوند (Amount Storage v1). Minor Unit فقط در مرز UI/import/export بانکی — نه مدل اصلی DB. جزئیات: Project-Blueprint + Financial-Invariants + db Amount Storage.
 - تراکنش‌ها تغییرناپذیر هستند - برای اصلاح تراکنش جدید ایجاد شود
-- تمام تاریخ‌ها باید به صورت UTC ذخیره شوند
+- **Timestamps** (`createdAt`, `eventAt`, `fetchedAt`, …) → UTC instant (ISO-8601)
+- **Calendar dates** (`businessDate`, `marketDate`, `settlementDate`, `dueDate`, `paymentDate`) → DATE-only (Gregorian `YYYY-MM-DD`), نه timestamp مبدل‌شده با `toISOString().slice`
+- تبدیل event timestamp → businessDate فقط با **user profile timezone** + local midnight cutoff (`Date-Semantics-Matrix.md`)
 
 ### سازگاری PWA و موبایل آفلاین (الزامی)
 
@@ -206,7 +208,7 @@ UI / Hooks
 - **Reconciliation**: APIهای مرکزی در `core/db/db.md` — snapshot در برابر ledger.
 - **CHECK + FK**: schema سطح SQLite با CHECK و ON DELETE صریح؛ پیش‌فرض مالی RESTRICT.
 - **Polymorphic links**: Domain validate + reconcile؛ SQLite enforce کامل ندارد.
-- **Time**: UTC timestamps + فیلدهای business/market/settlement/due جدا برای بازار ایران.
+- **Time**: UTC timestamps برای instants؛ DATE-only برای business/market/settlement/due؛ Jalali فقط presentation/business-calendar (`Date-Semantics-Matrix.md`).
 
 ---
 
