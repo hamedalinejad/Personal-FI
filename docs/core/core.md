@@ -104,3 +104,6 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `fixtures/HARNESS.md`
 - `CANONICAL-FINANCIAL-REQUIREMENTS.md`
 - `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`
+- `fixtures/GOLDEN-GATE.md`
+- `db/SCHEMA-FREEZE-REQUIREMENTS.md`
+- `ARCHIVE-NOTE-BATCH-LOCKS.md`

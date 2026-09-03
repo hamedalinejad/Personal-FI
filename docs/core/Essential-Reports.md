@@ -50,7 +50,7 @@ UI: زیر صفحه **Reports** (و گزارش‌های تخصصی ماژول د
 
 ## P0-090 — Canonical metrics
 
-P&L and wealth metrics used by Reports, Portfolio, and Dashboard share **one definition catalog** and shared query path. Divergent formulas for the same metric name are forbidden. See CROSS-FEATURE-P0-090-100-LOCKS.md.
+P&L and wealth metrics used by Reports, Portfolio, and Dashboard share **one definition catalog** and shared query path. Divergent formulas for the same metric name are forbidden. See ARCHIVE-NOTE-BATCH-LOCKS.md (was P0-090-100; use Essential-Reports / P0-FINAL).
 
 
 ---

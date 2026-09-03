@@ -44,3 +44,5 @@ Standalone (P1-FINAL-047): `STANDALONE-CRYPTO` · `STANDALONE-LOAN` · `STANDALO
 ## P0-FINAL-018
 
 Harness: `HARNESS.md`. Skeletons `GOLDEN-CORE-*` / `GOLDEN-CRYPTO-*`. Gate C blocked until green CI.
+
+**Gate doc:** `GOLDEN-GATE.md` · critical vectors filled · families listed.

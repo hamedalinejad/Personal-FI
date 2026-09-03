@@ -61,3 +61,6 @@ Only mutation path: Feature Command → Operation Builder → Core → Journal/C
 Implement against **`CANONICAL-FINANCIAL-REQUIREMENTS.md`** — non-negotiable regardless of UI.
 
 Per-feature must-support: `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`.
+
+Schema freeze checklist: `db/SCHEMA-FREEZE-REQUIREMENTS.md`.
+Golden gate: `fixtures/GOLDEN-GATE.md`.

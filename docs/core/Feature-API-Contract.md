@@ -275,7 +275,7 @@ interface ListResult<T> {
 | reconcile | required if feature has projections/snapshots |
 | rebuild | required if feature has projections/snapshots |
 
-Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See CROSS-CUTTING-CONTRACTS-BATCH.md.
+Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See Date-Semantics-Matrix.md / P0-FINAL locks.
 
 ## Labels vs semantic names (CROSS-CUTTING BATCH-5 §5)
 

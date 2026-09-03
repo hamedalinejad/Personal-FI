@@ -59,7 +59,7 @@ Policy فعلی (IRR HALF_UP، Stocks ROUND_DOWN، Crypto decimals، …) قاب
 
 ## P0-099 — Single engine
 
-One Core RoundingPolicy engine; `policyVersion` stored on financial operations. Features must not implement independent intermediate/final rounding rules. See CROSS-FEATURE-P0-090-100-LOCKS.md.
+One Core RoundingPolicy engine; `policyVersion` stored on financial operations. Features must not implement independent intermediate/final rounding rules. See ARCHIVE-NOTE-BATCH-LOCKS.md (was P0-090-100; use Essential-Reports / P0-FINAL).
 
 ## Single engine (X-012)
 

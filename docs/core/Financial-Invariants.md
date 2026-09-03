@@ -378,7 +378,7 @@ DB: NOT NULL + structural checks؛ quant rules in Domain.
 - **P0-098**: Multi-hop FX must persist `conversionPath` (hops + rates + asOf + source).
 - **P0-099**: All features use Core `RoundingPolicy` with `policyVersion` on the operation; no per-feature ad-hoc rounding.
 
-See `CROSS-FEATURE-P0-090-100-LOCKS.md`.
+See `ARCHIVE-NOTE-BATCH-LOCKS.md (was P0-090-100; use Essential-Reports / P0-FINAL)`.
 
 ## Public API decimals (X-005)
 

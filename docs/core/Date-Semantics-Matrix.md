@@ -74,7 +74,7 @@ Every financial/domain entity documents which of these apply:
 
 `createdAt` · `updatedAt` · `eventAt` · `businessDate` · `settlementDate` · `dueDate` · `marketDate` · `paymentDate` · `fetchedAt` · `priceAsOf`/`rateDate`
 
-See `CROSS-CUTTING-CONTRACTS-BATCH.md` §1.
+See `Date-Semantics-Matrix.md / P0-FINAL locks` §1.
 
 ---
 

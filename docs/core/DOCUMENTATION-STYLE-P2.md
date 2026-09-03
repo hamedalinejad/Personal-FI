@@ -53,5 +53,5 @@
 
 ## 7. Cross-cutting batches
 
-- P0 locks: `CROSS-CUTTING-CONTRACTS-BATCH*.md`, `CROSS-FEATURE-P0-090-100-LOCKS.md`
+- P0 locks: `CROSS-CUTTING-CONTRACTS-BATCH*.md`, `ARCHIVE-NOTE-BATCH-LOCKS.md (was P0-090-100; use Essential-Reports / P0-FINAL)`
 - این P2 فقط کیفیت زبان و نگهداری docs است؛ جایگزین قفل‌های P0 نمی‌شود.
