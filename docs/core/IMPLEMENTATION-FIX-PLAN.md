@@ -8,6 +8,8 @@
 
 **Current status: BLOCKED FOR FEATURE CODING**
 
+> Audit series (5 passes + 5 cycles) applied 2026-09-03. See `FINAL-THINK-TANK-AUDIT-2026-09-03.md` and `GO-NO-GO.md`. P0-DOC residual prose closed; schema freeze still required.
+
 دلیل: قراردادهای اصلی خوب تثبیت شده‌اند، اما چند تضاد مستنداتی و چند شکاف schema/fixture هنوز می‌توانند به دو implementation متفاوت منجر شوند.
 
 هدف این فایل:
