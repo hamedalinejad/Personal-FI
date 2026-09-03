@@ -1703,11 +1703,11 @@ The consolidation policy explicitly says think-tank logs may remain as decision 
 ## 32.1 Recommended to RETAIN as history for now
 
 ```text
-docs/core/P0-FIX-001-005-THINK-TANK.md
-docs/core/P0-FIX-006-010-THINK-TANK.md
-docs/core/P0-FIX-011-016-THINK-TANK.md
-docs/core/P0-FIX-017-020-THINK-TANK.md
-docs/core/P1-FIX-001-009-THINK-TANK.md
+docs/core/AUDIT-HISTORY-NOTE.md
+docs/core/AUDIT-HISTORY-NOTE.md
+docs/core/AUDIT-HISTORY-NOTE.md
+docs/core/AUDIT-HISTORY-NOTE.md
+docs/core/AUDIT-HISTORY-NOTE.md
 ```
 
 Reason:
@@ -1725,7 +1725,7 @@ These look like audit snapshots rather than long-term implementation authority:
 ```text
 docs/core/fixtures/HARNESS.md / P0-COST-BASIS-PNL-001-005-LOCK.md
 docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md
-docs/core/P1-FIX-001-009-THINK-TANK.md / CANONICAL-FINANCIAL-REQUIREMENTS.md
+docs/core/AUDIT-HISTORY-NOTE.md / CANONICAL-FINANCIAL-REQUIREMENTS.md
 ```
 
 ### Deletion condition
