@@ -154,3 +154,8 @@ venue_offchain: UNIQUE(exchangeId, instrumentId) WHERE networkId IS NULL
 wallet_onchain: UNIQUE(exchangeId, networkId, instrumentId) WHERE networkId IS NOT NULL
 ```
 Partial unique indexes required — see `P0-FINAL-015-020-LOCKS.md`.
+
+## Network / venue identity (Final Audit §12)
+
+Same symbol on different venues/networks **must not** collapse into one `instrumentId` unless explicitly intentional product rule.
+USDT-TRC20 ≠ USDT-ERC20 as instruments when transferability differs.

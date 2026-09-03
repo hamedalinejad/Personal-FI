@@ -15,3 +15,16 @@
 \* Crypto/Stocks/Funds/Metals holdings and txs require instrumentId (P0 identity locks).
 
 **Acceptance:** script lists SQLite FKs vs this matrix → zero missing edges before Gate D.
+
+## P1-DOC-015 — Required columns (schema freeze)
+
+Every edge must eventually list:
+
+```text
+source table | source column | reference table | reference column
+cardinality | nullable | ON DELETE | unique | index | semantic owner
+```
+
+Coverage required before Gate D: CA, loan schedule/payments, fees, documents, price observations, tax links, provenance/import, polymorphic links, feature→core.
+
+ER diagrams **generated from this matrix**, not hand-maintained duplicates.

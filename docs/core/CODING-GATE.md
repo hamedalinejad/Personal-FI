@@ -91,3 +91,15 @@ P0-FIX-017…020: `P0-FIX-017-020-THINK-TANK.md`.
 P1-FIX-001…009: `P1-FIX-001-009-THINK-TANK.md`.
 
 Doc merge/delete rules: `DOC-CONSOLIDATION-POLICY.md`.
+
+## Final Audit work order (authority)
+
+```text
+Phase 1 — close P0-DOC-001…014 contradictions
+Phase 2 — schema freeze (relationship + field inventory)
+Phase 3 — golden gate green
+Phase 4 — Core engines only
+Phase 5 — vertical: Accounts → Loan → Crypto → Funds → Stocks → Metals
+```
+
+**GO limited Core/fixtures; NO full Feature implementation until Phase 1–3 green.**

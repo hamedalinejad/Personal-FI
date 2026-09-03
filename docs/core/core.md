@@ -116,3 +116,5 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `P1-FIX-001-009-THINK-TANK.md`
 - `Relationship-Matrix.md`
 - `DOC-CONSOLIDATION-POLICY.md`
+- `ARCHITECTURAL-PROHIBITIONS.md`
+- `FINAL-THINK-TANK-AUDIT-2026-09-03.md`
