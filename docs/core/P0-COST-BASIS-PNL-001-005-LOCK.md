@@ -185,3 +185,69 @@ attributionStatus: exact | degraded | unavailable
 
 WA multi-quote without unique historical FX split → **degraded** (or lot mode preferred).  
 **Forbidden:** manufacturing synthetic historical FX split when non-identifiable.
+
+---
+
+## P0-FINAL-AUD-005 — Single pool mutation (transfer fee)
+
+```text
+releasedCostTotal = avg × gross
+transferredCost   = avg × net
+feeCarrying       = avg × fee
+releasedCostTotal = transferredCost + feeCarrying
+```
+
+**Forbidden:** `transfer_out` releases cost **and** `fee_burn` releases cost again.
+
+**Code:** only `transferCost()` / `bridgeCost()` return `TransferCostResult`. Adapters **must not** mutate the cost pool a second time.
+
+## P0-FINAL-AUD-006 — Acquisition fee ≠ burn
+
+```text
+acquisition_fee_from_received  ≠  post_acquisition_network_burn  ≠  standalone_asset_burn
+```
+
+BUY example:
+
+```text
+BUY gross 1 BTC · fee 0.001 from received · net 0.999
+consideration C (quote/cash)
+holding += 0.999
+unit cost pool = C / 0.999
+```
+
+**No** second `standalone_asset_burn` cost release on the 0.001.
+
+## P0-FINAL-AUD-007 — Two-axis P&L in API object
+
+```typescript
+interface PnlReport {
+  primary: {
+    realizedPnlBase: string;
+    unrealizedPnlBase: string;
+    recognizedIncomeBase: string;
+    recognizedExpenseBase: string;
+    primaryPnlBase: string; // realized+unrealized+income−expense
+  };
+  attribution?: {
+    status: 'exact' | 'degraded' | 'unavailable';
+    // dimensions ONLY when status=exact; else null — never flat-sum with primary
+    assetPriceEffectBase: string | null;
+    fxEffectBase: string | null;
+    feeEffectBase: string | null;
+    costBasisResidualEffectBase: string | null;
+  };
+}
+```
+
+**Forbidden:** one array of siblings `[realized, unrealized, assetPrice, fx, fees, …]` inviting sum of both axes.
+
+## P0-FINAL-AUD-008 — WAC multi-quote degraded
+
+| status | |
+|--------|--|
+| exact | dimensions populated and sum to bucket |
+| degraded | **total** P&L exact; non-identifiable dimensions = **`null`** |
+| unavailable | valuation cannot run |
+
+**Forbidden:** inventing synthetic FX split when history is non-identifiable.
