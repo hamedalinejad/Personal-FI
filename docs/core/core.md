@@ -112,3 +112,4 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `P0-FIX-001-005-THINK-TANK.md`
 - `P0-FIX-006-010-THINK-TANK.md`
 - `P0-FIX-011-016-THINK-TANK.md`
+- `P0-FIX-017-020-THINK-TANK.md`

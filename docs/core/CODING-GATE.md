@@ -85,3 +85,5 @@ No feature may write another feature's tables directly. No feature may maintain 
 4. Feature implementations do not yet exist, so runtime verification is necessarily limited to Core helpers/fixtures.
 
 **Do not remove this block by changing status text. Change status only after evidence is green.**
+
+P0-FIX-017…020: `P0-FIX-017-020-THINK-TANK.md`.

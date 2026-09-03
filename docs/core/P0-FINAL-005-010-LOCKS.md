@@ -308,3 +308,7 @@ Observation order + `sourcePriorityRank` from `sourcePriorityOrder` + snapshot s
 **`P0-FINAL-006-015-LOCKS.md`**
 
 Replace bare `attributionDegraded=true` with `attributionStatus: exact|degraded|unavailable` (P0-005 / 015).
+
+## P0-FIX-019
+
+Multi-hop FX: persist conversionPath, sourcePriorityRank, asOf, source. Selection: applicability → rank → observationTime → sourceId → id ASC.

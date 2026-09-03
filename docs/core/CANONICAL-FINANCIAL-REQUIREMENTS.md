@@ -197,3 +197,5 @@ WAL / intent
 ```
 
 UI **«ثبت شد»** = documented **durable** state — not RAM-only SQL commit.
+
+**P0-FIX-017…020:** see `P0-FIX-017-020-THINK-TANK.md` (immutable rows, full ValuationContext, FX path, reconcile≠repair).
