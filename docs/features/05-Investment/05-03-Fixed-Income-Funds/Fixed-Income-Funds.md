@@ -585,7 +585,7 @@ etf_market:  units * marketPrice - totalInvested
 if fundType == 'etf':
   brokerageId mandatory
   accountId nullable
-  cash via brokerage cash ledger (+ acc فقط اگر bank↔broker)
+  cash via CashSettlementPort → journal (+ acc event فقط اگر bank↔broker)
 if fundType == 'issuance_redemption':
   accountId required only when Integrated bank settlement; else nullable (P0-FIX-009)
   brokerageId null
