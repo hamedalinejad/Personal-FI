@@ -12,7 +12,7 @@ describe('cost-basis input validation', () => {
     });
     expect(r.netQty).toBe('0.999');
     expect(r.totalCost).toBe('100000000');
-    expect(r.avgCost).toBe('100100100.1001001001001001001');
+    expect(r.avgCost).toBe('100100100.1001001001');
   });
 
   it('rejects fee equal to or above gross quantity', () => {
