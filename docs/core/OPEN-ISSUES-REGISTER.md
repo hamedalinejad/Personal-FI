@@ -22,3 +22,18 @@
 
 Allowed now: Core money/costBasis/fixture harness tests.  
 Blocked: Feature command writers until OPEN-001/003/004 reach Gate D/C green.
+
+## DOC-CLN (architecture lock pass)
+
+| ID | Status |
+|----|--------|
+| DOC-CLN-001 README broken ARCHIVE ref | **CLOSED** (prior) |
+| DOC-CLN-002 CODING-GATE blocking source | **CLOSED** (prior + GO-NO-GO) |
+| DOC-CLN-003 Audit HEAD metadata | **CLOSED** (historical marker) |
+| DOC-CLN-004 status=committed vs posted | **CLOSED** (CFO) |
+| DOC-CLN-005 UTC vs DATE-only | **CLOSED** (Technical-Architecture) |
+| DOC-CLN-006 CI test:unit | **CLOSED**; ESLint deferred OPEN-006 |
+| DOC-CLN-007 Relationship matrix 100% | **OPEN** (expanded, not complete) |
+| DOC-CLN-008 Dictionary completeness | **OPEN** (= OPEN-003) |
+
+Constitution document: `ARCHITECTURE-LOCKED.md` (sections pipeline, SoT, editions, UX-9, gates A–H, fixture list, execution order).

@@ -1,3 +1,7 @@
+## Canonical order
+
+See `ARCHITECTURE-LOCKED.md` §10 execution order. Do not invent parallel plans.
+
 # IMPLEMENTATION FIX PLAN — Personal-FI
 
 > نسخه اجرایی ممیزی نهایی — 2026-09-03

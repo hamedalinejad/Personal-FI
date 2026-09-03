@@ -1,15 +1,27 @@
-# Go / No-Go (Final Think-Tank Audit §42)
+# Go / No-Go
 
-| Gate | Status |
-|------|--------|
-| Continued documentation | **GO** |
-| Schema freeze complete | **NO** |
-| Full feature implementation | **NO** |
-| Limited Core + fixtures | **GO** (follow canonical contracts) |
-| Production release | **NO** |
+**Live authority** for coding readiness. Historical narrative: `FINAL-THINK-TANK-AUDIT-2026-09-03.md`.  
+**Constitution:** `ARCHITECTURE-LOCKED.md`.
 
-## Next developer one-liner (§45)
+| Gate | Status | Notes |
+|------|--------|-------|
+| Continued documentation | **GO** | concept homes only |
+| A — Authority | **MOSTLY GO** | DOC-CLN residual tracked in OPEN register |
+| B — Schema freeze | **NO** | OPEN-001 |
+| C — Numeric fixtures | **NO** | OPEN-004 partial |
+| D — Financial path code | **NO** | Core helpers only |
+| E — Standalone | **NO** | fixtures structural |
+| F — Offline recovery | **NO** | contract only |
+| G — Rebuild determinism | **NO** | needs engines |
+| H — No-field-loss proof | **NO** | inventory started OPEN-003 |
+| Limited Core + unit tests | **GO** | money/costBasis/harness |
+| Feature production code | **NO** | until B+C green for that family |
+| Production release | **NO** | |
 
-> Do not add another P0 file. Make existing canonical contracts unambiguous, freeze schema and field graph, prove with golden fixtures, then implement one feature vertically through Core/API/Journal/Settlement.
+## One-liner
 
-**R2 series (2026-09-03):** P0-DOC residual prose closed; session logs deleted; schema freeze still required before Feature coding.
+> Do not add another P0 file. Freeze schema + field graph, green golden fixtures, implement one vertical Feature through API → Operation → Journal → Cash → Persist → Report.
+
+## Edition commercial lock
+
+License/capability flags **must not** delete or rewrite accounting history.

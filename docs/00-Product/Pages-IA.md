@@ -528,3 +528,7 @@ Prefer ~9 main pages + sheets/drawers; Feature logic via APIs/engines — not on
 | 9 | `/settings` | page | backup, security, currency display, price sources |
 
 **Page budget = 9.** Additional URLs may exist as modal state or query params, not top-level nav items.
+
+---
+
+**Cross-ref:** Nine-page UX lock in `docs/core/ARCHITECTURE-LOCKED.md` §5. Feature ≠ Page.

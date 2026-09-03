@@ -63,6 +63,7 @@
 
 | موضوع | مسیر |
 |--------|------|
+| Architecture constitution | `docs/core/ARCHITECTURE-LOCKED.md` |
 | Documentation Audit | `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` |
 | Database | `docs/core/db/db.md` (+ زیرفایل‌ها) |
 | Types | `docs/core/types/types.md` |
