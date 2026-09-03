@@ -1,52 +1,47 @@
-# Executive status — coding readiness
+# Executive Status — Final Audit 2026-09-03
 
-**STATUS: NOT YET READY FOR CODING** — near SPEC freeze.
+**STATUS: BLOCKED — documentation/schema freeze is not yet safe for Feature coding.**
 
-## Closed dual-interpretation risks (must remain locked)
+## Confirmed Core implementation fixes in this audit
 
-| ID | Topic |
-|----|--------|
-| P0-FINAL-001 | Single cash SoT = fin_accounts + journal |
-| P0-FINAL-002 | CostBasis identity = instrumentId only |
-| P0-FINAL-003 | Fee funding vocabulary + truth table |
-| P0-FINAL-004 | Fee burn closed-form v1 |
+- Decimal boundary rejects non-finite values.
+- Toman UI normalization validates input.
+- Transfer cost validates quantities and guarantees one source-cost release.
+- Acquisition fee-from-received validates impossible states.
+- Economic swap validates financial inputs.
+- BTC/USDT/IRR attribution helper validates positive finite inputs.
+- Fixture harness compares strings exactly and rejects JSON numeric values.
+- Failure-path tests were added for the Core cost helpers.
 
-Authority: `P0-FINAL-001-004-LOCKS.md`
+## Primary documentation blockers
 
-## Still blocking full freeze
+1. Crypto contains conflicting identity/quantity/C2C/fee sections.
+2. CashSettlementPort still has wording that can be read as a feature-local cash ledger.
+3. `acc_transactions` is still described too strongly as a cash ledger in schema prose.
+4. Funds contains conflicting `accountId` rules for standalone vs integrated operation.
+5. Stocks contains conflicting hard-coded IRR/Tether wording and brokerage cash ownership language.
+6. One P0 Period Return lock still contains a superseded mixed bridge equation.
+7. The full field-level dictionary/FK matrix is not yet provably complete for every Feature field.
+8. The P0 lock file count/ranges are now too large and overlapping for reliable developer use.
+9. Gate C states 12 golden vectors while the executable critical fixture set is smaller.
 
-1. Golden fixture pack mostly inventory — need numeric expected domain/journal/cash/holding/P&L beyond the one crypto FX golden.
-2. Multi-hop / multi-trade FX attribution algorithm further formalization for all paths (beyond single-lot golden).
-3. Per-Feature P1 field matrices / reverse plans completion.
+Full findings and exact remediation: `docs/core/FINAL-AUDIT-2026-09.md`.
 
-## When READY FOR CODING
+## Architecture decision
 
-- P0-FINAL-001…004 remain uncontradicted in all Core docs  
-- Acceptance matrix §28 in `P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md` for scoped release  
-- Critical path fixtures green (Core + scoped Features)
+Keep the product simple at the UX level and rich at the domain/data level:
 
-## P0-FINAL-005…010 (LOCKED)
+```text
+~9 navigation pages
+Feature tabs / sheets
+Feature API
+Core Financial Operation
+Domain subledger + Journal + CashSettlementPort
+SQLite / durable local persistence
+```
 
-Deterministic attribution v1 · FX path composition · price/FX no-observation policies · T+n settlement journals · dividend journal dates.
+Standalone features remain first-class: Loan/Crypto/Fund/etc. must work without the Accounts UI and without another Feature's private tables. Integrated cash is an adapter concern, not a second SoT.
 
-Still not full coding green until numeric fixture pack expands; **these algorithms are no longer optional prose**.
+## Coding gate
 
-## P0-FINAL-011…014 (LOCKED)
-
-CA golden numbers · transfer/bridge/swap split · EconomicKind journals · opening equity (not fake buy).
-
-
-## P0-FINAL-015…020 (LOCKED)
-
-Immutability delete/update · Kind enum + SYSTEM_INDEX · fee currency vs instrument · holding partial unique · acc_tx vs journal.
-
-## P0-FINAL-021…026 (LOCKED)
-
-costCurrency immutability · fee allocation equations · transfer fee pools · Period Return v1 · cash FX wealth · full snapshot watermark.
-
-## P0-FINAL-027…035 / P1-FINAL-030…032 (LOCKED)
-
-Loan schedule/accrual/settled · var-rate vector · FX loan journals · Feature authority chain · canonical file pointers · spec.md role · fixture schema + negatives + reversal pairs.
-
-**Largest remaining gap to coding green:** numeric fixture pack fill-out (033–035).
-
+Do not move to Feature implementation until the P0/P1 blockers in `FINAL-AUDIT-2026-09.md` are explicitly resolved and the numeric/standalone fixture gate is green.

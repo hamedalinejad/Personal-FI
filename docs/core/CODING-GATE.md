@@ -1,77 +1,87 @@
-# Coding Gate — Exact Order (آخرین اصلاحیه قبل از کد)
+# Coding Gate — Final Order
 
-هیچ Feature implementation تا اتمام Gate A–D.
+**Status:** BLOCKED until the canonical documentation contradictions in `FINAL-AUDIT-2026-09.md` are resolved and the scoped golden fixture pack is green.
 
-## Gate A — Contract cleanup (P0 list)
+## Gate A — Contract cleanup
 
-بدون Feature جدید؛ بستن/تأیید:
+Resolve all P0 items in:
 
-```
-P0-FINAL-001 … 013, 015 … 029, 033 … 035, 039, 040, 041, 043, 048, 049
-```
+- `docs/core/FINAL-AUDIT-2026-09.md`
+- `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.md`
+- Core identity / cash / fee / FX / loan / valuation contracts
 
-(جزئیات در `P0-FINAL-*-LOCKS.md` و اسناد Core.)
-
-P1 همراه: 036–038, 042, 044–047, 050, 051.
+The final audit is the blocking cross-document review. A later lock file may add detail, but may not contradict the canonical financial requirements.
 
 ## Gate B — Canonical docs cleanup
 
-- Remove/mark contradictory legacy prose
-- One authority per concept (`Concept-Ownership-Matrix`)
-- Resolve duplicate doc names
-- `spec.md` = alias only → main Feature doc
+- Remove or explicitly mark contradictory legacy prose.
+- One authority per concept.
+- One field kind enum: `RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX`.
+- `instrumentId = ref_instruments.id` for financial assets; `symbol` is never identity.
+- Cash truth is `fin_accounts + fin_journal_lines`.
+- `acc_transactions` and feature cash fields are event/projection layers only.
+- `spec.md` is an implementation entrypoint, not a competing authority.
 
-## Gate C — Fixture Green
+## Gate C — Numeric fixture green
 
-12 golden vectors + standalone scenarios implemented in test harness and **green**.
+Minimum before feature coding:
+
+```text
+critical fixtures
++ core reversal/failure fixtures
++ standalone Loan/Crypto/Fund fixtures
++ scoped Iran stock/fund/loan fixtures
+```
+
+Every persisted financial number in fixtures is a decimal string. No JSON number is accepted.
 
 ## Gate D — Schema Freeze
 
-Explicit and frozen:
-
-```
-tables · columns · types · FKs · unique indexes · check constraints
-nullable rules · indexes · migration version
-```
-
-Source: `docs/core/db/01-schema-tables.md` + constraints docs.
-
-## Gate E — First Coding (only after A–D)
+Freeze:
 
 ```text
-Core Decimal / Money / FX
-  → Core Operation
-  → Journal / Cash
-  → Reversal
-  → Cost Basis
-  → Reconciliation
-  → Feature 00 Accounts
-  → Core simple Income / Expense
-  → Investments
+tables · columns · types · FKs · nullable rules
+unique/partial unique indexes · structural constraints
+field ownership · migration version · preservation policy
 ```
 
-## Architecture test (ongoing)
+Source set: `docs/core/db/01-schema-tables.md`, constraints, Data Dictionary and Field-Level ownership matrix.
 
-Only mutation path: Feature Command → Operation Builder → Core → Journal/Cash → projection.
+## Gate E — First implementation order
 
-036–040 index: `P0-FINAL-036-040-LOCKS.md` · 006–015: `P0-FINAL-006-015-LOCKS.md`
+```text
+Decimal / Money / Rounding / FX
+→ Core Financial Operation
+→ Journal / Cash Settlement
+→ Reversal / Idempotency
+→ Cost Basis / Valuation
+→ Reconciliation / Repair
+→ Accounts
+→ Income / Expense
+→ Loans
+→ Investments
+```
 
-**P0-018:** Until fixture harness is green, **Gate C = BLOCKED** — see `fixtures/HARNESS.md`.
+## Architecture invariant
 
-Implement against **`CANONICAL-FINANCIAL-REQUIREMENTS.md`** — non-negotiable regardless of UI.
+Only this mutation path is legal:
 
-Per-feature must-support: `FEATURE-IMPLEMENTATION-REQUIREMENTS.md`.
+```text
+Feature Command
+→ Operation Builder
+→ Core validation + engines
+→ domain ledger + Journal + CashSettlementPort
+→ projections
+→ durable commit
+```
 
-Schema freeze checklist: `db/SCHEMA-FREEZE-REQUIREMENTS.md`.
-Golden gate: `fixtures/GOLDEN-GATE.md`.
+No feature may write another feature's tables directly. No feature may maintain a second cash balance truth.
 
-## P0-FINAL-AUD-001…004
+## Current blockers
 
-See `P0-FINAL-AUD-001-004.md`.
+1. Documentation contradictions listed in `FINAL-AUDIT-2026-09.md`.
+2. Full field-level dictionary/relationship coverage is not yet provable for every Feature field.
+3. Full numeric golden pack is not yet implemented.
+4. Feature implementations do not yet exist, so runtime verification is necessarily limited to Core helpers/fixtures.
 
-- Critical fixture harness: **exists** (`npm test` / vitest fixtures)
-- Full Gate C: still blocked for non-critical families
-- Gate D: blocked until schema.sql + drift test
-- Cost helpers: only `src/core/costBasis/{transferCost,bridgeCost,applyEconomicSwap}.ts`
-
-P1 final audit: `P1-FINAL-AUD-001-008.md`.
+**Do not remove this block by changing status text. Change status only after evidence is green.**
