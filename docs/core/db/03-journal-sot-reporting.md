@@ -62,7 +62,7 @@ SoT گزارش میان‌فیچری = **fin_journal_lines** (`accountId` + amou
 | **Domain Ledger** | `inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, … | quantity، units، cost basis، loan portions، P&L دامنه همان asset |
 | **Cash Ledger** | `acc_transactions` (+ cash brokerage/platform tables) | فقط جابه‌جایی پول بانکی/نقدی حساب |
 | **Accounting Journal** | `fin_journal_entries` + `fin_journal_lines` | سند + خطوط؛ SoT مبلغ = lines |
-| **Snapshot** | `currentBalance`, holding qty، `cashBalance`، … | **فقط Projection** — مشتق از Domain/Cash ledger؛ هرگز SoT گزارش |
+| **Snapshot** | `currentBalance`, holding qty، `cashBalance`، … | **فقط Projection** — مشتق از Domain / fin_journal_lines؛ هرگز SoT گزارش |
 
 **قانون طلایی گزارش:** هر رویداد اقتصادی **یک‌بار** از Journal (یا از Domain برای متریک تخصصی) شمرده می‌شود — نه Journal+Domain+acc با هم در یک مجموع.
 
@@ -90,7 +90,7 @@ Cr cash             amountInBase = fee
 1. جداول فیچر = جزئیات دامنه (units، NAV، portions، …).
 2. `fin_journal_lines` = SoT مبلغ گزارش میان‌فیچری؛ `fin_journal_entries` = header سند.
 3. `acc_transactions` = Cash/Bank ledger؛ فقط وقتی پول **حساب بانکی** جابه‌جا می‌شود.
-4. Snapshot = Projection؛ rebuild از Domain/Cash ledger.
+4. Snapshot = Projection؛ rebuild از Domain / fin_journal_lines.
 5. بدون journal متوازن، atomic op fail.
 6. گزارش Expense بانکی از `acc`/`exp` یا journal `accountClass=expense` — **نه** جمع همزمان هر دو.
 
@@ -172,7 +172,7 @@ Dr expense/fee  feeAmount
 | داده | نقش | mutable؟ | چگونه به‌روز می‌شود |
 |------|-----|----------|---------------------|
 | Domain ledger (`inv_*_transactions`, `ln_transactions`, `inc_*`, `exp_*`, …) | **SoT جزئیات دامنه** | فقط append + void/reversal | atomic op |
-| Cash ledger (`acc_transactions`) | **SoT پول بانکی** | همان | فقط وقتی bank cash جابه‌جا شود |
+| `acc_transactions` | **event/projection** (نه SoT) | journal `fin_accounts`+`fin_journal_lines` | فقط وقتی bank cash جابه‌جا شود |
 | Journal (`fin_journal_entries` + `fin_journal_lines`) | **SoT میان‌فیچری / audit** | append + void | هر atomic op |
 | Snapshot (holding qty, currentBalance, remainingBalance, …) | **Projection** | بله | **فقط** از خروجی یک محاسبه از ledger در همان op یا rebuild — نه «حقیقت موازی» |
 | port_snapshots | cache تاریخی UI | بله | derived |
@@ -202,3 +202,4 @@ reconcileOrphans() scheduled + on demand
 
 ---
 
+**P0-DOC-002:** Cash SoT = `fin_accounts` + `fin_journal_lines` only. `acc_transactions` never SoT.

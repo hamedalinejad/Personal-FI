@@ -29,7 +29,7 @@ Must Have:
 - مشاهده موجودی هر فلز (به میلی‌گرم/گرم) و میانگین خرید
 - محاسبه سود و زیان (realized و unrealized)
 - مشاهده ارزش کل پرتفوی فلزات
-- ذخیره نرخ تتر لحظه هر معامله
+- ذخیره exchangeRateToBase در هر معامله (نه الزام تتر)
 - ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase`)
 
 Should Have:

@@ -297,7 +297,7 @@ calculateProfitLoss(fundId?) → سود/زیان تحقق‌یافته از فر
 روابط با سایر فیچرها
 
 Accounts & Banking: واریز، برداشت و دریافت سود نقدی
-Currency & Multi-Currency: نرخ تتر لحظه‌ای
+Currency & Multi-Currency: exchangeRateToBase (transaction → baseCurrency)
 Reports / Dashboard / Portfolio: ارزش پرتفوی و بازدهی
 
 

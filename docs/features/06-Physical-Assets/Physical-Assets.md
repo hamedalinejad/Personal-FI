@@ -170,7 +170,7 @@
 ## روابط با سایر فیچرها
 
 - **Accounts & Banking**: خری��، فروش و هزینه‌های مرتبط
-- **Currency & Multi-Currency**: نرخ تتر لحظه‌ای
+- **Currency & Multi-Currency**: exchangeRateToBase (transaction → baseCurrency)
 - **Metals**: پس از تحویل فیزیکی می‌توان دارایی را از Metals به اینجا منتقل کرد
 - **Reports / Dashboard / Portfolio**: ارزش کل دارایی‌های فیزیکی و سود/زیان
 - **Document Management**: نگهداری سند ملک، فاکتور خرید و تصاویر
