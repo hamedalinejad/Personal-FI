@@ -727,3 +727,16 @@ Fund entity → instrumentId → ref_instruments.id
 ```
 
 Price, holding, cost basis, reports use **instrumentId** only. Dual identity forbidden.
+
+---
+
+## P0-DOC-010 DECISION — fundId vs instrumentId
+
+```text
+fundId          = feature entity PK (inv_fif_funds.id) — metadata registry of the fund product
+instrumentId    = ref_instruments.id — canonical investment identity for price, holding, cost basis, reports
+```
+
+**Rule:** every holding/transaction/price path uses `instrumentId`.  
+`fundId` links the product row to `instrumentId` (FK).  
+**Not** `fundId === instrumentId` unless a future migration explicitly collapses them (v1: separate).

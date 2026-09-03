@@ -1074,7 +1074,7 @@ avg_BTC = BTC_totalInvested / BTC_qty
 - **ممنوع:** rebuild بعدی با latest USDT/IRR برای همان trade تاریخی
 
 ### تخصیص Fee در C2C
-| feePresence روی leg | تعلق حسابداری | اثر Cost Basis |
+| feePresence *(SOLE TRUTH TABLE — P0-DOC-004)* روی leg | تعلق حسابداری | اثر Cost Basis |
 |---------------------|----------------|----------------|
 | SELL + fee_from_base_asset | SELL leg | fee در disposal؛ از proceeds اقتصادی کم یا به cost released اضافه |
 | BUY + fee_from_received | BUY leg | net qty کمتر؛ fee در cost مقصد |

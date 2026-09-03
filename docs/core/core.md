@@ -114,4 +114,4 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `FINAL-THINK-TANK-AUDIT-2026-09-03.md`
 - `GO-NO-GO.md`
 - `AUDIT-HISTORY-NOTE.md`
-
+- `P0-DOC-001-014-VERIFY.md`

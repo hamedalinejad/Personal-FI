@@ -13,8 +13,8 @@
 1. تمام مبالغ به ریال هستند.
 2. در هر معامله، ارز تراکنش + `exchangeRateToBase` (به base کاربر) ثبت می‌شود؛ تتر فقط در صورت نیاز valuation جدا.
 3. واریز/برداشت بین حساب بانکی و کارگزاری باید در `acc_transactions` و `inv_stocks_iran_brokerage_transactions` با لینک متقابل ثبت شود.
-4. خرید از cashBalance کارگزاری کسر و به Holding اضافه می‌شود.
-5. فروش از Holding کسر و خالص مبلغ به cashBalance کارگزاری اضافه می‌شود.
+4. خرید از **ledger/Port نقد کارگزاری** اثر می‌گذارد (cashBalance فقط projection) و به Holding اضافه می‌شود.
+5. فروش از Holding کسر و خالص مبلغ از طریق **CashSettlementPort → journal** به نقد کارگزاری می‌رود (cashBalance projection).
 6. **کارمزد و مالیات**:
  - `feeAmount` فیلد Total و برای سازگاری با مدل قبلی **حذف نمی‌شود**.
  - `feeBrokerCommission` = کارمزد کارگزار.
@@ -25,7 +25,7 @@
  - برای داده‌های قدیمی (legacy): `feeAmount` اصلی **بدون تغییر** حفظ می‌شود؛ breakdownها **nullable** هستند. صفر کردن اجباری breakdown ممنوع است چون معنای historical را عوض می‌کند (P0-052).
  - `feeTax` فقط هزینه معامله است؛ رویداد بدهی مالیاتی جدا در Tax Feature (P0-053).
 7. سود نقدی با `type = 'dividend'` ثبت می‌شود و جزو Realized P&L خرید/فروش نیست.
-8. موجودی حساب بانکی، cashBalance کارگزاری و quantity سهم نمی‌توانند منفی شوند.
+8. موجودی حساب بانکی (journal)، نقد کارگزاری (journal/Port) و quantity سهم نمی‌توانند منفی شوند؛ cashBalance فقط مشتق است.
 9. تراکنش ثبت‌شده قابل ویرایش/حذف مستقیم نیست و اصلاح با void/reversal انجام می‌شود.
 10. **Price Mapping**:
  - `symbol` فقط شناسه داخلی و قابل نمایش سیستم است.

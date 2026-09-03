@@ -73,7 +73,7 @@ Loan / Crypto / Stock / Fund / Metal
 ```
 
 - اگر Accounts فعال باشد → `AccountsCashAdapter` → Accounts
-- اگر نباشد (Loan-only و مشابه) → `LocalSettlementAdapter` → Local Settlement Account
+- اگر نباشد (Loan-only و مشابه) → `LocalSettlementAdapter` → **یک ردیف `fin_accounts`** (systemRole e.g. `local_settlement_cash`) + `fin_journal_lines` — نه ledger جدا
 - **ممنوع:** وابستگی مستقیم Domain فیچر به UI یا جداول داخلی Accounts
 
 ## استقلال در برابر یکپارچگی
