@@ -16,8 +16,8 @@
 ## Primary documentation blockers
 
 1. Crypto contains conflicting identity/quantity/C2C/fee sections.
-2. CashSettlementPort still has wording that can be read as a feature-local cash ledger.
-3. `acc_transactions` is still described too strongly as a cash ledger in schema prose.
+2. CashSettlementPort — **CLOSED**: local account = fin_accounts only (P0-DOC-001).
+3. `acc_transactions` — **CLOSED**: event/projection only (P0-DOC-002).
 4. Funds contains conflicting `accountId` rules for standalone vs integrated operation.
 5. Stocks contains conflicting hard-coded IRR/Tether wording and brokerage cash ownership language.
 6. One P0 Period Return lock still contains a superseded mixed bridge equation.
