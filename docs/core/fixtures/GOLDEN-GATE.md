@@ -53,3 +53,14 @@ See:
 - `GOLDEN-CRITICAL-TOMAN-INPUT.md`
 - `GOLDEN-CRITICAL-TRANSFER-FEE.md`
 - `GOLDEN-CRITICAL-C2C-SWAP.md`
+
+## P0-FIX-015 — Minimum family list (expanded)
+
+Toman · Transfer fee · Economic C2C · BTC/USDT/IRR P&L ·  
+Crypto BUY fee_in_quote · fee_from_base · SELL+fee · Bridge fee ·  
+Stock buy/sell fee · CA · T+2 ·  
+Fund NAV vs transactionPrice · dividend/reinvest ·  
+Loan declining · flat · qarz · bullet · variable · multi-ccy repay ·  
+Opening · Reversal before/after
+
+**Gate:** No P0 Feature implementation until **its** fixture family is green (executable + expected strings).

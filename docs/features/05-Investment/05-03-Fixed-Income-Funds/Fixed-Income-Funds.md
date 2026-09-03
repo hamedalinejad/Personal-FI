@@ -50,13 +50,13 @@ Business Rules
  - فیلد `nav` (NAV همان روز) برای snapshot تاریخی توصیه می‌شود ولی مبنای میانگین خرید نیست.
  - در صندوق‌های ETF، `brokerageId` در `inv_fif_holdings` و `inv_fif_transactions` پر می‌شود.
  - `units` نمی‌تواند منفی شود.
- - در صورت خرید از کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` کاهش می‌یابد.
+ - در صورت خرید از کارگزاری، اثر نقد فقط از Port → journal؛ سپس projection.
 - فروش/ابطال واحد:
  - تعداد واحد کاهش می‌یابد.
  - مبلغ حاصل بر اساس `transactionPrice` (قیمت ابطال) به موجودی نقدی (کارگزاری یا حساب بانکی) اضافه می‌شود.
  - Realized P&L با مقایسه `transactionPrice` فروش و `averageBuyPrice` محاسبه می‌شود.
  - `units` نمی‌تواند منفی شود.
- - در صورت فروش به کارگزاری، `cashBalance` در `inv_stocks_iran_brokerages` افزایش می‌یابد.
+ - در صورت فروش به کارگزاری، اثر نقد فقط از Port → journal؛ سپس projection.
 - تقسیم سود نقدی:
  - مبلغ سود به عنوان درآمد ثبت می‌شود.
  - در صندوق‌های با تقسیم سود، معمولاً NAV به نزدیک قیمت پایه برمی‌گردد.
@@ -190,8 +190,7 @@ Domain Entities
 > **نکته**: برای صندوق‌های ETF (که از بورس خرید می‌شوند)، `brokerageId` لینک به کارگزاری است. برای صندوق‌های issuance_redemption (که مستقیماً از صندوق خرید می‌شوند)، `brokerageId` nullable است.
 
 > **نکته مهم - آپدیت cashBalance**:
-> - در خرید ETF: `cashBalance -= (amount + fees)` در `inv_stocks_iran_brokerages`
-> - در فروش ETF: `cashBalance += (amount - fees)` در `inv_stocks_iran_brokerages`
+> - در خرید/فروش ETF: **فقط** از طریق `CashSettlementPort(route=stocks_iran_brokerage)`؛ `cashBalance` projection بعد از journal rebuild می‌شود (P0-FIX-012). FIF مستقیماً `cashBalance` را mutate نمی‌کند.
 > - این قانون مانند `inv_stocks_iran_brokerages` در فیچر Stocks Iran است
 
 

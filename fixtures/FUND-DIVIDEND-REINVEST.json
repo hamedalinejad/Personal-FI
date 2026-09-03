@@ -1,0 +1,16 @@
+{
+  "id": "FUND-DIVIDEND-REINVEST",
+  "engineVersions": {},
+  "input": {},
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

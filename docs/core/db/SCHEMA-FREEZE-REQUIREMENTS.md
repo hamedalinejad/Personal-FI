@@ -39,3 +39,22 @@ schema-drift-test (docs tables vs SQL = 0 diff)
 ```
 
 exist and CI runs the drift check.
+
+## P0-FIX-016 — Real freeze checklist (per table)
+
+For every table before Feature coding:
+
+```text
+table | column | sql type | nullable | FK | unique | index
+structural CHECK only
+field kind | owner | SoT | precision | migration version
+```
+
+**Especially required columns documented:**
+
+- instrumentId · operationId · accountId · accountTransactionId
+- relatedCorporateActionId · finAccountId
+- sourceType / sourceReference
+- fee fields · date fields · provenance fields
+
+**Done:** `schema-drift-test` compares docs ↔ `schema.sql` / migrations = **0** diff.

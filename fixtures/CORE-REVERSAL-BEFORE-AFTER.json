@@ -1,0 +1,16 @@
+{
+  "id": "CORE-REVERSAL-BEFORE-AFTER",
+  "engineVersions": {},
+  "input": {},
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

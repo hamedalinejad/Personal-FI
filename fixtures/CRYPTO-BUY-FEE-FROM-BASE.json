@@ -1,0 +1,16 @@
+{
+  "id": "CRYPTO-BUY-FEE-FROM-BASE",
+  "engineVersions": {},
+  "input": {},
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

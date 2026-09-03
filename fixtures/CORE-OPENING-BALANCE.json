@@ -1,0 +1,16 @@
+{
+  "id": "CORE-OPENING-BALANCE",
+  "engineVersions": {},
+  "input": {},
+  "expected": {
+    "domain": {},
+    "journal": [],
+    "cash": {},
+    "holding": {},
+    "costBasis": {},
+    "realizedPnl": {},
+    "unrealizedPnl": {},
+    "attribution": {},
+    "wealthDelta": {}
+  }
+}

@@ -4,14 +4,14 @@
 
 ## توضیح کلی
 این زیر‌فیچر مدیریت سرمایه‌گذاری در **بازار بورس ایران** را بر عهده دارد.
-تمام مبالغ به **ریال** هستند، اما در هر معامله **نرخ تتر لحظه** ذخیره می‌شود.
+معاملات بازار ایران معمولاً **IRR** هستند. **baseCurrency** = user profile. **exchangeRateToBase** = نرخ ارز تراکنش → baseCurrency. نرخ تتر/USDT **الزام حسابداری هر trade نیست** (P0-FIX-011).
 
 ---
 
 ## Business Rules
 
 1. تمام مبالغ به ریال هستند.
-2. در هر معامله، نرخ تتر لحظه ثبت و قفل می‌شود.
+2. در هر معامله، ارز تراکنش + `exchangeRateToBase` (به base کاربر) ثبت می‌شود؛ تتر فقط در صورت نیاز valuation جدا.
 3. واریز/برداشت بین حساب بانکی و کارگزاری باید در `acc_transactions` و `inv_stocks_iran_brokerage_transactions` با لینک متقابل ثبت شود.
 4. خرید از cashBalance کارگزاری کسر و به Holding اضافه می‌شود.
 5. فروش از Holding کسر و خالص مبلغ به cashBalance کارگزاری اضافه می‌شود.
@@ -650,3 +650,30 @@ Full ST-001…ST-012: `STOCKS-ST-001-012-LOCKS.md`
 trade vs settlement dates · CA in rebuild · fractional/cash-in-lieu · stable instrumentId · raw≠adjusted prices · feeTax vs tax_events · dividend gross/withholding/net · transfer cost carry · delisting write-off · registry lot/tick · P&L decomposition · providerSymbol mapping.
 
 **P0-FIX-007:** `totalFeesPaidBase` = Σ active fee events (DERIVED); rebuild-owned; no independent setter.
+
+## P0-FIX-012 — Brokerage cash single path
+
+```text
+Feature → CashSettlementPort(route=stocks_iran_brokerage)
+       → Brokerage Cash capability
+       → fin_journal_lines
+       → optional acc_transactions link
+```
+
+`cashBalance` on brokerage = **projection only**. Mutations only via Port inside atomic operation.
+
+## P0-FIX-013 — accountId nullable at schema
+
+Bank-integrated **commands** may require `accountId`.  
+Feature schema must **not** make bank FK universal for correctness.  
+Standalone stock/brokerage without Accounts UI must be runnable.
+
+## P0-FIX-014 — Corporate Action ownership
+
+| Owner | Responsibility |
+|-------|----------------|
+| **Corporate-Action-Engine** | quantity/cost formulas; apply; idempotent legs |
+| **Iran Core** | calendar/session/T+2/lot/tick/market policy |
+| **Stocks Feature** | required fields + API boundary only |
+
+**Forbidden:** copy CA quantity/cost formulas into multiple feature files.
