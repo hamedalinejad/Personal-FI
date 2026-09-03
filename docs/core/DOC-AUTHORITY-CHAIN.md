@@ -18,3 +18,5 @@ Each **in-scope** feature before its coding starts:
 - reversal plan by operation kind
 - standalone behavior
 - ValuationContext where applicable
+
+Consolidation/delete policy: `DOC-CONSOLIDATION-POLICY.md`.

@@ -89,3 +89,5 @@ No feature may write another feature's tables directly. No feature may maintain 
 P0-FIX-017…020: `P0-FIX-017-020-THINK-TANK.md`.
 
 P1-FIX-001…009: `P1-FIX-001-009-THINK-TANK.md`.
+
+Doc merge/delete rules: `DOC-CONSOLIDATION-POLICY.md`.
