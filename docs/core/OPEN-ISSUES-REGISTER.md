@@ -78,3 +78,16 @@ Full table (doc home, method, acceptance): `REQUIREMENTS-IMPLEMENTATION-ROADMAP.
 
 P0 blockers for coding Feature writers: R-001…R-008 + OPEN-001/003/004.
 
+
+
+## P0-DOC-001…005 / P1-DOC-006…007 (2026-09-04)
+
+| ID | Status |
+|----|--------|
+| P0-DOC-001 CashSettlementPort second SoT | **LOCKED** — routing only; fin_accounts+journal |
+| P0-DOC-002 acc_transactions cash ledger wording | **LOCKED** — event log/projection only |
+| P0-DOC-003 Crypto rebuild identity | **LOCKED** — instrumentId only |
+| P0-DOC-004 Crypto qty gross/net/fee | **LOCKED** — semantic table |
+| P0-DOC-005 Crypto fee double-count | **LOCKED** — one CanonicalFeeEvent |
+| P1-DOC-006 Relationship matrix | **IMPROVED** — CA/fee/import/metals/budget edges |
+| P1-DOC-007 Field inventory | **IN PROGRESS** — expanded TSV; not yet 0 gap |

@@ -246,3 +246,12 @@ inv_crypto_instrument_meta (if used): chainId, contractAddress, decimals — FK 
 
 Target physical schema: `docs/core/db/schema.sql` (expand until every table in this list is represented). OPEN-001 closes when drift = 0.
 
+## P0-DOC-002 — acc_transactions
+
+```text
+acc_transactions = bank operational event log + UX projection (operationId link)
+Cash balance SoT = fin_journal_lines only
+
+FORBIDDEN: SUM(acc_transactions) + SUM(journal) for the same economic cash movement
+FORBIDDEN: describing acc_transactions as «دفتر کل نقد» / cash ledger of record
+```

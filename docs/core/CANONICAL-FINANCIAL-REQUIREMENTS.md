@@ -199,3 +199,8 @@ WAL / intent
 UI **«ثبت شد»** = documented **durable** state — not RAM-only SQL commit.
 
 **P0-FIX-017…020:** see `AUDIT-HISTORY-NOTE.md` (immutable rows, full ValuationContext, FX path, reconcile≠repair).
+
+## P0-DOC-001
+
+Cash balance SoT = `fin_accounts` + `fin_journal_lines` only.  
+CashSettlementPort selects accounts; does not create a feature cash SoT.

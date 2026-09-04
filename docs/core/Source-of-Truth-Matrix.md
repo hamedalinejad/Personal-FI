@@ -86,3 +86,7 @@ Ledger → Calculation → Report
 
 This matrix is protected; keep cash/instrument/journal rows aligned with CANONICAL-FINANCIAL-REQUIREMENTS and Canonical-Cash-Model.
 
+## P0-DOC-001
+
+Cash balance SoT = `fin_accounts` + `fin_journal_lines` only.  
+CashSettlementPort selects accounts; does not create a feature cash SoT.

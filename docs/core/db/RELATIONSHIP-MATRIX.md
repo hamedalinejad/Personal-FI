@@ -87,3 +87,40 @@ Expand until Schema Freeze CLOSED.
 - [ ] Tax_events.linked from investment tx
 - [ ] Budget links operationId
 
+
+
+## P1-DOC-006 — Expanded edges (freeze fill)
+
+### Corporate actions
+| From | To | Rule |
+|------|-----|------|
+| inv_stocks_iran_corporate_actions.instrument_id | ref_instruments.id | RESTRICT |
+| inv_stocks_iran_corporate_actions.operation_id | fin_operations.id | RESTRICT |
+| CA entitlement/exercise legs | same operation_id group | no orphan rights qty |
+| cash-in-lieu leg | fin_journal_lines via operation | cash SoT journal |
+
+### Fees
+| From | To | Rule |
+|------|-----|------|
+| domain tx fee_* | CanonicalFeeEvent / operation fee metadata | 1:1 economic |
+| fee_instrument_id | ref_instruments.id | RESTRICT when set |
+| fee journal lines | fin_journal_lines.operation via entry | same operationId |
+
+### Import
+| From | To | Rule |
+|------|-----|------|
+| import_raw_records | (none for calc) | preservation only |
+| import_dedupe_keys.operation_id | fin_operations.id | RESTRICT when linked |
+| import_dedupe_keys hierarchy | provider_tx_id → tx_hash+logIndex → external_ref → command_hash | P0-FINAL-040 |
+
+### Metals → Physical
+| From | To | Rule |
+|------|-----|------|
+| pa_assets.source_operation_id | fin_operations.id | RESTRICT |
+| delivery reduces metals holding | inv metals tx + operation | lineage required |
+
+### Budget / Bills
+| From | To | Rule |
+|------|-----|------|
+| bg_transaction_links.operation_id | fin_operations.id | reverse restores envelope |
+| br_occurrences unique | (br_item_id, occurrence_key) | BR-001 |

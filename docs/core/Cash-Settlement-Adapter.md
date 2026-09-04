@@ -85,3 +85,18 @@ Loan-only or Crypto-only:
 
 - No doc/table/sample presents a feature-local cash balance as SoT.
 - LocalSettlementAdapter prose only mentions Core `fin_accounts` + `fin_journal_lines`.
+
+## P0-DOC-001 — No second cash truth
+
+```text
+CashSettlementPort / LocalSettlementAdapter / AccountsCashAdapter
+  = routing only (which fin_accounts.id receives journal lines)
+
+NEVER:
+  feature-owned cash ledger as balance SoT
+  inv_*_cash.balance as independent truth
+  “local settlement ledger” outside fin_accounts
+```
+
+Local settlement account **is** a `fin_accounts` row (e.g. systemRole `local_settlement_cash`).  
+Feature cash tables = **projection** with optional `finAccountId` FK; rebuild from journal.

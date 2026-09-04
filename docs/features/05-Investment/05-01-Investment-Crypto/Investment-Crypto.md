@@ -567,7 +567,7 @@ holding.totalFeesPaidBase += feeBase
 
  > **نکته**: برای رمزارزهایی که از IRR/USDT خریداری شده‌اند، `totalAmountBase` رکورد تراکنش مستقیماً هزینه به ارز پایه را دارد (طبق «ارز پایه محاسبات»). این تابع فقط از آن فیلد استفاده می‌کند — نیازی به نرخ ارز تاریخی در زمان Rebuild نیست.
 
-- **`reconcileHolding(holdingId | { exchangeId, assetKey })`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
+- **`reconcileHolding(holdingId | { exchangeId, instrumentId }) /* P0-DOC-003: never assetKey/symbol as rebuild identity */`** → مقایسه مقادیر فعلی Holding با نتیجه `rebuildHolding`
 
  ```typescript
  reconcileHolding(holdingId: UUID): // or { exchangeId, instrumentId, networkId? } {
@@ -583,7 +583,7 @@ holding.totalFeesPaidBase += feeBase
 
  **در صورت Mismatch**: ثبت در audit log + هشدار کاربر + گزینه auto-fix از `rebuildHolding`.
 
-- **`rebuildAllHoldings(exchangeId?)`** → اجرای `rebuildHolding` برای همه symbol‌های یک صرافی (یا همه صرافی‌ها اگر `exchangeId` داده نشود) و آپدیت atomic هر Holding پس از Rebuild
+- **`rebuildAllHoldings(exchangeId?)`** → اجرای `rebuildHolding` برای همه holding/instrumentIdهای یک صرافی (یا همه صرافی‌ها اگر `exchangeId` داده نشود) و آپدیت atomic هر Holding پس از Rebuild
 
  **زمان استفاده الزامی**:
  - پس از هر Migration
@@ -706,7 +706,7 @@ holding.totalFeesPaidBase += feeBase
 
  ── مرحله ۱: Guard — بررسی موجودی کافی در مبدا ──────────────────────
  srcHolding = SELECT * FROM inv_crypto_holdings
- WHERE exchangeId=sourceExchangeId AND symbol=? FOR UPDATE
+ WHERE exchangeId=sourceExchangeId AND instrumentId=? FOR UPDATE /* P0-DOC-003 */
  IF srcHolding.quantity < amountToSend → ROLLBACK + خطا «موجودی کافی نیست»
 
  ── مرحله ۲: محاسبات ────────────────────────────────────────────────
@@ -730,7 +730,7 @@ holding.totalFeesPaidBase += feeBase
  feeAmount=0, feeCurrency=null, transferGroupId, counterExchangeId=source, ...)
 
  ── مرحله ۵: آپدیت Holding مقصد (Weighted Average) ──────────────────
- destHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=destExchangeId AND symbol=?
+ destHolding = SELECT * FROM inv_crypto_holdings WHERE exchangeId=destExchangeId AND instrumentId=? /* P0-DOC-003 */
  IF destHolding EXISTS:
  newQuantity = destHolding.quantity + quantityReceived
  newTotalInvested = destHolding.totalInvested + costTransferred
@@ -739,7 +739,7 @@ holding.totalFeesPaidBase += feeBase
  averageBuyPrice=newTotalInvested/newQuantity
  WHERE id = destHolding.id
  ELSE:
- INSERT inv_crypto_holdings (exchangeId=dest, symbol, quantity=quantityReceived,
+ INSERT inv_crypto_holdings (exchangeId=dest, instrumentId, quantity=quantityReceived,
  averageBuyPrice=srcHolding.averageBuyPrice, totalInvested=costTransferred, totalFeesPaidBase=0)
 
  COMMIT;
@@ -811,7 +811,7 @@ averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط �
 - موجودی و میانگین خرید و مجموع کارمزدها در جدول `inv_crypto_holdings` نگهداری می‌شود.
 - قیمت لحظه‌ای رمزارزها می‌تواند از API خارجی + کش آفلاین تأمین شود.
 
-> **نکته مهم**: موجودی نقدی ریال/تتر هر صرافی/ولت از طریق جدول `inv_crypto_holdings` با `symbol=IRR` یا `symbol=USDT` مدیریت می‌شود. این یک تصمیم طراحی عمدی است که به جای ایجاد یک جدول جداگانه، از ساختار موجود استفاده می‌کند. ~~par=1 همیشه~~ منسوخ — CashPosition جدا؛ USDT سرمایه‌گذاری = Asset با cost واقعی.
+> **نکته مهم**: موجودی نقد صرافی: جدول `inv_crypto_cash` (projection) + `finAccountId` → journal SoT. **ممنوع** holding با symbol=IRR/USDT به‌عنوان cash SoT (legacy migration only). ~~par=1 همیشه~~ منسوخ — CashPosition جدا؛ USDT سرمایه‌گذاری = Asset با cost واقعی.
 
 ---
 
@@ -1819,3 +1819,17 @@ On STAKING_REWARD:
 ```
 
 Aligns P0-FINAL-013 EconomicKind matrix. Capital Gain فقط از disposal با cost released.
+
+
+## P0-DOC-005 — One fee, one economic effect
+
+Each fee → one **CanonicalFeeEvent** with:
+
+```text
+feeFundingAsset / location / quantity / feeCurrency|feeInstrumentId
+valuation rate (if needed)
+treatment: capitalize_into_cost | from_proceeds | expense | burn_carrying
+```
+
+**Forbidden:** counting the same fee fully in cost basis **and** again as full P&L expense (double).  
+Cost path XOR expense path per treatment matrix (`Fee-Treatment-Matrix.md`, P0-FINAL-022).
