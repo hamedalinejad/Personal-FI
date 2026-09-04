@@ -1,20 +1,33 @@
-table	column	fieldKind	owner	sot	nullable	inDictionary	inSchemaFreeze	migration
-fin_operations	id	SYSTEM_INDEX	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
-fin_operations	status	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
-fin_operations	commandHash	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
-fin_operations	baseCurrencyAtOperation	RAW	Accounting Core	fin_operations	NO	YES	REQUIRED	preserve
-fin_journal_lines	amount	RAW	Accounting Core	journal	NO	YES	REQUIRED	preserve
-fin_journal_lines	amountInBase	RAW	Accounting Core	journal	NO	YES	REQUIRED	preserve
-fin_journal_lines	exchangeRateToBase	RAW	Accounting Core	journal	YES	YES	REQUIRED	preserve
-fin_accounts	id	SYSTEM_INDEX	Accounting Core	fin_accounts	NO	YES	REQUIRED	preserve
-ref_instruments	id	SYSTEM_INDEX	Identity	ref_instruments	NO	YES	REQUIRED	preserve
-inv_crypto_transactions	instrumentId	RAW	Crypto	ref_instruments	NO	YES	REQUIRED	preserve
-inv_crypto_transactions	grossQuantity	RAW	Crypto	ledger	NO	YES	REQUIRED	preserve
-inv_crypto_transactions	feeQuantity	RAW	Crypto	ledger	YES	YES	REQUIRED	preserve
-inv_crypto_transactions	netQuantity	RAW	Crypto	ledger	NO	YES	REQUIRED	preserve
-inv_crypto_holdings	quantity	DERIVED	Crypto	inv_crypto_transactions	NO	YES	REQUIRED	rebuild
-inv_crypto_holdings	totalFeesPaidBase	DERIVED	Crypto	fee events	YES	YES	REQUIRED	rebuild
-inv_fif_funds	id	SYSTEM_INDEX	FIF	inv_fif_funds	NO	YES	REQUIRED	preserve
-inv_fif_funds	instrumentId	RAW	FIF	ref_instruments	NO	YES	REQUIRED	preserve
-acc_transactions	amount	RAW	Accounts	projection event	NO	YES	REQUIRED	preserve
-acc_accounts	currentBalance	SNAPSHOT	Accounts	fin_journal_lines via Port	NO	YES	REQUIRED	rebuild
+table	column	kind	owner	editable_after_post	sot	migration_status	documented
+fin_operations	id	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	status	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	business_date	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	base_currency	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	engine_versions	RAW	Core	no	fin_operations	canonical	yes
+fin_journal_lines	amount	RAW	Core	no	fin_journal_lines	canonical	yes
+fin_journal_lines	amount_in_base	RAW	Core	no	fin_journal_lines	canonical	yes
+fin_journal_lines	account_id	RAW	Core	no	fin_journal_lines	canonical	yes
+fin_accounts	id	RAW	Core	no	fin_accounts	canonical	yes
+fin_accounts	currency	RAW	Core	no	fin_accounts	canonical	yes
+ref_instruments	id	RAW	Core	no	ref_instruments	canonical	yes
+ref_instruments	symbol	LABEL	Core	yes	ref_instruments	canonical	yes
+ref_instruments	network_identifier	RAW	Core	no	ref_instruments	canonical	yes
+ref_instruments	contract_address	RAW	Core	no	ref_instruments	canonical	yes
+acc_transactions	operation_id	RAW	Accounts	no	acc_transactions	canonical	yes
+acc_transactions	amount	RAW	Accounts	no	acc_transactions	canonical	yes
+inv_crypto_holdings	instrument_id	RAW	Crypto	no	inv_crypto_holdings	canonical	yes
+inv_crypto_holdings	quantity	SNAPSHOT	Crypto	no	rebuild from txs	canonical	yes
+inv_crypto_holdings	total_invested	SNAPSHOT	Crypto	no	cost basis rebuild	canonical	yes
+inv_crypto_transactions	gross_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	net_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	fee_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+ln_loans	calculation_method	RAW	Loan	no	ln_loans	canonical	yes
+ln_schedule_snapshots	snapshot_json	SNAPSHOT	Loan	no	schedule engine	canonical	yes
+ln_loan_fees	amount_due	RAW	Loan	no	ln_loan_fees	canonical	yes
+ln_loan_fees	amount_paid	RAW	Loan	no	ln_loan_fees	canonical	yes
+chk_cheques	sayadi_id	RAW	Cheque	no	chk_cheques	canonical	yes
+chk_cheques	status	RAW	Cheque	no	chk_cheques	canonical	yes
+price_history	price	RAW	Price	no	price_history	canonical	yes
+price_history	market_date	RAW	Price	no	price_history	canonical	yes
+import_raw_records	unknown_fields_json	RAW	Import	no	import_raw_records	canonical	yes
+import_raw_records	raw_record_hash	RAW	Import	no	import_raw_records	canonical	yes

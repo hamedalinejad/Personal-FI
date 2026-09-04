@@ -44,3 +44,17 @@ Constitution document: `ARCHITECTURE-LOCKED.md` (sections pipeline, SoT, edition
 - `src/` removed from main (docs-only). Restore on implementation branch.
 - P0 lock files consolidated into concept homes.
 - Added: Standalone license mode, IRR/Toman policy, Gate H, crash recovery, ER-from-matrix roadmap.
+
+
+## B-001…B-006 tracking (2026-09-04)
+
+| ID | Maps to | Status | Evidence / residual |
+|----|---------|--------|---------------------|
+| B-001 | OPEN-001 Schema Freeze | **IN PROGRESS** | `docs/core/db/schema.sql` core tables+FK added; expand stocks/funds/metals/PA columns to CLOSE |
+| B-002 | OPEN-003 Field preservation | **IN PROGRESS** | `field-inventory.checklist.tsv` seeded for core/crypto/loan/cheque; target 0 undocumented |
+| B-003 | OPEN-004 Golden fixture gate | **PARTIAL** | Many GOLDEN-* files exist; full engine pipeline still partial — see OPEN-004-FIXTURE-GAP.md |
+| B-004 | OPEN-002 Relationship matrix | **IMPROVED** | `docs/core/db/RELATIONSHIP-MATRIX.md` + schema.sql FKs; residual CA/metals/budget edges |
+| B-005 | Doc authority contradiction | **LOCKED policy** | DOC-CONSOLIDATION-POLICY § B-005 — LOCK > prose |
+| B-006 | Mandatory fixtures | **DEFINED** | 07-fixtures-release-gate § B-006 families; CI green per family still residual of B-003 |
+
+**Coding:** still blocked for Feature command writers until OPEN-001/003/004 Gate green per CODING-GATE.

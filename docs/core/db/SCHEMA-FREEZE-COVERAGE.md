@@ -62,3 +62,7 @@ undocumented financial fields → FAIL
 ```
 
 Placeholder harness: `src/architecture/schemaCoverage.test.ts` (documents expectation until schema.sql lands).
+
+## B-001
+
+Executable skeleton: `docs/core/db/schema.sql`. Drift test target: docs checklist ↔ this file ↔ schema.sql = 0.

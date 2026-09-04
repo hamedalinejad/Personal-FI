@@ -88,3 +88,16 @@ Think-tank logs (`*-THINK-TANK.md`) may remain as **decision history**; they do 
 Those headings are **historical labels** inside canonical files.  
 Content stays; authority is the host file, not the deleted batch pack.  
 Optional cleanup: rename heading to drop BATCH id without deleting rules.
+
+
+## B-005 — Authority when docs conflict (LOCKED)
+
+```text
+1. Concept home LOCK section / P0-FINAL-* / Feature *-LOCKS.md
+2. Canonical concept file body (merge map above)
+3. Feature main *.md
+4. Think-tank / audit narrative (history only)
+```
+
+Ticket numbers (B-00x, OPEN-00x, P0-xxx) are **tracking labels only** — they do not outrank LOCK text.  
+Two developers must follow the same chain; if prose conflicts with LOCK, **LOCK wins** and prose is marked LEGACY or deleted (P1-FINAL-030).

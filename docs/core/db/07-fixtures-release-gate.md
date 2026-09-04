@@ -166,3 +166,18 @@ assert snapshots = rebuild from ledger
 | 10 | ln pay: ردیف‌های جدا + invariant | ✅ |
 | 11 | فازبندی MVP Product-Map | ✅ |
 | 12 | گزارش کلی فقط journal (`vw_financial_report` / getFinancialReport) | ✅ Must |
+
+
+## B-006 — Mandatory fixture families (CI target)
+
+| Family | Path pattern | Min green before Feature writers |
+|--------|--------------|----------------------------------|
+| Core income/expense/transfer/reversal | GOLDEN-CORE-* | YES |
+| Crypto fee + C2C + bridge + PnL attribution | GOLDEN-CRYPTO-* / CRITICAL-* | YES for crypto commands |
+| Stocks buy/sell + CA + T+2 | GOLDEN-STOCK-* | YES for stocks |
+| Funds NAV vs tx / reinvest | GOLDEN-FUND-* | YES for funds |
+| Loan qarz / flat / declining / reverse | GOLDEN-LOAN-* | YES for loan |
+| Cheque bounce | GOLDEN-CHEQUE-* or STANDALONE | YES for cheque |
+| Offline recovery | GOLDEN-RECOVERY-OFFLINE | YES for sync |
+
+Gate: `OPEN-004` / CODING-GATE — family green = expected domain+journal+cash+holding+cost+PnL strings pass harness.
