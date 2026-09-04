@@ -885,13 +885,6 @@ The current dictionary already states this as the project rule; the remaining ta
 There are multiple overlapping ranges such as:
 
 - `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
-- `Financial-Invariants.md`
 
 The new consolidation policy improves this, but the archive is still large enough that a new developer can accidentally search for “P0” and read the wrong copy first.
 
@@ -1707,10 +1700,6 @@ The consolidation policy explicitly says think-tank logs may remain as decision 
 
 ```text
 docs/core/AUDIT-HISTORY-NOTE.md
-docs/core/AUDIT-HISTORY-NOTE.md
-docs/core/AUDIT-HISTORY-NOTE.md
-docs/core/AUDIT-HISTORY-NOTE.md
-docs/core/AUDIT-HISTORY-NOTE.md
 ```
 
 Reason:
@@ -1726,7 +1715,7 @@ They must not be treated as canonical sources by developers.
 These look like audit snapshots rather than long-term implementation authority:
 
 ```text
-docs/core/fixtures/HARNESS.md / Cost-Basis-Engine.md
+docs/core/fixtures/HARNESS.md; docs/core/Cost-Basis-Engine.md
 docs/core/Cost-Basis-Engine.md
 docs/core/AUDIT-HISTORY-NOTE.md / CANONICAL-FINANCIAL-REQUIREMENTS.md
 ```
@@ -1754,14 +1743,6 @@ Current P0 lock files include:
 
 ```text
 docs/core/Cost-Basis-Engine.md
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
-`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
 `Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
 ```
 
@@ -2025,8 +2006,8 @@ The following should be explicit architectural prohibitions:
 | Feature main docs | KEEP | feature specification |
 | Golden fixtures | KEEP | implementation acceptance |
 | `*-THINK-TANK.md` | KEEP as history | traceability; not authority |
-| `P0-FINAL-AUD-*` | CANDIDATE DELETE | audit snapshot; delete only after reference + uniqueness check |
-| `P1-FINAL-AUD-*` | CANDIDATE DELETE | audit snapshot; same gate |
+| `feature `*-LOCKS.md` pointers (consolidated BUG-02)` | CANDIDATE DELETE | audit snapshot; delete only after reference + uniqueness check |
+| `feature `*-LOCKS.md` pointers (consolidated BUG-02)` | CANDIDATE DELETE | audit snapshot; same gate |
 | `NAMING-GLOSSARY.md` | KEEP as pointer | path may be used by references |
 | `Calculation-Engines.md` | KEEP as pointer | compatibility path |
 | `Financial-Scenario-Catalog.md` | KEEP as pointer | compatibility path |
@@ -2172,3 +2153,12 @@ Primary repository evidence consulted includes:
 # 45. One-line final answer for the next developer
 
 > **Do not add another P0 file. First make the existing canonical contracts unambiguous, freeze the schema and field graph, prove them with golden fixtures, then implement one feature vertically through the same Core/API/Journal/Settlement pipeline.**
+
+---
+
+## BUG-03 audit cleanup (2026-09-04)
+
+- Removed accidental duplicate path lines in retain/delete lists.
+- P0-FINAL-AUD-* / P1-FINAL-AUD-* references treated as non-existent; use Feature main docs + LOCK pointers.
+- **Live status:** `OPEN-ISSUES-REGISTER.md` (not this historical audit alone).
+- This report is historical relative to the commit that last fully regenerated it; prefer OPEN register + concept homes for implementation.

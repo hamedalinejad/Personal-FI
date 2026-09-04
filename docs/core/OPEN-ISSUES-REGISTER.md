@@ -91,3 +91,14 @@ P0 blockers for coding Feature writers: R-001…R-008 + OPEN-001/003/004.
 | P0-DOC-005 Crypto fee double-count | **LOCKED** — one CanonicalFeeEvent |
 | P1-DOC-006 Relationship matrix | **IMPROVED** — CA/fee/import/metals/budget edges |
 | P1-DOC-007 Field inventory | **IN PROGRESS** — expanded TSV; not yet 0 gap |
+
+
+## BUG-01 / BUG-02 / BUG-03 (2026-09-04 evening)
+
+| ID | Status |
+|----|--------|
+| BUG-01 P0-DOC-003 residual assetKey in Reversal section | **CLOSED** — instrumentId in Core reverse adapter samples |
+| BUG-02 LOCKS consolidation | **CLOSED** — 15 `*-LOCKS.md` are pointers; full text in Feature main docs |
+| BUG-03 FINAL-THINK-TANK-AUDIT corruption | **CLEANED** — deduped paths; live status = this register |
+
+Prior claim «P0 lock files consolidated» was premature until BUG-02 pointer conversion.
