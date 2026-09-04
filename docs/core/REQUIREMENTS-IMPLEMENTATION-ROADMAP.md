@@ -1,4 +1,4 @@
-# Requirements Implementation Roadmap (R-001 … R-020)
+# Requirements Implementation Roadmap (R-001 … R-060)
 
 **Purpose:** single list of *still-needed* implementation work with exact doc homes, method, and acceptance.  
 **Phase:** documentation is largely specified; **runtime code** is on the implementation branch (`src/` not on main).
@@ -11,14 +11,14 @@
 
 | ID | Requirement | Doc home | Current state | Implementation method | Acceptance |
 |----|-------------|----------|---------------|----------------------|------------|
-| **R-001** | Full `schema.sql` | `db/01-schema-tables.md`, `db/schema.sql`, OPEN-001 | **Partial** — core tables in `schema.sql` | Expand `docs/core/db/schema.sql` from full table list; generate/check with drift test vs inventory; first migration = apply schema | Every table in 01-schema-tables present with types, FK, CHECK, indexes; OPEN-001 CLOSED |
-| **R-002** | `runAtomicFinancialOperation` | `Canonical-Financial-Operation.md`, `Calculation-Engines.md` OperationEngine | Spec only | Core module: validate → domain apply → journal balanced → projections → **single persist boundary** with `operationId` + `commandHash` idempotency | Retry same commandHash → one op; crash mid-way → recovery, no double post |
-| **R-003** | Write-to-temp-then-swap | `Technical-Architecture.md`, `Persistence-State-Machine.md` | Spec only | Persistence queue + Worker: write temp → COMMIT sqlite → await IDB/filesystem swap → then UI success | Kill process mid-write → no corrupt primary; UI success only after durable swap |
-| **R-004** | Financial invariants runtime | `CANONICAL-FINANCIAL-REQUIREMENTS.md`, `Financial-Invariants.md` | Spec + unit intent | Enforce decimal strings, immutability post-post, rebuild APIs, reconcile≠repair in Core services + tests | Invariant tests green; no float money in public API |
-| **R-005** | Cost-Basis Engine code | `Cost-Basis-Engine.md` | Spec + GOLDEN crypto helpers partial | `core/domain/costBasis` implement apply() for acquisition/disposal/fee/CA/transfer; wire fee roles | GOLDEN cost/fee/C2C fixtures green |
-| **R-006** | Loan Schedule Engine code | `Loan-Schedule-Engine.md`, Debt-Loan feature | Spec + GOLDEN-LOAN-* docs | Product templates: declining, flat, qarz, bullet, Iran step; day count; schedule versions | GOLDEN-LOAN-QARZ/FLAT/DECLINING/VARIABLE-MID green |
-| **R-007** | Cash Settlement Adapter | `Cash-Settlement-Adapter.md`, `Canonical-Cash-Model.md` | Spec | Port: settle(operation) → journal lines only; T+2 routes for stocks; acc_transactions event-only | Single cash SoT; broker T+2 payable then cash |
-| **R-008** | Instrument Identity runtime | `Instrument-Identity.md`, `ref_instruments` in schema | Partial schema | Registry service; resolve symbol≠id; network_identifier; holding uniques | Two USDT networks ≠ one instrument; no assetKey PK |
+| **R-001** | Full `schema.sql` | `db/01-schema-tables.md`, `db/schema.sql`, OPEN-001 | **Advanced partial** (~690 lines; feature tables added; drift test still open) | Finish remaining columns/CHECKs; migration notes v1; drift test docs↔schema = 0 | OPEN-001 CLOSED |
+| **R-002** | `runAtomicFinancialOperation` | `Canonical-Financial-Operation.md` + `src/core/domain/operation/operationEngine.js` | **Stub only** (`notImplemented`) | Implement validate → domain → journal balance → projections → persist + commandHash idempotency | Retry same commandHash → one op |
+| **R-003** | Write-to-temp-then-swap | `Persistence-State-Machine.md` + `src/core/persistence/worker.js` | **Stub only** | Worker: temp → COMMIT → swap → UI success | Crash mid-write → no corrupt primary |
+| **R-004** | Financial invariants runtime | `CANONICAL-FINANCIAL-REQUIREMENTS.md` + `src/core/domain/invariants/` + `money/canonicalDecimal.js` | **Partial** (decimal boundary tested; other validators stub) | Wire all invariants into OperationEngine before persist | Invariant tests green |
+| **R-005** | Cost-Basis Engine code | `Cost-Basis-Engine.md` + `src/core/domain/costBasis/engine.js` | **Stub only** | apply acquisition/disposal/fee/CA/transfer/C2C | GOLDEN crypto cost fixtures green |
+| **R-006** | Loan Schedule Engine code | `Loan-Schedule-Engine.md` + `src/core/domain/loan/scheduleEngine.js` | **Stub only** | Templates declining/flat/qarz/bullet/Iran step + day count | GOLDEN-LOAN-* green |
+| **R-007** | Cash Settlement Adapter | `Cash-Settlement-Adapter.md` + `src/core/domain/cash/settlementAdapter.js` | **Stub only** | settle() → journal lines only; T+2 routes | Single cash SoT |
+| **R-008** | Instrument Identity runtime | `Instrument-Identity.md` + schema + `src/core/domain/instrument/registry.js` | **Partial schema + stub registry** | Registry resolve/register; network_identifier uniques | USDT-TRC20 ≠ USDT-ERC20 |
 
 **P0 exit:** OPEN-001/003/004 + R-002…R-008 harness green for scoped families → Gate allows Feature commands.
 
@@ -121,3 +121,21 @@ R-036 NFT · R-037 DeFi · R-056 webhooks · R-057 cloud sync · R-058 multi-ent
 | R-001…R-008 | Bootstrap src stubs + schema expansion; not production-complete |
 | R-009…R-020 | Spec / later |
 | R-021…R-060 | Prioritized above; implement only after Core money path green |
+
+
+## File deletion decisions (listed only — think-tank)
+
+| Item | Decision |
+|------|----------|
+| Trackers OPEN / GO-NO-GO / REQUIREMENTS roadmap | **KEEP** until all items CLOSED |
+| FINAL-THINK-TANK-AUDIT | **KEEP historical** until unique rules fully in concept homes |
+| AUDIT-HISTORY-NOTE | **KEEP thin HISTORICAL** |
+| Naming-Glossary.md / Rounding-Policy.md (root) | **KEEP pointer-only** (done) |
+| DOCUMENTATION-STYLE-P2 | **Pointer** to DOC-CONSOLIDATION (done) |
+| FEATURE-README-TEMPLATE | **Moved** to `.github/` (done) |
+| 15× feature `*-LOCKS.md` | **KEEP** as ~7-line pointers |
+| GOLDEN skeletons / HARNESS | **KEEP** until expected values filled |
+| `src/` | **KEEP bootstrap** (not delete) |
+| feature-id-map.json | **KEEP** |
+
+Do not delete files outside this table without a new explicit decision.

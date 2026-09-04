@@ -3,6 +3,8 @@
 **Date:** 2026-09-04  
 **Panel:** accounting (Iran GAAP-ish personal books), financial analysis, systems engineering, product, security, QA.
 
+**Scope lock:** Only R-001…R-060 and the explicit file-lifecycle table in this doc / user message. No opportunistic bug hunts in unrelated GitHub history.
+
 ---
 
 ## 1. Verdict on R-001…R-020 (P0/P1 blockers)
