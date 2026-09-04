@@ -27,3 +27,9 @@
 License/capability flags **must not** delete or rewrite accounting history.
 
 **Phase:** documentation-only on `main` (`src/` absent). Implementation branch will restore runtime + CI tests.
+
+## Requirements R-001…R-020
+
+See `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`.  
+**NO-GO** for Feature command implementation until P0 row (R-001…R-008) acceptance criteria met for the scoped release.
+

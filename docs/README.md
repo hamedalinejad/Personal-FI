@@ -143,3 +143,8 @@ See [`core/P1-GLOBAL-CONTRACTS.md`](core/P1-GLOBAL-CONTRACTS.md).
 [`core/P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md`](core/P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.md)
 
 > **Phase:** Documentation on `main`. Application source is intentionally not on this branch.
+
+## Implementation roadmap
+
+[`core/REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`](core/REQUIREMENTS-IMPLEMENTATION-ROADMAP.md) — R-001…R-020.
+

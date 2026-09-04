@@ -122,3 +122,8 @@ Every **new persisted financial field** must be mapped in **all** of:
 Inventory seed: `field-inventory.checklist.tsv` · proof rules: `FIELD-PRESERVATION-PROOF.md`.
 
 Feature production code is **blocked** for any table that fails this gate.
+
+## Roadmap
+
+Implementation order and acceptance: `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` (R-001…R-020).
+

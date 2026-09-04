@@ -242,3 +242,7 @@ inv_crypto_instrument_meta (if used): chainId, contractAddress, decimals — FK 
 
 **ممنوع (رد اتاق فکر):** Primary Key = `(symbol, network)` — symbol ناپایدار است و با ISIN/سهام تداخل دارد.
 
+## R-001
+
+Target physical schema: `docs/core/db/schema.sql` (expand until every table in this list is represented). OPEN-001 closes when drift = 0.
+

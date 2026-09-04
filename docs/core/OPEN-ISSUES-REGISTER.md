@@ -71,3 +71,10 @@ Constitution document: `ARCHITECTURE-LOCKED.md` (sections pipeline, SoT, edition
 | B-011 NAMING-GLOSSARY | **CLOSED** | `NAMING-GLOSSARY.md` body; `Naming-Glossary.md` pointer |
 | B-012 Rounding-Policy | **CLOSED** | `rounding/Rounding-Policy.md` body; root pointer |
 | B-013 CROSS-CUTTING headers | **IN PROGRESS** | Historical labels; content remains under concept homes; optional rename without deleting rules |
+
+## R-001…R-020 requirements roadmap
+
+Full table (doc home, method, acceptance): `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`.
+
+P0 blockers for coding Feature writers: R-001…R-008 + OPEN-001/003/004.
+
