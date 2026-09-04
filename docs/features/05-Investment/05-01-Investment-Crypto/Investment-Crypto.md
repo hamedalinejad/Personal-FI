@@ -201,7 +201,7 @@ Holding با **netQuantity** به‌روز می‌شود؛ gross/fee برای ب
 - `costCurrency` → string (معمولاً baseCurrency کاربر)
 - `totalInvested` / `totalCostBase` → decimal (**DERIVED** در costCurrency)
 - `currency` → string (display context؛ نه جایگزین costCurrency)
-- `totalFeesPaidBase` → decimal (**DERIVED** — مجموع feeBase txs)
+- `totalFeesPaidBase` → decimal (**DERIVED/SNAPSHOT** — rebuild from raw fee fields; P0-DOC-007; not independent SoT)
 - `createdAt` / `updatedAt` → datetime
 
 > **هویت:** chainId / contractAddress / decimals روی `inv_crypto_instrument_meta` (FK به همان `instrumentId`) ذخیره می‌شوند، نه به‌عنوان SoT موازی روی holding. Holding فقط location (`exchangeId`, `networkId`) + `instrumentId` دارد.
@@ -2043,3 +2043,29 @@ Use `economicKind` + `Cost-Basis-Engine.md`:
 - trade/swap → consideration-based dest cost + source realized
 - transfer/bridge → carry cost only
 
+
+
+## P0-DOC-006 — C2C destination cost (LOCKED)
+
+```text
+One operationId
+  Leg S: disposal source — release cost from CostBasisEngine (historical carrying)
+  Leg D: acquisition dest — costBasis = economic consideration of swap
+           = explicitSwapConsideration OR value implied by source disposal proceeds
+           + capitalized acquisition fees
+NEVER: destination totalInvested from spot market mark at post time alone
+```
+
+Realized on source leg = proceedsBase − costReleased − sale fees (economic_trade_or_swap).  
+See also CR-005 / P0-FINAL-012.
+
+
+## P0-DOC-007 — totalFeesPaidBase
+
+```text
+totalFeesPaidBase on holding = DERIVED / SNAPSHOT
+Rebuild: Σ feeBase of non-reversed txs affecting holding (effectiveFeesBase)
+Not an independent writable accumulator that can drift from raw fee fields
+```
+
+UI may cache; reconcile must match rebuild from raw fee legs. Align CR-007 effective vs lifetime metrics.

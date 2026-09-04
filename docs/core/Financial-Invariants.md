@@ -409,3 +409,17 @@ Numbered `P0-FINAL-*` and `P0-COST-BASIS-PNL-*` **files were removed** from the 
 | Coding gates | `CODING-GATE.md`, `GO-NO-GO.md` |
 
 Do **not** reintroduce parallel P0 lock files. Amend concept homes only.
+
+
+## P0-DOC-008 — Period return / wealth bridge (canonical)
+
+**Canonical (v1):** see `P0-FINAL-021-026-LOCKS.md` §024–025 and `Essential-Reports.md`.
+
+```text
+Wealth_end ≈ Opening_wealth + External_flows + Investment_return_components
+             + cashFxTranslation + liabilityFxTranslation ± other
+
+Period Return v1 (ratio) = (end − start − netExternalFlows) / (start + weightedFlows)
+```
+
+Any older single-line “period return = (end−start)/start” without flows is **LEGACY / SUPERSEDED** — do not implement.

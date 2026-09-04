@@ -33,3 +33,18 @@ License/capability flags **must not** delete or rewrite accounting history.
 See `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`.  
 **NO-GO** for Feature command implementation until P0 row (R-001…R-008) acceptance criteria met for the scoped release.
 
+
+
+## 2026-09-04 live gates
+
+| Gate | Status |
+|------|--------|
+| B — Schema freeze | **NO** |
+| C — Numeric fixtures | **NO** |
+| D — Financial path code | **NO** (no src on main) |
+| E — Standalone | **NO** |
+| F — Offline recovery | **NO** |
+| G — Rebuild determinism | **NO** |
+| H — No-field-loss proof | **NO** |
+
+**Feature command coding: NO-GO** until P0 roadmap R-001…R-008 and gates B/C progress.

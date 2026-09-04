@@ -849,3 +849,37 @@ priceProviderId + providerSymbol + market
 |----|--------|
 | ST-001 … ST-012 | **LOCKED** 2026-09-02 |
 
+
+
+## P0-DOC-011 — Currency model (not hard-coded USDT)
+
+```text
+transaction currency for Iran equity trades: typically IRR
+user baseCurrency: from settings (IRR / USD / …)
+exchangeRateToBase on operation when tx currency ≠ base
+USDT is a separate instrument/cash currency if used — not implied as stock quote
+```
+
+## P0-DOC-012 — Brokerage cash path
+
+```text
+brokerage cashBalance field = PROJECTION only
+Path: Operation → CashSettlementPort → fin_accounts (brokerage cash) → fin_journal_lines
+Never feature-owned independent cash SoT
+```
+
+## P0-DOC-013 — accountId brokerage
+
+```text
+Schema: accountId / finAccountId nullable
+Command validation: required when settlementMode = integrated; optional for standalone local settlement
+```
+
+## P0-DOC-014 — CA / settlement ownership
+
+| Concern | Owner |
+|---------|--------|
+| CA transform formulas (qty/cost) | Corporate-Action-Engine + CostBasisEngine |
+| Calendar, T+n, lot/tick | Iran-Market-Rules / market adapter |
+| Fields, UX, brokerage holdings tables | Stocks Iran Feature |
+| Cash on settlement | CashSettlementPort + journal |

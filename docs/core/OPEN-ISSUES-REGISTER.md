@@ -102,3 +102,28 @@ P0 blockers for coding Feature writers: R-001…R-008 + OPEN-001/003/004.
 | BUG-03 FINAL-THINK-TANK-AUDIT corruption | **CLEANED** — deduped paths; live status = this register |
 
 Prior claim «P0 lock files consolidated» was premature until BUG-02 pointer conversion.
+
+
+## P0-DOC-001…014 status (content pass 2026-09-04)
+
+| ID | Status |
+|----|--------|
+| P0-DOC-001 | CLOSED |
+| P0-DOC-002 | CLOSED |
+| P0-DOC-003 | CLOSED (Reversal samples use instrumentId — BUG-01) |
+| P0-DOC-004 | CLOSED (feePresence table) |
+| P0-DOC-005 | CLOSED (fee discriminator / CanonicalFeeEvent) |
+| P0-DOC-006 | CLOSED (C2C dest cost = consideration, not mark) |
+| P0-DOC-007 | CLOSED (totalFeesPaidBase derived) |
+| P0-DOC-008 | CLOSED (legacy period return superseded) |
+| P0-DOC-009 | CLOSED (accountId nullable standalone) |
+| P0-DOC-010 | CLOSED (fund → instrumentId) |
+| P0-DOC-011 | CLOSED (no hard-coded USDT stock model) |
+| P0-DOC-012 | CLOSED (broker cash projection + port) |
+| P0-DOC-013 | CLOSED (accountId validation by mode) |
+| P0-DOC-014 | CLOSED (CA vs market vs feature ownership) |
+| P1-DOC-015 | IN PROGRESS (RELATIONSHIP-MATRIX) |
+| P1-DOC-016 | IN PROGRESS (field-inventory) |
+| P1-DOC-017 | CLOSED for feature LOCKS→pointer (BUG-02); Core P0-FINAL files remain concept homes |
+
+Code bugs: `IMPLEMENTATION-BRANCH-CODE-BUGS.md` — not verified on main.
