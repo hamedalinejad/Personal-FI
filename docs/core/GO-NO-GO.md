@@ -48,3 +48,9 @@ See `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`.
 | H — No-field-loss proof | **NO** |
 
 **Feature command coding: NO-GO** until P0 roadmap R-001…R-008 and gates B/C progress.
+
+
+## Scope discipline
+
+R-021…R-051 may be planned in parallel **docs**, but **implementation order** remains Core R-002…R-008 before Iran extras and full report suite.  
+R-036/037/056–058 = P3 non-goals for v1.

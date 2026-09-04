@@ -154,3 +154,9 @@ Code bugs: `IMPLEMENTATION-BRANCH-CODE-BUGS.md` — not verified on main.
 | BUG-035…050 columns | schema-migration-notes-v1.md |
 
 Feature UI commands still NO-GO until Gate C (GOLDEN fixtures green).
+
+
+## R-021…R-060
+
+Prioritized backlog: `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` + `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.  
+P3 items are explicit non-goals for v1.

@@ -117,3 +117,15 @@ Section titles that still mention batch ids are historical labels inside concept
 ## Documentation style (from DOCUMENTATION-STYLE-P2)
 
 See historical notes in git history of `DOCUMENTATION-STYLE-P2.md` if needed. Prefer this policy file.
+
+
+## File lifecycle (think-tank R-021…060)
+
+See `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.
+
+- Trackers OPEN / GO-NO-GO / REQUIREMENTS roadmap: **retain until all items closed**.
+- FINAL-THINK-TANK-AUDIT: **historical retain** until unique rules fully migrated.
+- Root Naming/Rounding: **pointer only**.
+- Feature `*-LOCKS.md`: **thin pointers OK**.
+- Do not delete GOLDEN skeletons until replaced with expected values.
+- `src/` bootstrap is intentional; do not remove again without implementation branch policy.

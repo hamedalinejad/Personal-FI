@@ -76,3 +76,48 @@
 | OPEN-006 | R-009 (ESLint when src exists) |
 
 Update this file when a requirement moves to **IMPLEMENTED** (link commit + fixture green).
+
+---
+
+## Extended requirements R-021 … R-060 (think-tank 2026-09-04)
+
+Authority for prioritization: `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.
+
+### P1 — Iran & books (integrate into existing engines)
+
+| ID | Requirement | Home | Method |
+|----|-------------|------|--------|
+| R-021 | Bank deposit interest (Iran) | Accounts-Banking | Interest accrual event; day/month count policy |
+| R-022 | Broker fee schedules | Stocks Iran | Fee table → CanonicalFeeEvent |
+| R-024 | ETF vs fixed income | Fixed-Income-Funds | valuationMode NAV vs market |
+| R-027 | Opening entry | Canonical-Financial-Operation | opening op all classes (P0-FINAL-014) |
+| R-029 | AR/AP beyond cheque | Cheque + Parties | receivable/payable ops |
+| R-031 | Iran loan templates | Loan | mehr/housing/qarz product templates |
+| R-032 | Late payment penalty | Loan | penalty component + schedule |
+| R-033 | Jalali holidays due dates | Loan + calendar | business calendar adapter |
+| R-038 | Balance sheet | Reports | projection from journal |
+| R-039 | P&L statement | Reports | projection |
+| R-040 | Cash flow statement | Reports | projection |
+| R-041 | Journal book | Reports | fin_journal_* listing |
+| R-042 | General ledger | Reports | by fin_account |
+| R-043 | Subsidiary ledger | Reports | sub-account filter |
+| R-044 | Account activity | Reports | account history |
+| R-047 | Jalali/Gregorian | Settings | calendar display + businessDate |
+| R-048 | FA/EN i18n | Settings | message catalogs |
+| R-049 | Scheduled backup | Settings | export job |
+| R-050 | Excel/CSV import | Settings + Import | mapping + unknownFields envelope |
+| R-051 | DB encryption | Security | SQLCipher-class at rest |
+
+### P2
+
+R-023 Codal · R-025 bonds · R-026 housing/car · R-028 closing · R-030 depreciation · R-034 staking · R-035 airdrop · R-045 period compare · R-046 XLSX/PDF · R-052 biometric · R-053 auto-lock · R-054/055 dashboard · R-059 sub-accounts · R-060 report FX translation
+
+### P3 (out of v1)
+
+R-036 NFT · R-037 DeFi · R-056 webhooks · R-057 cloud sync · R-058 multi-entity
+
+### Status snapshot
+
+| R-001…R-008 | Bootstrap src stubs + schema expansion; not production-complete |
+| R-009…R-020 | Spec / later |
+| R-021…R-060 | Prioritized above; implement only after Core money path green |
