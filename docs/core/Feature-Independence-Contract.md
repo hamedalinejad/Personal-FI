@@ -252,3 +252,42 @@ Loan-only · Fund-only · Crypto-only · Stocks-only · Metals-only
 ```
 
 Feature UI independence ≠ removal of Accounting Core / journal truth.
+
+---
+
+## Standalone Mode (License-critical)
+
+**Definition:** A paid or free **edition** that activates only a subset of Features (e.g. Loan calculator only) without requiring Accounts UI or full Personal Accounting navigation.
+
+### What Standalone is
+
+```text
+User sees: Loan UI (+ minimal Settings)
+User does not need: Accounts page, full Chart of Accounts UI, Investment UI
+```
+
+### What Standalone is NOT
+
+```text
+Standalone ≠ no journal
+Standalone ≠ feature-owned cash ledger
+Standalone ≠ wipe data when license upgrades/downgrades
+```
+
+### Mandatory Core behavior
+
+1. Every financial mutation still goes through `runAtomicFinancialOperation`.
+2. Core still writes **hidden local journal** (`fin_operations`, `fin_journal_entries`, `fin_journal_lines`, `fin_accounts` including local settlement cash).
+3. Cash path = `CashSettlementPort` → `LocalSettlementAdapter` → Core `fin_accounts` row + journal lines.
+4. Domain ledger (e.g. `ln_transactions`) remains SoT for specialty state; journal remains SoT for accounting/cash.
+5. **No-Field-Loss:** upgrading license from Loan-only → Full must **not** require re-entry of history. Existing operations, journal lines, and domain rows stay; new UI surfaces simply read the same DB.
+6. **License/capability** only gates UI and `capabilities()` — never deletes journal or domain history.
+
+### Acceptance
+
+| Check | Pass |
+|-------|------|
+| Loan-only creates loan + payment without Accounts UI | yes |
+| After payment, journal lines exist and balance | yes |
+| Export/backup includes journal + domain | yes |
+| Enable Accounts UI later → balances reconcile without data loss | yes |

@@ -43,4 +43,4 @@ Financial Core
 
 پیاده‌سازی تدریجی مجاز است؛ **قرارداد و مرز از الان** قفل است.
 
-مرجع: `Cost-Basis-Engine.md` · `Loan-Schedule-Engine.md` · `Rounding-Policy.md` · `Precision-Policy.md`
+مرجع: `Cost-Basis-Engine.md` · `Loan-Schedule-Engine.md` · `rounding/Rounding-Policy.md` · `Precision-Policy.md`

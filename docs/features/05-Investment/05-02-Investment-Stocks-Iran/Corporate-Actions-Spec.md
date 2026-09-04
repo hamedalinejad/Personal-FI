@@ -142,9 +142,9 @@ Rebuild via CorporateActionEngine only. Fractional + cash-in-lieu explicit. Symb
 
 ## P0-FINAL-010 — Dividend journal
 
-gross / withholding / net with incomeRecognitionDate vs paymentDate journals — see `P0-FINAL-005-010-LOCKS.md` §010.
+gross / withholding / net with incomeRecognitionDate vs paymentDate journals — see `Financial-Invariants.md` §010.
 
 ## P0-FINAL-011 numeric vectors
 
-Bonus/split/reverse/capital increase/rights+CIL golden numbers: `docs/core/P0-FINAL-011-014-LOCKS.md` §011.
+Bonus/split/reverse/capital increase/rights+CIL golden numbers: `Financial-Invariants.md` (P0 locks consolidated 2026-09-04) §011.
 

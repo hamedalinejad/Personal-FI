@@ -1,4 +1,6 @@
 # Personal-FI — Final Think-Tank Repository Audit
+
+> **Note (2026-09-04):** `src/` paths referenced below are **historical**. Application code was removed from `main` for a documentation-only phase; restore on an implementation branch. P0 lock files were consolidated into concept homes.
 ## Final Documentation / Architecture / Data Integrity / Modularity Review — 2026-09-03
 
 **Repository:** `hamedalinejad/Personal-FI`
@@ -552,8 +554,8 @@ The exact vocabulary can be normalized, but the economic semantics must exist in
 
 **Locations:**
 
-- `docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md`
-- `docs/core/P0-FINAL-001-004-LOCKS.md`
+- `docs/core/Cost-Basis-Engine.md`
+- `Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
 - `Investment-Crypto.md`
 
 ### Problem
@@ -630,7 +632,7 @@ Raw fee fields remain preserved for history/audit.
 
 ## P0-DOC-008 — Period Return has a superseded mixed bridge inside a “FINAL” lock file
 
-**Location:** `docs/core/P0-FINAL-021-026-LOCKS.md`
+**Location:** `Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
 
 ### Problem
 
@@ -882,14 +884,14 @@ The current dictionary already states this as the project rule; the remaining ta
 
 There are multiple overlapping ranges such as:
 
-- `P0-FINAL-005-010-LOCKS.md`
-- `P0-FINAL-006-015-LOCKS.md`
-- `P0-FINAL-011-014-LOCKS.md`
-- `P0-FINAL-015-020-LOCKS.md`
-- `P0-FINAL-021-026-LOCKS.md`
-- `P0-FINAL-027-035-LOCKS.md`
-- `P0-FINAL-036-040-LOCKS.md`
-- `P0-FINAL-041-051-LOCKS.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
 
 The new consolidation policy improves this, but the archive is still large enough that a new developer can accidentally search for “P0” and read the wrong copy first.
 
@@ -1670,16 +1672,16 @@ They are historical cleanup targets, not files to preserve.
 The current repository already identifies these as pointer candidates:
 
 ```text
-docs/core/Naming-Glossary.md
+docs/core/NAMING-GLOSSARY.md
  → docs/core/NAMING-GLOSSARY.md
 
-docs/core/Core-Engines.md
+docs/core/Calculation-Engines.md
  → docs/core/Calculation-Engines.md
 
-docs/core/Financial-Scenarios.md
+docs/core/Financial-Scenario-Catalog.md
  → docs/core/Financial-Scenario-Catalog.md + fixtures
 
-docs/core/Rounding-Policy.md
+docs/core/rounding/Rounding-Policy.md
  → docs/core/rounding/Rounding-Policy.md
 ```
 
@@ -1724,8 +1726,8 @@ They must not be treated as canonical sources by developers.
 These look like audit snapshots rather than long-term implementation authority:
 
 ```text
-docs/core/fixtures/HARNESS.md / P0-COST-BASIS-PNL-001-005-LOCK.md
-docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md
+docs/core/fixtures/HARNESS.md / Cost-Basis-Engine.md
+docs/core/Cost-Basis-Engine.md
 docs/core/AUDIT-HISTORY-NOTE.md / CANONICAL-FINANCIAL-REQUIREMENTS.md
 ```
 
@@ -1751,16 +1753,16 @@ Do **not** bulk-delete these files merely because there are many of them.
 Current P0 lock files include:
 
 ```text
-docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md
-docs/core/P0-FINAL-001-004-LOCKS.md
-docs/core/P0-FINAL-005-010-LOCKS.md
-docs/core/P0-FINAL-006-015-LOCKS.md
-docs/core/P0-FINAL-011-014-LOCKS.md
-docs/core/P0-FINAL-015-020-LOCKS.md
-docs/core/P0-FINAL-021-026-LOCKS.md
-docs/core/P0-FINAL-027-035-LOCKS.md
-docs/core/P0-FINAL-036-040-LOCKS.md
-docs/core/P0-FINAL-041-051-LOCKS.md
+docs/core/Cost-Basis-Engine.md
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
+`Financial-Invariants.md` (P0 locks consolidated 2026-09-04)
 ```
 
 ### Recommended treatment
@@ -2025,10 +2027,10 @@ The following should be explicit architectural prohibitions:
 | `*-THINK-TANK.md` | KEEP as history | traceability; not authority |
 | `P0-FINAL-AUD-*` | CANDIDATE DELETE | audit snapshot; delete only after reference + uniqueness check |
 | `P1-FINAL-AUD-*` | CANDIDATE DELETE | audit snapshot; same gate |
-| `Naming-Glossary.md` | KEEP as pointer | path may be used by references |
-| `Core-Engines.md` | KEEP as pointer | compatibility path |
-| `Financial-Scenarios.md` | KEEP as pointer | compatibility path |
-| `Rounding-Policy.md` | KEEP as pointer | compatibility path |
+| `NAMING-GLOSSARY.md` | KEEP as pointer | path may be used by references |
+| `Calculation-Engines.md` | KEEP as pointer | compatibility path |
+| `Financial-Scenario-Catalog.md` | KEEP as pointer | compatibility path |
+| `rounding/Rounding-Policy.md` | KEEP as pointer | compatibility path |
 | historically removed cross-cutting packs | DO NOT RECREATE | already superseded |
 | any file with unique financial rule | KEEP / MIGRATE | rule must move before deletion |
 | any pure duplicate full-body copy | DELETE after reference check | canonical target survives |
@@ -2147,11 +2149,11 @@ That is the design target that should govern every implementation decision from 
 
 This report was prepared against repository head `cbfd5c49e68031b9e0c80287b409416bd771f56f` on 2026-09-03 (baseline). Subsequent commits closed many P0-DOC items; treat OPEN register + GO-NO-GO as live status.
 
-The prior `FINAL-AUDIT-2026-09.md` was itself created at an earlier baseline. The repository advanced nine commits after that baseline, including documentation consolidation and multiple P0/P1 fix/thinking-tank commits. Therefore this report intentionally treats the **current HEAD** and the newer consolidation policy as the authoritative state.
+The prior `FINAL-THINK-TANK-AUDIT-2026-09-03.md` was itself created at an earlier baseline. The repository advanced nine commits after that baseline, including documentation consolidation and multiple P0/P1 fix/thinking-tank commits. Therefore this report intentionally treats the **current HEAD** and the newer consolidation policy as the authoritative state.
 
 Primary repository evidence consulted includes:
 
-- `docs/core/FINAL-AUDIT-2026-09.md`
+- `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md`
 - `docs/core/IMPLEMENTATION-FIX-PLAN.md`
 - `docs/core/DOC-CONSOLIDATION-POLICY.md`
 - `docs/core/Data-Dictionary.md`

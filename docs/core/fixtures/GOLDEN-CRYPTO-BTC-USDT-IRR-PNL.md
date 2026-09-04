@@ -139,5 +139,5 @@ All money fields in fixtures/API: **decimal strings**.
 
 ## Algorithm version
 
-Uses **P&L Attribution Algorithm v1** (`P0-FINAL-005-010-LOCKS.md`): asset price effect with FX0, FX effect with P1.
+Uses **P&L Attribution Algorithm v1** (`Financial-Invariants.md`): asset price effect with FX0, FX effect with P1.
 

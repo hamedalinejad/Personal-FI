@@ -25,7 +25,7 @@
 8. The P0 lock file count/ranges are now too large and overlapping for reliable developer use.
 9. Gate C states 12 golden vectors while the executable critical fixture set is smaller.
 
-Full findings and exact remediation: `docs/core/FINAL-AUDIT-2026-09.md`.
+Full findings and exact remediation: `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md`.
 
 ## Architecture decision
 
@@ -44,6 +44,6 @@ Standalone features remain first-class: Loan/Crypto/Fund/etc. must work without 
 
 ## Coding gate
 
-Do not move to Feature implementation until the P0/P1 blockers in `FINAL-AUDIT-2026-09.md` are explicitly resolved and the numeric/standalone fixture gate is green.
+Do not move to Feature implementation until the P0/P1 blockers in `FINAL-THINK-TANK-AUDIT-2026-09-03.md` are explicitly resolved and the numeric/standalone fixture gate is green.
 
 **Current final audit:** `FINAL-THINK-TANK-AUDIT-2026-09-03.md` + `GO-NO-GO.md`.

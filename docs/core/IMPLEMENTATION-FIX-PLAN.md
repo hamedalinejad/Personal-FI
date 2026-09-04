@@ -204,7 +204,7 @@ totalFeesPaidBase = Σ active fee events
 
 ## P0-FIX-008 — Period Return bridge فقط یک نسخه
 
-**محل:** `P0-FINAL-021-026-LOCKS.md` و هر سند قدیمی.
+**محل:** `Financial-Invariants.md` و هر سند قدیمی.
 
 **نسخه معتبر:**
 
@@ -680,7 +680,7 @@ STEP 14  Feature coding
 این‌ها می‌توانند باقی بمانند، ولی body مستقل نداشته باشند:
 
 ```text
-Naming-Glossary.md
+NAMING-GLOSSARY.md
 core/rounding/Rounding-Policy.md
 ```
 
@@ -837,7 +837,7 @@ Core Money/Decimal
 
 ## References
 
-- `docs/core/FINAL-AUDIT-2026-09.md`
+- `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md`
 - `docs/core/CODING-GATE.md`
 - `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.md`
 - `docs/core/Source-of-Truth-Matrix.md`

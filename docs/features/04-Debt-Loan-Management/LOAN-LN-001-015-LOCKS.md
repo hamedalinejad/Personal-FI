@@ -197,5 +197,5 @@ Money remains reportable on a canonical fin_account; not an invisible side pocke
 
 ## P0-FINAL-027…029
 
-scheduled vs accrued vs settled; variable-rate mid-period fixture; multi-currency repayment journal roles — `docs/core/P0-FINAL-027-035-LOCKS.md`.
+scheduled vs accrued vs settled; variable-rate mid-period fixture; multi-currency repayment journal roles — `Financial-Invariants.md` (P0 locks consolidated 2026-09-04).
 

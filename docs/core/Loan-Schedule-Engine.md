@@ -246,5 +246,5 @@ Variable rate by **accrual interval**; explicit dayCount vs period mode; grace c
 
 ## P0-FINAL-027/028
 
-Schedule = projection; accrual posts only via accrual/payment events. Variable-rate fixture: `P0-FINAL-027-035-LOCKS.md`.
+Schedule = projection; accrual posts only via accrual/payment events. Variable-rate fixture: `Financial-Invariants.md`.
 

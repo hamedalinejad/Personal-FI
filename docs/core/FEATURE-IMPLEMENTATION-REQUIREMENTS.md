@@ -79,7 +79,7 @@ Must support:
 - historical FX and multi-currency cost basis
 - realized / unrealized + **2-axis** P&L attribution
 
-**Before coding:** C2C = consideration-based dest cost (`P0-COST-BASIS-PNL-001-005-LOCK.md`).
+**Before coding:** C2C = consideration-based dest cost (`Cost-Basis-Engine.md`).
 
 Canonical: CRYPTO-CR locks · Cost-Basis-Engine · Instrument-Identity.
 

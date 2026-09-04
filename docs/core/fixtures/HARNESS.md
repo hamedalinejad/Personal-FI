@@ -1,35 +1,13 @@
-# Fixture Harness (P0-FINAL-AUD-001)
+# Fixture Harness (docs-only phase)
 
-## Executable now
+Golden JSON fixtures live in `/fixtures` and `docs/core/fixtures/`.
 
-```bash
-npm install
-npx vitest run src/core/fixtures
-```
+**Runtime harness** (`src/core/fixtures/harness.ts`) was removed from `main` during the documentation-only cleanup (2026-09-04).  
+Restore on the **implementation branch** together with vitest CI.
 
-| Layer | Path |
-|-------|------|
-| JSON fixtures | `/fixtures/*.json` |
-| Harness | `src/core/fixtures/harness.ts` |
-| Tests | `src/core/fixtures/criticalFixtures.test.ts` |
-| CI | `.github/workflows/ci.yml` |
+Until then:
 
-## Rules
+- Fixtures remain the **numeric contract** (all money/qty/rate = decimal strings).
+- Gate C is **BLOCKED** for Feature coding until harness is restored and green.
 
-- money/qty/rate = **string**
-- `canonicalDecimalString` before compare
-- missing expected field → fail
-- JSON numbers for money in fixture files → **forbidden** (use strings)
-
-## Green today (critical math)
-
-- CRITICAL-TOMAN-INPUT
-- CRITICAL-TRANSFER-FEE
-- CRITICAL-C2C-SWAP
-- CRYPTO-BTC-USDT-IRR-PNL
-
-## Not green yet
-
-Full Core/Loan/Stock/Recovery operation graphs — require Domain/Operation implementation.
-
-**Gate C full = BLOCKED** until those exist. Critical subset = **executable**.
+See `OPEN-004-FIXTURE-GAP.md`, `CODING-GATE.md`, `GO-NO-GO.md`.

@@ -712,7 +712,7 @@ calculationContext
 
 **Invariant:** تغییر method یا policy بعدی فقط ops جدید یا rebuild صریح با version جدید را تحت تأثیر قرار می‌دهد — silent rewrite تاریخچه ممنوع.
 
-مرجع: `Cost-Basis-Engine.md` · `Rounding-Policy.md`
+مرجع: `Cost-Basis-Engine.md` · `rounding/Rounding-Policy.md`
 
 ---
 

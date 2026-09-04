@@ -100,7 +100,7 @@ Historical reports **must** pass an explicit context; “latest everything” fo
 ## 22 — Attribution model (multi-currency assets)
 
 ```text
-Primary P&L buckets (see P0-COST-BASIS-PNL-001-005-LOCK.md — do NOT sum with attribution axis)
+Primary P&L buckets (see Cost-Basis-Engine.md — do NOT sum with attribution axis)
 ├── realizedPnlBase / unrealizedPnlBase / …
 Attribution dimensions (within bucket only)
 ├── Asset price effect
@@ -177,13 +177,13 @@ Iranian detail, IA performance pattern, golden fixture pack, acceptance matrix:
 
 ## P0-FINAL-025 / 026
 
-Cash FX translation vs investment P&L; snapshot watermark expanded — see `P0-FINAL-021-026-LOCKS.md`.
+Cash FX translation vs investment P&L; snapshot watermark expanded — see `Financial-Invariants.md`.
 
 ---
 
 ## P0-FINAL-004 / 005 — P&L axes & attributionStatus (LOCKED)
 
-**Authority:** `P0-COST-BASIS-PNL-001-005-LOCK.md`
+**Authority:** `Cost-Basis-Engine.md`
 
 - Primary buckets ≠ attribution dimensions; never flat-sum both axes.
 - `attributionStatus`: exact | degraded | unavailable

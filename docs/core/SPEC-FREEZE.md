@@ -8,7 +8,7 @@
 | 02 | `Data-Dictionary.md` |
 | 03 | `Domain-Dependency-Matrix.md` |
 | 04 | `Canonical-Financial-Operation.md` |
-| 05 | `Financial-Scenarios.md` |
+| 05 | `Financial-Scenario-Catalog.md` |
 | 06 | `fixtures/README.md` (+ golden JSONها) |
 | 07 | `Data-Model-Relationship-Matrix.md` |
 | 08 | `Feature-API-Contract.md` |
@@ -36,7 +36,7 @@ UI (~9 pages) → Feature API (commands/queries)
 
 ## آخرین اصلاحیه
 
-- `P0-FINAL-041-051-LOCKS.md`
+- `Financial-Invariants.md`
 - `CODING-GATE.md` — ترتیب اجباری قبل از کد
 - Golden 12 vectors در `fixtures/README.md`
 - P1-FINAL-050: هر چک‌لیست = GREEN یا EXPLICITLY_OUT_OF_SCOPE

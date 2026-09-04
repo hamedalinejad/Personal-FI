@@ -79,5 +79,5 @@ Ledger → Calculation → Report
 
 ## P0-FINAL-048 / 049 — Report integrity
 
-- Every historical report carries `ReportCalculationContext` (asOf, priceAsOf, fxAsOf, engineVersions, staleStatus, …) — see `P0-FINAL-041-051-LOCKS.md`.
+- Every historical report carries `ReportCalculationContext` (asOf, priceAsOf, fxAsOf, engineVersions, staleStatus, …) — see `Financial-Invariants.md`.
 - `calculatedProfit` ≠ `externalReportedProfit`; export keeps both separate.

@@ -12,7 +12,7 @@
 
 **Minor unit:** فقط تبدیل در Presentation یا API بانکی (`toMinorUnit`/`fromMinorUnit`) — ستون‌های مالی اصلی INTEGER نیستند.
 
-محاسبات فقط با `decimal.js` طبق `Rounding-Policy.md`. ارجاع قدیمی Blueprint «Minor Unit integer» **باطل** است.
+محاسبات فقط با `decimal.js` طبق `rounding/Rounding-Policy.md`. ارجاع قدیمی Blueprint «Minor Unit integer» **باطل** است.
 
 
 ## مسیر فایل‌های دیتابیس

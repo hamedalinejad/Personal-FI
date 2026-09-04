@@ -12,3 +12,5 @@ See `docs/core/CODING-GATE.md` and `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.m
 npm install
 npx vitest run src/core/fixtures src/architecture
 ```
+
+> **Phase:** Documentation on `main`. Application source is intentionally not on this branch.

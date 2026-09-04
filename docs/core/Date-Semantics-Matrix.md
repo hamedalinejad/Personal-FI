@@ -86,6 +86,6 @@ See `Date-Semantics-Matrix.md / P0-FINAL locks` §1.
 - Jalali فقط presentation / قوانین صریح Iran adapter — نه interval arithmetic هسته
 - Financial Date ≠ Event Timestamp
 
-جزئیات: `P0-FINAL-041-051-LOCKS.md`
+جزئیات: `Financial-Invariants.md`
 
 **P1-AUD-003:** See AUDIT-HISTORY-NOTE.md / CANONICAL-FINANCIAL-REQUIREMENTS.md — no UTC slice without TZ policy.

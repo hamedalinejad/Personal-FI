@@ -62,7 +62,7 @@
 - `Raw-vs-Derived-Data.md` — حقایق ثبت‌شده vs محاسبات
 - `Precision-Policy.md` — scale per currency/instrument
 - `Feature-API-Contract.md` — Command/Query، TS API، sourceType
-- `Core-Engines.md` — لیست engineهای مرکزی
+- `Calculation-Engines.md` — لیست engineهای مرکزی
 - `Source-of-Truth-Matrix.md` — یک سؤال → یک منبع
 - `Canonical-Cash-Model.md` — **P0** تنها SoT نقد = fin_accounts + journal
 - `Loan-Component-Classification.md`
@@ -90,11 +90,11 @@
 - `Feature-Independence-Contract.md`
 - `Module-Architecture.md` — Core vs Feature modules؛ Accounting Core ≠ UI
 - `Architecture-Final.md`
-- `P0-FINAL-041-051-LOCKS.md`
+- `Financial-Invariants.md`
 - `CODING-GATE.md`
-- `P0-COST-BASIS-PNL-001-005-LOCK.md` — C2C/trade vs transfer; fee roles; P&L axes
-- `P0-FINAL-006-015-LOCKS.md`
-- `P0-FINAL-036-040-LOCKS.md`
+- `Cost-Basis-Engine.md` — C2C/trade vs transfer; fee roles; P&L axes
+- `Financial-Invariants.md`
+- `Financial-Invariants.md`
 
 ## P1-005 — Implementation paths
 
@@ -107,17 +107,19 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `fixtures/GOLDEN-GATE.md`
 - `db/SCHEMA-FREEZE-REQUIREMENTS.md`
 - `ARCHIVE-NOTE-BATCH-LOCKS.md`
-- `P0-COST-BASIS-PNL-001-005-LOCK.md`
+- `Cost-Basis-Engine.md`
 - `Relationship-Matrix.md`
 - `DOC-CONSOLIDATION-POLICY.md`
 - `ARCHITECTURAL-PROHIBITIONS.md`
 - `FINAL-THINK-TANK-AUDIT-2026-09-03.md`
 - `GO-NO-GO.md`
 - `AUDIT-HISTORY-NOTE.md`
-- `P0-DOC-001-014-VERIFY.md`
+- `GO-NO-GO.md`
 - `OPEN-ISSUES-REGISTER.md`
 - `FIELD-PRESERVATION-PROOF.md`
 - `db/SCHEMA-FREEZE-COVERAGE.md`
 - `fixtures/OPEN-004-FIXTURE-GAP.md`
 - `ARCHITECTURE-LOCKED.md` — pre-coding constitution
-- `P0-DOC-REVERIFY-2026-09-04.md`
+- `ARCHITECTURE-LOCKED.md`
+- `Money-Decimal-Policy.md`
+- `Financial-Invariants.md` — includes absorbed P0 lock notice

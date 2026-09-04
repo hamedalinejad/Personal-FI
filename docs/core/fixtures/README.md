@@ -14,7 +14,7 @@ Add new fixtures here or under `docs/features/<feature>/fixtures/` and link from
 
 ## CA / C2C / Opening (specified in locks)
 
-Numeric vectors live in `docs/core/P0-FINAL-011-014-LOCKS.md` until split into individual fixture files.
+Numeric vectors live in `Financial-Invariants.md` (P0 locks consolidated 2026-09-04) until split into individual fixture files.
 
 ---
 

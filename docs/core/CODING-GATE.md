@@ -1,6 +1,6 @@
 # Coding Gate — Final Order
 
-**Status:** Gate A (P0-DOC contracts) largely closed — see `P0-DOC-001-014-VERIFY.md`. **Still BLOCKED** on Gate C (full golden fixtures executable) and Gate D (schema freeze + relationship coverage). Authority: `GO-NO-GO.md` + `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical) + concept homes.
+**Status:** Gate A (P0-DOC contracts) largely closed — see `GO-NO-GO.md / ARCHITECTURE-LOCKED.md`. **Still BLOCKED** on Gate C (full golden fixtures executable) and Gate D (schema freeze + relationship coverage). Authority: `GO-NO-GO.md` + `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical) + concept homes.
 
 ## Gate A — Contract cleanup
 
@@ -8,7 +8,7 @@ Resolve all P0 items in:
 
 - `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical audit)
 - `docs/core/GO-NO-GO.md`
-- `docs/core/P0-DOC-001-014-VERIFY.md`
+- `docs/core/GO-NO-GO.md / ARCHITECTURE-LOCKED.md`
 - `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.md`
 - Core identity / cash / fee / FX / loan / valuation contracts
 
@@ -105,3 +105,20 @@ Phase 5 — vertical: Accounts → Loan → Crypto → Funds → Stocks → Meta
 ```
 
 **GO limited Core/fixtures; NO full Feature implementation until Phase 1–3 green.**
+
+---
+
+## Gate H — No-Field-Loss (mandatory)
+
+Every **new persisted financial field** must be mapped in **all** of:
+
+1. `Data-Dictionary.md` (or Feature appendix with same columns)
+2. Schema freeze row (`db/SCHEMA-FREEZE-COVERAGE.md` / future `schema.sql`)
+3. Feature API request/response (decimal string where money)
+4. Migration disposition (`preserve` | `rebuild` | `map` | `deprecated`)
+5. Fixture or rebuild path when field is RAW
+
+**Acceptance:** undocumented financial fields = **0**.  
+Inventory seed: `field-inventory.checklist.tsv` · proof rules: `FIELD-PRESERVATION-PROOF.md`.
+
+Feature production code is **blocked** for any table that fails this gate.

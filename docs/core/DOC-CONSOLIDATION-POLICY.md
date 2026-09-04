@@ -55,10 +55,10 @@ May delete when grep shows no inbound links and body has no unique rule:
 
 | Path | Canonical body |
 |------|----------------|
-| `Naming-Glossary.md` | `NAMING-GLOSSARY.md` |
-| `docs/core/Rounding-Policy.md` | prefer `docs/core/rounding/Rounding-Policy.md` as sole body; root file = thin pointer + Iran table only if not duplicated |
-| `Core-Engines.md` | `Calculation-Engines.md` |
-| `Financial-Scenarios.md` | Financial-Scenario-Catalog / fixtures |
+| `NAMING-GLOSSARY.md` | `NAMING-GLOSSARY.md` |
+| `docs/core/rounding/Rounding-Policy.md` | prefer `docs/core/rounding/Rounding-Policy.md` as sole body; root file = thin pointer + Iran table only if not duplicated |
+| `Calculation-Engines.md` | `Calculation-Engines.md` |
+| `Financial-Scenario-Catalog.md` | Financial-Scenario-Catalog / fixtures |
 
 ---
 
@@ -70,7 +70,7 @@ May delete when grep shows no inbound links and body has no unique rule:
 | **Canonical-Cash-Model** + **Cash-Settlement-Adapter** | cash SoT, ports, acc_transactions event-only |
 | **Money / Rounding** (`rounding/Rounding-Policy.md`) | precision, decimal string, IRR/Toman display |
 | **Instrument-Identity** | instrumentId, symbol label, assetKey index |
-| **Cost-Basis-Engine** + **P0-COST-BASIS-PNL lock** + **Fee-Treatment-Matrix** | C2C, transfer fee, fee roles, P&L axes |
+| **Cost-Basis-Engine** + **Fee-Treatment-Matrix** | C2C, transfer fee, fee roles, P&L axes |
 | **Valuation & FX** (Currency feature + P0-FINAL FX locks) | ValuationContext, multi-hop path, observation order |
 | **Loan** feature + **Loan-Schedule-Engine** | schedule, day count, residual |
 | **Stocks Iran** + **Corporate-Action-Engine** + **Iran Core** | T+2, CA formulas ownership |

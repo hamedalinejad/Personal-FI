@@ -153,7 +153,7 @@ Forbidden: rebuild/query by `symbol` alone.
 venue_offchain: UNIQUE(exchangeId, instrumentId) WHERE networkId IS NULL
 wallet_onchain: UNIQUE(exchangeId, networkId, instrumentId) WHERE networkId IS NOT NULL
 ```
-Partial unique indexes required — see `P0-FINAL-015-020-LOCKS.md`.
+Partial unique indexes required — see `Financial-Invariants.md`.
 
 ## Network / venue identity (Final Audit §12)
 

@@ -116,9 +116,9 @@ CanonicalFeeEvent + explicit treatment: each fee has exactly one economic effect
 
 ## P0-FINAL-003/004
 
-Canonical feeFundingAsset / feeIncludedInReceivedQuantity and burn closed form: `P0-FINAL-001-004-LOCKS.md`.
+Canonical feeFundingAsset / feeIncludedInReceivedQuantity and burn closed form: `Financial-Invariants.md`.
 
 
 ## feeCurrency vs feeInstrumentId (P0-FINAL-018)
 
-Exclusive presence preferred; one economic fee event. See `P0-FINAL-015-020-LOCKS.md`.
+Exclusive presence preferred; one economic fee event. See `Financial-Invariants.md`.

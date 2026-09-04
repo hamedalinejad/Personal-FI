@@ -19,8 +19,8 @@
 scale, roundingMode, minimumStep
 ```
 
-Round فقط در مرز نمایش یا طبق `Rounding-Policy.md` — نه وسط زنجیره محاسبه.
-ارجاع: `Financial-Invariants` §5 · `Rounding-Policy.md`
+Round فقط در مرز نمایش یا طبق `rounding/Rounding-Policy.md` — نه وسط زنجیره محاسبه.
+ارجاع: `Financial-Invariants` §5 · `rounding/Rounding-Policy.md`
 
 ---
 

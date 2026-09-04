@@ -214,7 +214,7 @@ input
 
 **اجباری در Documentation/Code review:** هر PR که `SUM(` روی amount/quantity/price بزند رد می‌شود مگر ستون non-financial INTEGER باشد.
 
-جزئیات: `Implementation-Pitfalls.md` · `Precision-Policy.md` · `Rounding-Policy.md`
+جزئیات: `Implementation-Pitfalls.md` · `Precision-Policy.md` · `rounding/Rounding-Policy.md`
 
 ---
 ## P0-007 — Polymorphic link enforce

@@ -156,7 +156,7 @@ Raw quote fields روی tx برای audit و گزارش چندارزی می‌م
 
 ## C2C / economicKind (canonical — P0-COST-BASIS-PNL-001-005)
 
-**Authority:** `docs/core/P0-COST-BASIS-PNL-001-005-LOCK.md`
+**Authority:** `docs/core/Cost-Basis-Engine.md`
 
 Command sets `economicKind`: `internal_transfer` | `same_owner_bridge` | `economic_trade_or_swap`.
 
@@ -398,12 +398,27 @@ Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-
 
 ## P0-FINAL-011…014
 
-CA numeric vectors, C2C vs bridge, economic kinds, opening cost: `P0-FINAL-011-014-LOCKS.md`.
+CA numeric vectors, C2C vs bridge, economic kinds, opening cost: `Financial-Invariants.md`.
 
 ## P0-FINAL-021…023
 
-costCurrency immutable per pool; CostBasisFeeAllocation v1; transfer fee source/dest split — `P0-FINAL-021-026-LOCKS.md`.
+costCurrency immutable per pool; CostBasisFeeAllocation v1; transfer fee source/dest split — `Financial-Invariants.md`.
 
 ## costCurrency (P0-009)
 
 Pool `costCurrency` immutable; default `baseCurrencyAtFirstCostBearingEvent`. Report valuation may convert to user base; pool currency does not rewrite.
+
+---
+
+## economicFeeRole (canonical)
+
+Set **before** any cost-pool mutation:
+
+| Role | Effect |
+|------|--------|
+| `acquisition_fee_from_received` | holding += net; cost over net qty; no second burn release |
+| `post_acquisition_network_burn` | after acquisition; proportional carrying burn |
+| `sale_fee_from_proceeds` | reduces net proceeds |
+| `standalone_asset_burn` | explicit burn only |
+
+One CanonicalFeeEvent → one economic allocation.

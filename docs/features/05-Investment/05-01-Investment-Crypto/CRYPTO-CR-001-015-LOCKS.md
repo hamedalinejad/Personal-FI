@@ -63,7 +63,7 @@ Any formula `destinationCost = costReleasedFromSource` applies **only** to trans
 ## CR-005 — (legacy section retained for history; rules above win)
 
 ```text
-// VOID for economic_trade_or_swap — see P0-FINAL-010 / P0-COST-BASIS-PNL lock
+// VOID for economic_trade_or_swap — see Cost-Basis-Engine.md
 // economic_trade_or_swap: destinationCost = trade consideration + capitalized fees
 // internal_transfer | same_owner_bridge: destinationCost = transferred/carried cost
 ```
@@ -189,11 +189,11 @@ Raw lot identity must not be discarded solely because current method is WA.
 
 ## P0-FINAL fee vocabulary
 
-feePresence legacy maps to feeFundingAsset table in `docs/core/P0-FINAL-001-004-LOCKS.md`. Burn math: P0-FINAL-004.
+feePresence legacy maps to feeFundingAsset table in `Financial-Invariants.md` (P0 locks consolidated 2026-09-04). Burn math: P0-FINAL-004.
 
 ## P0-FINAL-012 / 013 / 014
 
-C2C = economic_trade_or_swap (realized). Bridge/transfer realized=0. EconomicKind matrix + opening equity journals: `docs/core/P0-FINAL-011-014-LOCKS.md`.
+C2C = economic_trade_or_swap (realized). Bridge/transfer realized=0. EconomicKind matrix + opening equity journals: `Financial-Invariants.md` (P0 locks consolidated 2026-09-04).
 
 ---
 
@@ -201,6 +201,6 @@ C2C = economic_trade_or_swap (realized). Bridge/transfer realized=0. EconomicKin
 
 Any CR-005 text that sets C2C destination cost = source carrying cost is **void**.
 
-Use `economicKind` + `P0-COST-BASIS-PNL-001-005-LOCK.md`:
+Use `economicKind` + `Cost-Basis-Engine.md`:
 - trade/swap → consideration-based dest cost + source realized
 - transfer/bridge → carry cost only

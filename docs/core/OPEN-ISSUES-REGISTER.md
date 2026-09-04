@@ -37,3 +37,10 @@ Blocked: Feature command writers until OPEN-001/003/004 reach Gate D/C green.
 | DOC-CLN-008 Dictionary completeness | **OPEN** (= OPEN-003) |
 
 Constitution document: `ARCHITECTURE-LOCKED.md` (sections pipeline, SoT, editions, UX-9, gates A–H, fixture list, execution order).
+
+
+## 2026-09-04
+
+- `src/` removed from main (docs-only). Restore on implementation branch.
+- P0 lock files consolidated into concept homes.
+- Added: Standalone license mode, IRR/Toman policy, Gate H, crash recovery, ER-from-matrix roadmap.

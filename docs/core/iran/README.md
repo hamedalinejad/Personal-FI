@@ -196,3 +196,23 @@ UI **هرگز** داخل Operation مبلغ را scale نمی‌کند.
 ## P1-FINAL-044 — نرمال‌سازی شناسه بانکی
 
 رقم فارسی/عربی → ASCII، حذف فاصله و خط تیره، IBAN uppercase، سپس UNIQUE روی فرم نرمال.
+
+---
+
+## سیاست یکپارچه پول ایران (IRR / Toman)
+
+| لایه | قانون |
+|------|--------|
+| **DB / Domain / API / Journal** | فقط **IRR** به‌صورت **decimal string** |
+| **UI input** | کاربر می‌تواند ریال یا تومان انتخاب کند |
+| **UI display** | preference: Rial یا Toman (`1 Toman = 10 Rial`) |
+| **Conversion** | فقط در مرز UI → قبل از Command؛ Command همیشه IRR می‌بیند |
+| **ممنوع** | فیلد جدا `amountToman` در جداول مالی · Currency code جدا برای TOM/IRT در ledger |
+
+```text
+User types 1,000,000 Toman
+  → normalize → amount = "10000000" (IRR string)
+  → commandHash / persist / journal
+```
+
+جزئیات rounding: `docs/core/rounding/Rounding-Policy.md` و `docs/core/Money-Decimal-Policy.md`.

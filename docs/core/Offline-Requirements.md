@@ -50,3 +50,31 @@ Valuation/rebuild use local last-known or manual prices with stale flags. Airpla
 7. attachments survive backup/restore
 8. license expiry does not wipe financial history
 9. export works when feature license-disabled
+
+---
+
+## Crash Recovery (atomic financial ops)
+
+### Problem
+
+Complex ops (e.g. stock buy + fees + T+2 settlement intent) must not leave a half-written domain+journal state after process kill.
+
+### Rules
+
+1. **Single SQLite transaction** wraps: domain rows + journal header/lines + operation row (`status` transitions to `posted` only on successful COMMIT).
+2. **Durability after COMMIT:** `db_meta.durabilityState = sql_committed` → IndexedDB/persist swap → `persisted` | `persist_failed`.
+3. UI «ثبت شد» only when **persisted** (or product-defined durable policy), never on RAM-only commit alone.
+4. On restart: if `sql_committed` but not `persisted`, **retry persist** — do not re-run the financial command (idempotent `operationId`).
+5. If SQL never committed: no domain/journal residue (rollback).
+6. Multi-leg ops (C2C, reinvest, buy+fee) share **one `operationId`** so partial legs cannot exist without the whole plan.
+
+### Acceptance scenarios
+
+| Scenario | Expected |
+|----------|----------|
+| Kill during validate | no rows |
+| Kill after SQL COMMIT before IDB | retry persist; one operation |
+| Kill mid-plan before COMMIT | rollback; user retries same or new operationId per policy |
+| Complex stock buy T+2 | trade + payable/fee legs atomic with operation |
+
+See also: `Canonical-Financial-Operation.md`, `Multi-Tab-Writer-Contract.md`.

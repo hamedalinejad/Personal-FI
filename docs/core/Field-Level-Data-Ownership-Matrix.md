@@ -193,4 +193,4 @@ Hard DELETE فیزیکی فقط پس از archive policy + backup.
 
 ## deletedAt / updatedAt (P0-FINAL-015/016)
 
-Posted financial rows: no deletedAt path; financial fields immutable; updatedAt frozen or metadata-only. See `P0-FINAL-015-020-LOCKS.md`.
+Posted financial rows: no deletedAt path; financial fields immutable; updatedAt frozen or metadata-only. See `Financial-Invariants.md`.

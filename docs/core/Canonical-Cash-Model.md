@@ -139,7 +139,7 @@ inv_crypto_transactions / inv_stocks_* / inv_fif_* / inv_metals_*
 Venue features emit journal lines through operations / CashSettlementPort.  
 Dual Model A (journal) vs Model B (independent venue balance SoT) is **forbidden**.
 
-See `P0-FINAL-001-004-LOCKS.md`.
+See `Financial-Invariants.md`.
 
 
 ## P1 cash ownership (24)

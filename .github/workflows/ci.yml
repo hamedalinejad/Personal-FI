@@ -4,13 +4,14 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  test:
+  docs-phase:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: npm install
-      - run: npm run test:unit
-      - run: npm run typecheck
+      - name: Docs-only phase notice
+        run: |
+          echo "Implementation/tests deferred to dedicated branch."
+          echo "Canonical constitution: docs/core/ARCHITECTURE-LOCKED.md"
+          test -f docs/core/ARCHITECTURE-LOCKED.md
+          test -f docs/core/GO-NO-GO.md
+          test ! -d src

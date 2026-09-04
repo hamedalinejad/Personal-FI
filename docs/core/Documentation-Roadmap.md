@@ -14,7 +14,7 @@ Optional Main Accounting Integration
 
 ## فاز صفر: اصلاح اسناد (قبل از کد)
 
-- واژه‌نامه FA/EN (`Naming-Glossary.md`)
+- واژه‌نامه FA/EN (`NAMING-GLOSSARY.md`)
 - Scope / out of scope (`Project-Blueprint` / Product-Map)
 - Bounded Context ماژول‌ها
 - ERD / schema tables (`db/`)

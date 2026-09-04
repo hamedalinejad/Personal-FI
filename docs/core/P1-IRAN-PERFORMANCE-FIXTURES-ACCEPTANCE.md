@@ -146,5 +146,5 @@ monthly declining · weekly · custom day count · variable rate · grace · par
 
 ## P0-FINAL-033…035 Fixture gate
 
-Schema for numeric fixtures, failure vectors, reversal before/after pairs: `P0-FINAL-027-035-LOCKS.md`. Inventory alone is not release-green.
+Schema for numeric fixtures, failure vectors, reversal before/after pairs: `Financial-Invariants.md`. Inventory alone is not release-green.
 

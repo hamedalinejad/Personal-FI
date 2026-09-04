@@ -211,5 +211,5 @@ never store mixed rial/toman in same column without currency
 
 ## P0-FINAL-005…008
 
-Attribution Algorithm v1, FX Conversion Path v1, PriceSelectionPolicy v1, FxSelectionPolicy v1: `P0-FINAL-005-010-LOCKS.md`.
+Attribution Algorithm v1, FX Conversion Path v1, PriceSelectionPolicy v1, FxSelectionPolicy v1: `Financial-Invariants.md`.
 

@@ -75,5 +75,16 @@ Global `ValuationContext`; multi-currency attribution; wealth change ≠ investm
 
 ## P0-FINAL-024…026
 
-Period Return v1 formula; cash FX wealth matrix; full SnapshotWatermark — `P0-FINAL-021-026-LOCKS.md`.
+Period Return v1 formula; cash FX wealth matrix; full SnapshotWatermark — `Financial-Invariants.md`.
 
+---
+
+## Period / Wealth bridges (canonical)
+
+```text
+Wealth = Opening + ExternalFlows + InvestmentReturn + CashFX + LiabilityFX + OtherPolicy
+
+InvestmentReturn = Realized + Unrealized + RecognizedIncome − RecognizedInvestmentExpense
+```
+
+Mixed legacy formulas that double-count sales/profit are **forbidden**.

@@ -38,7 +38,7 @@ SQLite/sql.js → IndexedDB
 
 ## Engines
 
-Canonical list: **`Calculation-Engines.md`**. `Core-Engines.md` is a pointer only.
+Canonical list: **`Calculation-Engines.md`**. `Calculation-Engines.md` is a pointer only.
 
 ## Legacy note
 

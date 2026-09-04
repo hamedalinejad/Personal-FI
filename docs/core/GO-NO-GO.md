@@ -25,3 +25,5 @@
 ## Edition commercial lock
 
 License/capability flags **must not** delete or rewrite accounting history.
+
+**Phase:** documentation-only on `main` (`src/` absent). Implementation branch will restore runtime + CI tests.

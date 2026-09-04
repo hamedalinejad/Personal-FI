@@ -116,7 +116,7 @@ accountId / instrumentId معتبر
 
 - `Canonical-Financial-Operation.md`
 - `core/db/*` (persist, journal, fixtures)
-- `Rounding-Policy.md`
+- `rounding/Rounding-Policy.md`
 - `Product-Map-FA.md` فازبندی
 
 ---
@@ -389,3 +389,23 @@ Public contracts and JSON examples use decimal **strings** only for financial qu
 **`CANONICAL-FINANCIAL-REQUIREMENTS.md`** (§4.1–4.13).
 
 **P0-FIX-020:** reconcile = detect/report only; repair = explicit user + audit + rebuild. No silent snapshot mutation.
+
+---
+
+## Absorbed P0 lock files (2026-09-04 consolidation)
+
+Numbered `P0-FINAL-*` and `P0-COST-BASIS-PNL-*` **files were removed** from the tree to reduce dual authority.
+
+**Where rules live now:**
+
+| Topic | Canonical home |
+|-------|----------------|
+| Cash / journal SoT | `Canonical-Cash-Model.md`, `Cash-Settlement-Adapter.md` |
+| Cost basis / fees / C2C / transfer | `Cost-Basis-Engine.md`, `Fee-Treatment-Matrix.md` |
+| Period return / wealth bridges | `Essential-Reports.md`, `ARCHITECTURE-LOCKED.md` |
+| Identity | `Instrument-Identity.md` |
+| Operation / idempotency / durability | `Canonical-Financial-Operation.md` |
+| Iran money | `iran/README.md`, `Money-Decimal-Policy.md` |
+| Coding gates | `CODING-GATE.md`, `GO-NO-GO.md` |
+
+Do **not** reintroduce parallel P0 lock files. Amend concept homes only.
