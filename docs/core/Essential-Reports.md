@@ -75,7 +75,7 @@ Global `ValuationContext`; multi-currency attribution; wealth change ≠ investm
 
 ## P0-FINAL-024…026
 
-Period Return v1 formula; cash FX wealth matrix; full SnapshotWatermark — `Financial-Invariants.md`.
+Period Return v1 formula; cash FX wealth matrix; full SnapshotWatermark — **this file** § Period / Wealth bridges (not Financial-Invariants.md).
 
 ---
 

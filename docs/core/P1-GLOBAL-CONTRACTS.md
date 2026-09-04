@@ -177,7 +177,7 @@ Iranian detail, IA performance pattern, golden fixture pack, acceptance matrix:
 
 ## P0-FINAL-025 / 026
 
-Cash FX translation vs investment P&L; snapshot watermark expanded — see `Financial-Invariants.md`.
+Cash FX translation vs investment P&L; snapshot watermark — see `Essential-Reports.md` § Period / Wealth bridges.
 
 ---
 

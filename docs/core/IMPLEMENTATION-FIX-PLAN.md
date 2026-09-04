@@ -204,7 +204,7 @@ totalFeesPaidBase = Σ active fee events
 
 ## P0-FIX-008 — Period Return bridge فقط یک نسخه
 
-**محل:** `Financial-Invariants.md` و هر سند قدیمی.
+**محل:** `Essential-Reports.md` § Period / Wealth bridges (Financial-Invariants دیگر host این فرمول نیست).
 
 **نسخه معتبر:**
 

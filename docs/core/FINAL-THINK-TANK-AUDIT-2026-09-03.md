@@ -2162,3 +2162,5 @@ Primary repository evidence consulted includes:
 - P0-FINAL-AUD-* / P1-FINAL-AUD-* references treated as non-existent; use Feature main docs + LOCK pointers.
 - **Live status:** `OPEN-ISSUES-REGISTER.md` (not this historical audit alone).
 - This report is historical relative to the commit that last fully regenerated it; prefer OPEN register + concept homes for implementation.
+
+> وضعیت زنده: `OPEN-ISSUES-REGISTER.md` — این فایل ممیزی تاریخی است.

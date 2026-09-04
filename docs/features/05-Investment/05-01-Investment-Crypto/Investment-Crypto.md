@@ -399,7 +399,7 @@ totalInvested -= soldPortionCost
 در صرافی مبدا (transfer_out):
  holdings.quantity -= quantityDeducted (= amountToSend)
  holdings.totalInvested -= costDeducted (= amountToSend × averageBuyPrice_source)
- holdings.totalFeesPaidBase += feeBase
+ /* DERIVED only — do not persist mutate; rebuild Σ feeBase (P0-DOC-007) */ // holdings.totalFeesPaidBase = rebuildFees(holdingId)
  averageBuyPrice بدون تغییر (فروش/انتقال averageBuyPrice را عوض نمی‌کند)
 
 در صرافی مقصد (transfer_in):
@@ -491,7 +491,7 @@ costTransferred = 0.999 × 50,000 = 49,950 USDT ← این است که به مق
 
 در **همه** عملیات، پس از محاسبه `feeBase`:
 ```
-holding.totalFeesPaidBase += feeBase
+/* DERIVED only — P0-DOC-007 */ // effectiveFeesBase = Σ feeBase(active ops)
 ```
 این فیلد تجمعی است و هرگز کاهش نمی‌یابد (حتی در فروش).
 
@@ -530,7 +530,7 @@ holding.totalFeesPaidBase += feeBase
 
  let qty = new Decimal(0)
  let totalInvested = new Decimal(0)
- let totalFeesPaidBase = new Decimal(0)
+ let totalFeesPaidBase = new Decimal(0) // local rebuild accumulator only; result is SNAPSHOT field
 
  for (const tx of txs) {
  const feeBase = convertFeeToBase(tx.feeAmount, tx.feeCurrency, tx.feeAssetPriceToBase, tx.exchangeRateToBase, baseCurrency)
@@ -659,7 +659,7 @@ holding.totalFeesPaidBase += feeBase
  UPDATE inv_crypto_holdings SET
  quantity = fromHolding.quantity - fromQuantity,
  totalInvested = fromHolding.totalInvested - soldPortionCost,
- totalFeesPaidBase = fromHolding.totalFeesPaidBase + feeBase
+ totalFeesPaidBase = rebuildFees(fromHolding) /* not += accumulator; P0-DOC-007 */
  -- averageBuyPrice بدون تغییر (فروش averageBuyPrice را تغییر نمی‌دهد)
  WHERE id = fromHolding.id
 
@@ -719,7 +719,7 @@ holding.totalFeesPaidBase += feeBase
  UPDATE inv_crypto_holdings SET
  quantity = srcHolding.quantity - amountToSend,
  totalInvested = srcHolding.totalInvested - costDeducted,
- totalFeesPaidBase = srcHolding.totalFeesPaidBase + feeBase
+ totalFeesPaidBase = rebuildFees(srcHolding) /* P0-DOC-007 */
  -- averageBuyPrice بدون تغییر
  WHERE id = srcHolding.id
 
@@ -1004,7 +1004,7 @@ validate holdings / balances / feePresence fields
 BEGIN
   write domain txs (with instrumentId, optional assetKey index, quoteAsset, gross/net/fee quantities)
   update holdings by netQuantity
-  totalFeesPaidBase += feeBase
+  /* DERIVED — rebuild Σ feeBase; never += persist (P0-DOC-007) */
   fin_journal_entries
   optional acc_transactions
 COMMIT → persist → UI success
@@ -1417,7 +1417,7 @@ WAC می‌تواند بدون lot کار کند؛ مدل data lot را برای
 ## totalFeesPaidBase
 
 ```text
-totalFeesPaidBase = lifetime accumulated fee metric
+totalFeesPaidBase = DERIVED effective fee metric (Σ active feeBase); optional separate lifetime/audit metric if needed — never dual SoT
 ≠ current cost basis
 ≠ remaining cost
 ```

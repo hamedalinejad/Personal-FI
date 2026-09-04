@@ -127,3 +127,15 @@ Prior claim «P0 lock files consolidated» was premature until BUG-02 pointer co
 | P1-DOC-017 | CLOSED for feature LOCKS→pointer (BUG-02); Core P0-FINAL files remain concept homes |
 
 Code bugs: `IMPLEMENTATION-BRANCH-CODE-BUGS.md` — not verified on main.
+
+
+## Verification pass 2026-09-04 (second)
+
+| ID | Result |
+|----|--------|
+| BUG-01 / P0-DOC-003 Reversal samples | **CLOSED on main** — instrumentId (re-verified) |
+| BUG-02 / P0-DOC-007 totalFeesPaidBase += examples | **CLOSED** — examples marked DERIVED/rebuild only |
+| BUG-03 Period Return file refs | **CLOSED** — point to Essential-Reports.md |
+| BUG-04 / P1-DOC-017 LOCKS files | **CLOSED** — all 15 are 7-line pointers |
+| BUG-05 audit spam | **CLEANED** further |
+| P1-DOC-015 / 016 | still IN PROGRESS |

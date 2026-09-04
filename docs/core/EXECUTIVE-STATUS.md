@@ -20,7 +20,7 @@
 3. `acc_transactions` — **CLOSED**: event/projection only (P0-DOC-002).
 4. Funds contains conflicting `accountId` rules for standalone vs integrated operation.
 5. Stocks contains conflicting hard-coded IRR/Tether wording and brokerage cash ownership language.
-6. One P0 Period Return lock still contains a superseded mixed bridge equation.
+6. Period Return: **RESOLVED** — canonical formula in `Essential-Reports.md` § Period / Wealth bridges (not Financial-Invariants.md).
 7. The full field-level dictionary/FK matrix is not yet provably complete for every Feature field.
 8. The P0 lock file count/ranges are now too large and overlapping for reliable developer use.
 9. Gate C states 12 golden vectors while the executable critical fixture set is smaller.
