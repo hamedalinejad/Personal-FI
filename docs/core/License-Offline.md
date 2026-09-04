@@ -189,3 +189,5 @@ Capability Gate در Application/UI:
 **نه** داخل Core Ledger: `if premium: calculate...`
 
 فقط Loan license → سیستم سالم بدون dependency اجباری به Investment.
+
+**Capability enforcement:** `License-Gate.md`.

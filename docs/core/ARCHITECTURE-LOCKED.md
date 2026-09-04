@@ -105,7 +105,11 @@ capabilities() → edition support
 
 ---
 
-## 5. UX — nine pages max
+## 5. UX — Sheet-based navigation (see Pages-IA)
+
+**Update:** Primary nav **≤6** destinations; all create/edit flows are **Sheets**. Detail: `docs/00-Product/Pages-IA.md`. Historical «nine areas» map into those destinations + More.
+
+## 5b. UX areas (product map)
 
 | # | Page | Content |
 |---|------|---------|
