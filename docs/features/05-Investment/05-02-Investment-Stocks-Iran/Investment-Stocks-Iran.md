@@ -151,7 +151,7 @@ feeAmount =
 - `feeAmount` → decimal
 - `feeCurrency` → string
 - `exchangeRateToBase` → decimal
-- `accountId` → UUID
+- `accountId` → UUID **nullable** (required only for bank-integrated commands; standalone OK — P0-DOC-013)
 - `accountTransactionId` → UUID
 - `description` → string
 - `date` → datetime

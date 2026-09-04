@@ -120,3 +120,4 @@ Contracts here are technology-neutral; ADRs/tech decision docs own framework cho
 - `db/SCHEMA-FREEZE-COVERAGE.md`
 - `fixtures/OPEN-004-FIXTURE-GAP.md`
 - `ARCHITECTURE-LOCKED.md` — pre-coding constitution
+- `P0-DOC-REVERIFY-2026-09-04.md`
