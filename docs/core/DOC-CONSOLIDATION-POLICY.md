@@ -129,3 +129,8 @@ See `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.
 - Feature `*-LOCKS.md`: **thin pointers OK**.
 - Do not delete GOLDEN skeletons until replaced with expected values.
 - `src/` bootstrap is intentional; do not remove again without implementation branch policy.
+
+
+## P0-DOC closed set
+
+Do not re-open P0-DOC-001…014 without superseding version. Prevention checklist: `P0-DOC-CLOSED-PREVENTION.md`.

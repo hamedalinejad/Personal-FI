@@ -1,4 +1,4 @@
-# Relationship Matrix (B-004 / OPEN-002)
+# Relationship Matrix (B-004 / OPEN-002 / REL-001…005)
 
 **Authority with:** `schema.sql` + `05-constraints-polymorphic.md`  
 Expand until Schema Freeze CLOSED.
@@ -53,74 +53,107 @@ Expand until Schema Freeze CLOSED.
 | chk_cheques.account_id | acc_accounts.id | FK | RESTRICT |
 | chk_cheques.operation_id | fin_operations.id | FK | RESTRICT |
 
-## CA / Stocks / Funds (logical — expand columns at freeze)
+---
+
+## REL-001 — Stocks brokerage cash (OPEN residual → contract)
+
+```text
+inv_stocks_iran_transactions
+  → operation_id → fin_operations
+  → CashSettlementPort.settle(operation)
+  → fin_journal_lines on broker fin_accounts.id
+  → inv_stocks_iran_brokerages.fin_account_id (FK)
+
+Ownership:
+  Feature: stock domain qty/price legs
+  Core: cash balance SoT (journal)
+  brokerage.cashBalance: SNAPSHOT only
+```
 
 | Edge | Rule |
 |------|------|
-| inv_stocks_iran_corporate_actions.instrument_id | → ref_instruments.id RESTRICT |
-| CA event → fin_operations | operation_id RESTRICT |
-| CA fee legs | CanonicalFeeEvent via operation; not orphan fee rows |
-| Fund NAV observation | → ref_instruments + price_history quote_type=nav |
-| Fund tx → operation | operation_id RESTRICT |
+| brokerage.fin_account_id | → fin_accounts.id RESTRICT |
+| stock tx.operation_id | → fin_operations.id RESTRICT |
+| settlement_date cash move | journal lines only; no second broker ledger SoT |
 
-## Import
+**Status:** Documented contract; enforce in schema freeze + engine.
 
-| From | To | Rule |
-|------|-----|------|
-| import_dedupe_keys.operation_id | fin_operations.id | RESTRICT when linked |
-| import_raw_records | no calc dependency | preservation only |
-| Provider tx id hierarchy | provider_tx_id → tx_hash+logIndex → external_ref → command_hash | P0-FINAL-040 |
+## REL-002 — Metals delivery → physical assets (OPEN residual → contract)
 
-## Fee edges (anti double-count)
+```text
+inv_metals_physical_deliveries.operation_id → fin_operations.id
+pa_assets.source_operation_id → fin_operations.id
+pa_assets.source_feature = 'metals'
+delivery delivered ⇒ metals holding ↓ + pa_assets row with lineage
+```
 
 | Edge | Rule |
 |------|------|
-| Domain fee fields | → one CanonicalFeeEvent / operation fee leg |
-| fee_instrument_id XOR fee_currency | P0-FINAL-018 |
-| Journal fee expense | same operationId as domain fee |
+| pa_assets.source_operation_id | FK fin_operations RESTRICT |
+| delivery.metals_holding_id | → inv_metals_holdings |
+| cancellation after economic transfer | Core reverse of delivery operation |
 
-## Residual gaps (OPEN-002)
+**Status:** FK present in schema.sql; lineage semantics must stay in Metals + PA docs.
 
-- [ ] Full stocks brokerage cash fin_account link table
-- [ ] Metals delivery → pa_assets source_operation_id FK
-- [ ] Bills occurrence → operation unique
-- [ ] Tax_events.linked from investment tx
-- [ ] Budget links operationId
+## REL-003 — Bills occurrence → operation (OPEN residual → contract)
 
+```text
+UNIQUE (br_items.id as item_id, occurrence_key)  -- already br_occurrences
+Executed pay: exactly one fin_operations.id per occurrence (operation_id)
+Reversal: reverse operation; occurrence may return unpaid/scheduled per policy
+```
 
+| Edge | Rule |
+|------|------|
+| br_occurrences.operation_id | → fin_operations nullable until paid |
+| uniqueness | (item_id, occurrence_key) |
+| no double pay | second pay same occurrence → IDEMPOTENCY_CONFLICT / CONFLICT |
 
-## P1-DOC-006 — Expanded edges (freeze fill)
+## REL-004 — Tax event linkage (OPEN residual → contract)
 
-### Corporate actions
-| From | To | Rule |
-|------|-----|------|
-| inv_stocks_iran_corporate_actions.instrument_id | ref_instruments.id | RESTRICT |
-| inv_stocks_iran_corporate_actions.operation_id | fin_operations.id | RESTRICT |
-| CA entitlement/exercise legs | same operation_id group | no orphan rights qty |
-| cash-in-lieu leg | fin_journal_lines via operation | cash SoT journal |
+```text
+Investment / income ops that create tax:
+  tax_events.operation_id → fin_operations.id
+  domain tx.linkedTaxEventId → tax_events.id  (or only operation_id group)
 
-### Fees
-| From | To | Rule |
-|------|-----|------|
-| domain tx fee_* | CanonicalFeeEvent / operation fee metadata | 1:1 economic |
-| fee_instrument_id | ref_instruments.id | RESTRICT when set |
-| fee journal lines | fin_journal_lines.operation via entry | same operationId |
+Payment of tax: separate payTax operation; does not rewrite liability provenance
+```
 
-### Import
-| From | To | Rule |
-|------|-----|------|
-| import_raw_records | (none for calc) | preservation only |
-| import_dedupe_keys.operation_id | fin_operations.id | RESTRICT when linked |
-| import_dedupe_keys hierarchy | provider_tx_id → tx_hash+logIndex → external_ref → command_hash | P0-FINAL-040 |
+| Edge | Rule |
+|------|------|
+| tax_events.operation_id | source liability op |
+| linkedTaxEventId | optional on investment rows; new writes canonical |
+| legacy tax fields | read-only |
 
-### Metals → Physical
-| From | To | Rule |
-|------|-----|------|
-| pa_assets.source_operation_id | fin_operations.id | RESTRICT |
-| delivery reduces metals holding | inv metals tx + operation | lineage required |
+## REL-005 — Budget → operation (OPEN residual → contract)
 
-### Budget / Bills
-| From | To | Rule |
-|------|-----|------|
-| bg_transaction_links.operation_id | fin_operations.id | reverse restores envelope |
-| br_occurrences unique | (br_item_id, occurrence_key) | BR-001 |
+```text
+bg_transaction_links.operation_id → fin_operations.id
+UNIQUE (envelope_id, operation_id)
+spent_snapshot DERIVED from links
+Expense reverse → reverse link effect (restore envelope)
+```
+
+| Edge | Rule |
+|------|------|
+| link.operation_id | FK RESTRICT |
+| reverse | releases consumption for that operationId |
+| budget never blocks ledger | advisory only |
+
+---
+
+## CA / Fees / Import (summary)
+
+| Edge | Rule |
+|------|------|
+| CA.instrument_id | → ref_instruments |
+| CA.operation_id | → fin_operations |
+| fee → CanonicalFeeEvent | one economic effect per fee |
+| import_dedupe_keys.operation_id | → fin_operations when linked |
+
+## Residual checklist
+
+- [x] REL-001…005 **contracts written** (this file)
+- [ ] Runtime engines enforce all edges
+- [ ] Drift test schema ↔ matrix = 0
+- [ ] Field inventory complete for related tables

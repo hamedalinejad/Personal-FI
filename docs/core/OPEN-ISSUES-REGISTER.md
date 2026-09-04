@@ -160,3 +160,11 @@ Feature UI commands still NO-GO until Gate C (GOLDEN fixtures green).
 
 Prioritized backlog: `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` + `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.  
 P3 items are explicit non-goals for v1.
+
+
+## REL-001…005 (relationship residuals)
+
+Contracts locked in `db/RELATIONSHIP-MATRIX.md`.  
+Runtime/schema freeze still open until engines + drift test green.
+
+P0-DOC-001…014 reintroduction prevention: `P0-DOC-CLOSED-PREVENTION.md`.
