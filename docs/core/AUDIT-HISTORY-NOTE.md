@@ -1,3 +1,5 @@
+> **HISTORICAL** — not live authority. Live: OPEN-ISSUES-REGISTER.md
+
 # Audit history note
 
 Detailed PASS/CYCLE/THINK-TANK session logs and AUD snapshot bodies were removed after rules migrated to canonical docs.

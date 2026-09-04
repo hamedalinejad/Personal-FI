@@ -113,3 +113,7 @@ Two developers must follow the same chain; if prose conflicts with LOCK, **LOCK 
 ## B-013 headers
 
 Section titles that still mention batch ids are historical labels inside concept homes; authority is the host file (see above). Soft-renamed where automated.
+
+## Documentation style (from DOCUMENTATION-STYLE-P2)
+
+See historical notes in git history of `DOCUMENTATION-STYLE-P2.md` if needed. Prefer this policy file.

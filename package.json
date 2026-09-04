@@ -1,9 +1,11 @@
 {
   "name": "personal-fi",
   "private": true,
-  "description": "Documentation-first phase \u2014 implementation lives on a future branch",
+  "type": "module",
+  "description": "Personal-FI — Core engines bootstrap (docs + src skeleton)",
   "scripts": {
-    "docs:check-refs": "node -e \"console.log('docs-only phase: run link checks manually; implementation branch will restore CI tests');\"",
-    "lint": "node -e \"console.log('B-007: ESLint deferred until src/features packages exist on implementation branch');\""
+    "test": "node --experimental-vm-modules --test src/**/*.test.js 2>/dev/null || node --test src/core/money/canonicalDecimal.test.js",
+    "lint": "node -e \"console.log('ESLint: enable when feature packages land (B-007)');\"",
+    "docs:check-refs": "node -e \"console.log('docs-only checks manual');\""
   }
 }

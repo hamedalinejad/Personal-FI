@@ -139,3 +139,18 @@ Code bugs: `IMPLEMENTATION-BRANCH-CODE-BUGS.md` — not verified on main.
 | BUG-04 / P1-DOC-017 LOCKS files | **CLOSED** — all 15 are 7-line pointers |
 | BUG-05 audit spam | **CLEANED** further |
 | P1-DOC-015 / 016 | still IN PROGRESS |
+
+
+## BUG-001…050 engineering batch (2026-09-04)
+
+| Band | Status on main |
+|------|----------------|
+| BUG-001 schema expansion | advanced — feature tables in schema.sql |
+| BUG-002…015 engines | bootstrapped stubs in src/core + canonicalDecimal tests |
+| BUG-016…017 | still IN PROGRESS |
+| BUG-018…025 feature schema | ADDED |
+| BUG-026…028 | stubs |
+| BUG-029…033 docs hygiene | cleanup |
+| BUG-035…050 columns | schema-migration-notes-v1.md |
+
+Feature UI commands still NO-GO until Gate C (GOLDEN fixtures green).

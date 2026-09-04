@@ -299,3 +299,392 @@ CREATE TABLE IF NOT EXISTS import_dedupe_keys (
 CREATE UNIQUE INDEX IF NOT EXISTS uq_import_provider_tx
   ON import_dedupe_keys(source_provider, provider_tx_id)
   WHERE provider_tx_id IS NOT NULL;
+
+
+-- ═══════════════════════════════════════════════════════════
+-- BUG-001 expansion + BUG-035…050 column/table gaps (2026-09-04)
+-- Domain still validates decimal; SQLite stores TEXT
+-- ═══════════════════════════════════════════════════════════
+
+INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaVersion', '1');
+INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
+
+-- Extend notes: fin_operations.durability_state domain values:
+-- pending | temp_written | committed | swapped | failed
+
+CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  venue_kind TEXT, -- exchange|wallet
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_crypto_wallet_networks (
+  id TEXT PRIMARY KEY,
+  exchange_id TEXT NOT NULL REFERENCES inv_crypto_exchanges(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  network TEXT NOT NULL,
+  chain_id TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_crypto_wallet_addresses (
+  id TEXT PRIMARY KEY,
+  network_id TEXT NOT NULL REFERENCES inv_crypto_wallet_networks(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  address TEXT NOT NULL,
+  is_primary INTEGER NOT NULL DEFAULT 0 CHECK (is_primary IN (0, 1)),
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_crypto_cash (
+  id TEXT PRIMARY KEY,
+  exchange_id TEXT NOT NULL REFERENCES inv_crypto_exchanges(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  currency TEXT NOT NULL,
+  fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  balance TEXT NOT NULL DEFAULT '0', -- SNAPSHOT only
+  updated_at TEXT NOT NULL,
+  UNIQUE (exchange_id, currency)
+);
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_brokerages (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_instruments (
+  id TEXT PRIMARY KEY, -- may equal ref_instruments.id or map 1:1
+  instrument_id TEXT NOT NULL UNIQUE REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  isin TEXT,
+  lot_size TEXT,
+  price_tick TEXT,
+  firm_code TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
+  id TEXT PRIMARY KEY,
+  brokerage_id TEXT NOT NULL REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  quantity TEXT NOT NULL,
+  total_invested TEXT NOT NULL,
+  cost_currency TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE (brokerage_id, instrument_id)
+);
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
+  id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  holding_id TEXT REFERENCES inv_stocks_iran_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  tx_type TEXT NOT NULL,
+  trade_date TEXT NOT NULL,
+  settlement_date TEXT,
+  quantity TEXT NOT NULL,
+  price TEXT,
+  fee_amount TEXT,
+  currency TEXT NOT NULL,
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_corporate_actions (
+  id TEXT PRIMARY KEY,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ca_type TEXT NOT NULL,
+  ex_date TEXT,
+  record_date TEXT,
+  payment_date TEXT,
+  ratio TEXT,
+  payload_json TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_fif_funds (
+  id TEXT PRIMARY KEY,
+  instrument_id TEXT NOT NULL UNIQUE REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  fund_kind TEXT, -- mutual|etf|…
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_fif_holdings (
+  id TEXT PRIMARY KEY,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  quantity TEXT NOT NULL,
+  total_invested TEXT NOT NULL,
+  cost_currency TEXT NOT NULL,
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_fif_transactions (
+  id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  tx_type TEXT NOT NULL, -- subscribe|redeem|distribution|reinvest|…
+  trade_date TEXT NOT NULL,
+  settlement_date TEXT,
+  quantity TEXT,
+  nav TEXT,
+  transaction_price TEXT,
+  amount TEXT,
+  currency TEXT NOT NULL,
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_metals_platforms (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_metals_holdings (
+  id TEXT PRIMARY KEY,
+  platform_id TEXT REFERENCES inv_metals_platforms(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  quantity_mg TEXT NOT NULL, -- SoT mass
+  total_invested TEXT NOT NULL,
+  cost_currency TEXT NOT NULL,
+  purity_code TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_metals_transactions (
+  id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  tx_type TEXT NOT NULL,
+  quantity_mg TEXT NOT NULL,
+  amount TEXT,
+  currency TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inv_metals_physical_deliveries (
+  id TEXT PRIMARY KEY,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  metals_holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  pa_asset_id TEXT,
+  status TEXT NOT NULL, -- requested|processing|delivered|cancelled
+  quantity_mg TEXT NOT NULL,
+  fee_amount TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pa_assets (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  asset_kind TEXT,
+  currency TEXT NOT NULL,
+  source_feature TEXT,
+  source_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pa_transactions (
+  id TEXT PRIMARY KEY,
+  asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  tx_type TEXT NOT NULL,
+  amount TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  business_date TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pa_valuations (
+  id TEXT PRIMARY KEY,
+  asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  as_of TEXT NOT NULL,
+  value TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  source TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bg_budgets (
+  id TEXT PRIMARY KEY,
+  period_key TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  income_source_mode TEXT, -- calculated|manual
+  total_income TEXT,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE (period_key)
+);
+
+CREATE TABLE IF NOT EXISTS bg_envelopes (
+  id TEXT PRIMARY KEY,
+  budget_id TEXT NOT NULL REFERENCES bg_budgets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  category_id TEXT,
+  assigned TEXT NOT NULL,
+  spent_snapshot TEXT, -- DERIVED
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bg_transaction_links (
+  id TEXT PRIMARY KEY,
+  envelope_id TEXT NOT NULL REFERENCES bg_envelopes(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  amount TEXT NOT NULL,
+  UNIQUE (envelope_id, operation_id)
+);
+
+CREATE TABLE IF NOT EXISTS fg_goals (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  target_amount TEXT NOT NULL,
+  current_amount_snapshot TEXT, -- DERIVED
+  target_date TEXT,
+  funding_mode TEXT, -- earmark|segregated_cash
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fg_contributions (
+  id TEXT PRIMARY KEY,
+  goal_id TEXT NOT NULL REFERENCES fg_goals(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  amount TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  business_date TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS br_items (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  amount TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  recurrence_rule TEXT,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS br_occurrences (
+  id TEXT PRIMARY KEY,
+  item_id TEXT NOT NULL REFERENCES br_items(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  occurrence_key TEXT NOT NULL,
+  due_date TEXT NOT NULL,
+  scheduled_amount TEXT NOT NULL,
+  paid_amount TEXT,
+  status TEXT NOT NULL,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  UNIQUE (item_id, occurrence_key)
+);
+
+CREATE TABLE IF NOT EXISTS tax_events (
+  id TEXT PRIMARY KEY,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  tax_kind TEXT NOT NULL,
+  amount TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  period_key TEXT,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cur_currencies (
+  code TEXT PRIMARY KEY,
+  name TEXT,
+  minor_units INTEGER NOT NULL DEFAULT 2,
+  is_active INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS cur_exchange_rates (
+  id TEXT PRIMARY KEY,
+  from_currency TEXT NOT NULL,
+  to_currency TEXT NOT NULL,
+  rate TEXT NOT NULL,
+  as_of TEXT NOT NULL,
+  source TEXT,
+  source_priority INTEGER NOT NULL DEFAULT 100,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cur_currency_preferences (
+  id TEXT PRIMARY KEY,
+  base_currency TEXT NOT NULL,
+  is_toman_display INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cat_categories (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  kind TEXT, -- income|expense|…
+  parent_id TEXT REFERENCES cat_categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  is_active INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS not_notifications (
+  id TEXT PRIMARY KEY,
+  dedupe_key TEXT NOT NULL UNIQUE,
+  category TEXT,
+  title TEXT NOT NULL,
+  body TEXT,
+  is_read INTEGER NOT NULL DEFAULT 0,
+  dismissed_at TEXT,
+  snooze_until TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS rpt_snapshots (
+  id TEXT PRIMARY KEY,
+  report_kind TEXT NOT NULL,
+  as_of TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  ledger_watermark TEXT,
+  price_as_of TEXT,
+  fx_as_of TEXT,
+  engine_versions TEXT,
+  calculation_context_hash TEXT,
+  rebuilt_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS usr_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ln_loan_collateral (
+  id TEXT PRIMARY KEY,
+  loan_id TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  description TEXT,
+  value TEXT,
+  currency TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ln_rate_history (
+  id TEXT PRIMARY KEY,
+  loan_id TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  effective_from TEXT NOT NULL,
+  annual_rate TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_acc_tx_links_related ON acc_transaction_links(related_id);
+CREATE INDEX IF NOT EXISTS idx_fin_journal_lines_entry ON fin_journal_lines(entry_id);
+CREATE INDEX IF NOT EXISTS idx_price_history_instr_date ON price_history(instrument_id, market_date);
+
+-- Note: additive columns for existing tables (SQLite migration style on implementation):
+-- fin_journal_lines.line_number INTEGER
+-- fin_operations durability CHECK domain
+-- ref_instruments.is_active
+-- price_history.is_manual / quote_type already partial
+-- chk_cheques.bounced_reason
+-- ln_loans.start_date, maturity_date
+-- import_raw_records.source_file_name
+-- created_by/updated_by on major tables via migration v2
+
