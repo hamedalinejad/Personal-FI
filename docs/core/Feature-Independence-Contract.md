@@ -291,3 +291,48 @@ Standalone ≠ wipe data when license upgrades/downgrades
 | After payment, journal lines exist and balance | yes |
 | Export/backup includes journal + domain | yes |
 | Enable Accounts UI later → balances reconcile without data loss | yes |
+
+---
+
+## Hidden Journal Mode (Standalone) — قفل معماری
+
+> **اصلاح اتاق فکر:** وابستگی به `fin_accounts` / `fin_journal_lines` **پنهانِ درست** است، نه باگ.  
+> آنچه ممنوع است وابستگی به **Accounts UI** و ساخت ledger نقدی جداگانه است.
+
+### قانون
+
+```text
+Standalone Feature UI
+        ↓
+Feature Public API
+        ↓
+runAtomicFinancialOperation
+        ↓
+Domain ledger (ln_*, inv_*, …)
+        ↓
+CashSettlementPort → LocalSettlementAdapter
+        ↓
+همان fin_accounts + fin_journal_lines  (ژورنال واقعی Core — نه موقت)
+```
+
+| درست | غلط |
+|------|-----|
+| ژورنال محلی = **همان** جداول Core | «ژورنال موقت» جدا که بعداً migrate شود |
+| ارتقای لایسنس = روشن شدن UI/capability | کپی/انتقال ردیف‌ها بین دو journal |
+| کاربر debit/credit نمی‌بیند | Feature-owned cash balance به‌عنوان SoT |
+
+### چرا migration ژورنال موقت ممنوع است
+
+1. دو SoT موقت/نهایی → ریسک double-count و از دست رفتن فیلد.
+2. `operationId` / `commandHash` / reversal باید از روز اول پایدار بمانند.
+3. No-Field-Loss یعنی از **اولین** تراکنش Standalone، تاریخچه حسابداری کامل است.
+
+### Acceptance (License edition)
+
+| سناریو | انتظار |
+|--------|--------|
+| Loan-only: ایجاد وام + پرداخت قسط بدون صفحه Accounts | journal lines موجود و متوازن |
+| Export/Backup | شامل domain + journal |
+| فعال‌سازی Full Accounting UI | **بدون** migration داده؛ فقط query/UI جدید روی همان DB |
+| غیرفعال کردن UI حسابداری | داده پاک **نمی‌شود** |
+

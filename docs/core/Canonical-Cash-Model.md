@@ -147,3 +147,23 @@ See `Financial-Invariants.md`.
 Feature cash tables are projections with optional `finAccountId`; SoT remains fin_accounts + journal_lines. See `P1-GLOBAL-CONTRACTS.md` §24.
 
 **P1-AUD-005:** Sole cash SoT = fin_accounts + fin_journal_lines.
+
+---
+
+## قانون محاسبه مانده نقد (اتاق فکر — Accountant)
+
+```text
+Cash balance for any pocket =
+  Σ fin_journal_lines on that fin_accounts.id
+  (via Decimal engine in Domain — never SQL SUM on TEXT)
+```
+
+| جدول / فیلد | نقش | استفاده برای مانده نقد |
+|-------------|-----|-------------------------|
+| `fin_accounts` | تعریف حساب | شناسه pocket — نه مجموع تراکنش |
+| `fin_journal_lines` | **تنها SoT مانده نقد** | **بله** |
+| `acc_transactions` | event log / bank feed / UX projection | **خیر** |
+| `inv_*_holdings.quantity` | موجودی دارایی | **خیر** (دارایی ≠ نقد مگر cash pocket جدا در fin_accounts) |
+| `cashBalance` روی brokerage/exchange | snapshot مشتق | **خیر** — rebuild از journal |
+
+**ممنوع:** `SUM(acc_transactions) + SUM(journal)` برای یک جیب پول.

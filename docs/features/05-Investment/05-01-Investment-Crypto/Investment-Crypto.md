@@ -1777,3 +1777,29 @@ Forbidden in new implementation:
   WHERE assetKey = ?   as sole rebuild key
   PK logical = assetKey
 ```
+
+---
+
+## Crypto Fee Classification Matrix (canonical)
+
+Set **`economicFeeRole`** (and `feePresence`) **before** any cost-pool mutation. One fee event → one allocation.
+
+| Scenario | feePresence (qty) | economicFeeRole | Holding qty | Cost basis | P&L |
+|----------|-------------------|-----------------|-------------|------------|-----|
+| Buy, fee in quote (USDT) | `fee_in_quote` | capitalize or expense per policy | += gross (=net) | + quote + fee (if capitalize) | fee expense if not capitalized |
+| Buy, fee from received asset | `fee_from_received` | `acquisition_fee_from_received` | += **net** = gross−fee | consideration / net | no second burn release |
+| Buy, fee external third asset | `fee_external` | capitalize or expense | += gross | + fee value if capitalize | else fee expense |
+| Sell, fee from proceeds | `fee_in_quote` / proceeds | `sale_fee_from_proceeds` | − gross | release avg×qty | realized on net proceeds |
+| Network transfer burn | `fee_from_received` | `post_acquisition_network_burn` or transfer fee allocation | out gross / in net | single release: transferred+feeCarrying | not disposal P&L |
+| Standalone gas after buy | — | `standalone_asset_burn` | − fee qty | proportional carrying | fee/burn effect |
+
+**Forbidden:** treating network burn as a second full cost release after acquisition fee already reduced net qty.
+
+### Token identity (restate)
+
+```text
+ref_instruments.id  = ONLY identity (instrumentId)
+symbol              = LABEL
+assetKey            = SYSTEM_INDEX / provider convenience
+USDT-TRC20 ≠ USDT-ERC20 → two instrumentIds
+```

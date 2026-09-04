@@ -694,3 +694,25 @@ Standalone stock/brokerage without Accounts UI must be runnable.
 
 `accountId` on brokerage transactions: **nullable** at schema level for standalone/local/external settlement.
 Command validation may require it only for integrated bank route.
+
+---
+
+## Timeline of Events — Iranian equity trade (T+2 default)
+
+> Owner: IranSettlement Core + Stocks Feature API. Formulas not hard-coded only in UI.
+
+| Day | Label | What is booked (one `operationId` for trade intent; settlement may be linked ops) |
+|-----|--------|-------------------------------------------------------------------------------------|
+| **T+0** | Trade date | Domain stock tx (buy/sell); position qty change; **broker payable/receivable** (or pending cash); fees/tax legs per fee breakdown; **not** necessarily settled bank cash |
+| **T+1** | Interim | No automatic second economic trade; pending settlement remains open; reports show pending vs settled cash separately |
+| **T+2** | Settlement (default Iran equity) | Settlement clears payable/receivable → **CashSettlementPort** → journal on brokerage/bank `fin_accounts`; `settlementDate` = business date of clear |
+
+### Rules
+
+1. `tradeDate` ≠ `settlementDate` (both DATE-only Gregorian; Jalali display only).
+2. Portfolio quantity uses trade-date (T+0) unless product policy says otherwise for specific instruments.
+3. **Available cash** must not assume unsettled sale proceeds are spendable until settlement posts (or explicit credit policy).
+4. Settlement failure → reverse/adjust settlement intent without orphaning liability (Core reversal).
+5. v1 may post trade+settlement in one operation only when user records an already-settled historical trade; live T+2 must keep pending state visible.
+
+See also: `IranSettlement` in `docs/core/iran/README.md`.

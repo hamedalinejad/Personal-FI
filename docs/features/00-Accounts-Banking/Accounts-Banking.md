@@ -266,8 +266,24 @@ Default: non-credit accounts reject negative ledger balance.
 
 transfer-out (principal) + transfer-in (principal) + fee leg مستقل در یک operationId.
 
-## Accounts AC locks (P0)
+## Accounts & Banking
+
+> **`acc_transactions` = bank/account event log + UX projection.**  
+> **Cash balance SoT = `fin_journal_lines` on linked `fin_accounts`.**  
+> هرگز `acc_transactions` را دفترکل نقدی authoritative نخوانید.
+
+# Accounts AC locks (P0)
 
 Full AC-001…AC-006: `ACCOUNTS-AC-001-006-LOCKS.md`
 
 **P1-FIX-006:** Normalize IBAN/Shaba/account numbers before unique/store (Persian digits→ASCII, strip spaces/hyphens/ZW, IBAN upper, keep leading zeros).
+
+---
+
+## مانده حساب (SoT)
+
+```text
+reported bank balance = derive from fin_journal_lines (fin_accounts for this bank)
+acc_transactions      = immutable event rows for UI/filter/reconcilation aids
+currentBalance        = SNAPSHOT cache only
+```

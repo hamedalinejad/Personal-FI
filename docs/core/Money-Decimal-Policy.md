@@ -21,3 +21,12 @@ See `rounding/Rounding-Policy.md` for scale by currency/instrument (IRR 0 dp sto
 - `iran/README.md` — Iran Core + Toman layer
 - `CANONICAL-FINANCIAL-REQUIREMENTS.md` — money section
 - `ARCHITECTURE-LOCKED.md` — constitution
+
+## ضد-الگوی ممنوع
+
+```text
+❌ amount_toman + amount_rial columns
+❌ currency = 'TOM' | 'IRT' as ledger currencies
+❌ storing both units for the same fact
+✅ amount TEXT IRR + UI unit preference
+```
