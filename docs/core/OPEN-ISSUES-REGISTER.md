@@ -168,3 +168,25 @@ Contracts locked in `db/RELATIONSHIP-MATRIX.md`.
 Runtime/schema freeze still open until engines + drift test green.
 
 P0-DOC-001…014 reintroduction prevention: `P0-DOC-CLOSED-PREVENTION.md`.
+
+## Engineering board (live) — R-001…R-015 / BUG-001…015
+
+| # | Title | Status | Note |
+|---|--------|--------|------|
+| 1 | schema.sql incomplete | Advanced Partial | ~690 lines; drift test still open |
+| 2 | runAtomicFinancialOperation | Stub only | `notImplemented` |
+| 3 | Write-to-temp-then-swap | Stub only | no real worker |
+| 4 | Financial invariants runtime | Partial | only canonicalDecimal tested (+ BUG-CODE helpers) |
+| 5 | Cost-Basis Engine | Stub only | no full apply() for all types |
+| 6 | Loan Schedule Engine | Stub only | no templates |
+| 7 | Cash Settlement Adapter | Stub only | no settle() |
+| 8 | Instrument Identity runtime | Partial | schema OK; registry stub |
+| 9 | Golden Fixture Gate | Partial | most families no engine assert |
+| 10 | Feature Independence | Stub only | no package + ESLint |
+| 11 | Price Fetching | Spec only | no PriceProvider code |
+| 12 | Currency Cross-Rate | Spec only | no ValuationContext code |
+| 13 | Corporate Action Engine | Spec only | no CA transform code |
+| 14 | Fixed Income Funds | Spec only | no fund engine |
+| 15 | Migration strategy | Spec only | no migration runner |
+
+**Gate:** Feature command coding **NO-GO** until rows 2–7 implement and row 9 scoped families green.
