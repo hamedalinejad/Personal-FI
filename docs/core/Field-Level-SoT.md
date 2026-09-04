@@ -52,3 +52,18 @@ Every Feature completes RAW/DERIVED/SNAPSHOT/EXTERNAL_REPORTED/LABEL + Owner + E
 **P0-FINAL-049:** reports/export must not merge EXTERNAL_REPORTED into calculated fields.
 
 **P1-FIX-002:** Field Kind only: RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX. No `INDEX` synonym.
+
+## B-009 — Alignment
+
+Must stay consistent with `CANONICAL-FINANCIAL-REQUIREMENTS.md` and `Source-of-Truth-Matrix.md`:
+
+| Topic | Rule |
+|-------|------|
+| Money | decimal string persist/API |
+| Cash SoT | fin_accounts + fin_journal_lines |
+| Instrument | instrumentId UUID only |
+| Snapshot fields | DERIVED/SNAPSHOT + rebuild path |
+| Kind enum | RAW\|DERIVED\|SNAPSHOT\|EXTERNAL_REPORTED\|LABEL\|SYSTEM_INDEX |
+
+If conflict: CANONICAL-FINANCIAL-REQUIREMENTS + LOCK files win.
+

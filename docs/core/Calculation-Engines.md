@@ -44,3 +44,16 @@ Financial Core
 پیاده‌سازی تدریجی مجاز است؛ **قرارداد و مرز از الان** قفل است.
 
 مرجع: `Cost-Basis-Engine.md` · `Loan-Schedule-Engine.md` · `rounding/Rounding-Policy.md` · `Precision-Policy.md`
+
+## B-010 — Authority
+
+This file is the **canonical body** for the engine map (what Core implements).
+
+| Concern | Document |
+|---------|----------|
+| Engine responsibilities | **this file** |
+| Scenario inventory / SCN ids | `Financial-Scenario-Catalog.md` (catalog only) |
+| Numeric expected values | `docs/core/fixtures/GOLDEN-*` |
+| Test pattern | `Mandatory-Test-Vectors.md` |
+
+Do not copy full fixture tables into this file.

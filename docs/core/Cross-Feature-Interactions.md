@@ -115,7 +115,7 @@ runAtomicFinancialOperation
 
 Reconcile دوره‌ای: orphan links → integrity queue.
 
-## Write path (CROSS-CUTTING BATCH-5 §8)
+## Write path (historical batch-5 §8; see host LOCK)
 
 Cross-feature state changes go through operation + port/adapter only. Direct cross-feature repository calls are forbidden.
 

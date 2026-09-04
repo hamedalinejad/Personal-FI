@@ -18,7 +18,7 @@ sql.js: **یک active writer**.
 
 detect incomplete → verify → recover/WAL → rebuild deterministic.
 
-## Financial writes (CROSS-CUTTING BATCH-4 §6)
+## Financial writes (historical batch-4 §6; see host LOCK)
 
 All financial writes (operations, journal, domain financial tables) **must** acquire the single-writer lock. Read-only paths do not take exclusive write lock.
 

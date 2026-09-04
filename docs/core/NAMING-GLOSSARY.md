@@ -1,5 +1,7 @@
 # Naming Glossary (P2 — Canonical Vocabulary)
 
+**Canonical path:** `docs/core/NAMING-GLOSSARY.md` only (B-011). `Naming-Glossary.md` is pointer.
+
 یک زبان برای کل مستندات و API. در تعارض مثال‌های قدیمی با این واژه‌نامه، **این سند** مبنا است.
 
 ---

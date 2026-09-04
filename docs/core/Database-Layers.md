@@ -37,7 +37,7 @@ Schema ذهنی پروژه در چهار طبقه:
 
 مرجع: `Source-of-Truth-Matrix.md` · `Raw-vs-Derived-Data.md` · `db/01-schema-tables.md`
 
-## Seeds & uniqueness (CROSS-CUTTING BATCH-5 §9–§10)
+## Seeds & uniqueness (Policy (ex-batch-5) §9–§10)
 
 Reference tables have versioned, idempotent seed/migration contracts.  
 Uniqueness on nullable business identifiers uses **partial unique indexes** (WHERE col IS NOT NULL) as documented per table.

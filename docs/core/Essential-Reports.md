@@ -55,12 +55,12 @@ P&L and wealth metrics used by Reports, Portfolio, and Dashboard share **one def
 
 ---
 
-## Report modes (CROSS-CUTTING BATCH-2 §7–§8)
+## Report modes (Policy (ex-batch-2) §7–§8)
 
 API queries declare `mode`: `current` | `asOf` | `period` | `sinceInception`.  
 Investment period P&L exposes opening qty/cost, period txs, realized, closing valuation/unrealized separately (bridge), not a single opaque number.
 
-## Export preflight (CROSS-CUTTING BATCH-5 §3–§4)
+## Export preflight (Policy (ex-batch-5) §3–§4)
 
 Before Excel/PDF/CSV financial export: detect stale snapshots via watermark; rebuild or fail with `STALE_DATA`.  
 Pipeline keeps decimal **strings** — no IEEE float conversion before write.

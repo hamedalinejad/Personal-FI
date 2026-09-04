@@ -66,7 +66,7 @@ UI می‌تواند بعداً بیاید؛ **حذف از مدل اولیه = �
 
 ---
 
-## Fractional rounding (CROSS-CUTTING BATCH-2 §10)
+## Fractional rounding (historical batch-2 §10; see host LOCK)
 
 Entitlement rounding uses: ratio → **instrument quantity precision** → `fractionalPolicy` → optional cash-in-lieu. Market-rule adapter (e.g. Iran) supplies lot/tick constraints. See also Corporate-Actions-Spec / P0-056.
 

@@ -124,7 +124,7 @@ Unknown fields در raw/unmapped می‌مانند — قانون مطلق Data 
 - Every imported financial row **must** receive an `operationId` (batch import operation and/or per-leg child ops). External IDs preserved for idempotency.
 - `operationSource` / provenance (`user` | `import` | `migration` | `system` | `repair`) lives on the operation and is **not** the same enum as domain transaction `source` fields (e.g. goal contribution source).
 
-## Raw preservation (CROSS-CUTTING BATCH-4 §4)
+## Raw preservation (historical batch-4 §4; see host LOCK)
 
 Raw import payloads are immutable. Normalization is derived and may be re-run under a new `mapperVersion` without overwriting raw bytes/records.
 

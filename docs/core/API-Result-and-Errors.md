@@ -40,7 +40,7 @@ Response/request JSON:
 
 **Forbidden in Public API samples:** `Decimal` class instances, `number` for money.
 
-## Canonical error codes (CROSS-CUTTING BATCH-4 §8)
+## Canonical error codes (historical batch-4 §8; see host LOCK)
 
 Shared codes include at least: `VALIDATION_ERROR`, `CONFLICT`, `IDEMPOTENCY_CONFLICT`, `INSUFFICIENT_BALANCE`, `STALE_DATA`, `NOT_FOUND`, `PERMISSION_DENIED`, `RECOVERY_REQUIRED` / `INTERNAL`. Features extend; they do not replace these meanings.
 

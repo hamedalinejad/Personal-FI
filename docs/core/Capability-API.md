@@ -37,7 +37,7 @@ Persistence
 
 مرجع: `Feature-API-Contract.md` · `Module-Architecture.md`
 
-## Headless modules (CROSS-CUTTING BATCH-5 §6)
+## Headless modules (historical batch-5 §6; see host LOCK)
 
 Every Feature/Capability module exposes API usable **without** parent UI (tests, jobs, import, limited license modules). UI is a client, not a runtime requirement.
 

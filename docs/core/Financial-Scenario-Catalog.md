@@ -2,7 +2,7 @@
 
 فهرست سناریوهای اجباری برای golden fixtures. جزئیات عددی در `fixtures/` و شرح الگوی تست در `Mandatory-Test-Vectors.md`.
 
-**این فایل SoT فهرست سناریوها است.** فایل قدیمی `Financial-Scenario-Catalog.md` فقط alias است.
+**این فایل فهرست (catalog) سناریوها است** — نه موتور محاسبه (B-010). موتورها: `Calculation-Engines.md`. اعداد: `fixtures/GOLDEN-*`.
 
 ## قرارداد هر سناریو
 

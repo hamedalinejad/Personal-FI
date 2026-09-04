@@ -101,3 +101,15 @@ Optional cleanup: rename heading to drop BATCH id without deleting rules.
 
 Ticket numbers (B-00x, OPEN-00x, P0-xxx) are **tracking labels only** — they do not outrank LOCK text.  
 Two developers must follow the same chain; if prose conflicts with LOCK, **LOCK wins** and prose is marked LEGACY or deleted (P1-FINAL-030).
+
+
+## B-011 / B-012 path lock
+
+| Concept | Canonical body | Pointer only |
+|---------|----------------|--------------|
+| Naming | `docs/core/NAMING-GLOSSARY.md` | `docs/core/Naming-Glossary.md` |
+| Rounding | `docs/core/rounding/Rounding-Policy.md` | `docs/core/Rounding-Policy.md` |
+
+## B-013 headers
+
+Section titles that still mention batch ids are historical labels inside concept homes; authority is the host file (see above). Soft-renamed where automated.

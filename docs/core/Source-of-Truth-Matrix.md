@@ -81,3 +81,8 @@ Ledger → Calculation → Report
 
 - Every historical report carries `ReportCalculationContext` (asOf, priceAsOf, fxAsOf, engineVersions, staleStatus, …) — see `Financial-Invariants.md`.
 - `calculatedProfit` ≠ `externalReportedProfit`; export keeps both separate.
+
+## B-009
+
+This matrix is protected; keep cash/instrument/journal rows aligned with CANONICAL-FINANCIAL-REQUIREMENTS and Canonical-Cash-Model.
+

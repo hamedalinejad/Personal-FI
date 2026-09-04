@@ -101,7 +101,7 @@ Field-level owner/raw/derived: `docs/core/Field-Level-SoT.md`.
 - Party identity: `ref_parties.id` only; payee/payer text = display snapshot.
 - External IDs: namespaced `(sourceKind, providerId, namespace?, externalId)` — not a single global externalId.
 
-## Partial unique indexes (CROSS-CUTTING BATCH-5 §10)
+## Partial unique indexes (historical batch-5 §10; see host LOCK)
 
 Nullable external/provider identifiers participate in uniqueness only via partial unique constraints; document each in schema.
 
@@ -125,3 +125,9 @@ undocumented persisted financial fields = 0
 ```
 
 Each row: Kind | Owner | Currency | Precision | SoT | Immutable/Editable | FK | Index/Unique | Migration | UsedBy
+
+## B-008 / B-009
+
+Dictionary completeness tracks OPEN-003 / `field-inventory.checklist.tsv`.  
+Semantic types here must not contradict CANONICAL-FINANCIAL-REQUIREMENTS (decimal strings, identities).
+

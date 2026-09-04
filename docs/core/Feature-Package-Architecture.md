@@ -55,7 +55,7 @@ Standalone UI ≠ بدون Sub-ledger / Journal
 
 مرجع: `Feature-Independence-Contract.md` · `Cash-Settlement-Adapter.md`
 
-## No circular feature dependencies (CROSS-CUTTING BATCH-5 §7–§8)
+## No circular feature dependencies (Policy (ex-batch-5) §7–§8)
 
 Feature packages must not circularly depend. Cross-feature **writes** only via Financial Operation adapters / CashSettlementPort / public commands — never direct foreign feature repository access.
 

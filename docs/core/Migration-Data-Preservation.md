@@ -60,7 +60,7 @@ Validation
 - پس از تغییر schema معنایی: `rebuildAllDerivedState()` از journal/domain
 - sql.js نباید بهانه wipe دیتا باشد — backup قبل از migration اجباری
 
-## Rollback per schema version (CROSS-CUTTING BATCH-4 §5)
+## Rollback per schema version (historical batch-4 §5; see host LOCK)
 
 Each schema migration documents forward steps and either rollback steps or explicit `rollback: not_supported` with a recovery path. Silent up-only migrations without documentation are not acceptable for release.
 

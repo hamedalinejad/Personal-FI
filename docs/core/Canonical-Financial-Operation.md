@@ -808,7 +808,7 @@ Link: reversesOperationId / reversalOperationId
 
 Rebuild تاریخی از settings.baseCurrency فعلی استفاده **نمی‌کند**.
 
-## Atomicity (CROSS-CUTTING BATCH-4 §9)
+## Atomicity (historical batch-4 §9; see host LOCK)
 
 One operationId commit spans domain effects + journal + cash settlement atomically from the caller’s perspective; partial persistence requires recovery protocol (see Persistence-State-Machine / BATCH-4).
 

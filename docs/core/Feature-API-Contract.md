@@ -277,7 +277,7 @@ interface ListResult<T> {
 
 Reconcile does not silent-mutate; rebuild rebuilds from ledger/SoT. See Date-Semantics-Matrix.md / P0-FINAL locks.
 
-## Labels vs semantic names (CROSS-CUTTING BATCH-5 §5)
+## Labels vs semantic names (historical batch-5 §5; see host LOCK)
 
 API/DB field names are semantic and stable. User-facing labels come from i18n/mapping docs only and must not rename domain fields.
 

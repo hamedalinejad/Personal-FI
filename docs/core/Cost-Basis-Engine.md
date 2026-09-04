@@ -391,7 +391,7 @@ Dest basis uses moved cost only; burn follows Fee matrix (expense or cost write-
 
 ---
 
-## Method versioning (CROSS-CUTTING BATCH-2 §9)
+## Method versioning (historical batch-2 §9; see host LOCK)
 
 - Default cost basis method is **per asset class** (settings) with optional per-holding override.
 - Operations store `engineVersions.costBasis` (and rounding policy version). Replay uses the version on the operation, not the current default only.

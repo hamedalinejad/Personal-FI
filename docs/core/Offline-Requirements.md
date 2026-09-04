@@ -31,7 +31,7 @@ Offline ≠ ساختن قیمت لحظه‌ای از هیچ.
 
 مرجع: Technical-Architecture · Persistence-State-Machine · Price-Fetching · License-Offline
 
-## Optimistic UI (CROSS-CUTTING BATCH-4 §7)
+## Optimistic UI (historical batch-4 §7; see host LOCK)
 
 Optimistic financial UI must show pending state and confirm only after durable persist ACK; on failure, UI rolls back. Final financial values before persist are forbidden.
 
