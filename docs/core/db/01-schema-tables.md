@@ -219,3 +219,26 @@ cash balance     = fin_accounts + fin_journal_lines ONLY
 **Forbidden for one pocket:** `SUM(acc_transactions) + SUM(journal)`.
 
 Use one: journal (authoritative) or a single projection rebuilt from journal — never both summed.
+
+## BUG-D03 — `ref_instruments` و شبکه (ERC20/TRC20/…)
+
+**مشکل:** دو USDT روی دو شبکه نباید یک instrument شوند.
+
+**Fix (هم‌راستا با Instrument-Identity — نه PK بر اساس symbol):**
+
+```text
+ref_instruments.id              = UUID  (ONLY primary key / canonical identity)
+ref_instruments.symbol          = LABEL (mutable display; not unique alone)
+ref_instruments.network_identifier  NULLABLE TEXT
+  // e.g. "TRC20" | "ERC20" | "BEP20" | chainId string | null for non-chain assets
+ref_instruments.assetClass      = crypto | stock | fund | metal | …
+
+// Optional uniqueness for on-chain fungible tokens:
+UNIQUE(network_identifier, contract_address) WHERE contract_address IS NOT NULL
+// یا برای native: UNIQUE(network_identifier, symbol) WHERE contract_address IS NULL AND assetClass=crypto
+
+inv_crypto_instrument_meta (if used): chainId, contractAddress, decimals — FK instrumentId
+```
+
+**ممنوع (رد اتاق فکر):** Primary Key = `(symbol, network)` — symbol ناپایدار است و با ISIN/سهام تداخل دارد.
+

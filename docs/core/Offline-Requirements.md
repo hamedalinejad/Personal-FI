@@ -78,3 +78,26 @@ Complex ops (e.g. stock buy + fees + T+2 settlement intent) must not leave a hal
 | Complex stock buy T+2 | trade + payable/fee legs atomic with operation |
 
 See also: `Canonical-Financial-Operation.md`, `Multi-Tab-Writer-Contract.md`.
+
+## BUG-D05 — Fallback valuation when offline / price missing
+
+Sale and mark paths **must not block** solely because live Price Fetching failed.
+
+```text
+PriceSelectionPolicy (aligned P0-FINAL-007):
+  1. Use trade price from command if user/import supplied
+  2. Else LAST_KNOWN_BEFORE_ASOF from price_history
+  3. Else MANUAL only
+  4. Never invent 0 as market price
+
+On Last_Known_Price use:
+  valuationSource = "last_known"
+  reconciliationNeeded = true   // flag on position/snapshot/operation metadata
+  stale = true if age > staleMaxAge
+
+When back online:
+  price sync may refresh marks; reconciliation queue processes reconciliationNeeded
+  historical posted trade prices remain immutable
+```
+
+PnL for a sell uses **command trade price** (or last known if policy allows mark). Missing live feed ≠ skip PnL.

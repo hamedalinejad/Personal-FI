@@ -248,3 +248,23 @@ Variable rate by **accrual interval**; explicit dayCount vs period mode; grace c
 
 Schedule = projection; accrual posts only via accrual/payment events. Variable-rate fixture: `Financial-Invariants.md`.
 
+## BUG-D04 — Iranian Loan Engine (product methods)
+
+Standard declining amortization **alone** does not cover all Iranian bank products. Schedule Engine must support **product templates**:
+
+| Method / template | Behavior |
+|-------------------|----------|
+| `qarz_al_hasaneh` | Principal-only installments; **no interest**; fee/work-charge (`serviceFee` / `ln_loan_fees`) separate — e.g. 4% annual fee style as **fee assessment**, not interest amortization |
+| `flat_rate` | Interest total computed upfront; fixed installment mix |
+| `declining_balance` | Classic amortization on remaining principal |
+| `bullet` | Interest-only or zero until balloon |
+| `iran_housing_step` / unequal | **Unequal installment schedule** from bank table or explicit `customInstallments[]` — engine does not force equal PMT |
+| `iran_fee_on_avg_balance` | Optional fee engine: period fee from **average outstanding balance** × fee rate (not standard interest) |
+
+```text
+IranianLoanEngine ⊂ Schedule Engine product adapters
+  → same ln_schedule_snapshots + component allocation
+  → NEVER silently map qarz fee into interestRate amortization
+```
+
+Fixtures: `GOLDEN-LOAN-QARZ` + future `GOLDEN-LOAN-HOUSING-STEP`.

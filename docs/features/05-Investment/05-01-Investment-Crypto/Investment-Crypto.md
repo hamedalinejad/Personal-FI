@@ -1803,3 +1803,19 @@ symbol              = LABEL
 assetKey            = SYSTEM_INDEX / provider convenience
 USDT-TRC20 ≠ USDT-ERC20 → two instrumentIds
 ```
+
+## BUG-D02 — STAKING_REWARD ≠ Capital Gain
+
+| Event | Income at receipt | Cost basis | Later sale |
+|-------|-------------------|------------|------------|
+| `STAKING_REWARD` / economicKind `staking_reward` | **Yes** — Income (FMV in base at receipt) | **Yes** — cost of new qty = FMV (v1) so immediate unrealized ≈ 0 | Only **incremental** price move = capital gain/loss |
+| Price appreciation of existing holding | No | unchanged | Capital gain on disposal |
+
+```text
+On STAKING_REWARD:
+  domain: +qty @ cost = FMV_base
+  income: +FMV_base (Income feature / journal income account)
+  NOT recorded as capital gain
+```
+
+Aligns P0-FINAL-013 EconomicKind matrix. Capital Gain فقط از disposal با cost released.

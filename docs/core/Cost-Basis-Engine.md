@@ -422,3 +422,31 @@ Set **before** any cost-pool mutation:
 | `standalone_asset_burn` | explicit burn only |
 
 One CanonicalFeeEvent → one economic allocation.
+
+## BUG-D01 — حقوق تقدم → سهم (بورس ایران) — Cost Basis
+
+وقتی حق تقدم به سهم تبدیل/تخصیص می‌شود (پرداخت ارزش اسمی + کارمزد):
+
+```text
+New_Avg_Cost = (Rights_Cost + Nominal_Value_Paid + Capitalized_Fees) / Total_Shares_After
+
+where:
+  Rights_Cost           = carrying cost of rights lot(s) being converted (CostBasisEngine release)
+  Nominal_Value_Paid    = cash paid at exercise (e.g. 1000 IRR par per new share) in costCurrency
+  Capitalized_Fees      = fees with treatment capitalize_into_cost
+  Total_Shares_After    = shares received from this conversion (or post-holding qty when merging into common pool)
+
+Event shape (conceptual):
+  ca_rights_exercise:
+    disposal/close rights qty (release Rights_Cost)
+    acquisition common shares with costBasisAdded = Rights_Cost + Nominal_Value_Paid + Capitalized_Fees
+Realized P&L on pure conversion = 0 (economic reclass), except fee expense treatments.
+```
+
+Cash leg for Nominal_Value_Paid is separate journal (Cr cash / bank); cost pool of **shares** absorbs it.  
+Fixture target: `CA-RIGHTS-EXERCISE-COST` (see Corporate-Actions-Spec + STOCKS locks).
+
+## BUG-D02 — staking_reward
+
+`staking_reward` = acquisition with **income recognition at FMV** + cost basis = FMV.  
+Do not fold staking income into capital gain on later sale beyond post-receipt price move.

@@ -148,3 +148,11 @@ gross / withholding / net with incomeRecognitionDate vs paymentDate journals —
 
 Bonus/split/reverse/capital increase/rights+CIL golden numbers: `Financial-Invariants.md` (P0 locks consolidated 2026-09-04) §011.
 
+## BUG-D01 — Cost basis حق تقدم → سهم
+
+```text
+New_Cost_Pool_For_New_Shares = Rights_Cost + Nominal_Value_Paid + Capitalized_Fees
+unitCost = New_Cost_Pool / shares_received
+```
+
+مرجع فرمول کامل: `docs/core/Cost-Basis-Engine.md` § BUG-D01. Realized روی تبدیل خالص = 0.

@@ -159,3 +159,8 @@ Partial unique indexes required — see `Financial-Invariants.md`.
 
 Same symbol on different venues/networks **must not** collapse into one `instrumentId` unless explicitly intentional product rule.
 USDT-TRC20 ≠ USDT-ERC20 as instruments when transferability differs.
+
+## BUG-D03 — network_identifier on registry
+
+`ref_instruments.network_identifier` (nullable) distinguishes chain-scoped assets.  
+PK remains `id` (UUID). Never `(symbol, network)` as primary key.
