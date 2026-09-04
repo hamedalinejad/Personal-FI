@@ -169,24 +169,44 @@ Runtime/schema freeze still open until engines + drift test green.
 
 P0-DOC-001…014 reintroduction prevention: `P0-DOC-CLOSED-PREVENTION.md`.
 
-## Engineering board (live) — R-001…R-015 / BUG-001…015
+## Engineering board (live) — 2026-09-05
+
+### P0 (none fully closed)
+
+| # | Title | Location | Status | Note |
+|---|--------|----------|--------|------|
+| BUG-001 | schema.sql incomplete | docs/core/db/schema.sql | Advanced Partial (~690) | drift test open; CHECKs incomplete; migration notes v1 |
+| BUG-002 | runAtomicFinancialOperation | operationEngine.js | Stub only | notImplemented |
+| BUG-003 | Write-to-temp-then-swap | persistence/worker.js | Stub only | no worker body |
+| BUG-004 | Financial invariants runtime | domain/invariants + money | Partial | canonicalDecimal + BUG-CODE helpers; other validators stub |
+| BUG-005 | Cost-Basis Engine | domain/costBasis/engine.js | Stub only | full apply() missing (helpers exist under costBasis/) |
+| BUG-006 | Loan Schedule Engine | loan/scheduleEngine.js | Stub only | no templates |
+| BUG-007 | Cash Settlement Adapter | cash/settlementAdapter.js | Stub only | no settle() |
+| BUG-008 | Instrument Identity runtime | instrument/registry.js | Partial | schema OK; registry stub |
+| BUG-009 | Golden Fixture Gate | fixtures/OPEN-004 | Partial | ~3–4 families assert; ~11 NO engine |
+| BUG-010 | Feature Independence | Feature-Independence-Contract | Stub only | no packages/ESLint |
+| BUG-011 | Price Fetching | 19-Price-Fetching | Spec only | no PriceProvider |
+| BUG-012 | Currency Cross-Rate | 17-Currency-CrossRate | Spec only | no ValuationContext code |
+| BUG-013 | Corporate Action Engine | Corporate-Action-Engine.md | Spec only | no CA transform code |
+| BUG-014 | Fixed Income Funds | Fixed-Income-Funds | Spec only | no fund engine |
+| BUG-015 | Migration strategy | 06-migration-backup-audit | Spec only | no migration runner |
+
+### P1
 
 | # | Title | Status | Note |
 |---|--------|--------|------|
-| 1 | schema.sql incomplete | Advanced Partial | ~690 lines; drift test still open |
-| 2 | runAtomicFinancialOperation | Stub only | `notImplemented` |
-| 3 | Write-to-temp-then-swap | Stub only | no real worker |
-| 4 | Financial invariants runtime | Partial | only canonicalDecimal tested (+ BUG-CODE helpers) |
-| 5 | Cost-Basis Engine | Stub only | no full apply() for all types |
-| 6 | Loan Schedule Engine | Stub only | no templates |
-| 7 | Cash Settlement Adapter | Stub only | no settle() |
-| 8 | Instrument Identity runtime | Partial | schema OK; registry stub |
-| 9 | Golden Fixture Gate | Partial | most families no engine assert |
-| 10 | Feature Independence | Stub only | no package + ESLint |
-| 11 | Price Fetching | Spec only | no PriceProvider code |
-| 12 | Currency Cross-Rate | Spec only | no ValuationContext code |
-| 13 | Corporate Action Engine | Spec only | no CA transform code |
-| 14 | Fixed Income Funds | Spec only | no fund engine |
-| 15 | Migration strategy | Spec only | no migration runner |
+| BUG-016 | Relationship Matrix | Improved | REL contracts written; edges not fully enforced |
+| BUG-017 | Field inventory | In progress | core/crypto/loan/cheque seeded; not zero gap |
+| BUG-018 | Stocks schema | Added | tables in schema; no engine |
+| BUG-019 | Metals schema | Added | tables; no engine |
+| BUG-020 | Budget/Goals schema | Added | tables; no engine |
+| BUG-021 | Tax schema | Added | tables; no engine |
+| BUG-022 | Reports schema | Added | rpt_snapshots; no engine |
+| BUG-023 | Settings schema | Added | usr_settings |
+| BUG-024 | Security schema | Missing | no encryption/security tables |
+| BUG-025 | Portfolio/Physical schema | Added | pa_* tables (physical assets lineage) |
+| BUG-026 | Multi-Tab Writer | Stub only | contract only |
+| BUG-027 | Reconciliation | Stub only | contract only |
+| BUG-028 | Integrity Engine | Stub only | contract only |
 
-**Gate:** Feature command coding **NO-GO** until rows 2–7 implement and row 9 scoped families green.
+**Feature command coding: NO-GO** until P0 BUG-002…007 implement and BUG-009 scoped families green.
