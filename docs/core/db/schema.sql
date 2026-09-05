@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   id           TEXT PRIMARY KEY,
   code         TEXT,
   name         TEXT NOT NULL,
-  account_kind TEXT NOT NULL,
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('asset','liability','equity','income','expense')),
   currency     TEXT NOT NULL,
   parent_id    TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   amount_in_base  TEXT,
   exchange_rate_to_base TEXT,
   conversion_path TEXT, -- JSON when hops > 1
-  line_number     INTEGER,
+  line_number INTEGER NOT NULL DEFAULT 1,
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','fee','tax','fx','adjustment','other')),
   memo            TEXT
 );
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   id              TEXT PRIMARY KEY,
   fin_account_id  TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   name            TEXT NOT NULL,
-  account_kind    TEXT NOT NULL,
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('bank','cash','investment','loan','credit','wallet','other')),
   currency        TEXT NOT NULL,
   iban            TEXT,
   bank_name       TEXT,
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
   network_id      TEXT, -- null = venue_offchain
   instrument_id   TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity        TEXT NOT NULL, -- net
-  total_invested  TEXT NOT NULL,
+  total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency   TEXT NOT NULL,
   created_at      TEXT NOT NULL,
   updated_at      TEXT NOT NULL
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   net_quantity    TEXT NOT NULL,
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  economic_kind   TEXT,
+  economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')),
   created_at      TEXT NOT NULL
 );
 
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
   brokerage_id TEXT NOT NULL REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity TEXT NOT NULL,
-  total_invested TEXT NOT NULL,
+  total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
@@ -422,7 +422,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','dividend','corporate_action','fee','adjustment')),
-  trade_date TEXT NOT NULL,
+  trade_date TEXT NOT NULL, -- synonym of market_date (invariant §11); business/market event date for the trade,
   settlement_date TEXT,
   quantity TEXT NOT NULL,
   price TEXT,
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_corporate_actions (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   ca_type TEXT NOT NULL CHECK (ca_type IN ('split','reverse_split','dividend','rights','bonus','merger','other')),
   ex_date TEXT,
   record_date TEXT,
@@ -456,7 +456,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_holdings (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity TEXT NOT NULL,
-  total_invested TEXT NOT NULL,
+  total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at TEXT NOT NULL,
@@ -467,7 +467,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','dividend','reinvest','fee','adjustment')), -- subscribe|redeem|distribution|reinvest|…
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment'))
   trade_date TEXT NOT NULL,
   settlement_date TEXT,
   quantity TEXT,
@@ -493,9 +493,9 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   quantity_mg TEXT NOT NULL, -- SoT mass (gross weight, mg canonical)
   purity_code TEXT, -- e.g. 24k, 18k, 750, 999, emami, bahar
   purity_ratio TEXT, -- decimal 0-1 for fine weight derivation: quantity_mg * purity_ratio
-  total_invested TEXT NOT NULL, -- historical cost (metal + premiums paid, net of fees as policy)
+  total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
-  average_cost_per_mg TEXT, -- derived / maintained by cost-basis engine
+  average_cost_per_mg TEXT, -- DERIVED: cost-basis engine rebuild only, -- derived / maintained by cost-basis engine
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -547,7 +547,7 @@ CREATE TABLE IF NOT EXISTS pa_assets (
   owner TEXT,
   depreciation_policy TEXT,
   quantity TEXT,
-  average_buy_price TEXT,
+  average_buy_price TEXT, -- DERIVED: rebuild on every tx change by cost-basis engine,
   source_feature TEXT CHECK (source_feature IS NULL OR source_feature IN ('metals','manual','import','delivery')),
   source_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_disposed INTEGER NOT NULL DEFAULT 0 CHECK (is_disposed IN (0, 1)),
@@ -599,7 +599,7 @@ CREATE TABLE IF NOT EXISTS bg_envelopes (
   budget_id TEXT NOT NULL REFERENCES bg_budgets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   category_id TEXT,
   assigned TEXT NOT NULL,
-  spent_snapshot TEXT, -- DERIVED
+  spent_snapshot TEXT, -- DERIVED: budget engine only; never user-direct UPDATE
   created_at TEXT NOT NULL
 );
 
@@ -616,7 +616,7 @@ CREATE TABLE IF NOT EXISTS fg_goals (
   name TEXT NOT NULL,
   currency TEXT NOT NULL,
   target_amount TEXT NOT NULL,
-  current_amount_snapshot TEXT, -- DERIVED
+  current_amount_snapshot TEXT, -- DERIVED: goals engine only; rebuild from contributions; never user-direct UPDATE
   target_date TEXT,
   funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup','earmark','segregated_cash'))
   status TEXT NOT NULL,
@@ -672,7 +672,8 @@ CREATE TABLE IF NOT EXISTS tax_events (
   document_id TEXT, -- link to docs_documents evidence (MR-206)
   status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')), -- draft|posted|amended|void
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+  updated_at TEXT NOT NULL,
+  CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)
 );
 
 CREATE TABLE IF NOT EXISTS cur_currencies (
@@ -684,8 +685,8 @@ CREATE TABLE IF NOT EXISTS cur_currencies (
 
 CREATE TABLE IF NOT EXISTS cur_exchange_rates (
   id TEXT PRIMARY KEY,
-  from_currency TEXT NOT NULL,
-  to_currency TEXT NOT NULL,
+  from_currency TEXT NOT NULL REFERENCES cur_currencies(code) ON DELETE RESTRICT ON UPDATE CASCADE,
+  to_currency TEXT NOT NULL REFERENCES cur_currencies(code) ON DELETE RESTRICT ON UPDATE CASCADE,
   rate TEXT NOT NULL, -- always store direct; inverse = 1/rate deterministic (MR-213)
   as_of TEXT NOT NULL, -- observation date/time (MR-215)
   source TEXT,

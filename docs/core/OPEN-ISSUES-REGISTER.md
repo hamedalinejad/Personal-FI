@@ -379,3 +379,21 @@ Still open by nature (not schema column bugs):
 | D18 snapshot_json schema | Documented required keys in schema comment |
 | D19 CA ownership | CLOSED |
 | D20 standalone mode | Documented in schema footer + Feature-Independence-Contract |
+
+## NEW-001…020 schema hardening 2026-09-05
+
+| ID | Result |
+|----|--------|
+| NEW-001 metals tx_type CHECK | already present / confirmed |
+| NEW-002 tax status CHECK | already present / confirmed |
+| NEW-003 tax operation_id | CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1) |
+| NEW-004 line_number NOT NULL | DEFAULT 1 NOT NULL |
+| NEW-005/006 account_kind CHECK | fin + acc |
+| NEW-007 economic_kind CHECK | crypto |
+| NEW-008 fif distribution not dividend | CHECK fixed |
+| NEW-009 trade_date = market_date | documented |
+| NEW-010 CA operation_id NOT NULL | fixed |
+| NEW-011 crypto_cash no DEFAULT | already fixed |
+| NEW-012 FX currency FKs | fixed |
+| NEW-013 base_currency FK | already fixed |
+| NEW-014…020 DERIVED snapshots | comments + rebuild-only contract |
