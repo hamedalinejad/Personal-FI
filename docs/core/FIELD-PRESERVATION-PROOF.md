@@ -29,3 +29,21 @@ RAW without preserve migration = 0
 ```
 
 Until inventory is complete, Gate D remains **BLOCKED**. Core money helpers may still land; Feature command code must not.
+
+---
+
+## Requirements Lock (MR-291 … MR-296) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-291 | Feature field → Data Dictionary | ✅ LOCKED | Every financial field listed in Data-Dictionary / field-inventory.checklist.tsv |
+| MR-292 | Feature field → Schema freeze row | ✅ LOCKED | SCHEMA-FREEZE-COVERAGE.md row per table/column |
+| MR-293 | Feature field → API request/response | ✅ LOCKED | API-Reference + per-feature command/query schemas echo the same fields |
+| MR-294 | Feature field → Migration disposition | ✅ LOCKED | preserve / rebuild / map / deprecated recorded in migration notes |
+| MR-295 | Feature field → Fixture or rebuild path | ✅ LOCKED | Golden fixtures (or explicit rebuild rule) per feature family |
+| MR-296 | Undocumented financial fields = 0 | ✅ LOCKED | Gate H: CI / audit fails if any financial field lacks dictionary + schema + ownership |
+
+**No-Field-Loss Gate H rule:**  
+A financial field may not ship unless it has: (1) dictionary entry, (2) schema column, (3) ownership/SoT, (4) API surface or explicit internal-only mark, (5) migration disposition, (6) fixture or rebuild path.
+
+Original amount, currency, gross/net/fee, instrumentId, FX path, operationId, reversal chain, source lineage, engine versions remain mandatory and never dropped.
