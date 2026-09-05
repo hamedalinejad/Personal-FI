@@ -255,3 +255,20 @@ Gates: see GO-NO-GO — D is PARTIAL GO after engine implementation; B/C still N
 | Remaining P0-008/010–012/019–025/027–030 | OPEN — SQLite ledger, full fixtures, feature packages |
 
 Deleted: IMPLEMENTATION-BRANCH-CODE-BUGS.md (superseded by BUG-CODE-REGRESSION-INVARIANTS.md)
+
+## 2026-09-05 Schema audit remediation (Grok pass)
+
+| Area | Action | Status |
+|------|--------|--------|
+| Income | Added `inc_transactions` + `inc_recurring` to schema.sql with operation_id, void/reversal, provenance | CLOSED |
+| Expense | Added `exp_transactions` + `exp_recurring` symmetric | CLOSED |
+| Loans | Added `ln_loan_fee_tiers` with effective range, ordering, calculation semantics | CLOSED |
+| Crypto/Stocks/Metals cash | Confirmed projection-only (inv_crypto_cash) + Core journal SoT; no ghost tables | CLOSED |
+| Budget | bg_transfers resolved as journal-linked via existing bg_transaction_links; no table | CLOSED |
+| Notifications | Canonical `not_notifications`; docs notif_* → not_ | CLOSED |
+| Reports | Canonical `rpt_snapshots`; docs rep_* → rpt_ | CLOSED |
+| Tax | `tax_events` event ledger + new `tax_categories` config | CLOSED |
+| Duplicate CREATE | Verified single CREATE for import_raw_records and fin_reconcile_runs; additive notes only | CLOSED |
+| Field no-loss | All new tables carry operation_id, source_*, import_*, FX, reversal, decimal TEXT | LOCKED |
+
+OPEN-001 residual reduced: priority domain tables now present.
