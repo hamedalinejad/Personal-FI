@@ -284,24 +284,39 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
 
 -- ─── Import preservation envelope (P0-FINAL-039) ─────────────
 CREATE TABLE IF NOT EXISTS import_raw_records (
-  id                   TEXT PRIMARY KEY,
-  source_provider      TEXT NOT NULL,
+  id                    TEXT PRIMARY KEY,
+  batch_id              TEXT NOT NULL, -- import batch (MR-230)
+  source_provider       TEXT NOT NULL,
   source_schema_version TEXT,
-  raw_record_hash      TEXT NOT NULL,
-  unknown_fields_json  TEXT,
-  payload_json         TEXT NOT NULL,
-  imported_at          TEXT NOT NULL
+  source_type           TEXT, -- csv|json|api|manual|broker_export (MR-231)
+  source_reference      TEXT, -- file name / URL / batch label (MR-232)
+  source_document_id    TEXT, -- link to docs_documents (MR-233)
+  raw_record_hash       TEXT NOT NULL, -- never destroy source identity (MR-241)
+  unknown_fields_json   TEXT,
+  payload_json          TEXT NOT NULL, -- original raw amount/date/time preserved (MR-235/236)
+  normalization_status  TEXT NOT NULL DEFAULT 'raw', -- raw|normalized|mapped|rejected (MR-237)
+  mapping_decision_json TEXT, -- mapping log (MR-238)
+  user_override_json    TEXT, -- user override + reason (MR-239)
+  reconciliation_status TEXT NOT NULL DEFAULT 'unreconciled', -- unreconciled|matched|partial|ignored (MR-240)
+  imported_at           TEXT NOT NULL,
+  created_at            TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_import_raw_batch ON import_raw_records(batch_id);
+CREATE INDEX IF NOT EXISTS idx_import_raw_hash ON import_raw_records(raw_record_hash);
+
 
 CREATE TABLE IF NOT EXISTS import_dedupe_keys (
   id              TEXT PRIMARY KEY,
   source_provider TEXT NOT NULL,
-  provider_tx_id  TEXT,
+  provider_tx_id  TEXT, -- external transaction id (MR-234)
   tx_hash         TEXT,
   log_index       TEXT,
   external_ref    TEXT,
   command_hash    TEXT,
-  operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE
+  operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  raw_record_id   TEXT REFERENCES import_raw_records(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_import_provider_tx

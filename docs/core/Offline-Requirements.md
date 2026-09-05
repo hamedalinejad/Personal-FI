@@ -101,3 +101,21 @@ When back online:
 ```
 
 PnL for a sell uses **command trade price** (or last known if policy allows mark). Missing live feed ≠ skip PnL.
+
+---
+
+## Requirements Lock (MR-242 … MR-250) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-242 | Airplane mode allows all ordinary writes | ✅ LOCKED | Offline-Requirements / Offline-Modes; no network gate on domain writes |
+| MR-243 | Airplane mode allows rebuild and reports | ✅ LOCKED | Reports & rebuild engines run fully offline |
+| MR-244 | Missing online prices = explicit stale/missing | ✅ LOCKED | Financial-Invariants §10 + price_history.is_stale / is_degraded |
+| MR-245 | Crash during persistence never half-posted | ✅ LOCKED | persistence worker: temp → COMMIT → atomic swap; durability_state machine |
+| MR-246 | Recovery reopens DB and preserves history | ✅ LOCKED | Migration-Data-Preservation + WAL recovery; history never truncated |
+| MR-247 | Backup restored on clean machine | ✅ LOCKED | Backup manifest (schemaVersion + checksums + file list) + verify-on-restore |
+| MR-248 | Attachments survive backup/restore | ✅ LOCKED | Attachment files included in backup package with per-file checksums |
+| MR-249 | License expiry cannot wipe history | ✅ LOCKED | License-Offline.md; license only gates features, never deletes ledger |
+| MR-250 | Export possible when feature disabled | ✅ LOCKED | License-Offline.md; read/export always available |
+
+Crash recovery and backup/restore are first-class offline contracts; no silent data loss.

@@ -336,3 +336,19 @@ CashSettlementPort → LocalSettlementAdapter
 | فعال‌سازی Full Accounting UI | **بدون** migration داده؛ فقط query/UI جدید روی همان DB |
 | غیرفعال کردن UI حسابداری | داده پاک **نمی‌شود** |
 
+
+---
+
+## Requirements Lock (MR-251 … MR-257) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-251 | Loan-only | ✅ LOCKED | Loan package + Core engines usable without other feature UI |
+| MR-252 | Fund-only | ✅ LOCKED | FIF package standalone |
+| MR-253 | Crypto-only | ✅ LOCKED | Crypto package standalone |
+| MR-254 | Stocks-only | ✅ LOCKED | Stocks-Iran package standalone |
+| MR-255 | Metals-only | ✅ LOCKED | Metals package standalone |
+| MR-256 | Accounting-only | ✅ LOCKED | Documented as possible future edition; Core journal + accounts + reports can run without investment packages |
+| MR-257 | Feature UI independence ≠ remove Accounting Core | ✅ LOCKED | Every financial write still goes through Canonical Financial Operation + journal; UI may hide Core but Core remains |
+
+Standalone editions share the same offline SQLite + Core accounting plane. No second ledger is allowed.
