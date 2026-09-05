@@ -9,7 +9,7 @@ test("BUG-006 declining", () => {
     periods: "12",
   });
   assert.equal(s.rows.length, 12);
-  assert.equal(Number(s.rows[11].balance), 0);
+  assert.ok(s.rows[11].balance === '0' || s.rows[11].balance === '0.00');
 });
 
 test("BUG-006 qarz", () => {
@@ -18,6 +18,6 @@ test("BUG-006 qarz", () => {
     periods: "10",
     feePercent: "0.04",
   });
-  assert.equal(s.rows[0].interest, "0");
+  assert.ok(s.rows[0].interest === "0" || s.rows[0].interest === "0.00");
   assert.ok(Number(s.rows[0].fee) > 0);
 });

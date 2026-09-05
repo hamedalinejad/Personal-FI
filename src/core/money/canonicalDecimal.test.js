@@ -26,5 +26,6 @@ test("BUG-CODE-001 normalizes -0", () => {
   assert.equal(canonicalDecimalString("-0"), "0");
 });
 test("BUG-CODE-001 accepts plain decimal", () => {
-  assert.equal(canonicalDecimalString("12.50"), "12.50");
+  assert.equal(canonicalDecimalString("12.50"), "12.5");
+  assert.equal(canonicalDecimalString("12.5"), "12.5");
 });

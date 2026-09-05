@@ -3,18 +3,14 @@ import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  runAtomicFinancialOperation,
-  _resetIdempotencyForTests,
-} from "./operationEngine.js";
+import { randomUUID } from "node:crypto";
+import { runAtomicFinancialOperation } from "./operationEngine.js";
 
 test("BUG-002 balanced journal persists", async () => {
-  _resetIdempotencyForTests();
   const dataDir = await mkdtemp(join(tmpdir(), "pf-op-"));
-  // inject dataDir via env-less: patch by passing through command apply only
   const r = await runAtomicFinancialOperation({
     type: "expense",
-    commandHash: "h1",
+    operationId: randomUUID(),
     dataDir,
     journalLines: [
       { accountId: "cash", side: "credit", amount: "100" },
@@ -27,10 +23,12 @@ test("BUG-002 balanced journal persists", async () => {
 });
 
 test("BUG-002 idempotent replay", async () => {
-  _resetIdempotencyForTests();
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-op-"));
+  const operationId = randomUUID();
   const cmd = {
     type: "expense",
-    commandHash: "same",
+    operationId,
+    dataDir,
     journalLines: [
       { accountId: "a", side: "debit", amount: "10" },
       { accountId: "b", side: "credit", amount: "10" },
@@ -42,11 +40,21 @@ test("BUG-002 idempotent replay", async () => {
   assert.equal(a.operationId, b.operationId);
 });
 
-test("BUG-002 rejects unbalanced", async () => {
-  _resetIdempotencyForTests();
+test("BUG-002 rejects missing operationId", async () => {
   await assert.rejects(() =>
     runAtomicFinancialOperation({
-      commandHash: "bad",
+      journalLines: [
+        { accountId: "a", side: "debit", amount: "10" },
+        { accountId: "b", side: "credit", amount: "10" },
+      ],
+    }),
+  );
+});
+
+test("BUG-002 rejects unbalanced", async () => {
+  await assert.rejects(() =>
+    runAtomicFinancialOperation({
+      operationId: randomUUID(),
       journalLines: [
         { accountId: "a", side: "debit", amount: "10" },
         { accountId: "b", side: "credit", amount: "9" },

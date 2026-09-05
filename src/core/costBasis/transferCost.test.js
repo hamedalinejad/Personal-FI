@@ -9,7 +9,7 @@ test("BUG-CODE-002 conserves cost", () => {
     netQuantity: "0.999",
     sourceUnitCost: "100",
   });
-  assert.equal(Number(r.sourceCostReleased), 100);
+  assert.equal(r.sourceCostReleased, '100');
   assert.ok(Math.abs(Number(r.destinationCarrying) - 99.9) < 1e-9);
   assert.ok(Math.abs(Number(r.feeCarrying) - 0.1) < 1e-9);
   assert.ok(

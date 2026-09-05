@@ -1,3 +1,5 @@
+> **Live status 2026-09-05:** `src/core` engines v1 present; not docs-only. Historical «src removed» statements are audit-only.
+
 # Architecture Locked — Pre-Coding Constitution
 
 **Status:** LOCKED for implementation design  

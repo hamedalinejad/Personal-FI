@@ -4,14 +4,23 @@ on:
     branches: [main]
   pull_request:
 jobs:
-  docs-phase:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Docs-only phase notice
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install
+        run: npm install
+      - name: Unit tests
+        run: npm test
+      - name: Schema presence
         run: |
-          echo "Implementation/tests deferred to dedicated branch."
-          echo "Canonical constitution: docs/core/ARCHITECTURE-LOCKED.md"
+          test -f docs/core/db/schema.sql
           test -f docs/core/ARCHITECTURE-LOCKED.md
           test -f docs/core/GO-NO-GO.md
-          test ! -d src
+          test -d src
+      - name: Schema drift smoke
+        run: node scripts/schema-drift-smoke.js

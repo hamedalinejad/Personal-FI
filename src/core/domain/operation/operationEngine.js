@@ -1,46 +1,64 @@
-import { randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { runInvariantGate } from "../invariants/index.js";
 import { persistOperation } from "../../persistence/worker.js";
 
-/**
- * In-memory idempotency store (process-local). Production → durable table.
- */
-const idempotency = new Map();
+function stableHash(obj) {
+  return createHash("sha256").update(JSON.stringify(obj)).digest("hex");
+}
+
+async function loadIdempotency(dir) {
+  try {
+    return JSON.parse(await readFile(join(dir, "idempotency.json"), "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+async function saveIdempotency(dir, map) {
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, "idempotency.json"), JSON.stringify(map, null, 0));
+}
 
 /**
- * runAtomicFinancialOperation
- * validate → domain apply (caller plan) → journal balance → persist
+ * P0-006/007 — durable idempotency + required operationId
  */
 export async function runAtomicFinancialOperation(command) {
-  if (!command || typeof command !== "object") {
-    throw new Error("OP_INVALID_COMMAND");
-  }
-  const commandHash =
-    command.commandHash ||
-    command.operationId ||
-    JSON.stringify({
-      type: command.type,
-      payload: command.payload,
-    });
-
-  if (idempotency.has(commandHash)) {
-    return { ...idempotency.get(commandHash), idempotentReplay: true };
+  if (!command || typeof command !== "object") throw new Error("OP_INVALID_COMMAND");
+  if (!command.operationId || typeof command.operationId !== "string") {
+    throw new Error("OP_OPERATION_ID_REQUIRED");
   }
 
-  const operationId = command.operationId || randomUUID();
+  const dataDir = command.dataDir || join(process.cwd(), ".pf-data");
+  const payloadForHash = {
+    type: command.type,
+    payload: command.payload ?? null,
+    journalLines: command.journalLines || [],
+  };
+  const commandHash = command.commandHash || stableHash(payloadForHash);
+
+  const idMap = await loadIdempotency(dataDir);
+  const prev = idMap[command.operationId];
+  if (prev) {
+    if (prev.commandHash !== commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
+    return { ...prev.result, idempotentReplay: true };
+  }
+
   const journalLines = command.journalLines || [];
-  runInvariantGate({
-    journalLines,
-    rates: command.rates || [],
-  });
+  runInvariantGate({ journalLines, rates: command.rates || [] });
 
+  // Domain apply only after validation; persistence is single boundary
   const domainResult =
     typeof command.applyDomain === "function"
-      ? await command.applyDomain({ operationId, payload: command.payload })
+      ? await command.applyDomain({
+          operationId: command.operationId,
+          payload: command.payload,
+        })
       : command.domainResult || null;
 
   const record = {
-    operationId,
+    operationId: command.operationId,
     commandHash,
     type: command.type || "unknown",
     journalLines,
@@ -49,7 +67,7 @@ export async function runAtomicFinancialOperation(command) {
     createdAt: new Date().toISOString(),
   };
 
-  const persisted = await persistOperation(record, { dataDir: command.dataDir });
+  const persisted = await persistOperation(record, { dataDir });
   const result = {
     operationId: persisted.operationId,
     commandHash,
@@ -58,10 +76,11 @@ export async function runAtomicFinancialOperation(command) {
     domainResult,
     idempotentReplay: false,
   };
-  idempotency.set(commandHash, result);
+  idMap[command.operationId] = { commandHash, result };
+  await saveIdempotency(dataDir, idMap);
   return result;
 }
 
 export function _resetIdempotencyForTests() {
-  idempotency.clear();
+  /* tests use isolated dataDir */
 }

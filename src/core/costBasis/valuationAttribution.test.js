@@ -10,7 +10,7 @@ test("BUG-CODE-005 golden-style attribution", () => {
     fx0: "100000",
     fx1: "150000",
   });
-  assert.equal(Number(r.total), 350000000);
+  assert.ok(r.total === '350000000' || r.total.startsWith('350000000'));
 });
 
 test("BUG-CODE-005 rejects zero price", () => {

@@ -275,3 +275,11 @@ Income/Expense standalone must state whether CashSettlementPort local account is
 
 ## Status: IE-001…IE-007 **LOCKED** 2026-09-02
 
+## P0-013 — Cash path (LOCKED)
+
+```text
+API command → runAtomicFinancialOperation → domain → fin_journal_lines
+acc_transactions = projection/event only
+FORBIDDEN: direct currentBalance mutate as cash SoT
+FORBIDDEN: feature-local reversal engine (use Core reverse)
+```

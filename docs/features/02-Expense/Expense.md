@@ -257,3 +257,11 @@ Feature-local dual-layer void+reversal **ممنوع**.
 
 Shared IE-001…IE-007: `docs/features/01-Income/INCOME-EXPENSE-IE-001-007-LOCKS.md`
 
+## P0-013 — Cash path (LOCKED)
+
+```text
+API command → runAtomicFinancialOperation → domain → fin_journal_lines
+acc_transactions = projection/event only
+FORBIDDEN: direct currentBalance mutate as cash SoT
+FORBIDDEN: feature-local reversal engine (use Core reverse)
+```

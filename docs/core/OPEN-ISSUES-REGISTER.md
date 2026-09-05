@@ -238,3 +238,20 @@ Gates: see GO-NO-GO — D is PARTIAL GO after engine implementation; B/C still N
 | OPEN-010 | Date contract | CLOSED | — |
 | OPEN-011 | Fund identity schema | CLOSED | schema enforce done |
 | OPEN-012 | Crypto holding identity | CLOSED | — |
+
+
+## P0-001…030 progress (2026-09-05)
+
+| Band | Status |
+|------|--------|
+| P0-001 CI | FIXED — npm test + schema smoke; src required |
+| P0-002…005,026 Decimal | FIXED — decimal.js, no Number money path |
+| P0-006/007 operationId + durable idempotency file | FIXED v1 |
+| P0-009 duplicate CREATE | FIXED |
+| P0-013 Income/Expense cash path lock | FIXED prose |
+| P0-014 ARCHITECTURE-LOCKED live status | FIXED |
+| P0-017 reconcile | FIXED v1 detect/approve plan |
+| P0-018 loan residual last period | IMPROVED |
+| Remaining P0-008/010–012/019–025/027–030 | OPEN — SQLite ledger, full fixtures, feature packages |
+
+Deleted: IMPLEMENTATION-BRANCH-CODE-BUGS.md (superseded by BUG-CODE-REGRESSION-INVARIANTS.md)

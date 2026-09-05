@@ -1,29 +1,10 @@
-import { canonicalDecimalString } from "../money/canonicalDecimal.js";
-
-/**
- * BUG-CODE-006 / 007 — type-aware fixture compare; reject JSON number primitives for money
- */
+import { canonicalDecimalString, toDecimal } from "../money/canonicalDecimal.js";
 
 const MONEY_KEYS = new Set([
-  "amount",
-  "quantity",
-  "price",
-  "fee",
-  "rate",
-  "totalInvested",
-  "cost",
-  "pnl",
-  "balance",
-  "nav",
+  "amount", "quantity", "price", "fee", "rate", "totalInvested", "cost", "pnl", "balance", "nav",
 ]);
-
 const ID_KEYS = new Set([
-  "id",
-  "operationId",
-  "instrumentId",
-  "holdingId",
-  "accountId",
-  "commandHash",
+  "id", "operationId", "instrumentId", "holdingId", "accountId", "commandHash",
 ]);
 
 export function assertNoJsonNumbers(value, path = "$") {
@@ -43,7 +24,7 @@ export function assertNoJsonNumbers(value, path = "$") {
 
 export function assertExpected(actual, expected, path = "$") {
   if (expected === null || expected === undefined) {
-    assert.equal(actual, expected);
+    if (actual !== expected) throw new Error(`ASSERT ${path}`);
     return;
   }
   if (typeof expected === "object" && !Array.isArray(expected)) {
@@ -52,22 +33,12 @@ export function assertExpected(actual, expected, path = "$") {
       const e = expected[key];
       const a = actual?.[key];
       if (ID_KEYS.has(key) || key.endsWith("Id")) {
-        if (String(a) !== String(e)) {
-          throw new Error(`ID_MISMATCH ${p}: ${a} !== ${e}`);
-        }
+        if (String(a) !== String(e)) throw new Error(`ID_MISMATCH ${p}: ${a} !== ${e}`);
         continue;
       }
-      if (
-        MONEY_KEYS.has(key) ||
-        typeof e === "string" && /^-?\d+(\.\d+)?$/.test(e) && key.toLowerCase().includes("amount")
-      ) {
-        const ca = canonicalDecimalString(String(a));
-        const ce = canonicalDecimalString(String(e));
-        if (Number(ca) !== Number(ce) && ca !== ce) {
-          // allow equivalent numeric string forms after canonicalize path
-          if (Number(ca) !== Number(ce)) {
-            throw new Error(`MONEY_MISMATCH ${p}: ${a} !== ${e}`);
-          }
+      if (MONEY_KEYS.has(key) || (typeof e === "string" && key.toLowerCase().includes("amount"))) {
+        if (!toDecimal(String(a)).eq(toDecimal(String(e)))) {
+          throw new Error(`MONEY_MISMATCH ${p}: ${a} !== ${e}`);
         }
         continue;
       }
@@ -82,15 +53,5 @@ export function assertExpected(actual, expected, path = "$") {
     expected.forEach((e, i) => assertExpected(actual[i], e, `${path}[${i}]`));
     return;
   }
-  // exact for non-money scalars
-  if (actual !== expected) {
-    throw new Error(`VALUE_MISMATCH ${path}: ${actual} !== ${expected}`);
-  }
+  if (actual !== expected) throw new Error(`VALUE_MISMATCH ${path}: ${actual} !== ${expected}`);
 }
-
-// local assert.equal without importing node assert in non-test
-const assert = {
-  equal(a, b) {
-    if (a !== b) throw new Error(`ASSERT ${a} !== ${b}`);
-  },
-};
