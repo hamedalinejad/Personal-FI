@@ -52,11 +52,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_operations_command_hash
 
 CREATE TABLE IF NOT EXISTS fin_journal_entries (
   id            TEXT PRIMARY KEY,
-  operation_id  TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  operation_id  TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- entry exists only for posted path; status is on operation
   business_date TEXT NOT NULL,
   memo          TEXT,
   created_at    TEXT NOT NULL,
-  reference_number TEXT
+  reference_number TEXT,
+  fiscal_period_id TEXT  -- optional; FK to fiscal_periods when table exists
 );
 
 CREATE TABLE IF NOT EXISTS fin_journal_lines (
@@ -71,7 +72,8 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   conversion_path TEXT, -- JSON when hops > 1
   line_number INTEGER NOT NULL DEFAULT 1,
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','fee','tax','fx','adjustment','other')),
-  memo            TEXT
+  memo            TEXT,
+  reference TEXT
 );
 
 CREATE TABLE IF NOT EXISTS fin_audit_log (
@@ -92,7 +94,7 @@ CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
   scope          TEXT NOT NULL,
   as_of          TEXT,
   status         TEXT NOT NULL CHECK (status IN ('running','completed','failed','cancelled')),
-  result_json    TEXT,
+  result_json    TEXT, -- schema: {matched:n, unmatched:n, differences:[], asOf, baseCurrency}
   reconciled_by  TEXT,
   created_at     TEXT NOT NULL,
   base_currency TEXT,
@@ -174,7 +176,7 @@ CREATE TABLE IF NOT EXISTS price_sources (
   id       TEXT PRIMARY KEY,
   name     TEXT NOT NULL,
   priority INTEGER NOT NULL DEFAULT 100 CHECK (priority >= 0), -- lower = higher priority (MR-216)
-  kind     TEXT, -- manual|csv_import|online_adapter|local_cache
+  kind     TEXT, -- NULL = unknown/legacy; else manual|csv_import|online_adapter|local_cache, -- manual|csv_import|online_adapter|local_cache
   is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
   created_at TEXT
 );
@@ -734,11 +736,11 @@ CREATE TABLE IF NOT EXISTS rpt_snapshots (
   report_kind TEXT NOT NULL CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')),
   as_of TEXT NOT NULL,
   payload_json TEXT NOT NULL, -- schema per report_kind: see Essential-Reports.md (net_worth|cash_flow|pnl|balance_sheet|tax|allocation|fees)
-  ledger_watermark TEXT,
+  ledger_watermark TEXT, -- opaque hash/version string of ledger state
   price_as_of TEXT,
   fx_as_of TEXT,
   engine_versions TEXT,
-  calculation_context_hash TEXT,
+  calculation_context_hash TEXT, -- hash of engines+asOf+FX+price context for reproducibility
   rebuilt_at TEXT NOT NULL
 );
 
@@ -1088,7 +1090,7 @@ CREATE TABLE IF NOT EXISTS sec_session_logs (
   id         TEXT PRIMARY KEY,
   event_type TEXT NOT NULL CHECK (event_type IN ('start','end','lock','unlock','timeout')),
   at         TEXT NOT NULL,
-  detail     TEXT
+  detail     TEXT, -- no PII/secrets; sanitized only
 );
 
 -- Price sync settings (opt-in online)
@@ -1177,3 +1179,7 @@ CREATE INDEX IF NOT EXISTS idx_exp_reversed ON exp_transactions(reversed_expense
 --   principal, cheque amount, journal line amount > 0
 -- See Financial-Invariants.md + BUG-CODE regression suite.
 -- ═══════════════════════════════════════════════════════════
+
+
+-- Domain validators (NEW-131,133-135,138): at least one is_primary per network;
+-- pa quantity/avg/cost > 0 when present; RRULE format for recurrence fields.

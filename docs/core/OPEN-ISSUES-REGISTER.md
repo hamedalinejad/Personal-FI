@@ -428,3 +428,20 @@ Applied in schema.sql:
 
 Already OK / previously fixed: NEW-001…034, 053–056, 059–065, 132, 171, 196–199
 Domain-only (decimal.js): positive amounts, fee consistency, reverse targets, RRULE, Sayadi, etc.
+
+## NEW-121…150 residual close 2026-09-06
+
+| ID | Result |
+|----|--------|
+| 121 failed_at/voided_at | already present |
+| 122 reverses index | already present |
+| 123 reference_number | already present |
+| 124 fiscal_period_id | ADDED (nullable; fiscal_periods table future) |
+| 125 journal status | documented via operation_id comment |
+| 126 line reference | ADDED |
+| 127–128 reconcile | schema comment + base_currency already |
+| 129–130 quote_type/kind | CHECK + NULL=legacy doc |
+| 131,133-135,138 | domain validators |
+| 136-137,139,141,146-147,150 | already CHECK |
+| 142-143 watermark/hash | format comments |
+| 148 session detail | no PII documented |
