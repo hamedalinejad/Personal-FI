@@ -1,9 +1,24 @@
-/** @typedef {import('../../types.js').DecimalString} DecimalString */
-/**
- * STUB — BUG implementation target.
- * Spec: see docs/core and REQUIREMENTS-IMPLEMENTATION-ROADMAP.md
- * File: src/core/domain/stocks/corporateAction.js
- */
-export function notImplemented(op = "corporateAction") {
-  throw new Error(`NOT_IMPLEMENTED:${op}`);
+import { toNum, assertPositive } from "../../money/decimalMath.js";
+
+export function applyCorporateAction(holding, { type, ratio }) {
+  const q = toNum(holding.quantity || "0");
+  const cost = toNum(holding.totalInvested || "0");
+  const r = assertPositive(ratio);
+  switch (type) {
+    case "bonus":
+    case "split":
+      return {
+        quantity: String(q * r),
+        totalInvested: String(cost),
+        averageCost: q * r === 0 ? "0" : String(cost / (q * r)),
+      };
+    case "reverse_split":
+      return {
+        quantity: String(q / r),
+        totalInvested: String(cost),
+        averageCost: q / r === 0 ? "0" : String(cost / (q / r)),
+      };
+    default:
+      throw new Error(`CA_TYPE_UNKNOWN:${type}`);
+  }
 }

@@ -1,0 +1,1 @@
+{"operationId":"51df01ab-110f-4c6a-b89b-59c8b04e561a","commandHash":"same","type":"expense","journalLines":[{"accountId":"a","side":"debit","amount":"10"},{"accountId":"b","side":"credit","amount":"10"}],"domainResult":null,"durability_state":"swapped","createdAt":"2026-09-05T02:14:50.642Z"}

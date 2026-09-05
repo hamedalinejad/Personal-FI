@@ -688,3 +688,17 @@ CREATE INDEX IF NOT EXISTS idx_price_history_instr_date ON price_history(instrum
 -- import_raw_records.source_file_name
 -- created_by/updated_by on major tables via migration v2
 
+
+
+CREATE TABLE IF NOT EXISTS sec_encryption_meta (
+  id TEXT PRIMARY KEY,
+  scheme TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sec_access_log (
+  id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  detail TEXT
+);

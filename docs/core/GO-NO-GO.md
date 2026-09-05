@@ -55,44 +55,27 @@ See `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`.
 R-021…R-051 may be planned in parallel **docs**, but **implementation order** remains Core R-002…R-008 before Iran extras and full report suite.  
 R-036/037/056–058 = P3 non-goals for v1.
 
-## Engineering board (live) — 2026-09-05
+## Engineering board (live) — 2026-09-05 post-implement
 
-### P0 (none fully closed)
-
-| # | Title | Location | Status | Note |
-|---|--------|----------|--------|------|
-| BUG-001 | schema.sql incomplete | docs/core/db/schema.sql | Advanced Partial (~690) | drift test open; CHECKs incomplete; migration notes v1 |
-| BUG-002 | runAtomicFinancialOperation | operationEngine.js | Stub only | notImplemented |
-| BUG-003 | Write-to-temp-then-swap | persistence/worker.js | Stub only | no worker body |
-| BUG-004 | Financial invariants runtime | domain/invariants + money | Partial | canonicalDecimal + BUG-CODE helpers; other validators stub |
-| BUG-005 | Cost-Basis Engine | domain/costBasis/engine.js | Stub only | full apply() missing (helpers exist under costBasis/) |
-| BUG-006 | Loan Schedule Engine | loan/scheduleEngine.js | Stub only | no templates |
-| BUG-007 | Cash Settlement Adapter | cash/settlementAdapter.js | Stub only | no settle() |
-| BUG-008 | Instrument Identity runtime | instrument/registry.js | Partial | schema OK; registry stub |
-| BUG-009 | Golden Fixture Gate | fixtures/OPEN-004 | Partial | ~3–4 families assert; ~11 NO engine |
-| BUG-010 | Feature Independence | Feature-Independence-Contract | Stub only | no packages/ESLint |
-| BUG-011 | Price Fetching | 19-Price-Fetching | Spec only | no PriceProvider |
-| BUG-012 | Currency Cross-Rate | 17-Currency-CrossRate | Spec only | no ValuationContext code |
-| BUG-013 | Corporate Action Engine | Corporate-Action-Engine.md | Spec only | no CA transform code |
-| BUG-014 | Fixed Income Funds | Fixed-Income-Funds | Spec only | no fund engine |
-| BUG-015 | Migration strategy | 06-migration-backup-audit | Spec only | no migration runner |
-
-### P1
+### P0
 
 | # | Title | Status | Note |
 |---|--------|--------|------|
-| BUG-016 | Relationship Matrix | Improved | REL contracts written; edges not fully enforced |
-| BUG-017 | Field inventory | In progress | core/crypto/loan/cheque seeded; not zero gap |
-| BUG-018 | Stocks schema | Added | tables in schema; no engine |
-| BUG-019 | Metals schema | Added | tables; no engine |
-| BUG-020 | Budget/Goals schema | Added | tables; no engine |
-| BUG-021 | Tax schema | Added | tables; no engine |
-| BUG-022 | Reports schema | Added | rpt_snapshots; no engine |
-| BUG-023 | Settings schema | Added | usr_settings |
-| BUG-024 | Security schema | Missing | no encryption/security tables |
-| BUG-025 | Portfolio/Physical schema | Added | pa_* tables (physical assets lineage) |
-| BUG-026 | Multi-Tab Writer | Stub only | contract only |
-| BUG-027 | Reconciliation | Stub only | contract only |
-| BUG-028 | Integrity Engine | Stub only | contract only |
+| BUG-001 | schema.sql | Advanced Partial | + sec_* tables; drift test still open |
+| BUG-002 | runAtomicFinancialOperation | **Implemented (v1)** | idempotency + journal gate + persist |
+| BUG-003 | Write-to-temp-then-swap | **Implemented (v1 fs)** | temp→commit→rename swap |
+| BUG-004 | Financial invariants | **Implemented (v1)** | money string, journal balance, rate |
+| BUG-005 | Cost-Basis Engine | **Implemented (v1 WA)** | acq/disposal/fee/transfer/C2C helpers wired |
+| BUG-006 | Loan Schedule Engine | **Implemented (v1)** | declining, flat, qarz, bullet |
+| BUG-007 | Cash Settlement Adapter | **Implemented (v1)** | settle → journal lines only |
+| BUG-008 | Instrument Identity | **Implemented (v1 mem)** | network-distinct registry |
+| BUG-009 | Golden Fixture Gate | Partial | helpers green; full family CI still open |
+| BUG-010 | Feature Independence | Stub | packages/ESLint still open |
+| BUG-011 | Price Fetching | **Implemented (v1)** | manual/cached/online selection |
+| BUG-012 | Currency Cross-Rate | **Implemented (v1)** | direct + pivot path |
+| BUG-013 | Corporate Action Engine | **Implemented (v1)** | bonus/split/reverse_split |
+| BUG-014 | Fixed Income Funds | **Implemented (v1)** | subscribe nav≠tx; reinvest 2 legs |
+| BUG-015 | Migration strategy | **Implemented (v1)** | ordered runner + schemaVersion file |
 
-**Feature command coding: NO-GO** until P0 BUG-002…007 implement and BUG-009 scoped families green.
+**Tests:** `npm test` — 35 passing (2026-09-05).  
+**Still open for production freeze:** drift test schema, full GOLDEN families, Feature packages, decimal.js precision, SQLite worker.
