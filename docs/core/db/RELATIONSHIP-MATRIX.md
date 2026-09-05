@@ -157,3 +157,20 @@ Expense reverse → reverse link effect (restore envelope)
 - [ ] Runtime engines enforce all edges
 - [ ] Drift test schema ↔ matrix = 0
 - [ ] Field inventory complete for related tables
+
+## Income / Expense (2026-09-05)
+
+| From | To | FK / rule | ON DELETE |
+|------|-----|-----------|-----------|
+| inc_transactions.operation_id | fin_operations.id | FK | RESTRICT |
+| inc_transactions.account_id | acc_accounts.id | FK | RESTRICT |
+| inc_transactions.category_id | cat_categories.id | FK | SET NULL |
+| inc_transactions.account_transaction_id | acc_transactions.id | FK | SET NULL |
+| inc_transactions.reversed_income_id | inc_transactions.id | FK | RESTRICT |
+| inc_recurring.account_id | acc_accounts.id | FK | RESTRICT |
+| exp_transactions.* | (symmetric to Income) | | |
+| ln_loan_fee_tiers.loan_id | ln_loans.id | FK | RESTRICT |
+
+**Ownership:** Domain rows for UX/metadata/recurring; Journal + fin_operations for accounting truth. Standalone feature use allowed (operation_id nullable only if pure draft; posted requires it).
+
+**Cash:** never stored in inc/exp tables; always via CashSettlementPort → journal lines.
