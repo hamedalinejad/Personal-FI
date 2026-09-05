@@ -11,7 +11,7 @@
 
 | ID | Requirement | Doc home | Current state | Implementation method | Acceptance |
 |----|-------------|----------|---------------|----------------------|------------|
-| **R-001** | Full `schema.sql` | `db/01-schema-tables.md`, `db/schema.sql`, OPEN-001 | **Advanced partial** (~690 lines; feature tables added; drift test still open) | Finish remaining columns/CHECKs; migration notes v1; drift test docs↔schema = 0 | OPEN-001 CLOSED |
+| **R-001** | Full `schema.sql` | `db/01-schema-tables.md`, `db/schema.sql`, OPEN-001 | **Advanced** (Income/Expense/ln_loan_fee_tiers/tax_categories added 2026-09-05; namespaces locked; no duplicate CREATE) | Finish remaining CHECKs/indexes; drift test docs↔schema = 0; full column inventory | OPEN-001 residual reduced |
 | **R-002** | `runAtomicFinancialOperation` | `Canonical-Financial-Operation.md` + `src/core/domain/operation/operationEngine.js` | **Stub only** (`notImplemented`) | Implement validate → domain → journal balance → projections → persist + commandHash idempotency | Retry same commandHash → one op |
 | **R-003** | Write-to-temp-then-swap | `Persistence-State-Machine.md` + `src/core/persistence/worker.js` | **Stub only** | Worker: temp → COMMIT → swap → UI success | Crash mid-write → no corrupt primary |
 | **R-004** | Financial invariants runtime | `CANONICAL-FINANCIAL-REQUIREMENTS.md` + `src/core/domain/invariants/` + `money/canonicalDecimal.js` | **Partial** (decimal boundary tested; other validators stub) | Wire all invariants into OperationEngine before persist | Invariant tests green |
@@ -196,3 +196,23 @@ Do not delete files outside this table without a new explicit decision.
 | OPEN-010 | Date contract | CLOSED | — |
 | OPEN-011 | Fund identity schema | CLOSED | schema enforce done |
 | OPEN-012 | Crypto holding identity | CLOSED | — |
+
+---
+
+## 2026-09-05 status note (Grok audit)
+
+**Schema (R-001):** domain tables for Income, Expense, Loan fee tiers, tax_categories added. Cash SoT remains Core-only. Namespaces locked (`not_`, `rpt_`). Duplicate CREATE defect verified absent.
+
+**File lifecycle:** pure pointer files (`Naming-Glossary.md`, root `Rounding-Policy.md`, `DOCUMENTATION-STYLE-P2.md`) deleted after zero-reference update. Feature `*-LOCKS.md` pointers retained (still referenced from feature main docs; optional delete after full lock text migration).
+
+**Still incomplete (priority order for next implementation branch):**
+1. R-001 residual — full column CHECKs + drift test
+2. R-002 / R-003 — atomic op + durable WAL/temp-swap
+3. R-004 / R-005 / R-006 / R-007 — invariants, cost-basis, loan schedule (Iran templates), cash settlement
+4. R-008 / R-010 / R-011 — instrument registry, price, FX multi-hop
+5. R-012 / R-013 / R-021–033 — CA, funds, Iran bank interest/broker fees/loans
+6. R-038–044 — classic accounting reports (BS/P&L/CF/Journal/GL)
+7. R-014 / R-015 / R-047–051 — migrations, fixtures/CI, shell/security/Jalali/i18n/encryption
+8. Explicit v1 exclusions (R-036/037/056/057/058) remain out of scope
+
+No code on main; all above are docs-tracked for the implementation branch.
