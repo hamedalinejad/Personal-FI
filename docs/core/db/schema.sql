@@ -41,7 +41,10 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   reverses_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
   created_at        TEXT NOT NULL,
-  posted_at         TEXT
+  posted_at         TEXT,
+  CHECK (status != 'posted' OR command_hash IS NOT NULL),
+  failed_at TEXT,
+  voided_at TEXT
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_operations_command_hash
@@ -52,7 +55,8 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   operation_id  TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date TEXT NOT NULL,
   memo          TEXT,
-  created_at    TEXT NOT NULL
+  created_at    TEXT NOT NULL,
+  reference_number TEXT
 );
 
 CREATE TABLE IF NOT EXISTS fin_journal_lines (
@@ -73,12 +77,12 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
 CREATE TABLE IF NOT EXISTS fin_audit_log (
   id            TEXT PRIMARY KEY,
   actor         TEXT,
-  source        TEXT,
+  source TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system','user')),
   reason        TEXT,
   operation_id  TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  entity_type   TEXT,
+  entity_type TEXT CHECK (entity_type IS NULL OR entity_type IN ('operation','journal_entry','journal_line','account','instrument','loan','cheque','import','settings')),
   entity_id     TEXT,
-  action        TEXT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('create','update','delete','void','reverse','rebuild','repair','import','export','login','logout','post')),
   at            TEXT NOT NULL,
   payload_json  TEXT
 );
@@ -90,7 +94,9 @@ CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
   status         TEXT NOT NULL CHECK (status IN ('running','completed','failed','cancelled')),
   result_json    TEXT,
   reconciled_by  TEXT,
-  created_at     TEXT NOT NULL
+  created_at     TEXT NOT NULL,
+  base_currency TEXT,
+  valuation_context_json TEXT
 );
 
 -- ─── Instrument registry (BUG-D03 / B-001 identity) ──────────
@@ -120,7 +126,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_ref_instr_chain_native_symbol
 CREATE TABLE IF NOT EXISTS ref_parties (
   id         TEXT PRIMARY KEY,
   display_name TEXT NOT NULL,
-  party_kind TEXT,
+  party_kind TEXT CHECK (party_kind IS NULL OR party_kind IN ('individual','company','bank','brokerage','government','other')),
   created_at TEXT NOT NULL
 );
 
@@ -167,7 +173,7 @@ CREATE TABLE IF NOT EXISTS acc_transaction_links (
 CREATE TABLE IF NOT EXISTS price_sources (
   id       TEXT PRIMARY KEY,
   name     TEXT NOT NULL,
-  priority INTEGER NOT NULL DEFAULT 100, -- lower = higher priority (MR-216)
+  priority INTEGER NOT NULL DEFAULT 100 CHECK (priority >= 0), -- lower = higher priority (MR-216)
   kind     TEXT, -- manual|csv_import|online_adapter|local_cache
   is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
   created_at TEXT
@@ -524,7 +530,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_physical_deliveries (
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   metals_holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   pa_asset_id TEXT REFERENCES pa_assets(id) ON DELETE SET NULL ON UPDATE CASCADE,
-  status TEXT NOT NULL, -- requested|processing|delivered|cancelled
+  status TEXT NOT NULL CHECK (status IN ('requested','processing','delivered','cancelled')),
   quantity_mg TEXT NOT NULL,
   fee_amount TEXT, -- delivery/logistics fee (separate from trade fee)
   fee_currency TEXT,
@@ -639,7 +645,7 @@ CREATE TABLE IF NOT EXISTS br_items (
   amount TEXT NOT NULL,
   currency TEXT NOT NULL,
   recurrence_rule TEXT,
-  status TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('active','paused','completed','cancelled')),
   created_at TEXT NOT NULL
 );
 
@@ -690,7 +696,7 @@ CREATE TABLE IF NOT EXISTS cur_exchange_rates (
   rate TEXT NOT NULL, -- always store direct; inverse = 1/rate deterministic (MR-213)
   as_of TEXT NOT NULL, -- observation date/time (MR-215)
   source TEXT,
-  source_priority INTEGER NOT NULL DEFAULT 100,
+  source_priority INTEGER NOT NULL DEFAULT 100 CHECK (source_priority >= 0),
   conversion_path TEXT, -- JSON multi-hop when used (MR-214)
   is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)),
   created_at TEXT NOT NULL
@@ -706,7 +712,7 @@ CREATE TABLE IF NOT EXISTS cur_currency_preferences (
 CREATE TABLE IF NOT EXISTS cat_categories (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  kind TEXT, -- income|expense|…
+  kind TEXT CHECK (kind IS NULL OR kind IN ('income','expense','transfer','system')), -- income|expense|…
   parent_id TEXT REFERENCES cat_categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1))
 );
@@ -714,7 +720,7 @@ CREATE TABLE IF NOT EXISTS cat_categories (
 CREATE TABLE IF NOT EXISTS not_notifications (
   id TEXT PRIMARY KEY,
   dedupe_key TEXT NOT NULL UNIQUE,
-  category TEXT,
+  category TEXT CHECK (category IS NULL OR category IN ('system','reminder','alert','reconcile','price','loan','bill','tax')),
   title TEXT NOT NULL,
   body TEXT,
   is_read INTEGER NOT NULL DEFAULT 0 CHECK (is_read IN (0, 1)),
@@ -725,7 +731,7 @@ CREATE TABLE IF NOT EXISTS not_notifications (
 
 CREATE TABLE IF NOT EXISTS rpt_snapshots (
   id TEXT PRIMARY KEY,
-  report_kind TEXT NOT NULL,
+  report_kind TEXT NOT NULL CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')),
   as_of TEXT NOT NULL,
   payload_json TEXT NOT NULL, -- schema per report_kind: see Essential-Reports.md (net_worth|cash_flow|pnl|balance_sheet|tax|allocation|fees)
   ledger_watermark TEXT,
@@ -776,7 +782,7 @@ CREATE INDEX IF NOT EXISTS idx_price_history_instr_date ON price_history(instrum
 
 CREATE TABLE IF NOT EXISTS sec_encryption_meta (
   id TEXT PRIMARY KEY,
-  scheme TEXT NOT NULL,
+  scheme TEXT NOT NULL CHECK (scheme IN ('aes-256-gcm','aes-256-cbc','none')),
   created_at TEXT NOT NULL
 );
 
@@ -832,7 +838,8 @@ CREATE TABLE IF NOT EXISTS inc_transactions (
   source_reference        TEXT,
   import_batch_id         TEXT,
   created_at              TEXT NOT NULL,
-  updated_at              TEXT NOT NULL
+  updated_at              TEXT NOT NULL,
+  voided_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS inc_recurring (
@@ -843,7 +850,7 @@ CREATE TABLE IF NOT EXISTS inc_recurring (
   account_id      TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   category_id     TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
   description     TEXT,
-  interval_kind   TEXT NOT NULL, -- monthly|weekly|yearly|custom
+  interval_kind TEXT NOT NULL CHECK (interval_kind IN ('daily','weekly','monthly','yearly','custom')), -- monthly|weekly|yearly|custom
   interval_value  INTEGER, -- for custom
   start_date      TEXT NOT NULL,
   end_date        TEXT,
@@ -878,7 +885,8 @@ CREATE TABLE IF NOT EXISTS exp_transactions (
   source_reference        TEXT,
   import_batch_id         TEXT,
   created_at              TEXT NOT NULL,
-  updated_at              TEXT NOT NULL
+  updated_at              TEXT NOT NULL,
+  voided_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS exp_recurring (
@@ -889,7 +897,7 @@ CREATE TABLE IF NOT EXISTS exp_recurring (
   account_id      TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   category_id     TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
   description     TEXT,
-  interval_kind   TEXT NOT NULL,
+  interval_kind TEXT NOT NULL CHECK (interval_kind IN ('daily','weekly','monthly','yearly','custom')),
   interval_value  INTEGER,
   start_date      TEXT NOT NULL,
   end_date        TEXT,
@@ -914,8 +922,8 @@ CREATE TABLE IF NOT EXISTS ln_loan_fee_tiers (
   is_percentage   INTEGER NOT NULL DEFAULT 0 CHECK (is_percentage IN (0, 1)),
   min_amount      TEXT,
   max_amount      TEXT,
-  day_count       TEXT, -- actual/365|30/360|...
-  calculation_base TEXT, -- principal|outstanding|installment
+  day_count TEXT CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual')), -- actual/365|30/360|...
+  calculation_base TEXT CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment')), -- principal|outstanding|installment
   created_at      TEXT NOT NULL
 );
 
@@ -959,7 +967,7 @@ CREATE TABLE IF NOT EXISTS docs_documents (
   mime_type    TEXT,
   storage_path TEXT NOT NULL,
   checksum     TEXT,
-  size_bytes   INTEGER,
+  size_bytes INTEGER CHECK (size_bytes IS NULL OR size_bytes >= 0),
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
 );
@@ -967,7 +975,7 @@ CREATE TABLE IF NOT EXISTS docs_documents (
 CREATE TABLE IF NOT EXISTS docs_links (
   id          TEXT PRIMARY KEY,
   document_id TEXT NOT NULL REFERENCES docs_documents(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  entity_type TEXT NOT NULL, -- pa_asset|tax_event|loan|cheque|import_raw|...
+  entity_type TEXT NOT NULL CHECK (entity_type IN ('pa_asset','tax_event','loan','cheque','import_raw','operation','instrument','account','goal','budget')), -- pa_asset|tax_event|loan|cheque|import_raw|...
   entity_id   TEXT NOT NULL,
   created_at  TEXT NOT NULL
 );
@@ -995,7 +1003,7 @@ CREATE TABLE IF NOT EXISTS not_custom_reminders (
 CREATE TABLE IF NOT EXISTS rpt_presets (
   id          TEXT PRIMARY KEY,
   name        TEXT NOT NULL,
-  report_kind TEXT NOT NULL,
+  report_kind TEXT NOT NULL CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')),
   params_json TEXT,
   created_at  TEXT NOT NULL
 );
@@ -1088,14 +1096,14 @@ CREATE TABLE IF NOT EXISTS price_sync_settings (
   id         TEXT PRIMARY KEY,
   source_id  TEXT REFERENCES price_sources(id) ON DELETE SET NULL ON UPDATE CASCADE,
   enabled    INTEGER NOT NULL DEFAULT 0 CHECK (enabled IN (0, 1)),
-  interval_minutes INTEGER,
+  interval_minutes INTEGER CHECK (interval_minutes IS NULL OR interval_minutes > 0),
   updated_at TEXT NOT NULL
 );
 
 -- Integrity queue (async checks)
 CREATE TABLE IF NOT EXISTS ref_integrity_queue (
   id         TEXT PRIMARY KEY,
-  check_kind TEXT NOT NULL,
+  check_kind TEXT NOT NULL CHECK (check_kind IN ('fk','balance','price_stale','orphan','custom')),
   payload_json TEXT,
   status     TEXT NOT NULL CHECK (status IN ('pending','running','done','failed')),
   created_at TEXT NOT NULL,
@@ -1117,4 +1125,55 @@ CREATE TABLE IF NOT EXISTS ref_integrity_queue (
 -- Standalone edition = UI/package may ship without other feature UIs;
 -- local settlement still uses CashSettlementPort + journal when cash moves.
 -- See Feature-Independence-Contract.md.
+-- ═══════════════════════════════════════════════════════════
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_import_external_ref ON import_dedupe_keys(source_provider, external_ref) WHERE external_ref IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_dash_default ON dash_layouts(is_default) WHERE is_default = 1;
+
+CREATE INDEX IF NOT EXISTS idx_fin_jl_account ON fin_journal_lines(account_id);
+CREATE INDEX IF NOT EXISTS idx_fin_op_date ON fin_operations(business_date);
+CREATE INDEX IF NOT EXISTS idx_fin_op_type ON fin_operations(operation_type);
+CREATE INDEX IF NOT EXISTS idx_fin_op_status ON fin_operations(status);
+CREATE INDEX IF NOT EXISTS idx_fin_op_reverses ON fin_operations(reverses_operation_id);
+CREATE INDEX IF NOT EXISTS idx_acc_tx_account ON acc_transactions(account_id);
+CREATE INDEX IF NOT EXISTS idx_acc_tx_date ON acc_transactions(business_date);
+CREATE INDEX IF NOT EXISTS idx_price_src ON price_history(source_id);
+CREATE INDEX IF NOT EXISTS idx_crypto_tx_op ON inv_crypto_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_crypto_tx_holding ON inv_crypto_transactions(holding_id);
+CREATE INDEX IF NOT EXISTS idx_stocks_tx_op ON inv_stocks_iran_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_stocks_tx_holding ON inv_stocks_iran_transactions(holding_id);
+CREATE INDEX IF NOT EXISTS idx_fif_tx_op ON inv_fif_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_metals_tx_op ON inv_metals_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_pa_tx_op ON pa_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_ln_tx_op ON ln_transactions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_ln_tx_loan ON ln_transactions(loan_id);
+CREATE INDEX IF NOT EXISTS idx_chk_op ON chk_cheques(operation_id);
+CREATE INDEX IF NOT EXISTS idx_tax_op ON tax_events(operation_id);
+CREATE INDEX IF NOT EXISTS idx_fg_goal ON fg_contributions(goal_id);
+CREATE INDEX IF NOT EXISTS idx_fg_op ON fg_contributions(operation_id);
+CREATE INDEX IF NOT EXISTS idx_br_item ON br_occurrences(item_id);
+CREATE INDEX IF NOT EXISTS idx_br_op ON br_occurrences(operation_id);
+CREATE INDEX IF NOT EXISTS idx_bg_env ON bg_transaction_links(envelope_id);
+CREATE INDEX IF NOT EXISTS idx_bg_op ON bg_transaction_links(operation_id);
+CREATE INDEX IF NOT EXISTS idx_fin_acc_parent ON fin_accounts(parent_id);
+CREATE INDEX IF NOT EXISTS idx_pa_source_op ON pa_assets(source_operation_id);
+CREATE INDEX IF NOT EXISTS idx_metals_del_holding ON inv_metals_physical_deliveries(metals_holding_id);
+CREATE INDEX IF NOT EXISTS idx_stocks_ca_instr ON inv_stocks_iran_corporate_actions(instrument_id);
+CREATE INDEX IF NOT EXISTS idx_crypto_addr_net ON inv_crypto_wallet_addresses(network_id);
+CREATE INDEX IF NOT EXISTS idx_crypto_net_ex ON inv_crypto_wallet_networks(exchange_id);
+CREATE INDEX IF NOT EXISTS idx_inc_reversed ON inc_transactions(reversed_income_id);
+CREATE INDEX IF NOT EXISTS idx_exp_reversed ON exp_transactions(reversed_expense_id);
+
+-- ═══════════════════════════════════════════════════════════
+-- DOMAIN DECIMAL VALIDATORS (SQLite cannot CHECK TEXT arithmetic)
+-- Enforced by decimal.js in OperationEngine before persist:
+--   amount/qty/price/rate/nav > 0 when required
+--   fee/premium/paid/waived >= 0
+--   paid + waived <= due (loan fees)
+--   net = gross - fee when all present (crypto)
+--   realized_gain_loss only on sale/disposal
+--   reverse target must be posted / not already voided
+--   principal, cheque amount, journal line amount > 0
+-- See Financial-Invariants.md + BUG-CODE regression suite.
 -- ═══════════════════════════════════════════════════════════

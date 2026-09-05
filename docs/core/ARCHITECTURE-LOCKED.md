@@ -3,7 +3,7 @@
 # Architecture Locked — Pre-Coding Constitution
 
 **Status:** LOCKED for implementation design  
-**Phase:** documentation-only on `main` (`src/` removed 2026-09-04)  
+**Phase:** docs-first on `main`; runtime `src/` lives on implementation branch (restored when coding)  
 **HEAD note:** Live status = `GO-NO-GO.md` + `OPEN-ISSUES-REGISTER.md`  
 **Rule:** Do not invent parallel P0 files. Amend concept homes only.
 

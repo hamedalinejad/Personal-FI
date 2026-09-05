@@ -414,3 +414,17 @@ Still open by nature (not schema column bugs):
 | NEW-030 name optional | documented |
 | NEW-031…033 venue names | duplicates allowed + documented |
 | NEW-034 related_feature CHECK | fixed |
+
+## NEW-035…200 batch 2026-09-06
+
+Applied in schema.sql:
+- CHECKs: audit action/source/entity_type, party_kind, category kind, priority>=0, interval_kind, fee tier base/day_count, br status, integrity check_kind, metals delivery status, report_kind, encryption scheme, docs entity_type, notification category
+- fin_operations: command_hash required when posted; failed_at/voided_at
+- voided_at on inc/exp; journal reference_number; reconcile base_currency/context
+- UNIQUE partial: dash default layout; import external_ref
+- 33 performance indexes (journal account, ops date/type/status/reverses, domain tx operation_id, etc.)
+- DOMAIN DECIMAL VALIDATORS block (amounts/fees/rates enforced in engine)
+- ARCHITECTURE-LOCKED phase line clarified (docs-first main; src on implementation branch)
+
+Already OK / previously fixed: NEW-001…034, 053–056, 059–065, 132, 171, 196–199
+Domain-only (decimal.js): positive amounts, fee consistency, reverse targets, RRULE, Sayadi, etc.
