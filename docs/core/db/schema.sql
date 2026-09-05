@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   parent_id    TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
   created_at   TEXT NOT NULL,
-  updated_at   TEXT NOT NULL
+  updated_at   TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed'))
 );
 
 CREATE TABLE IF NOT EXISTS fin_operations (
@@ -135,7 +136,8 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   branch_name     TEXT,
   is_archived     INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
   created_at      TEXT NOT NULL,
-  updated_at      TEXT NOT NULL
+  updated_at      TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed'))
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
@@ -179,7 +181,7 @@ CREATE TABLE IF NOT EXISTS price_history (
   price           TEXT NOT NULL,
   currency        TEXT NOT NULL,
   quote_basis     TEXT, -- per_unit|per_coin|per_mg|nav|... (MR-211)
-  quote_type      TEXT, -- last|close|nav|manual|imported
+  quote_type TEXT CHECK (quote_type IS NULL OR quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- last|close|nav|manual|imported
   is_manual       INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- MR-221 / MR-224
   is_stale        INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- MR-218
   is_degraded     INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- MR-220 DEGRADED mode
@@ -370,7 +372,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_cash (
   exchange_id TEXT NOT NULL REFERENCES inv_crypto_exchanges(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   currency TEXT NOT NULL,
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  balance TEXT NOT NULL DEFAULT '0', -- SNAPSHOT only
+  balance TEXT NOT NULL, -- SNAPSHOT only; NO default — must be written by rebuild from journal
   updated_at TEXT NOT NULL,
   UNIQUE (exchange_id, currency)
 );
@@ -383,13 +385,14 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_brokerages (
 );
 
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_instruments (
-  id TEXT PRIMARY KEY, -- may equal ref_instruments.id or map 1:1
+  id TEXT PRIMARY KEY, -- MUST equal instrument_id (same UUID as ref_instruments.id)
   instrument_id TEXT NOT NULL UNIQUE REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   isin TEXT,
   lot_size TEXT,
   price_tick TEXT,
   firm_code TEXT,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  CHECK (id = instrument_id)
 );
 
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
@@ -494,7 +497,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL, -- buy|sell|deposit_cash|withdraw_cash|physical_delivery|adjustment
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','deposit_cash','withdraw_cash','physical_delivery','adjustment')), -- buy|sell|deposit_cash|withdraw_cash|physical_delivery|adjustment
   business_date TEXT NOT NULL,
   quantity_mg TEXT NOT NULL, -- gross weight moved; for partial sell <= holding.quantity_mg
   metal_price_per_mg TEXT, -- pure metal unit price (ex-premium)
@@ -526,18 +529,18 @@ CREATE TABLE IF NOT EXISTS inv_metals_physical_deliveries (
 CREATE TABLE IF NOT EXISTS pa_assets (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  asset_kind TEXT CHECK (asset_kind IS NULL OR asset_kind IN ('gold','coin','vehicle','real_estate','electronics','other')), -- gold|coin|vehicle|real_estate|electronics|other
+  asset_kind TEXT CHECK (asset_kind IS NULL OR asset_kind IN ('gold','coin','vehicle','real_estate','electronics','other')),
   currency TEXT NOT NULL,
-  purchase_date TEXT, -- DATE-only (MR-185)
-  acquisition_cost TEXT, -- original total cost (MR-186)
-  location TEXT, -- (MR-190)
-  serial_number TEXT, -- (MR-191)
-  model TEXT, -- (MR-191)
-  owner TEXT, -- (MR-193)
-  depreciation_policy TEXT, -- none|straight_line|... (MR-189) nullable
-  quantity TEXT, -- for fungible (gold/coin); 1 for unique assets
+  purchase_date TEXT,
+  acquisition_cost TEXT,
+  location TEXT,
+  serial_number TEXT,
+  model TEXT,
+  owner TEXT,
+  depreciation_policy TEXT,
+  quantity TEXT,
   average_buy_price TEXT,
-  source_feature TEXT, -- metals|manual|import
+  source_feature TEXT CHECK (source_feature IS NULL OR source_feature IN ('metals','manual','import','delivery')),
   source_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_disposed INTEGER NOT NULL DEFAULT 0 CHECK (is_disposed IN (0, 1)),
   created_at TEXT NOT NULL,
@@ -607,7 +610,7 @@ CREATE TABLE IF NOT EXISTS fg_goals (
   target_amount TEXT NOT NULL,
   current_amount_snapshot TEXT, -- DERIVED
   target_date TEXT,
-  funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup')), -- earmark|segregated_cash
+  funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup','earmark','segregated_cash'))
   status TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
@@ -659,7 +662,7 @@ CREATE TABLE IF NOT EXISTS tax_events (
   is_manual_adjustment INTEGER NOT NULL DEFAULT 0 CHECK (is_manual_adjustment IN (0, 1)),
   adjustment_reason TEXT, -- required when manual (MR-207)
   document_id TEXT, -- link to docs_documents evidence (MR-206)
-  status TEXT NOT NULL, -- draft|posted|amended|void
+  status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')), -- draft|posted|amended|void
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

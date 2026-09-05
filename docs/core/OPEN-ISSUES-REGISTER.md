@@ -343,3 +343,24 @@ Residual DoD (require implementation evidence, not more doc files):
 - golden/standalone fixtures green on implementation branch
 - relationship residual edges
 - Gate H zero undocumented fields
+
+## BUG-001…050 residual close-out 2026-09-05 (late)
+
+| ID | Result |
+|----|--------|
+| BUG-011 stocks id===instrument_id | FIXED — CHECK (id = instrument_id) |
+| BUG-012 crypto_cash DEFAULT '0' | FIXED — DEFAULT removed; balance required from rebuild |
+| BUG-013 pa_assets source_feature CHECK | FIXED |
+| BUG-018 tax_events status CHECK | FIXED |
+| BUG-025 fin_accounts status enum | FIXED — active\|inactive\|closed |
+| BUG-026 acc_accounts status enum | FIXED |
+| BUG-032 metals tx_type CHECK | FIXED |
+| BUG-015 fg_goals funding_mode | FIXED — values aligned incl. earmark\|segregated_cash |
+| BUG-044 price_history quote_type CHECK | FIXED |
+| BUG-008 reconciled_by | CONFIRMED present |
+
+Still open by nature (not schema column bugs):
+- BUG-001 schema drift test vs 01-schema-tables (OPEN-001)
+- P1-DOC-015 relationship residual edges
+- P1-DOC-016 field inventory TSV
+- P0-CODE-001…008 regression locks (implementation branch)
