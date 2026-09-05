@@ -261,9 +261,7 @@ Single setting `budgetChequeRecognition`: `on_pending` | `on_cleared` (default r
 
 ## Budget BU locks (P0)
 
-Full BU-001…BU-007: `BUDGET-BU-001-007-LOCKS.md`
-
-## Locks full text (from BUDGET-BU-001-007-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Budget Locks BU-001 … BU-007 (P0)
 

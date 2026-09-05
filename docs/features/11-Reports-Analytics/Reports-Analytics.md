@@ -279,9 +279,7 @@ Global Search و Advanced Filter در Query Contract: dateFrom/To, account, part
 
 ## Reports/Portfolio/Dashboard RP locks (P0)
 
-Full RP-001…RP-009: `REPORTS-PORTFOLIO-RP-001-009-LOCKS.md`
-
-## Locks full text (from REPORTS-PORTFOLIO-RP-001-009-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Reports / Portfolio / Dashboard Locks RP-001 … RP-009 (P0)
 

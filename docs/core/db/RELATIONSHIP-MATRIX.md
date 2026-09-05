@@ -174,3 +174,11 @@ Expense reverse → reverse link effect (restore envelope)
 **Ownership:** Domain rows for UX/metadata/recurring; Journal + fin_operations for accounting truth. Standalone feature use allowed (operation_id nullable only if pure draft; posted requires it).
 
 **Cash:** never stored in inc/exp tables; always via CashSettlementPort → journal lines.
+
+---
+
+## Completeness note 2026-09-05
+
+Core, instruments, accounts, loan, cheque, income/expense, metals delivery edges documented.  
+Remaining edges (CA full graph, fee funding, import batch → operation) tracked under OPEN-002; schema FKs present for all created tables.  
+Status: **advanced — residual edges only**.

@@ -646,7 +646,6 @@ Journal: Dr receivable/cash net, Dr tax withholding, Cr dividend income gross �
 
 ## Stocks ST locks (P0)
 
-Full ST-001…ST-012: `STOCKS-ST-001-012-LOCKS.md`  
 trade vs settlement dates · CA in rebuild · fractional/cash-in-lieu · stable instrumentId · raw≠adjusted prices · feeTax vs tax_events · dividend gross/withholding/net · transfer cost carry · delisting write-off · registry lot/tick · P&L decomposition · providerSymbol mapping.
 
 **P0-FIX-007:** `totalFeesPaidBase` = Σ active fee events (DERIVED); rebuild-owned; no independent setter.
@@ -717,7 +716,7 @@ Command validation may require it only for integrated bank route.
 
 See also: `IranSettlement` in `docs/core/iran/README.md`.
 
-## Locks full text (from STOCKS-ST-001-012-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Stocks Iran Locks ST-001 … ST-012 (P0)
 

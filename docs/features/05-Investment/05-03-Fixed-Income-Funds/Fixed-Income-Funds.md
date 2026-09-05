@@ -708,7 +708,6 @@ Never fold feeTax or redemption fees into distribution income or NAV return buck
 
 ## Funds FI locks (P0)
 
-Full FI-001…FI-010: `FUNDS-FI-001-010-LOCKS.md`  
 NAV≠transactionPrice · valuationMode · income vs unrealized · reinvest one op two legs · FeeTreatment · settlement dates · predictedProfit external only · shared broker cash · immutable NAV history · period return bridge.
 
 **P0-FIX-007:** `totalFeesPaidBase` = Σ active fee events (DERIVED); rebuild-owned; no independent setter.
@@ -755,7 +754,7 @@ holdings.instrumentId / transactions.instrumentId / price_history.instrumentId
 fundId = product entity only
 ```
 
-## Locks full text (from FUNDS-FI-001-010-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Fixed Income Funds Locks FI-001 … FI-010 (P0)
 

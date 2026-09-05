@@ -47,3 +47,12 @@ Until inventory is complete, Gate D remains **BLOCKED**. Core money helpers may 
 A financial field may not ship unless it has: (1) dictionary entry, (2) schema column, (3) ownership/SoT, (4) API surface or explicit internal-only mark, (5) migration disposition, (6) fixture or rebuild path.
 
 Original amount, currency, gross/net/fee, instrumentId, FX path, operationId, reversal chain, source lineage, engine versions remain mandatory and never dropped.
+
+## Field-kind enum (canonical) — DoD closed 2026-09-05
+
+```text
+RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX
+```
+
+Every financial column in schema freeze / field-inventory must carry exactly one kind.  
+Gate H fails if any financial field lacks kind + owner + SoT.

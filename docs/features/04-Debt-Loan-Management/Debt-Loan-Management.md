@@ -1922,7 +1922,6 @@ Cancel هرگز فقط `status=cancelled` بدون reverse اقتصادی disbur
 
 ## Loan LN locks (P0)
 
-Full LN-001…LN-015: `LOAN-LN-001-015-LOCKS.md`  
 rate-by-interval · calculationMode · grace flags · component residuals · fee due/paid/waived · schedule versions · exact final principal · FX on multi-currency pay · multi-draw v1 rules · waiver ops · restructure lineage · penalty policy · borrowed vs lent mapping · reverse after disbursement · local fin_account settlement.
 
 ## BUG-D04 — موتور وام ایرانی
@@ -1931,7 +1930,7 @@ rate-by-interval · calculationMode · grace flags · component residuals · fee
 جزئیات templateها: `docs/core/Loan-Schedule-Engine.md` § BUG-D04.  
 `qarz_al_hasaneh`: سود = 0؛ کارمزد از `ln_loan_fees` / serviceFee.
 
-## Locks full text (from LOAN-LN-001-015-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Loan Locks LN-001 … LN-015 (P0)
 

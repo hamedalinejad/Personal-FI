@@ -1834,7 +1834,7 @@ treatment: capitalize_into_cost | from_proceeds | expense | burn_carrying
 **Forbidden:** counting the same fee fully in cost basis **and** again as full P&L expense (double).  
 Cost path XOR expense path per treatment matrix (`Fee-Treatment-Matrix.md`, P0-FINAL-022).
 
-## Locks full text (from CRYPTO-CR-001-015-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Crypto Feature Locks CR-001 … CR-015 (P0)
 

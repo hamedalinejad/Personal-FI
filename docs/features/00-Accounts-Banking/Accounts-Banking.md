@@ -274,8 +274,6 @@ transfer-out (principal) + transfer-in (principal) + fee leg مستقل در ی�
 
 # Accounts AC locks (P0)
 
-Full AC-001…AC-006: `ACCOUNTS-AC-001-006-LOCKS.md`
-
 **P1-FIX-006:** Normalize IBAN/Shaba/account numbers before unique/store (Persian digits→ASCII, strip spaces/hyphens/ZW, IBAN upper, keep leading zeros).
 
 ---
@@ -288,7 +286,7 @@ acc_transactions      = immutable event rows for UI/filter/reconcilation aids
 currentBalance        = SNAPSHOT cache only
 ```
 
-## Locks full text (from ACCOUNTS-AC-001-006-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Accounts & Banking Locks AC-001 … AC-006 (P0)
 

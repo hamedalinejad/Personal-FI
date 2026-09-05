@@ -307,3 +307,21 @@ Authority for residual work order remains the roadmap + GO-NO-GO.
 | Intentional omissions | crypto/stocks/metals platform cash tx tables + bg_transfers — no ghost cash ledgers |
 | Naming | not_ / rpt_ / stg_ / docs_ locked; notif_/rep_ legacy only |
 | Schema freeze residual | drift test + full field-inventory still needed for Gate H GREEN |
+
+## Definition of Done — updated 2026-09-05 (evening)
+
+| Item | Status |
+|------|--------|
+| cash SoT | ✅ |
+| instrument identity | ✅ |
+| field-kind enum | ✅ RAW\|DERIVED\|SNAPSHOT\|EXTERNAL_REPORTED\|LABEL\|SYSTEM_INDEX |
+| fee / C2C / transfer / period-return / settlement / date / FX / price / reversal / idempotency | ✅ |
+| provenance | ✅ |
+| schema freeze | 🔶 residual: automated drift test + full TSV inventory |
+| golden / standalone fixtures | 🔶 implementation branch |
+| relationship matrix | 🔶 advanced (residual edges only) |
+| no undocumented financial field | 🔶 Gate H until inventory TSV complete |
+
+## Cleanup
+- All feature `*-LOCKS.md` pointer files **deleted** (locks live in feature main docs)
+- P0-DOC-CLOSED-PREVENTION, BUG-CODE-REGRESSION-INVARIANTS, P1-GLOBAL-CONTRACTS, AUDIT-HISTORY **kept**

@@ -462,9 +462,7 @@ On `physical_delivery`, PA acquisition cost = **historical carrying cost release
 
 ## Metals ME locks (P0)
 
-Full ME-001…ME-010: `METALS-ME-001-010-LOCKS.md`
-
-## Locks full text (from METALS-ME-001-010-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Metals Locks ME-001 … ME-010 (P0)
 

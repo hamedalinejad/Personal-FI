@@ -199,9 +199,7 @@
 
 ## Notification NO locks (P0)
 
-Full NO-001…NO-005: `NOTIFICATION-NO-001-005-LOCKS.md`
-
-## Locks full text (from NOTIFICATION-NO-001-005-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Notification Locks NO-001 … NO-005 (P0)
 

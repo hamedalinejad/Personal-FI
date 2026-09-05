@@ -259,9 +259,7 @@ If scheduler misses days: `catchUpPolicy` = `single_latest` | `all_missed` | `sk
 
 ## Bills BR locks (P0)
 
-Full BR-001…BR-007: `BILLS-BR-001-007-LOCKS.md`
-
-## Locks full text (from BILLS-BR-001-007-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Bills / Recurring Locks BR-001 … BR-007 (P0)
 

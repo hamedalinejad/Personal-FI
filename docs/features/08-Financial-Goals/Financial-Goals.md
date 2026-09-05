@@ -219,9 +219,7 @@ Withdrawal reverses allocation links with operationId; cash movement only if rea
 
 ## Goals GO locks (P0)
 
-Full GO-001…GO-006: `GOALS-GO-001-006-LOCKS.md`
-
-## Locks full text (from GOALS-GO-001-006-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Financial Goals Locks GO-001 … GO-006 (P0)
 

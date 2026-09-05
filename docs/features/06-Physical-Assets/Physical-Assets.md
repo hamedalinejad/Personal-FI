@@ -282,9 +282,7 @@ Revaluation/mark updates `currentValue` only. **Does not** create realized P&L u
 
 ## Physical Assets PA locks (P0)
 
-Full PA-001…PA-009: `PHYSICAL-PA-001-009-LOCKS.md`
-
-## Locks full text (from PHYSICAL-PA-001-009-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Physical Assets Locks PA-001 … PA-009 (P0)
 

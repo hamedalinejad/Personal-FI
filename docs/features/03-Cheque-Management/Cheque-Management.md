@@ -298,9 +298,7 @@ Clearing sets `clearedDate` / paymentDate / `effectiveCashDate` without erasing 
 
 ## Cheque CH locks (P0)
 
-Full CH-001…CH-007: `CHEQUE-CH-001-007-LOCKS.md`
-
-## Locks full text (from CHEQUE-CH-001-007-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Cheque Locks CH-001 … CH-007 (P0)
 

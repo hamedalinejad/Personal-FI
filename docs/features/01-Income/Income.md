@@ -213,9 +213,7 @@ No Feature-local void+acc reverse pipeline.
 
 ## Income/Expense IE locks (P0)
 
-Shared IE-001…IE-007: `docs/features/01-Income/INCOME-EXPENSE-IE-001-007-LOCKS.md`
-
-## Locks full text (from INCOME-EXPENSE-IE-001-007-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Income / Expense Locks IE-001 … IE-007 (P0)
 

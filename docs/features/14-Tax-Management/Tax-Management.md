@@ -288,9 +288,7 @@ feeTax on trades = cost component. tax_events = liability/payment domain. Withho
 
 ## Tax TX locks (P0)
 
-Full TX-001…TX-006: `TAX-TX-001-006-LOCKS.md`
-
-## Locks full text (from TAX-TX-001-006-LOCKS.md)
+## Locks (canonical — in this document)
 
 # Tax Locks TX-001 … TX-006 (P0)
 
