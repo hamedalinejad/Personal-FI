@@ -5,3 +5,4 @@
 .aider.tags.cache.v4/cache.db-wal
 node_modules/
 package-lock.json
+.pf-data/
