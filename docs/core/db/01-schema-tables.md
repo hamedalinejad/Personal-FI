@@ -61,11 +61,11 @@
 | `fg_contributions` | Financial Goals | کمک‌های اهداف |
 | `br_items` | Bills & Recurring | آیتم‌های تکرارشونده |
 | `br_occurrences` | Bills & Recurring | رخدادهای تکرارشونده |
-| `notif_notifications` | Notification & Reminder | اعلان‌ها |
-| `notif_settings` | Notification & Reminder | تنظیمات اعلان |
-| `notif_custom_reminders` | Notification & Reminder | یادآوری‌های سفارشی |
-| `rep_presets` | Reports & Analytics | پیش‌تنظیم گزارش |
-| `rep_net_worth_snapshots` | Reports & Analytics | نمونه‌گیری Net Worth |
+| `not_notifications` | Notification & Reminder | اعلان‌ها |
+| `not_settings` | Notification & Reminder | تنظیمات اعلان |
+| `not_custom_reminders` | Notification & Reminder | یادآوری‌های سفارشی |
+| `rpt_presets` | Reports & Analytics | پیش‌تنظیم گزارش |
+| `rpt_net_worth_snapshots` | Reports & Analytics | نمونه‌گیری Net Worth |
 | `port_snapshots` | Portfolio & Wealth Overview | نمونه‌گیری پرتفوی |
 | `port_settings` | Portfolio & Wealth Overview | تنظیمات پرتفوی |
 | `dash_layouts` | Dashboard | چیدمان داشبورد |

@@ -246,6 +246,10 @@ CREATE TABLE IF NOT EXISTS ln_schedule_snapshots (
   id              TEXT PRIMARY KEY,
   loan_id         TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   version         INTEGER NOT NULL,
+  -- snapshot_json schema (BUG-D18): owned by Loan-Schedule-Engine
+  -- Required keys: installments[], dayCount, rate, residual, currency, generatedAt, engineVersion
+  -- Each installment: { seq, dueDate, principal, interest, fee, total, status }
+  -- Domain validates JSON shape before persist; SQLite stores TEXT only.
   snapshot_json   TEXT NOT NULL,
   effective_from  TEXT NOT NULL,
   operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -253,13 +257,15 @@ CREATE TABLE IF NOT EXISTS ln_schedule_snapshots (
 );
 
 CREATE TABLE IF NOT EXISTS ln_loan_fees (
-  id          TEXT PRIMARY KEY,
-  loan_id     TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  fee_kind    TEXT NOT NULL,
-  amount_due  TEXT NOT NULL,
-  amount_paid TEXT NOT NULL DEFAULT '0',
+  id            TEXT PRIMARY KEY,
+  loan_id       TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  fee_kind      TEXT NOT NULL,
+  amount_due    TEXT NOT NULL, -- decimal string
+  amount_paid   TEXT NOT NULL DEFAULT '0',
   amount_waived TEXT NOT NULL DEFAULT '0',
-  currency    TEXT NOT NULL
+  currency      TEXT NOT NULL
+  -- DOMAIN INVARIANT (BUG-D17): decimal.js enforce amount_paid + amount_waived <= amount_due
+  -- SQLite cannot reliably CHECK decimal TEXT arithmetic; engine validates before persist.
 );
 
 CREATE TABLE IF NOT EXISTS ln_transactions (
@@ -371,6 +377,8 @@ CREATE TABLE IF NOT EXISTS inv_crypto_cash (
   id TEXT PRIMARY KEY,
   exchange_id TEXT NOT NULL REFERENCES inv_crypto_exchanges(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   currency TEXT NOT NULL,
+  -- fin_account_id NULLABLE: standalone crypto edition may omit Core bank account link;
+  -- cash SoT remains journal when linked; when null, balance is local projection only (rebuild from domain txs).
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   balance TEXT NOT NULL, -- SNAPSHOT only; NO default — must be written by rebuild from journal
   updated_at TEXT NOT NULL,
@@ -689,8 +697,8 @@ CREATE TABLE IF NOT EXISTS cur_exchange_rates (
 
 CREATE TABLE IF NOT EXISTS cur_currency_preferences (
   id TEXT PRIMARY KEY,
-  base_currency TEXT NOT NULL,
-  is_toman_display INTEGER NOT NULL DEFAULT 0,
+  base_currency TEXT NOT NULL REFERENCES cur_currencies(code) ON DELETE RESTRICT ON UPDATE CASCADE,
+  is_toman_display INTEGER NOT NULL DEFAULT 0 CHECK (is_toman_display IN (0, 1)),
   updated_at TEXT NOT NULL
 );
 
@@ -1098,3 +1106,14 @@ CREATE TABLE IF NOT EXISTS ref_integrity_queue (
 -- inv_metals_platform_transactions / bg_transfers
 -- Cash moves only through Core fin_journal_lines + CashSettlementPort.
 -- Domain tables remain specialized qty/price/fee; cash balance is journal SoT.
+
+
+-- ═══════════════════════════════════════════════════════════
+-- STANDALONE MODE (BUG-D20)
+-- Feature UI independence ≠ remove Accounting Core.
+-- Domain tables may have operation_id NULL only while status=draft.
+-- Posted financial events ALWAYS require operation_id → fin_operations.
+-- Standalone edition = UI/package may ship without other feature UIs;
+-- local settlement still uses CashSettlementPort + journal when cash moves.
+-- See Feature-Independence-Contract.md.
+-- ═══════════════════════════════════════════════════════════

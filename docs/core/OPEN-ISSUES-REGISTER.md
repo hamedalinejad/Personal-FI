@@ -364,3 +364,18 @@ Still open by nature (not schema column bugs):
 - P1-DOC-015 relationship residual edges
 - P1-DOC-016 field inventory TSV
 - P0-CODE-001…008 regression locks (implementation branch)
+
+## BUG-D01…D20 close-out 2026-09-05
+
+| ID | Result |
+|----|--------|
+| D01–D04 ghost cash tables | RESOLVED (intentional omission) |
+| D05 notif_→not_ | FIXED in 01-schema-tables.md |
+| D06 rep_→rpt_ | FIXED in 01-schema-tables.md |
+| D07–D14 missing tables | FIXED earlier |
+| D15 base_currency FK | FIXED → cur_currencies(code) |
+| D16 crypto_cash standalone | FIXED comment + nullable semantics |
+| D17 loan fees paid+waived≤due | Domain invariant documented (SQLite TEXT decimal) |
+| D18 snapshot_json schema | Documented required keys in schema comment |
+| D19 CA ownership | CLOSED |
+| D20 standalone mode | Documented in schema footer + Feature-Independence-Contract |
