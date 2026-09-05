@@ -57,7 +57,8 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   memo          TEXT,
   created_at    TEXT NOT NULL,
   reference_number TEXT,
-  fiscal_period_id TEXT  -- optional; FK to fiscal_periods when table exists
+  fiscal_period_id TEXT  -- optional; FK to fiscal_periods when table exists,
+  post_state TEXT CHECK (post_state IS NULL OR post_state IN ('draft','posted','void'))  -- mirrors operation; entry exists for posted path
 );
 
 CREATE TABLE IF NOT EXISTS fin_journal_lines (
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   exchange_rate_to_base TEXT,
   conversion_path TEXT, -- JSON when hops > 1
   line_number INTEGER NOT NULL DEFAULT 1,
-  line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','fee','tax','fx','adjustment','other')),
+  line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')),
   memo            TEXT,
   reference TEXT
 );
@@ -273,7 +274,8 @@ CREATE TABLE IF NOT EXISTS ln_loan_fees (
   amount_waived TEXT NOT NULL DEFAULT '0',
   currency      TEXT NOT NULL
   -- DOMAIN INVARIANT (BUG-D17): decimal.js enforce amount_paid + amount_waived <= amount_due
-  -- SQLite cannot reliably CHECK decimal TEXT arithmetic; engine validates before persist.
+  -- SQLite cannot reliably CHECK decimal TEXT arithmetic; engine validates before persist.,
+  fee_timing TEXT CHECK (fee_timing IS NULL OR fee_timing IN ('upfront','per_installment','on_default','on_early_settlement','other'))
 );
 
 CREATE TABLE IF NOT EXISTS ln_transactions (
