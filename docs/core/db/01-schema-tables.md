@@ -271,6 +271,6 @@ FORBIDDEN: describing acc_transactions as «دفتر کل نقد» / cash ledger
 | Portfolio UI | `port_` |
 | Dashboard UI | `dash_` |
 
-Docs that still say `notif_` / `rep_` are legacy aliases; implementation must use the canonical prefixes above.
+Canonical prefixes enforced in this file and schema.sql; any remaining notif_/rep_ mentions outside this catalog are legacy prose only.
 
 Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_transfers`) are **intentionally not created** — cash SoT is Core journal only.
