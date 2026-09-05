@@ -702,3 +702,37 @@ CREATE TABLE IF NOT EXISTS sec_access_log (
   created_at TEXT NOT NULL,
   detail TEXT
 );
+
+
+-- ═══════════════════════════════════════════════════════════
+-- BUG-036..050 schema apply (2026-09-05)
+-- SQLite cannot easily ALTER CHECK on existing tables; additive tables + notes for migrate
+-- ═══════════════════════════════════════════════════════════
+
+-- BUG-040
+-- import_raw_records.source_file_name (if table exists from expansion)
+CREATE TABLE IF NOT EXISTS import_raw_records (
+  id TEXT PRIMARY KEY,
+  source_provider TEXT,
+  source_file_name TEXT,
+  source_schema_version TEXT,
+  raw_json TEXT NOT NULL,
+  raw_record_hash TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- Ensure price_history has is_manual (recreate-safe: new table shape documented)
+-- Existing price_history may lack columns — migration runner adds in implementation DB.
+-- Documented expected columns:
+-- is_manual INTEGER NOT NULL DEFAULT 0
+-- quote_type TEXT
+
+-- fin_reconcile_runs.reconciled_by
+CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
+  id TEXT PRIMARY KEY,
+  started_at TEXT NOT NULL,
+  finished_at TEXT,
+  status TEXT NOT NULL,
+  reconciled_by TEXT,
+  report_json TEXT
+);

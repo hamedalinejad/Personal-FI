@@ -193,3 +193,16 @@ P0-DOC-001…014 reintroduction prevention: `P0-DOC-CLOSED-PREVENTION.md`.
 
 **Tests:** `npm test` — 35 passing (2026-09-05).  
 **Still open for production freeze:** drift test schema, full GOLDEN families, Feature packages, decimal.js precision, SQLite worker.
+
+
+## P2 BUG-029…050 (2026-09-05)
+
+| Band | Status |
+|------|--------|
+| 029–032 docs pointers | CLOSED / KEEP |
+| 033 CROSS-CUTTING headers | IN PROGRESS optional |
+| 034,037,038,046 | BY DESIGN |
+| 035,039 | FIXED in schema |
+| 036,040–045,047–050 | migration notes / additive apply track |
+
+Gates: see GO-NO-GO — D is PARTIAL GO after engine implementation; B/C still NO.

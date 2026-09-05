@@ -79,3 +79,21 @@ R-036/037/056–058 = P3 non-goals for v1.
 
 **Tests:** `npm test` — 35 passing (2026-09-05).  
 **Still open for production freeze:** drift test schema, full GOLDEN families, Feature packages, decimal.js precision, SQLite worker.
+
+## Coding gates (live 2026-09-05 evening)
+
+| Gate | Status | Note |
+|------|--------|------|
+| A — Authority | MOSTLY GO | residual DOC-CLN tracked |
+| B — Schema freeze | **NO** | drift test + full CHECK still open |
+| C — Numeric fixtures | **NO** | full GOLDEN families not e2e green |
+| D — Financial path code | **PARTIAL GO** | OperationEngine, worker, invariants, cost/loan/cash v1 implemented + unit tests |
+| E — Standalone packages | **NO** | Feature packages + ESLint boundaries missing |
+| F — Offline recovery | **PARTIAL** | fs temp-swap v1; not full SQLite+IDB crash matrix |
+| G — Rebuild determinism | **PARTIAL** | engines exist; not all asset rebuild paths |
+| H — No-field-loss proof | **NO** | inventory incomplete |
+| Limited Core + unit tests | **GO** | `npm test` 35+ passing |
+| Feature production code | **NO** | until B+C for family |
+| Production release | **NO** | |
+
+P2 hygiene: BUG-029–032,034–035,037–039,046 closed/by-design; 033 optional; 036/040–050 migration track.
