@@ -272,3 +272,15 @@ Deleted: IMPLEMENTATION-BRANCH-CODE-BUGS.md (superseded by BUG-CODE-REGRESSION-I
 | Field no-loss | All new tables carry operation_id, source_*, import_*, FX, reversal, decimal TEXT | LOCKED |
 
 OPEN-001 residual reduced: priority domain tables now present.
+
+## 2026-09-05 File lifecycle + Requirements residual
+
+| Action | Result |
+|--------|--------|
+| Delete pointer files | Naming-Glossary.md, root Rounding-Policy.md, DOCUMENTATION-STYLE-P2.md **DELETED** after zero-ref |
+| Feature *-LOCKS.md | Kept (optional; still referenced from feature main docs) |
+| R-001 | Advanced (domain tables present); residual = full CHECKs + drift test |
+| R-002…R-015 + Iran + reports | Still incomplete — tracked in REQUIREMENTS-IMPLEMENTATION-ROADMAP.md |
+| Explicit v1 exclusions | NFT/DeFi/webhooks/cloud sync/multi-entity remain out |
+
+Authority for residual work order remains the roadmap + GO-NO-GO.
