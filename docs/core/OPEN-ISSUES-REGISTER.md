@@ -290,10 +290,10 @@ Authority for residual work order remains the roadmap + GO-NO-GO.
 | Item | Result |
 |------|--------|
 | MR-297…309 Reports | All ✅ LOCKED in Essential-Reports.md |
-| Architecture-Final.md | Converted to pointer → ARCHITECTURE-LOCKED.md |
-| Concept-Ownership-Matrix.md | Converted to pointer → Canonical-Ownership-Matrix.md |
-| Financial-Scenario-Catalog.md | Converted to pointer → fixtures/ |
-| Feature-Package-Architecture.md | Converted to pointer → Feature-Independence-Contract.md |
+| ARCHITECTURE-LOCKED.md | Converted to pointer → ARCHITECTURE-LOCKED.md |
+| Canonical-Ownership-Matrix.md | Converted to pointer → Canonical-Ownership-Matrix.md |
+| fixtures/ (golden scenarios) | Converted to pointer → fixtures/ |
+| Feature-Independence-Contract.md | Converted to pointer → Feature-Independence-Contract.md |
 | Already-deleted list (4.1) | Confirmed — do not recreate |
 | Remaining 4.2 candidates | Kept for unique-content verification in next pass |
 | Authority files (4.3) | Untouched |
@@ -325,3 +325,21 @@ Authority for residual work order remains the roadmap + GO-NO-GO.
 ## Cleanup
 - All feature `*-LOCKS.md` pointer files **deleted** (locks live in feature main docs)
 - P0-DOC-CLOSED-PREVENTION, BUG-CODE-REGRESSION-INVARIANTS, P1-GLOBAL-CONTRACTS, AUDIT-HISTORY **kept**
+
+## Final cleanup pass 2026-09-05 (late)
+
+Deleted pure pointer files (content already in canonical homes):
+- Architecture-Final.md
+- Concept-Ownership-Matrix.md
+- Financial-Scenario-Catalog.md
+- Feature-Package-Architecture.md
+- Audit-vs-Financial-Event.md
+
+No feature *-LOCKS.md remain.
+No root Naming-Glossary / DOCUMENTATION-STYLE-P2 / root Rounding-Policy.
+
+Residual DoD (require implementation evidence, not more doc files):
+- schema drift test + field-inventory TSV
+- golden/standalone fixtures green on implementation branch
+- relationship residual edges
+- Gate H zero undocumented fields

@@ -28,7 +28,7 @@
 
 | ID | Requirement | Doc home | Method | Acceptance |
 |----|-------------|----------|--------|------------|
-| **R-009** | Feature Independence | `Feature-Independence-Contract.md`, `Feature-Package-Architecture.md` | Each feature package: public API + ports only; no cross-feature repo imports; ESLint boundaries (B-007) when `src/features` exists | Standalone loan/crypto tests without Accounts UI |
+| **R-009** | Feature Independence | `Feature-Independence-Contract.md`, `Feature-Independence-Contract.md` | Each feature package: public API + ports only; no cross-feature repo imports; ESLint boundaries (B-007) when `src/features` exists | Standalone loan/crypto tests without Accounts UI |
 | **R-010** | Price Fetching | `features/.../Price-Fetching.md` + 19-* | `PriceProvider`: Manual \| Cached \| Online; offline = Manual+Cached; selection policy P0-FINAL-007 | Airplane mode sell with last_known + reconciliationNeeded |
 | **R-011** | Currency Cross-Rate | `Currency-CrossRate.md`, FX locks P0-FINAL-006/008 | ValuationContext + path composition + source priority | EUR→USD→IRR deterministic with same snapshot |
 | **R-012** | Corporate Action Engine | `Corporate-Action-Engine.md`, Stocks CA locks | CA transforms only via engine; rights cost BUG-D01; bonus/split fixtures | STOCK-CORPORATE-ACTION fixture green |

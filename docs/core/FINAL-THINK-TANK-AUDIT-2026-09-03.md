@@ -1671,8 +1671,8 @@ docs/core/NAMING-GLOSSARY.md
 docs/core/Calculation-Engines.md
  → docs/core/Calculation-Engines.md
 
-docs/core/Financial-Scenario-Catalog.md
- → docs/core/Financial-Scenario-Catalog.md + fixtures
+docs/core/fixtures/
+ → docs/core/fixtures/ + fixtures
 
 docs/core/rounding/Rounding-Policy.md
  → docs/core/rounding/Rounding-Policy.md
@@ -2010,7 +2010,7 @@ The following should be explicit architectural prohibitions:
 | `feature `*-LOCKS.md` pointers (consolidated BUG-02)` | CANDIDATE DELETE | audit snapshot; same gate |
 | `NAMING-GLOSSARY.md` | KEEP as pointer | path may be used by references |
 | `Calculation-Engines.md` | KEEP as pointer | compatibility path |
-| `Financial-Scenario-Catalog.md` | KEEP as pointer | compatibility path |
+| `fixtures/ (golden scenarios)` | KEEP as pointer | compatibility path |
 | `rounding/Rounding-Policy.md` | KEEP as pointer | compatibility path |
 | historically removed cross-cutting packs | DO NOT RECREATE | already superseded |
 | any file with unique financial rule | KEEP / MIGRATE | rule must move before deletion |

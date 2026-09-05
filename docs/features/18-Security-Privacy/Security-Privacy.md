@@ -153,7 +153,7 @@ PIN/password **هرگز** plaintext ذخیره نمی‌شود — فقط hash/v
 | فیلدها | action, at, actor (local), detail, operationId? |
 | IP | در اپ pure offline معمولاً خالی/نامربوط |
 
-Financial Event ≠ Audit — `Audit-vs-Financial-Event.md`
+Financial Event ≠ Audit — `Canonical-Financial-Operation.md`
 
 ## Export
 

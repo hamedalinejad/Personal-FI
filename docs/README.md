@@ -100,7 +100,7 @@
 | Invariant Catalog | `docs/core/Financial-Invariant-Catalog.md` |
 | Accounting Event Mapping | `docs/core/Accounting-Event-Mapping-Matrix.md` |
 | Feature Capability Matrix | `docs/core/Feature-Capability-Matrix.md` |
-| Scenario Catalog | `docs/core/Financial-Scenario-Catalog.md` |
+| Scenario Catalog | `docs/core/fixtures/` |
 | Layer Separation | `docs/core/Layer-Separation.md` |
 | Accounting Calculation Invariants | `docs/core/Accounting-Calculation-Invariants.md` |
 | Deletion Policy Matrix | `docs/core/Deletion-Policy-Matrix.md` |
@@ -108,7 +108,7 @@
 | Multi-Tab Writer | `docs/core/Multi-Tab-Writer-Contract.md` |
 | API Result & Errors | `docs/core/API-Result-and-Errors.md` |
 | Crypto v1 Scope | `docs/features/05-Investment/05-01-Investment-Crypto/Crypto-V1-Scope.md` |
-| Feature Package Architecture | `docs/core/Feature-Package-Architecture.md` |
+| Feature Package Architecture | `docs/core/Feature-Independence-Contract.md` |
 | API Requirements | `docs/core/API-Requirements.md` |
 | Offline Requirements | `docs/core/Offline-Requirements.md` |
 | Essential Reports | `docs/core/Essential-Reports.md` |

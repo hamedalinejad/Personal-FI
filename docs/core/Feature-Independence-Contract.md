@@ -231,7 +231,7 @@ Loan Payment → optional Cash Account از طریق Port.
 ### Level 3 — Full integration
 Loan + Accounting UI + Accounts + Documents + Reports سراسری.
 
-جزئیات بسته: `Feature-Package-Architecture.md`.
+جزئیات بسته: `Feature-Independence-Contract.md`.
 
 ---
 ## P0-006 — Standalone vs required accountId

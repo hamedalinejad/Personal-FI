@@ -78,7 +78,7 @@
 - `Instrument-Identity.md`
 - `Date-Semantics-Matrix.md`
 - `Canonical-Ownership-Matrix.md`
-- `Audit-vs-Financial-Event.md`
+- `Canonical-Financial-Operation.md`
 - `Storage-Abstraction.md`
 - `Investment-Three-Layers.md`
 - `fixtures/README.md` — Golden fixtures
@@ -87,13 +87,13 @@
 - `Field-Level-SoT.md`
 - `Field-Level-Data-Ownership-Matrix.md` — مالک فیلد به فیلد (RAW/DERIVED/editable/migration)
 - `Fee-Treatment-Matrix.md`
-- `Concept-Ownership-Matrix.md`
+- `Canonical-Ownership-Matrix.md`
 - `Implementation-Pitfalls.md` — هشدارهای کدنویسی
 - ../API-Reference.md — مرجع API
 - `Cross-Feature-Interactions.md`
 - `Feature-Independence-Contract.md`
 - `Module-Architecture.md` — Core vs Feature modules؛ Accounting Core ≠ UI
-- `Architecture-Final.md`
+- `ARCHITECTURE-LOCKED.md`
 - `Financial-Invariants.md`
 - `CODING-GATE.md`
 - `Cost-Basis-Engine.md` — C2C/trade vs transfer; fee roles; P&L axes

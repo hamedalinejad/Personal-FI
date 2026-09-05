@@ -52,7 +52,7 @@ This file is the **canonical body** for the engine map (what Core implements).
 | Concern | Document |
 |---------|----------|
 | Engine responsibilities | **this file** |
-| Scenario inventory / SCN ids | `Financial-Scenario-Catalog.md` (catalog only) |
+| Scenario inventory / SCN ids | `fixtures/ (golden scenarios)` (catalog only) |
 | Numeric expected values | `docs/core/fixtures/GOLDEN-*` |
 | Test pattern | `Mandatory-Test-Vectors.md` |
 

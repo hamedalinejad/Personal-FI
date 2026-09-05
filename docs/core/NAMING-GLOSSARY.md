@@ -61,7 +61,7 @@ Legacy فقط در بخش **Migration / Alias** یا پاورقی؛ نه در م
 
 ## Related docs
 
-- `Audit-vs-Financial-Event.md`
+- `Canonical-Financial-Operation.md`
 - `Deletion-Policy-Matrix.md`
 - `Canonical-Financial-Operation.md`
 - `Canonical-Cash-Model.md`

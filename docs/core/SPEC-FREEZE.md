@@ -8,7 +8,7 @@
 | 02 | `Data-Dictionary.md` |
 | 03 | `Domain-Dependency-Matrix.md` |
 | 04 | `Canonical-Financial-Operation.md` |
-| 05 | `Financial-Scenario-Catalog.md` |
+| 05 | `fixtures/ (golden scenarios)` |
 | 06 | `fixtures/README.md` (+ golden JSONها) |
 | 07 | `Data-Model-Relationship-Matrix.md` |
 | 08 | `Feature-API-Contract.md` |
