@@ -97,3 +97,35 @@ R-036/037/056–058 = P3 non-goals for v1.
 | Production release | **NO** | |
 
 P2 hygiene: BUG-029–032,034–035,037–039,046 closed/by-design; 033 optional; 036/040–050 migration track.
+
+## R-001…R-008 status (live 2026-09-05)
+
+| ID | Requirement | Status | Progress |
+|----|-------------|--------|----------|
+| R-001 | Full schema.sql | Advanced Partial (~690+) | Feature tables added; **drift test still open** |
+| R-002 | runAtomicFinancialOperation | **Implemented v1** | `operationEngine.js` + tests (idempotency, balance gate, persist) |
+| R-003 | Write-to-temp-then-swap | **Implemented v1 (fs)** | `persistence/worker.js` temp→commit→rename |
+| R-004 | Financial invariants runtime | **Implemented v1** | journal balance, money string, rates + decimal tests |
+| R-005 | Cost-Basis Engine | **Implemented v1 (WA)** | acq/disposal/fee/transfer/C2C in `domain/costBasis/engine.js` |
+| R-006 | Loan Schedule Engine | **Implemented v1** | declining/flat/qarz/bullet |
+| R-007 | Cash Settlement Adapter | **Implemented v1** | settle → journal lines only |
+| R-008 | Instrument Identity runtime | **Implemented v1 (memory)** | registry network-distinct; schema OK |
+
+**P0 exit still needs:** R-001 drift test green + OPEN-001/003/004 + production SQLite/decimal.js hardening — not “all stubs”.
+
+## OPEN issues (live 2026-09-05)
+
+| ID | Topic | Status | Residual |
+|----|-------|--------|----------|
+| OPEN-001 | Schema Freeze | IN PROGRESS | drift test + full column parity |
+| OPEN-002 | Relationship matrix | IMPROVED | enforce remaining edges at freeze |
+| OPEN-003 | Field preservation | IN PROGRESS | expand inventory → 0 undocumented |
+| OPEN-004 | Golden fixture gate | PARTIAL | full family e2e pipeline |
+| OPEN-005 | CI coverage | CLOSED | npm test in CI path |
+| OPEN-006 | Lint real | DEFERRED | ESLint when src/features exists |
+| OPEN-007 | Authority refs | CLOSED | — |
+| OPEN-008 | Audit HEAD metadata | CLOSED | — |
+| OPEN-009 | Operation status vocab | CLOSED | — |
+| OPEN-010 | Date contract | CLOSED | — |
+| OPEN-011 | Fund identity schema | CLOSED | schema enforce done |
+| OPEN-012 | Crypto holding identity | CLOSED | — |
