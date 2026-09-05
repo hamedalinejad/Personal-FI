@@ -130,7 +130,7 @@
 ## P2 documentation quality
 
 - Naming: [`core/NAMING-GLOSSARY.md`](core/NAMING-GLOSSARY.md)
-- Style: [`core/DOCUMENTATION-STYLE-P2.md`](core/DOCUMENTATION-STYLE-P2.md)
+- Style: [`core/DOC-CONSOLIDATION-POLICY.md`](core/DOC-CONSOLIDATION-POLICY.md)
 - Feature README template: [`features/_FEATURE-README-TEMPLATE.md`](features/_FEATURE-README-TEMPLATE.md)
 | Market Data Quality Pipeline | `docs/core/Market-Data-Quality-Pipeline.md` |
 

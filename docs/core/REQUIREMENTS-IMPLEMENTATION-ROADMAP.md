@@ -130,7 +130,7 @@ R-036 NFT · R-037 DeFi · R-056 webhooks · R-057 cloud sync · R-058 multi-ent
 | Trackers OPEN / GO-NO-GO / REQUIREMENTS roadmap | **KEEP** until all items CLOSED |
 | FINAL-THINK-TANK-AUDIT | **KEEP historical** until unique rules fully in concept homes |
 | AUDIT-HISTORY-NOTE | **KEEP thin HISTORICAL** |
-| Naming-Glossary.md / Rounding-Policy.md (root) | **KEEP pointer-only** (done) |
+| Naming-Glossary.md / Rounding-Policy.md / DOCUMENTATION-STYLE-P2.md | **DELETED** (pointers removed 2026-09-05 after zero-ref) |
 | DOCUMENTATION-STYLE-P2 | **Pointer** to DOC-CONSOLIDATION (done) |
 | FEATURE-README-TEMPLATE | **Moved** to `.github/` (done) |
 | 15× feature `*-LOCKS.md` | **KEEP** as ~7-line pointers |

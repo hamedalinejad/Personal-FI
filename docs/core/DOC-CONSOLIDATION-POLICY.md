@@ -107,8 +107,8 @@ Two developers must follow the same chain; if prose conflicts with LOCK, **LOCK 
 
 | Concept | Canonical body | Pointer only |
 |---------|----------------|--------------|
-| Naming | `docs/core/NAMING-GLOSSARY.md` | `docs/core/Naming-Glossary.md` |
-| Rounding | `docs/core/rounding/Rounding-Policy.md` | `docs/core/Rounding-Policy.md` |
+| Naming | `docs/core/NAMING-GLOSSARY.md` | (pointer deleted 2026-09-05) |
+| Rounding | `docs/core/rounding/Rounding-Policy.md` | (pointer deleted 2026-09-05) |
 
 ## B-013 headers
 
@@ -116,7 +116,7 @@ Section titles that still mention batch ids are historical labels inside concept
 
 ## Documentation style (from DOCUMENTATION-STYLE-P2)
 
-See historical notes in git history of `DOCUMENTATION-STYLE-P2.md` if needed. Prefer this policy file.
+DOCUMENTATION-STYLE-P2.md deleted 2026-09-05 after merge; historical notes in git history. Prefer this policy file.
 
 
 ## File lifecycle (think-tank R-021…060)

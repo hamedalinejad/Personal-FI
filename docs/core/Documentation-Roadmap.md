@@ -56,7 +56,7 @@ Wallet/chain · tx hash · gas/fee asset · staking/airdrop · License offline �
 ## P2 — Quality
 
 - Naming glossary + status verbs: `NAMING-GLOSSARY.md`
-- Maintenance style: `DOCUMENTATION-STYLE-P2.md`
+- Maintenance style: `DOC-CONSOLIDATION-POLICY.md`
 - Each Feature: short README (SoT, dependencies) from `_FEATURE-README-TEMPLATE.md`
 - Diagrams derived from Data-Model-Relationship-Matrix, not hand-drawn drift
 
