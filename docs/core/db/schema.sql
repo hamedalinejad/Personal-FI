@@ -719,3 +719,142 @@ CREATE TABLE IF NOT EXISTS sec_access_log (
 -- quote_type TEXT
 
 -- fin_reconcile_runs.reconciled_by
+
+-- ═══════════════════════════════════════════════════════════
+-- Schema audit fix 2026-09-05 — Missing domain tables (Income/Expense/Loan tiers)
+-- Modular: each feature domain table links to fin_operations for accounting SoT.
+-- Cash always through Core journal; domain for specialized UX/metadata.
+-- No duplicate CREATE; additive only. Namespace: not_ notifications, rpt_ reports.
+-- ═══════════════════════════════════════════════════════════
+
+-- Income domain (01-Income) — standalone usable without full accounting UI
+CREATE TABLE IF NOT EXISTS inc_transactions (
+  id                      TEXT PRIMARY KEY,
+  operation_id            TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  business_date           TEXT NOT NULL, -- DATE-only
+  amount                  TEXT NOT NULL, -- decimal string
+  currency                TEXT NOT NULL,
+  exchange_rate_to_base   TEXT,
+  account_id              TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  description             TEXT,
+  category_id             TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  has_attachment          INTEGER NOT NULL DEFAULT 0 CHECK (has_attachment IN (0, 1)),
+  attachment_path         TEXT,
+  recurring_id            TEXT, -- FK added after table
+  account_transaction_id  TEXT REFERENCES acc_transactions(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  is_voided               INTEGER NOT NULL DEFAULT 0 CHECK (is_voided IN (0, 1)),
+  reversed_income_id      TEXT REFERENCES inc_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  source_type             TEXT, -- ui|import|recurring|api
+  source_reference        TEXT,
+  import_batch_id         TEXT,
+  created_at              TEXT NOT NULL,
+  updated_at              TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inc_recurring (
+  id              TEXT PRIMARY KEY,
+  title           TEXT NOT NULL,
+  amount          TEXT NOT NULL,
+  currency        TEXT NOT NULL,
+  account_id      TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  category_id     TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  description     TEXT,
+  interval_kind   TEXT NOT NULL, -- monthly|weekly|yearly|custom
+  interval_value  INTEGER, -- for custom
+  start_date      TEXT NOT NULL,
+  end_date        TEXT,
+  next_occurrence TEXT,
+  is_active       INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at      TEXT NOT NULL,
+  updated_at      TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_inc_tx_date ON inc_transactions(business_date);
+CREATE INDEX IF NOT EXISTS idx_inc_tx_voided ON inc_transactions(is_voided);
+CREATE INDEX IF NOT EXISTS idx_inc_recurring_next ON inc_recurring(next_occurrence) WHERE is_active = 1;
+
+-- Expense domain (02-Expense) — symmetric to Income for modularity
+CREATE TABLE IF NOT EXISTS exp_transactions (
+  id                      TEXT PRIMARY KEY,
+  operation_id            TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  business_date           TEXT NOT NULL,
+  amount                  TEXT NOT NULL,
+  currency                TEXT NOT NULL,
+  exchange_rate_to_base   TEXT,
+  account_id              TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  description             TEXT,
+  category_id             TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  has_attachment          INTEGER NOT NULL DEFAULT 0 CHECK (has_attachment IN (0, 1)),
+  attachment_path         TEXT,
+  recurring_id            TEXT,
+  account_transaction_id  TEXT REFERENCES acc_transactions(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  is_voided               INTEGER NOT NULL DEFAULT 0 CHECK (is_voided IN (0, 1)),
+  reversed_expense_id     TEXT REFERENCES exp_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  source_type             TEXT,
+  source_reference        TEXT,
+  import_batch_id         TEXT,
+  created_at              TEXT NOT NULL,
+  updated_at              TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS exp_recurring (
+  id              TEXT PRIMARY KEY,
+  title           TEXT NOT NULL,
+  amount          TEXT NOT NULL,
+  currency        TEXT NOT NULL,
+  account_id      TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  category_id     TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  description     TEXT,
+  interval_kind   TEXT NOT NULL,
+  interval_value  INTEGER,
+  start_date      TEXT NOT NULL,
+  end_date        TEXT,
+  next_occurrence TEXT,
+  is_active       INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at      TEXT NOT NULL,
+  updated_at      TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_exp_tx_date ON exp_transactions(business_date);
+CREATE INDEX IF NOT EXISTS idx_exp_tx_voided ON exp_transactions(is_voided);
+
+-- Loan fee tiers (documented, missing) — ordered effective ranges for calculation
+CREATE TABLE IF NOT EXISTS ln_loan_fee_tiers (
+  id              TEXT PRIMARY KEY,
+  loan_id         TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  fee_kind        TEXT NOT NULL, -- origination|late|prepayment|service|...
+  tier_order      INTEGER NOT NULL DEFAULT 0,
+  effective_from  TEXT NOT NULL, -- DATE
+  effective_to    TEXT, -- nullable = open
+  rate_or_amount  TEXT NOT NULL, -- decimal string; interpretation by fee_kind
+  is_percentage   INTEGER NOT NULL DEFAULT 0 CHECK (is_percentage IN (0, 1)),
+  min_amount      TEXT,
+  max_amount      TEXT,
+  day_count       TEXT, -- actual/365|30/360|...
+  calculation_base TEXT, -- principal|outstanding|installment
+  created_at      TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_ln_fee_tiers_loan ON ln_loan_fee_tiers(loan_id, tier_order);
+
+-- Budget transfers: journal-linked, no separate SoT cash table
+-- (bg_transfers concept resolved as operation + bg_transaction_links; no ghost table)
+
+-- Notifications: canonical not_notifications already present; docs notif_* migrated to not_
+-- Reports: canonical rpt_snapshots; docs rep_* → rpt_
+
+-- Crypto/Stocks/Metals cash: inv_crypto_cash present as projection;
+-- stocks/metals cash modeled via Core fin_accounts + CashSettlementPort (no ghost table)
+
+-- Tax: tax_events is event ledger; configuration stays in settings or separate tax_categories if needed later
+CREATE TABLE IF NOT EXISTS tax_categories (
+  id          TEXT PRIMARY KEY,
+  code        TEXT NOT NULL UNIQUE,
+  name        TEXT NOT NULL,
+  jurisdiction TEXT, -- IR|...
+  is_active   INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at  TEXT NOT NULL
+);
+
+-- Field no-loss: all domain tables carry operation_id, source_*, import_*, exchange_rate_to_base,
+-- original amount/currency as TEXT decimal, reversal chain via reversed_*_id + fin_operations.reverses_operation_id
