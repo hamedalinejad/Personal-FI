@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   event_at          TEXT,
   settlement_date   TEXT,
   base_currency     TEXT NOT NULL,
-  engine_versions   TEXT, -- JSON
+  engine_versions   TEXT, -- JSON schema: {"money":"x.y","costBasis":"x.y","fx":"x.y","loanSchedule":"x.y","rounding":"x.y"} -- JSON
   attribution_algorithm_version TEXT,
   reverses_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
@@ -96,13 +96,13 @@ CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
 -- ─── Instrument registry (BUG-D03 / B-001 identity) ──────────
 CREATE TABLE IF NOT EXISTS ref_instruments (
   id                   TEXT PRIMARY KEY,
-  asset_class          TEXT NOT NULL, -- crypto|stock|fund|metal|…
-  symbol               TEXT NOT NULL, -- LABEL only
-  name                 TEXT,
+  asset_class          TEXT NOT NULL CHECK (asset_class IN ('crypto','stock','fund','metal','currency','other')), -- crypto|stock|fund|metal|…
+  symbol               TEXT NOT NULL, -- LABEL only; NOT unique (same ticker can exist across networks/venues)
+  name                 TEXT, -- optional display name
   network_identifier   TEXT,          -- TRC20/ERC20/… nullable
   contract_address     TEXT,
   isin                 TEXT,
-  cost_currency_default TEXT,
+  cost_currency_default TEXT REFERENCES cur_currencies(code) ON DELETE SET NULL ON UPDATE CASCADE,
   meta_json            TEXT,
   created_at           TEXT NOT NULL,
   updated_at           TEXT NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS acc_transactions (
 CREATE TABLE IF NOT EXISTS acc_transaction_links (
   id               TEXT PRIMARY KEY,
   transaction_id   TEXT NOT NULL REFERENCES acc_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  related_feature  TEXT NOT NULL,
+  related_feature  TEXT NOT NULL CHECK (related_feature IN ('crypto','stocks','funds','metals','loans','income','expense','cheque','budget','goals','bills','tax','physical_assets','accounts')),
   related_id       TEXT NOT NULL,
   UNIQUE (transaction_id, related_feature, related_id)
 );
@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   principal          TEXT NOT NULL,
   currency           TEXT NOT NULL,
   interest_rate      TEXT,
-  status TEXT CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')) NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')), -- draft = created, schedule not yet accepted/activated,
   created_at         TEXT NOT NULL
 ,
   start_date TEXT,
@@ -352,7 +352,7 @@ INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
 
 CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL, -- display label; duplicates allowed (user may have multiple accounts at same exchange)
   venue_kind TEXT CHECK (venue_kind IN ('cex','dex','wallet','other')), -- exchange|wallet
   created_at TEXT NOT NULL
 );
@@ -387,7 +387,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_cash (
 
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_brokerages (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL, -- display label; duplicates allowed (user may have multiple accounts at same brokerage)
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at TEXT NOT NULL
 );
@@ -448,7 +448,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_corporate_actions (
 CREATE TABLE IF NOT EXISTS inv_fif_funds (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL UNIQUE REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  fund_kind TEXT, -- mutual|etf|…
+  fund_kind TEXT CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')),
   created_at TEXT NOT NULL
 );
 
@@ -481,7 +481,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
 
 CREATE TABLE IF NOT EXISTS inv_metals_platforms (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
+  name TEXT NOT NULL, -- display label; duplicates allowed (user may have multiple accounts at same platform)
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at TEXT NOT NULL
 );
@@ -727,7 +727,7 @@ CREATE TABLE IF NOT EXISTS rpt_snapshots (
   id TEXT PRIMARY KEY,
   report_kind TEXT NOT NULL,
   as_of TEXT NOT NULL,
-  payload_json TEXT NOT NULL,
+  payload_json TEXT NOT NULL, -- schema per report_kind: see Essential-Reports.md (net_worth|cash_flow|pnl|balance_sheet|tax|allocation|fees)
   ledger_watermark TEXT,
   price_as_of TEXT,
   fx_as_of TEXT,

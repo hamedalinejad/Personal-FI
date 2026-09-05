@@ -268,3 +268,21 @@ IranianLoanEngine ⊂ Schedule Engine product adapters
 ```
 
 Fixtures: `GOLDEN-LOAN-QARZ` + future `GOLDEN-LOAN-HOUSING-STEP`.
+
+
+## snapshot_json schema (canonical)
+
+```json
+{
+  "installments": [
+    { "seq": 1, "dueDate": "YYYY-MM-DD", "principal": "0", "interest": "0", "fee": "0", "total": "0", "status": "pending|paid|skipped" }
+  ],
+  "dayCount": "actual/365|30/360|actual/actual",
+  "rate": "0.18",
+  "residual": "0",
+  "currency": "IRR",
+  "generatedAt": "ISO-8601",
+  "engineVersion": "x.y"
+}
+```
+Domain validates before persist. SQLite stores TEXT only.

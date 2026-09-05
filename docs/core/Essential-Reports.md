@@ -112,3 +112,19 @@ Mixed legacy formulas that double-count sales/profit are **forbidden**.
 All reports are **projections** from Ledger + Engines + Valuation; never a second SoT.  
 UI lives under the single Reports page (Sheet), not extra nav routes.  
 asOf / period parameters mandatory; multi-currency via historical FX.
+
+
+## rpt_snapshots.payload_json schema (by report_kind)
+
+Common envelope:
+```json
+{
+  "reportKind": "net_worth|cash_flow|income_statement|balance_sheet|investment_pnl|tax|allocation|fees|category_spending",
+  "asOf": "YYYY-MM-DD",
+  "currency": "IRR",
+  "lines": [],
+  "totals": {},
+  "meta": { "ledgerWatermark": "...", "priceAsOf": "...", "fxAsOf": "..." }
+}
+```
+Each report_kind extends `lines`/`totals` per Essential-Reports definitions. Engine validates shape before persist.

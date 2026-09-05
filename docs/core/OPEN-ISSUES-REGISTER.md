@@ -397,3 +397,20 @@ Still open by nature (not schema column bugs):
 | NEW-012 FX currency FKs | fixed |
 | NEW-013 base_currency FK | already fixed |
 | NEW-014…020 DERIVED snapshots | comments + rebuild-only contract |
+
+## NEW-021…034 close-out 2026-09-05
+
+| ID | Result |
+|----|--------|
+| NEW-021 loan draft status | kept + documented (pre-activation) |
+| NEW-022 snapshot_json schema | documented in schema + Loan-Schedule-Engine.md |
+| NEW-023 report payload_json | documented in Essential-Reports.md |
+| NEW-024 engine_versions JSON | schema comment on fin_operations |
+| NEW-025 id=instrument_id | already CHECK |
+| NEW-026 fund_kind CHECK | fixed |
+| NEW-027 asset_class CHECK | fixed |
+| NEW-028 cost_currency_default FK | fixed |
+| NEW-029 symbol label not unique | documented |
+| NEW-030 name optional | documented |
+| NEW-031…033 venue names | duplicates allowed + documented |
+| NEW-034 related_feature CHECK | fixed |
