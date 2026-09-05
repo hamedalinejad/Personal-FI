@@ -449,10 +449,12 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   id TEXT PRIMARY KEY,
   platform_id TEXT REFERENCES inv_metals_platforms(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  quantity_mg TEXT NOT NULL, -- SoT mass
-  total_invested TEXT NOT NULL,
+  quantity_mg TEXT NOT NULL, -- SoT mass (gross weight, mg canonical)
+  purity_code TEXT, -- e.g. 24k, 18k, 750, 999, emami, bahar
+  purity_ratio TEXT, -- decimal 0-1 for fine weight derivation: quantity_mg * purity_ratio
+  total_invested TEXT NOT NULL, -- historical cost (metal + premiums paid, net of fees as policy)
   cost_currency TEXT NOT NULL,
-  purity_code TEXT,
+  average_cost_per_mg TEXT, -- derived / maintained by cost-basis engine
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -462,10 +464,17 @@ CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL,
-  quantity_mg TEXT NOT NULL,
-  amount TEXT,
+  tx_type TEXT NOT NULL, -- buy|sell|deposit_cash|withdraw_cash|physical_delivery|adjustment
+  business_date TEXT NOT NULL,
+  quantity_mg TEXT NOT NULL, -- gross weight moved; for partial sell <= holding.quantity_mg
+  metal_price_per_mg TEXT, -- pure metal unit price (ex-premium)
+  premium_amount TEXT, -- fabrication / maker / premium separate from metal price (MR-174)
+  fee_amount TEXT, -- brokerage/dealer fee
+  fee_currency TEXT,
+  amount TEXT, -- total consideration (metal + premium ± fees as signed by policy)
   currency TEXT NOT NULL,
+  exchange_rate_to_base TEXT,
+  is_partial INTEGER NOT NULL DEFAULT 0 CHECK (is_partial IN (0, 1)), -- MR-179 partial sales
   created_at TEXT NOT NULL
 );
 
@@ -473,41 +482,63 @@ CREATE TABLE IF NOT EXISTS inv_metals_physical_deliveries (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   metals_holding_id TEXT REFERENCES inv_metals_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  pa_asset_id TEXT,
+  pa_asset_id TEXT REFERENCES pa_assets(id) ON DELETE SET NULL ON UPDATE CASCADE,
   status TEXT NOT NULL, -- requested|processing|delivered|cancelled
   quantity_mg TEXT NOT NULL,
-  fee_amount TEXT,
-  created_at TEXT NOT NULL
+  fee_amount TEXT, -- delivery/logistics fee (separate from trade fee)
+  fee_currency TEXT,
+  delivery_address TEXT,
+  invoice_ref TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pa_assets (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  asset_kind TEXT,
+  asset_kind TEXT, -- gold|coin|vehicle|real_estate|electronics|other
   currency TEXT NOT NULL,
-  source_feature TEXT,
+  purchase_date TEXT, -- DATE-only (MR-185)
+  acquisition_cost TEXT, -- original total cost (MR-186)
+  location TEXT, -- (MR-190)
+  serial_number TEXT, -- (MR-191)
+  model TEXT, -- (MR-191)
+  owner TEXT, -- (MR-193)
+  depreciation_policy TEXT, -- none|straight_line|... (MR-189) nullable
+  quantity TEXT, -- for fungible (gold/coin); 1 for unique assets
+  average_buy_price TEXT,
+  source_feature TEXT, -- metals|manual|import
   source_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  created_at TEXT NOT NULL
+  is_disposed INTEGER NOT NULL DEFAULT 0 CHECK (is_disposed IN (0, 1)),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pa_transactions (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL,
-  amount TEXT NOT NULL,
-  currency TEXT NOT NULL,
+  tx_type TEXT NOT NULL, -- purchase|sale|valuation_adj|maintenance|disposal
   business_date TEXT NOT NULL,
+  amount TEXT NOT NULL, -- consideration
+  currency TEXT NOT NULL,
+  quantity TEXT, -- portion sold (partial disposal)
+  realized_gain_loss TEXT, -- calculated on disposal/sale (MR-195)
+  exchange_rate_to_base TEXT,
+  fee_amount TEXT,
+  note TEXT,
   created_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pa_valuations (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  as_of TEXT NOT NULL,
-  value TEXT NOT NULL,
+  as_of TEXT NOT NULL, -- valuation date (MR-188)
+  value TEXT NOT NULL, -- estimated market value (MR-187)
   currency TEXT NOT NULL,
-  source TEXT,
+  exchange_rate_to_base TEXT,
+  source TEXT, -- manual|price_feed|appraisal
+  note TEXT,
   created_at TEXT NOT NULL
 );
 

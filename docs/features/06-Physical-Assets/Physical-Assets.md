@@ -339,3 +339,27 @@ Purchase and historical valuations retain `currency` + `exchangeRateToBase` (and
 
 ## Status: PA-001…PA-009 **LOCKED** 2026-09-02
 
+
+---
+
+## Requirements Lock (MR-184 … MR-195) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-184 | Asset identity | ✅ LOCKED | `pa_assets.id` + `name` + `asset_kind` |
+| MR-185 | Purchase date | ✅ LOCKED | `pa_assets.purchase_date` (DATE-only) |
+| MR-186 | Acquisition cost | ✅ LOCKED | `pa_assets.acquisition_cost` + maintained via `pa_transactions` |
+| MR-187 | Estimated value | ✅ LOCKED | `pa_valuations.value` |
+| MR-188 | Valuation date | ✅ LOCKED | `pa_valuations.as_of` |
+| MR-189 | Depreciation policy | ✅ LOCKED | `pa_assets.depreciation_policy` (none\|straight_line\|…); optional for v1 |
+| MR-190 | Location | ✅ LOCKED | `pa_assets.location` |
+| MR-191 | Serial/model | ✅ LOCKED | `pa_assets.serial_number`, `model` |
+| MR-192 | Document attachments | ✅ LOCKED | via Documents feature (`docs_documents` + polymorphic link by `entity_type=pa_asset`, `entity_id`); no second attachment SoT |
+| MR-193 | Ownership | ✅ LOCKED | `pa_assets.owner` |
+| MR-194 | Sale/disposal | ✅ LOCKED | `pa_transactions.tx_type = sale\|disposal` + `is_disposed` flag; quantity reduced; cannot go negative |
+| MR-195 | Gain/loss treatment | ✅ LOCKED | `pa_transactions.realized_gain_loss` calculated on disposal/sale from carrying cost (Cost-Basis Engine); posted as journal via operation |
+
+**Notes:**  
+- Fungible (gold/coin) allow quantity > 1 and weighted average; unique assets (vehicle/real_estate/…) are quantity=1.  
+- Attachments stay in the Documents module (modular).  
+- All money fields are decimal TEXT; FX via `exchange_rate_to_base`.

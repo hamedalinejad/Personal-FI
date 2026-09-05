@@ -518,3 +518,28 @@ Making charge, labor, VAT/tax components = explicit fee/tax component lines with
 
 ## Status: ME-001…ME-010 **LOCKED** 2026-09-02
 
+
+---
+
+## Requirements Lock (MR-168 … MR-183) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-168 | Gold/silver support | ✅ LOCKED | `ref_instruments.asset_class = metal` + platforms |
+| MR-169 | Gross weight | ✅ LOCKED | `inv_metals_holdings.quantity_mg` / tx `quantity_mg` (mg canonical) |
+| MR-170 | Purity | ✅ LOCKED | `purity_code` + `purity_ratio` (0–1) |
+| MR-171 | Fine weight | ✅ LOCKED | Derived: `quantity_mg × purity_ratio` (never stored as SoT) |
+| MR-172 | Unit of weight | ✅ LOCKED | mg canonical; display conversion table only |
+| MR-173 | Buy/sell price | ✅ LOCKED | `metal_price_per_mg` + total `amount` |
+| MR-174 | Fabrication/premium | ✅ LOCKED | `premium_amount` **separate** from metal price (never folded into unit metal price) |
+| MR-175 | Brokerage/dealer fee | ✅ LOCKED | `fee_amount` + `fee_currency` on transaction |
+| MR-176 | Delivery fee | ✅ LOCKED | `inv_metals_physical_deliveries.fee_amount` (logistics only) |
+| MR-177 | Physical delivery | ✅ LOCKED | `inv_metals_physical_deliveries` + link to `pa_assets` on completion |
+| MR-178 | Account/location/custody | ✅ LOCKED | `inv_metals_platforms` + optional `fin_account_id` |
+| MR-179 | Partial sales | ✅ LOCKED | `is_partial` + `quantity_mg ≤ holding.quantity_mg`; cost-basis releases proportional carrying |
+| MR-180 | Historical cost | ✅ LOCKED | `total_invested` + `average_cost_per_mg` maintained by Cost-Basis Engine |
+| MR-181 | Valuation price | ✅ LOCKED | `price_history` for metal instruments (quoteBasis per purity / per coin); offline last-known + manual override |
+| MR-182 | FX if quoted in another currency | ✅ LOCKED | `exchange_rate_to_base` on every tx |
+| MR-183 | Standalone mode | ✅ LOCKED | Feature-Independence-Contract; metals APIs usable without full ledger UI |
+
+**Conservation rules:** premium and trade fee are distinct legs; delivery fee is a separate cash event; partial sell conserves cost basis (same as transferCost / economic-swap invariants).
