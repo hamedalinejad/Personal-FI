@@ -297,3 +297,13 @@ Authority for residual work order remains the roadmap + GO-NO-GO.
 | Already-deleted list (4.1) | Confirmed — do not recreate |
 | Remaining 4.2 candidates | Kept for unique-content verification in next pass |
 | Authority files (4.3) | Untouched |
+
+## 2026-09-05 Schema freeze completion pass
+
+| Area | Result |
+|------|--------|
+| PARTIAL tables | CHECKs + missing columns added (durability_state, line_number/line_kind, reconciled_by, is_active, start/maturity, bounced_reason, tx_type/ca_type/status checks, recurring FKs, pa_asset_id FK, …) |
+| Missing CREATE (real) | docs_*, not_settings, not_custom_reminders, rpt_presets, rpt_net_worth_snapshots, port_*, dash_*, tax_records, stg_*, sec_settings/session_logs, price_sync_settings, ref_integrity_queue |
+| Intentional omissions | crypto/stocks/metals platform cash tx tables + bg_transfers — no ghost cash ledgers |
+| Naming | not_ / rpt_ / stg_ / docs_ locked; notif_/rep_ legacy only |
+| Schema freeze residual | drift test + full field-inventory still needed for Gate H GREEN |

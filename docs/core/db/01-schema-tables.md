@@ -255,3 +255,22 @@ Cash balance SoT = fin_journal_lines only
 FORBIDDEN: SUM(acc_transactions) + SUM(journal) for the same economic cash movement
 FORBIDDEN: describing acc_transactions as «دفتر کل نقد» / cash ledger of record
 ```
+
+---
+
+## Naming freeze (2026-09-05)
+
+| Concept | Canonical prefix in schema.sql |
+|---------|--------------------------------|
+| Notifications | `not_` |
+| Reports | `rpt_` |
+| Budget links | `bg_transaction_links` (no `bg_transfers` table) |
+| Settings | `stg_` |
+| Documents | `docs_` |
+| Security | `sec_` |
+| Portfolio UI | `port_` |
+| Dashboard UI | `dash_` |
+
+Docs that still say `notif_` / `rep_` are legacy aliases; implementation must use the canonical prefixes above.
+
+Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_transfers`) are **intentionally not created** — cash SoT is Core journal only.

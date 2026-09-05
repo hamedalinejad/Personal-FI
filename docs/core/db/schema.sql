@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   command_hash      TEXT,
   operation_type    TEXT NOT NULL,
   status            TEXT NOT NULL CHECK (status IN ('draft', 'posted', 'reversed')),
-  durability_state  TEXT,
+  durability_state  TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','temp_written','committed','swapped','failed')),
   business_date     TEXT NOT NULL, -- DATE-only
   event_at          TEXT,
   settlement_date   TEXT,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   engine_versions   TEXT, -- JSON
   attribution_algorithm_version TEXT,
   reverses_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  source            TEXT, -- ui|api|import|migration|system
+  source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
   created_at        TEXT NOT NULL,
   posted_at         TEXT
 );
@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   amount_in_base  TEXT,
   exchange_rate_to_base TEXT,
   conversion_path TEXT, -- JSON when hops > 1
+  line_number     INTEGER,
+  line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','fee','tax','fx','adjustment','other')),
   memo            TEXT
 );
 
@@ -81,12 +83,13 @@ CREATE TABLE IF NOT EXISTS fin_audit_log (
 );
 
 CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
-  id           TEXT PRIMARY KEY,
-  scope        TEXT NOT NULL,
-  as_of        TEXT,
-  status       TEXT NOT NULL,
-  result_json  TEXT,
-  created_at   TEXT NOT NULL
+  id             TEXT PRIMARY KEY,
+  scope          TEXT NOT NULL,
+  as_of          TEXT,
+  status         TEXT NOT NULL CHECK (status IN ('running','completed','failed','cancelled')),
+  result_json    TEXT,
+  reconciled_by  TEXT,
+  created_at     TEXT NOT NULL
 );
 
 -- ─── Instrument registry (BUG-D03 / B-001 identity) ──────────
@@ -101,7 +104,8 @@ CREATE TABLE IF NOT EXISTS ref_instruments (
   cost_currency_default TEXT,
   meta_json            TEXT,
   created_at           TEXT NOT NULL,
-  updated_at           TEXT NOT NULL
+  updated_at           TEXT NOT NULL,
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1))
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_ref_instr_chain_contract
@@ -209,7 +213,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   operation_id    TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   holding_id      TEXT REFERENCES inv_crypto_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id   TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type         TEXT NOT NULL,
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','transfer_in','transfer_out','deposit','withdraw','fee','adjustment','swap')),
   business_date   TEXT NOT NULL,
   gross_quantity  TEXT,
   fee_quantity    TEXT,
@@ -229,8 +233,11 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   principal          TEXT NOT NULL,
   currency           TEXT NOT NULL,
   interest_rate      TEXT,
-  status             TEXT NOT NULL,
+  status TEXT CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')) NOT NULL,
   created_at         TEXT NOT NULL
+,
+  start_date TEXT,
+  maturity_date TEXT
 );
 
 CREATE TABLE IF NOT EXISTS ln_schedule_snapshots (
@@ -274,13 +281,13 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
   due_date        TEXT,
   sayadi_id       TEXT,
   cheque_number   TEXT,
-  status          TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft','issued','deposited','cleared','bounced','cancelled','returned')) NOT NULL,
   cleared_date    TEXT,
   effective_cash_date TEXT,
   bounced_date    TEXT,
   operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  created_at      TEXT NOT NULL
-);
+  created_at      TEXT NOT NULL,
+  bounced_reason TEXT);
 
 -- ─── Import preservation envelope (P0-FINAL-039) ─────────────
 CREATE TABLE IF NOT EXISTS import_raw_records (
@@ -299,8 +306,8 @@ CREATE TABLE IF NOT EXISTS import_raw_records (
   user_override_json    TEXT, -- user override + reason (MR-239)
   reconciliation_status TEXT NOT NULL DEFAULT 'unreconciled', -- unreconciled|matched|partial|ignored (MR-240)
   imported_at           TEXT NOT NULL,
-  created_at            TEXT NOT NULL DEFAULT (datetime('now'))
-);
+  created_at            TEXT NOT NULL DEFAULT (datetime('now')),
+  source_file_name TEXT);
 
 CREATE INDEX IF NOT EXISTS idx_import_raw_batch ON import_raw_records(batch_id);
 CREATE INDEX IF NOT EXISTS idx_import_raw_hash ON import_raw_records(raw_record_hash);
@@ -338,7 +345,7 @@ INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
 CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  venue_kind TEXT, -- exchange|wallet
+  venue_kind TEXT CHECK (venue_kind IN ('cex','dex','wallet','other')), -- exchange|wallet
   created_at TEXT NOT NULL
 );
 
@@ -403,7 +410,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   holding_id TEXT REFERENCES inv_stocks_iran_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL,
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','dividend','corporate_action','fee','adjustment')),
   trade_date TEXT NOT NULL,
   settlement_date TEXT,
   quantity TEXT NOT NULL,
@@ -418,7 +425,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_corporate_actions (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  ca_type TEXT NOT NULL,
+  ca_type TEXT NOT NULL CHECK (ca_type IN ('split','reverse_split','dividend','rights','bonus','merger','other')),
   ex_date TEXT,
   record_date TEXT,
   payment_date TEXT,
@@ -449,7 +456,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL, -- subscribe|redeem|distribution|reinvest|…
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','dividend','reinvest','fee','adjustment')), -- subscribe|redeem|distribution|reinvest|…
   trade_date TEXT NOT NULL,
   settlement_date TEXT,
   quantity TEXT,
@@ -519,7 +526,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_physical_deliveries (
 CREATE TABLE IF NOT EXISTS pa_assets (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  asset_kind TEXT, -- gold|coin|vehicle|real_estate|electronics|other
+  asset_kind TEXT CHECK (asset_kind IS NULL OR asset_kind IN ('gold','coin','vehicle','real_estate','electronics','other')), -- gold|coin|vehicle|real_estate|electronics|other
   currency TEXT NOT NULL,
   purchase_date TEXT, -- DATE-only (MR-185)
   acquisition_cost TEXT, -- original total cost (MR-186)
@@ -541,7 +548,7 @@ CREATE TABLE IF NOT EXISTS pa_transactions (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL, -- purchase|sale|valuation_adj|maintenance|disposal
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('purchase','sale','valuation_adj','maintenance','disposal')), -- purchase|sale|valuation_adj|maintenance|disposal
   business_date TEXT NOT NULL,
   amount TEXT NOT NULL, -- consideration
   currency TEXT NOT NULL,
@@ -569,7 +576,7 @@ CREATE TABLE IF NOT EXISTS bg_budgets (
   id TEXT PRIMARY KEY,
   period_key TEXT NOT NULL,
   currency TEXT NOT NULL,
-  income_source_mode TEXT, -- calculated|manual
+  income_source_mode TEXT CHECK (income_source_mode IS NULL OR income_source_mode IN ('calculated','manual')), -- calculated|manual
   total_income TEXT,
   status TEXT NOT NULL,
   created_at TEXT NOT NULL,
@@ -600,7 +607,7 @@ CREATE TABLE IF NOT EXISTS fg_goals (
   target_amount TEXT NOT NULL,
   current_amount_snapshot TEXT, -- DERIVED
   target_date TEXT,
-  funding_mode TEXT, -- earmark|segregated_cash
+  funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup')), -- earmark|segregated_cash
   status TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
@@ -632,7 +639,7 @@ CREATE TABLE IF NOT EXISTS br_occurrences (
   due_date TEXT NOT NULL,
   scheduled_amount TEXT NOT NULL,
   paid_amount TEXT,
-  status TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pending','due','paid','skipped','cancelled')) NOT NULL,
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   UNIQUE (item_id, occurrence_key)
 );
@@ -661,7 +668,7 @@ CREATE TABLE IF NOT EXISTS cur_currencies (
   code TEXT PRIMARY KEY,
   name TEXT,
   minor_units INTEGER NOT NULL DEFAULT 2,
-  is_active INTEGER NOT NULL DEFAULT 1
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS cur_exchange_rates (
@@ -689,7 +696,7 @@ CREATE TABLE IF NOT EXISTS cat_categories (
   name TEXT NOT NULL,
   kind TEXT, -- income|expense|…
   parent_id TEXT REFERENCES cat_categories(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  is_active INTEGER NOT NULL DEFAULT 1
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS not_notifications (
@@ -698,7 +705,7 @@ CREATE TABLE IF NOT EXISTS not_notifications (
   category TEXT,
   title TEXT NOT NULL,
   body TEXT,
-  is_read INTEGER NOT NULL DEFAULT 0,
+  is_read INTEGER NOT NULL DEFAULT 0 CHECK (is_read IN (0, 1)),
   dismissed_at TEXT,
   snooze_until TEXT,
   created_at TEXT NOT NULL
@@ -763,7 +770,7 @@ CREATE TABLE IF NOT EXISTS sec_encryption_meta (
 
 CREATE TABLE IF NOT EXISTS sec_access_log (
   id TEXT PRIMARY KEY,
-  event_type TEXT NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('login','logout','unlock','export','backup','settings_change','denied')),
   created_at TEXT NOT NULL,
   detail TEXT
 );
@@ -805,7 +812,7 @@ CREATE TABLE IF NOT EXISTS inc_transactions (
   category_id             TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
   has_attachment          INTEGER NOT NULL DEFAULT 0 CHECK (has_attachment IN (0, 1)),
   attachment_path         TEXT,
-  recurring_id            TEXT, -- FK added after table
+  recurring_id TEXT REFERENCES inc_recurring(id) ON DELETE SET NULL ON UPDATE CASCADE, -- FK added after table
   account_transaction_id  TEXT REFERENCES acc_transactions(id) ON DELETE SET NULL ON UPDATE CASCADE,
   is_voided               INTEGER NOT NULL DEFAULT 0 CHECK (is_voided IN (0, 1)),
   reversed_income_id      TEXT REFERENCES inc_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -851,7 +858,7 @@ CREATE TABLE IF NOT EXISTS exp_transactions (
   category_id             TEXT REFERENCES cat_categories(id) ON DELETE SET NULL ON UPDATE CASCADE,
   has_attachment          INTEGER NOT NULL DEFAULT 0 CHECK (has_attachment IN (0, 1)),
   attachment_path         TEXT,
-  recurring_id            TEXT,
+  recurring_id TEXT REFERENCES exp_recurring(id) ON DELETE SET NULL ON UPDATE CASCADE,
   account_transaction_id  TEXT REFERENCES acc_transactions(id) ON DELETE SET NULL ON UPDATE CASCADE,
   is_voided               INTEGER NOT NULL DEFAULT 0 CHECK (is_voided IN (0, 1)),
   reversed_expense_id     TEXT REFERENCES exp_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -926,3 +933,165 @@ CREATE TABLE IF NOT EXISTS tax_categories (
 
 -- Field no-loss: all domain tables carry operation_id, source_*, import_*, exchange_rate_to_base,
 -- original amount/currency as TEXT decimal, reversal chain via reversed_*_id + fin_operations.reverses_operation_id
+
+-- ═══════════════════════════════════════════════════════════
+-- Schema freeze completion 2026-09-05 — missing domain tables
+-- Cash projection tables intentionally OMITTED (Core journal SoT)
+-- Naming: not_ notifications, rpt_ reports (canonical)
+-- ═══════════════════════════════════════════════════════════
+
+-- Documents (MR-192 evidence links)
+CREATE TABLE IF NOT EXISTS docs_documents (
+  id           TEXT PRIMARY KEY,
+  title        TEXT,
+  mime_type    TEXT,
+  storage_path TEXT NOT NULL,
+  checksum     TEXT,
+  size_bytes   INTEGER,
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS docs_links (
+  id          TEXT PRIMARY KEY,
+  document_id TEXT NOT NULL REFERENCES docs_documents(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  entity_type TEXT NOT NULL, -- pa_asset|tax_event|loan|cheque|import_raw|...
+  entity_id   TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_docs_links_entity ON docs_links(entity_type, entity_id);
+
+-- Notifications settings (canonical not_ prefix)
+CREATE TABLE IF NOT EXISTS not_settings (
+  id         TEXT PRIMARY KEY,
+  key        TEXT NOT NULL UNIQUE,
+  value_json TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS not_custom_reminders (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  due_at      TEXT NOT NULL,
+  recurrence  TEXT,
+  is_active   INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at  TEXT NOT NULL
+);
+
+-- Reports presets / net-worth history (canonical rpt_ prefix)
+CREATE TABLE IF NOT EXISTS rpt_presets (
+  id          TEXT PRIMARY KEY,
+  name        TEXT NOT NULL,
+  report_kind TEXT NOT NULL,
+  params_json TEXT,
+  created_at  TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS rpt_net_worth_snapshots (
+  id           TEXT PRIMARY KEY,
+  as_of        TEXT NOT NULL,
+  total_assets TEXT NOT NULL,
+  total_liabilities TEXT NOT NULL,
+  net_worth    TEXT NOT NULL,
+  currency     TEXT NOT NULL,
+  payload_json TEXT,
+  created_at   TEXT NOT NULL
+);
+
+-- Portfolio / Dashboard UI state (never financial SoT)
+CREATE TABLE IF NOT EXISTS port_snapshots (
+  id           TEXT PRIMARY KEY,
+  as_of        TEXT NOT NULL,
+  payload_json TEXT NOT NULL,
+  created_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS port_settings (
+  id         TEXT PRIMARY KEY,
+  key        TEXT NOT NULL UNIQUE,
+  value_json TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dash_layouts (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  layout_json TEXT NOT NULL,
+  is_default INTEGER NOT NULL DEFAULT 0 CHECK (is_default IN (0, 1)),
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dash_widget_configs (
+  id         TEXT PRIMARY KEY,
+  layout_id  TEXT REFERENCES dash_layouts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  widget_kind TEXT NOT NULL,
+  config_json TEXT,
+  created_at TEXT NOT NULL
+);
+
+-- Tax records (config/reporting companion to tax_events ledger)
+CREATE TABLE IF NOT EXISTS tax_records (
+  id           TEXT PRIMARY KEY,
+  period_key   TEXT NOT NULL,
+  jurisdiction TEXT NOT NULL,
+  summary_json TEXT,
+  status       TEXT NOT NULL CHECK (status IN ('draft','filed','amended')),
+  created_at   TEXT NOT NULL
+);
+
+-- Settings
+CREATE TABLE IF NOT EXISTS stg_settings (
+  id         TEXT PRIMARY KEY,
+  key        TEXT NOT NULL UNIQUE,
+  value_json TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS stg_backup_logs (
+  id            TEXT PRIMARY KEY,
+  backup_path   TEXT,
+  checksum      TEXT,
+  status        TEXT NOT NULL CHECK (status IN ('started','completed','failed','verified')),
+  created_at    TEXT NOT NULL
+);
+
+-- Security
+CREATE TABLE IF NOT EXISTS sec_settings (
+  id         TEXT PRIMARY KEY,
+  key        TEXT NOT NULL UNIQUE,
+  value_json TEXT,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sec_session_logs (
+  id         TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL CHECK (event_type IN ('start','end','lock','unlock','timeout')),
+  at         TEXT NOT NULL,
+  detail     TEXT
+);
+
+-- Price sync settings (opt-in online)
+CREATE TABLE IF NOT EXISTS price_sync_settings (
+  id         TEXT PRIMARY KEY,
+  source_id  TEXT REFERENCES price_sources(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  enabled    INTEGER NOT NULL DEFAULT 0 CHECK (enabled IN (0, 1)),
+  interval_minutes INTEGER,
+  updated_at TEXT NOT NULL
+);
+
+-- Integrity queue (async checks)
+CREATE TABLE IF NOT EXISTS ref_integrity_queue (
+  id         TEXT PRIMARY KEY,
+  check_kind TEXT NOT NULL,
+  payload_json TEXT,
+  status     TEXT NOT NULL CHECK (status IN ('pending','running','done','failed')),
+  created_at TEXT NOT NULL,
+  finished_at TEXT
+);
+
+-- INTENTIONAL OMISSIONS (no ghost cash ledgers):
+-- inv_crypto_exchange_transactions / inv_stocks_iran_brokerage_transactions /
+-- inv_metals_platform_transactions / bg_transfers
+-- Cash moves only through Core fin_journal_lines + CashSettlementPort.
+-- Domain tables remain specialized qty/price/fee; cash balance is journal SoT.
