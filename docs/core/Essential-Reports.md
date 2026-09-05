@@ -88,3 +88,27 @@ InvestmentReturn = Realized + Unrealized + RecognizedIncome − RecognizedInvest
 ```
 
 Mixed legacy formulas that double-count sales/profit are **forbidden**.
+
+---
+
+## Requirements Lock (MR-297 … MR-309) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-297 | Net Worth report | ✅ LOCKED | Portfolio-Wealth-Overview + Essential-Reports; assets − liabilities at asOf |
+| MR-298 | Cash Flow report | ✅ LOCKED | income − expense over period from journal + domain income/expense; period filter |
+| MR-299 | Income Statement | ✅ LOCKED | revenue − expenses (P&L) for period; projection from journal + categories |
+| MR-300 | Balance Sheet | ✅ LOCKED | assets = liabilities + equity at asOf; journal-derived snapshot |
+| MR-301 | Investment P&L | ✅ LOCKED | Cost-Basis-Engine realized + unrealized |
+| MR-302 | Realized vs Unrealized P&L | ✅ LOCKED | separate columns/sections; realized from disposals, unrealized from valuation − carrying |
+| MR-303 | Tax report | ✅ LOCKED | Tax-Management tax_events by period_key / jurisdiction |
+| MR-304 | Loan amortization schedule | ✅ LOCKED | Loan-Schedule-Engine schedule snapshot + residual |
+| MR-305 | Portfolio allocation | ✅ LOCKED | asset class / instrument weight % of total portfolio value at asOf |
+| MR-306 | Historical wealth bridge | ✅ LOCKED | Essential-Reports: opening NW → flows → valuation Δ → closing NW |
+| MR-307 | Period return | ✅ LOCKED | Essential-Reports TWR / simple return; explicit formula |
+| MR-308 | Fee analysis | ✅ LOCKED | total fees by category / instrument / fee_kind from domain txs + journal |
+| MR-309 | Category spending | ✅ LOCKED | expense by category over time (from exp_transactions / journal + cat_categories) |
+
+All reports are **projections** from Ledger + Engines + Valuation; never a second SoT.  
+UI lives under the single Reports page (Sheet), not extra nav routes.  
+asOf / period parameters mandatory; multi-currency via historical FX.

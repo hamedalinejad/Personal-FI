@@ -284,3 +284,16 @@ OPEN-001 residual reduced: priority domain tables now present.
 | Explicit v1 exclusions | NFT/DeFi/webhooks/cloud sync/multi-entity remain out |
 
 Authority for residual work order remains the roadmap + GO-NO-GO.
+
+## 2026-09-05 Reports + file lifecycle pass
+
+| Item | Result |
+|------|--------|
+| MR-297…309 Reports | All ✅ LOCKED in Essential-Reports.md |
+| Architecture-Final.md | Converted to pointer → ARCHITECTURE-LOCKED.md |
+| Concept-Ownership-Matrix.md | Converted to pointer → Canonical-Ownership-Matrix.md |
+| Financial-Scenario-Catalog.md | Converted to pointer → fixtures/ |
+| Feature-Package-Architecture.md | Converted to pointer → Feature-Independence-Contract.md |
+| Already-deleted list (4.1) | Confirmed — do not recreate |
+| Remaining 4.2 candidates | Kept for unique-content verification in next pass |
+| Authority files (4.3) | Untouched |

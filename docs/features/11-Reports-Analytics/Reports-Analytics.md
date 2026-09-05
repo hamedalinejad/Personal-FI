@@ -326,3 +326,10 @@ Export detects stale snapshot → rebuild or fail/warn with explicit stale (BATC
 
 Status: **LOCKED** 2026-09-02
 
+
+---
+
+## Requirements Lock (MR-297 … MR-309)
+
+See canonical lock table in `docs/core/Essential-Reports.md` (2026-09-05).  
+Reports feature is a pure aggregator; all formulas and SoT rules live in Core Essential-Reports + engines.
