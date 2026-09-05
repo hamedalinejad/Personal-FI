@@ -930,3 +930,16 @@ Canonical configurable `StalePolicy` per asset class (freshWithin, staleAfter, o
 `docs/core/Market-Data-Quality-Pipeline.md` عبور کند قبل از Canonical price/candle.
 
 AI یا سیگنال روی Raw/Rejected **ممنوع** است.
+
+---
+
+## Requirements Lock (MR-224 … MR-229) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-224 | Manual price | ✅ LOCKED | `price_history` with `is_manual = 1` |
+| MR-225 | Imported CSV/JSON | ✅ LOCKED | Import pipeline → `price_history` (source kind = csv_import); raw preserved in import_raw_records |
+| MR-226 | Local cached observation | ✅ LOCKED | `price_history` is the local cache / SoT for observations |
+| MR-227 | Optional online adapter | ✅ LOCKED | `price_sources` kind = online_adapter (opt-in only; offline default) |
+| MR-228 | Provenance per observation | ✅ LOCKED | `provenance_json` + columns: instrument, market_date, quote_type, currency, is_stale, is_manual, source_id |
+| MR-229 | Never use "latest" without as-of | ✅ LOCKED | Financial-Invariants §10; every valuation requires explicit as-of / market_date |

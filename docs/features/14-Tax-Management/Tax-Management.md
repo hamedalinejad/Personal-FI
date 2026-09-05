@@ -319,3 +319,24 @@ New writes only `linkedTaxEventId` (canonical). Legacy columns read-only migrati
 
 Status: **LOCKED** 2026-09-02
 
+
+---
+
+## Requirements Lock (MR-196 … MR-207) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-196 | Policy-driven (not hard-coded) | ✅ LOCKED | `tax_categories.policy_json` + rule_version; rates never hard-coded in engine |
+| MR-197 | Tax year | ✅ LOCKED | `tax_events.period_key` (e.g. 1404, 2025-IR) |
+| MR-198 | Jurisdiction | ✅ LOCKED | `tax_categories.jurisdiction` + denormalized on event |
+| MR-199 | Tax rule version | ✅ LOCKED | `tax_categories.rule_version` + `tax_events.rule_version` |
+| MR-200 | Taxable event | ✅ LOCKED | `tax_events.tax_kind` + link to `operation_id` |
+| MR-201 | Basis | ✅ LOCKED | `tax_events.basis_amount` (cost basis from Cost-Basis Engine) |
+| MR-202 | Realized gain source | ✅ LOCKED | `tax_events.operation_id` → investment disposal/realized operation |
+| MR-203 | Deductible expenses | ✅ LOCKED | `is_deductible` flag on event / fee role matrix in Fee-Treatment |
+| MR-204 | Holding period | ✅ LOCKED | `holding_period_days` (short vs long-term classification) |
+| MR-205 | Loss carry rules | ✅ LOCKED | Policy in `policy_json`; carry-forward tracked as subsequent tax_events with kind=loss_carry |
+| MR-206 | Evidence/document | ✅ LOCKED | `document_id` → Documents module (polymorphic link) |
+| MR-207 | Manual adjustment with audit trail | ✅ LOCKED | `is_manual_adjustment` + `adjustment_reason` + `fin_audit_log` entry required |
+
+Tax is always event-ledger (`tax_events`); configuration lives in `tax_categories`. No parallel tax truth.

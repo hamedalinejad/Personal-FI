@@ -486,3 +486,26 @@ valueInBase(asOf) = price(instrument, quote, asOf) × convert(1, quote, base, as
 در کد و schema: **`exchangeRateToBase`** (= basePerTransactionUnit).
 عبارت UI «نرخ تتر» فقط label نمایشی است وقتی base یا quote مرتبط با USDT است — **نه** نام فیلد canonical.
 Rate source جدا: `rateSource` / `rateId`.
+
+---
+
+## Requirements Lock (MR-208 … MR-223) — 100% complete 2026-09-05
+
+| # | Requirement | Status | Implementation |
+|---|-------------|--------|----------------|
+| MR-208 | Base currency | ✅ LOCKED | `cur_currency_preferences.base_currency` |
+| MR-209 | Transaction currency | ✅ LOCKED | Domain tx `currency` field (every financial event) |
+| MR-210 | Instrument currency | ✅ LOCKED | `ref_instruments` attributes / cost_currency_default |
+| MR-211 | Quote/base orientation | ✅ LOCKED | `price_history.quote_basis` (per_unit, per_coin, per_mg, nav, …) |
+| MR-212 | Cross rate | ✅ LOCKED | `cur_exchange_rates` |
+| MR-213 | Inverse rate | ✅ LOCKED | Deterministic `1/rate`; never store both directions as independent truth |
+| MR-214 | Multi-hop path | ✅ LOCKED | `conversion_path` JSON on journal lines + on rate row when used |
+| MR-215 | Observation date/time | ✅ LOCKED | `cur_exchange_rates.as_of` + `price_history.market_date` |
+| MR-216 | Source priority | ✅ LOCKED | `price_sources.priority` / `source_priority` (lower = preferred) |
+| MR-217 | Source identity | ✅ LOCKED | `price_sources.id` + name |
+| MR-218 | Stale status | ✅ LOCKED | `price_history.is_stale` |
+| MR-219 | Missing rate behavior | ✅ LOCKED | Engine **must not** silently zero; fail closed or mark DEGRADED |
+| MR-220 | Degraded valuation mode | ✅ LOCKED | `is_degraded` flag + valuation status DEGRADED |
+| MR-221 | Manual override | ✅ LOCKED | `price_history.is_manual` / rate `is_manual` |
+| MR-222 | Historical lock of rate | ✅ LOCKED | `exchange_rate_to_base` immutable on posted operation |
+| MR-223 | Reproducibility | ✅ LOCKED | Financial-Invariants §11 + calculationContextHash |

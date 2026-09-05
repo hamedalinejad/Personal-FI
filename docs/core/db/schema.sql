@@ -159,21 +159,29 @@ CREATE TABLE IF NOT EXISTS acc_transaction_links (
 
 -- ─── Prices ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS price_sources (
-  id   TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  priority INTEGER NOT NULL DEFAULT 100
+  id       TEXT PRIMARY KEY,
+  name     TEXT NOT NULL,
+  priority INTEGER NOT NULL DEFAULT 100, -- lower = higher priority (MR-216)
+  kind     TEXT, -- manual|csv_import|online_adapter|local_cache
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS price_history (
   id              TEXT PRIMARY KEY,
   instrument_id   TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   source_id       TEXT REFERENCES price_sources(id) ON DELETE SET NULL ON UPDATE CASCADE,
-  market_date     TEXT NOT NULL,
+  market_date     TEXT NOT NULL, -- as-of date (never "latest" without as-of)
   price           TEXT NOT NULL,
   currency        TEXT NOT NULL,
-  quote_basis     TEXT,
-  quote_type      TEXT, -- last|close|nav|manual|…
+  quote_basis     TEXT, -- per_unit|per_coin|per_mg|nav|... (MR-211)
+  quote_type      TEXT, -- last|close|nav|manual|imported
+  is_manual       INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- MR-221 / MR-224
+  is_stale        INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- MR-218
+  is_degraded     INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- MR-220 DEGRADED mode
+  provenance_json TEXT, -- instrument, market, price type, currency, timestamp, stale, override (MR-228)
   fetched_at      TEXT,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (instrument_id, market_date, source_id, quote_type)
 );
 
@@ -616,13 +624,22 @@ CREATE TABLE IF NOT EXISTS br_occurrences (
 
 CREATE TABLE IF NOT EXISTS tax_events (
   id TEXT PRIMARY KEY,
-  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tax_kind TEXT NOT NULL,
-  amount TEXT NOT NULL,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- source investment/realized op (MR-202)
+  tax_kind TEXT NOT NULL, -- capital_gain|income|withholding|adjustment|...
+  amount TEXT NOT NULL, -- tax amount (decimal string)
   currency TEXT NOT NULL,
-  period_key TEXT,
-  status TEXT NOT NULL,
-  created_at TEXT NOT NULL
+  period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR (MR-197)
+  jurisdiction TEXT, -- denormalized from category or override (MR-198)
+  rule_version TEXT, -- tax rule version applied (MR-199)
+  basis_amount TEXT, -- cost basis used for this tax event (MR-201)
+  holding_period_days INTEGER, -- for short vs long-term (MR-204)
+  is_deductible INTEGER NOT NULL DEFAULT 0 CHECK (is_deductible IN (0, 1)), -- fee/expense deductible flag (MR-203)
+  is_manual_adjustment INTEGER NOT NULL DEFAULT 0 CHECK (is_manual_adjustment IN (0, 1)),
+  adjustment_reason TEXT, -- required when manual (MR-207)
+  document_id TEXT, -- link to docs_documents evidence (MR-206)
+  status TEXT NOT NULL, -- draft|posted|amended|void
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS cur_currencies (
@@ -636,10 +653,12 @@ CREATE TABLE IF NOT EXISTS cur_exchange_rates (
   id TEXT PRIMARY KEY,
   from_currency TEXT NOT NULL,
   to_currency TEXT NOT NULL,
-  rate TEXT NOT NULL,
-  as_of TEXT NOT NULL,
+  rate TEXT NOT NULL, -- always store direct; inverse = 1/rate deterministic (MR-213)
+  as_of TEXT NOT NULL, -- observation date/time (MR-215)
   source TEXT,
   source_priority INTEGER NOT NULL DEFAULT 100,
+  conversion_path TEXT, -- JSON multi-hop when used (MR-214)
+  is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)),
   created_at TEXT NOT NULL
 );
 
@@ -879,12 +898,15 @@ CREATE INDEX IF NOT EXISTS idx_ln_fee_tiers_loan ON ln_loan_fee_tiers(loan_id, t
 
 -- Tax: tax_events is event ledger; configuration stays in settings or separate tax_categories if needed later
 CREATE TABLE IF NOT EXISTS tax_categories (
-  id          TEXT PRIMARY KEY,
-  code        TEXT NOT NULL UNIQUE,
-  name        TEXT NOT NULL,
-  jurisdiction TEXT, -- IR|...
-  is_active   INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
-  created_at  TEXT NOT NULL
+  id           TEXT PRIMARY KEY,
+  code         TEXT NOT NULL UNIQUE,
+  name         TEXT NOT NULL,
+  jurisdiction TEXT NOT NULL, -- IR|US|... (MR-198)
+  rule_version TEXT, -- active rule set version (MR-199)
+  policy_json  TEXT, -- policy-driven rules, never hard-coded rates (MR-196)
+  is_active    INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
 );
 
 -- Field no-loss: all domain tables carry operation_id, source_*, import_*, exchange_rate_to_base,
