@@ -23,7 +23,10 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed'))
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed')),
+  role TEXT,
+  reconciliation_status TEXT CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')),
+  external_ref_json TEXT
 );
 
 CREATE TABLE IF NOT EXISTS fin_operations (
@@ -44,7 +47,8 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   posted_at         TEXT,
   CHECK (status != 'posted' OR command_hash IS NOT NULL),
   failed_at TEXT,
-  voided_at TEXT
+  voided_at TEXT,
+  corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE  -- correction = new op after reverse
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_operations_command_hash
@@ -74,7 +78,9 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   line_number INTEGER NOT NULL DEFAULT 1,
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')),
   memo            TEXT,
-  reference TEXT
+  reference TEXT,
+  source_type TEXT CHECK (source_type IS NULL OR source_type IN ('ui','api','import','migration','system','reconciliation')),
+  source_reference TEXT
 );
 
 CREATE TABLE IF NOT EXISTS fin_audit_log (
@@ -146,7 +152,10 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   is_archived     INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
   created_at      TEXT NOT NULL,
   updated_at      TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed'))
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed')),
+  role TEXT CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')),
+  reconciliation_status TEXT CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')),
+  external_ref_json TEXT
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
@@ -286,7 +295,9 @@ CREATE TABLE IF NOT EXISTS ln_transactions (
   business_date TEXT NOT NULL,
   amount        TEXT NOT NULL,
   currency      TEXT NOT NULL,
-  created_at    TEXT NOT NULL
+  created_at    TEXT NOT NULL,
+  payment_date TEXT, -- when cash actually moved (may differ from business_date)
+  exchange_rate_to_base TEXT
 );
 
 -- ─── Cheques ─────────────────────────────────────────────────

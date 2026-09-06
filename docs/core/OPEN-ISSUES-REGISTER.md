@@ -445,3 +445,23 @@ Domain-only (decimal.js): positive amounts, fee consistency, reverse targets, RR
 | 136-137,139,141,146-147,150 | already CHECK |
 | 142-143 watermark/hash | format comments |
 | 148 session detail | no PII documented |
+
+
+## MR residual close 2026-09-06 (late)
+
+| ID | Result |
+|----|--------|
+| MR-004/019 account_kind CHECK | already present |
+| MR-010 journal line source_type/reference | ADDED |
+| MR-013 corrects_operation_id | ADDED |
+| MR-025/026/027 role, reconciliation_status, external_ref_json | ADDED |
+| MR-028…033 reconciliation docs | Reconciliation-Policy.md |
+| MR-036…041 correction rules | same |
+| MR-048 Persian digits | documented (engine) |
+| MR-055 payment_date | ADDED on ln_transactions |
+| MR-058 Iran calendar | documented |
+| MR-137/189 depreciation_policy | already present |
+| MR-216 priority >= 0 | already present |
+| MR-219 missing rate | documented |
+| MR-291…296 Gate H / inventory | remains OPEN (implementation + TSV) |
+| MR-290 migration scripts | remains OPEN (implementation branch) |
