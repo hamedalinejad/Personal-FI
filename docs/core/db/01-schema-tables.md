@@ -281,3 +281,6 @@ Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_tr
 | `sec_access_log` | Security | لاگ دسترسی |
 | `sec_encryption_meta` | Security | متادیتای رمزنگاری |
 | `usr_settings` | Settings | تنظیمات کاربر |
+
+
+> **Cash rule:** `acc_transactions` and all `inv_*_cash` are event log or projection. Cash balance SoT = `fin_accounts` + `fin_journal_lines` only.

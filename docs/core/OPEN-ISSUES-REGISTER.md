@@ -476,3 +476,14 @@ Domain-only (decimal.js): positive amounts, fee consistency, reverse targets, RR
 | OPEN-003 | field-inventory.checklist.tsv expanded from schema CREATE columns |
 | OPEN-004 | OPEN-004-FIXTURE-GAP.md CI family plan documented |
 | OPEN-006 / MR-290 / P0-008… | remain implementation branch |
+
+
+## P0-DOC-001…014 CLOSED — P files policy 2026-09-07
+
+Cash SoT, instrument identity, fee/C2C, standalone accountId, CA ownership locked in concept homes + P0-DOC-CLOSED-PREVENTION.
+
+**Do not delete:** P0-DOC-CLOSED-PREVENTION, BUG-CODE-REGRESSION-INVARIANTS, P1-GLOBAL-CONTRACTS, P1-IRAN-PERFORMANCE-FIXTURES-ACCEPTANCE.
+
+**Already deleted (do not restore):** feature *-LOCKS.md, pure pointers (Architecture-Final, etc.).
+
+P1-DOC-015/016 remain work (matrix automation, Gate H) — not extra P files to invent.
