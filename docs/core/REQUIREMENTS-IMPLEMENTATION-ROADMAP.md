@@ -229,3 +229,36 @@ No code on main; all above are docs-tracked for the implementation branch.
 | **R-019** | License blob outside financial SQLite; one DB file per user; expiry cannot wipe history | Shell v1 parallel |
 
 Docs authority already present: Feature-Independence-Contract, GOLDEN-GATE, Portfolio-Wealth-Overview, Tax-Management, Reports-Analytics, Dashboard, License-Offline.
+
+## R-021…R-051 Iran / Reports / Settings (spec lock 2026-09-07)
+
+### P1 scope
+
+| ID | Requirement | Home | Spec note |
+|----|-------------|------|-----------|
+| R-021 | Bank deposit interest (Iran) | Accounts-Banking | Accrual event; day/month count policy (Jalali-aware) |
+| R-022 | Brokerage fee schedule | Stocks-Iran | Fee table → CanonicalFeeEvent on trade |
+| R-024 | ETF vs fixed-income | Fixed-Income-Funds | valuationMode: NAV \| market |
+| R-027 | Opening constraint | Canonical-Financial-Operation | opening op for all asset classes |
+| R-029 | AR/AP beyond cheque | Cheque + Parties | receivable/payable operations |
+| R-031 | Iranian loan templates | Debt-Loan | mehr / housing / qarz templates |
+| R-032 | Loan late penalty | Debt-Loan | penalty component + schedule |
+| R-033 | Jalali holidays & due dates | Loan + iran calendar | business calendar adapter |
+| R-038…044 | Seven financial statements | Reports-Analytics | projections from journal only |
+| R-047 | Jalali/Gregorian display | Settings-Tools | calendar mode + businessDate |
+| R-048 | i18n FA/EN | Settings-Tools | message catalogs |
+| R-049 | Scheduled backup | Settings-Tools | export job |
+| R-050 | Import Excel/CSV | Settings + Import | mapping + unknownFields envelope |
+| R-051 | DB encryption at rest | Security-Privacy | SQLCipher-class |
+
+### P2 (later versions — think-tank)
+
+R-023 Codal · R-025 bonds · R-026 housing/auto assets · R-028 period close UI · R-030 depreciation engine · R-034 staking · R-035 airdrop polish · R-045 period compare · R-046 XLSX/PDF export · R-052 biometric · R-053 auto-lock · R-054/055 dashboard widgets · R-059 sub-accounts · R-060 report FX translation
+
+### File lifecycle (confirmed)
+
+**Deleted — do not recreate:** feature `*-LOCKS.md` pointers, root Naming-Glossary/Rounding-Policy/DOCUMENTATION-STYLE-P2, Architecture-Final, Concept-Ownership-Matrix, Financial-Scenario-Catalog, Feature-Package-Architecture, Audit-vs-Financial-Event, IMPLEMENTATION-BRANCH-CODE-BUGS, CROSS-CUTTING/CROSS-FEATURE batch audits, Documentation-Audit-*, FEATURE-BUG-RESOLUTIONS.
+
+**Keep:** `fixtures/HARNESS.md` (live refs from GOLDEN-* fixtures).
+
+**Protected canonical (delete forbidden):** Data-Dictionary, Field-Level-SoT, Ownership-Matrix, Source-of-Truth-Matrix, Domain-Dependency-Matrix, Feature-API-Contract, Feature-Independence-Contract, Cash-Settlement-Adapter, Canonical-Cash-Model, Instrument-Identity, CANONICAL-FINANCIAL-REQUIREMENTS, CODING-GATE, fixtures/**, features/**
