@@ -64,3 +64,20 @@ Loan declining · flat · qarz · bullet · variable · multi-ccy repay ·
 Opening · Reversal before/after
 
 **Gate:** No P0 Feature implementation until **its** fixture family is green (executable + expected strings).
+
+## CI family jobs (R-015 / OPEN-004)
+
+| Job | Glob | Blocks release |
+|-----|------|----------------|
+| fixtures-core | GOLDEN-CORE-* | yes |
+| fixtures-crypto | GOLDEN-CRYPTO-* + STANDALONE-CRYPTO | yes |
+| fixtures-loan | GOLDEN-LOAN-* + STANDALONE-LOAN | yes |
+| fixtures-fund | GOLDEN-FUND-* + STANDALONE-FUND | yes |
+| fixtures-stock | GOLDEN-STOCK-* + STANDALONE-STOCKS | yes |
+| fixtures-metal | GOLDEN-*METAL* + STANDALONE-METALS | yes |
+| fixtures-recovery | REVERSAL / CORRECTION | yes |
+| schema-drift | `node scripts/schema-drift-test.js` | yes |
+
+Gate C GREEN ⇔ all jobs above green + decimal-string equality on expected blocks.
+
+See also: `OPEN-004-FIXTURE-GAP.md`

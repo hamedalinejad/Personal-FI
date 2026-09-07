@@ -216,3 +216,16 @@ Do not delete files outside this table without a new explicit decision.
 8. Explicit v1 exclusions (R-036/037/056/057/058) remain out of scope
 
 No code on main; all above are docs-tracked for the implementation branch.
+
+## R-009…R-019 acceptance lock (2026-09-07)
+
+| ID | Acceptance (must be demonstrable) | Depends |
+|----|-----------------------------------|---------|
+| **R-009** | Loan-only (and crypto-only) package runs CRUD + schedule/report without Accounts UI; no import of another feature's `internal/` | ESLint when `src/features` exists (OPEN-006) |
+| **R-015** | Each GOLDEN family job green; schema-drift PASS; financial release blocked if red | OPEN-004 harness |
+| **R-016** | Attribution v1 + Period Return v1 on Portfolio-Wealth-Overview; numbers match golden | R-005 cost basis, R-007 cash, R-011 FX/price |
+| **R-017** | Tax event links `operation_id`; `payTax` is one `fin_operations`; report period_key | Realized P&L path |
+| **R-018** | Reports/Dashboard read snapshots + watermark only; no ad-hoc multi-feature SQL from UI | Stable data-plane + R-015 |
+| **R-019** | License blob outside financial SQLite; one DB file per user; expiry cannot wipe history | Shell v1 parallel |
+
+Docs authority already present: Feature-Independence-Contract, GOLDEN-GATE, Portfolio-Wealth-Overview, Tax-Management, Reports-Analytics, Dashboard, License-Offline.
