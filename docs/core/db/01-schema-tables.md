@@ -37,18 +37,18 @@
 | `inv_crypto_wallet_addresses` | Investment Crypto | چند آدرس/derivation per شبکه |
 | `inv_crypto_holdings` | Investment Crypto | دارایی‌های رمزارز |
 | `inv_crypto_transactions` | Investment Crypto | تراکنش‌های رمزارز |
-| `inv_crypto_exchange_transactions` | Investment Crypto | تراکنش‌های نقدی صرافی |
+| `inv_crypto_exchange_transactions` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger) | Investment Crypto | تراکنش‌های نقدی صرافی |
 | `inv_stocks_iran_brokerages` | Investment Stocks Iran | کارگزاری‌ها |
 | `inv_stocks_iran_holdings` | Investment Stocks Iran | دارایی‌های سهام |
 | `inv_stocks_iran_transactions` | Investment Stocks Iran | تراکنش‌های سهام |
-| `inv_stocks_iran_brokerage_transactions` | Investment Stocks Iran | تراکنش‌های نقدی کارگزاری |
+| `inv_stocks_iran_brokerage_transactions` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger) | Investment Stocks Iran | تراکنش‌های نقدی کارگزاری |
 | `inv_fif_funds` | Investment Fixed Income Funds | صندوق‌های درآمد ثابت |
 | `inv_fif_holdings` | Investment Fixed Income Funds | دارایی‌های صندوق |
 | `inv_fif_transactions` | Investment Fixed Income Funds | تراکنش‌های صندوق |
 | `inv_metals_platforms` | Investment Metals | پلتفرم‌های فلزات |
 | `inv_metals_holdings` | Investment Metals | دارایی‌های فلزات |
 | `inv_metals_transactions` | Investment Metals | تراکنش‌های فلزات |
-| `inv_metals_platform_transactions` | Investment Metals | تراکنش‌های نقدی پلتفرم |
+| `inv_metals_platform_transactions` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger) | Investment Metals | تراکنش‌های نقدی پلتفرم |
 | `inv_metals_physical_deliveries` | Investment Metals | تحویل فیزیکی فلزات |
 | `pa_assets` | Physical Assets | دارایی‌های فیزیکی |
 | `pa_valuations` | Physical Assets | ارزش‌گذاری‌های دارایی |
@@ -56,7 +56,7 @@
 | `bg_budgets` | Budget Management | بودجه‌ها |
 | `bg_envelopes` | Budget Management | پاکت‌های بودجه |
 | `bg_transaction_links` | Budget Management | لینک هزینه به پاکت |
-| `bg_transfers` | Budget Management | انتقال بین پاکت‌ها |
+| `bg_transfers` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger) | Budget Management | انتقال بین پاکت‌ها |
 | `fg_goals` | Financial Goals | اهداف مالی |
 | `fg_contributions` | Financial Goals | کمک‌های اهداف |
 | `br_items` | Bills & Recurring | آیتم‌های تکرارشونده |
@@ -264,7 +264,7 @@ FORBIDDEN: describing acc_transactions as «دفتر کل نقد» / cash ledger
 |---------|--------------------------------|
 | Notifications | `not_` |
 | Reports | `rpt_` |
-| Budget links | `bg_transaction_links` (no `bg_transfers` table) |
+| Budget links | `bg_transaction_links` (no `bg_transfers` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger) table) |
 | Settings | `stg_` |
 | Documents | `docs_` |
 | Security | `sec_` |
@@ -273,4 +273,11 @@ FORBIDDEN: describing acc_transactions as «دفتر کل نقد» / cash ledger
 
 Canonical prefixes enforced in this file and schema.sql; any remaining notif_/rep_ mentions outside this catalog are legacy prose only.
 
-Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_transfers`) are **intentionally not created** — cash SoT is Core journal only.
+Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_transfers` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger)) are **intentionally not created** — cash SoT is Core journal only.
+
+| `import_raw_records` | Import | رکورد خام وارداتی |
+| `import_dedupe_keys` | Import | کلیدهای جلوگیری از تکرار |
+| `rpt_snapshots` | Reports | اسنپ‌شات گزارش |
+| `sec_access_log` | Security | لاگ دسترسی |
+| `sec_encryption_meta` | Security | متادیتای رمزنگاری |
+| `usr_settings` | Settings | تنظیمات کاربر |

@@ -181,4 +181,57 @@ Expense reverse → reverse link effect (restore envelope)
 
 Core, instruments, accounts, loan, cheque, income/expense, metals delivery edges documented.  
 Remaining edges (CA full graph, fee funding, import batch → operation) tracked under OPEN-002; schema FKs present for all created tables.  
-Status: **advanced — residual edges only**.
+Status: **residual edges documented 2026-09-07**.
+
+
+## Corporate Actions (OPEN-002 residual)
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| inv_stocks_iran_corporate_actions.instrument_id | ref_instruments.id | FK | RESTRICT | N:1 | Stocks |
+| inv_stocks_iran_corporate_actions.operation_id | fin_operations.id | FK NOT NULL | RESTRICT | N:1 | Core |
+| inv_stocks_iran_instruments.instrument_id | ref_instruments.id | FK UNIQUE + CHECK id=instrument_id | RESTRICT | 1:1 | Stocks |
+
+## Fee funding
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| inv_crypto_transactions.fee_instrument_id | ref_instruments.id | FK nullable | RESTRICT | N:1 | Crypto |
+| ln_loan_fees.loan_id | ln_loans.id | FK | RESTRICT | N:1 | Loan |
+| ln_loan_fee_tiers.loan_id | ln_loans.id | FK | RESTRICT | N:1 | Loan |
+| inv_metals_transactions (fee_amount) | — | amount on tx; journal via operation_id | — | — | Metals |
+
+## Import lineage
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| import_raw_records.source_document_id | docs_documents.id | soft/ref | SET NULL | N:1 | Import |
+| import_dedupe_keys → import batch | import_raw_records | provider+external_ref UNIQUE | — | N:1 | Import |
+| domain txs.operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+
+## Metals
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| inv_metals_holdings.instrument_id | ref_instruments.id | FK | RESTRICT | N:1 | Metals |
+| inv_metals_transactions.holding_id | inv_metals_holdings.id | FK | RESTRICT | N:1 | Metals |
+| inv_metals_transactions.operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+| inv_metals_physical_deliveries.metals_holding_id | inv_metals_holdings.id | FK | RESTRICT | N:1 | Metals |
+| inv_metals_physical_deliveries.pa_asset_id | pa_assets.id | FK | SET NULL | N:1 | PA |
+
+## Budget
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| bg_envelopes.budget_id | bg_budgets.id | FK | RESTRICT | N:1 | Budget |
+| bg_transaction_links.envelope_id | bg_envelopes.id | FK | RESTRICT | N:1 | Budget |
+| bg_transaction_links.operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+
+## Correction / reverse
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| fin_operations.reverses_operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+| fin_operations.corrects_operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+
+**Status 2026-09-07:** residual edges closed in matrix; schema FKs already present.

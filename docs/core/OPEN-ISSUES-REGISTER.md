@@ -465,3 +465,14 @@ Domain-only (decimal.js): positive amounts, fee consistency, reverse targets, RR
 | MR-219 missing rate | documented |
 | MR-291…296 Gate H / inventory | remains OPEN (implementation + TSV) |
 | MR-290 migration scripts | remains OPEN (implementation branch) |
+
+
+## OPEN-001…004 progress 2026-09-07
+
+| ID | Action |
+|----|--------|
+| OPEN-001 | scripts/schema-drift-test.js added — run: `node scripts/schema-drift-test.js` |
+| OPEN-002 | RELATIONSHIP-MATRIX residual edges (CA/fee/import/metals/budget/correction) closed |
+| OPEN-003 | field-inventory.checklist.tsv expanded from schema CREATE columns |
+| OPEN-004 | OPEN-004-FIXTURE-GAP.md CI family plan documented |
+| OPEN-006 / MR-290 / P0-008… | remain implementation branch |
