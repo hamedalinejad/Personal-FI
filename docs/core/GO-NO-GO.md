@@ -1,6 +1,7 @@
 # Go / No-Go
 
-**Live authority** for coding readiness (single status table below).  
+**Live authority** for coding readiness (single status table below).
+**Executive snapshot:** `FINAL-AUDIT-STATUS-2026-09-08.md`.  
 **Constitution:** `ARCHITECTURE-LOCKED.md`  
 **Tracking:** `OPEN-ISSUES-REGISTER.md` · `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`  
 **Historical audits:** `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (NOT live)

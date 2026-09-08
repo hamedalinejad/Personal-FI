@@ -513,3 +513,10 @@ P1-DOC-015/016 remain work (matrix automation, Gate H) — not extra P files to 
 - schema header: content advanced / freeze not proven
 - Vocabulary: SPECIFIED | IMPLEMENTED-IN-CORE | INTEGRATED | RELEASE-PROVEN
 - MOD-001…003: packages/ESLint/standalone proof still open
+
+
+## Final audit 2026-09-08
+
+Executive status: `FINAL-AUDIT-STATUS-2026-09-08.md`.
+Phase 1 doc/schema vocabulary largely closed.
+Open: Gate B/C/H proof, feature packages, Loan-only vertical slice, Iran runtime evidence, recovery matrix.
