@@ -229,3 +229,6 @@ Personal-FI is closer to a serious financial system than a simple budget app. Ma
 | Product map | `docs/Product-Map-FA.md` |
 | Historical audit | `FINAL-THINK-TANK-AUDIT-2026-09-03.md` |
 | CI | `.github/workflows/ci.yml` |
+
+
+**Iran data preservation + UX depth:** see Product-Principle.md § Iran accounting preservation.
