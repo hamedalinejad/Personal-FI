@@ -129,3 +129,6 @@ P2 hygiene: BUG-029–032,034–035,037–039,046 closed/by-design; 033 optional
 | OPEN-010 | Date contract | CLOSED | — |
 | OPEN-011 | Fund identity schema | CLOSED | schema enforce done |
 | OPEN-012 | Crypto holding identity | CLOSED | — |
+
+
+**Product path:** see REQUIREMENTS-IMPLEMENTATION-ROADMAP.md section Product path to professional v1. Gap = proof/runtime, not more design docs.

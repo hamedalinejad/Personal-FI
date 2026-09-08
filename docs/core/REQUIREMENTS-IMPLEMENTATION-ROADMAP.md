@@ -277,3 +277,65 @@ R-023 Codal · R-025 bonds · R-026 housing/auto assets · R-028 period close UI
 | R-008 Instrument registry | Implemented v1 (design/mem) | Instrument-Identity; schema ref_instruments |
 
 Do **not** re-list these as Stub on main. Residual = full CI families + feature packages.
+
+---
+
+## Product path to professional v1 (2026-09-08)
+
+**Thesis:** design coverage is wide; gap is **proof + runtime execution**, not more parallel P0 docs.
+
+### P0 — must be green before any Feature production release
+
+| ID | Need | Home | Proof |
+|----|------|------|-------|
+| R-001 | Schema freeze | schema.sql + 01-schema-tables + inventory | drift test PASS + Gate H undocumented=0 |
+| R-002 | Atomic financial operation | Canonical-Financial-Operation + operationEngine | same commandHash → one op; full path test |
+| R-003 | Crash-safe persistence | Persistence-State-Machine + worker | crash matrix + restore |
+| R-004 | Runtime financial invariants | Financial-Invariants + money | negative + property tests |
+| R-005 | Cost basis complete | Cost-Basis-Engine | crypto golden family green |
+| R-006 | Loan schedule complete | Loan-Schedule-Engine | loan golden family green |
+| R-007 | Cash settlement one SoT | Cash-Settlement-Adapter | standalone + integrated |
+| R-008 | Instrument identity | Instrument-Identity | USDT-TRC20 ≠ USDT-ERC20 |
+
+**Docs/contracts for R-002…R-008 = Implemented v1.** Remaining = executable proof (OPEN-001…004, worker, full fixtures).
+
+### P1 — product completeness (after P0 families)
+
+| ID | Need |
+|----|------|
+| R-009 | Feature independence tooling (ESLint boundaries) |
+| R-010 | Price fetching (manual/cache/online, as-of, stale) |
+| R-011 | FX cross-rate deterministic multi-hop |
+| R-012 | Corporate actions one owner |
+| R-013 | Fixed-income funds NAV≠tx, reinvest |
+| R-014 | Migration runner checksum + backup |
+| R-015 | Golden/CI gate per family |
+| R-020 | Iran cross-cutting (IRR/Toman, Jalali, T+2, Sayadi) |
+| R-021 | Bank deposit interest |
+| R-022 | Broker fee schedules |
+| R-024 | ETF vs fixed-income valuationMode |
+| R-027 | Opening entries all classes |
+| R-029 | AR/AP beyond cheque |
+| R-031…033 | Iran loan templates, penalty, Jalali calendar |
+| R-038…044 | Classic reports from journal only |
+| R-047…051 | Locale, backup, import, encryption |
+
+### P2 — after data-plane stable
+
+R-016 Portfolio analytics · R-017 Tax · R-018 Reports/Dashboard shell · R-019 Offline license
+
+### P3 — explicit non-goals for v1 (do not sneak in)
+
+**R-036 NFT · R-037 DeFi · R-056 Webhooks · R-057 Cloud sync · R-058 Multi-entity**
+
+Keep out of v1 architecture and schema scope.
+
+### Engineering order (recommended)
+
+1. R-001 drift + Gate H evidence  
+2. R-015 family CI (crypto + loan first)  
+3. R-002…R-008 runtime proof on existing helpers  
+4. R-003 worker + crash matrix  
+5. One vertical Feature (Loan or Crypto) end-to-end  
+6. R-009 boundaries · R-014 migrations · Iran P1 (R-020…033)  
+7. R-016…R-019  
