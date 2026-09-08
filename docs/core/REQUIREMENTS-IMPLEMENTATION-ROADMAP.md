@@ -18,7 +18,7 @@
 
 | ID | Need | State | Evidence / residual |
 |----|------|-------|---------------------|
-| R-001 | Schema freeze | SPECIFIED / freeze not proven | drift+inventory scripts; OPEN-001 |
+| R-001 | Schema freeze | **GO for coding** (SCHEMA-FREEZE-PROOF + drift/inventory CI) | release still needs family fixtures |
 | R-002 | Atomic operation | IMPLEMENTED-IN-CORE | operationEngine.js + tests |
 | R-003 | Durable persistence | IMPLEMENTED-IN-CORE | SQLite worker + json prototype |
 | R-004 | Exact decimal / invariants | IMPLEMENTED-IN-CORE | canonicalDecimal + invariant gate |
@@ -34,7 +34,7 @@
 
 ## Implementation sequence
 
-1. R-001 freeze proven + Gate H  
+1. R-001 coding freeze done → deepen Gate H + family fixtures  
 2. R-015 family CI (crypto + loan)  
 3. R-002…R-008 release-proven on helpers  
 4. Vertical slice Loan-only (R-009 edition)  

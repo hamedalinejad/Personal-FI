@@ -109,7 +109,7 @@ capabilities() → edition support
 
 ## 5. UX — Sheet-based navigation (see Pages-IA)
 
-**Update:** Primary nav **≤6** destinations; all create/edit flows are **Sheets**. Detail: `docs/00-Product/Pages-IA.md`. Historical «nine areas» map into those destinations + More.
+**Update:** Primary nav **≤6** destinations; all create/edit flows are **Sheets**. Detail: `docs/00-Product/Pages-IA.md` is **UX authority**. Historical «nine areas» map into ≤6 destinations + Sheets. Do not list 9 primary nav items.
 
 ## 5b. UX areas (product map)
 
@@ -190,13 +190,13 @@ raw source values · gross/net/fee qty · original amount+currency · historical
 6. Cash Settlement Port + adapters  
 7. Cost Basis + Valuation  
 8. Reconciliation + Recovery  
-9. Vertical #1 Accounts + Transactions  
-10. Vertical #2 Loans  
-11. Vertical #3 Crypto  
-12. Vertical #4 Funds  
-13. Vertical #5 Stocks Iran  
-14. Vertical #6 Metals  
-15. UI Shell (9 pages)  
+9. Vertical #1 **Loan-only** (standalone edition + LocalSettlement)  
+10. Vertical #2 Crypto  
+11. Vertical #3 Funds  
+12. Vertical #4 Stocks Iran  
+13. Vertical #5 Metals  
+14. Vertical #6 Accounts full UI integration (optional shell)  
+15. UI Shell — **≤6 nav** per `docs/00-Product/Pages-IA.md` (not 9 primary routes)  
 16. Commercial capability gates  
 
 ---
