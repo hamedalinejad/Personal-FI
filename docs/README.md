@@ -1,3 +1,17 @@
+# Personal-FI Documentation
+
+**Start here for coding:**
+1. `core/GO-NO-GO.md` — gates
+2. `core/OPEN-ISSUES-REGISTER.md` — open work only
+3. `core/ARCHITECTURE-LOCKED.md` — constitution
+4. `core/CODING-GATE.md` — what you may implement now
+5. `core/FINAL-AUDIT-STATUS-2026-09-08.md` — executive snapshot
+
+Bug narratives and historical audits are **not** live work lists.
+
+
+---
+
 # مستندات Personal-FI — راهنمای توسعه‌دهنده
 
 این پوشه **منبع حقیقت مشخصات** است. قبل از پیاده‌سازی هر فیچر، سند همان فیچر + قراردادهای `core/` را بخوانید.

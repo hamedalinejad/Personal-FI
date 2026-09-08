@@ -1,3 +1,19 @@
+# Coding Gate
+
+**Ready for coding 2026-09-08 — scoped.**
+
+Allowed now:
+1. Continue `src/core` hardening (invariants, SQLite domain writes, recovery tests)
+2. Scaffold **Loan-only** vertical slice (`src/features/loan` public-api only)
+3. Golden fixtures harness for core + loan families
+
+Not allowed yet:
+- Parallel Feature production UI for all domains
+- Ignoring OPEN-001 / OPEN-004 for the scoped family
+- New parallel P0 audit files
+
+Authority: GO-NO-GO.md · OPEN-ISSUES-REGISTER.md · ARCHITECTURE-LOCKED.md
+
 # Coding Gate — Final Order
 
 **Status:** Gate A (P0-DOC contracts) largely closed — see `GO-NO-GO.md / ARCHITECTURE-LOCKED.md`. **Still BLOCKED** on Gate C (full golden fixtures executable) and Gate D (schema freeze + relationship coverage). Authority: `GO-NO-GO.md` + `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical) + concept homes.
