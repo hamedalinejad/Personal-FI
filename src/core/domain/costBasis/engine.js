@@ -50,9 +50,26 @@ export function applyFee(state, { role, feeAmount, feeQty = "0", currency, timin
 
   switch (role) {
     case "acquisition_fee_from_received": {
-      // Full path: use acquisitionFeeFromReceived helper; net qty already reduced
       if (feeAmount != null) assertNonNegative(feeAmount, "FEE_AMOUNT");
-      if (feeQty != null && feeQty !== "0") assertNonNegative(feeQty, "FEE_QTY");
+      if (state.grossQuantity != null && state.consideration != null) {
+        const r = acquisitionFeeFromReceived({
+          grossQuantity: state.grossQuantity,
+          feeQuantity: feeQty || "0",
+          consideration: state.consideration,
+        });
+        return {
+          ...state,
+          quantity: r.netQuantity,
+          lastFeeEvent: {
+            role,
+            feeAmount: feeAmount || "0",
+            feeQty: feeQty || "0",
+            allocation: "reduce_received_qty",
+            helper: "acquisitionFeeFromReceived",
+            result: r,
+          },
+        };
+      }
       return {
         ...state,
         lastFeeEvent: {
@@ -91,7 +108,6 @@ export function applyFee(state, { role, feeAmount, feeQty = "0", currency, timin
     }
     case "sale_fee_from_proceeds": {
       const fee = assertNonNegative(feeAmount, "FEE_AMOUNT");
-      if (fee.lt(0)) throw new Error("FEE_AMOUNT");
       return {
         ...state,
         saleFee: fee.toFixed(),

@@ -86,7 +86,7 @@ export async function runAtomicFinancialOperation(command) {
     // P0-CODE-003: recover from durable operation record before any domain work
     try {
       const existing = await loadOperation(command.operationId, { dataDir, mode: command.persistMode || 'sqlite' });
-      if (existing && existing.durability_state === "sql_committed" || existing.durability_state === "swapped" || existing.durability_state === "persisted") {
+      if (existing && ["sql_committed", "swapped", "persisted"].includes(existing.durability_state)) {
         if (existing.commandHash && existing.commandHash !== commandHash) {
           throw new Error("OP_IDEMPOTENCY_CONFLICT");
         }

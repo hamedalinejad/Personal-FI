@@ -58,3 +58,15 @@ Status: **CLOSED** in src; keep as regression lock.
 | P0-008 | toDecimal("0") in cost basis |
 | P0-009 | Decimal API in funds engine |
 | P0-010 | Decimal API in FX engine |
+
+## P0-011…013 + migration + invariants 2026-09-08
+
+| ID | Fix |
+|----|-----|
+| P0-011 | CA engine Decimal only (already) |
+| P0-012 | operation recover if (existing && includes(...)) |
+| P0-013 | CI without npm cache; package-lock committed |
+| Migration | schema_migrations + version in SQLite txn |
+| Rate | assertRateNonNegative for loan zero rates |
+| Immutable | business status only, not durability |
+| Qty conservation | role-aware |

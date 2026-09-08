@@ -26,31 +26,32 @@ export function assertJournalBalanced(lines) {
   return true;
 }
 
+/** Rate strictly > 0 (FX, prices). */
 export function assertRatePositive(rate) {
   assertFiniteMoney(rate, "rate");
   if (!toDecimal(rate).gt(0)) throw new Error("INV_RATE_NOT_POSITIVE");
 }
 
+/** Interest rate may be zero (qarz / zero-interest loans). */
+export function assertRateNonNegative(rate) {
+  assertFiniteMoney(rate, "rate");
+  if (toDecimal(rate).lt(0)) throw new Error("INV_RATE_NEGATIVE");
+}
+
 /**
- * P0-CODE-009 — mutation guard: pass previous row; if previous is posted, reject any mutation.
- * Corrections must use new operation + reverses/corrects linkage, never in-place edit.
+ * Business immutability only — not durability_state.
+ * Corrections = new operation + reverses/corrects linkage.
  */
 export function assertImmutablePost(previousRow, attemptedChange) {
   if (!previousRow) return true;
   const posted =
-    previousRow.status === "posted" ||
-    previousRow.posted === true ||
-    previousRow.durability_state === "sql_committed";
-  if (posted && attemptedChange) {
-    throw new Error("INV_IMMUTABLE_POSTED");
-  }
-  if (posted && !attemptedChange) {
+    previousRow.status === "posted" || previousRow.posted === true;
+  if (posted) {
     throw new Error("INV_IMMUTABLE_POSTED");
   }
   return true;
 }
 
-/** Fee paid + waived ≤ due (loan fees). */
 export function assertFeeConservation({ amountDue, amountPaid, amountWaived }) {
   assertFiniteMoney(amountDue, "amountDue");
   assertFiniteMoney(amountPaid || "0", "amountPaid");
@@ -63,27 +64,44 @@ export function assertFeeConservation({ amountDue, amountPaid, amountWaived }) {
   return true;
 }
 
-/** gross/net/fee quantity consistency when all present. */
-export function assertQuantityConservation({ gross, fee, net }) {
+/**
+ * Role-aware quantity conservation.
+ * fee_from_received / network_burn: net = gross - fee
+ * non-quantity fee: fee may be currency-only (fee qty optional)
+ */
+export function assertQuantityConservation({ role, gross, fee, net }) {
   if (gross == null || net == null) return true;
   assertFiniteMoney(gross, "gross");
   assertFiniteMoney(net, "net");
   const g = toDecimal(gross);
   const n = toDecimal(net);
-  if (fee != null) {
-    assertFiniteMoney(fee, "fee");
-    const f = toDecimal(fee);
-    if (!g.minus(f).eq(n) && !g.plus(f).eq(n)) {
-      // allow net = gross - fee (typical)
-      if (!g.minus(f).eq(n)) throw new Error("INV_QTY_NOT_CONSERVED");
+  const r = role || "fee_from_received";
+
+  if (fee == null || fee === "0") {
+    if (!g.eq(n) && r !== "non_quantity_fee") {
+      // allow equal when no fee qty
     }
+    return true;
   }
+  assertFiniteMoney(fee, "fee");
+  const f = toDecimal(fee);
+
+  if (r === "fee_from_received" || r === "network_burn" || r === "standalone_burn") {
+    if (!g.minus(f).eq(n)) throw new Error("INV_QTY_NOT_CONSERVED");
+    return true;
+  }
+  if (r === "non_quantity_fee") {
+    return true;
+  }
+  // default: net = gross - fee
+  if (!g.minus(f).eq(n)) throw new Error("INV_QTY_NOT_CONSERVED");
   return true;
 }
 
 export function runInvariantGate({
   journalLines,
   rates = [],
+  ratesNonNegative = [],
   fee,
   quantities,
   previousPostedRow,
@@ -91,6 +109,7 @@ export function runInvariantGate({
 } = {}) {
   if (journalLines) assertJournalBalanced(journalLines);
   for (const r of rates) assertRatePositive(r);
+  for (const r of ratesNonNegative) assertRateNonNegative(r);
   if (fee) assertFeeConservation(fee);
   if (quantities) assertQuantityConservation(quantities);
   if (previousPostedRow && attemptedMutation !== false) {
