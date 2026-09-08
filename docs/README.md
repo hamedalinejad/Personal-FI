@@ -6,6 +6,7 @@
 3. `core/ARCHITECTURE-LOCKED.md` — constitution
 4. `core/CODING-GATE.md` — what you may implement now
 5. `core/FINAL-AUDIT-STATUS-2026-09-08.md` — executive snapshot
+6. `core/IMPLEMENTATION-READY-LOAN-SLICE.md` — **first coding target (100% implementable)**
 
 Bug narratives and historical audits are **not** live work lists.
 

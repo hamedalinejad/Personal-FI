@@ -2,6 +2,8 @@
 
 **Ready for coding 2026-09-08 — scoped.**
 
+Primary spec: `IMPLEMENTATION-READY-LOAN-SLICE.md`
+
 Allowed now:
 1. Continue `src/core` hardening (invariants, SQLite domain writes, recovery tests)
 2. Scaffold **Loan-only** vertical slice (`src/features/loan` public-api only)

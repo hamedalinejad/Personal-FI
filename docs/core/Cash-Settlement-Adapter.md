@@ -100,3 +100,31 @@ NEVER:
 
 Local settlement account **is** a `fin_accounts` row (e.g. systemRole `local_settlement_cash`).  
 Feature cash tables = **projection** with optional `finAccountId` FK; rebuild from journal.
+
+
+## TypeScript port (normative for implementers)
+
+See also `IMPLEMENTATION-READY-LOAN-SLICE.md` §4.
+
+```ts
+interface CashSettlementPort {
+  settle(req: {
+    operationId: string;
+    amount: string;
+    currency: string;
+    direction: "in" | "out";
+    businessDate: string;
+    memo?: string;
+  }): Promise<{
+    finAccountId: string;
+    journalLines: Array<{
+      accountId: string;
+      side: "debit" | "credit";
+      amount: string;
+      currency: string;
+    }>;
+  }>;
+}
+```
+
+Bootstrap standalone editions must ensure a `fin_accounts` row with role/systemRole `local_settlement_cash`.

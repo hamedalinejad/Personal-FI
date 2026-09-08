@@ -19,8 +19,8 @@ User/Command
        4. acc_transactions (if bank cash)      [operational/event view ONLY — not cash SoT]
        4b. fin_accounts + fin_journal_lines   [cash SoT]
        5. derive snapshots from (2)/(4) only
-       6. COMMIT sql.js
-  → persist IndexedDB (state machine)
+       6. COMMIT SQLite
+  → durability marker (persistence state machine)
   → fin_audit_log (if required)
   → DomainEventBus.emit (persisted phase only)
 ```
