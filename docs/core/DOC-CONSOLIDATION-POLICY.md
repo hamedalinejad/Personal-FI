@@ -134,3 +134,39 @@ See `THINK-TANK-R021-060-AND-FILE-LIFECYCLE.md`.
 ## P0-DOC closed set
 
 Do not re-open P0-DOC-001…014 without superseding version. Prevention checklist: `P0-DOC-CLOSED-PREVENTION.md`.
+
+
+## Single live status vocabulary (2026-09-08)
+
+| Status | Meaning |
+|--------|---------|
+| SPEC_LOCKED | contract complete, no contradiction |
+| IMPLEMENTED | code + scoped tests green |
+| PARTIAL | some execution; acceptance incomplete |
+| BLOCKED | waiting on another Gate |
+| DEFERRED | intentionally out of current version |
+| CLOSED_HISTORICAL | history only; no live action |
+
+One requirement → **one** live status (OPEN-ISSUES / Roadmap). Other files link; do not triplicate Stub/Implemented.
+
+## Documentation pyramid
+
+```text
+00_Product/          Pages-IA, feature-id-map
+core/
+  ARCHITECTURE-LOCKED · GO-NO-GO · OPEN-ISSUES · DOC-CONSOLIDATION · ROADMAP
+  Data-Dictionary · Field ownership/SoT · Domain-Dependency
+  Feature-API · Feature-Independence · CANONICAL-FINANCIAL-REQUIREMENTS
+  Canonical-Financial-Operation · Cash · Cost-Basis · Instrument · Loan · Invariants · Reports
+  fixtures/ · db/
+features/<domain>/   main spec + API + acceptance
+```
+
+One concept = one home. Tickets = headings inside homes, not new files.
+
+## File delete rules (confirmed)
+
+Delete only if unique rule = 0 AND inbound refs = 0.  
+**KEEP:** P0-DOC-CLOSED-PREVENTION, BUG-CODE-REGRESSION-INVARIANTS, OPEN-ISSUES, GO-NO-GO, ROADMAP, GOLDEN/HARNESS, schema+inventory+matrix.  
+**KEEP DELETED (do not restore):** pure pointers, feature *-LOCKS, superseded code-bug docs.  
+P0 in a name is **not** a reason to delete.

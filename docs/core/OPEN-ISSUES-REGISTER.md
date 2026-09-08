@@ -496,3 +496,11 @@ P1-DOC-015/016 remain work (matrix automation, Gate H) — not extra P files to 
 - Roadmap R-002…R-008 = Implemented v1 (not Stub)
 - feature *-LOCKS.md = deleted; do not KEEP/restore
 - FINAL-THINK-TANK-AUDIT = historical only, not live authority
+
+
+## Think-tank 2026-09-08 final locks
+
+- API: commands/queries/events/capabilities; dependency law; editions table in Feature-API-Contract
+- Offline proof matrix + vertical slice Loan-only in GO-NO-GO
+- Doc pyramid + status vocabulary in DOC-CONSOLIDATION-POLICY
+- File lifecycle: no restore of deleted pointers/LOCKS; prevention registries KEEP

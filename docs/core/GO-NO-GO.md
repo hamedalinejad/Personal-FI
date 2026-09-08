@@ -132,3 +132,37 @@ P2 hygiene: BUG-029–032,034–035,037–039,046 closed/by-design; 033 optional
 
 
 **Product path:** see REQUIREMENTS-IMPLEMENTATION-ROADMAP.md section Product path to professional v1. Gap = proof/runtime, not more design docs.
+
+
+## Offline proof matrix (Gate F/G — not yet green)
+
+| Scenario | Required behavior | Test |
+|----------|-------------------|------|
+| Airplane mode | record/manage txs offline | offline fixture |
+| Price unavailable | last known + as-of + stale; never silent zero | stale/degraded test |
+| Crash mid-write | primary DB not corrupt | crash matrix |
+| Backup/restore | domain+journal+docs+provenance | roundtrip |
+| License expire | capability off; data remains | upgrade/downgrade |
+| Import unknown | unknownFields preserved | import preservation |
+| Rebuild | same ledger+engines+context ⇒ same report | determinism |
+
+**R-051 DB encryption** belongs in **persistence boundary**, not a complex security UI feature.
+
+## Feature coding entry gate
+
+| Gate | Exit condition |
+|------|----------------|
+| A Authority | one concept home; zero broken links; zero contradictory status |
+| B Schema | 100% table/column/FK/null/unique/index/owner/migration; drift=0 |
+| C Numeric | scoped golden families green; invalid inputs rejected |
+| D Financial path | API → Atomic Op → Journal/Cash → Persist → Report |
+| E Standalone | Loan + one Investment without Accounts UI |
+| F Offline | airplane + stale + crash + backup/restore |
+| G Rebuild | same context ⇒ same report |
+| H No-field-loss | field traceable Domain→Schema→API→Migration→Fixture |
+
+### Vertical slice #1 (do this first)
+
+**Loan-only:** create loan → schedule → payment → journal → LocalSettlementAdapter → persist → loan report → export/restore → later enable Full Accounting UI **without migration**.
+
+Do not start dozens of Feature writers until this slice is green.
