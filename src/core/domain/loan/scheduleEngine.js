@@ -29,7 +29,8 @@ export function assertDayCountSupported(dayCount) {
   throw new Error(`LOAN_DAY_COUNT_UNSUPPORTED:${dayCount}`);
 }
 
-export function scheduleDeclining({ principal, annualRate, periods, startDate = "2026-01-01", dayCount }) {
+export function scheduleDeclining({ principal, annualRate, periods, startDate, dayCount }) {
+  if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const r = assertNonNegative(annualRate).div(12);
@@ -54,7 +55,9 @@ export function scheduleDeclining({ principal, annualRate, periods, startDate = 
   return { method: "declining_balance", startDate, dayCount: "period_based", rows };
 }
 
-export function scheduleFlat({ principal, annualRate, periods, startDate = "2026-01-01", dayCount }) {
+export function scheduleFlat({ principal, annualRate, periods, startDate, dayCount })
+{
+  if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
@@ -87,7 +90,8 @@ export function scheduleFlat({ principal, annualRate, periods, startDate = "2026
   return { method: "flat_rate", startDate, dayCount: "period_based", rows };
 }
 
-export function scheduleQarz({ principal, periods, feePercent = "0", startDate = "2026-01-01", dayCount }) {
+export function scheduleQarz({ principal, periods, feePercent = "0", startDate, dayCount }) {
+  if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
@@ -112,7 +116,9 @@ export function scheduleQarz({ principal, periods, feePercent = "0", startDate =
   return { method: "qarz_al_hasaneh", startDate, dayCount: "period_based", rows };
 }
 
-export function scheduleBullet({ principal, annualRate, periods, startDate = "2026-01-01", dayCount }) {
+export function scheduleBullet({ principal, annualRate, periods, startDate, dayCount })
+{
+  if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);

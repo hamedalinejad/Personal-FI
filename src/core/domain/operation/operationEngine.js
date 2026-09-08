@@ -136,6 +136,7 @@ export async function runAtomicFinancialOperation(command) {
       type: command.type || "unknown",
       journalLines,
       domainResult,
+      engineVersions: command.engineVersions || null,
       durability_state: "pending",
       createdAt: new Date().toISOString(),
     };
@@ -148,6 +149,7 @@ export async function runAtomicFinancialOperation(command) {
       durability_state: persisted.durability_state,
       journalLines,
       domainResult,
+      engineVersions: command.engineVersions || null,
       idempotentReplay: false,
     };
 

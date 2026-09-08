@@ -1,0 +1,7721 @@
+{
+  "generatedAt": "2026-09-08T18:54:59.334Z",
+  "tables": {
+    "acc_accounts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "fin_account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "iban",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "bank_name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "branch_name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_archived",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'active'",
+          "pk": 0
+        },
+        {
+          "name": "role",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reconciliation_status",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_ref_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "fin_account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "uq_acc_iban_active",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_acc_accounts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "acc_transaction_links": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "transaction_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "related_feature",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "related_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "acc_transactions",
+          "from": "transaction_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_acc_tx_links_related",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_acc_transaction_links_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_acc_transaction_links_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "acc_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "direction",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "memo",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_acc_tx_date",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_acc_tx_account",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_acc_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "bg_budgets": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "period_key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "income_source_mode",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_income",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_bg_budgets_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_bg_budgets_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "bg_envelopes": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "budget_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "assigned",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "spent_snapshot",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "bg_budgets",
+          "from": "budget_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_bg_envelopes_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "bg_transaction_links": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "envelope_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "bg_envelopes",
+          "from": "envelope_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_bg_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_bg_env",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_bg_transaction_links_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_bg_transaction_links_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "br_items": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "recurrence_rule",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_br_items_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "br_occurrences": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "item_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "occurrence_key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "due_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "scheduled_amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "paid_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "br_items",
+          "from": "item_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_br_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_br_item",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_br_occurrences_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_br_occurrences_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "cat_categories": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "parent_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cat_categories",
+          "from": "parent_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_cat_categories_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "chk_cheques": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "direction",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "due_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "sayadi_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cheque_number",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cleared_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "effective_cash_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "bounced_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "bounced_reason",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_chk_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_chk_cheques_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "cur_currencies": {
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "minor_units",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "2",
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_cur_currencies_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "cur_currency_preferences": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "base_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_toman_display",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cur_currencies",
+          "from": "base_currency",
+          "to": "code",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_cur_currency_preferences_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "cur_exchange_rates": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "from_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "to_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rate",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_priority",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "100",
+          "pk": 0
+        },
+        {
+          "name": "conversion_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_manual",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cur_currencies",
+          "from": "to_currency",
+          "to": "code",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "cur_currencies",
+          "from": "from_currency",
+          "to": "code",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_cur_exchange_rates_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "dash_layouts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "layout_json",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_default",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_dash_default",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_dash_layouts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "dash_widget_configs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "layout_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "widget_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "config_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "dash_layouts",
+          "from": "layout_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_dash_widget_configs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "db_meta": {
+      "columns": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "value",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_db_meta_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "docs_documents": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "mime_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "storage_path",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "checksum",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "size_bytes",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_docs_documents_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "docs_links": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "document_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "entity_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "entity_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "docs_documents",
+          "from": "document_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_docs_links_entity",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_docs_links_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "exp_recurring": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interval_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interval_value",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "start_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "end_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "next_occurrence",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cat_categories",
+          "from": "category_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_exp_recurring_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "exp_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "has_attachment",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "attachment_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "recurring_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_transaction_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_voided",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "reversed_expense_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "import_batch_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "voided_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "exp_transactions",
+          "from": "reversed_expense_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_transactions",
+          "from": "account_transaction_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "exp_recurring",
+          "from": "recurring_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 3,
+          "seq": 0,
+          "table": "cat_categories",
+          "from": "category_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 4,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 5,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_exp_reversed",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_exp_tx_voided",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "idx_exp_tx_date",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_exp_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fg_contributions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "goal_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "fg_goals",
+          "from": "goal_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_fg_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_fg_goal",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_fg_contributions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fg_goals": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "target_amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "current_amount_snapshot",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "target_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "funding_mode",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_fg_goals_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_accounts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "code",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "parent_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_archived",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'active'",
+          "pk": 0
+        },
+        {
+          "name": "role",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reconciliation_status",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_ref_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "parent_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_fin_acc_parent",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_fin_accounts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_audit_log": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "actor",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "entity_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "entity_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "action",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_fin_audit_log_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_journal_entries": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "memo",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reference_number",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fiscal_period_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "post_state",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_fin_journal_entries_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_journal_lines": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "entry_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "side",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount_in_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "conversion_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "line_number",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "line_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "memo",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "fin_journal_entries",
+          "from": "entry_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_fin_jl_account",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_fin_journal_lines_entry",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_fin_journal_lines_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_operations": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "command_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "durability_state",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "event_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "settlement_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "base_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "engine_versions",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "attribution_algorithm_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reverses_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "posted_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "failed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "voided_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "corrects_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "corrects_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "reverses_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_fin_op_reverses",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_fin_op_status",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "idx_fin_op_type",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "idx_fin_op_date",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 4,
+          "name": "idx_fin_operations_command_hash",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 5,
+          "name": "sqlite_autoindex_fin_operations_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "fin_reconcile_runs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "scope",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "result_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reconciled_by",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "base_currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "valuation_context_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_fin_reconcile_runs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "import_dedupe_keys": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "source_provider",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "provider_tx_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "log_index",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_ref",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "command_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "raw_record_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "datetime('now')",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "import_raw_records",
+          "from": "raw_record_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "uq_import_external_ref",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "uq_import_provider_tx",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_import_dedupe_keys_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "import_raw_records": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "batch_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_provider",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_schema_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_document_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "raw_record_hash",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "unknown_fields_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "normalization_status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'raw'",
+          "pk": 0
+        },
+        {
+          "name": "mapping_decision_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "user_override_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "reconciliation_status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'unreconciled'",
+          "pk": 0
+        },
+        {
+          "name": "imported_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "datetime('now')",
+          "pk": 0
+        },
+        {
+          "name": "source_file_name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_import_raw_hash",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_import_raw_batch",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_import_raw_records_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inc_recurring": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interval_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interval_value",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "start_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "end_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "next_occurrence",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cat_categories",
+          "from": "category_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_inc_recurring_next",
+          "unique": 0,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inc_recurring_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inc_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "has_attachment",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "attachment_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "recurring_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_transaction_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_voided",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "reversed_income_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "import_batch_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "voided_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "inc_transactions",
+          "from": "reversed_income_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "acc_transactions",
+          "from": "account_transaction_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "inc_recurring",
+          "from": "recurring_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 3,
+          "seq": 0,
+          "table": "cat_categories",
+          "from": "category_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 4,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 5,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_inc_reversed",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_inc_tx_voided",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "idx_inc_tx_date",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_inc_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_cash": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "exchange_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fin_account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "balance",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "fin_account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_crypto_exchanges",
+          "from": "exchange_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_crypto_cash_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_crypto_cash_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_exchanges": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "venue_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_crypto_exchanges_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_holdings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "exchange_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "network_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_invested",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cost_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "uq_crypto_holding_wallet",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "uq_crypto_holding_venue",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_inv_crypto_holdings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "holding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "gross_quantity",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_quantity",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "net_quantity",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_instrument_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "economic_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "fee_instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "inv_crypto_holdings",
+          "from": "holding_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 3,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_crypto_tx_holding",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_crypto_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_inv_crypto_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_wallet_addresses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "network_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "address",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_primary",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "inv_crypto_wallet_networks",
+          "from": "network_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_crypto_addr_net",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_crypto_wallet_addresses_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_crypto_wallet_networks": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "exchange_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "network",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "chain_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "inv_crypto_exchanges",
+          "from": "exchange_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_crypto_net_ex",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_crypto_wallet_networks_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_fif_funds": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fund_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_fif_funds_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_fif_funds_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_fif_holdings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_invested",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cost_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_fif_holdings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_fif_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "trade_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "settlement_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "nav",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "transaction_price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_fif_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_fif_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_metals_holdings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "platform_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity_mg",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "purity_code",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "purity_ratio",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_invested",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cost_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "average_cost_per_mg",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_metals_platforms",
+          "from": "platform_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_metals_holdings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_metals_physical_deliveries": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "metals_holding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "pa_asset_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity_mg",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "delivery_address",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "invoice_ref",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "pa_assets",
+          "from": "pa_asset_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_metals_holdings",
+          "from": "metals_holding_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_metals_del_holding",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_metals_physical_deliveries_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_metals_platforms": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fin_account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "fin_account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_metals_platforms_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_metals_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "holding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity_mg",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "metal_price_per_mg",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "premium_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_partial",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_metals_holdings",
+          "from": "holding_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_metals_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_metals_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_stocks_iran_brokerages": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fin_account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_accounts",
+          "from": "fin_account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_stocks_iran_brokerages_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_stocks_iran_corporate_actions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "ca_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "ex_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "record_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payment_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "ratio",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_stocks_ca_instr",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_stocks_iran_corporate_actions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_stocks_iran_holdings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "brokerage_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_invested",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cost_currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_stocks_iran_brokerages",
+          "from": "brokerage_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_stocks_iran_holdings_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_stocks_iran_holdings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_stocks_iran_instruments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "isin",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "lot_size",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_tick",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "firm_code",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_inv_stocks_iran_instruments_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_inv_stocks_iran_instruments_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "inv_stocks_iran_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "holding_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "brokerage_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "trade_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "settlement_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "inv_stocks_iran_brokerages",
+          "from": "brokerage_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 2,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 3,
+          "seq": 0,
+          "table": "inv_stocks_iran_holdings",
+          "from": "holding_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 4,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_stocks_tx_holding",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_stocks_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_inv_stocks_iran_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_loan_collateral": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ln_loan_collateral_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_loan_fee_tiers": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tier_order",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "effective_from",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "effective_to",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rate_or_amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_percentage",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "min_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "max_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "day_count",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calculation_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_ln_fee_tiers_loan",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_ln_loan_fee_tiers_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_loan_fees": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount_due",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount_paid",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "amount_waived",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_timing",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ln_loan_fees_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_loans": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "party_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "role",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calculation_method",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "principal",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interest_rate",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "start_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "maturity_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ref_parties",
+          "from": "party_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ln_loans_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_rate_history": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "effective_from",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "annual_rate",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ln_rate_history_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_schedule_snapshots": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "snapshot_json",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "effective_from",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ln_schedule_snapshots_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_ln_schedule_snapshots_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ln_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "loan_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payment_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ln_loans",
+          "from": "loan_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_ln_tx_loan",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_ln_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_ln_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "not_custom_reminders": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "due_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "recurrence",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_not_custom_reminders_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "not_notifications": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "dedupe_key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "body",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_read",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "dismissed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "snooze_until",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_not_notifications_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_not_notifications_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "not_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_not_settings_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_not_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "pa_assets": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "asset_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "purchase_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "acquisition_cost",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "location",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "serial_number",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "model",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "owner",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "depreciation_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "average_buy_price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_feature",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_disposed",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "source_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_pa_source_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_pa_assets_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "pa_transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "asset_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tx_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quantity",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "realized_gain_loss",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "pa_assets",
+          "from": "asset_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_pa_tx_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_pa_transactions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "pa_valuations": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "asset_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "pa_assets",
+          "from": "asset_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_pa_valuations_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "port_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_port_settings_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_port_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "port_snapshots": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_port_snapshots_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "price_history": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "market_date",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quote_basis",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quote_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_manual",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "is_stale",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "is_degraded",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "provenance_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fetched_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "datetime('now')",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "price_sources",
+          "from": "source_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        },
+        {
+          "id": 1,
+          "seq": 0,
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_price_src",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_price_history_instr_date",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_price_history_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_price_history_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "price_sources": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "priority",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "100",
+          "pk": 0
+        },
+        {
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_price_sources_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "price_sync_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "enabled",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "interval_minutes",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "price_sources",
+          "from": "source_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_price_sync_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ref_instruments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "asset_class",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "symbol",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "network_identifier",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "contract_address",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "isin",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cost_currency_default",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "meta_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "cur_currencies",
+          "from": "cost_currency_default",
+          "to": "code",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "uq_ref_instr_chain_native_symbol",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 1,
+          "name": "uq_ref_instr_chain_contract",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_ref_instruments_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ref_integrity_queue": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "check_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ref_integrity_queue_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "ref_parties": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "display_name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "party_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_ref_parties_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "rpt_net_worth_snapshots": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_assets",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_liabilities",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "net_worth",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_rpt_net_worth_snapshots_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "rpt_presets": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "report_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "params_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_rpt_presets_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "rpt_snapshots": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "report_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "as_of",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "ledger_watermark",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fx_as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "engine_versions",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calculation_context_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rebuilt_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_rpt_snapshots_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "sec_access_log": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "detail",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_sec_access_log_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "sec_encryption_meta": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "scheme",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_sec_encryption_meta_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "sec_session_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "detail",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_sec_session_logs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "sec_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_sec_settings_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_sec_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "stg_backup_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "backup_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "checksum",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_stg_backup_logs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "stg_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "value_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_stg_settings_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_stg_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "tax_categories": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "code",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "jurisdiction",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rule_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "policy_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_tax_categories_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_tax_categories_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "tax_events": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "tax_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "period_key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "jurisdiction",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rule_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "basis_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "holding_period_days",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_deductible",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "is_manual_adjustment",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "adjustment_reason",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "document_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "id": 0,
+          "seq": 0,
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT",
+          "match": "NONE"
+        }
+      ],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "idx_tax_op",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_tax_events_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "tax_records": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "period_key",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "jurisdiction",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "summary_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_tax_records_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    },
+    "usr_settings": {
+      "columns": [
+        {
+          "name": "key",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "value",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_usr_settings_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  }
+}

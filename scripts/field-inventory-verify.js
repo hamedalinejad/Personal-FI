@@ -47,3 +47,6 @@ if (gaps > 0) {
 }
 console.log("PASS field-inventory column coverage");
 process.exit(0);
+
+// Gate H residual note: full apiIn/apiOut/fixture columns filled during feature work.
+console.log("NOTE: Gate H full API/fixture disposition still progressive per feature");
