@@ -372,3 +372,20 @@ Mutation only via Operation Builder → Core. See `CODING-GATE.md`.
 same operationId + same commandHash → return prior result
 same operationId + different commandHash → IDEMPOTENCY_CONFLICT (no financial write)
 ```
+
+## Editions + dependency law (2026-09-08)
+
+```text
+Feature UI → Feature Public API → Domain + Ledger → Core Atomic Operation
+  → CashSettlementPort → LocalSettlementAdapter | AccountsCashAdapter → Journal/Persist
+```
+
+Forbidden: Feature → another Feature's repository/SQL. Isolation via ESLint when `src/features` exists.
+
+| Edition | Cash adapter |
+|---------|----------------|
+| Loan/Crypto/Fund/Metals-only | LocalSettlementAdapter |
+| Stocks-only | Local or optional brokerage projection |
+| Full | AccountsCashAdapter |
+
+License gates capability/UI only — never erases journal/history.
