@@ -14,7 +14,7 @@
 |------|--------|-------|
 | Continued documentation | **GO** | concept homes only |
 | A — Authority | **MOSTLY GO** | residual consolidation tracked in OPEN |
-| B — Schema freeze | **NO** | content **advanced**; freeze **not proven** (OPEN-001) |
+| B — Schema freeze | **GO for coding** | content freeze proven (SCHEMA-FREEZE-PROOF + drift/inventory CI); release needs fixture families |
 | C — Numeric fixtures | **NO** | OPEN-004 family CI incomplete |
 | D — Financial path code | **PARTIAL** | `src/core` engines v1 present; Feature packages not on main |
 | E — Standalone | **NO** | contract yes; release-proven no (P1-MOD-003) |
@@ -22,7 +22,7 @@
 | G — Rebuild determinism | **NO** | needs full engines + fixtures |
 | H — No-field-loss proof | **PARTIAL** | inventory column coverage; API/fixture disposition residual |
 | Core unit tests | **GO** | `npm test` on `src/core` |
-| Feature production code | **NO** | until B+C green for scoped family + vertical slice |
+| Feature production code | **GO scoped** | IMPLEMENTATION-READY-* packs; each family needs fixtures before RELEASE-PROVEN |
 | Production release | **NO** | |
 
 **Phase:** docs-first on `main` **with** `src/core` engines v1 (helpers).  
@@ -85,3 +85,6 @@ Canonical current R-status → `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` (one tab
 > Prior paragraphs that said “src absent / no src on main / Feature NO-GO because no src” referred to a **docs-only cleanup phase** and are **obsolete**.  
 > `src/core` was restored; Feature production remains NO until gates above.
 
+
+
+**Implementer packs:** IMPLEMENTATION-READY-LOAN-SLICE · FEATURES · REPORTS · IRAN · db/SCHEMA-FREEZE-PROOF

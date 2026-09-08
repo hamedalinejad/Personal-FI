@@ -18,14 +18,14 @@ This is **not** a replacement for concept homes. It does **not** claim the full 
 | Cost-basis **architecture** | GREEN / complete proof pending |
 | Loan **architecture** | GREEN / engine incomplete vs full day-count spec |
 | Iran scope coverage in docs | GOOD / runtime proof pending |
-| Schema **content** | ADVANCED |
+| Schema **content** | FROZEN for v1 coding |
 | File lifecycle discipline | GREEN (no mass delete; prevention KEEP) |
 
 ## 2. What is NO-GO (proof)
 
 | Area | Result |
 |------|--------|
-| Schema Freeze (Gate B) | NO-GO |
+| Schema Freeze (Gate B) | GO for coding (fixtures still for release) |
 | Field no-loss Gate H (full API/fixture disposition) | NO-GO |
 | Golden fixture Gate C (family CI) | NO-GO |
 | Atomic path **production** | NO-GO (Core helpers yes) |

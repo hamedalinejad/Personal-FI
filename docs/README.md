@@ -6,7 +6,11 @@
 3. `core/ARCHITECTURE-LOCKED.md` — constitution
 4. `core/CODING-GATE.md` — what you may implement now
 5. `core/FINAL-AUDIT-STATUS-2026-09-08.md` — executive snapshot
-6. `core/IMPLEMENTATION-READY-LOAN-SLICE.md` — **first coding target (100% implementable)**
+6. `core/IMPLEMENTATION-READY-LOAN-SLICE.md` — Loan-only
+7. `core/IMPLEMENTATION-READY-FEATURES.md` — all domains
+8. `core/IMPLEMENTATION-READY-REPORTS.md` — accounting reports
+9. `core/IMPLEMENTATION-READY-IRAN.md` — Iran runtime
+10. `core/db/SCHEMA-FREEZE-PROOF.md` — schema freeze evidence
 
 Bug narratives and historical audits are **not** live work lists.
 

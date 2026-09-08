@@ -1,40 +1,27 @@
 # Open Issues Register — LIVE
 
-**Only open work for coding readiness.** Closed items → git history / `BUG-CODE-REGRESSION-INVARIANTS.md` / `P0-DOC-CLOSED-PREVENTION.md`.
+## Closed for coding start (2026-09-08)
 
-## Blockers before Feature production (P0)
+| Item | Evidence |
+|------|----------|
+| Schema content freeze | db/SCHEMA-FREEZE-PROOF.md + drift/inventory CI |
+| Loan-only spec | IMPLEMENTATION-READY-LOAN-SLICE.md |
+| All-feature patterns | IMPLEMENTATION-READY-FEATURES.md |
+| Reports from journal | IMPLEMENTATION-READY-REPORTS.md |
+| Iran runtime rules | IMPLEMENTATION-READY-IRAN.md |
+| P0-CODE 001–012 | src/core + BUG-CODE-REGRESSION-INVARIANTS |
 
-| ID | Work | Acceptance |
-|----|------|------------|
-| OPEN-001 | Schema freeze proven | strong drift + freeze evidence; not only table names |
-| OPEN-003 / Gate H | Field no-loss | inventory + API/fixture disposition complete |
-| OPEN-004 / Gate C | Golden family CI | core/crypto/loan/… jobs green |
-| R-002…008 path | Production atomic path | SQLite domain txn + recovery matrix |
-| Vertical slice #1 | **Loan-only** E2E | create→schedule→pay→journal→settle→persist→report→backup |
+## Still open (parallel with implementation)
 
-## P1 (after slice #1)
+| ID | Work | Blocks |
+|----|------|--------|
+| OPEN-004 | Golden family CI jobs green | release of that family |
+| Gate F/G | Full crash/offline matrix | production release |
+| Gate H residual | API/fixture disposition on every field | production release |
+| P1-MOD-001 | Physical src/features packages | isolation CI proof |
+| Day-count full | actual_365 etc. | advanced loan products only |
 
-| ID | Work |
-|----|------|
-| P1-MOD-001/002 | `src/features/*` packages + ESLint boundaries |
-| P1-MOD-003 | Standalone editions RELEASE-PROVEN |
-| R-020…033 | Iran runtime evidence (Toman, fees, calendar, templates) |
-| R-038…044 | Accounting reports from journal |
-| R-047…051 | Locale, backup, import, encryption |
-| Gate F/G | Offline crash/recovery + rebuild determinism |
+## Coding rule
 
-## Explicit non-goals v1
-
-NFT · DeFi · webhooks · cloud sync · multi-entity
-
-## Closed (do not re-open as OPEN)
-
-- P0-DOC-001…014 → `P0-DOC-CLOSED-PREVENTION.md`
-- P0-CODE-001…012 → `BUG-CODE-REGRESSION-INVARIANTS.md` + `src/core`
-- P0-SCHEMA-001…002 vocabulary → schema + Canonical-Financial-Operation
-- Historical audits → thin pointers only
-
-## Coding entry rule
-
-**GO for Core hardening / Loan vertical slice scaffolding.**  
-**NO-GO for parallel Feature UI production** until OPEN-001 + OPEN-004 family for that feature + vertical path proven.
+Implement from IMPLEMENTATION-READY-* now.  
+Mark RELEASE-PROVEN only when that family's golden CI is green.
