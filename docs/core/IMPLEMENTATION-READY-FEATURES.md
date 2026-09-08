@@ -157,3 +157,16 @@ type Expense = {
 ## DoD per feature
 
 create/mutate posts journal; idempotency; decimal strings; no cross-imports; golden family green in CI.
+
+## Journal sketch (all investment buys)
+
+Disbursement-like buy (cash out):
+- Cr cash (Port)
+- Dr investment asset / holding clearing
+
+Sell:
+- Dr cash
+- Cr investment asset
+- Cr/Dr realized gain/loss (from cost basis engine)
+
+Always: lines balanced; amounts decimal strings; one operationId.

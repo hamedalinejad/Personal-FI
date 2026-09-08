@@ -1,6 +1,8 @@
 # Personal-FI Documentation
 
 **Start here for coding:**
+0. `core/IMPLEMENTATION-READY-INDEX.md` — **preflight (docs 100% ready checklist)**
+
 1. `core/GO-NO-GO.md` — gates
 2. `core/OPEN-ISSUES-REGISTER.md` — open work only
 3. `core/ARCHITECTURE-LOCKED.md` — constitution

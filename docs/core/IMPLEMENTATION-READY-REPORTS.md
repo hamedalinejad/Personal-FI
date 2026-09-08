@@ -24,3 +24,15 @@ Optional rpt_snapshots with calculation_context_hash; rebuild must match.
 | R3 | Cash payment affects BS cash |
 | R4 | Snapshot rebuild = live report |
 | R5 | UI never queries other feature tables directly |
+
+## account_kind → statement mapping
+
+| account_kind | Balance sheet / P&L |
+|--------------|---------------------|
+| asset | BS assets |
+| liability | BS liabilities |
+| equity | BS equity |
+| income | P&L revenue |
+| expense | P&L expense |
+
+Trial balance is the single source; statements are presentations of TB.

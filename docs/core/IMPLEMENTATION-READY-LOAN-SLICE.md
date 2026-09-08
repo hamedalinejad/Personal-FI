@@ -211,3 +211,62 @@ SPECIFIED → IMPLEMENTED-IN-CORE (engines exist)
 ```
 
 Only then: enable Full Accounting UI without migration.
+
+---
+
+## 10. Chart of accounts (Loan-only bootstrap)
+
+On edition bootstrap, ensure these `fin_accounts` rows exist (create-if-absent):
+
+| code | name | account_kind | systemRole |
+|------|------|--------------|------------|
+| LOC-CASH | Local settlement cash | asset | local_settlement_cash |
+| LOAN-REC | Loans receivable | asset | loan_receivable |
+| LOAN-INT-INC | Interest income | income | loan_interest_income |
+| LOAN-FEE-INC | Fee income | income | loan_fee_income |
+| LOAN-PEN-INC | Penalty income | income | loan_penalty_income |
+
+## 11. Journal templates
+
+### Disbursement (`loan.create`)
+
+| side | account systemRole | amount |
+|------|--------------------|--------|
+| debit | loan_receivable | principal |
+| credit | local_settlement_cash | principal |
+
+### Payment (`loan.recordPayment`) — allocation auto
+
+| side | account | amount |
+|------|---------|--------|
+| debit | local_settlement_cash | total payment |
+| credit | loan_receivable | principal portion |
+| credit | loan_interest_income | interest portion |
+| credit | loan_fee_income | fee portion (if any) |
+| credit | loan_penalty_income | penalty portion (if any) |
+
+Sum(credits) must equal debit (decimal string equality via decimal.js).
+
+## 12. Error codes (loan)
+
+| code | when |
+|------|------|
+| VALIDATION_ERROR | bad decimal, periods not integer, unsupported dayCount |
+| LOAN_NOT_FOUND | unknown loanId |
+| LOAN_PERIODS | periods ≤ 0 |
+| LOAN_DAY_COUNT_UNSUPPORTED | not period_based |
+| INSUFFICIENT_BALANCE | optional if cash control enabled |
+| IDEMPOTENCY_CONFLICT | same operationId, different hash |
+| INV_JOURNAL_UNBALANCED | handler bug |
+| OP_OPERATION_ID_REQUIRED | missing operationId |
+
+## 13. Bootstrap sequence (code order)
+
+```text
+1. open SQLite (personal-fi.sqlite)
+2. apply schema.sql if empty
+3. ensure chart of accounts rows (§10)
+4. wire CashSettlementPort = LocalSettlementAdapter
+5. register loan public-api commands/queries
+6. ready for createLoan
+```

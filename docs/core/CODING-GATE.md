@@ -1,3 +1,5 @@
+**Preflight:** `IMPLEMENTATION-READY-INDEX.md`
+
 # Coding Gate
 
 **Ready for coding 2026-09-08 — scoped.**
