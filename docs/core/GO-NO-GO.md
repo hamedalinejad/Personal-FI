@@ -26,7 +26,7 @@
 
 License/capability flags **must not** delete or rewrite accounting history.
 
-**Phase:** documentation-only on `main` (`src/` absent). Implementation branch will restore runtime + CI tests.
+**Phase (2026-09-08):** `main` is docs-first + `src/core` engines v1 (helpers). Feature packages / full CI still implementation-branch. Live gates table above is authority.
 
 ## Requirements R-001…R-020
 

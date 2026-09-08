@@ -1,4 +1,9 @@
-# BUG-CODE-001…008 — Permanent regression invariants
+# BUG-CODE-001…008 / P0-CODE-001…008 — Permanent regression invariants
+
+**Status: CLOSED + regression lock only.** Do not list as OPEN product bugs.
+
+Aliases: P0-CODE-001…005 ≡ BUG-CODE-001…005; P1-CODE-006…008 ≡ BUG-CODE-006…008.
+
 
 These were confirmed historical failures. They are **not** open product bugs on the docs branch; they **must not be reintroduced**.
 

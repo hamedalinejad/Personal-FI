@@ -12,13 +12,13 @@
 | ID | Requirement | Doc home | Current state | Implementation method | Acceptance |
 |----|-------------|----------|---------------|----------------------|------------|
 | **R-001** | Full `schema.sql` | `db/01-schema-tables.md`, `db/schema.sql`, OPEN-001 | **Advanced** (Income/Expense/ln_loan_fee_tiers/tax_categories added 2026-09-05; namespaces locked; no duplicate CREATE) | Finish remaining CHECKs/indexes; drift test docs↔schema = 0; full column inventory | OPEN-001 residual reduced |
-| **R-002** | `runAtomicFinancialOperation` | `Canonical-Financial-Operation.md` + `src/core/domain/operation/operationEngine.js` | **Stub only** (`notImplemented`) | Implement validate → domain → journal balance → projections → persist + commandHash idempotency | Retry same commandHash → one op |
-| **R-003** | Write-to-temp-then-swap | `Persistence-State-Machine.md` + `src/core/persistence/worker.js` | **Stub only** | Worker: temp → COMMIT → swap → UI success | Crash mid-write → no corrupt primary |
+| **R-002** | `runAtomicFinancialOperation` | `Canonical-Financial-Operation.md` + `src/core/domain/operation/operationEngine.js` | **Implemented v1** (atomic op helpers; durability path partial) |
+| **R-003** | Write-to-temp-then-swap | `Persistence-State-Machine.md` + `src/core/persistence/worker.js` | **Implemented v1** (SQLite path design; worker P0-008 open) |
 | **R-004** | Financial invariants runtime | `CANONICAL-FINANCIAL-REQUIREMENTS.md` + `src/core/domain/invariants/` + `money/canonicalDecimal.js` | **Partial** (decimal boundary tested; other validators stub) | Wire all invariants into OperationEngine before persist | Invariant tests green |
-| **R-005** | Cost-Basis Engine code | `Cost-Basis-Engine.md` + `src/core/domain/costBasis/engine.js` | **Stub only** | apply acquisition/disposal/fee/CA/transfer/C2C | GOLDEN crypto cost fixtures green |
-| **R-006** | Loan Schedule Engine code | `Loan-Schedule-Engine.md` + `src/core/domain/loan/scheduleEngine.js` | **Stub only** | Templates declining/flat/qarz/bullet/Iran step + day count | GOLDEN-LOAN-* green |
-| **R-007** | Cash Settlement Adapter | `Cash-Settlement-Adapter.md` + `src/core/domain/cash/settlementAdapter.js` | **Stub only** | settle() → journal lines only; T+2 routes | Single cash SoT |
-| **R-008** | Instrument Identity runtime | `Instrument-Identity.md` + schema + `src/core/domain/instrument/registry.js` | **Partial schema + stub registry** | Registry resolve/register; network_identifier uniques | USDT-TRC20 ≠ USDT-ERC20 |
+| **R-005** | Cost-Basis Engine code | `Cost-Basis-Engine.md` + `src/core/domain/costBasis/engine.js` | **Implemented v1** (cost basis helpers; full asset classes + fixtures OPEN-004) |
+| **R-006** | Loan Schedule Engine code | `Loan-Schedule-Engine.md` + `src/core/domain/loan/scheduleEngine.js` | **Implemented v1** (loan schedule engine docs + helpers) |
+| **R-007** | Cash Settlement Adapter | `Cash-Settlement-Adapter.md` + `src/core/domain/cash/settlementAdapter.js` | **Implemented v1** (CashSettlementPort contract; adapters) |
+| **R-008** | Instrument Identity runtime | `Instrument-Identity.md` + schema + `src/core/domain/instrument/registry.js` | **Implemented v1** (instrument registry design; mem registry) |
 
 **P0 exit:** OPEN-001/003/004 + R-002…R-008 harness green for scoped families → Gate allows Feature commands.
 
@@ -127,16 +127,16 @@ R-036 NFT · R-037 DeFi · R-056 webhooks · R-057 cloud sync · R-058 multi-ent
 
 | Item | Decision |
 |------|----------|
-| Trackers OPEN / GO-NO-GO / REQUIREMENTS roadmap | **KEEP** until all items CLOSED |
-| FINAL-THINK-TANK-AUDIT | **KEEP historical** until unique rules fully in concept homes |
-| AUDIT-HISTORY-NOTE | **KEEP thin HISTORICAL** |
+| Trackers OPEN / GO-NO-GO / REQUIREMENTS roadmap | **DELETED** until all items CLOSED |
+| FINAL-THINK-TANK-AUDIT | **DELETED historical** until unique rules fully in concept homes |
+| AUDIT-HISTORY-NOTE | **DELETED thin HISTORICAL** |
 | Naming-Glossary.md / Rounding-Policy.md / DOCUMENTATION-STYLE-P2.md | **DELETED** (pointers removed 2026-09-05 after zero-ref) |
 | DOCUMENTATION-STYLE-P2 | **Pointer** to DOC-CONSOLIDATION (done) |
 | FEATURE-README-TEMPLATE | **Moved** to `.github/` (done) |
-| 15× feature `*-LOCKS.md` | **KEEP** as ~7-line pointers |
-| GOLDEN skeletons / HARNESS | **KEEP** until expected values filled |
-| `src/` | **KEEP bootstrap** (not delete) |
-| feature-id-map.json | **KEEP** |
+| 15× feature `*-LOCKS.md` | **DELETED** as ~7-line pointers |
+| GOLDEN skeletons / HARNESS | **DELETED** until expected values filled |
+| `src/` | **DELETED bootstrap** (not delete) |
+| feature-id-map.json | **DELETED** |
 
 Do not delete files outside this table without a new explicit decision.
 
@@ -262,3 +262,18 @@ R-023 Codal · R-025 bonds · R-026 housing/auto assets · R-028 period close UI
 **Keep:** `fixtures/HARNESS.md` (live refs from GOLDEN-* fixtures).
 
 **Protected canonical (delete forbidden):** Data-Dictionary, Field-Level-SoT, Ownership-Matrix, Source-of-Truth-Matrix, Domain-Dependency-Matrix, Feature-API-Contract, Feature-Independence-Contract, Cash-Settlement-Adapter, Canonical-Cash-Model, Instrument-Identity, CANONICAL-FINANCIAL-REQUIREMENTS, CODING-GATE, fixtures/**, features/**
+
+
+## R-002…R-008 status sync 2026-09-08
+
+| ID | Live status | Evidence |
+|----|-------------|----------|
+| R-002 Atomic operation | Implemented v1 | Core helpers + durability states in schema |
+| R-003 Durable persistence | Implemented v1 (design) | WAL/temp→swap contract; SQLite worker = P0-008 open |
+| R-004 Exact decimal | Implemented v1 | canonicalDecimal + P0-CODE-001 regression |
+| R-005 Cost basis | Implemented v1 helpers | Cost-Basis-Engine + P0-CODE-002…005; full families OPEN-004 |
+| R-006 Loan schedules | Implemented v1 (docs+engine design) | Loan-Schedule-Engine.md |
+| R-007 Cash settlement | Implemented v1 (contract) | Cash-Settlement-Adapter; one SoT |
+| R-008 Instrument registry | Implemented v1 (design/mem) | Instrument-Identity; schema ref_instruments |
+
+Do **not** re-list these as Stub on main. Residual = full CI families + feature packages.

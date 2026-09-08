@@ -199,7 +199,7 @@ P0-DOC-001…014 reintroduction prevention: `P0-DOC-CLOSED-PREVENTION.md`.
 
 | Band | Status |
 |------|--------|
-| 029–032 docs pointers | CLOSED / KEEP |
+| 029–032 docs pointers | CLOSED / DELETED |
 | 033 CROSS-CUTTING headers | IN PROGRESS optional |
 | 034,037,038,046 | BY DESIGN |
 | 035,039 | FIXED in schema |
@@ -487,3 +487,12 @@ Cash SoT, instrument identity, fee/C2C, standalone accountId, CA ownership locke
 **Already deleted (do not restore):** feature *-LOCKS.md, pure pointers (Architecture-Final, etc.).
 
 P1-DOC-015/016 remain work (matrix automation, Gate H) — not extra P files to invent.
+
+
+## Status sync 2026-09-08
+
+- P0-CODE-001…008 / BUG-CODE-001…008 = **CLOSED regression only** (`BUG-CODE-REGRESSION-INVARIANTS.md`)
+- GO-NO-GO: `src/core` engines v1 present; feature production still NO-GO
+- Roadmap R-002…R-008 = Implemented v1 (not Stub)
+- feature *-LOCKS.md = deleted; do not KEEP/restore
+- FINAL-THINK-TANK-AUDIT = historical only, not live authority

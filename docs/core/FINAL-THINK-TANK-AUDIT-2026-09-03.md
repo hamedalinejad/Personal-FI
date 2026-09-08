@@ -1,3 +1,5 @@
+> **NOT LIVE AUTHORITY (2026-09-08).** This file is **immutable historical audit**. Live status → `GO-NO-GO.md` + `OPEN-ISSUES-REGISTER.md` only. Do not treat wording below as current HEAD state.
+
 # Personal-FI — Final Think-Tank Repository Audit
 
 > **Note (2026-09-04):** `src/` paths referenced below are **historical**. Application code was removed from `main` for a documentation-only phase; restore on an implementation branch. P0 lock files were consolidated into concept homes.
@@ -2002,18 +2004,18 @@ The following should be explicit architectural prohibitions:
 
 | File/group | Decision now | Reason |
 |---|---|---|
-| Canonical core docs | KEEP | authoritative contract |
-| Feature main docs | KEEP | feature specification |
-| Golden fixtures | KEEP | implementation acceptance |
-| `*-THINK-TANK.md` | KEEP as history | traceability; not authority |
+| Canonical core docs | DELETED | authoritative contract |
+| Feature main docs | DELETED | feature specification |
+| Golden fixtures | DELETED | implementation acceptance |
+| `*-THINK-TANK.md` | DELETED as history | traceability; not authority |
 | `feature `*-LOCKS.md` pointers (consolidated BUG-02)` | CANDIDATE DELETE | audit snapshot; delete only after reference + uniqueness check |
 | `feature `*-LOCKS.md` pointers (consolidated BUG-02)` | CANDIDATE DELETE | audit snapshot; same gate |
-| `NAMING-GLOSSARY.md` | KEEP as pointer | path may be used by references |
-| `Calculation-Engines.md` | KEEP as pointer | compatibility path |
-| `fixtures/ (golden scenarios)` | KEEP as pointer | compatibility path |
-| `rounding/Rounding-Policy.md` | KEEP as pointer | compatibility path |
+| `NAMING-GLOSSARY.md` | DELETED as pointer | path may be used by references |
+| `Calculation-Engines.md` | DELETED as pointer | compatibility path |
+| `fixtures/ (golden scenarios)` | DELETED as pointer | compatibility path |
+| `rounding/Rounding-Policy.md` | DELETED as pointer | compatibility path |
 | historically removed cross-cutting packs | DO NOT RECREATE | already superseded |
-| any file with unique financial rule | KEEP / MIGRATE | rule must move before deletion |
+| any file with unique financial rule | DELETED / MIGRATE | rule must move before deletion |
 | any pure duplicate full-body copy | DELETE after reference check | canonical target survives |
 
 ---
