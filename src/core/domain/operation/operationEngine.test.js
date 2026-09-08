@@ -62,3 +62,32 @@ test("BUG-002 rejects unbalanced", async () => {
     }),
   );
 });
+
+import { stableStringify, runAtomicFinancialOperation as runOp } from "./operationEngine.js";
+
+test("P0-CODE-005 stableStringify ignores key order", () => {
+  const a = stableStringify({ b: 1, a: 2 });
+  const b = stableStringify({ a: 2, b: 1 });
+  assert.equal(a, b);
+});
+
+test("P0-CODE-003 recovers from durable op file without idempotency map", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-op-"));
+  const operationId = randomUUID();
+  const cmd = {
+    type: "expense",
+    operationId,
+    dataDir,
+    journalLines: [
+      { accountId: "a", side: "debit", amount: "10" },
+      { accountId: "b", side: "credit", amount: "10" },
+    ],
+  };
+  const first = await runOp(cmd);
+  // simulate lost idempotency map
+  const { writeFile } = await import("node:fs/promises");
+  await writeFile(join(dataDir, "idempotency.json"), "{}", "utf8");
+  const second = await runOp(cmd);
+  assert.equal(second.idempotentReplay, true);
+  assert.equal(second.operationId, first.operationId);
+});

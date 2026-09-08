@@ -19,3 +19,15 @@ These were confirmed historical failures. They are **not** open product bugs on 
 | BUG-CODE-008 | Every helper: golden + failure vectors | tests above include both |
 
 Live code lives under `src/core/`. Re-run: `npm test` / `node --test src/**/*.test.js`.
+
+## P0-CODE-001…005 runtime fixes 2026-09-08
+
+| ID | Fix |
+|----|-----|
+| P0-CODE-001 | `toDecimal` → `canonicalDecimalString` only (no `String(number)`) |
+| P0-CODE-002 | domain path = pure prepare before single `persistOperation` |
+| P0-CODE-003 | recover from durable `operationId.json` before domain; commandHash in record |
+| P0-CODE-004 | in-process mutex per operationId (pre-SQLite) |
+| P0-CODE-005 | `stableStringify` sorted keys for commandHash |
+
+Status: **CLOSED** in src; keep as regression lock.

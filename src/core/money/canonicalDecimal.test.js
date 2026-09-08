@@ -29,3 +29,18 @@ test("BUG-CODE-001 accepts plain decimal", () => {
   assert.equal(canonicalDecimalString("12.50"), "12.5");
   assert.equal(canonicalDecimalString("12.5"), "12.5");
 });
+
+import { toDecimal } from "./canonicalDecimal.js";
+
+test("P0-CODE-001 toDecimal accepts string", () => {
+  assert.equal(toDecimal("123.45").toFixed(), "123.45");
+});
+test("P0-CODE-001 toDecimal rejects number", () => {
+  assert.throws(() => toDecimal(123.45));
+});
+test("P0-CODE-001 toDecimal rejects NaN number", () => {
+  assert.throws(() => toDecimal(NaN));
+});
+test("P0-CODE-001 toDecimal rejects Infinity", () => {
+  assert.throws(() => toDecimal(Infinity));
+});
