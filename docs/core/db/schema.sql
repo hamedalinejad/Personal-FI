@@ -1,6 +1,7 @@
--- Personal-FI canonical schema skeleton (docs-first)
--- Authority: SCHEMA-FREEZE-REQUIREMENTS.md + 01-schema-tables.md + P0-FINAL identity/cash locks
--- Status: B-001 IN PROGRESS — core tables present; Feature columns expand until OPEN-001 CLOSED
+-- Personal-FI canonical schema
+-- Authority: SCHEMA-FREEZE-REQUIREMENTS.md + 01-schema-tables.md + identity/cash locks
+-- content: advanced (tables/columns/CHECKs present)
+-- freeze: not proven (Gate B / OPEN-001 — drift scripts help; full freeze evidence pending)
 -- Money: TEXT decimal strings. IDs: TEXT UUID.
 -- PK policy: UUID only; never (symbol, network) as PK.
 

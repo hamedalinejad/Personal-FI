@@ -504,3 +504,12 @@ P1-DOC-015/016 remain work (matrix automation, Gate H) — not extra P files to 
 - Offline proof matrix + vertical slice Loan-only in GO-NO-GO
 - Doc pyramid + status vocabulary in DOC-CONSOLIDATION-POLICY
 - File lifecycle: no restore of deleted pointers/LOCKS; prevention registries KEEP
+
+
+## P1-DOC-001…005 / P1-MOD-001…003 2026-09-08
+
+- GO-NO-GO: one live table; obsolete src-absent prose HISTORICAL
+- Roadmap: single R status + sequence; lifecycle → DOC-CONSOLIDATION only
+- schema header: content advanced / freeze not proven
+- Vocabulary: SPECIFIED | IMPLEMENTED-IN-CORE | INTEGRATED | RELEASE-PROVEN
+- MOD-001…003: packages/ESLint/standalone proof still open
