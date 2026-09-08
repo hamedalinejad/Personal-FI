@@ -24,7 +24,7 @@ export function applyDisposal(state, { quantity, proceeds }) {
   const prevQ = toDecimal(state.quantity || "0");
   const prevC = toDecimal(state.totalInvested || "0");
   if (q.gt(prevQ)) throw new Error("DIS_INSUFFICIENT_QTY");
-  const avg = prevQ.isZero() ? toDecimal(0) : prevC.div(prevQ);
+  const avg = prevQ.isZero() ? toDecimal("0") : prevC.div(prevQ);
   const costReleased = q.times(avg);
   const realized = p.minus(costReleased);
   const newQ = prevQ.minus(q);
@@ -72,7 +72,7 @@ export function applyFee(state, { role, feeAmount, feeQty = "0", currency, timin
       const prevQ = toDecimal(state.quantity || "0");
       const prevC = toDecimal(state.totalInvested || "0");
       if (fq.gt(prevQ)) throw new Error("FEE_QTY_EXCEEDS");
-      const avg = prevQ.isZero() ? toDecimal(0) : prevC.div(prevQ);
+      const avg = prevQ.isZero() ? toDecimal("0") : prevC.div(prevQ);
       const costBurn = fq.times(avg);
       const newQ = prevQ.minus(fq);
       const newC = prevC.minus(costBurn);

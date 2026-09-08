@@ -85,7 +85,7 @@ export async function runAtomicFinancialOperation(command) {
 
     // P0-CODE-003: recover from durable operation record before any domain work
     try {
-      const existing = await loadOperation(command.operationId, { dataDir, mode: command.persistMode || 'json' });
+      const existing = await loadOperation(command.operationId, { dataDir, mode: command.persistMode || 'sqlite' });
       if (existing && existing.durability_state === "sql_committed" || existing.durability_state === "swapped" || existing.durability_state === "persisted") {
         if (existing.commandHash && existing.commandHash !== commandHash) {
           throw new Error("OP_IDEMPOTENCY_CONFLICT");
@@ -141,7 +141,7 @@ export async function runAtomicFinancialOperation(command) {
     };
 
     // Single durable boundary — commandHash stored in operation file (P0-CODE-003)
-    const persisted = await persistOperation(record, { dataDir, mode: command.persistMode || 'json' });
+    const persisted = await persistOperation(record, { dataDir, mode: command.persistMode || 'sqlite' });
     const result = {
       operationId: persisted.operationId,
       commandHash,

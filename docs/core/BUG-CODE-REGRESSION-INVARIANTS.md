@@ -43,3 +43,18 @@ Status: **CLOSED** in src; keep as regression lock.
 | P0-CODE-010 | parsePeriodCount strict integer |
 | P0-CODE-011 | unsupported day counts rejected (period_based only v1) |
 | P0-CODE-012 | applyFee validates amount + single allocation event |
+
+## P0-001…010 persistence/schema integrity 2026-09-08
+
+| ID | Fix |
+|----|-----|
+| P0-001 | worker applies docs/core/db/schema.sql |
+| P0-002 | operationEngine default persistMode=sqlite |
+| P0-003 | status draft\|posted\|voided\|failed |
+| P0-004 | command_hash non-unique index only |
+| P0-005 | loadOperation reads journal_lines join |
+| P0-006 | canonical schema FKs |
+| P0-007 | assertJournalBalanced in persist |
+| P0-008 | toDecimal("0") in cost basis |
+| P0-009 | Decimal API in funds engine |
+| P0-010 | Decimal API in FX engine |

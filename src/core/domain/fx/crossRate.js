@@ -1,30 +1,34 @@
-import { toNum, assertPositive } from "../../money/decimalMath.js";
+import { toDecimal } from "../../money/canonicalDecimal.js";
+import { assertPositive } from "../../money/decimalMath.js";
 
 /**
  * Direct or 1-hop via pivot (e.g. EUR→USD→IRR)
- * rates map: "EUR/USD" -> rate meaning quote per base as stored
+ * rates map: "EUR/USD" -> rate string
  */
 export function convertAmount({ amount, from, to, rates, pivot = "USD" }) {
   assertPositive(amount);
-  if (from === to) return { amount: String(amount), path: [from] };
+  if (from === to) return { amount: toDecimal(amount).toFixed(), path: [from] };
   const direct = rates[`${from}/${to}`];
   if (direct != null) {
+    const out = toDecimal(amount).times(toDecimal(String(direct)));
     return {
-      amount: String(toNum(amount) * toNum(direct)),
+      amount: out.toFixed(),
       path: [from, to],
-      rate: String(direct),
+      rate: toDecimal(String(direct)).toFixed(),
     };
   }
   const a = rates[`${from}/${pivot}`];
   const b = rates[`${pivot}/${to}`];
   if (a != null && b != null) {
-    const out = toNum(amount) * toNum(a) * toNum(b);
+    const out = toDecimal(amount)
+      .times(toDecimal(String(a)))
+      .times(toDecimal(String(b)));
     return {
-      amount: String(out),
+      amount: out.toFixed(),
       path: [from, pivot, to],
       conversionPath: [
-        { from, to: pivot, rate: String(a) },
-        { from: pivot, to, rate: String(b) },
+        { from, to: pivot, rate: toDecimal(String(a)).toFixed() },
+        { from: pivot, to, rate: toDecimal(String(b)).toFixed() },
       ],
     };
   }

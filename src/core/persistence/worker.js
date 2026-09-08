@@ -1,83 +1,92 @@
-import { mkdir, writeFile, rename, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { writeFile, rename, readFile } from "node:fs/promises";
+import { mkdirSync, existsSync, readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
+import { assertJournalBalanced } from "../domain/invariants/index.js";
 
 const DEFAULT_DIR = join(process.cwd(), ".pf-data");
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
- * P0-CODE-006/007 — persistence boundary
- *
- * Public/canonical fields on returned record:
- *   status: draft | posted | reversed
- *   durability_state: sql_committed | persist_failed | pending
- *
- * Internal transport recovery (JSON path only, never business truth):
- *   _transportState: pending | temp_written | committed | swapped
- *
- * Default: SQLite one-file DB under dataDir/personal-fi.sqlite
- * options.mode = "json" keeps crash-safe JSON prototype for tests.
+ * P0-001: Runtime DB applies canonical docs/core/db/schema.sql (not a second schema).
+ * P0-003: status draft|posted|voided|failed
+ * P0-004: command_hash NOT globally unique
+ * P0-005: journal lines are SoT; journal_json optional derived only
+ * P0-006: FK from canonical schema
+ * P0-007: balance guard before write
  */
-
-const SCHEMA_SQL = `
-CREATE TABLE IF NOT EXISTS fin_operations (
-  id TEXT PRIMARY KEY,
-  command_hash TEXT,
-  operation_type TEXT NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('draft','posted','reversed')),
-  durability_state TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')),
-  business_date TEXT,
-  journal_json TEXT,
-  domain_json TEXT,
-  created_at TEXT NOT NULL,
-  posted_at TEXT
-);
-CREATE TABLE IF NOT EXISTS fin_journal_entries (
-  id TEXT PRIMARY KEY,
-  operation_id TEXT NOT NULL REFERENCES fin_operations(id),
-  business_date TEXT,
-  memo TEXT,
-  created_at TEXT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS fin_journal_lines (
-  id TEXT PRIMARY KEY,
-  entry_id TEXT NOT NULL REFERENCES fin_journal_entries(id),
-  account_id TEXT NOT NULL,
-  side TEXT NOT NULL CHECK (side IN ('debit','credit')),
-  amount TEXT NOT NULL,
-  currency TEXT,
-  line_number INTEGER NOT NULL DEFAULT 1
-);
-CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_op_command ON fin_operations(command_hash) WHERE command_hash IS NOT NULL;
-`;
-
-function openDb(dataDir) {
-  mkdirSyncSafe(dataDir);
-  const dbPath = join(dataDir, "personal-fi.sqlite");
-  const db = new DatabaseSync(dbPath);
-  db.exec(SCHEMA_SQL);
-  return db;
-}
-
-function mkdirSyncSafe(dir) {
-  import("node:fs").then(({ mkdirSync }) => mkdirSync(dir, { recursive: true })).catch(() => {});
-  try {
-    const { mkdirSync } = require("node:fs");
-    mkdirSync(dir, { recursive: true });
-  } catch {
-    // ESM — use sync via fs
-  }
-}
-
-import { mkdirSync, existsSync } from "node:fs";
 
 function ensureDir(dir) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 }
 
-/**
- * Persist financial operation atomically into SQLite (canonical path).
- */
+function resolveSchemaSql() {
+  const candidates = [
+    join(process.cwd(), "docs/core/db/schema.sql"),
+    join(__dirname, "../../../docs/core/db/schema.sql"),
+  ];
+  for (const p of candidates) {
+    if (existsSync(p)) return readFileSync(p, "utf8");
+  }
+  throw new Error("SCHEMA_SQL_MISSING:docs/core/db/schema.sql");
+}
+
+/** Strip SQL comments for exec; keep statements. */
+function prepareSchema(sql) {
+  return sql
+    .split("\n")
+    .map((line) => {
+      const i = line.indexOf("--");
+      return i >= 0 ? line.slice(0, i) : line;
+    })
+    .join("\n");
+}
+
+const openDbs = new Map();
+
+export function openDb(dataDir) {
+  ensureDir(dataDir);
+  const dbPath = join(dataDir, "personal-fi.sqlite");
+  if (openDbs.has(dbPath)) return openDbs.get(dbPath);
+  const db = new DatabaseSync(dbPath);
+  // Apply canonical schema once
+  const meta = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='fin_operations'",
+  ).get();
+  if (!meta) {
+    db.exec(prepareSchema(resolveSchemaSql()));
+  }
+  // P0-004: drop mistaken global unique on command_hash if present from older runtime
+  try {
+    db.exec("DROP INDEX IF EXISTS uq_fin_operations_command_hash");
+    db.exec("DROP INDEX IF EXISTS uq_fin_op_command");
+  } catch {
+    /* ignore */
+  }
+  try {
+    db.exec(
+      "CREATE INDEX IF NOT EXISTS idx_fin_operations_command_hash ON fin_operations(command_hash)",
+    );
+  } catch {
+    /* ignore */
+  }
+  openDbs.set(dbPath, db);
+  return db;
+}
+
+export function closeAllDbs() {
+  for (const db of openDbs.values()) {
+    try {
+      db.close();
+    } catch {
+      /* ignore */
+    }
+  }
+  openDbs.clear();
+}
+
 export async function persistOperation(record, options = {}) {
   const dir = options.dataDir || DEFAULT_DIR;
   ensureDir(dir);
@@ -91,37 +100,60 @@ export async function persistOperation(record, options = {}) {
 
 function persistOperationSqlite(record, dir) {
   const id = record.operationId || randomUUID();
-  const db = openDb(dir);
-  const now = new Date().toISOString();
-  const status = record.status || "posted";
-  const businessDate = record.businessDate || now.slice(0, 10);
   const journalLines = record.journalLines || [];
 
-  const tx = db.prepare("BEGIN IMMEDIATE");
+  // P0-007
+  if (journalLines.length) {
+    assertJournalBalanced(journalLines);
+  }
+
+  const status = record.status || "posted";
+  if (!["draft", "posted", "voided", "failed"].includes(status)) {
+    throw new Error(`OP_STATUS_INVALID:${status}`);
+  }
+
+  const db = openDb(dir);
+  const now = new Date().toISOString();
+  const businessDate = record.businessDate || now.slice(0, 10);
+
   try {
-    tx.run();
+    db.exec("BEGIN IMMEDIATE");
     db.prepare(
-      `INSERT INTO fin_operations (id, command_hash, operation_type, status, durability_state, business_date, journal_json, domain_json, created_at, posted_at)
-       VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?)`,
+      `INSERT INTO fin_operations (
+        id, command_hash, operation_type, status, durability_state,
+        business_date, base_currency, created_at, posted_at
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
     ).run(
       id,
       record.commandHash || null,
       record.type || "unknown",
       status,
       businessDate,
-      JSON.stringify(journalLines),
-      JSON.stringify(record.domainResult ?? null),
+      record.baseCurrency || record.base_currency || "IRR",
       now,
       status === "posted" ? now : null,
     );
 
     const entryId = randomUUID();
     db.prepare(
-      `INSERT INTO fin_journal_entries (id, operation_id, business_date, memo, created_at) VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO fin_journal_entries (id, operation_id, business_date, memo, created_at)
+       VALUES (?, ?, ?, ?, ?)`,
     ).run(entryId, id, businessDate, record.memo || null, now);
 
+    // Ensure referenced accounts exist (bootstrap stub; production seeds chart)
+    const ensureAcc = db.prepare(
+      `INSERT OR IGNORE INTO fin_accounts (id, name, account_kind, currency, is_archived, created_at, updated_at)
+       VALUES (?, ?, 'asset', 'IRR', 0, ?, ?)`,
+    );
+    for (const line of journalLines) {
+      const aid = line.accountId || line.account_id;
+      ensureAcc.run(aid, aid, now, now);
+    }
+
     const insLine = db.prepare(
-      `INSERT INTO fin_journal_lines (id, entry_id, account_id, side, amount, currency, line_number) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO fin_journal_lines (
+        id, entry_id, account_id, side, amount, currency, line_number
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     );
     journalLines.forEach((line, i) => {
       insLine.run(
@@ -130,7 +162,7 @@ function persistOperationSqlite(record, dir) {
         line.accountId || line.account_id,
         line.side,
         line.amount,
-        line.currency || null,
+        line.currency || 'IRR',
         line.line_number || i + 1,
       );
     });
@@ -138,7 +170,7 @@ function persistOperationSqlite(record, dir) {
     db.prepare(
       `UPDATE fin_operations SET durability_state = 'sql_committed' WHERE id = ?`,
     ).run(id);
-    db.prepare("COMMIT").run();
+    db.exec("COMMIT");
 
     return {
       operationId: id,
@@ -150,51 +182,37 @@ function persistOperationSqlite(record, dir) {
     };
   } catch (e) {
     try {
-      db.prepare("ROLLBACK").run();
+      db.exec("ROLLBACK");
     } catch {
       /* ignore */
     }
     throw e;
-  } finally {
-    db.close();
   }
 }
 
-/** JSON prototype — transport states internal only (P0-CODE-007). */
 async function persistOperationJson(record, dir) {
   const id = record.operationId || randomUUID();
+  const journalLines = record.journalLines || [];
+  if (journalLines.length) assertJournalBalanced(journalLines);
+  const status = record.status || "posted";
   const tempPath = join(dir, `${id}.tmp.json`);
   const finalPath = join(dir, `${id}.json`);
-
-  let _transportState = "pending";
-  const publicStatus = record.status || "posted";
   const body = {
-    ...record,
     operationId: id,
-    status: publicStatus,
-    durability_state: "pending",
-    _transportState,
-  };
-  await writeFile(tempPath, JSON.stringify(body), "utf8");
-  _transportState = "temp_written";
-
-  const committed = {
-    ...body,
+    commandHash: record.commandHash,
+    type: record.type,
+    status,
     durability_state: "sql_committed",
-    _transportState: "committed",
-  };
-  await writeFile(tempPath, JSON.stringify(committed), "utf8");
-
-  await rename(tempPath, finalPath);
-  const finalBody = {
-    ...committed,
-    durability_state: "sql_committed",
+    journalLines,
+    domainResult: record.domainResult ?? null,
     _transportState: "swapped",
   };
-  await writeFile(finalPath, JSON.stringify(finalBody), "utf8");
-  return finalBody;
+  await writeFile(tempPath, JSON.stringify(body), "utf8");
+  await rename(tempPath, finalPath);
+  return body;
 }
 
+/** P0-005: load journal from relational tables when sqlite */
 export async function loadOperation(operationId, options = {}) {
   const dir = options.dataDir || DEFAULT_DIR;
   const mode = options.mode || "sqlite";
@@ -205,25 +223,29 @@ export async function loadOperation(operationId, options = {}) {
     return JSON.parse(raw);
   }
 
-  ensureDir(dir);
   const db = openDb(dir);
-  try {
-    const row = db
-      .prepare(`SELECT * FROM fin_operations WHERE id = ?`)
-      .get(operationId);
-    if (!row) throw new Error("OP_NOT_FOUND");
-    return {
-      operationId: row.id,
-      commandHash: row.command_hash,
-      type: row.operation_type,
-      status: row.status,
-      durability_state: row.durability_state,
-      journalLines: row.journal_json ? JSON.parse(row.journal_json) : [],
-      domainResult: row.domain_json ? JSON.parse(row.domain_json) : null,
-    };
-  } finally {
-    db.close();
-  }
+  const row = db.prepare(`SELECT * FROM fin_operations WHERE id = ?`).get(operationId);
+  if (!row) throw new Error("OP_NOT_FOUND");
+
+  const lines = db
+    .prepare(
+      `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number
+       FROM fin_journal_lines jl
+       JOIN fin_journal_entries je ON je.id = jl.entry_id
+       WHERE je.operation_id = ?
+       ORDER BY jl.line_number`,
+    )
+    .all(operationId);
+
+  return {
+    operationId: row.id,
+    commandHash: row.command_hash,
+    type: row.operation_type,
+    status: row.status,
+    durability_state: row.durability_state,
+    journalLines: lines,
+    domainResult: null,
+  };
 }
 
 export { DEFAULT_DIR };

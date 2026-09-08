@@ -48,14 +48,15 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
   created_at        TEXT NOT NULL,
   posted_at         TEXT,
-  CHECK (status != 'posted' OR command_hash IS NOT NULL),
   failed_at TEXT,
   voided_at TEXT,
-  corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE  -- correction = new op after reverse
+  corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CHECK (status != 'posted' OR command_hash IS NOT NULL)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_operations_command_hash
-  ON fin_operations(command_hash) WHERE command_hash IS NOT NULL;
+-- P0-004: command_hash is NOT globally unique (only compared within operationId)
+CREATE INDEX IF NOT EXISTS idx_fin_operations_command_hash
+  ON fin_operations(command_hash);
 
 CREATE TABLE IF NOT EXISTS fin_journal_entries (
   id            TEXT PRIMARY KEY,
@@ -64,7 +65,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   memo          TEXT,
   created_at    TEXT NOT NULL,
   reference_number TEXT,
-  fiscal_period_id TEXT  -- optional; FK to fiscal_periods when table exists,
+  fiscal_period_id TEXT,
   post_state TEXT CHECK (post_state IS NULL OR post_state IN ('draft','posted','void'))  -- mirrors operation; entry exists for posted path
 );
 
@@ -284,10 +285,9 @@ CREATE TABLE IF NOT EXISTS ln_loan_fees (
   amount_due    TEXT NOT NULL, -- decimal string
   amount_paid   TEXT NOT NULL DEFAULT '0',
   amount_waived TEXT NOT NULL DEFAULT '0',
-  currency      TEXT NOT NULL
-  -- DOMAIN INVARIANT (BUG-D17): decimal.js enforce amount_paid + amount_waived <= amount_due
-  -- SQLite cannot reliably CHECK decimal TEXT arithmetic; engine validates before persist.,
+  currency      TEXT NOT NULL,
   fee_timing TEXT CHECK (fee_timing IS NULL OR fee_timing IN ('upfront','per_installment','on_default','on_early_settlement','other'))
+  -- DOMAIN: amount_paid + amount_waived <= amount_due enforced in engine
 );
 
 CREATE TABLE IF NOT EXISTS ln_transactions (
@@ -491,7 +491,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment'))
+  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment')),
   trade_date TEXT NOT NULL,
   settlement_date TEXT,
   quantity TEXT,
@@ -642,7 +642,7 @@ CREATE TABLE IF NOT EXISTS fg_goals (
   target_amount TEXT NOT NULL,
   current_amount_snapshot TEXT, -- DERIVED: goals engine only; rebuild from contributions; never user-direct UPDATE
   target_date TEXT,
-  funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup','earmark','segregated_cash'))
+  funding_mode TEXT CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup','earmark','segregated_cash')),
   status TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
@@ -1106,7 +1106,7 @@ CREATE TABLE IF NOT EXISTS sec_session_logs (
   id         TEXT PRIMARY KEY,
   event_type TEXT NOT NULL CHECK (event_type IN ('start','end','lock','unlock','timeout')),
   at         TEXT NOT NULL,
-  detail     TEXT, -- no PII/secrets; sanitized only
+  detail     TEXT
 );
 
 -- Price sync settings (opt-in online)
