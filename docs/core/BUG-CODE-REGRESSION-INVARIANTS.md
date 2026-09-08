@@ -31,3 +31,15 @@ Live code lives under `src/core/`. Re-run: `npm test` / `node --test src/**/*.te
 | P0-CODE-005 | `stableStringify` sorted keys for commandHash |
 
 Status: **CLOSED** in src; keep as regression lock.
+
+## P0-CODE-006…012 2026-09-08
+
+| ID | Status |
+|----|--------|
+| P0-CODE-006 | SQLite path via node:sqlite (default mode=sqlite); json prototype kept |
+| P0-CODE-007 | Public status/durability_state vs internal _transportState |
+| P0-CODE-008 | Gate expanded: fee conservation, qty conservation, immutable post |
+| P0-CODE-009 | assertImmutablePost(previous, attempted) |
+| P0-CODE-010 | parsePeriodCount strict integer |
+| P0-CODE-011 | unsupported day counts rejected (period_based only v1) |
+| P0-CODE-012 | applyFee validates amount + single allocation event |

@@ -21,3 +21,32 @@ test("BUG-006 qarz", () => {
   assert.ok(s.rows[0].interest === "0" || s.rows[0].interest === "0.00");
   assert.ok(Number(s.rows[0].fee) > 0);
 });
+
+test("P0-CODE-010 rejects fractional periods", () => {
+  assert.throws(() =>
+    buildSchedule("declining_balance", {
+      principal: "1000",
+      annualRate: "0.1",
+      periods: "12.5",
+    }),
+  );
+});
+test("P0-CODE-010 rejects zero periods", () => {
+  assert.throws(() =>
+    buildSchedule("flat_rate", {
+      principal: "1000",
+      annualRate: "0.1",
+      periods: "0",
+    }),
+  );
+});
+test("P0-CODE-011 rejects unsupported day count", () => {
+  assert.throws(() =>
+    buildSchedule("declining_balance", {
+      principal: "1000",
+      annualRate: "0.1",
+      periods: "12",
+      dayCount: "actual_365",
+    }),
+  );
+});

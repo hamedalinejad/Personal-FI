@@ -38,13 +38,37 @@ export function applyDisposal(state, { quantity, proceeds }) {
   };
 }
 
-export function applyFee(state, { role, feeAmount, feeQty = "0" }) {
+/** P0-CODE-012 — one fee role → one economic allocation; amounts validated. */
+export function applyFee(state, { role, feeAmount, feeQty = "0", currency, timing }) {
+  const known = new Set([
+    "acquisition_fee_from_received",
+    "post_acquisition_network_burn",
+    "standalone_asset_burn",
+    "sale_fee_from_proceeds",
+  ]);
+  if (!known.has(role)) throw new Error(`FEE_ROLE_UNKNOWN:${role}`);
+
   switch (role) {
-    case "acquisition_fee_from_received":
-      return { ...state, note: "handled at acquisition net qty" };
+    case "acquisition_fee_from_received": {
+      // Full path: use acquisitionFeeFromReceived helper; net qty already reduced
+      if (feeAmount != null) assertNonNegative(feeAmount, "FEE_AMOUNT");
+      if (feeQty != null && feeQty !== "0") assertNonNegative(feeQty, "FEE_QTY");
+      return {
+        ...state,
+        lastFeeEvent: {
+          role,
+          feeAmount: feeAmount || "0",
+          feeQty: feeQty || "0",
+          currency: currency || null,
+          timing: timing || "acquisition",
+          allocation: "reduce_received_qty",
+        },
+      };
+    }
     case "post_acquisition_network_burn":
     case "standalone_asset_burn": {
       const fq = assertNonNegative(feeQty, "FEE_QTY");
+      if (fq.lte(0)) throw new Error("FEE_QTY_REQUIRED");
       const prevQ = toDecimal(state.quantity || "0");
       const prevC = toDecimal(state.totalInvested || "0");
       if (fq.gt(prevQ)) throw new Error("FEE_QTY_EXCEEDS");
@@ -57,10 +81,29 @@ export function applyFee(state, { role, feeAmount, feeQty = "0" }) {
         totalInvested: newC.toFixed(),
         averageCost: newQ.isZero() ? "0" : newC.div(newQ).toFixed(),
         feeCostReleased: costBurn.toFixed(),
+        lastFeeEvent: {
+          role,
+          feeQty: fq.toFixed(),
+          allocation: "burn_quantity_release_cost",
+          timing: timing || "post_acquisition",
+        },
       };
     }
-    case "sale_fee_from_proceeds":
-      return { ...state, saleFee: feeAmount };
+    case "sale_fee_from_proceeds": {
+      const fee = assertNonNegative(feeAmount, "FEE_AMOUNT");
+      if (fee.lt(0)) throw new Error("FEE_AMOUNT");
+      return {
+        ...state,
+        saleFee: fee.toFixed(),
+        lastFeeEvent: {
+          role,
+          feeAmount: fee.toFixed(),
+          currency: currency || null,
+          timing: timing || "disposal",
+          allocation: "reduce_proceeds",
+        },
+      };
+    }
     default:
       throw new Error(`FEE_ROLE_UNKNOWN:${role}`);
   }
