@@ -864,3 +864,15 @@ same operationId + different commandHash → CONFLICT
 ## P0-FINAL-016
 
 Cash SoT = journal lines + fin_accounts. `acc_transactions` = event/UX projection. See Canonical-Cash-Model.
+
+
+## Status vocabulary lock (P0-SCHEMA-001 / 002)
+
+| Layer | Field | Values |
+|-------|-------|--------|
+| Business | `fin_operations.status` | `draft` \| `posted` \| `voided` \| `failed` |
+| Relationship | `reverses_operation_id` / `corrects_operation_id` | links; **not** a status enum value |
+| Durability | `fin_operations.durability_state` | `pending` \| `sql_committed` \| `persisted` \| `persist_failed` |
+| Transport (internal) | persistence worker only | temp_written / swapped — **never** public schema |
+
+API, TypeScript, fixtures, and schema **must** use this vocabulary only.

@@ -33,8 +33,10 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   id                TEXT PRIMARY KEY, -- operationId
   command_hash      TEXT,
   operation_type    TEXT NOT NULL,
-  status            TEXT NOT NULL CHECK (status IN ('draft', 'posted', 'reversed')),
-  durability_state  TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','temp_written','committed','swapped','failed')),
+  status            TEXT NOT NULL CHECK (status IN ('draft', 'posted', 'voided', 'failed')),
+  -- reversal is relationship via reverses_operation_id / corrects_operation_id, not a status value (P0-SCHEMA-001)
+  durability_state  TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')),
+  -- transport-only states (temp_written/swapped) live in persistence layer, not public schema (P0-SCHEMA-002)
   business_date     TEXT NOT NULL, -- DATE-only
   event_at          TEXT,
   settlement_date   TEXT,
@@ -368,7 +370,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_import_provider_tx
 INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaVersion', '1');
 INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
 
--- Extend notes: fin_operations.durability_state domain values:
+-- durability_state: pending | sql_committed | persisted | persist_failed (P0-SCHEMA-002)
 -- pending | temp_written | committed | swapped | failed
 
 CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
