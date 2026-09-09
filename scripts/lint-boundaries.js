@@ -37,9 +37,11 @@ for (const f of featureFiles) {
 }
 
 for (const f of coreFiles) {
+  const rel = f.slice(root.length + 1);
+  if (/\.test\.js$/.test(rel)) continue; // tests may import features for integration
   const text = readFileSync(f, "utf8");
   if (/from\s+["'][^"']*features\//.test(text)) {
-    console.error("BOUNDARY: core→feature forbidden:", f.slice(root.length + 1));
+    console.error("BOUNDARY: core→feature forbidden:", rel);
     failed = true;
   }
 }

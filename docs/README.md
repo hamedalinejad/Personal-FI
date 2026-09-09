@@ -1,34 +1,35 @@
 # Personal-FI Documentation
 
-## شروع (اجباری)
+## تیم توسعه — شروع از اینجا
 
-| # | سند |
-|---|-----|
-| 1 | [`READY-FOR-CODING.md`](./READY-FOR-CODING.md) |
-| 2 | [`core/CODING-GATE.md`](./core/CODING-GATE.md) |
-| 3 | [`core/GO-NO-GO.md`](./core/GO-NO-GO.md) |
-| 4 | [`core/IMPLEMENTATION-READY-INDEX.md`](./core/IMPLEMENTATION-READY-INDEX.md) |
-| 5 | [`core/IMPLEMENTATION-READY-LOAN-SLICE.md`](./core/IMPLEMENTATION-READY-LOAN-SLICE.md) |
+```text
+docs/DEVELOPER-HANDOFF.md
+```
+
+سپس: `READY-FOR-CODING.md` · `core/CODING-GATE.md` · `core/GO-NO-GO.md`
 
 ## Authority
 
 | موضوع | مرجع |
 |--------|------|
-| سلسله‌مراتب اسناد | `core/DOC-AUTHORITY-CHAIN.md` |
-| معماری حسابداری | `core/ARCHITECTURE-LOCKED.md` |
-| UX ≤۶ صفحه | `00-Product/Pages-IA.md` |
-| اسکیما | `core/db/schema.sql` |
-| وضعیت زنده | `core/OPEN-ISSUES-REGISTER.md` · `core/MASTER-SPEC-VERDICT.md` |
-| Loan v1 | `core/LOAN-V1-RESOLUTIONS.md` |
+| Handoff تیم | `DEVELOPER-HANDOFF.md` |
+| سلسله‌مراتب | `core/DOC-AUTHORITY-CHAIN.md` |
+| معماری | `core/ARCHITECTURE-LOCKED.md` |
+| UX ≤۶ | `00-Product/Pages-IA.md` |
+| Schema | `core/db/schema.sql` |
+| Loan v1 | `core/LOAN-V1-RESOLUTIONS.md` + `LOAN-V1-SCHEMA-DISPOSITION.md` |
+| Domain contracts | `core/DOMAIN-CONTRACTS-31-44.md` |
+| وضعیت زنده | `core/OPEN-ISSUES-REGISTER.md` · `MASTER-SPEC-VERDICT.md` |
+| Closed / deferred | `core/DEFERRED-AND-CLOSED.md` |
 
 ## Feature specs
 
-`docs/features/**` — جزئیات domain؛ در تعارض با concept home، **concept home برنده است**.
+`docs/features/**` — جزئیات domain. در تعارض با concept home، **concept home برنده است**.
 
 ## Historical
 
-فایل‌های `FINAL-THINK-TANK-*`، `THINK-TANK-*`، auditهای تاریخ‌دار = **تاریخچه**، نه مرجع اجرایی.
+`FINAL-THINK-TANK-*`، `THINK-TANK-*`، audit تاریخ‌دار = تاریخچه، نه مرجع اجرایی.
 
 ## Production
 
-**NO-GO** تا evidence در GO-NO-GO سبز شود.
+**NO-GO** تا evidence در GO-NO-GO و checklist Loan RELEASE-PROVEN سبز شود.

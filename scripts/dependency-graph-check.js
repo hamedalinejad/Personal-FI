@@ -44,8 +44,8 @@ for (const f of files) {
       }
     }
   }
-  // Core must not import features
-  if (rel.startsWith("src/core/")) {
+  // Core must not import features (production modules only; *.test.js may exercise features)
+  if (rel.startsWith("src/core/") && !/\.test\.js$/.test(rel)) {
     if (/from\s+["'][^"']*features\//.test(text)) {
       console.error("DEP_GRAPH: core must not import features:", rel);
       failed = true;

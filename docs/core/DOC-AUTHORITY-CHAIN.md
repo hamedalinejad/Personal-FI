@@ -31,6 +31,7 @@
 | Live work | OPEN-ISSUES-REGISTER.md |
 | Handoff | EXECUTION-HANDOFF.md |
 | Coding rules | CODING-GATE.md |
+| Team handoff | docs/DEVELOPER-HANDOFF.md |
 | UX | docs/00-Product/Pages-IA.md |
 | Schema | db/schema.sql |
 | Loan schedule | Loan-Schedule-Engine.md |

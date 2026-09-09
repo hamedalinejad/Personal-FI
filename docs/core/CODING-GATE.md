@@ -1,5 +1,8 @@
 # Coding Gate
 
+**Team entry:** `docs/DEVELOPER-HANDOFF.md`.
+
+
 **Live.** Rules for any coding AI or human implementer.  
 **Handoff:** `EXECUTION-HANDOFF.md` · **Readiness:** `GO-NO-GO.md`
 

@@ -28,7 +28,7 @@
 | R-006 | Loan schedule | IMPLEMENTED-IN-CORE | scheduleEngine period_based; day-count residual |
 | R-007 | Cash settlement | SPECIFIED + IMPLEMENTED-IN-CORE (contract/helpers) | Cash-Settlement-Adapter |
 | R-008 | Instrument identity | IMPLEMENTED-IN-CORE (memory registry) | network-distinct tests |
-| R-009 | Feature independence tooling | SPECIFIED | P1-MOD-001/002 — no src/features yet |
+| R-009 | Feature independence tooling | PARTIAL | Loan package under src/features/loan; ESLint boundaries deferred |
 | R-010…R-015 | Price/FX/CA/FIF/migration/CI | SPECIFIED | P1 |
 | R-016…R-019 | Portfolio/tax/reports/license | SPECIFIED / DEFERRED depth | P2 |
 | R-020…R-051 | Iran + settings + security | SPECIFIED | P1 product path |

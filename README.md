@@ -1,45 +1,48 @@
 # Personal-FI
 
-Offline-first personal finance / wealth management (Iran-focused accounting + investments).
+Offline-first personal accounting + investment system (Iran-aware).
 
-## What this repository is
+## Status
 
-| Layer | Status |
+| Scope | Status |
 |-------|--------|
-| Specification (`docs/`) | Mature — concept homes + implementer packs |
-| Core engines (`src/core/`) | Present — money, operation, journal/SQLite, cost basis, loan schedule, FX, price |
-| Feature packages (`src/features/`) | **Loan scaffold started**; other domains still docs-first |
-| Full app UI / framework | **Not** a complete runnable product shell yet |
+| **Coding (Loan + Core)** | READY |
+| **Production release** | **NO-GO** |
+| **Other features (Crypto/Stocks/…)** | SPECIFIED — after Loan RELEASE-PROVEN |
 
-This is an **engine + specification** repository with a growing executable core — not a finished finance application.
+## Start here (developers)
 
-## Quick start
+```text
+docs/DEVELOPER-HANDOFF.md
+```
+
+Then:
 
 ```bash
-npm install
+npm ci          # or: npm install
 npm test
-node scripts/schema-drift-test.js
-node scripts/field-inventory-verify.js
+npm run gates
 ```
 
-Uses **Node.js built-in test runner** (`node --test`), not Vitest.
-
-## Docs for implementers
-
-1. `docs/core/IMPLEMENTATION-READY-INDEX.md` — preflight  
-2. `docs/core/IMPLEMENTATION-READY-LOAN-SLICE.md` — first vertical  
-3. `docs/core/GO-NO-GO.md` — gates  
-4. `docs/00-Product/Pages-IA.md` — **UX authority** (≤6 nav)  
-5. `docs/core/ARCHITECTURE-LOCKED.md` — constitution  
-
-## Vertical order (locked)
+## Architecture (one-liner)
 
 ```text
-Core → Loan-only → Crypto → Funds → Stocks Iran → Metals → Accounts full UI
+Feature UI/API → Domain → Atomic Operation → Journal + Cash Port → SQLite txn → Rebuildable reports
 ```
 
-## Architecture invariant
+- One cash SoT: `fin_accounts` + `fin_journal_lines`
+- One journal · Decimal strings only · Posted facts immutable
+- Feature independence · ≤6 navigation pages (`docs/00-Product/Pages-IA.md`)
+
+## Repo layout
 
 ```text
-one operation → one SQLite transaction → one journal truth → one cash truth → durable commit
+docs/          specifications (authority chain)
+src/core/      money, operation, persistence, engines
+src/features/loan/   first vertical (executable)
+scripts/       gates, schema drift, inventory
 ```
+
+## License / sharing
+
+Designed for offline single-user and future license editions (loan-only, crypto-only, …).
