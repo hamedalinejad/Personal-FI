@@ -270,3 +270,22 @@ Sum(credits) must equal debit (decimal string equality via decimal.js).
 5. register loan public-api commands/queries
 6. ready for createLoan
 ```
+
+
+---
+
+## HEAD code map (auto-synced)
+
+| Spec area | Implementation |
+|-----------|----------------|
+| createLoan | `src/features/loan/commands/createLoan.js` |
+| recordPayment + waterfall | `commands/recordPayment.js` + `domain/paymentAllocation.js` |
+| schedule | `src/core/domain/loan/scheduleEngine.js` via `domain/scheduleFacade.js` |
+| COA bootstrap | `src/core/accounting/chartOfAccounts.js` → `bootstrapLoanEditionAccounts` |
+| repos | `ledger/loanRepository.js`, `scheduleRepository.js` |
+| queries | `queries/getLoan.js`, `listLoans.js`, `getSchedule.js`, `getStatement.js` |
+| golden vectors | `tests/golden-schedule.test.js` |
+| public-api | `public-api/index.js` |
+
+**engineVersions string:** `1.0.0-period_based-equal-principal`  
+Changing formula requires version bump + new golden — never silent.

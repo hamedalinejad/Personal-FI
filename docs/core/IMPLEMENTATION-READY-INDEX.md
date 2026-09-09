@@ -1,87 +1,92 @@
 # Implementation-Ready Index — Preflight
 
-**If this checklist is green, documentation is sufficient to implement without inventing contracts.**
+**هدف:** هر هوش مصنوعی/فرد با این نقشه بدون اختراع قرارداد کد بزند.  
+**قانون:** فقط Loan تا RELEASE-PROVEN؛ بقیه Feature موازی ممنوع (`CODING-GATE.md`).
 
-## A. Authority (read first)
+---
 
-| # | Doc | Purpose |
-|---|-----|---------|
-| 1 | ARCHITECTURE-LOCKED.md | constitution |
-| 2 | GO-NO-GO.md | gates |
-| 3 | CODING-GATE.md | what you may code now |
-| 4 | SCHEMA-FREEZE-PROOF.md | schema baseline |
-| 5 | This index | navigation |
+## 1. Read order (اجباری)
 
-## B. Implementer packs (normative)
+1. `CODING-GATE.md` — DO NOTs  
+2. `GO-NO-GO.md` — gates زنده  
+3. `EXECUTION-HANDOFF.md` — اولویت و DoD  
+4. این فایل  
+5. `IMPLEMENTATION-READY-LOAN-SLICE.md`  
+6. `Loan-Schedule-Engine.md` + `Canonical-Financial-Operation.md`  
+7. `db/schema.sql` (جداول `ln_*`, `fin_*`)
 
-| Pack | Covers |
-|------|--------|
-| IMPLEMENTATION-READY-LOAN-SLICE.md | Loan E2E 100% |
-| IMPLEMENTATION-READY-FEATURES.md | Crypto/Stocks/Funds/Metals/Cheque/Cashflow |
-| IMPLEMENTATION-READY-REPORTS.md | TB/GL/BS/P&L/CF |
-| IMPLEMENTATION-READY-IRAN.md | IRR/Toman, templates, calendar, import |
+---
 
-## C. Engine contracts
+## 2. Current code map (HEAD)
 
-| Engine | Doc | Code (exists) |
-|--------|-----|----------------|
-| Atomic op | Canonical-Financial-Operation.md | src/core/domain/operation/ |
-| Cash | Cash-Settlement-Adapter.md | (wire adapters in feature) |
-| Decimal | Money-Decimal-Policy / canonicalDecimal | src/core/money/ |
-| Cost basis | Cost-Basis-Engine.md | src/core/domain/costBasis/ |
-| Loan schedule | Loan-Schedule-Engine.md | src/core/domain/loan/ |
-| Instrument | Instrument-Identity.md | src/core registry helpers |
-| Invariants | Financial-Invariants.md | src/core/domain/invariants/ |
+| Concern | Path |
+|---------|------|
+| Decimal boundary | `src/core/money/canonicalDecimal.js` |
+| Atomic operation | `src/core/domain/operation/operationEngine.js` |
+| SQLite persist | `src/core/persistence/worker.js` |
+| Chart of accounts | `src/core/accounting/chartOfAccounts.js` |
+| Invariants | `src/core/domain/invariants/index.js` |
+| Loan schedule | `src/core/domain/loan/scheduleEngine.js` |
+| Cost basis | `src/core/domain/costBasis/` + `src/core/costBasis/` |
+| FX | `src/core/domain/fx/crossRate.js` |
+| Price | `src/core/domain/price/provider.js` |
+| Iran Toman | `src/core/iran/toman.js` |
+| ValuationContext | `src/core/valuation/valuationContext.js` |
+| Migration bootstrap | `src/core/db/migration.js` |
+| **Loan feature** | `src/features/loan/**` |
 
-## D. Data plane
+### Loan public API (موجود)
 
-| Artifact | Role |
-|----------|------|
-| db/schema.sql | frozen CREATE tables |
-| field-inventory.checklist.tsv | column coverage |
-| RELATIONSHIP-MATRIX.md | FKs + semantics |
-| scripts/schema-drift-test.js | CI |
-| scripts/field-inventory-verify.js | CI |
+```text
+createLoan, recordPayment, reversePayment (stub)
+previewSchedule, generateSchedule
+getLoan, listLoans, getSchedule, getStatement
+capabilities
+```
 
-## E. Preflight commands
+---
+
+## 3. Implementer packs
+
+| Pack | وقتی |
+|------|------|
+| IMPLEMENTATION-READY-LOAN-SLICE.md | **حالا** |
+| IMPLEMENTATION-READY-FEATURES.md | بعد از Loan RELEASE-PROVEN |
+| IMPLEMENTATION-READY-REPORTS.md | بعد از accounting ops پایدار |
+| IMPLEMENTATION-READY-IRAN.md | همراه Loan/Core |
+
+---
+
+## 4. Preflight (باید سبز)
 
 ```bash
 npm test
-node scripts/schema-drift-test.js
-node scripts/field-inventory-verify.js
+npm run gates
+# includes: lint, docs-validate, drift, inventory, manifest:check, bench
 ```
 
-All three must PASS before claiming environment ready.
+---
 
-## F. Gaps that are NOT doc blockers
+## 5. Remaining for Loan RELEASE-PROVEN (کار واقعی)
 
-These are **implementation work**, not missing design:
+- [ ] `createLoan` + `ln_*` + journal در **یک** SQLite transaction  
+- [ ] `recordPayment` allocation روی schedule باقی‌مانده + `ln_transactions`  
+- [ ] `reversePayment` واقعی (reverses_operation_id)  
+- [ ] Golden recovery: crash / conflict / backup  
+- [ ] Standalone edition smoke بدون Accounts UI (الان partial)  
 
-- Writing `src/features/loan/**` files
-- Wiring LocalSettlementAdapter class
-- Golden CI job YAML per family
-- Full day-count engines beyond period_based
-- Encryption at rest module
+تا این‌ها evidence نداشته باشند → **PARTIAL** نه RELEASE-PROVEN.
 
-## G. Definition: docs 100% ready
+---
 
-| Criterion | Met |
-|-----------|-----|
-| One cash SoT | yes |
-| One atomic path | yes |
-| Status/durability vocabulary | yes |
-| Schema inventoriable + drift CI | yes |
-| Loan commands + journal templates + errors + bootstrap | yes |
-| Other features command shapes | yes |
-| Reports query list + acceptance | yes |
-| Iran rules + acceptance | yes |
-| Standalone port pattern | yes |
-| Forbidden cross-feature imports | yes |
+## 6. Docs 100% for coding?
 
-**Verdict: documentation is implementation-complete for scoped Feature coding.**  
-Remaining risk is **execution quality**, not missing contracts.
+| Criterion | Status |
+|-----------|--------|
+| Contracts + authority | YES |
+| Loan command shapes + journal templates | YES |
+| Schema + inventory + drift | YES (coding baseline) |
+| Runtime Loan package scaffold | YES |
+| Production / full golden CI | NO |
 
-
-## Cross-feature contracts
-
-See `CROSS-FEATURE-DOMAIN-CONTRACTS.md` (§31–44 crypto/stocks/funds/metals/cheque/cash/FX/price/rebuild/import/Iran/dates/valuation).
+**نتیجه:** مستندات برای شروع کد Loan کافی است. محصول کامل هنوز NO-GO است.
