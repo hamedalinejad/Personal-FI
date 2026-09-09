@@ -61,12 +61,6 @@ export function openDb(dataDir) {
   } catch {
     /* ignore */
   }
-  // result_json for idempotent replay (NOT accounting SoT)
-  try {
-    db.exec(`ALTER TABLE fin_operations ADD COLUMN result_json TEXT`);
-  } catch {
-    /* already exists */
-  }
   openDbs.set(dbPath, db);
   return db;
 }

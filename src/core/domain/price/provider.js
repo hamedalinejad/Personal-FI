@@ -24,8 +24,10 @@ function validateObservation(o, instrumentId) {
 }
 
 export function setManualPrice(instrumentId, price, asOf, currency = "IRR") {
+  if (typeof price !== "string") throw new Error("PRICE_NOT_STRING");
+  if (typeof asOf !== "string") throw new Error("PRICE_ASOF_REQUIRED");
   const obs = validateObservation(
-    { price: String(price), asOf, currency, source: "manual", isManual: true, isStale: false },
+    { price, asOf, currency, source: "manual", isManual: true, isStale: false },
     instrumentId,
   );
   manual.set(instrumentId, obs);
@@ -33,29 +35,23 @@ export function setManualPrice(instrumentId, price, asOf, currency = "IRR") {
 }
 
 export function cachePrice(instrumentId, observation) {
+  if (observation == null || typeof observation !== "object") {
+    throw new Error("PRICE_INVALID_OBSERVATION");
+  }
   const obs = validateObservation(
-    typeof observation === "object"
-      ? observation
-      : { price: String(observation), asOf: arguments[2], currency: arguments[3] || "IRR", source: "cached", isStale: true },
+    { ...observation, source: observation.source || "cached", isStale: true },
     instrumentId,
   );
-  cache.set(instrumentId, { ...obs, source: obs.source || "cached", isStale: true });
-  return cache.get(instrumentId);
+  cache.set(instrumentId, obs);
+  return obs;
 }
 
-/**
- * Async-safe price resolution. onlineFetch may return observation or Promise.
- */
 export async function getPrice(instrumentId, { onlineFetch } = {}) {
   if (manual.has(instrumentId)) {
     return { ...manual.get(instrumentId), isStale: false, isManual: true };
   }
   if (cache.has(instrumentId)) {
-    return {
-      ...cache.get(instrumentId),
-      isStale: true,
-      reconciliationNeeded: true,
-    };
+    return { ...cache.get(instrumentId), isStale: true, reconciliationNeeded: true };
   }
   if (typeof onlineFetch === "function") {
     let p = onlineFetch(instrumentId);
@@ -68,7 +64,6 @@ export async function getPrice(instrumentId, { onlineFetch } = {}) {
   throw new Error("PRICE_MISSING");
 }
 
-/** Sync helper for tests that only use manual/cache */
 export function getPriceSync(instrumentId) {
   if (manual.has(instrumentId)) return { ...manual.get(instrumentId), isStale: false };
   if (cache.has(instrumentId)) return { ...cache.get(instrumentId), isStale: true };

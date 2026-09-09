@@ -1,5 +1,5 @@
 {
-  "schemaHash": "f22ff6ebda50d9a3a5a5397cd82c4c83b9382a593072c4e2e9c624379dc32657",
+  "schemaHash": "ea1c2fbb7e53228a86c23b3046a4e5fd22e07606266278d2c49607728f4d653e",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -2493,6 +2493,13 @@
         },
         {
           "name": "corrects_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "result_json",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,

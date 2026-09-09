@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   failed_at TEXT,
   voided_at TEXT,
   corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  result_json TEXT, -- idempotent replay snapshot ONLY; not accounting SoT
   CHECK (status != 'posted' OR command_hash IS NOT NULL)
 );
 

@@ -19,6 +19,56 @@ function stableHash(obj) {
   return createHash("sha256").update(stableStringify(obj)).digest("hex");
 }
 
+/**
+ * Normalize BEFORE hash — never mutate after hashing.
+ */
+export function normalizeCommand(command) {
+  if (!command || typeof command !== "object") throw new Error("OP_INVALID_COMMAND");
+  if (!command.operationId || typeof command.operationId !== "string") {
+    throw new Error("OP_OPERATION_ID_REQUIRED");
+  }
+  if (!command.businessDate || typeof command.businessDate !== "string") {
+    throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  }
+  if (!command.baseCurrency || typeof command.baseCurrency !== "string") {
+    throw new Error("OP_BASE_CURRENCY_REQUIRED");
+  }
+
+  const baseCurrency = command.baseCurrency;
+  const journalLines = (command.journalLines || []).map((line, i) => {
+    if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+    if (!line.accountId && !line.account_id) throw new Error("JOURNAL_LINE_ACCOUNT_REQUIRED");
+    if (!line.side || !line.amount) throw new Error("JOURNAL_LINE_INVALID");
+    return {
+      accountId: line.accountId || line.account_id,
+      side: line.side,
+      amount: line.amount,
+      currency: line.currency,
+      line_number: line.line_number ?? i + 1,
+      memo: line.memo,
+    };
+  });
+
+  return {
+    operationId: command.operationId,
+    type: command.type || "unknown",
+    status: command.status || "posted",
+    businessDate: command.businessDate,
+    baseCurrency,
+    payload: command.payload ?? null,
+    journalLines,
+    rates: command.rates || [],
+    domainResult: command.domainResult ?? null,
+    engineVersions: command.engineVersions || null,
+    source: command.source || "api",
+    dataDir: command.dataDir,
+    persistMode: command.persistMode || "sqlite",
+    withinTransaction: command.withinTransaction,
+    prepareDomain: command.prepareDomain || command.applyDomain,
+    commandHash: command.commandHash,
+  };
+}
+
 async function loadIdempotency(dir) {
   try {
     return JSON.parse(await readFile(join(dir, "idempotency.json"), "utf8"));
@@ -56,31 +106,23 @@ async function withOpLock(operationId, fn) {
 }
 
 export async function runAtomicFinancialOperation(command) {
-  if (!command || typeof command !== "object") throw new Error("OP_INVALID_COMMAND");
-  if (!command.operationId || typeof command.operationId !== "string") {
-    throw new Error("OP_OPERATION_ID_REQUIRED");
-  }
-  if (!command.businessDate || typeof command.businessDate !== "string") {
-    throw new Error("OP_BUSINESS_DATE_REQUIRED");
-  }
-  if (!command.baseCurrency || typeof command.baseCurrency !== "string") {
-    throw new Error("OP_BASE_CURRENCY_REQUIRED");
-  }
+  const norm = normalizeCommand(command);
+  return withOpLock(norm.operationId, async () => {
+    const dataDir = norm.dataDir || join(process.cwd(), ".pf-data");
+    const mode = norm.persistMode;
 
-  return withOpLock(command.operationId, async () => {
-    const dataDir = command.dataDir || join(process.cwd(), ".pf-data");
-    const mode = command.persistMode || "sqlite";
     const payloadForHash = {
-      type: command.type,
-      payload: command.payload ?? null,
-      journalLines: command.journalLines || [],
-      businessDate: command.businessDate,
-      baseCurrency: command.baseCurrency,
+      type: norm.type,
+      payload: norm.payload,
+      journalLines: norm.journalLines,
+      businessDate: norm.businessDate,
+      baseCurrency: norm.baseCurrency,
     };
-    const commandHash = command.commandHash || stableHash(payloadForHash);
+    const commandHash = norm.commandHash || stableHash(payloadForHash);
 
+    // Durable identity first — only OP_NOT_FOUND continues
     try {
-      const existing = await loadOperation(command.operationId, { dataDir, mode });
+      const existing = await loadOperation(norm.operationId, { dataDir, mode });
       if (
         existing &&
         ["sql_committed", "swapped", "persisted"].includes(existing.durability_state)
@@ -103,53 +145,48 @@ export async function runAtomicFinancialOperation(command) {
       }
     } catch (e) {
       if (e && e.message === "OP_IDEMPOTENCY_CONFLICT") throw e;
-      // missing → continue
+      if (e && e.message === "OP_NOT_FOUND") {
+        /* continue */
+      } else if (e && e.code === "ENOENT") {
+        /* json missing */
+      } else if (e && /no such file|ENOENT|OP_NOT_FOUND/i.test(String(e.message))) {
+        /* continue */
+      } else {
+        throw e;
+      }
     }
 
-    // SQLite path: identity is fin_operations PK — no parallel idempotency.json required
     if (mode === "json") {
       const idMap = await loadIdempotency(dataDir);
-      const prev = idMap[command.operationId];
+      const prev = idMap[norm.operationId];
       if (prev) {
         if (prev.commandHash !== commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
         return { ...prev.result, idempotentReplay: true };
       }
     }
 
-    const journalLines = command.journalLines || [];
-    // ensure each line has currency
-    for (const line of journalLines) {
-      if (!line.currency) line.currency = command.baseCurrency;
-    }
-    runInvariantGate({ journalLines, rates: command.rates || [] });
+    runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates });
 
-    const prepare =
-      typeof command.prepareDomain === "function"
-        ? command.prepareDomain
-        : typeof command.applyDomain === "function"
-          ? command.applyDomain
-          : null;
-
-    const domainResult = prepare
-      ? await prepare({
-          operationId: command.operationId,
-          payload: command.payload,
+    const domainResult = norm.prepareDomain
+      ? await norm.prepareDomain({
+          operationId: norm.operationId,
+          payload: norm.payload,
           mode: "prepare",
         })
-      : command.domainResult || null;
+      : norm.domainResult;
 
     const record = {
-      operationId: command.operationId,
+      operationId: norm.operationId,
       commandHash,
-      type: command.type || "unknown",
-      status: command.status || "posted",
-      businessDate: command.businessDate,
-      baseCurrency: command.baseCurrency,
-      journalLines,
+      type: norm.type,
+      status: norm.status,
+      businessDate: norm.businessDate,
+      baseCurrency: norm.baseCurrency,
+      journalLines: norm.journalLines,
       domainResult,
-      engineVersions: command.engineVersions || null,
-      source: command.source || "api",
-      withinTransaction: command.withinTransaction,
+      engineVersions: norm.engineVersions,
+      source: norm.source,
+      withinTransaction: norm.withinTransaction,
     };
 
     const persisted = await persistOperation(record, { dataDir, mode });
@@ -160,15 +197,15 @@ export async function runAtomicFinancialOperation(command) {
       durability_state: persisted.durability_state,
       businessDate: record.businessDate,
       baseCurrency: record.baseCurrency,
-      journalLines,
+      journalLines: norm.journalLines,
       domainResult,
-      engineVersions: command.engineVersions || null,
+      engineVersions: norm.engineVersions,
       idempotentReplay: !!persisted.idempotentReplay,
     };
 
     if (mode === "json") {
       const idMap = await loadIdempotency(dataDir);
-      idMap[command.operationId] = { commandHash, result };
+      idMap[norm.operationId] = { commandHash, result };
       await saveIdempotency(dataDir, idMap);
     }
     return result;

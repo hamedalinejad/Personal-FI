@@ -9,11 +9,15 @@ import { assertPositive } from "../../money/decimalMath.js";
  */
 function normalizeRate(entry) {
   if (entry == null) return null;
-  if (typeof entry === "string" || typeof entry === "number") {
-    return { rate: String(entry), asOf: null, source: "legacy" };
+  if (typeof entry === "number") {
+    throw new Error("FX_RATE_NOT_STRING");
   }
+  if (typeof entry === "string") {
+    return { rate: entry, asOf: null, source: "map" };
+  }
+  if (typeof entry.rate !== "string") throw new Error("FX_RATE_NOT_STRING");
   return {
-    rate: String(entry.rate),
+    rate: entry.rate,
     asOf: entry.asOf || null,
     source: entry.source || "unknown",
     isStale: !!entry.isStale,

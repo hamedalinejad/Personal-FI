@@ -1,3 +1,5 @@
+> **RESOLVED hierarchy:** see `DOC-AUTHORITY-CHAIN.md`. Older B-005 ranking of P0-FINAL/LOCKS is obsolete.
+
 # Documentation Consolidation Policy
 
 ## Authority model

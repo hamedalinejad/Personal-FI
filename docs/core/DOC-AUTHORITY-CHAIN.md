@@ -1,36 +1,39 @@
-# Documentation Authority Chain
+# Documentation Authority Chain (RESOLVED)
 
-## پنج خانهٔ قانون (Sole rule homes)
+**Live.** Supersedes older B-005 hierarchy that ranked P0-FINAL/LOCKS above concept homes.
 
-پس از حذف فایل‌های `P0-FINAL-*` از `main`، **تنها** این پنج سند برای قوانین زیر مرجع‌اند.  
-قانون خارج از این‌ها (و feature docهای تابع) برای implementation **معتبر نیست** مگر به یکی از این‌ها پیوند صریح داشته باشد.
+## Hierarchy for financial semantics
 
-| # | فایل مرجع | دامنه قانون |
-|---|-----------|-------------|
-| 1 | **`Canonical-Cash-Model.md`** (+ `Cash-Settlement-Adapter.md` به‌عنوان قرارداد Port) | نقد، حساب نقدی، journal balance، ممنوعیت SoT دوم |
-| 2 | **`Cost-Basis-Engine.md`** (+ `Fee-Treatment-Matrix.md`) | Cost basis، کارمزد، C2C، transfer/bridge، نقش اقتصادی fee |
-| 3 | **`Instrument-Identity.md`** | `instrumentId`، symbol/label، assetKey index |
-| 4 | **`Financial-Invariants.md`** | تغییرناپذیرهای مالی، money/decimal اشاره، immutability، absorbed P0 notice |
-| 5 | **`Feature-Independence-Contract.md`** (+ **`License-Gate.md`**) | Standalone، Hidden Journal=Core journal، لایسنس/capability |
-
-### لایهٔ بالاتر (constitution / gates)
-
-- `ARCHITECTURE-LOCKED.md` — pipeline و ترتیب اجرا  
-- `CODING-GATE.md` / `GO-NO-GO.md` — پذیرش قبل از کد  
-- `CANONICAL-FINANCIAL-REQUIREMENTS.md` — فهرست الزامات  
-- `Canonical-Financial-Operation.md` — operation/idempotency/durability  
-
-این‌ها **متناقض** با پنج خانهٔ بالا نباید باشند؛ در تعارض، خانهٔ موضوعی + ARCHITECTURE-LOCKED بر UX prose مقدم‌اند.
-
-### ترتیب حل تعارض
-
-```text
-1. Five rule homes (table above)
-2. Canonical-Financial-Operation / ARCHITECTURE-LOCKED
-3. Main Feature doc (must not invent parallel cash/identity/cost rules)
-4. Product / UX prose (Pages-IA for navigation only)
+```
+1. Concept home explicitly marked canonical (table below)
+2. ARCHITECTURE-LOCKED.md — pipeline / architecture
+3. Feature implementation-ready contract — feature scope only
+4. docs/core/db/schema.sql — persistence shape
+5. Current runtime — evidence of implemented behavior
+6. Fixtures/tests — proof
+7. Historical audits / tickets / think-tank — history only
 ```
 
-Feature `*-LOCKS.md` اگر باقی مانده‌اند، باید تابع خانه‌های بالا باشند یا LEGACY.
+## Canonical concept homes
 
-**ممنوع:** بازسازی فایل‌های `P0-FINAL-*-LOCKS.md` به‌عنوان authority موازی.
+| Concept | Home |
+|---------|------|
+| Cash SoT | Canonical-Cash-Model.md |
+| Cash ports | Cash-Settlement-Adapter.md |
+| Cost basis | Cost-Basis-Engine.md |
+| Fees | Fee-Treatment-Matrix.md |
+| Instrument identity | Instrument-Identity.md |
+| Invariants | Financial-Invariants.md |
+| Feature independence | Feature-Independence-Contract.md |
+| Operation | Canonical-Financial-Operation.md |
+| Architecture | ARCHITECTURE-LOCKED.md |
+| Readiness | GO-NO-GO.md |
+| Live work | OPEN-ISSUES-REGISTER.md |
+| Handoff | EXECUTION-HANDOFF.md |
+| Coding rules | CODING-GATE.md |
+| UX | docs/00-Product/Pages-IA.md |
+| Schema | db/schema.sql |
+| Loan schedule | Loan-Schedule-Engine.md |
+| Domain contracts | DOMAIN-CONTRACTS-31-44.md |
+
+P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority.
