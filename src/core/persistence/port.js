@@ -23,10 +23,11 @@ export function closeAllDbs() {
   return adapter.closeAllDbs?.();
 }
 
-export async function persistOperation(record) {
-  return adapter.persistOperation(record);
+export async function persistOperation(record, options = {}) {
+  return adapter.persistOperation(record, options);
 }
 
-export function loadOperation(dataDir, operationId) {
-  return adapter.loadOperation(dataDir, operationId);
+/** loadOperation(operationId, { dataDir, mode }) */
+export function loadOperation(operationId, options = {}) {
+  return adapter.loadOperation(operationId, options);
 }

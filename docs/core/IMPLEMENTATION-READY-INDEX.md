@@ -1,3 +1,23 @@
+---
+<!-- HEAD status 2026-09-10 — supersedes "loan only" narrative for current tree -->
+---
+
+# Implementation Ready Index (live HEAD)
+
+| Area | Status |
+|------|--------|
+| Core | scaffold / partial |
+| Loan | coding reference / strongest vertical |
+| Crypto | partial buy slice present |
+| Funds | partial subscribe slice present |
+| Stocks | partial buy slice present |
+| Metals | partial buy slice present |
+| Full product | not integrated / not release-proven |
+
+Historical coding sequence below remains for ordering **release promotion** (Loan RELEASE-PROVEN before parallel production packages). Scaffolding of other features is allowed when the live gate permits; release stays sequential.
+
+---
+
 # Implementation-Ready Index — Preflight
 
 **هدف:** هر هوش مصنوعی/فرد با این نقشه بدون اختراع قرارداد کد بزند.  

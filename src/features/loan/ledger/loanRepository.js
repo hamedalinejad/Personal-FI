@@ -1,4 +1,4 @@
-import { openDb } from "../../../core/persistence/worker.js";
+import { openDb } from "../../../core/persistence/port.js";
 
 export function getLoanById(dataDir, id) {
   const db = openDb(dataDir);

@@ -2,6 +2,16 @@
 
 Offline-first personal accounting & investments (Iran-aware).
 
+## Project phase (canonical)
+
+```text
+IMPLEMENTATION_SCAFFOLD_PHASE
+```
+
+- **Specification authority:** `docs/**` (contracts win over informal notes)
+- **Runtime:** `src/**` exists as scaffold / partial vertical slices — **not** production release
+- **Production:** **NO-GO** until release gates (field no-loss, golden fixtures, recovery) are green
+
 ## Developer start
 
 ```text
@@ -14,8 +24,19 @@ npm test
 npm run gates
 ```
 
-| Coding full product | **READY** |
-| Production release | **NO-GO** until CI release evidence |
+| Full-product coding | Allowed against docs + existing scaffold |
+| Production release | **NO-GO** |
 
-Loan package under `src/features/loan` is the reference implementation pattern.
-Scaffolds: `src/features/{crypto,funds,stocks,metals}`.
+## Feature status (HEAD)
+
+| Package | Status |
+|---------|--------|
+| Core | scaffold / partial |
+| Loan | strongest vertical (coding reference) |
+| Crypto | partial buy slice |
+| Funds | partial subscribe slice |
+| Stocks | partial buy slice |
+| Metals | partial buy slice |
+| Full product | not integrated / not release-proven |
+
+Loan under `src/features/loan` is the reference implementation pattern.

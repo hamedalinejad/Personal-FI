@@ -1,4 +1,4 @@
-import { openDb } from "../persistence/worker.js";
+import { openDb } from "../persistence/port.js";
 
 export function ensureAccount(db, { id, name, accountKind, currency, systemRole = null }) {
   if (!id || !name || !accountKind || !currency) {
@@ -37,15 +37,64 @@ export function assertAccountUsable(db, accountId, expectedCurrency) {
   return row;
 }
 
+/** Stable account id: systemRole + currency (never cross-currency reuse). */
+export function scopedAccountId(systemRole, currency) {
+  if (!systemRole || !currency) throw new Error("ACCOUNT_SCOPE_INVALID");
+  return `${systemRole}:${currency}`;
+}
+
+export function ensureLocalSettlementAccounts(db, currency = "IRR") {
+  return ensureAccount(db, {
+    id: scopedAccountId("local_settlement_cash", currency),
+    name: `Local settlement cash (${currency})`,
+    accountKind: "asset",
+    currency,
+    systemRole: "local_settlement_cash",
+  });
+}
+
+export function ensureFeatureInventoryAccount(db, { featureKey, currency, displayName }) {
+  const role = `${featureKey}_inventory`;
+  return ensureAccount(db, {
+    id: scopedAccountId(role, currency),
+    name: displayName || `${featureKey} investment (${currency})`,
+    accountKind: "asset",
+    currency,
+    systemRole: role,
+  });
+}
+
+export function ensureLoanAccounts(db, currency = "IRR") {
+  const defs = [
+    { role: "loan_receivable", name: "Loans receivable", accountKind: "asset" },
+    { role: "loan_interest_income", name: "Interest income", accountKind: "income" },
+    { role: "loan_fee_income", name: "Fee income", accountKind: "income" },
+    { role: "loan_penalty_income", name: "Penalty income", accountKind: "income" },
+  ];
+  const ids = [];
+  for (const d of defs) {
+    const acc = ensureAccount(db, {
+      id: scopedAccountId(d.role, currency),
+      name: `${d.name} (${currency})`,
+      accountKind: d.accountKind,
+      currency,
+      systemRole: d.role,
+    });
+    ids.push(acc.id);
+  }
+  return ids;
+}
+
+/** @deprecated Loan-only; prefer ensureLoanAccounts + ensureLocalSettlementAccounts */
 export function bootstrapLoanEditionAccounts(dataDir, currency = "IRR") {
   const db = openDb(dataDir);
-  const defs = [
-    { id: "LOC-CASH", name: "Local settlement cash", accountKind: "asset", currency, systemRole: "local_settlement_cash" },
-    { id: "LOAN-REC", name: "Loans receivable", accountKind: "asset", currency, systemRole: "loan_receivable" },
-    { id: "LOAN-INT-INC", name: "Interest income", accountKind: "income", currency, systemRole: "loan_interest_income" },
-    { id: "LOAN-FEE-INC", name: "Fee income", accountKind: "income", currency, systemRole: "loan_fee_income" },
-    { id: "LOAN-PEN-INC", name: "Penalty income", accountKind: "income", currency, systemRole: "loan_penalty_income" },
+  ensureLocalSettlementAccounts(db, currency);
+  ensureLoanAccounts(db, currency);
+  return [
+    scopedAccountId("local_settlement_cash", currency),
+    scopedAccountId("loan_receivable", currency),
+    scopedAccountId("loan_interest_income", currency),
+    scopedAccountId("loan_fee_income", currency),
+    scopedAccountId("loan_penalty_income", currency),
   ];
-  for (const d of defs) ensureAccount(db, d);
-  return defs.map((d) => d.id);
 }

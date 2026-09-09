@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
-import { openDb } from "../../../core/persistence/worker.js";
+import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
+import { openDb } from "../../../core/persistence/port.js";
 import { allocatePayment, allocationJournalLines } from "../domain/paymentAllocation.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
@@ -54,11 +54,11 @@ export async function recordPayment(
   input,
   {
     dataDir,
-    cashAccountId = "LOC-CASH",
-    receivableAccountId = "LOAN-REC",
-    interestIncomeId = "LOAN-INT-INC",
-    feeIncomeId = "LOAN-FEE-INC",
-    penaltyIncomeId = "LOAN-PEN-INC",
+    cashAccountId = null,
+    receivableAccountId = null,
+    interestIncomeId = null,
+    feeIncomeId = null,
+    penaltyIncomeId = null,
   } = {},
 ) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
@@ -70,6 +70,13 @@ export async function recordPayment(
 
   const currency = p.currency;
   bootstrapLoanEditionAccounts(dataDir, currency);
+  if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
+  if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
+  if (!interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);
+  if (!feeIncomeId) feeIncomeId = scopedAccountId("loan_fee_income", currency);
+  if (!penaltyIncomeId) penaltyIncomeId = scopedAccountId("loan_penalty_income", currency);
+  if (typeof interestIncomeId !== "undefined" && !interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);
+
 
   const db = openDb(dataDir);
   const loan = db.prepare(`SELECT * FROM ln_loans WHERE id = ?`).get(p.loanId);

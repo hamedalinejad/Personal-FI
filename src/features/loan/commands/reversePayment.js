@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { openDb } from "../../../core/persistence/worker.js";
-import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
+import { openDb } from "../../../core/persistence/port.js";
+import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
 /**
@@ -12,9 +12,9 @@ export async function reversePayment(
   input,
   {
     dataDir,
-    cashAccountId = "LOC-CASH",
-    receivableAccountId = "LOAN-REC",
-    interestIncomeId = "LOAN-INT-INC",
+    cashAccountId = null,
+    receivableAccountId = null,
+    interestIncomeId = null,
     feeIncomeId = "LOAN-FEE-INC",
     penaltyIncomeId = "LOAN-PEN-INC",
   } = {},
@@ -30,6 +30,10 @@ export async function reversePayment(
   const currency = p.currency;
 
   bootstrapLoanEditionAccounts(dataDir, currency);
+  if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
+  if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
+  if (typeof interestIncomeId !== "undefined" && !interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);
+
   const db = openDb(dataDir);
   const origOp = db.prepare(`SELECT * FROM fin_operations WHERE id = ?`).get(p.originalOperationId);
   if (!origOp) throw new Error("OP_NOT_FOUND");

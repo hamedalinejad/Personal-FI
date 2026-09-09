@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { runInvariantGate } from "../invariants/index.js";
 import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
-import { persistOperation, loadOperation } from "../../persistence/worker.js";
+import { persistOperation, loadOperation } from "../../persistence/port.js";
 
 export function stableStringify(value) {
   if (value === null || typeof value !== "object") {

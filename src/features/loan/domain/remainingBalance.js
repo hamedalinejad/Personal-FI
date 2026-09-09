@@ -1,5 +1,5 @@
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
-import { openDb } from "../../../core/persistence/worker.js";
+import { openDb } from "../../../core/persistence/port.js";
 import { latestSchedule } from "../ledger/scheduleRepository.js";
 import { getLoanById } from "../ledger/loanRepository.js";
 

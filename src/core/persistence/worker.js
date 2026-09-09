@@ -109,20 +109,7 @@ function persistOperationSqlite(record, dir) {
   const businessDate = record.businessDate;
   const baseCurrency = record.baseCurrency;
 
-  // Verify accounts — never invent
-  for (const line of journalLines) {
-    const aid = line.accountId || line.account_id;
-    const lineCur = line.currency || baseCurrency;
-    if (!line.currency) {
-      throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
-    }
-    assertAccountUsable(db, aid, null);
-    // line currency must match account currency
-    const acc = assertAccountUsable(db, aid);
-    if (acc.currency !== lineCur) {
-      throw new Error("ACCOUNT_CURRENCY_MISMATCH");
-    }
-  }
+  // Account usability is verified inside the transaction after domain bootstrap (withinTransaction).
 
   const resultSnapshot = {
     operationId: id,
@@ -173,6 +160,24 @@ function persistOperationSqlite(record, dir) {
       JSON.stringify(resultSnapshot),
     );
 
+    // Domain bootstrap + subledger (operation row already exists for FKs)
+    if (typeof record.withinTransaction === "function") {
+      record.withinTransaction(db, { operationId: id, businessDate, baseCurrency });
+    }
+
+    // Verify accounts after bootstrap — never invent missing accounts
+    for (const line of journalLines) {
+      const aid = line.accountId || line.account_id;
+      const lineCur = line.currency || baseCurrency;
+      if (!line.currency) {
+        throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+      }
+      const acc = assertAccountUsable(db, aid);
+      if (acc.currency !== lineCur) {
+        throw new Error("ACCOUNT_CURRENCY_MISMATCH");
+      }
+    }
+
     const entryId = randomUUID();
     const postState = status === "posted" ? "posted" : status === "voided" ? "void" : "draft";
     db.prepare(
@@ -209,10 +214,6 @@ function persistOperationSqlite(record, dir) {
         line.reference ?? null,
       );
     });
-
-    if (typeof record.withinTransaction === "function") {
-      record.withinTransaction(db, { operationId: id, businessDate, baseCurrency });
-    }
 
     db.prepare(
       `UPDATE fin_operations SET durability_state = 'sql_committed' WHERE id = ?`,

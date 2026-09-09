@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { openDb } from "../../../core/persistence/worker.js";
+import { openDb } from "../../../core/persistence/port.js";
 
 export function insertScheduleSnapshot(dataDir, { loanId, version, rows, effectiveFrom, operationId }) {
   const db = openDb(dataDir);

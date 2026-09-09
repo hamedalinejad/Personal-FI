@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { generateSchedule } from "../domain/scheduleFacade.js";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
+import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
 import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
 import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
 import { normalizeRatePercentage } from "../../../core/domain/loan/scheduleEngine.js";
@@ -13,8 +13,8 @@ export async function createLoan(
   input,
   {
     dataDir,
-    cashAccountId = "LOC-CASH",
-    receivableAccountId = "LOAN-REC",
+    cashAccountId = null,
+    receivableAccountId = null,
     operationBaseCurrency,
   } = {},
 ) {
@@ -48,6 +48,9 @@ export async function createLoan(
   const rateFractional = normalizeRatePercentage(p.annualRate).toFixed();
 
   bootstrapLoanEditionAccounts(dataDir, currency);
+  if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
+  if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
+
 
   const schedule = generateSchedule({
     method: p.method,

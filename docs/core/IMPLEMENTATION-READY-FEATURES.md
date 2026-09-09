@@ -1,3 +1,5 @@
+**Gate:** Parallel production packages for Crypto/Stocks/Funds/Metals are forbidden until Loan is RELEASE-PROVEN. Scaffold-only work may exist under that constraint.
+
 # Implementation-Ready — All Feature Verticals
 
 **Coding status:** READY to implement using Loan as the **template pattern**.  
