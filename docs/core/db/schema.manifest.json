@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T18:54:59.334Z",
+  "schemaHash": "06f9174e193b785a6c73480bdc3e1b4ab082bd027a2e0ffd5a159ba64267759d",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -111,30 +111,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "fin_account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "uq_acc_iban_active",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "iban"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_acc_accounts_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -171,37 +170,39 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "acc_transactions",
           "from": "transaction_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_acc_tx_links_related",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "related_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_acc_transaction_links_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "transaction_id",
+            "related_feature",
+            "related_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_acc_transaction_links_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -273,47 +274,44 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_acc_tx_date",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "business_date"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_acc_tx_account",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "account_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_acc_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -372,18 +370,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_bg_budgets_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "period_key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_bg_budgets_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -434,23 +434,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "bg_budgets",
           "from": "budget_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_bg_envelopes_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -487,54 +485,53 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "bg_envelopes",
           "from": "envelope_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_bg_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_bg_env",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "envelope_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_bg_transaction_links_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "envelope_id",
+            "operation_id"
+          ]
         },
         {
-          "seq": 3,
           "name": "sqlite_autoindex_bg_transaction_links_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -593,11 +590,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_br_items_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -662,54 +660,53 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "br_items",
           "from": "item_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_br_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_br_item",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "item_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_br_occurrences_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "item_id",
+            "occurrence_key"
+          ]
         },
         {
-          "seq": 3,
           "name": "sqlite_autoindex_br_occurrences_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -753,23 +750,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cat_categories",
           "from": "parent_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_cat_categories_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -883,40 +878,36 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_chk_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_chk_cheques_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -954,11 +945,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_cur_currencies_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "code"
+          ]
         }
       ]
     },
@@ -995,23 +987,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cur_currencies",
           "from": "base_currency",
           "to": "code",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_cur_currency_preferences_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1090,33 +1080,28 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cur_currencies",
           "from": "to_currency",
           "to": "code",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "cur_currencies",
           "from": "from_currency",
           "to": "code",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_cur_exchange_rates_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1161,18 +1146,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_dash_default",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "is_default"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_dash_layouts_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1216,23 +1203,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "dash_layouts",
           "from": "layout_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "CASCADE",
-          "match": "NONE"
+          "on_delete": "CASCADE"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_dash_widget_configs_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1256,11 +1241,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_db_meta_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         }
       ]
     },
@@ -1326,11 +1312,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_docs_documents_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1374,30 +1361,30 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "docs_documents",
           "from": "document_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_docs_links_entity",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "entity_type",
+            "entity_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_docs_links_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1511,33 +1498,28 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cat_categories",
           "from": "category_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_exp_recurring_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1693,94 +1675,80 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "exp_transactions",
           "from": "reversed_expense_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_transactions",
           "from": "account_transaction_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "exp_recurring",
           "from": "recurring_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 3,
-          "seq": 0,
           "table": "cat_categories",
           "from": "category_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 4,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 5,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_exp_reversed",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "reversed_expense_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_exp_tx_voided",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "is_voided"
+          ]
         },
         {
-          "seq": 2,
           "name": "idx_exp_tx_date",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "business_date"
+          ]
         },
         {
-          "seq": 3,
           "name": "sqlite_autoindex_exp_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1838,47 +1806,44 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "fg_goals",
           "from": "goal_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_fg_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_fg_goal",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "goal_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_fg_contributions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -1951,11 +1916,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_fg_goals_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2055,30 +2021,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "parent_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_fin_acc_parent",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "parent_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_fin_accounts_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2157,23 +2122,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_fin_audit_log_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2238,23 +2201,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_fin_journal_entries_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2368,47 +2329,44 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "fin_journal_entries",
           "from": "entry_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_fin_jl_account",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "account_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_fin_journal_lines_entry",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "entry_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_fin_journal_lines_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2543,68 +2501,68 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "corrects_operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "fin_operations",
           "from": "reverses_operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_fin_op_reverses",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "reverses_operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_fin_op_status",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "status"
+          ]
         },
         {
-          "seq": 2,
           "name": "idx_fin_op_type",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_type"
+          ]
         },
         {
-          "seq": 3,
           "name": "idx_fin_op_date",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "business_date"
+          ]
         },
         {
-          "seq": 4,
           "name": "idx_fin_operations_command_hash",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "command_hash"
+          ]
         },
         {
-          "seq": 5,
           "name": "sqlite_autoindex_fin_operations_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2677,11 +2635,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_fin_reconcile_runs_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2760,47 +2719,46 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "import_raw_records",
           "from": "raw_record_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "uq_import_external_ref",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "source_provider",
+            "external_ref"
+          ]
         },
         {
-          "seq": 1,
           "name": "uq_import_provider_tx",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "source_provider",
+            "provider_tx_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_import_dedupe_keys_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -2929,25 +2887,28 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_import_raw_hash",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "raw_record_hash"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_import_raw_batch",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "batch_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_import_raw_records_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3061,40 +3022,36 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cat_categories",
           "from": "category_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_inc_recurring_next",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "next_occurrence"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inc_recurring_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3250,94 +3207,80 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "inc_transactions",
           "from": "reversed_income_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "acc_transactions",
           "from": "account_transaction_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "inc_recurring",
           "from": "recurring_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 3,
-          "seq": 0,
           "table": "cat_categories",
           "from": "category_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 4,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 5,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_inc_reversed",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "reversed_income_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_inc_tx_voided",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "is_voided"
+          ]
         },
         {
-          "seq": 2,
           "name": "idx_inc_tx_date",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "business_date"
+          ]
         },
         {
-          "seq": 3,
           "name": "sqlite_autoindex_inc_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3388,40 +3331,37 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "fin_account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_crypto_exchanges",
           "from": "exchange_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_crypto_cash_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "exchange_id",
+            "currency"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_crypto_cash_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3459,11 +3399,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_crypto_exchanges_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3535,37 +3476,40 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "uq_crypto_holding_wallet",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "exchange_id",
+            "network_id",
+            "instrument_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "uq_crypto_holding_venue",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "exchange_id",
+            "instrument_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_inv_crypto_holdings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3665,67 +3609,58 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "fee_instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "inv_crypto_holdings",
           "from": "holding_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 3,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_crypto_tx_holding",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "holding_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_crypto_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_inv_crypto_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3769,30 +3704,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "inv_crypto_wallet_networks",
           "from": "network_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_crypto_addr_net",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "network_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_crypto_wallet_addresses_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3836,30 +3770,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "inv_crypto_exchanges",
           "from": "exchange_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_crypto_net_ex",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "exchange_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_crypto_wallet_networks_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3896,30 +3829,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_fif_funds_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "instrument_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_fif_funds_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -3984,33 +3916,28 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_fif_holdings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4110,50 +4037,43 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_fif_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_fif_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4239,33 +4159,28 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_metals_platforms",
           "from": "platform_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_metals_holdings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4358,50 +4273,43 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "pa_assets",
           "from": "pa_asset_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_metals_holdings",
           "from": "metals_holding_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_metals_del_holding",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "metals_holding_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_metals_physical_deliveries_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4438,23 +4346,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "fin_account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_metals_platforms_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4575,50 +4481,43 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_metals_holdings",
           "from": "holding_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_metals_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_metals_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4655,23 +4554,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_accounts",
           "from": "fin_account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_stocks_iran_brokerages_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4750,40 +4647,36 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_stocks_ca_instr",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "instrument_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_stocks_iran_corporate_actions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4848,40 +4741,37 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_stocks_iran_brokerages",
           "from": "brokerage_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_stocks_iran_holdings_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "brokerage_id",
+            "instrument_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_stocks_iran_holdings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -4939,30 +4829,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_inv_stocks_iran_instruments_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "instrument_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_inv_stocks_iran_instruments_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5069,77 +4958,65 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "inv_stocks_iran_brokerages",
           "from": "brokerage_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 2,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 3,
-          "seq": 0,
           "table": "inv_stocks_iran_holdings",
           "from": "holding_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 4,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_stocks_tx_holding",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "holding_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_stocks_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_inv_stocks_iran_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5190,23 +5067,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ln_loan_collateral_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5306,30 +5181,30 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_ln_fee_tiers_loan",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "loan_id",
+            "tier_order"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_ln_loan_fee_tiers_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5394,23 +5269,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ln_loan_fees_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5496,23 +5369,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ref_parties",
           "from": "party_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ln_loans_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5556,23 +5427,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ln_rate_history_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5623,40 +5492,37 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ln_schedule_snapshots_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "loan_id",
+            "version"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_ln_schedule_snapshots_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5735,47 +5601,44 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ln_loans",
           "from": "loan_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_ln_tx_loan",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "loan_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_ln_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_ln_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5827,11 +5690,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_not_custom_reminders_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5904,18 +5768,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_not_notifications_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "dedupe_key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_not_notifications_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -5953,18 +5819,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_not_settings_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_not_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6099,30 +5967,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "source_operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_pa_source_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "source_operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_pa_assets_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6222,40 +6089,36 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "pa_assets",
           "from": "asset_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_pa_tx_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_pa_transactions_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6327,23 +6190,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "pa_assets",
           "from": "asset_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_pa_valuations_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6381,18 +6242,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_port_settings_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_port_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6430,11 +6293,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_port_snapshots_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6541,54 +6405,56 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "price_sources",
           "from": "source_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         },
         {
-          "id": 1,
-          "seq": 0,
           "table": "ref_instruments",
           "from": "instrument_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_price_src",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "source_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "idx_price_history_instr_date",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "instrument_id",
+            "market_date"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_price_history_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "instrument_id",
+            "market_date",
+            "source_id",
+            "quote_type"
+          ]
         },
         {
-          "seq": 3,
           "name": "sqlite_autoindex_price_history_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6640,11 +6506,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_price_sources_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6688,23 +6555,21 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "price_sources",
           "from": "source_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_price_sync_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6797,37 +6662,39 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "cur_currencies",
           "from": "cost_currency_default",
           "to": "code",
           "on_update": "CASCADE",
-          "on_delete": "SET NULL",
-          "match": "NONE"
+          "on_delete": "SET NULL"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "uq_ref_instr_chain_native_symbol",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "network_identifier",
+            "symbol"
+          ]
         },
         {
-          "seq": 1,
           "name": "uq_ref_instr_chain_contract",
-          "unique": 1,
+          "unique": true,
           "origin": "c",
-          "partial": 1
+          "columns": [
+            "network_identifier",
+            "contract_address"
+          ]
         },
         {
-          "seq": 2,
           "name": "sqlite_autoindex_ref_instruments_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6879,11 +6746,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ref_integrity_queue_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6921,11 +6789,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_ref_parties_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -6991,11 +6860,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_rpt_net_worth_snapshots_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7040,11 +6910,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_rpt_presets_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7124,11 +6995,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_rpt_snapshots_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7166,11 +7038,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_sec_access_log_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7201,11 +7074,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_sec_encryption_meta_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7243,11 +7117,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_sec_session_logs_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7285,18 +7160,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_sec_settings_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_sec_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7341,11 +7218,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_stg_backup_logs_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7383,18 +7261,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_stg_settings_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_stg_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7467,18 +7347,20 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_tax_categories_2",
-          "unique": 1,
+          "unique": true,
           "origin": "u",
-          "partial": 0
+          "columns": [
+            "code"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_tax_categories_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7606,30 +7488,29 @@
       ],
       "foreignKeys": [
         {
-          "id": 0,
-          "seq": 0,
           "table": "fin_operations",
           "from": "operation_id",
           "to": "id",
           "on_update": "CASCADE",
-          "on_delete": "RESTRICT",
-          "match": "NONE"
+          "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
         {
-          "seq": 0,
           "name": "idx_tax_op",
-          "unique": 0,
+          "unique": false,
           "origin": "c",
-          "partial": 0
+          "columns": [
+            "operation_id"
+          ]
         },
         {
-          "seq": 1,
           "name": "sqlite_autoindex_tax_events_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7681,11 +7562,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_tax_records_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "id"
+          ]
         }
       ]
     },
@@ -7709,11 +7591,12 @@
       "foreignKeys": [],
       "indexes": [
         {
-          "seq": 0,
           "name": "sqlite_autoindex_usr_settings_1",
-          "unique": 1,
+          "unique": true,
           "origin": "pk",
-          "partial": 0
+          "columns": [
+            "key"
+          ]
         }
       ]
     }

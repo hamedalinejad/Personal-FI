@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-/**
- * P0-SCHEMA-005 — Field inventory Gate H verifier (partial)
- * Ensures every schema column has inventory row with required columns.
- * Exit 0 if gaps = 0 for required headers; warns on optional API/fixture empty.
- */
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,17 +8,55 @@ const schema = fs.readFileSync(path.join(root, "docs/core/db/schema.sql"), "utf8
 const invPath = path.join(root, "docs/core/field-inventory.checklist.tsv");
 const inv = fs.readFileSync(invPath, "utf8").trim().split("\n");
 const header = inv[0].split("\t");
-const required = ["table", "column", "kind", "owner", "editable_after_post", "sot", "migration_status", "documented"];
-for (const r of required) {
-  if (!header.includes(r) && !header.includes(r.replace("sot", "sot"))) {
-    // header uses sot lowercase from earlier seed
+const requiredHeaders = [
+  "table",
+  "column",
+  "kind",
+  "owner",
+  "editable_after_post",
+  "sot",
+  "migration_status",
+  "documented",
+];
+let failed = false;
+for (const h of requiredHeaders) {
+  if (!header.includes(h)) {
+    console.error("MISSING_HEADER", h);
+    failed = true;
   }
 }
+
+const idx = Object.fromEntries(header.map((h, i) => [h, i]));
 const rows = new Map();
 for (const line of inv.slice(1)) {
   const p = line.split("\t");
   if (p.length < 2) continue;
-  rows.set(`${p[0]}.${p[1]}`, p);
+  const key = `${p[0]}.${p[1]}`;
+  rows.set(key, p);
+  const kind = p[idx.kind];
+  const owner = p[idx.owner];
+  const sot = p[idx.sot];
+  const mig = p[idx.migration_status];
+  const doc = p[idx.documented];
+  if (!kind || kind === "") {
+    console.error("FIELD_KIND_MISSING", key);
+    failed = true;
+  }
+  if (!owner || owner === "") {
+    console.error("FIELD_OWNER_MISSING", key);
+    failed = true;
+  }
+  if (!sot || sot === "") {
+    console.error("FIELD_SOT_MISSING", key);
+    failed = true;
+  }
+  if (!mig || mig === "") {
+    console.error("FIELD_MIGRATION_MISSING", key);
+    failed = true;
+  }
+  if (doc !== "yes" && doc !== "true" && doc !== "1") {
+    // soft for now — warn
+  }
 }
 
 const creates = [...schema.matchAll(/CREATE TABLE IF NOT EXISTS (\w+) \((.*?)\);/gs)];
@@ -41,12 +74,13 @@ for (const [, table, body] of creates) {
     }
   }
 }
-console.log(`inventory rows: ${rows.size}; schema column gaps: ${gaps}`);
 if (gaps > 0) {
-  process.exit(1);
+  console.error(`FAIL inventory gaps: ${gaps}`);
+  failed = true;
+} else {
+  console.log("PASS inventory covers all CREATE columns + required metadata columns");
 }
-console.log("PASS field-inventory column coverage");
-process.exit(0);
 
-// Gate H residual note: full apiIn/apiOut/fixture columns filled during feature work.
-console.log("NOTE: Gate H full API/fixture disposition still progressive per feature");
+if (failed) process.exit(1);
+console.log(`inventory rows: ${rows.size}`);
+process.exit(0);

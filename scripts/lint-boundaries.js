@@ -1,42 +1,48 @@
 #!/usr/bin/env node
-/**
- * Minimal boundary lint until full ESLint lands.
- * Fails if any feature file imports another feature's internal path.
- */
 import { readdirSync, readFileSync, statSync, existsSync } from "fs";
 import { join } from "path";
 
-const root = join(process.cwd(), "src/features");
-if (!existsSync(root)) {
-  console.log("lint-boundaries: no src/features yet — OK");
-  process.exit(0);
-}
+const root = process.cwd();
+const featuresRoot = join(root, "src/features");
+const coreRoot = join(root, "src/core");
 
 function walk(dir, acc = []) {
+  if (!existsSync(dir)) return acc;
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walk(p, acc);
-    else if (name.endsWith(".js") || name.endsWith(".ts")) acc.push(p);
+    else if (/\.(js|ts|mjs)$/.test(name)) acc.push(p);
   }
   return acc;
 }
 
-const files = walk(root);
 let failed = false;
-for (const f of files) {
+const featureFiles = walk(featuresRoot);
+const coreFiles = walk(coreRoot);
+
+for (const f of featureFiles) {
   const text = readFileSync(f, "utf8");
-  const feature = f.split("src/features/")[1]?.split("/")[0];
-  const re = /from\s+["']([^"']+)["']/g;
-  let m;
-  while ((m = re.exec(text))) {
+  const rel = f.slice(root.length + 1);
+  const self = rel.split("/")[2];
+  for (const m of text.matchAll(/from\s+["']([^"']+)["']/g)) {
     const spec = m[1];
-    if (spec.includes("features/") && !spec.includes(`features/${feature}`)) {
-      if (spec.includes("/internal") || spec.includes("/ledger") || spec.includes("/domain")) {
-        console.error("BOUNDARY:", f, "→", spec);
-        failed = true;
-      }
+    if (!spec.includes("features/")) continue;
+    if (spec.includes(`features/${self}`)) continue;
+    // only public-api of other features allowed
+    if (!/features\/[^/]+\/public-api/.test(spec)) {
+      console.error("BOUNDARY forbidden:", rel, "→", spec);
+      failed = true;
     }
   }
 }
+
+for (const f of coreFiles) {
+  const text = readFileSync(f, "utf8");
+  if (/from\s+["'][^"']*features\//.test(text)) {
+    console.error("BOUNDARY: core→feature forbidden:", f.slice(root.length + 1));
+    failed = true;
+  }
+}
+
 if (failed) process.exit(1);
-console.log("lint-boundaries: OK (", files.length, "files)");
+console.log("lint-boundaries: OK (features", featureFiles.length, "core", coreFiles.length, ")");
