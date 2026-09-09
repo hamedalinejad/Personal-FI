@@ -1,41 +1,81 @@
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { settle } from "../../../core/domain/cash/settlementAdapter.js";
-import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
+import { getLoanById } from "../ledger/loanRepository.js";
+import { assertLoanPayable } from "../domain/loanState.js";
+import { allocatePayment, allocationJournalLines } from "../domain/paymentAllocation.js";
+import { latestSchedule } from "../ledger/scheduleRepository.js";
+import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
-export async function recordPayment(input, { dataDir, cashAccountId = "LOC-CASH", receivableAccountId = "LOAN-REC", baseCurrency = "IRR" } = {}) {
+/**
+ * loan.recordPayment — waterfall penalty→fee→interest→principal
+ */
+export async function recordPayment(
+  input,
+  {
+    dataDir,
+    cashAccountId = "LOC-CASH",
+    receivableAccountId = "LOAN-REC",
+    interestIncomeId = "LOAN-INT-INC",
+    feeIncomeId = "LOAN-FEE-INC",
+    penaltyIncomeId = "LOAN-PEN-INC",
+    baseCurrency = "IRR",
+  } = {},
+) {
   const operationId = input.operationId || randomUUID();
   const p = input.payload || input;
   if (!p.loanId || !p.amount) throw new Error("VALIDATION_ERROR");
-  toDecimal(p.amount);
-  const businessDate = p.businessDate;
-  if (!businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   const currency = p.currency || baseCurrency;
 
   bootstrapLoanEditionAccounts(dataDir, currency);
+  const loan = getLoanById(dataDir, p.loanId);
+  assertLoanPayable(loan, currency);
 
-  const settlement = settle({
-    finAccountId: cashAccountId,
-    counterAccountId: receivableAccountId,
-    amount: p.amount,
-    side: "debit",
-    operationId,
-    memo: "loan_payment",
-  });
-  for (const line of settlement.journalLines) {
-    line.currency = currency;
+  const schedule = latestSchedule(dataDir, p.loanId);
+  let outstanding = {
+    principal: loan.principal,
+    interest: "0",
+    fee: "0",
+    penalty: "0",
+  };
+  if (schedule?.snapshot_json) {
+    const rows = JSON.parse(schedule.snapshot_json);
+    // sum remaining principal from unpaid rows (v1: all open)
+    let prin = toDecimal("0");
+    let interest = toDecimal("0");
+    for (const row of rows) {
+      prin = prin.plus(toDecimal(row.principal || "0"));
+      interest = interest.plus(toDecimal(row.interest || "0"));
+    }
+    outstanding = {
+      principal: prin.toFixed(),
+      interest: interest.toFixed(),
+      fee: "0",
+      penalty: "0",
+    };
   }
+
+  const allocation = allocatePayment({ amount: p.amount, outstanding });
+  const journalLines = allocationJournalLines({
+    allocation,
+    currency,
+    cashAccountId,
+    receivableAccountId,
+    interestIncomeId,
+    feeIncomeId,
+    penaltyIncomeId,
+  });
 
   return runAtomicFinancialOperation({
     operationId,
     type: "loan.recordPayment",
     dataDir,
-    businessDate,
+    businessDate: p.businessDate,
     baseCurrency: currency,
     payload: p,
-    journalLines: settlement.journalLines,
-    domainResult: { loanId: p.loanId, amount: p.amount },
-    engineVersions: { loanSchedule: "1.0.0-period_based", money: "1.0.0" },
+    journalLines,
+    domainResult: { loanId: p.loanId, allocation },
+    engineVersions: { loanSchedule: "1.0.0-period_based-equal-principal", money: "1.0.0" },
   });
 }

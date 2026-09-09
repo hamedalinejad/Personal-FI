@@ -1,0 +1,8 @@
+{
+  "name": "@personal-fi/loan",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./public-api/index.js"
+  }
+}

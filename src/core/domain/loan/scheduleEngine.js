@@ -24,16 +24,33 @@ function money2str(d) {
  * Current v1 uses period_based monthly (/12). Other day-count modes are
  * explicitly rejected until DayCountEngine lands (not silent approximation).
  */
+/** Only for dayCount=period_based — frequency mapping lives in engine, not features. */
+export function periodRateFromAnnual(annualRate, frequency = "monthly") {
+  const a = assertNonNegative(annualRate);
+  switch (frequency) {
+    case "monthly":
+      return a.div(12);
+    case "weekly":
+      return a.div(52);
+    case "quarterly":
+      return a.div(4);
+    case "annual":
+      return a;
+    default:
+      throw new Error(`LOAN_FREQUENCY_UNSUPPORTED:${frequency}`);
+  }
+}
+
 export function assertDayCountSupported(dayCount) {
   if (dayCount == null || dayCount === "period_based" || dayCount === "monthly") return;
   throw new Error(`LOAN_DAY_COUNT_UNSUPPORTED:${dayCount}`);
 }
 
-export function scheduleDeclining({ principal, annualRate, periods, startDate, dayCount }) {
+export function scheduleDeclining({ principal, annualRate, periods, startDate, dayCount, frequency = "monthly" }) {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
-  const r = assertNonNegative(annualRate).div(12);
+  const r = periodRateFromAnnual(annualRate, frequency);
   const n = parsePeriodCount(periods);
   const principalPart = P.div(n);
   let bal = P;
@@ -116,13 +133,13 @@ export function scheduleQarz({ principal, periods, feePercent = "0", startDate, 
   return { method: "qarz_al_hasaneh", startDate, dayCount: "period_based", rows };
 }
 
-export function scheduleBullet({ principal, annualRate, periods, startDate, dayCount })
+export function scheduleBullet({ principal, annualRate, periods, startDate, dayCount, frequency = "monthly" })
 {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
-  const r = assertNonNegative(annualRate).div(12);
+  const r = periodRateFromAnnual(annualRate, frequency);
   const rows = [];
   let bal = P;
   for (let i = 1; i <= n; i++) {

@@ -1,35 +1,48 @@
 import { randomUUID } from "node:crypto";
-import { buildSchedule } from "../../../core/domain/loan/scheduleEngine.js";
+import { generateSchedule } from "../domain/scheduleFacade.js";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { settle } from "../../../core/domain/cash/settlementAdapter.js";
 import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
-import { openDb } from "../../../core/persistence/worker.js";
+import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
+import { insertLoan } from "../ledger/loanRepository.js";
+import { insertScheduleSnapshot } from "../ledger/scheduleRepository.js";
 
+/**
+ * loan.create
+ * Journal: DEBIT receivable / CREDIT cash = principal
+ */
 export async function createLoan(
   input,
-  { dataDir, cashAccountId = "LOC-CASH", receivableAccountId = "LOAN-REC", baseCurrency = "IRR" } = {},
+  {
+    dataDir,
+    cashAccountId = "LOC-CASH",
+    receivableAccountId = "LOAN-REC",
+    baseCurrency = "IRR",
+  } = {},
 ) {
   const operationId = input.operationId || randomUUID();
-  if (typeof operationId !== "string" || !operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const p = input.payload || input;
   if (!p.startDate) throw new Error("LOAN_START_DATE_REQUIRED");
   if (!p.principal || !p.periods || !p.method) throw new Error("VALIDATION_ERROR");
-  const businessDate = p.businessDate || p.startDate;
+  if (!p.currency && !baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
+
   const currency = p.currency || baseCurrency;
+  const businessDate = p.businessDate || p.startDate;
+  const annualRate = p.annualRate != null ? p.annualRate : "0";
 
   bootstrapLoanEditionAccounts(dataDir, currency);
 
-  const schedule = buildSchedule(p.method, {
+  const schedule = generateSchedule({
+    method: p.method,
     principal: p.principal,
-    annualRate: p.annualRate || "0",
+    annualRate,
     periods: p.periods,
     startDate: p.startDate,
-    feePercent: p.feePercent,
     dayCount: p.dayCount || "period_based",
+    feePercent: p.feePercent,
   });
 
   const loanId = p.loanId || randomUUID();
-  const settlement = settle({
+  const settlement = localSettlementAdapter.settle({
     finAccountId: cashAccountId,
     counterAccountId: receivableAccountId,
     amount: p.principal,
@@ -37,6 +50,8 @@ export async function createLoan(
     operationId,
     memo: "loan_disbursement",
   });
+  // Convention: credit cash = money out to borrower; debit receivable
+  // settle() with side credit on cash → other side debit on receivable ✓
   for (const line of settlement.journalLines) line.currency = currency;
 
   const result = await runAtomicFinancialOperation({
@@ -45,30 +60,37 @@ export async function createLoan(
     dataDir,
     businessDate,
     baseCurrency: currency,
-    payload: { ...p, loanId },
+    payload: { ...p, loanId, annualRate, currency },
     journalLines: settlement.journalLines,
     domainResult: {
       schedule,
       loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: p.method },
     },
-    engineVersions: { loanSchedule: "1.0.0-period_based", money: "1.0.0" },
+    engineVersions: { loanSchedule: "1.0.0-period_based-equal-principal", money: "1.0.0" },
   });
 
   if (!result.idempotentReplay) {
-    const db = openDb(dataDir);
     const now = new Date().toISOString();
-    db.prepare(
-      `INSERT OR IGNORE INTO ln_loans (
-        id, role, calculation_method, principal, currency, interest_rate, status, created_at, start_date
-      ) VALUES (?, 'borrowed', ?, ?, ?, ?, 'active', ?, ?)`,
-    ).run(loanId, p.method, p.principal, currency, p.annualRate || "0", now, p.startDate);
+    insertLoan(dataDir, {
+      id: loanId,
+      calculation_method: p.method,
+      principal: p.principal,
+      currency,
+      interest_rate: annualRate,
+      status: "active",
+      created_at: now,
+      start_date: p.startDate,
+    });
     try {
-      db.prepare(
-        `INSERT INTO ln_schedule_snapshots (id, loan_id, version, snapshot_json, effective_from, operation_id)
-         VALUES (?, ?, 1, ?, ?, ?)`,
-      ).run(randomUUID(), loanId, JSON.stringify(schedule.rows), p.startDate, operationId);
+      insertScheduleSnapshot(dataDir, {
+        loanId,
+        version: 1,
+        rows: schedule.rows,
+        effectiveFrom: p.startDate,
+        operationId,
+      });
     } catch {
-      /* optional */
+      /* ignore unique */
     }
   }
 

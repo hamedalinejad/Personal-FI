@@ -1,6 +1,10 @@
 export { createLoan } from "../commands/createLoan.js";
 export { recordPayment } from "../commands/recordPayment.js";
+export { reversePayment } from "../commands/reversePayment.js";
+export { generateScheduleCommand as generateSchedule } from "../commands/generateSchedule.js";
 export { previewSchedule } from "../commands/previewSchedule.js";
 export { capabilities } from "../commands/capabilities.js";
-export { getLoan, listLoans } from "../queries/getLoan.js";
+export { getLoan } from "../queries/getLoan.js";
+export { listLoans } from "../queries/listLoans.js";
 export { getSchedule } from "../queries/getSchedule.js";
+export { getStatement } from "../queries/getStatement.js";
