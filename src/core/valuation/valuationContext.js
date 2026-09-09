@@ -14,6 +14,9 @@ export function createValuationContext({
   valuationMode,
   cashScope,
   liabilityScope,
+  priceDatasetVersion,
+  fxDatasetVersion,
+  valuationPolicy,
 }) {
   if (!valuationAsOf || typeof valuationAsOf !== "string") {
     throw new Error("VALUATION_ASOF_REQUIRED");
@@ -31,6 +34,9 @@ export function createValuationContext({
     valuationMode: valuationMode || null,
     cashScope: cashScope || null,
     liabilityScope: liabilityScope || null,
+    priceDatasetVersion: priceDatasetVersion || null,
+    fxDatasetVersion: fxDatasetVersion || null,
+    valuationPolicy: valuationPolicy || null,
   };
   ctx.contextHash = createHash("sha256").update(stableStringify(ctx)).digest("hex").slice(0, 16);
   return Object.freeze(ctx);

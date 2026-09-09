@@ -24,6 +24,10 @@ export async function createLoan(
   const p = input.payload || input;
   if (!p.startDate) throw new Error("LOAN_START_DATE_REQUIRED");
   if (!p.principal || !p.periods || !p.method) throw new Error("VALIDATION_ERROR");
+  // Master Spec §30: only lent supported until liability COA exists
+  const role = p.role || p.direction || "lent";
+  if (role === "borrowed") throw new Error("LOAN_ROLE_DEFERRED:borrowed");
+  if (role !== "lent") throw new Error("LOAN_ROLE_UNSUPPORTED");
 
   const currency = p.currency || baseCurrency;
   const businessDate = p.businessDate || p.startDate;
@@ -74,7 +78,7 @@ export async function createLoan(
         `INSERT INTO ln_loans (
           id, role, calculation_method, principal, currency, interest_rate, status, created_at,
           start_date, operation_id, total_installments, day_count, schedule_engine_version, notes
-        ) VALUES (?, 'borrowed', ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, 'lent', ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         loanId,
         p.method,

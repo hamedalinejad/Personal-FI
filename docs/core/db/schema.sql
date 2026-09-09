@@ -299,13 +299,18 @@ CREATE TABLE IF NOT EXISTS ln_transactions (
   id            TEXT PRIMARY KEY,
   loan_id       TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   operation_id  TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type       TEXT NOT NULL,
+  tx_type       TEXT NOT NULL CHECK (tx_type IN ('disbursement','payment','fee','penalty','adjustment','reversal')),
   business_date TEXT NOT NULL,
   amount        TEXT NOT NULL,
   currency      TEXT NOT NULL,
   created_at    TEXT NOT NULL,
-  payment_date TEXT, -- when cash actually moved (may differ from business_date)
-  exchange_rate_to_base TEXT
+  payment_date TEXT,
+  exchange_rate_to_base TEXT,
+  principal_portion TEXT NOT NULL DEFAULT '0',
+  interest_portion TEXT NOT NULL DEFAULT '0',
+  fee_portion TEXT NOT NULL DEFAULT '0',
+  penalty_portion TEXT NOT NULL DEFAULT '0',
+  reverses_transaction_id TEXT REFERENCES ln_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- ─── Cheques ─────────────────────────────────────────────────

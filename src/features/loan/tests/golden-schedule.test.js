@@ -37,3 +37,35 @@ test("GOLDEN declining equal-principal 12% annual period_based", () => {
   assert.equal(totalInt, 78);
   assert.equal(s.rows[11].balance, "0.00");
 });
+
+test("GOLDEN flat residual zero", () => {
+  const s = buildSchedule("flat_rate", {
+    principal: "1200",
+    annualRate: "0.12",
+    periods: "12",
+    startDate: "2026-01-01",
+  });
+  assert.equal(s.rows[11].balance, "0.00");
+});
+
+test("GOLDEN bullet residual zero", () => {
+  const s = buildSchedule("bullet", {
+    principal: "1000",
+    annualRate: "0.12",
+    periods: "4",
+    startDate: "2026-01-01",
+  });
+  assert.equal(s.rows[3].balance, "0.00");
+  assert.ok(Number(s.rows[0].principal) === 0);
+});
+
+test("GOLDEN qarz zero fee", () => {
+  const s = buildSchedule("qarz_al_hasaneh", {
+    principal: "1000",
+    periods: "10",
+    startDate: "2026-01-01",
+    feePercent: "0",
+  });
+  assert.equal(s.rows[0].interest, "0.00");
+  assert.equal(s.rows[0].fee, "0.00");
+});

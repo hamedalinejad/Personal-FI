@@ -69,3 +69,49 @@ test("loan.payment writes ln_transactions", async () => {
   assert.equal(txs[0].amount, "100");
   closeAllDbs();
 });
+
+test("loan.reversePayment creates reversal tx linked to original", async () => {
+  const { reversePayment } = await import("../public-api/index.js");
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-rev-"));
+  const created = await createLoan(
+    {
+      payload: {
+        principal: "1200",
+        annualRate: "0",
+        periods: "12",
+        method: "declining_balance",
+        startDate: "2026-01-01",
+        currency: "IRR",
+      },
+    },
+    { dataDir },
+  );
+  const pay = await recordPayment(
+    {
+      payload: {
+        loanId: created.loanId,
+        amount: "100",
+        currency: "IRR",
+        businessDate: "2026-02-01",
+      },
+    },
+    { dataDir },
+  );
+  const rev = await reversePayment(
+    {
+      payload: {
+        originalOperationId: pay.operationId,
+        businessDate: "2026-02-02",
+        currency: "IRR",
+      },
+    },
+    { dataDir },
+  );
+  assert.equal(rev.idempotentReplay, false);
+  const db = openDb(dataDir);
+  const op = db.prepare(`SELECT reverses_operation_id FROM fin_operations WHERE id = ?`).get(rev.operationId);
+  assert.equal(op.reverses_operation_id, pay.operationId);
+  const txs = db.prepare(`SELECT * FROM ln_transactions WHERE loan_id = ?`).all(created.loanId);
+  assert.equal(txs.length, 2);
+  closeAllDbs();
+});

@@ -1,5 +1,5 @@
 {
-  "schemaHash": "ea1c2fbb7e53228a86c23b3046a4e5fd22e07606266278d2c49607728f4d653e",
+  "schemaHash": "fcf646b6cbfeaa7b9e67588b2079b98a67bcea6a1a13bdcceb8794fde5cf4e07",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -5646,9 +5646,51 @@
           "notnull": false,
           "dflt": null,
           "pk": 0
+        },
+        {
+          "name": "principal_portion",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "interest_portion",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "fee_portion",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "penalty_portion",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'0'",
+          "pk": 0
+        },
+        {
+          "name": "reverses_transaction_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
         }
       ],
       "foreignKeys": [
+        {
+          "table": "ln_transactions",
+          "from": "reverses_transaction_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
         {
           "table": "fin_operations",
           "from": "operation_id",
