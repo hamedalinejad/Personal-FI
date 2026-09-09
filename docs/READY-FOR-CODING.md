@@ -1,36 +1,41 @@
-# آمادهٔ کدنویسی — Final Entry
+# آمادهٔ شروع کدنویسی
 
-**بله — برای ادامهٔ توسعهٔ Loan/Core آماده است.**  
-**نه — Production RELEASE نیست.**
+**وضعیت:** می‌توانید کدنویسی **Core hardening + Loan vertical** را شروع کنید.  
+**Production / انتشار کامل:** هنوز **NO-GO**.
 
-## شروع در ۳ قدم
+## ۱) قبل از هر commit بخوانید
 
-1. بخوان: `docs/README.md` → `core/CODING-GATE.md` → `core/GO-NO-GO.md`
-2. اجرا: `npm install && npm test && npm run gates`
-3. فقط Loan + Core تا چک‌لیست A1–A12 کامل و evidence سبز شود
+1. `docs/core/CODING-GATE.md` — قوانین مطلق  
+2. `docs/core/GO-NO-GO.md` — دروازه‌ها  
+3. `docs/core/IMPLEMENTATION-READY-LOAN-SLICE.md` — قرارداد Loan  
+4. `docs/core/LOAN-V1-RESOLUTIONS.md` — فرمول و role  
 
-## Loan A1–A12 (HEAD)
+## ۲) دستورات پایه
 
-| # | وضعیت |
-|---|--------|
-| A1 atomic create | ✅ |
-| A2 replay | ✅ |
-| A3 conflict | ✅ |
-| A4 schedule golden | ✅ |
-| A5 allocation | ✅ |
-| A6 ln_transactions | ✅ |
-| A7 reverse | ✅ |
-| A8 backup/restore | ✅ test |
-| A9 standalone | ✅ test |
-| A10 borrowed rejected | ✅ |
-| A11 migration full model | 🔶 residual |
-| A12 remaining rebuild | ✅ derived query |
+```bash
+npm install
+npm test
+npm run gates
+```
 
-## ممنوع
+همه باید سبز باشند قبل از ادعای پیشرفت.
 
-Crypto/Stocks/Funds/Metals production قبل از Loan RELEASE-PROVEN.  
-دومین journal/cash. Number برای پول. silent default.
+## ۳) محدوده مجاز الان
 
-## Production
+| مجاز | ممنوع تا Loan RELEASE-PROVEN |
+|------|------------------------------|
+| `src/core/**` hardening | Crypto / Stocks / Funds / Metals packages |
+| `src/features/loan/**` تکمیل | UI navigation > 6 |
+| golden / recovery Loan | second cash/journal SoT |
+| schema migration additive | silent formula change |
 
-**NO-GO** تا recovery کامل PWA + schema semantic freeze + CI runner evidence.
+## ۴) Authority
+
+`docs/core/DOC-AUTHORITY-CHAIN.md`  
+UX: `docs/00-Product/Pages-IA.md`  
+Schema: `docs/core/db/schema.sql`
+
+## ۵) Checklist Loan RELEASE-PROVEN
+
+ببینید `MASTER-SPEC-VERDICT.md` بخش A1–A12.  
+فایل به‌تنهایی = implemented نیست.

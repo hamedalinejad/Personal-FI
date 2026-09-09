@@ -1,6 +1,8 @@
 # Go / No-Go
 
 **Live authority** for coding readiness.
+
+**CODING-READY for Loan+Core** (see `docs/READY-FOR-CODING.md`). **Production still NO-GO.**
 **Human entry:** `docs/READY-FOR-CODING.md`.
 **Execution handoff:** `EXECUTION-HANDOFF.md` (§45–57).  
 **Executive snapshot:** `FINAL-AUDIT-STATUS-2026-09-08.md`  

@@ -59,7 +59,7 @@ May delete when grep shows no inbound links and body has no unique rule:
 |------|----------------|
 | `NAMING-GLOSSARY.md` | `NAMING-GLOSSARY.md` |
 | `docs/core/rounding/Rounding-Policy.md` | prefer `docs/core/rounding/Rounding-Policy.md` as sole body; root file = thin pointer + Iran table only if not duplicated |
-| `Calculation-Engines.md` | `Calculation-Engines.md` |
+| `Cost-Basis-Engine.md / Loan-Schedule-Engine.md` | `Cost-Basis-Engine.md / Loan-Schedule-Engine.md` |
 | `fixtures/ (golden scenarios)` | Financial-Scenario-Catalog / fixtures |
 
 ---
