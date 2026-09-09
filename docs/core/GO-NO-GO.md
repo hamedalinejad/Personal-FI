@@ -1,90 +1,77 @@
 # Go / No-Go
 
-**Live authority** for coding readiness (single status table below).
-**Executive snapshot:** `FINAL-AUDIT-STATUS-2026-09-08.md`.  
+**Live authority** for coding readiness.  
+**Executive snapshot:** `FINAL-AUDIT-STATUS-2026-09-08.md`  
 **Constitution:** `ARCHITECTURE-LOCKED.md`  
-**Tracking:** `OPEN-ISSUES-REGISTER.md` · `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`  
-**Historical audits:** `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (NOT live)
+**Tracking:** `OPEN-ISSUES-REGISTER.md` · `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`
 
 ---
 
-## Live status — 2026-09-08
+## Think-tank lock (2026-09-09)
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| Continued documentation | **GO** | concept homes only |
-| A — Authority | **MOSTLY GO** | residual consolidation tracked in OPEN |
-| B — Schema freeze | **GO for coding** | content freeze proven (SCHEMA-FREEZE-PROOF + drift/inventory CI); release needs fixture families |
-| C — Numeric fixtures | **NO** | OPEN-004 family CI incomplete |
-| D — Financial path code | **PARTIAL** | `src/core` engines v1 present; Feature packages not on main |
-| E — Standalone | **NO** | contract yes; release-proven no (P1-MOD-003) |
-| F — Offline recovery | **NO** | contract + partial crash tests; matrix incomplete |
-| G — Rebuild determinism | **NO** | needs full engines + fixtures |
-| H — No-field-loss proof | **PARTIAL** | inventory column coverage; API/fixture disposition residual |
-| Core unit tests | **GO** | `npm test` on `src/core` |
-| Feature production code | **GO scoped** | IMPLEMENTATION-READY-* packs; each family needs fixtures before RELEASE-PROVEN |
-| Production release | **NO** | |
+**Do not** add parallel Feature surface until this sequence is green:
 
-**Phase:** docs-first on `main` **with** `src/core` engines v1 (helpers).  
-`src/features/*` package graph **not** present yet (P1-MOD-001).
+```text
+HEAD → CI GREEN → one SQLite schema → one atomic persist path
+  → correct idempotency → strict Decimal → journal SoT
+  → schema/migration manifest → Loan-only vertical
+  → golden + recovery proof → repeat Feature pattern
+```
 
-### Implementation state vocabulary (P1-DOC-005)
-
-| State | Meaning |
-|-------|---------|
-| **SPECIFIED** | contract complete in docs |
-| **IMPLEMENTED-IN-CORE** | `src/core` helper exists + unit tests |
-| **INTEGRATED** | Feature package uses Core via Public API/ports |
-| **RELEASE-PROVEN** | golden family + offline/crash gates green for that scope |
-
-Do **not** use bare “Implemented v1” in live tables. Prefer the four states above.
-
-### One-liner
-
-> Freeze schema + field graph, green golden fixtures, implement one vertical Feature (Loan-only) through API → Operation → Journal → Cash → Persist → Report.
-
-### Edition commercial lock
-
-License/capability flags **must not** delete or rewrite accounting history.
-
-### Requirements pointer
-
-Canonical current R-status → `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` (one table only).
-
-### Offline proof matrix (Gate F/G — not green)
-
-| Scenario | Required | Status |
-|----------|----------|--------|
-| Airplane mode | txs offline | SPECIFIED |
-| Price unavailable | last known + stale; never silent zero | SPECIFIED |
-| Crash mid-write | DB not corrupt | PARTIAL (tests) |
-| Backup/restore | domain+journal+docs | SPECIFIED |
-| License expire | capability off; data remains | SPECIFIED |
-| Import unknown | unknownFields kept | SPECIFIED |
-| Rebuild | same context ⇒ same report | SPECIFIED |
-
-### Feature coding entry gate
-
-| Gate | Exit condition |
-|------|----------------|
-| A Authority | one concept home; zero contradictory live status |
-| B Schema | drift=0 + freeze proven |
-| C Numeric | scoped golden families green |
-| D Financial path | API → Atomic Op → Journal/Cash → Persist → Report |
-| E Standalone | Loan + one Investment without Accounts UI |
-| F Offline | airplane + stale + crash + backup/restore |
-| G Rebuild | same context ⇒ same report |
-| H No-field-loss | Domain→Schema→API→Migration→Fixture |
-
-**Vertical slice #1:** Loan-only end-to-end before parallel Feature writers.
+**Risk class now:** contracts exist, but runtime can diverge from them.  
+That is more dangerous than missing docs — fix foundation before expanding Features.
 
 ---
 
-## HISTORICAL (do not use as live status)
+## Final Gate Table (live)
 
-> Prior paragraphs that said “src absent / no src on main / Feature NO-GO because no src” referred to a **docs-only cleanup phase** and are **obsolete**.  
-> `src/core` was restored; Feature production remains NO until gates above.
+| Gate | Status | Evidence / residual |
+|------|--------|---------------------|
+| Authority | **PARTIAL** | concept homes OK; residual doc consolidation |
+| Schema freeze | **PARTIAL** | coding baseline: drift+inventory+manifest PASS; release freeze needs full semantic equality + families |
+| CI | **LOCAL GREEN** | `npm test` 53 pass; drift/inventory/docs-check PASS on HEAD. Confirm GitHub Actions run green on push |
+| Decimal | **PARTIAL** | public boundary rejects non-string; global audit residual |
+| Accounting | **PARTIAL** | journal balance + post path; void/reverse/correct/fiscal not full |
+| Persistence | **PARTIAL** | canonical schema.sql bootstrap; SQLite default; JSON test-only |
+| Idempotency | **PARTIAL** | operationId + commandHash in engine; not yet DB UNIQUE txn lock only |
+| Migration | **PARTIAL** | schema_migrations + checksum in SQLite txn; not full product migration set |
+| Cost basis | **PARTIAL** | WA + transfer/C2C helpers; full fee/journal attribution residual |
+| FX | **PARTIAL** | direct/pivot/inverse + contextHash; full curve residual |
+| Price | **PARTIAL** | async-safe + observation validation; full provider residual |
+| Loan | **PARTIAL** | schedule period_based + feature scaffold create/pay |
+| Feature packages | **PARTIAL** | `src/features/loan` only |
+| Standalone | **NO** | contract yes; release-proven no |
+| Golden CI | **NO** | families not release-gated |
+| Offline recovery | **NO** | matrix incomplete |
+| Rebuild determinism | **NO** | engineVersions partial; full context residual |
+| No-field-loss | **PARTIAL** | column inventory; API/fixture disposition residual |
+| **Production release** | **NO-GO** | |
 
+---
 
+## Allowed work now
 
-**Implementer packs:** IMPLEMENTATION-READY-LOAN-SLICE · FEATURES · REPORTS · IRAN · db/SCHEMA-FREEZE-PROOF
+1. Keep CI green (tests + drift + inventory + lint-boundaries + docs-check-refs)  
+2. Harden Core (accounting ops, decimal audit, migration set)  
+3. Complete **Loan-only** vertical to RELEASE-PROVEN (not parallel Features)  
+4. Golden + recovery for loan family  
+
+## Forbidden until Loan vertical proven
+
+- Parallel Crypto/Stocks/Funds/Metals production writers  
+- New documentation-only expansion without runtime proof  
+- Claiming production readiness  
+
+## Vertical order (locked)
+
+```text
+Core → Loan-only → Crypto → Funds → Stocks Iran → Metals → Accounts full UI
+```
+
+## UX authority
+
+`docs/00-Product/Pages-IA.md` — primary nav ≤6.
+
+## One-liner
+
+> Prove one atomic financial path end-to-end for Loan-only; then copy the pattern. Do not expand specification surface faster than verified execution.

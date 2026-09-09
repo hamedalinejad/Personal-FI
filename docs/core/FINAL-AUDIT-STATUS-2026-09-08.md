@@ -97,3 +97,10 @@ Feature UI → Public API → runAtomicFinancialOperation
 Repo = strong **specification** + small **`src/core`** surface.  
 Legitimate now: P0 core hardening + this audit + order + acceptance tests.  
 **Not** legitimate: “full app code updated and production-ready.”
+
+
+## Think-tank 2026-09-09
+
+Remediation order locked in GO-NO-GO.md.  
+Current risk: **runtime divergence from contracts** > missing contracts.  
+Production: **NO-GO**. Next: CI confirmed + Loan vertical proof — not parallel Features.
