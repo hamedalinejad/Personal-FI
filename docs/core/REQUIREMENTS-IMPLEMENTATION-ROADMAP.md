@@ -1,3 +1,5 @@
+> **Live status:** `GO-NO-GO.md` + `OPEN-ISSUES-REGISTER.md`. This roadmap is tracking; historical rows are not authority.
+
 # Requirements Implementation Roadmap
 
 **Live status authority:** this file’s **Current status** table + `GO-NO-GO.md` + `OPEN-ISSUES-REGISTER.md`.  

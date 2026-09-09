@@ -1,3 +1,5 @@
+> Prefer `IMPLEMENTATION-READY-*.md` for coding. This file is supplementary feature requirements matrix.
+
 # Feature-by-Feature Implementation Requirements
 
 > **UI-agnostic must-support lists.** Detail lives in Feature LOCKS + Core.  

@@ -1,3 +1,5 @@
+> **SNAPSHOT 2026-09-08** — not live status. Live: `GO-NO-GO.md` · `MASTER-SPEC-VERDICT.md`.
+
 # Final Audit Status — 2026-09-08
 
 **Role:** single executive snapshot of product readiness.  

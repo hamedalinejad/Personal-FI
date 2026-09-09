@@ -1,50 +1,34 @@
 # Personal-FI Documentation
 
-**برای هر AI یا توسعه‌دهنده — فقط این مسیر را دنبال کنید.**
+## شروع (اجباری)
 
-## شروع (۵ دقیقه)
-
-| # | سند | چرا |
-|---|-----|-----|
-| 1 | `core/CODING-GATE.md` | قوانین مطلق DO NOT |
-| 2 | `core/GO-NO-GO.md` | وضعیت زنده + ترتیب کار |
-| 3 | `core/EXECUTION-HANDOFF.md` | handoff کامل §45–57 |
-| 4 | `core/IMPLEMENTATION-READY-INDEX.md` | نقشهٔ پیاده‌سازی |
-| 5 | `core/IMPLEMENTATION-READY-LOAN-SLICE.md` | **اولین vertical** |
+| # | سند |
+|---|-----|
+| 1 | [`READY-FOR-CODING.md`](./READY-FOR-CODING.md) |
+| 2 | [`core/CODING-GATE.md`](./core/CODING-GATE.md) |
+| 3 | [`core/GO-NO-GO.md`](./core/GO-NO-GO.md) |
+| 4 | [`core/IMPLEMENTATION-READY-INDEX.md`](./core/IMPLEMENTATION-READY-INDEX.md) |
+| 5 | [`core/IMPLEMENTATION-READY-LOAN-SLICE.md`](./core/IMPLEMENTATION-READY-LOAN-SLICE.md) |
 
 ## Authority
 
 | موضوع | مرجع |
 |--------|------|
-| UX / صفحات (≤۶) | `00-Product/Pages-IA.md` |
+| سلسله‌مراتب اسناد | `core/DOC-AUTHORITY-CHAIN.md` |
 | معماری حسابداری | `core/ARCHITECTURE-LOCKED.md` |
+| UX ≤۶ صفحه | `00-Product/Pages-IA.md` |
 | اسکیما | `core/db/schema.sql` |
-| قرارداد دامنه‌ها | `core/DOMAIN-CONTRACTS-31-44.md` |
-| وضعیت | `core/OPEN-ISSUES-REGISTER.md` |
+| وضعیت زنده | `core/OPEN-ISSUES-REGISTER.md` · `core/MASTER-SPEC-VERDICT.md` |
+| Loan v1 | `core/LOAN-V1-RESOLUTIONS.md` |
 
-## کد موجود (نه صفر)
+## Feature specs
 
-```text
-src/core/          engines + persistence + money + invariants
-src/features/loan/ Loan package scaffold (public-api, commands, ledger, …)
-```
+`docs/features/**` — جزئیات domain؛ در تعارض با concept home، **concept home برنده است**.
 
-## دستورات
+## Historical
 
-```bash
-npm install
-npm test
-npm run gates
-```
-
-## ترتیب Feature
-
-```text
-Loan RELEASE-PROVEN → Crypto → Funds → Stocks → Metals → Accounts UI
-```
+فایل‌های `FINAL-THINK-TANK-*`، `THINK-TANK-*`، auditهای تاریخ‌دار = **تاریخچه**، نه مرجع اجرایی.
 
 ## Production
 
-**NO-GO** تا Gateهای GO-NO-GO سبز شوند. وجود فایل ≠ RELEASE-PROVEN.
-
-Historical audits (`FINAL-THINK-TANK-*`, old AUDIT) مرجع اجرایی نیستند.
+**NO-GO** تا evidence در GO-NO-GO سبز شود.

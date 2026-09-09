@@ -1,5 +1,10 @@
 # فیچر: Debt & Loan Management (بدهی، طلب و وام)
 
+> **v1 FORMULA LOCK:** `declining_balance` = **equal-principal** (`1.0.0-period_based-equal-principal`).  
+> Classic annuity/PMT formulas in older sections are **not** v1 runtime. See `docs/core/LOAN-V1-RESOLUTIONS.md`.  
+> Role **lent** only until liability COA; `borrowed` = DEFERRED.
+
+
 ## توضیح کلی
 این فیچر مدیریت کامل بدهی‌ها، مطالبات و وام‌ها را بر عهده دارد. 
 اطلاعات اصلی وام در جدول `ln_loans` نگهداری می‌شود. 
