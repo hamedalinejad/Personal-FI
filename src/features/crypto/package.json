@@ -1,0 +1,6 @@
+{
+  "name": "@personal-fi/crypto",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./public-api/index.js" }
+}

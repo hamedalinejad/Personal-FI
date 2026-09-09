@@ -1,48 +1,21 @@
 # Personal-FI
 
-Offline-first personal accounting + investment system (Iran-aware).
+Offline-first personal accounting & investments (Iran-aware).
 
-## Status
-
-| Scope | Status |
-|-------|--------|
-| **Coding (Loan + Core)** | READY |
-| **Production release** | **NO-GO** |
-| **Other features (Crypto/Stocks/…)** | SPECIFIED — after Loan RELEASE-PROVEN |
-
-## Start here (developers)
+## Developer start
 
 ```text
 docs/DEVELOPER-HANDOFF.md
 ```
 
-Then:
-
 ```bash
-npm ci          # or: npm install
+npm ci
 npm test
 npm run gates
 ```
 
-## Architecture (one-liner)
+| Coding full product | **READY** |
+| Production release | **NO-GO** until CI release evidence |
 
-```text
-Feature UI/API → Domain → Atomic Operation → Journal + Cash Port → SQLite txn → Rebuildable reports
-```
-
-- One cash SoT: `fin_accounts` + `fin_journal_lines`
-- One journal · Decimal strings only · Posted facts immutable
-- Feature independence · ≤6 navigation pages (`docs/00-Product/Pages-IA.md`)
-
-## Repo layout
-
-```text
-docs/          specifications (authority chain)
-src/core/      money, operation, persistence, engines
-src/features/loan/   first vertical (executable)
-scripts/       gates, schema drift, inventory
-```
-
-## License / sharing
-
-Designed for offline single-user and future license editions (loan-only, crypto-only, …).
+Loan package under `src/features/loan` is the reference implementation pattern.
+Scaffolds: `src/features/{crypto,funds,stocks,metals}`.

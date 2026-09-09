@@ -1,172 +1,87 @@
-# Implementation-Ready — All Feature Slices
+# Implementation-Ready — All Feature Verticals
 
-Loan detail: `IMPLEMENTATION-READY-LOAN-SLICE.md`  
-Shared pattern for every domain.
+**Coding status:** READY to implement using Loan as the **template pattern**.  
+**Production ship:** still requires CI green + recovery evidence on release branch.
 
-## Shared rules
+## Shared pattern (copy from Loan)
 
-1. Commands → `runAtomicFinancialOperation` only
-2. Money = decimal strings
-3. Cash → `CashSettlementPort` only
-4. Identity → `instrumentId` = `ref_instruments.id`
-5. Package: `src/features/<id>/{public-api,commands,queries,domain,ledger,reports,ports,adapters,fixtures}`
-6. No cross-feature internal imports
-
-## Slice order
-
-| Order | Feature | Package | First commands |
-|-------|---------|---------|----------------|
-| 1 | Loan | loan | create, recordPayment, getSchedule |
-| 2 | Crypto | crypto | buy, sell, transferInternal, applyFee |
-| 3 | Stocks Iran | stocks-iran | buy, sell, recordDividend, applyCA |
-| 4 | Funds | funds | subscribe, redeem, reinvest |
-| 5 | Metals | metals | buy, sell, physicalDelivery |
-| 6 | Cheque | cheque | issue, deposit, clear, bounce |
-| 7 | Income/Expense | cashflow | recordIncome, recordExpense, transfer |
-| 8 | Reports | reports | trialBalance, balanceSheet, incomeStatement, cashFlow |
-
-## Crypto
-
-```ts
-type CryptoBuy = {
-  type: "crypto.buy";
-  operationId: string;
-  payload: {
-    instrumentId: string;
-    exchangeId?: string;
-    networkId?: string;
-    grossQuantity: string;
-    feeQuantity?: string;
-    netQuantity: string;
-    feeRole?: "quote" | "base" | "received" | "network_burn";
-    costTotal: string;
-    costCurrency: string;
-    businessDate: string;
-    price?: string;
-    priceAsOf?: string;
-    externalTxId?: string;
-  };
-};
+```text
+src/features/<name>/
+  package.json
+  public-api/index.js
+  commands/*.js
+  queries/*.js
+  domain/
+  ledger/
+  ports/
+  adapters/
+  fixtures/
+  tests/
 ```
 
-Must preserve: instrumentId, network, gross/net/fee, fee role, acquisition cost, FX, provenance.  
-Acceptance: USDT-TRC20 ≠ USDT-ERC20; one fee allocation; C2C uses consideration.
+Every money command: `operationId` required · Decimal strings · journal via `runAtomicFinancialOperation` · one SQLite txn · no cross-feature private imports.
 
-## Stocks Iran
+## Order (recommended parallelization)
 
-```ts
-type StockBuy = {
-  type: "stocks.buy";
-  operationId: string;
-  payload: {
-    instrumentId: string;
-    brokerageId: string;
-    quantity: string;
-    price: string;
-    tradeDate: string;
-    settlementDate?: string;
-    commission: string;
-    tax?: string;
-    otherFee?: string;
-    currency: string;
-  };
-};
+| Stream | Owner focus | Depends on |
+|--------|-------------|------------|
+| A | Loan polish + recovery CI | Core |
+| B | Crypto | Core + CostBasis + CashPort |
+| C | Funds | Core + CostBasis |
+| D | Stocks Iran + CA | Core + CostBasis + CA engine |
+| E | Metals | Core + CostBasis |
+| F | Cheque / Accounts UI | Core journal |
+
+Streams B–E may start **in parallel** after reading Loan package; they must not invent a second cash/journal.
+
+---
+
+## Crypto v1 commands
+
+| Command | Required payload |
+|---------|------------------|
+| `crypto.buy` | operationId, instrumentId, exchangeId?, networkId?, grossQuantity, feeQuantity, netQuantity, feeRole, costTotal, costCurrency, price, priceAsOf, businessDate, currency |
+| `crypto.sell` | same shape + proceeds |
+| `crypto.swap` | sourceInstrumentId, destInstrumentId, consideration, feeRole… (C2C economic) |
+| `crypto.transfer` | internal: realizedPL=0, cost moves |
+| `crypto.deposit` / `withdraw` | quantity, fee, externalTxId |
+| `crypto.airdrop` | quantity, cost=0 policy |
+| `crypto.opening` | opening balance |
+
+Identity: `ref_instruments.id`. USDT-TRC20 ≠ USDT-ERC20.
+
+## Stocks Iran v1
+
+| Command | Notes |
+|---------|-------|
+| `stocks.buy` / `sell` | tradeDate ≠ settlementDate, commission/tax/otherFee |
+| `stocks.settle` | T+2 cash stage |
+| `stocks.ca.apply` | only CA engine mutates holdings |
+
+## Funds v1
+
+| Command | Notes |
+|---------|-------|
+| `fund.subscribe` | cost uses **transactionPrice** |
+| `fund.redeem` | |
+| `fund.reinvest` | one op: income leg + subscription leg |
+| Valuation | may use NAV; NAV ≠ transactionPrice |
+
+## Metals v1
+
+| Command | Notes |
+|---------|-------|
+| `metals.buy` / `sell` | grossWeight, purityRatio, fineWeight=gross×purity, premium **separate** |
+| `metals.delivery` | to Physical Assets lineage |
+
+## Cheque v1
+
+Lifecycle: draft→issued→deposited→cleared|bounced. Partial clear rejected.
+
+## Acceptance per feature
+
+```text
+SPECIFIED → IMPLEMENTED → INTEGRATED → GOLDEN-GREEN → RECOVERY-GREEN → RELEASE-PROVEN
 ```
 
-Must preserve: ISIN/identity, broker, trade/settlement, fees, CA provenance.  
-CA engine sole lot mutation owner.
-
-## Funds
-
-```ts
-type FundSubscribe = {
-  type: "funds.subscribe";
-  operationId: string;
-  payload: {
-    instrumentId: string;
-    units: string;
-    nav: string;
-    transactionPrice: string;
-    amount: string;
-    businessDate: string;
-    currency: string;
-  };
-};
-```
-
-NAV may differ from transactionPrice. Reinvest = one op, distinct journal legs.
-
-## Metals
-
-```ts
-type MetalsBuy = {
-  type: "metals.buy";
-  operationId: string;
-  payload: {
-    instrumentId: string;
-    quantityMg: string;
-    purityCode: string;
-    purityRatio: string;
-    metalPricePerMg: string;
-    premiumAmount?: string;
-    feeAmount?: string;
-    currency: string;
-    businessDate: string;
-    platformId?: string;
-  };
-};
-```
-
-Fine weight = quantityMg × purityRatio. Premium separate from metal price.
-
-## Cheque
-
-```ts
-type ChequeIssue = {
-  type: "cheque.issue";
-  operationId: string;
-  payload: {
-    amount: string;
-    currency: string;
-    sayadiId?: string;
-    issueDate: string;
-    dueDate: string;
-    counterpartyId?: string;
-  };
-};
-```
-
-Events: issue → deposit → clear | bounce.
-
-## Income / Expense
-
-```ts
-type Expense = {
-  type: "expense.record";
-  operationId: string;
-  payload: {
-    amount: string;
-    currency: string;
-    categoryId?: string;
-    businessDate: string;
-    accountFinId?: string;
-  };
-};
-```
-
-## DoD per feature
-
-create/mutate posts journal; idempotency; decimal strings; no cross-imports; golden family green in CI.
-
-## Journal sketch (all investment buys)
-
-Disbursement-like buy (cash out):
-- Cr cash (Port)
-- Dr investment asset / holding clearing
-
-Sell:
-- Dr cash
-- Cr investment asset
-- Cr/Dr realized gain/loss (from cost basis engine)
-
-Always: lines balanced; amounts decimal strings; one operationId.
+Do not claim RELEASE-PROVEN without fixtures + recovery tests.

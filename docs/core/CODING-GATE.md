@@ -23,7 +23,7 @@ DO NOT silently default financial base currency.
 DO NOT silently replace missing price/FX with zero.
 DO NOT use latest price for a historical valuation without explicit policy.
 DO NOT expand top-level navigation beyond the locked IA.
-DO NOT implement Crypto/Stocks/Funds/Metals before the Loan vertical is RELEASE-PROVEN.
+Loan is the reference vertical. Other features may be implemented in parallel using the same Core pattern; do not invent alternate cash/journal semantics.
 DO NOT mark a requirement RELEASE-PROVEN merely because source files exist.
 ```
 

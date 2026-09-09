@@ -1,23 +1,14 @@
-# Open Issues Register — LIVE (FINAL shape)
+# Open Issues — LIVE
 
-## Coding may start
+## Not blocking coding start
 
-Loan + Core. Entry: `docs/READY-FOR-CODING.md`.
+| Item | Note |
+|------|------|
+| PWA sql.js adapter | Persistence Port; Node SQLite is current adapter |
+| Loan DEFERRED columns | migrations when product needs them |
+| Full multi-hop FX graph | extend after first investment vertical |
+| GitHub Actions evidence | ensure lockfile public; watch CI |
 
-## Closed permanently
+## Closed
 
-See `DEFERRED-AND-CLOSED.md` (CLOSED table). Stale audits citing pre-`withinTransaction` Loan bugs are obsolete.
-
-## Remaining engineering (not doc ambiguity)
-
-| Item | Track |
-|------|--------|
-| Loan DEFERRED columns | `LOAN-V1-SCHEMA-DISPOSITION.md` + migrations |
-| PWA SQLite-WASM adapter | Persistence Port |
-| CHECK harvest completeness edge-cases | schema-manifest.js improved; re-verify on CI |
-| Public CI runner green | package-lock on registry.npmjs.org |
-| Feature packages | After Loan RELEASE-PROVEN |
-
-## Production
-
-**NO-GO**
+See `DEFERRED-AND-CLOSED.md`.
