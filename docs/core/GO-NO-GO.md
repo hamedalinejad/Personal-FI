@@ -24,6 +24,16 @@ That is more dangerous than missing docs — fix foundation before expanding Fea
 
 ---
 
+## Coding AI rules (absolute)
+
+See full list: `CODING-GATE.md`.
+
+- No second cash/journal · no Number money · no silent date/currency/price defaults  
+- No Feature expansion before Loan **RELEASE-PROVEN**  
+- Files ≠ RELEASE-PROVEN without fixture + recovery evidence  
+
+
+
 ## Final Gate Table (live)
 
 | Gate | Status | Evidence / residual |

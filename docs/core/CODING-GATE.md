@@ -1,149 +1,104 @@
-**Preflight:** `IMPLEMENTATION-READY-INDEX.md`
-
 # Coding Gate
 
-**Ready for coding 2026-09-08 — scoped.**
-
-Primary spec: `IMPLEMENTATION-READY-LOAN-SLICE.md`
-
-Allowed now:
-1. Continue `src/core` hardening (invariants, SQLite domain writes, recovery tests)
-2. Scaffold **Loan-only** vertical slice (`src/features/loan` public-api only)
-3. Golden fixtures harness for core + loan families
-
-Not allowed yet:
-- Parallel Feature production UI for all domains
-- Ignoring OPEN-001 / OPEN-004 for the scoped family
-- New parallel P0 audit files
-
-Authority: GO-NO-GO.md · OPEN-ISSUES-REGISTER.md · ARCHITECTURE-LOCKED.md
-
-# Coding Gate — Final Order
-
-**Status:** Gate A (P0-DOC contracts) largely closed — see `GO-NO-GO.md / ARCHITECTURE-LOCKED.md`. **Still BLOCKED** on Gate C (full golden fixtures executable) and Gate D (schema freeze + relationship coverage). Authority: `GO-NO-GO.md` + `FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical) + concept homes.
-
-## Gate A — Contract cleanup
-
-Resolve all P0 items in:
-
-- `docs/core/FINAL-THINK-TANK-AUDIT-2026-09-03.md` (historical audit)
-- `docs/core/GO-NO-GO.md`
-- `docs/core/GO-NO-GO.md / ARCHITECTURE-LOCKED.md`
-- `docs/core/CANONICAL-FINANCIAL-REQUIREMENTS.md`
-- Core identity / cash / fee / FX / loan / valuation contracts
-
-The final audit is the blocking cross-document review. A later lock file may add detail, but may not contradict the canonical financial requirements.
-
-## Gate B — Canonical docs cleanup
-
-- Remove or explicitly mark contradictory legacy prose.
-- One authority per concept.
-- One field kind enum: `RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX`.
-- `instrumentId = ref_instruments.id` for financial assets; `symbol` is never identity.
-- Cash truth is `fin_accounts + fin_journal_lines`.
-- `acc_transactions` and feature cash fields are event/projection layers only.
-- `spec.md` is an implementation entrypoint, not a competing authority.
-
-## Gate C — Numeric fixture green
-
-Minimum before feature coding:
-
-```text
-critical fixtures
-+ core reversal/failure fixtures
-+ standalone Loan/Crypto/Fund fixtures
-+ scoped Iran stock/fund/loan fixtures
-```
-
-Every persisted financial number in fixtures is a decimal string. No JSON number is accepted.
-
-## Gate D — Schema Freeze
-
-Freeze:
-
-```text
-tables · columns · types · FKs · nullable rules
-unique/partial unique indexes · structural constraints
-field ownership · migration version · preservation policy
-```
-
-Source set: `docs/core/db/01-schema-tables.md`, constraints, Data Dictionary and Field-Level ownership matrix.
-
-## Gate E — First implementation order
-
-```text
-Decimal / Money / Rounding / FX
-→ Core Financial Operation
-→ Journal / Cash Settlement
-→ Reversal / Idempotency
-→ Cost Basis / Valuation
-→ Reconciliation / Repair
-→ Accounts
-→ Income / Expense
-→ Loans
-→ Investments
-```
-
-## Architecture invariant
-
-Only this mutation path is legal:
-
-```text
-Feature Command
-→ Operation Builder
-→ Core validation + engines
-→ domain ledger + Journal + CashSettlementPort
-→ projections
-→ durable commit
-```
-
-No feature may write another feature's tables directly. No feature may maintain a second cash balance truth.
-
-## Current blockers
-
-1. Residual OPEN items in `docs/core/OPEN-ISSUES-REGISTER.md` (schema freeze, fixtures, relationship matrix).
-2. Full field-level dictionary/relationship coverage is not yet provable for every Feature field.
-3. Full numeric golden pack is not yet implemented.
-4. Feature implementations do not yet exist, so runtime verification is necessarily limited to Core helpers/fixtures.
-
-**Do not remove this block by changing status text. Change status only after evidence is green.**
-
-P0-FIX-017…020: `AUDIT-HISTORY-NOTE.md`.
-
-P1-FIX-001…009: `AUDIT-HISTORY-NOTE.md`.
-
-Doc merge/delete rules: `DOC-CONSOLIDATION-POLICY.md`.
-
-## Final Audit work order (authority)
-
-```text
-Phase 1 — close P0-DOC-001…014 contradictions
-Phase 2 — schema freeze (relationship + field inventory)
-Phase 3 — golden gate green
-Phase 4 — Core engines only
-Phase 5 — vertical: Accounts → Loan → Crypto → Funds → Stocks → Metals
-```
-
-**GO limited Core/fixtures; NO full Feature implementation until Phase 1–3 green.**
+**Live.** Rules for any coding AI or human implementer.  
+**Handoff:** `EXECUTION-HANDOFF.md` · **Readiness:** `GO-NO-GO.md`
 
 ---
 
-## Gate H — No-Field-Loss (mandatory)
+## 1. Absolute rules (no exceptions)
 
-Every **new persisted financial field** must be mapped in **all** of:
+```
+DO NOT redesign architecture.
+DO NOT invent new accounting truth.
+DO NOT add a second cash ledger.
+DO NOT add a second journal.
+DO NOT identify historical assets by symbol alone.
+DO NOT mutate posted financial rows in place.
+DO NOT use JavaScript Number for money/qty/rate/price arithmetic.
+DO NOT silently default missing business dates.
+DO NOT silently default financial base currency.
+DO NOT silently replace missing price/FX with zero.
+DO NOT use latest price for a historical valuation without explicit policy.
+DO NOT expand top-level navigation beyond the locked IA.
+DO NOT implement Crypto/Stocks/Funds/Metals before the Loan vertical is RELEASE-PROVEN.
+DO NOT mark a requirement RELEASE-PROVEN merely because source files exist.
+```
 
-1. `Data-Dictionary.md` (or Feature appendix with same columns)
-2. Schema freeze row (`db/SCHEMA-FREEZE-COVERAGE.md` / future `schema.sql`)
-3. Feature API request/response (decimal string where money)
-4. Migration disposition (`preserve` | `rebuild` | `map` | `deprecated`)
-5. Fixture or rebuild path when field is RAW
+---
 
-**Acceptance:** undocumented financial fields = **0**.  
-Inventory seed: `field-inventory.checklist.tsv` · proof rules: `FIELD-PRESERVATION-PROOF.md`.
+## 2. Requirement chain (must be complete for RELEASE-PROVEN)
 
-Feature production code is **blocked** for any table that fails this gate.
+```
+Requirement
+→ Owner
+→ SoT
+→ Schema field/table
+→ API request
+→ domain calculation
+→ transaction plan
+→ persistence
+→ query
+→ fixture
+→ test
+→ recovery/rebuild behavior
+```
 
-## Roadmap
+If any link is missing → status stays **SPECIFIED** or **PARTIAL**.  
+Files alone ≠ RELEASE-PROVEN.
 
-Implementation order and acceptance: `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md` (R-001…R-020).
+---
 
+## 3. Canonical authority order (financial semantics)
+
+| Priority | Source | Role |
+|----------|--------|------|
+| 1 | Canonical concept/lock document | Meaning |
+| 2 | Feature implementation-ready doc | Scope for that slice |
+| 3 | `docs/core/db/schema.sql` | Persistence shape |
+| 4 | Current source implementation | Runtime |
+| 5 | Golden fixtures/tests | Evidence |
+| 6 | Historical audit notes | History only — **not** executable authority |
+
+### UX authority
+```
+docs/00-Product/Pages-IA.md
+```
+
+### Pipeline / accounting constitution
+```
+docs/core/ARCHITECTURE-LOCKED.md
+```
+
+### Live readiness
+```
+docs/core/GO-NO-GO.md
+docs/core/OPEN-ISSUES-REGISTER.md
+docs/core/REQUIREMENTS-IMPLEMENTATION-ROADMAP.md
+docs/core/EXECUTION-HANDOFF.md
+```
+
+---
+
+## 4. Allowed work now
+
+1. Core hardening (invariants, SQLite, recovery, decimal, accounting ops)  
+2. Complete **Loan-only** vertical until RELEASE-PROVEN  
+3. Golden + recovery for core + loan families  
+
+## 5. Forbidden until Loan RELEASE-PROVEN
+
+- Parallel Crypto / Stocks / Funds / Metals production packages  
+- New top-level nav destinations  
+- Second cash or journal SoT  
+- Claiming production readiness  
+
+---
+
+## 6. Preflight
+
+```bash
+npm test
+npm run gates
+```
+
+See `IMPLEMENTATION-READY-INDEX.md` · `IMPLEMENTATION-READY-LOAN-SLICE.md`

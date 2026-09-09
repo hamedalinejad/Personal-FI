@@ -1,6 +1,7 @@
 # Execution Handoff (§45–57)
 
-**Live.** This is the AI/implementer handoff. Production remains **NO-GO** until gates prove.
+**Live.** This is the AI/implementer handoff.
+**Coding rules:** `CODING-GATE.md` (absolute DO NOTs + authority order). Production remains **NO-GO** until gates prove.
 
 ## Priority (absolute)
 
