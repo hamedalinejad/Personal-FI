@@ -1,25 +1,28 @@
 # Open Issues Register — LIVE
 
-## Resolved this pass
+## Fixed (do not re-open as P0 from stale audits)
 
-- Loan create: journal + ln_loans + schedule in **one** SQLite transaction (`withinTransaction`)
-- Loan payment: writes `ln_transactions` in same transaction
-- Formula lock: declining_balance v1 = equal-principal
-- ln_loans columns: operation_id, total_installments, day_count, schedule_engine_version
-- Idempotency: SQLite primary; idempotency.json only for json test mode
-- Persistence port surface: `src/core/persistence/port.js`
+- Loan create/pay atomic via `withinTransaction`
+- ln_transactions with payment portions
+- reversePayment + reverses_operation_id
+- equal-principal formula lock
+- lent-only role
+- normalize before hash
+- no runtime ALTER for result_json
+- package-lock public npm URL
 
-## Still open
+## Open for Loan RELEASE-PROVEN
 
-| ID | Item |
-|----|------|
-| FX-full | Multi-hop historical resolver + source priority |
-| Price-full | price_history policy persistence complete |
-| Manifest-CHECK | Full CHECK/predicate semantic equality |
-| PWA-SQLite | WASM+IDB adapter behind same port |
-| Loan-annuity | Separate engine version if product switches |
-| CI-public | Confirm GitHub Actions green on public npm |
+1. Backup/restore golden (A8)
+2. Rebuild remaining principal/interest evidence (A12)
+3. Standalone edition boot test without Accounts UI (A9)
+4. Richer ln_loans fields via versioned migration (D-007 residual)
+5. Full semantic schema CHECK manifest (D-010)
 
-## Production
+## Deferred until after Loan
 
-**NO-GO**
+Crypto, Funds, Stocks Iran, Metals, Cheque packages · full FX path · PWA SQLite-WASM
+
+## Vocabulary
+
+SPECIFIED · PARTIAL · RELEASE-PROVEN · DEFERRED · NO-GO

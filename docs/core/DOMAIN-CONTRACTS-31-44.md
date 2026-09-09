@@ -81,3 +81,14 @@ No implicit “latest” for historical reports.
 ```
 Loan vertical RELEASE-PROVEN → Crypto → Funds → Stocks → Metals → …
 ```
+
+
+## §38–46 Scope notes (Master Spec)
+
+- **Crypto v1:** spot buy/sell, C2C, deposit/withdraw, transfer, fee kinds, airdrop, opening. No futures/DeFi/NFT.
+- **Stocks Iran:** instrumentId+ISIN+brokerage; trade≠settlement; T+2; CA engine ownership.
+- **Funds:** NAV ≠ transactionPrice; reinvest = one operation.
+- **Metals:** fineWeight = gross × purity; premium separate.
+- **Cheque:** draft→issued→deposited→cleared|bounced; correction = reversal.
+- **Opening:** real operation, sourceType=opening.
+- **Planning/Tax:** never mutate journal SoT silently.
