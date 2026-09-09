@@ -14,7 +14,9 @@ export function computeRemaining(loanId, dataDir) {
   let schedPrin = toDecimal("0");
   let schedInt = toDecimal("0");
   if (schedule?.snapshot_json) {
-    for (const row of JSON.parse(schedule.snapshot_json)) {
+    const parsed = JSON.parse(schedule.snapshot_json);
+    const rows = parsed.installments || parsed.rows || (Array.isArray(parsed) ? parsed : []);
+    for (const row of rows) {
       schedPrin = schedPrin.plus(toDecimal(row.principal || "0"));
       schedInt = schedInt.plus(toDecimal(row.interest || "0"));
     }

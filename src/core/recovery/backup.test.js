@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import { createLoan, recordPayment, getLoan } from "../../features/loan/public-api/index.js";
 import { backupDatabase, restoreDatabase } from "./backup.js";
 import { closeAllDbs } from "../persistence/worker.js";
@@ -11,19 +12,24 @@ test("A8 backup/restore preserves loan + payment", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-bk-"));
   const created = await createLoan(
     {
+      operationId: randomUUID(),
       payload: {
+        role: "lent",
         principal: "1200",
+        currency: "IRR",
         annualRate: "0",
         periods: "12",
         method: "declining_balance",
         startDate: "2026-01-01",
-        currency: "IRR",
+        businessDate: "2026-01-01",
+        dayCount: "period_based",
       },
     },
     { dataDir },
   );
   await recordPayment(
     {
+      operationId: randomUUID(),
       payload: {
         loanId: created.loanId,
         amount: "100",
@@ -35,7 +41,6 @@ test("A8 backup/restore preserves loan + payment", async () => {
   );
   const bak = join(dataDir, "backup.sqlite");
   await backupDatabase(dataDir, bak);
-
   const restoreDir = await mkdtemp(join(tmpdir(), "pf-rs-"));
   await restoreDatabase(bak, restoreDir);
   const loan = getLoan(created.loanId, { dataDir: restoreDir });

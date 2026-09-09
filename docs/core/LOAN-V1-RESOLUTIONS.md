@@ -23,3 +23,18 @@ Only `period_based` for first vertical.
 
 API `annualRate` uses **percentage points**: `18` = 18%.  
 Engine: `normalizeRatePercentage` → fractional `0.18` once, then internal math.
+
+## Snapshot JSON (FINAL)
+
+Canonical object with `engineVersion`, `dayCount`, `rate`, `rateInput`, `currency`, `residual`, `generatedAt`, `installments[]`.
+
+## Create command (FINAL)
+
+Required: operationId, role, principal, currency, annualRate, periods, method, startDate, businessDate, dayCount.  
+No silent defaults. Multi-currency → LOAN_MULTI_CURRENCY_DEFERRED.
+
+## Payment (FINAL)
+
+Overpayment → OVERPAYMENT_NOT_SUPPORTED.  
+Outstanding recalculated inside SQLite transaction.  
+Double reverse → ALREADY_REVERSED.

@@ -22,7 +22,7 @@ export async function reversePayment(
   const p = input.payload || input;
   if (!p.originalOperationId) throw new Error("VALIDATION_ERROR");
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
-  const operationId = input.operationId || randomUUID();
+  const operationId = input.operationId;
   const currency = p.currency || baseCurrency;
 
   bootstrapLoanEditionAccounts(dataDir, currency);
@@ -35,6 +35,11 @@ export async function reversePayment(
     .prepare(`SELECT * FROM ln_transactions WHERE operation_id = ? AND tx_type = 'payment'`)
     .get(p.originalOperationId);
   if (!origTx) throw new Error("LOAN_TX_NOT_FOUND");
+  const already = db
+    .prepare(`SELECT id FROM ln_transactions WHERE reverses_transaction_id = ?`)
+    .get(origTx.id);
+  if (already) throw new Error("ALREADY_REVERSED");
+  if (!input.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
 
   // Reverse journal: flip sides of original lines
   const lines = db

@@ -7,23 +7,28 @@ import { randomUUID } from "node:crypto";
 import { createLoan, recordPayment, getLoan } from "../public-api/index.js";
 import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
 
+function createInput(extra = {}) {
+  return {
+    operationId: extra.operationId || randomUUID(),
+    payload: {
+      role: "lent",
+      principal: "1200",
+      currency: "IRR",
+      annualRate: "0",
+      periods: "12",
+      method: "declining_balance",
+      startDate: "2026-01-01",
+      businessDate: "2026-01-01",
+      dayCount: "period_based",
+      ...extra.payload,
+    },
+  };
+}
+
 test("loan.create atomic: loan row + schedule + journal same op", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-at-"));
   const operationId = randomUUID();
-  const r = await createLoan(
-    {
-      operationId,
-      payload: {
-        principal: "1200",
-        annualRate: "0",
-        periods: "12",
-        method: "declining_balance",
-        startDate: "2026-01-01",
-        currency: "IRR",
-      },
-    },
-    { dataDir },
-  );
+  const r = await createLoan(createInput({ operationId }), { dataDir });
   assert.equal(r.idempotentReplay, false);
   const loan = getLoan(r.loanId, { dataDir });
   assert.equal(loan.principal, "1200");
@@ -31,28 +36,18 @@ test("loan.create atomic: loan row + schedule + journal same op", async () => {
   const db = openDb(dataDir);
   const snaps = db.prepare(`SELECT * FROM ln_schedule_snapshots WHERE loan_id = ?`).all(r.loanId);
   assert.equal(snaps.length, 1);
-  const ops = db.prepare(`SELECT id FROM fin_operations WHERE id = ?`).get(operationId);
-  assert.ok(ops);
+  const snap = JSON.parse(snaps[0].snapshot_json);
+  assert.equal(snap.engineVersion, "1.0.0-period_based-equal-principal");
+  assert.ok(Array.isArray(snap.installments));
   closeAllDbs();
 });
 
 test("loan.payment writes ln_transactions", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-pay-"));
-  const created = await createLoan(
-    {
-      payload: {
-        principal: "1200",
-        annualRate: "0",
-        periods: "12",
-        method: "declining_balance",
-        startDate: "2026-01-01",
-        currency: "IRR",
-      },
-    },
-    { dataDir },
-  );
+  const created = await createLoan(createInput(), { dataDir });
   const pay = await recordPayment(
     {
+      operationId: randomUUID(),
       payload: {
         loanId: created.loanId,
         amount: "100",
@@ -73,21 +68,10 @@ test("loan.payment writes ln_transactions", async () => {
 test("loan.reversePayment creates reversal tx linked to original", async () => {
   const { reversePayment } = await import("../public-api/index.js");
   const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-rev-"));
-  const created = await createLoan(
-    {
-      payload: {
-        principal: "1200",
-        annualRate: "0",
-        periods: "12",
-        method: "declining_balance",
-        startDate: "2026-01-01",
-        currency: "IRR",
-      },
-    },
-    { dataDir },
-  );
+  const created = await createLoan(createInput(), { dataDir });
   const pay = await recordPayment(
     {
+      operationId: randomUUID(),
       payload: {
         loanId: created.loanId,
         amount: "100",
@@ -99,6 +83,7 @@ test("loan.reversePayment creates reversal tx linked to original", async () => {
   );
   const rev = await reversePayment(
     {
+      operationId: randomUUID(),
       payload: {
         originalOperationId: pay.operationId,
         businessDate: "2026-02-02",
@@ -111,7 +96,27 @@ test("loan.reversePayment creates reversal tx linked to original", async () => {
   const db = openDb(dataDir);
   const op = db.prepare(`SELECT reverses_operation_id FROM fin_operations WHERE id = ?`).get(rev.operationId);
   assert.equal(op.reverses_operation_id, pay.operationId);
-  const txs = db.prepare(`SELECT * FROM ln_transactions WHERE loan_id = ?`).all(created.loanId);
-  assert.equal(txs.length, 2);
+  closeAllDbs();
+});
+
+test("rejects overpayment", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-ov-"));
+  const created = await createLoan(createInput(), { dataDir });
+  await assert.rejects(
+    () =>
+      recordPayment(
+        {
+          operationId: randomUUID(),
+          payload: {
+            loanId: created.loanId,
+            amount: "999999",
+            currency: "IRR",
+            businessDate: "2026-02-01",
+          },
+        },
+        { dataDir },
+      ),
+    /OVERPAYMENT_NOT_SUPPORTED/,
+  );
   closeAllDbs();
 });

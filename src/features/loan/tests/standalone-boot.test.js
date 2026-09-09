@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import {
   createLoan,
   recordPayment,
@@ -19,19 +20,24 @@ test("A9 Loan-only standalone without Accounts UI surface", async () => {
   assert.equal(caps.edition, "loan-only");
   const c = await createLoan(
     {
+      operationId: randomUUID(),
       payload: {
+        role: "lent",
         principal: "500",
+        currency: "IRR",
         annualRate: "0",
         periods: "5",
         method: "declining_balance",
         startDate: "2026-01-01",
-        currency: "IRR",
+        businessDate: "2026-01-01",
+        dayCount: "period_based",
       },
     },
     { dataDir },
   );
   await recordPayment(
     {
+      operationId: randomUUID(),
       payload: {
         loanId: c.loanId,
         amount: "100",

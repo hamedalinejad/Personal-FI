@@ -3,13 +3,12 @@ import { generateSchedule } from "../domain/scheduleFacade.js";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import { bootstrapLoanEditionAccounts } from "../../../core/accounting/chartOfAccounts.js";
 import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
+import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
+import { normalizeRatePercentage } from "../../../core/domain/loan/scheduleEngine.js";
 
 /**
- * loan.create — journal + ln_loans + schedule snapshot in ONE SQLite transaction
- * (via persistOperation.withinTransaction)
- *
- * declining_balance v1 = equal-principal (engineVersions lock).
- * Annuity/fixed-PMT = future engine version — never silent swap.
+ * loan.create — strict required fields, no silent defaults.
+ * Snapshot shape = LOAN-V1 canonical JSON.
  */
 export async function createLoan(
   input,
@@ -17,33 +16,58 @@ export async function createLoan(
     dataDir,
     cashAccountId = "LOC-CASH",
     receivableAccountId = "LOAN-REC",
-    baseCurrency = "IRR",
+    operationBaseCurrency,
   } = {},
 ) {
-  const operationId = input.operationId || randomUUID();
+  if (!input || typeof input !== "object") throw new Error("VALIDATION_ERROR");
+  if (!input.operationId || typeof input.operationId !== "string") {
+    throw new Error("OP_OPERATION_ID_REQUIRED");
+  }
+  const operationId = input.operationId;
   const p = input.payload || input;
-  if (!p.startDate) throw new Error("LOAN_START_DATE_REQUIRED");
-  if (!p.principal || !p.periods || !p.method) throw new Error("VALIDATION_ERROR");
-  // Master Spec §30: only lent supported until liability COA exists
-  const role = p.role || p.direction || "lent";
-  if (role === "borrowed") throw new Error("LOAN_ROLE_DEFERRED:borrowed");
-  if (role !== "lent") throw new Error("LOAN_ROLE_UNSUPPORTED");
 
-  const currency = p.currency || baseCurrency;
-  const businessDate = p.businessDate || p.startDate;
-  const annualRate = p.annualRate != null ? p.annualRate : "0";
+  if (!p.role) throw new Error("LOAN_ROLE_REQUIRED");
+  if (p.role === "borrowed") throw new Error("LOAN_ROLE_DEFERRED:borrowed");
+  if (p.role !== "lent") throw new Error("LOAN_ROLE_UNSUPPORTED");
+  if (!p.principal) throw new Error("LOAN_PRINCIPAL_REQUIRED");
+  if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
+  if (p.annualRate == null || p.annualRate === "") throw new Error("LOAN_RATE_REQUIRED");
+  if (!p.periods) throw new Error("LOAN_PERIODS_REQUIRED");
+  if (!p.method) throw new Error("LOAN_METHOD_REQUIRED");
+  if (!p.startDate) throw new Error("LOAN_START_DATE_REQUIRED");
+  if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  if (!p.dayCount) throw new Error("LOAN_DAY_COUNT_REQUIRED");
+  if (p.dayCount !== "period_based") throw new Error("LOAN_DAY_COUNT_UNSUPPORTED");
+
+  const currency = p.currency;
+  const baseCurrency = operationBaseCurrency || p.baseCurrency || currency;
+  if (currency !== baseCurrency) {
+    if (!p.exchangeRateToBase) throw new Error("LOAN_FX_REQUIRED");
+    // full multi-currency loan repayment deferred
+    throw new Error("LOAN_MULTI_CURRENCY_DEFERRED");
+  }
+
   const engineVersion = "1.0.0-period_based-equal-principal";
+  const rateFractional = normalizeRatePercentage(p.annualRate).toFixed();
 
   bootstrapLoanEditionAccounts(dataDir, currency);
 
   const schedule = generateSchedule({
     method: p.method,
     principal: p.principal,
-    annualRate,
+    annualRate: p.annualRate,
     periods: p.periods,
     startDate: p.startDate,
-    dayCount: p.dayCount || "period_based",
+    dayCount: p.dayCount,
     feePercent: p.feePercent,
+  });
+
+  const snapshot = buildScheduleSnapshot({
+    schedule,
+    rateInput: p.annualRate,
+    rateFractional,
+    currency,
+    engineVersion,
   });
 
   const loanId = p.loanId || randomUUID();
@@ -56,6 +80,11 @@ export async function createLoan(
     operationId,
     memo: "loan_disbursement",
   });
+  for (const line of settlement.journalLines) {
+    line.lineKind = line.accountId === receivableAccountId ? "principal" : "principal";
+    line.amountInBase = line.amount;
+    line.exchangeRateToBase = "1";
+  }
 
   const snapshotId = randomUUID();
   const now = new Date().toISOString();
@@ -64,14 +93,11 @@ export async function createLoan(
     operationId,
     type: "loan.create",
     dataDir,
-    businessDate,
-    baseCurrency: currency,
-    payload: { ...p, loanId, annualRate, currency },
+    businessDate: p.businessDate,
+    baseCurrency,
+    payload: { ...p, loanId },
     journalLines: settlement.journalLines,
-    domainResult: {
-      schedule,
-      loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: p.method },
-    },
+    domainResult: { schedule: snapshot, loan: { id: loanId, principal: p.principal, method: p.method } },
     engineVersions: { loanSchedule: engineVersion, money: "1.0.0" },
     withinTransaction(db) {
       db.prepare(
@@ -84,19 +110,19 @@ export async function createLoan(
         p.method,
         p.principal,
         currency,
-        annualRate,
+        p.annualRate,
         now,
         p.startDate,
         operationId,
         Number(p.periods),
-        p.dayCount || "period_based",
+        p.dayCount,
         engineVersion,
         p.notes || null,
       );
       db.prepare(
         `INSERT INTO ln_schedule_snapshots (id, loan_id, version, snapshot_json, effective_from, operation_id)
          VALUES (?, ?, 1, ?, ?, ?)`,
-      ).run(snapshotId, loanId, JSON.stringify(schedule.rows), p.startDate, operationId);
+      ).run(snapshotId, loanId, JSON.stringify(snapshot), p.startDate, operationId);
     },
   });
 
