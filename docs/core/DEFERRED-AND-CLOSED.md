@@ -32,3 +32,5 @@
 Always **NO-GO** until GO-NO-GO gates all green with evidence.
 
 | Durability vs business status | RESOLVED — `PERSISTENCE-DURABILITY.md`; dual-write db_meta |
+
+| Domain contracts 26–39 | FINAL in DOMAIN-CONTRACTS-31-44.md |

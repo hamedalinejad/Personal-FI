@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { stableStringify } from "../operation/operationEngine.js";
 import { toDecimal } from "../../money/canonicalDecimal.js";
 import { assertPositive } from "../../money/decimalMath.js";
 
@@ -86,5 +87,5 @@ function finish(out, path, hops, asOf, amount, from, to) {
 }
 
 function hashContext(obj) {
-  return createHash("sha256").update(JSON.stringify(obj)).digest("hex").slice(0, 16);
+  return createHash("sha256").update(stableStringify(obj)).digest("hex").slice(0, 16);
 }
