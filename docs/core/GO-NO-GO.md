@@ -75,3 +75,8 @@ Core → Loan-only → Crypto → Funds → Stocks Iran → Metals → Accounts 
 ## One-liner
 
 > Prove one atomic financial path end-to-end for Loan-only; then copy the pattern. Do not expand specification surface faster than verified execution.
+
+
+### Domain contracts §31–44
+
+Locked: `docs/core/DOMAIN-CONTRACTS-31-44.md`. Implement only after Loan vertical proven.
