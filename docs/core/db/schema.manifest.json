@@ -1,5 +1,5 @@
 {
-  "schemaHash": "fcf646b6cbfeaa7b9e67588b2079b98a67bcea6a1a13bdcceb8794fde5cf4e07",
+  "schemaHash": "5e00e7f51cfd6d51752bc5c997b440280c7fa3c5d60d3e37087bbeb950e0d799",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -135,6 +135,13 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (account_kind IN ('bank','cash','investment','loan','credit','wallet','other')",
+        "CHECK (is_archived IN (0, 1)",
+        "CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')",
+        "CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')",
+        "CHECK (status IN ('active','inactive','closed')"
       ]
     },
     "acc_transaction_links": {
@@ -204,6 +211,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (related_feature IN ('crypto','stocks','funds','metals','loans','income','expense','cheque','budget','goals','bills','tax','physical_assets','accounts')"
       ]
     },
     "acc_transactions": {
@@ -313,7 +323,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "bg_budgets": {
       "columns": [
@@ -385,6 +396,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (income_source_mode IS NULL OR income_source_mode IN ('calculated','manual')"
       ]
     },
     "bg_envelopes": {
@@ -450,7 +464,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "bg_transaction_links": {
       "columns": [
@@ -533,7 +548,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "br_items": {
       "columns": [
@@ -597,6 +613,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('active','paused','completed','cancelled')"
       ]
     },
     "br_occurrences": {
@@ -708,6 +727,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('pending','due','paid','skipped','cancelled')"
       ]
     },
     "cat_categories": {
@@ -766,6 +788,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_active IN (0, 1)",
+        "CHECK (kind IS NULL OR kind IN ('income','expense','transfer','system')"
       ]
     },
     "chk_cheques": {
@@ -909,6 +935,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('draft','issued','deposited','cleared','bounced','cancelled','returned')"
       ]
     },
     "cur_currencies": {
@@ -952,6 +981,9 @@
             "code"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "cur_currency_preferences": {
@@ -1003,6 +1035,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_toman_display IN (0, 1)"
       ]
     },
     "cur_exchange_rates": {
@@ -1103,6 +1138,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_manual IN (0, 1)",
+        "CHECK (source_priority >= 0)"
       ]
     },
     "dash_layouts": {
@@ -1161,6 +1200,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_default IN (0, 1)"
       ]
     },
     "dash_widget_configs": {
@@ -1219,7 +1261,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "db_meta": {
       "columns": [
@@ -1248,7 +1291,8 @@
             "key"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "docs_documents": {
       "columns": [
@@ -1319,6 +1363,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (size_bytes IS NULL OR size_bytes >= 0)"
       ]
     },
     "docs_links": {
@@ -1386,6 +1433,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (entity_type IN ('pa_asset','tax_event','loan','cheque','import_raw','operation','instrument','account','goal','budget')"
       ]
     },
     "exp_recurring": {
@@ -1521,6 +1571,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (interval_kind IN ('daily','weekly','monthly','yearly','custom')",
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "exp_transactions": {
@@ -1750,6 +1804,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (has_attachment IN (0, 1)",
+        "CHECK (is_voided IN (0, 1)"
       ]
     },
     "fg_contributions": {
@@ -1845,7 +1903,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "fg_goals": {
       "columns": [
@@ -1923,6 +1982,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (funding_mode IS NULL OR funding_mode IN ('manual','auto','roundup','earmark','segregated_cash')"
       ]
     },
     "fin_accounts": {
@@ -2045,6 +2107,12 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (account_kind IN ('asset','liability','equity','income','expense')",
+        "CHECK (is_archived IN (0, 1)",
+        "CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')",
+        "CHECK (status IN ('active','inactive','closed')"
       ]
     },
     "fin_audit_log": {
@@ -2138,6 +2206,11 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (action IN ('create','update','delete','void','reverse','rebuild','repair','import','export','login','logout','post')",
+        "CHECK (entity_type IS NULL OR entity_type IN ('operation','journal_entry','journal_line','account','instrument','loan','cheque','import','settings')",
+        "CHECK (source IS NULL OR source IN ('ui','api','import','migration','system','user')"
       ]
     },
     "fin_journal_entries": {
@@ -2217,6 +2290,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (post_state IS NULL OR post_state IN ('draft','posted','void')"
       ]
     },
     "fin_journal_lines": {
@@ -2368,6 +2444,11 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')",
+        "CHECK (side IN ('debit', 'credit')",
+        "CHECK (source_type IS NULL OR source_type IN ('ui','api','import','migration','system','reconciliation')"
       ]
     },
     "fin_operations": {
@@ -2571,6 +2652,12 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')",
+        "CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')",
+        "CHECK (status != 'posted' OR command_hash IS NOT NULL)",
+        "CHECK (status IN ('draft', 'posted', 'voided', 'failed')"
       ]
     },
     "fin_reconcile_runs": {
@@ -2649,6 +2736,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('running','completed','failed','cancelled')"
       ]
     },
     "import_dedupe_keys": {
@@ -2767,7 +2857,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "import_raw_records": {
       "columns": [
@@ -2917,7 +3008,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inc_recurring": {
       "columns": [
@@ -3060,6 +3152,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (interval_kind IN ('daily','weekly','monthly','yearly','custom')",
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "inc_transactions": {
@@ -3289,6 +3385,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (has_attachment IN (0, 1)",
+        "CHECK (is_voided IN (0, 1)"
       ]
     },
     "inv_crypto_cash": {
@@ -3370,7 +3470,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_crypto_exchanges": {
       "columns": [
@@ -3413,6 +3514,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (venue_kind IN ('cex','dex','wallet','other')"
       ]
     },
     "inv_crypto_holdings": {
@@ -3518,7 +3622,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_crypto_transactions": {
       "columns": [
@@ -3669,6 +3774,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')",
+        "CHECK (tx_type IN ('buy','sell','transfer_in','transfer_out','deposit','withdraw','fee','adjustment','swap')"
       ]
     },
     "inv_crypto_wallet_addresses": {
@@ -3735,6 +3844,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_primary IN (0, 1)"
       ]
     },
     "inv_crypto_wallet_networks": {
@@ -3801,7 +3913,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_fif_funds": {
       "columns": [
@@ -3860,6 +3973,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')"
       ]
     },
     "inv_fif_holdings": {
@@ -3946,7 +4062,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_fif_transactions": {
       "columns": [
@@ -4082,6 +4199,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment')"
       ]
     },
     "inv_metals_holdings": {
@@ -4189,7 +4309,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_metals_physical_deliveries": {
       "columns": [
@@ -4318,6 +4439,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('requested','processing','delivered','cancelled')"
       ]
     },
     "inv_metals_platforms": {
@@ -4369,7 +4493,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_metals_transactions": {
       "columns": [
@@ -4526,6 +4651,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_partial IN (0, 1)",
+        "CHECK (tx_type IN ('buy','sell','deposit_cash','withdraw_cash','physical_delivery','adjustment')"
       ]
     },
     "inv_stocks_iran_brokerages": {
@@ -4577,7 +4706,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_stocks_iran_corporate_actions": {
       "columns": [
@@ -4685,6 +4815,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (ca_type IN ('split','reverse_split','dividend','rights','bonus','merger','other')"
       ]
     },
     "inv_stocks_iran_holdings": {
@@ -4780,7 +4913,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "inv_stocks_iran_instruments": {
       "columns": [
@@ -4860,6 +4994,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (id = instrument_id)"
       ]
     },
     "inv_stocks_iran_transactions": {
@@ -5025,6 +5162,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (tx_type IN ('buy','sell','dividend','corporate_action','fee','adjustment')"
       ]
     },
     "ln_loan_collateral": {
@@ -5090,7 +5230,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "ln_loan_fee_tiers": {
       "columns": [
@@ -5213,6 +5354,11 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment')",
+        "CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual')",
+        "CHECK (is_percentage IN (0, 1)"
       ]
     },
     "ln_loan_fees": {
@@ -5292,6 +5438,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (fee_timing IS NULL OR fee_timing IN ('upfront','per_installment','on_default','on_early_settlement','other')"
       ]
     },
     "ln_loans": {
@@ -5434,6 +5583,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')"
       ]
     },
     "ln_rate_history": {
@@ -5492,7 +5644,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "ln_schedule_snapshots": {
       "columns": [
@@ -5573,7 +5726,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "ln_transactions": {
       "columns": [
@@ -5731,6 +5885,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (tx_type IN ('disbursement','payment','fee','penalty','adjustment','reversal')"
       ]
     },
     "not_custom_reminders": {
@@ -5788,6 +5945,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "not_notifications": {
@@ -5874,6 +6034,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (category IS NULL OR category IN ('system','reminder','alert','reconcile','price','loan','bill','tax')",
+        "CHECK (is_read IN (0, 1)"
       ]
     },
     "not_settings": {
@@ -5925,7 +6089,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "pa_assets": {
       "columns": [
@@ -6082,6 +6247,11 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (asset_kind IS NULL OR asset_kind IN ('gold','coin','vehicle','real_estate','electronics','other')",
+        "CHECK (is_disposed IN (0, 1)",
+        "CHECK (source_feature IS NULL OR source_feature IN ('metals','manual','import','delivery')"
       ]
     },
     "pa_transactions": {
@@ -6211,6 +6381,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (tx_type IN ('purchase','sale','valuation_adj','maintenance','disposal')"
       ]
     },
     "pa_valuations": {
@@ -6297,7 +6470,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "port_settings": {
       "columns": [
@@ -6348,7 +6522,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "port_snapshots": {
       "columns": [
@@ -6391,7 +6566,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "price_history": {
       "columns": [
@@ -6547,6 +6723,12 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_degraded IN (0, 1)",
+        "CHECK (is_manual IN (0, 1)",
+        "CHECK (is_stale IN (0, 1)",
+        "CHECK (quote_type IS NULL OR quote_type IN ('last','close','nav','manual','imported','bid','ask')"
       ]
     },
     "price_sources": {
@@ -6604,6 +6786,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_active IN (0, 1)",
+        "CHECK (priority >= 0)"
       ]
     },
     "price_sync_settings": {
@@ -6662,6 +6848,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (enabled IN (0, 1)",
+        "CHECK (interval_minutes IS NULL OR interval_minutes > 0)"
       ]
     },
     "ref_instruments": {
@@ -6787,6 +6977,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (asset_class IN ('crypto','stock','fund','metal','currency','other')",
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "ref_integrity_queue": {
@@ -6844,6 +7038,10 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (check_kind IN ('fk','balance','price_stale','orphan','custom')",
+        "CHECK (status IN ('pending','running','done','failed')"
       ]
     },
     "ref_parties": {
@@ -6887,6 +7085,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (party_kind IS NULL OR party_kind IN ('individual','company','bank','brokerage','government','other')"
       ]
     },
     "rpt_net_worth_snapshots": {
@@ -6958,7 +7159,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "rpt_presets": {
       "columns": [
@@ -7008,6 +7210,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')"
       ]
     },
     "rpt_snapshots": {
@@ -7093,6 +7298,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')"
       ]
     },
     "sec_access_log": {
@@ -7136,6 +7344,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (event_type IN ('login','logout','unlock','export','backup','settings_change','denied')"
       ]
     },
     "sec_encryption_meta": {
@@ -7172,6 +7383,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (scheme IN ('aes-256-gcm','aes-256-cbc','none')"
       ]
     },
     "sec_session_logs": {
@@ -7215,6 +7429,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (event_type IN ('start','end','lock','unlock','timeout')"
       ]
     },
     "sec_settings": {
@@ -7266,7 +7483,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "stg_backup_logs": {
       "columns": [
@@ -7316,6 +7534,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('started','completed','failed','verified')"
       ]
     },
     "stg_settings": {
@@ -7367,7 +7588,8 @@
             "id"
           ]
         }
-      ]
+      ],
+      "checks": []
     },
     "tax_categories": {
       "columns": [
@@ -7453,6 +7675,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_active IN (0, 1)"
       ]
     },
     "tax_events": {
@@ -7603,6 +7828,12 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (is_deductible IN (0, 1)",
+        "CHECK (is_manual_adjustment IN (0, 1)",
+        "CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)",
+        "CHECK (status IN ('draft','posted','amended','void')"
       ]
     },
     "tax_records": {
@@ -7660,6 +7891,9 @@
             "id"
           ]
         }
+      ],
+      "checks": [
+        "CHECK (status IN ('draft','filed','amended')"
       ]
     },
     "usr_settings": {
@@ -7689,7 +7923,8 @@
             "key"
           ]
         }
-      ]
+      ],
+      "checks": []
     }
   }
 }

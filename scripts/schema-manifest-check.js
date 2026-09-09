@@ -1,10 +1,10 @@
 #!/usr/bin/env node
+/** Must match schema-manifest.js hashing (incl. CHECK harvest). */
 import { readFileSync, existsSync, mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { DatabaseSync } from "node:sqlite";
 import { createHash } from "crypto";
-import { execSync } from "child_process";
 
 const schemaPath = join(process.cwd(), "docs/core/db/schema.sql");
 const checked = join(process.cwd(), "docs/core/db/schema.manifest.json");
@@ -18,6 +18,26 @@ const prepared = sql
   .split("\n")
   .map((l) => (l.includes("--") ? l.slice(0, l.indexOf("--")) : l))
   .join("\n");
+
+function harvestChecks(ddl) {
+  const map = {};
+  const re = /CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+(\w+)\s*\(([\s\S]*?)\)\s*;/gi;
+  let m;
+  while ((m = re.exec(ddl))) {
+    const table = m[1];
+    const body = m[2];
+    const checks = [];
+    const cre = /\bCHECK\s*\(([^)]*(?:\([^)]*\)[^)]*)*)\)/gi;
+    let c;
+    while ((c = cre.exec(body))) {
+      checks.push(c[0].replace(/\s+/g, " ").trim());
+    }
+    map[table] = checks.sort();
+  }
+  return map;
+}
+
+const checksByTable = harvestChecks(prepared);
 const dir = mkdtempSync(join(tmpdir(), "pf-mchk-"));
 const db = new DatabaseSync(join(dir, "m.sqlite"));
 db.exec(prepared);
@@ -55,6 +75,7 @@ for (const { name } of tables) {
       on_delete: f.on_delete,
     })),
     indexes: indexDetails,
+    checks: checksByTable[name] || [],
   };
 }
 db.close();
@@ -64,7 +85,6 @@ if (disk.schemaHash !== hash) {
   console.error("MANIFEST_HASH_MISMATCH");
   console.error("expected", disk.schemaHash);
   console.error("got     ", hash);
-  console.error("Run: npm run schema:manifest && commit");
   process.exit(1);
 }
 console.log("schema-manifest-check: OK", hash.slice(0, 12));

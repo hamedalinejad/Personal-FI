@@ -1,5 +1,9 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, existsSync, mkdtempSync } from "fs";
+/**
+ * Generates schema.manifest.json from schema.sql via SQLite introspection + SQL CHECK harvest.
+ * D-010 residual: SQLite PRAGMA does not expose all CHECKs; we also parse CHECK (...) from DDL text.
+ */
+import { readFileSync, writeFileSync, mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { DatabaseSync } from "node:sqlite";
@@ -14,12 +18,35 @@ const prepared = sql
   .map((l) => (l.includes("--") ? l.slice(0, l.indexOf("--")) : l))
   .join("\n");
 
-const dir = mkdtempSync(join(tmpdir(), "pf-manifest-"));
+/** Harvest CHECK clauses per table from DDL (best-effort, order-stable). */
+function harvestChecks(ddl) {
+  const map = {};
+  const re = /CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+(\w+)\s*\(([\s\S]*?)\)\s*;/gi;
+  let m;
+  while ((m = re.exec(ddl))) {
+    const table = m[1];
+    const body = m[2];
+    const checks = [];
+    const cre = /\bCHECK\s*\(([^)]*(?:\([^)]*\)[^)]*)*)\)/gi;
+    let c;
+    while ((c = cre.exec(body))) {
+      checks.push(c[0].replace(/\s+/g, " ").trim());
+    }
+    map[table] = checks.sort();
+  }
+  return map;
+}
+
+const checksByTable = harvestChecks(prepared);
+
+const dir = mkdtempSync(join(tmpdir(), "pf-man-"));
 const db = new DatabaseSync(join(dir, "m.sqlite"));
 db.exec(prepared);
 
 const tables = db
-  .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`)
+  .prepare(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
+  )
   .all();
 
 const manifest = { tables: {} };
@@ -53,12 +80,12 @@ for (const { name } of tables) {
       on_delete: f.on_delete,
     })),
     indexes: indexDetails,
+    checks: checksByTable[name] || [],
   };
 }
 db.close();
 
-const canonical = JSON.stringify(manifest);
-const hash = createHash("sha256").update(canonical).digest("hex");
-const out = { schemaHash: hash, ...manifest };
-writeFileSync(outPath, JSON.stringify(out, null, 2));
-console.log("Wrote", outPath, "tables", Object.keys(manifest.tables).length, "hash", hash.slice(0, 12));
+const hash = createHash("sha256").update(JSON.stringify(manifest)).digest("hex");
+const out = { schemaHash: hash, tables: manifest.tables };
+writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
+console.log("Wrote", outPath, "tables", tables.length, "hash", hash.slice(0, 12));

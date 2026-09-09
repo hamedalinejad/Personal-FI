@@ -1,17 +1,22 @@
-# Open Issues Register — LIVE
+# Open Issues Register — LIVE (FINAL shape)
 
-## Loan vertical (coding-ready)
+## Coding may start
 
-A1–A10, A12 met with tests. Residual:
+Loan + Core. Entry: `docs/READY-FOR-CODING.md`.
 
-- A11 richer loan fields via migration continuum
-- PWA durable swap (beyond file backup)
-- Semantic CHECK manifest completeness
-- CI Actions green evidence on public runner
+## Closed permanently
 
-## After Loan RELEASE-PROVEN
+See `DEFERRED-AND-CLOSED.md` (CLOSED table). Stale audits citing pre-`withinTransaction` Loan bugs are obsolete.
 
-Crypto → Funds → Stocks → Metals → Cheque
+## Remaining engineering (not doc ambiguity)
+
+| Item | Track |
+|------|--------|
+| Loan DEFERRED columns | `LOAN-V1-SCHEMA-DISPOSITION.md` + migrations |
+| PWA SQLite-WASM adapter | Persistence Port |
+| CHECK harvest completeness edge-cases | schema-manifest.js improved; re-verify on CI |
+| Public CI runner green | package-lock on registry.npmjs.org |
+| Feature packages | After Loan RELEASE-PROVEN |
 
 ## Production
 

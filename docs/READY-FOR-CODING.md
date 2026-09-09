@@ -8,7 +8,9 @@
 1. `docs/core/CODING-GATE.md` — قوانین مطلق  
 2. `docs/core/GO-NO-GO.md` — دروازه‌ها  
 3. `docs/core/IMPLEMENTATION-READY-LOAN-SLICE.md` — قرارداد Loan  
-4. `docs/core/LOAN-V1-RESOLUTIONS.md` — فرمول و role  
+4. `docs/core/LOAN-V1-RESOLUTIONS.md` — فرمول و role
+5. `docs/core/LOAN-V1-SCHEMA-DISPOSITION.md` — ستون‌های v1 / DEFERRED
+6. `docs/core/DEFERRED-AND-CLOSED.md` — بسته در برابر باز  
 
 ## ۲) دستورات پایه
 
