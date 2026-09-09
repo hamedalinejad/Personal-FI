@@ -59,11 +59,11 @@ Crypto/Stocks/Funds/Metals/Cheque/Opening/Reports/Budget/Tax: **SPECIFIED** in `
 | A5 | payment allocation | YES |
 | A6 | ln_transactions portions | YES |
 | A7 | reversePayment | YES |
-| A8 | backup/restore | NO |
-| A9 | standalone boot evidence | PARTIAL |
+| A8 | backup/restore | YES (file backup test) |
+| A9 | standalone boot evidence | YES |
 | A10 | borrowed rejected | YES |
 | A11 | migration no-field-loss | PARTIAL |
-| A12 | rebuild remaining | PARTIAL |
+| A12 | rebuild remaining | YES (derived) |
 
 ## Sequence (unchanged)
 
