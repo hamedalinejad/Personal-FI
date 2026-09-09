@@ -1,5 +1,6 @@
 /**
- * Canonical v1 schedule snapshot shape — aligned with LOAN-V1 + schema comments.
+ * Canonical v1 schedule snapshot shape.
+ * Must match Loan-Schedule-Engine.md + schema.sql comments.
  */
 export function buildScheduleSnapshot({
   schedule,
@@ -8,7 +9,8 @@ export function buildScheduleSnapshot({
   currency,
   engineVersion = "1.0.0-period_based-equal-principal",
 }) {
-  const installments = (schedule.rows || []).map((row, i) => ({
+  const rows = schedule.rows || [];
+  const installments = rows.map((row, i) => ({
     seq: row.period ?? i + 1,
     dueDate: row.dueDate || null,
     principal: row.principal,
@@ -17,7 +19,7 @@ export function buildScheduleSnapshot({
     total: row.payment || row.total,
     status: "planned",
   }));
-  const lastRow = (schedule.rows || [])[installments.length - 1];
+  const lastRow = rows[rows.length - 1];
   return {
     engineVersion,
     dayCount: schedule.dayCount || "period_based",

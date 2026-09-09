@@ -9,6 +9,7 @@ function max0(d) {
   return d.gt(0) ? d.toFixed() : "0";
 }
 
+/** Decimal-only outstanding from schedule + payment/reversal history. No CAST REAL. */
 function computeOutstanding(db, loanId, loan) {
   const snap = db
     .prepare(`SELECT * FROM ln_schedule_snapshots WHERE loan_id = ? ORDER BY version DESC LIMIT 1`)
@@ -114,7 +115,7 @@ export async function recordPayment(
     domainResult: { loanId: p.loanId, allocation, lnTransactionId: txId },
     engineVersions: { loanSchedule: "1.0.0-period_based-equal-principal", money: "1.0.0" },
     withinTransaction(db2) {
-      // Re-check outstanding inside the same financial transaction
+      // Authoritative re-check inside the same COMMIT boundary
       const loan2 = db2.prepare(`SELECT * FROM ln_loans WHERE id = ?`).get(p.loanId);
       const fresh = computeOutstanding(db2, p.loanId, loan2);
       const total2 = toDecimal(fresh.principal)

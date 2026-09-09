@@ -7,8 +7,7 @@ import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
 import { normalizeRatePercentage } from "../../../core/domain/loan/scheduleEngine.js";
 
 /**
- * loan.create — strict required fields, no silent defaults.
- * Snapshot shape = LOAN-V1 canonical JSON.
+ * loan.create — no silent defaults; all domain writes inside one SQLite txn.
  */
 export async function createLoan(
   input,
@@ -42,8 +41,6 @@ export async function createLoan(
   const currency = p.currency;
   const baseCurrency = operationBaseCurrency || p.baseCurrency || currency;
   if (currency !== baseCurrency) {
-    if (!p.exchangeRateToBase) throw new Error("LOAN_FX_REQUIRED");
-    // full multi-currency loan repayment deferred
     throw new Error("LOAN_MULTI_CURRENCY_DEFERRED");
   }
 
@@ -81,7 +78,7 @@ export async function createLoan(
     memo: "loan_disbursement",
   });
   for (const line of settlement.journalLines) {
-    line.lineKind = line.accountId === receivableAccountId ? "principal" : "principal";
+    line.lineKind = "principal";
     line.amountInBase = line.amount;
     line.exchangeRateToBase = "1";
   }
@@ -97,7 +94,10 @@ export async function createLoan(
     baseCurrency,
     payload: { ...p, loanId },
     journalLines: settlement.journalLines,
-    domainResult: { schedule: snapshot, loan: { id: loanId, principal: p.principal, method: p.method } },
+    domainResult: {
+      schedule: snapshot,
+      loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: p.method },
+    },
     engineVersions: { loanSchedule: engineVersion, money: "1.0.0" },
     withinTransaction(db) {
       db.prepare(

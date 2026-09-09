@@ -6,6 +6,7 @@ import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
 /**
  * Reverse a payment: new operation + reverses_operation_id + reversing journal + ln_transactions reversal.
+ * No silent operationId generation.
  */
 export async function reversePayment(
   input,
@@ -16,14 +17,17 @@ export async function reversePayment(
     interestIncomeId = "LOAN-INT-INC",
     feeIncomeId = "LOAN-FEE-INC",
     penaltyIncomeId = "LOAN-PEN-INC",
-    baseCurrency = "IRR",
   } = {},
 ) {
+  if (!input?.operationId || typeof input.operationId !== "string") {
+    throw new Error("OP_OPERATION_ID_REQUIRED");
+  }
+  const operationId = input.operationId;
   const p = input.payload || input;
   if (!p.originalOperationId) throw new Error("VALIDATION_ERROR");
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
-  const operationId = input.operationId;
-  const currency = p.currency || baseCurrency;
+  if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
+  const currency = p.currency;
 
   bootstrapLoanEditionAccounts(dataDir, currency);
   const db = openDb(dataDir);
@@ -35,16 +39,18 @@ export async function reversePayment(
     .prepare(`SELECT * FROM ln_transactions WHERE operation_id = ? AND tx_type = 'payment'`)
     .get(p.originalOperationId);
   if (!origTx) throw new Error("LOAN_TX_NOT_FOUND");
+
   const already = db
     .prepare(`SELECT id FROM ln_transactions WHERE reverses_transaction_id = ?`)
     .get(origTx.id);
   if (already) throw new Error("ALREADY_REVERSED");
-  if (!input.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
 
   // Reverse journal: flip sides of original lines
   const lines = db
     .prepare(
-      `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency
+      `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency,
+              jl.amount_in_base as amountInBase, jl.exchange_rate_to_base as exchangeRateToBase,
+              jl.conversion_path as conversionPath, jl.line_kind as lineKind
        FROM fin_journal_lines jl
        JOIN fin_journal_entries je ON je.id = jl.entry_id
        WHERE je.operation_id = ?
@@ -57,6 +63,10 @@ export async function reversePayment(
     side: l.side === "debit" ? "credit" : "debit",
     amount: l.amount,
     currency: l.currency || currency,
+    amountInBase: l.amountInBase || l.amount,
+    exchangeRateToBase: l.exchangeRateToBase || "1",
+    conversionPath: l.conversionPath || null,
+    lineKind: l.lineKind || null,
     line_number: i + 1,
   }));
 
