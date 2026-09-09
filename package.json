@@ -15,7 +15,8 @@
     "docs:validate": "node scripts/docs-validator.js",
     "registry:index": "node scripts/registry-index.js",
     "bench:smoke": "node scripts/bench-smoke.js",
-    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run lint && npm run schema:drift && npm run schema:inventory && npm run registry:index && npm run bench:smoke"
+    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run lint && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke",
+    "schema:manifest:check": "node scripts/schema-manifest-check.js"
   },
   "dependencies": {
     "decimal.js": "^10.4.3"
