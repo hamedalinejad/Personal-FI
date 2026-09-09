@@ -5,18 +5,10 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { assertJournalBalanced } from "../domain/invariants/index.js";
+import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
 
 const DEFAULT_DIR = join(process.cwd(), ".pf-data");
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-/**
- * P0-001: Runtime DB applies canonical docs/core/db/schema.sql (not a second schema).
- * P0-003: status draft|posted|voided|failed
- * P0-004: command_hash NOT globally unique
- * P0-005: journal lines are SoT; journal_json optional derived only
- * P0-006: FK from canonical schema
- * P0-007: balance guard before write
- */
 
 function ensureDir(dir) {
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -33,7 +25,6 @@ function resolveSchemaSql() {
   throw new Error("SCHEMA_SQL_MISSING:docs/core/db/schema.sql");
 }
 
-/** Strip SQL comments for exec; keep statements. */
 function prepareSchema(sql) {
   return sql
     .split("\n")
@@ -51,14 +42,12 @@ export function openDb(dataDir) {
   const dbPath = join(dataDir, "personal-fi.sqlite");
   if (openDbs.has(dbPath)) return openDbs.get(dbPath);
   const db = new DatabaseSync(dbPath);
-  // Apply canonical schema once
-  const meta = db.prepare(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='fin_operations'",
-  ).get();
+  const meta = db
+    .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='fin_operations'")
+    .get();
   if (!meta) {
     db.exec(prepareSchema(resolveSchemaSql()));
   }
-  // P0-004: drop mistaken global unique on command_hash if present from older runtime
   try {
     db.exec("DROP INDEX IF EXISTS uq_fin_operations_command_hash");
     db.exec("DROP INDEX IF EXISTS uq_fin_op_command");
@@ -71,6 +60,12 @@ export function openDb(dataDir) {
     );
   } catch {
     /* ignore */
+  }
+  // result_json for idempotent replay (NOT accounting SoT)
+  try {
+    db.exec(`ALTER TABLE fin_operations ADD COLUMN result_json TEXT`);
+  } catch {
+    /* already exists */
   }
   openDbs.set(dbPath, db);
   return db;
@@ -91,64 +86,105 @@ export async function persistOperation(record, options = {}) {
   const dir = options.dataDir || DEFAULT_DIR;
   ensureDir(dir);
   const mode = options.mode || "sqlite";
-
-  if (mode === "json") {
-    return persistOperationJson(record, dir);
-  }
+  if (mode === "json") return persistOperationJson(record, dir);
   return persistOperationSqlite(record, dir);
 }
 
 function persistOperationSqlite(record, dir) {
-  const id = record.operationId || randomUUID();
+  if (!record.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
+  const id = record.operationId;
   const journalLines = record.journalLines || [];
 
-  // P0-007
-  if (journalLines.length) {
-    assertJournalBalanced(journalLines);
-  }
+  if (journalLines.length) assertJournalBalanced(journalLines);
 
   const status = record.status || "posted";
   if (!["draft", "posted", "voided", "failed"].includes(status)) {
     throw new Error(`OP_STATUS_INVALID:${status}`);
   }
 
+  // P0: no implicit date/currency
+  if (!record.businessDate || typeof record.businessDate !== "string") {
+    throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  }
+  if (!record.baseCurrency || typeof record.baseCurrency !== "string") {
+    throw new Error("OP_BASE_CURRENCY_REQUIRED");
+  }
+
   const db = openDb(dir);
   const now = new Date().toISOString();
-  const businessDate = record.businessDate || now.slice(0, 10);
+  const businessDate = record.businessDate;
+  const baseCurrency = record.baseCurrency;
+
+  // Verify accounts — never invent
+  for (const line of journalLines) {
+    const aid = line.accountId || line.account_id;
+    const lineCur = line.currency || baseCurrency;
+    if (!line.currency) {
+      throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+    }
+    assertAccountUsable(db, aid, null);
+    // line currency must match account currency
+    const acc = assertAccountUsable(db, aid);
+    if (acc.currency !== lineCur) {
+      throw new Error("ACCOUNT_CURRENCY_MISMATCH");
+    }
+  }
+
+  const resultSnapshot = {
+    operationId: id,
+    commandHash: record.commandHash,
+    type: record.type || "unknown",
+    status,
+    businessDate,
+    baseCurrency,
+    engineVersions: record.engineVersions || null,
+    domainResult: record.domainResult ?? null,
+    journalLines,
+    durability_state: "sql_committed",
+  };
 
   try {
     db.exec("BEGIN IMMEDIATE");
+
+    // Existing row → idempotent semantics at DB layer
+    const existing = db.prepare(`SELECT id, command_hash, result_json FROM fin_operations WHERE id = ?`).get(id);
+    if (existing) {
+      if (existing.command_hash !== record.commandHash) {
+        db.exec("ROLLBACK");
+        throw new Error("OP_IDEMPOTENCY_CONFLICT");
+      }
+      db.exec("ROLLBACK");
+      if (existing.result_json) {
+        return { ...JSON.parse(existing.result_json), idempotentReplay: true };
+      }
+      // fall through load path
+      return loadOperationSync(db, id, true);
+    }
+
     db.prepare(
       `INSERT INTO fin_operations (
         id, command_hash, operation_type, status, durability_state,
-        business_date, base_currency, created_at, posted_at
-      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
+        business_date, base_currency, engine_versions, created_at, posted_at, result_json
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)`,
     ).run(
       id,
       record.commandHash || null,
       record.type || "unknown",
       status,
       businessDate,
-      record.baseCurrency || record.base_currency || "IRR",
+      baseCurrency,
+      record.engineVersions ? JSON.stringify(record.engineVersions) : null,
       now,
       status === "posted" ? now : null,
+      JSON.stringify(resultSnapshot),
     );
 
     const entryId = randomUUID();
+    const postState = status === "posted" ? "posted" : status === "voided" ? "void" : "draft";
     db.prepare(
-      `INSERT INTO fin_journal_entries (id, operation_id, business_date, memo, created_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    ).run(entryId, id, businessDate, record.memo || null, now);
-
-    // Ensure referenced accounts exist (bootstrap stub; production seeds chart)
-    const ensureAcc = db.prepare(
-      `INSERT OR IGNORE INTO fin_accounts (id, name, account_kind, currency, is_archived, created_at, updated_at)
-       VALUES (?, ?, 'asset', 'IRR', 0, ?, ?)`,
-    );
-    for (const line of journalLines) {
-      const aid = line.accountId || line.account_id;
-      ensureAcc.run(aid, aid, now, now);
-    }
+      `INSERT INTO fin_journal_entries (id, operation_id, business_date, memo, created_at, post_state)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(entryId, id, businessDate, record.memo || null, now, postState);
 
     const insLine = db.prepare(
       `INSERT INTO fin_journal_lines (
@@ -156,14 +192,16 @@ function persistOperationSqlite(record, dir) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     );
     journalLines.forEach((line, i) => {
+      const ln = line.line_number ?? i + 1;
+      if (!Number.isInteger(ln) || ln < 1) throw new Error("JOURNAL_LINE_NUMBER_INVALID");
       insLine.run(
         randomUUID(),
         entryId,
         line.accountId || line.account_id,
         line.side,
         line.amount,
-        line.currency || 'IRR',
-        line.line_number || i + 1,
+        line.currency,
+        ln,
       );
     });
 
@@ -172,60 +210,58 @@ function persistOperationSqlite(record, dir) {
     ).run(id);
     db.exec("COMMIT");
 
-    return {
-      operationId: id,
-      commandHash: record.commandHash,
-      status,
-      durability_state: "sql_committed",
-      journalLines,
-      domainResult: record.domainResult ?? null,
-    };
+    return { ...resultSnapshot, durability_state: "sql_committed", idempotentReplay: false };
   } catch (e) {
     try {
       db.exec("ROLLBACK");
     } catch {
       /* ignore */
     }
+    // Map SQLite unique to API conflict
+    if (e && /UNIQUE constraint failed.*fin_operations/i.test(String(e.message || e))) {
+      const existing = db.prepare(`SELECT command_hash, result_json FROM fin_operations WHERE id = ?`).get(id);
+      if (existing) {
+        if (existing.command_hash !== record.commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
+        if (existing.result_json) {
+          return { ...JSON.parse(existing.result_json), idempotentReplay: true };
+        }
+      }
+      throw new Error("OP_IDEMPOTENCY_CONFLICT");
+    }
     throw e;
   }
 }
 
-async function persistOperationJson(record, dir) {
-  const id = record.operationId || randomUUID();
-  const journalLines = record.journalLines || [];
-  if (journalLines.length) assertJournalBalanced(journalLines);
-  const status = record.status || "posted";
-  const tempPath = join(dir, `${id}.tmp.json`);
-  const finalPath = join(dir, `${id}.json`);
-  const body = {
-    operationId: id,
-    commandHash: record.commandHash,
-    type: record.type,
-    status,
-    durability_state: "sql_committed",
-    journalLines,
-    domainResult: record.domainResult ?? null,
-    _transportState: "swapped",
-  };
-  await writeFile(tempPath, JSON.stringify(body), "utf8");
-  await rename(tempPath, finalPath);
-  return body;
-}
-
-/** P0-005: load journal from relational tables when sqlite */
-export async function loadOperation(operationId, options = {}) {
-  const dir = options.dataDir || DEFAULT_DIR;
-  const mode = options.mode || "sqlite";
-
-  if (mode === "json") {
-    const finalPath = join(dir, `${operationId}.json`);
-    const raw = await readFile(finalPath, "utf8");
-    return JSON.parse(raw);
-  }
-
-  const db = openDb(dir);
+function loadOperationSync(db, operationId, replay = false) {
   const row = db.prepare(`SELECT * FROM fin_operations WHERE id = ?`).get(operationId);
   if (!row) throw new Error("OP_NOT_FOUND");
+
+  if (row.result_json) {
+    const snap = JSON.parse(row.result_json);
+    // Journal SoT from relational tables
+    const lines = db
+      .prepare(
+        `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number
+         FROM fin_journal_lines jl
+         JOIN fin_journal_entries je ON je.id = jl.entry_id
+         WHERE je.operation_id = ?
+         ORDER BY jl.line_number`,
+      )
+      .all(operationId);
+    return {
+      ...snap,
+      operationId: row.id,
+      commandHash: row.command_hash,
+      status: row.status,
+      durability_state: row.durability_state,
+      journalLines: lines,
+      domainResult: snap.domainResult ?? null,
+      engineVersions: snap.engineVersions ?? (row.engine_versions ? JSON.parse(row.engine_versions) : null),
+      businessDate: row.business_date,
+      baseCurrency: row.base_currency,
+      idempotentReplay: replay,
+    };
+  }
 
   const lines = db
     .prepare(
@@ -243,9 +279,55 @@ export async function loadOperation(operationId, options = {}) {
     type: row.operation_type,
     status: row.status,
     durability_state: row.durability_state,
+    businessDate: row.business_date,
+    baseCurrency: row.base_currency,
     journalLines: lines,
     domainResult: null,
+    engineVersions: row.engine_versions ? JSON.parse(row.engine_versions) : null,
+    idempotentReplay: replay,
   };
+}
+
+async function persistOperationJson(record, dir) {
+  if (!record.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  if (!record.baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
+  const id = record.operationId || randomUUID();
+  const journalLines = record.journalLines || [];
+  if (journalLines.length) assertJournalBalanced(journalLines);
+  for (const line of journalLines) {
+    if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+  }
+  const status = record.status || "posted";
+  const body = {
+    operationId: id,
+    commandHash: record.commandHash,
+    type: record.type,
+    status,
+    businessDate: record.businessDate,
+    baseCurrency: record.baseCurrency,
+    engineVersions: record.engineVersions || null,
+    domainResult: record.domainResult ?? null,
+    durability_state: "sql_committed",
+    journalLines,
+    _transportState: "swapped",
+  };
+  const tempPath = join(dir, `${id}.tmp.json`);
+  const finalPath = join(dir, `${id}.json`);
+  await writeFile(tempPath, JSON.stringify(body), "utf8");
+  await rename(tempPath, finalPath);
+  return body;
+}
+
+export async function loadOperation(operationId, options = {}) {
+  const dir = options.dataDir || DEFAULT_DIR;
+  const mode = options.mode || "sqlite";
+  if (mode === "json") {
+    const finalPath = join(dir, `${operationId}.json`);
+    const raw = await readFile(finalPath, "utf8");
+    return JSON.parse(raw);
+  }
+  const db = openDb(dir);
+  return loadOperationSync(db, operationId, false);
 }
 
 export { DEFAULT_DIR };

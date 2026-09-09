@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { runInvariantGate } from "../invariants/index.js";
 import { persistOperation, loadOperation } from "../../persistence/worker.js";
 
-/** P0-CODE-005 — canonical JSON for hashing (sorted object keys, array order preserved). */
 export function stableStringify(value) {
   if (value === null || typeof value !== "object") {
     return JSON.stringify(value);
@@ -33,7 +32,6 @@ async function saveIdempotency(dir, map) {
   await writeFile(join(dir, "idempotency.json"), JSON.stringify(map, null, 0));
 }
 
-/** In-process mutex per operationId (P0-CODE-004). Production: DB unique + txn. */
 const locks = new Map();
 
 async function withOpLock(operationId, fn) {
@@ -57,51 +55,55 @@ async function withOpLock(operationId, fn) {
   }
 }
 
-/**
- * Atomic financial operation (P0-CODE-002/003/004/005).
- *
- * Model A: domain **prepare** is pure calculation only; durable mutation is
- * the single persistOperation write (operation + journal + domainResult).
- * applyDomain, if provided, runs only as pure prepare alias — must not
- * independently mutate durable stores outside this path.
- *
- * Idempotency: recover from durable operation file first, then map;
- * map updated after persist (crash recovery uses operation file).
- */
 export async function runAtomicFinancialOperation(command) {
   if (!command || typeof command !== "object") throw new Error("OP_INVALID_COMMAND");
   if (!command.operationId || typeof command.operationId !== "string") {
     throw new Error("OP_OPERATION_ID_REQUIRED");
   }
+  if (!command.businessDate || typeof command.businessDate !== "string") {
+    throw new Error("OP_BUSINESS_DATE_REQUIRED");
+  }
+  if (!command.baseCurrency || typeof command.baseCurrency !== "string") {
+    throw new Error("OP_BASE_CURRENCY_REQUIRED");
+  }
 
   return withOpLock(command.operationId, async () => {
     const dataDir = command.dataDir || join(process.cwd(), ".pf-data");
+    const mode = command.persistMode || "sqlite";
     const payloadForHash = {
       type: command.type,
       payload: command.payload ?? null,
       journalLines: command.journalLines || [],
+      businessDate: command.businessDate,
+      baseCurrency: command.baseCurrency,
     };
     const commandHash = command.commandHash || stableHash(payloadForHash);
 
-    // P0-CODE-003: recover from durable operation record before any domain work
     try {
-      const existing = await loadOperation(command.operationId, { dataDir, mode: command.persistMode || 'sqlite' });
-      if (existing && ["sql_committed", "swapped", "persisted"].includes(existing.durability_state)) {
+      const existing = await loadOperation(command.operationId, { dataDir, mode });
+      if (
+        existing &&
+        ["sql_committed", "swapped", "persisted"].includes(existing.durability_state)
+      ) {
         if (existing.commandHash && existing.commandHash !== commandHash) {
           throw new Error("OP_IDEMPOTENCY_CONFLICT");
         }
         return {
           operationId: existing.operationId,
           commandHash: existing.commandHash || commandHash,
+          status: existing.status,
           durability_state: existing.durability_state,
+          businessDate: existing.businessDate,
+          baseCurrency: existing.baseCurrency,
           journalLines: existing.journalLines || [],
           domainResult: existing.domainResult ?? null,
+          engineVersions: existing.engineVersions ?? null,
           idempotentReplay: true,
         };
       }
     } catch (e) {
       if (e && e.message === "OP_IDEMPOTENCY_CONFLICT") throw e;
-      // missing file → continue
+      // missing → continue
     }
 
     const idMap = await loadIdempotency(dataDir);
@@ -112,9 +114,12 @@ export async function runAtomicFinancialOperation(command) {
     }
 
     const journalLines = command.journalLines || [];
+    // ensure each line has currency
+    for (const line of journalLines) {
+      if (!line.currency) line.currency = command.baseCurrency;
+    }
     runInvariantGate({ journalLines, rates: command.rates || [] });
 
-    // P0-CODE-002: pure prepare only (no durable side effects before persist)
     const prepare =
       typeof command.prepareDomain === "function"
         ? command.prepareDomain
@@ -134,23 +139,27 @@ export async function runAtomicFinancialOperation(command) {
       operationId: command.operationId,
       commandHash,
       type: command.type || "unknown",
+      status: command.status || "posted",
+      businessDate: command.businessDate,
+      baseCurrency: command.baseCurrency,
       journalLines,
       domainResult,
       engineVersions: command.engineVersions || null,
-      durability_state: "pending",
-      createdAt: new Date().toISOString(),
+      source: command.source || "api",
     };
 
-    // Single durable boundary — commandHash stored in operation file (P0-CODE-003)
-    const persisted = await persistOperation(record, { dataDir, mode: command.persistMode || 'sqlite' });
+    const persisted = await persistOperation(record, { dataDir, mode });
     const result = {
       operationId: persisted.operationId,
       commandHash,
+      status: persisted.status || record.status,
       durability_state: persisted.durability_state,
+      businessDate: record.businessDate,
+      baseCurrency: record.baseCurrency,
       journalLines,
       domainResult,
       engineVersions: command.engineVersions || null,
-      idempotentReplay: false,
+      idempotentReplay: !!persisted.idempotentReplay,
     };
 
     idMap[command.operationId] = { commandHash, result };

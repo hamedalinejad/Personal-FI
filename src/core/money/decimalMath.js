@@ -1,12 +1,12 @@
 import { canonicalDecimalString, toDecimal, Decimal } from "./canonicalDecimal.js";
 
+/** @deprecated prefer toDecimal — requires string */
 export function D(s) {
-  return canonicalDecimalString(String(s));
+  return canonicalDecimalString(s);
 }
 
-/** @deprecated use toDecimal — kept name but no Number */
+/** @deprecated use toDecimal */
 export function toNum(s) {
-  // Returns Decimal for call sites that still treat as numeric-like; prefer toDecimal
   return toDecimal(s);
 }
 
