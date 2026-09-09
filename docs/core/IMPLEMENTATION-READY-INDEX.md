@@ -80,3 +80,8 @@ These are **implementation work**, not missing design:
 
 **Verdict: documentation is implementation-complete for scoped Feature coding.**  
 Remaining risk is **execution quality**, not missing contracts.
+
+
+## Cross-feature contracts
+
+See `CROSS-FEATURE-DOMAIN-CONTRACTS.md` (§31–44 crypto/stocks/funds/metals/cheque/cash/FX/price/rebuild/import/Iran/dates/valuation).
