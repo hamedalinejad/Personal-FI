@@ -17,3 +17,9 @@ v1 columns on `ln_loans` / `ln_transactions` expanded for operation_id, portions
 
 ## Day count
 Only `period_based` for first vertical.
+
+
+## Rate unit (FINAL)
+
+API `annualRate` uses **percentage points**: `18` = 18%.  
+Engine: `normalizeRatePercentage` → fractional `0.18` once, then internal math.

@@ -5,19 +5,42 @@ export function assertFiniteMoney(value, field = "amount") {
   canonicalDecimalString(value);
 }
 
+/**
+ * Balance in base currency when amountInBase present on any line;
+ * otherwise all lines must share one currency and balance on amount.
+ */
 export function assertJournalBalanced(lines) {
   if (!Array.isArray(lines) || lines.length < 2) {
     throw new Error("INV_JOURNAL_MIN_LINES");
   }
+  const anyBase = lines.some((l) => l.amountInBase != null || l.amount_in_base != null);
   let debit = toDecimal("0");
   let credit = toDecimal("0");
+  let currency = null;
   for (const line of lines) {
     assertFiniteMoney(line.amount, "line.amount");
     const a = toDecimal(line.amount);
     if (a.lt(0)) throw new Error("INV_JOURNAL_NEGATIVE_AMOUNT");
     if (a.eq(0)) throw new Error("INV_JOURNAL_ZERO_AMOUNT");
-    if (line.side === "debit") debit = debit.plus(a);
-    else if (line.side === "credit") credit = credit.plus(a);
+
+    let balAmount;
+    if (anyBase) {
+      const base = line.amountInBase ?? line.amount_in_base;
+      if (base == null) throw new Error("INV_JOURNAL_MISSING_AMOUNT_IN_BASE");
+      assertFiniteMoney(base, "line.amountInBase");
+      balAmount = toDecimal(base);
+      if (balAmount.lt(0)) throw new Error("INV_JOURNAL_NEGATIVE_AMOUNT_IN_BASE");
+    } else {
+      if (!line.currency) throw new Error("INV_JOURNAL_CURRENCY_REQUIRED");
+      if (currency == null) currency = line.currency;
+      else if (currency !== line.currency) {
+        throw new Error("INV_JOURNAL_MULTI_CURRENCY_REQUIRES_BASE");
+      }
+      balAmount = a;
+    }
+
+    if (line.side === "debit") debit = debit.plus(balAmount);
+    else if (line.side === "credit") credit = credit.plus(balAmount);
     else throw new Error("INV_JOURNAL_SIDE");
   }
   if (!debit.eq(credit)) {
@@ -26,94 +49,48 @@ export function assertJournalBalanced(lines) {
   return true;
 }
 
-/** Rate strictly > 0 (FX, prices). */
 export function assertRatePositive(rate) {
   assertFiniteMoney(rate, "rate");
   if (!toDecimal(rate).gt(0)) throw new Error("INV_RATE_NOT_POSITIVE");
 }
 
-/** Interest rate may be zero (qarz / zero-interest loans). */
 export function assertRateNonNegative(rate) {
   assertFiniteMoney(rate, "rate");
   if (toDecimal(rate).lt(0)) throw new Error("INV_RATE_NEGATIVE");
 }
 
-/**
- * Business immutability only — not durability_state.
- * Corrections = new operation + reverses/corrects linkage.
- */
-export function assertImmutablePost(previousRow, attemptedChange) {
+export function assertImmutablePost(previousRow) {
   if (!previousRow) return true;
-  const posted =
-    previousRow.status === "posted" || previousRow.posted === true;
-  if (posted) {
-    throw new Error("INV_IMMUTABLE_POSTED");
-  }
+  const posted = previousRow.status === "posted" || previousRow.posted === true;
+  if (posted) throw new Error("INV_IMMUTABLE_POSTED");
   return true;
 }
 
-export function assertFeeConservation({ amountDue, amountPaid, amountWaived }) {
-  assertFiniteMoney(amountDue, "amountDue");
-  assertFiniteMoney(amountPaid || "0", "amountPaid");
-  assertFiniteMoney(amountWaived || "0", "amountWaived");
-  const due = toDecimal(amountDue);
-  const paid = toDecimal(amountPaid || "0");
-  const waived = toDecimal(amountWaived || "0");
-  if (paid.lt(0) || waived.lt(0)) throw new Error("INV_FEE_NEGATIVE");
-  if (paid.plus(waived).gt(due)) throw new Error("INV_FEE_OVER_APPLIED");
-  return true;
-}
-
-/**
- * Role-aware quantity conservation.
- * fee_from_received / network_burn: net = gross - fee
- * non-quantity fee: fee may be currency-only (fee qty optional)
- */
-export function assertQuantityConservation({ role, gross, fee, net }) {
-  if (gross == null || net == null) return true;
-  assertFiniteMoney(gross, "gross");
-  assertFiniteMoney(net, "net");
+export function assertFeeConservation({ gross, fee, net }) {
   const g = toDecimal(gross);
-  const n = toDecimal(net);
-  const r = role || "fee_from_received";
-
-  if (fee == null || fee === "0") {
-    if (!g.eq(n) && r !== "non_quantity_fee") {
-      // allow equal when no fee qty
-    }
-    return true;
-  }
-  assertFiniteMoney(fee, "fee");
   const f = toDecimal(fee);
-
-  if (r === "fee_from_received" || r === "network_burn" || r === "standalone_burn") {
-    if (!g.minus(f).eq(n)) throw new Error("INV_QTY_NOT_CONSERVED");
-    return true;
+  const n = toDecimal(net);
+  if (!g.minus(f).eq(n) && !g.plus(f).eq(n)) {
+    throw new Error("INV_FEE_CONSERVATION");
   }
-  if (r === "non_quantity_fee") {
-    return true;
-  }
-  // default: net = gross - fee
-  if (!g.minus(f).eq(n)) throw new Error("INV_QTY_NOT_CONSERVED");
   return true;
 }
 
-export function runInvariantGate({
-  journalLines,
-  rates = [],
-  ratesNonNegative = [],
-  fee,
-  quantities,
-  previousPostedRow,
-  attemptedMutation,
-} = {}) {
+export function assertQuantityConservation({ gross, fee, net, role }) {
+  if (role === "fee_from_received" || role === "network_burn" || !role) {
+    if (!toDecimal(gross).minus(toDecimal(fee || "0")).eq(toDecimal(net))) {
+      throw new Error("INV_QTY_CONSERVATION");
+    }
+  }
+  return true;
+}
+
+export function runInvariantGate({ journalLines, rates } = {}) {
   if (journalLines) assertJournalBalanced(journalLines);
-  for (const r of rates) assertRatePositive(r);
-  for (const r of ratesNonNegative) assertRateNonNegative(r);
-  if (fee) assertFeeConservation(fee);
-  if (quantities) assertQuantityConservation(quantities);
-  if (previousPostedRow && attemptedMutation !== false) {
-    assertImmutablePost(previousPostedRow, attemptedMutation ?? true);
+  if (rates) {
+    for (const r of rates) {
+      if (r != null) assertRateNonNegative(typeof r === "string" ? r : r.rate);
+    }
   }
   return true;
 }

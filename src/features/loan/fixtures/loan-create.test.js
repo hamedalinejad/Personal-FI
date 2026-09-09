@@ -12,7 +12,7 @@ test("loan create posts journal", async () => {
     {
       payload: {
         principal: "1000",
-        annualRate: "0.12",
+        annualRate: "12",
         periods: "12",
         method: "declining_balance",
         startDate: "2026-01-01",

@@ -182,12 +182,17 @@ function persistOperationSqlite(record, dir) {
 
     const insLine = db.prepare(
       `INSERT INTO fin_journal_lines (
-        id, entry_id, account_id, side, amount, currency, line_number
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        id, entry_id, account_id, side, amount, currency, line_number,
+        amount_in_base, exchange_rate_to_base, conversion_path, line_kind, memo, reference
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     journalLines.forEach((line, i) => {
       const ln = line.line_number ?? i + 1;
       if (!Number.isInteger(ln) || ln < 1) throw new Error("JOURNAL_LINE_NUMBER_INVALID");
+      const amountInBase = line.amountInBase ?? line.amount_in_base ?? null;
+      const fx = line.exchangeRateToBase ?? line.exchange_rate_to_base ?? null;
+      const path = line.conversionPath ?? line.conversion_path ?? null;
+      const kind = line.lineKind ?? line.line_kind ?? null;
       insLine.run(
         randomUUID(),
         entryId,
@@ -196,6 +201,12 @@ function persistOperationSqlite(record, dir) {
         line.amount,
         line.currency,
         ln,
+        amountInBase,
+        fx,
+        path,
+        kind,
+        line.memo ?? null,
+        line.reference ?? null,
       );
     });
 
@@ -246,7 +257,7 @@ function loadOperationSync(db, operationId, replay = false) {
     // Journal SoT from relational tables
     const lines = db
       .prepare(
-        `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number
+        `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number, jl.amount_in_base as amountInBase, jl.exchange_rate_to_base as exchangeRateToBase, jl.conversion_path as conversionPath, jl.line_kind as lineKind
          FROM fin_journal_lines jl
          JOIN fin_journal_entries je ON je.id = jl.entry_id
          WHERE je.operation_id = ?
@@ -270,7 +281,7 @@ function loadOperationSync(db, operationId, replay = false) {
 
   const lines = db
     .prepare(
-      `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number
+      `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number, jl.amount_in_base as amountInBase, jl.exchange_rate_to_base as exchangeRateToBase, jl.conversion_path as conversionPath, jl.line_kind as lineKind
        FROM fin_journal_lines jl
        JOIN fin_journal_entries je ON je.id = jl.entry_id
        WHERE je.operation_id = ?

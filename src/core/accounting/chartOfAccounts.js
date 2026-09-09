@@ -7,6 +7,10 @@ export function ensureAccount(db, { id, name, accountKind, currency, systemRole 
   if (!["asset", "liability", "equity", "income", "expense"].includes(accountKind)) {
     throw new Error("ACCOUNT_INVALID");
   }
+  const existing = db.prepare(`SELECT id, currency FROM fin_accounts WHERE id = ?`).get(id);
+  if (existing && existing.currency !== currency) {
+    throw new Error(`ACCOUNT_CURRENCY_CONFLICT:${id}:${existing.currency}!=${currency}`);
+  }
   const now = new Date().toISOString();
   db.prepare(
     `INSERT OR IGNORE INTO fin_accounts (

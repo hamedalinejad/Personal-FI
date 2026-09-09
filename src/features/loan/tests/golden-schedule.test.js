@@ -24,7 +24,7 @@ test("GOLDEN declining equal-principal 12% annual period_based", () => {
   // engineVersions: 1.0.0-period_based-equal-principal
   const s = buildSchedule("declining_balance", {
     principal: "1200",
-    annualRate: "0.12",
+    annualRate: "12",
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
@@ -41,7 +41,7 @@ test("GOLDEN declining equal-principal 12% annual period_based", () => {
 test("GOLDEN flat residual zero", () => {
   const s = buildSchedule("flat_rate", {
     principal: "1200",
-    annualRate: "0.12",
+    annualRate: "12",
     periods: "12",
     startDate: "2026-01-01",
   });
@@ -51,7 +51,7 @@ test("GOLDEN flat residual zero", () => {
 test("GOLDEN bullet residual zero", () => {
   const s = buildSchedule("bullet", {
     principal: "1000",
-    annualRate: "0.12",
+    annualRate: "12",
     periods: "4",
     startDate: "2026-01-01",
   });

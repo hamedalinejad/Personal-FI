@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { runInvariantGate } from "../invariants/index.js";
+import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
 import { persistOperation, loadOperation } from "../../persistence/worker.js";
 
 export function stableStringify(value) {
@@ -42,7 +43,12 @@ export function normalizeCommand(command) {
     return {
       accountId: line.accountId || line.account_id,
       side: line.side,
-      amount: line.amount,
+      amount: canonicalDecimalString(line.amount),
+      amountInBase: line.amountInBase != null ? canonicalDecimalString(line.amountInBase) : line.amount_in_base != null ? canonicalDecimalString(line.amount_in_base) : undefined,
+      exchangeRateToBase: line.exchangeRateToBase ?? line.exchange_rate_to_base,
+      conversionPath: line.conversionPath ?? line.conversion_path,
+      lineKind: line.lineKind ?? line.line_kind,
+      reference: line.reference,
       currency: line.currency,
       line_number: line.line_number ?? i + 1,
       memo: line.memo,

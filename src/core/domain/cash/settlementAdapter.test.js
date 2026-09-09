@@ -8,6 +8,7 @@ test("BUG-007 settle journal only", () => {
     finAccountId: "cash1",
     counterAccountId: "expense1",
     amount: "50",
+    currency: "IRR",
     operationId: "op1",
   });
   assert.equal(r.journalLines.length, 2);

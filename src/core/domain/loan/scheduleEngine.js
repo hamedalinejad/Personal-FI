@@ -30,8 +30,18 @@ function money2str(d) {
  * explicitly rejected until DayCountEngine lands (not silent approximation).
  */
 /** Only for dayCount=period_based — frequency mapping lives in engine, not features. */
-export function periodRateFromAnnual(annualRate, frequency = "monthly") {
-  const a = assertNonNegative(annualRate);
+
+/**
+ * API annual rate = percentage points (18 = 18%).
+ * Internal arithmetic uses fractional rate (0.18).
+ */
+export function normalizeRatePercentage(annualRatePercentagePoints) {
+  const p = assertNonNegative(annualRatePercentagePoints);
+  return p.div(100);
+}
+
+export function periodRateFromAnnual(annualRatePercentagePoints, frequency = "monthly") {
+  const a = normalizeRatePercentage(annualRatePercentagePoints);
   switch (frequency) {
     case "monthly":
       return a.div(12);

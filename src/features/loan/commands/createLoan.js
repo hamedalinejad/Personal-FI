@@ -51,11 +51,11 @@ export async function createLoan(
     finAccountId: cashAccountId,
     counterAccountId: receivableAccountId,
     amount: p.principal,
+    currency,
     side: "credit",
     operationId,
     memo: "loan_disbursement",
   });
-  for (const line of settlement.journalLines) line.currency = currency;
 
   const snapshotId = randomUUID();
   const now = new Date().toISOString();
