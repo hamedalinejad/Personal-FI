@@ -1,25 +1,25 @@
 # Open Issues Register — LIVE
 
-## Do next (ordered)
+## Resolved this pass
 
-1. Loan single-txn domain+journal  
-2. Payment residual schedule + ln_transactions  
-3. reversePayment  
-4. Loan golden recovery suite  
-5. Then only: Crypto package (pattern copy)
+- Loan create: journal + ln_loans + schedule in **one** SQLite transaction (`withinTransaction`)
+- Loan payment: writes `ln_transactions` in same transaction
+- Formula lock: declining_balance v1 = equal-principal
+- ln_loans columns: operation_id, total_installments, day_count, schedule_engine_version
+- Idempotency: SQLite primary; idempotency.json only for json test mode
+- Persistence port surface: `src/core/persistence/port.js`
 
-## Closed foundation
+## Still open
 
-- schema bootstrap from schema.sql  
-- no invented accounts on persist  
-- explicit businessDate/baseCurrency  
-- journal relational SoT + result_json replay  
-- decimal string boundary  
-- Loan scaffold + golden schedule vectors  
-- CODING-GATE / EXECUTION-HANDOFF  
+| ID | Item |
+|----|------|
+| FX-full | Multi-hop historical resolver + source priority |
+| Price-full | price_history policy persistence complete |
+| Manifest-CHECK | Full CHECK/predicate semantic equality |
+| PWA-SQLite | WASM+IDB adapter behind same port |
+| Loan-annuity | Separate engine version if product switches |
+| CI-public | Confirm GitHub Actions green on public npm |
 
-## Status vocabulary
+## Production
 
-SPECIFIED · PARTIAL · RELEASE-PROVEN · NO-GO  
-
-Production: **NO-GO**
+**NO-GO**

@@ -2,7 +2,7 @@
   "name": "personal-fi",
   "private": true,
   "type": "module",
-  "description": "Personal-FI \u2014 Core engines bootstrap (docs + src skeleton)",
+  "description": "Personal-FI — Core engines bootstrap (docs + src skeleton)",
   "scripts": {
     "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/features/**/*.test.js src/features/**/tests/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
@@ -19,6 +19,6 @@
     "schema:manifest:check": "node scripts/schema-manifest-check.js"
   },
   "dependencies": {
-    "decimal.js": "^10.4.3"
+    "decimal.js": "^10.6.0"
   }
 }

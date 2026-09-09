@@ -1,3 +1,8 @@
+/**
+ * Loan schedule v1: declining_balance = EQUAL PRINCIPAL (not annuity/fixed-PMT).
+ * engineVersion: 1.0.0-period_based-equal-principal
+ * Annuity requires a new versioned engine — never silent change.
+ */
 import { toDecimal } from "../../money/canonicalDecimal.js";
 import { assertPositive, assertNonNegative } from "../../money/decimalMath.js";
 

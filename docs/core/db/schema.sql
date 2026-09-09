@@ -252,16 +252,20 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
 CREATE TABLE IF NOT EXISTS ln_loans (
   id                 TEXT PRIMARY KEY,
   party_id           TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  role               TEXT NOT NULL, -- borrowed|lent
-  calculation_method TEXT NOT NULL, -- declining_balance|flat_rate|qarz_al_hasaneh|bullet|…
+  role               TEXT NOT NULL,
+  calculation_method TEXT NOT NULL,
   principal          TEXT NOT NULL,
   currency           TEXT NOT NULL,
   interest_rate      TEXT,
-  status TEXT NOT NULL CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')), -- draft = created, schedule not yet accepted/activated,
-  created_at         TEXT NOT NULL
-,
+  status TEXT NOT NULL CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')),
+  created_at         TEXT NOT NULL,
   start_date TEXT,
-  maturity_date TEXT
+  maturity_date TEXT,
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  total_installments INTEGER,
+  day_count TEXT DEFAULT 'period_based',
+  schedule_engine_version TEXT,
+  notes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS ln_schedule_snapshots (

@@ -1,3 +1,9 @@
+## Formula lock (v1)
+
+`declining_balance` = **equal-principal**, not annuity/fixed-PMT.
+`engineVersions.loanSchedule = 1.0.0-period_based-equal-principal`
+Changing to annuity requires a new version + new golden vectors.
+
 # Implementation-Ready Spec — Loan-only Vertical Slice #1
 
 **Status:** SPECIFIED for coding  

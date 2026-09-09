@@ -205,6 +205,10 @@ function persistOperationSqlite(record, dir) {
       );
     });
 
+    if (typeof record.withinTransaction === "function") {
+      record.withinTransaction(db, { operationId: id, businessDate, baseCurrency });
+    }
+
     db.prepare(
       `UPDATE fin_operations SET durability_state = 'sql_committed' WHERE id = ?`,
     ).run(id);

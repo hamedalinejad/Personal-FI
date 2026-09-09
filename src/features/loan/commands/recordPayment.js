@@ -7,9 +7,6 @@ import { allocatePayment, allocationJournalLines } from "../domain/paymentAlloca
 import { latestSchedule } from "../ledger/scheduleRepository.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
-/**
- * loan.recordPayment — waterfall penalty→fee→interest→principal
- */
 export async function recordPayment(
   input,
   {
@@ -41,7 +38,6 @@ export async function recordPayment(
   };
   if (schedule?.snapshot_json) {
     const rows = JSON.parse(schedule.snapshot_json);
-    // sum remaining principal from unpaid rows (v1: all open)
     let prin = toDecimal("0");
     let interest = toDecimal("0");
     for (const row of rows) {
@@ -67,6 +63,9 @@ export async function recordPayment(
     penaltyIncomeId,
   });
 
+  const txId = randomUUID();
+  const now = new Date().toISOString();
+
   return runAtomicFinancialOperation({
     operationId,
     type: "loan.recordPayment",
@@ -75,7 +74,23 @@ export async function recordPayment(
     baseCurrency: currency,
     payload: p,
     journalLines,
-    domainResult: { loanId: p.loanId, allocation },
+    domainResult: { loanId: p.loanId, allocation, lnTransactionId: txId },
     engineVersions: { loanSchedule: "1.0.0-period_based-equal-principal", money: "1.0.0" },
+    withinTransaction(db) {
+      db.prepare(
+        `INSERT INTO ln_transactions (
+          id, loan_id, operation_id, tx_type, business_date, amount, currency, created_at, payment_date
+        ) VALUES (?, ?, ?, 'payment', ?, ?, ?, ?, ?)`,
+      ).run(
+        txId,
+        p.loanId,
+        operationId,
+        p.businessDate,
+        allocation.total,
+        currency,
+        now,
+        p.paymentDate || p.businessDate,
+      );
+    },
   });
 }

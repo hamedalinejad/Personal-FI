@@ -106,11 +106,14 @@ export async function runAtomicFinancialOperation(command) {
       // missing → continue
     }
 
-    const idMap = await loadIdempotency(dataDir);
-    const prev = idMap[command.operationId];
-    if (prev) {
-      if (prev.commandHash !== commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
-      return { ...prev.result, idempotentReplay: true };
+    // SQLite path: identity is fin_operations PK — no parallel idempotency.json required
+    if (mode === "json") {
+      const idMap = await loadIdempotency(dataDir);
+      const prev = idMap[command.operationId];
+      if (prev) {
+        if (prev.commandHash !== commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
+        return { ...prev.result, idempotentReplay: true };
+      }
     }
 
     const journalLines = command.journalLines || [];
@@ -146,6 +149,7 @@ export async function runAtomicFinancialOperation(command) {
       domainResult,
       engineVersions: command.engineVersions || null,
       source: command.source || "api",
+      withinTransaction: command.withinTransaction,
     };
 
     const persisted = await persistOperation(record, { dataDir, mode });
@@ -162,8 +166,11 @@ export async function runAtomicFinancialOperation(command) {
       idempotentReplay: !!persisted.idempotentReplay,
     };
 
-    idMap[command.operationId] = { commandHash, result };
-    await saveIdempotency(dataDir, idMap);
+    if (mode === "json") {
+      const idMap = await loadIdempotency(dataDir);
+      idMap[command.operationId] = { commandHash, result };
+      await saveIdempotency(dataDir, idMap);
+    }
     return result;
   });
 }

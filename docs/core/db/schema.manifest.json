@@ -1,5 +1,5 @@
 {
-  "schemaHash": "06f9174e193b785a6c73480bdc3e1b4ab082bd027a2e0ffd5a159ba64267759d",
+  "schemaHash": "f22ff6ebda50d9a3a5a5397cd82c4c83b9382a593072c4e2e9c624379dc32657",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -5365,9 +5365,51 @@
           "notnull": false,
           "dflt": null,
           "pk": 0
+        },
+        {
+          "name": "operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_installments",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "day_count",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": "'period_based'",
+          "pk": 0
+        },
+        {
+          "name": "schedule_engine_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
         }
       ],
       "foreignKeys": [
+        {
+          "table": "fin_operations",
+          "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
         {
           "table": "ref_parties",
           "from": "party_id",
