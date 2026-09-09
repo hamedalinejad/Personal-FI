@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-09-09T18:48:55.423Z",
+  "core": true,
+  "features": [
+    {
+      "id": "loan",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": true
+    }
+  ],
+  "scripts": {
+    "test": "npm test",
+    "drift": "node scripts/schema-drift-test.js",
+    "inventory": "node scripts/field-inventory-verify.js",
+    "depGraph": "node scripts/dependency-graph-check.js",
+    "docs": "node scripts/docs-validator.js"
+  }
+}

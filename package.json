@@ -10,7 +10,12 @@
     "schema:smoke": "node scripts/schema-drift-smoke.js",
     "schema:drift": "node scripts/schema-drift-test.js",
     "schema:inventory": "node scripts/field-inventory-verify.js",
-    "schema:manifest": "node scripts/schema-manifest.js"
+    "schema:manifest": "node scripts/schema-manifest.js",
+    "dep:graph": "node scripts/dependency-graph-check.js",
+    "docs:validate": "node scripts/docs-validator.js",
+    "registry:index": "node scripts/registry-index.js",
+    "bench:smoke": "node scripts/bench-smoke.js",
+    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run lint && npm run schema:drift && npm run schema:inventory && npm run registry:index && npm run bench:smoke"
   },
   "dependencies": {
     "decimal.js": "^10.4.3"
