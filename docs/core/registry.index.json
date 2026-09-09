@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-09-09T22:20:00.832Z",
+  "generatedAt": "2026-09-09T23:02:17.205Z",
   "core": true,
   "features": [
     {
       "id": "crypto",
       "publicApi": true,
       "commands": true,
-      "fixtures": true
+      "fixtures": false
     },
     {
       "id": "funds",
       "publicApi": true,
       "commands": true,
-      "fixtures": true
+      "fixtures": false
     },
     {
       "id": "loan",
@@ -24,13 +24,13 @@
       "id": "metals",
       "publicApi": true,
       "commands": true,
-      "fixtures": true
+      "fixtures": false
     },
     {
       "id": "stocks",
       "publicApi": true,
       "commands": true,
-      "fixtures": true
+      "fixtures": false
     }
   ],
   "scripts": {

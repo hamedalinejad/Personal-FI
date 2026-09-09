@@ -1,15 +1,13 @@
-/**
- * metals public API — scaffold.
- * Implement commands per docs/core/IMPLEMENTATION-READY-FEATURES.md
- * Pattern: src/features/loan/**
- */
+import { buyMetal } from "../commands/buy.js";
+
 export function capabilities() {
   return {
     edition: "metals-only",
-    status: "SPECIFIED",
-    implements: [],
+    status: "PARTIAL",
+    implements: ["metals.buy"],
   };
 }
 
-export const commands = {};
+export const commands = { buy: buyMetal };
+export { buyMetal };
 export const queries = {};

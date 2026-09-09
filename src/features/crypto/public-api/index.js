@@ -1,15 +1,16 @@
-/**
- * crypto public API — scaffold.
- * Implement commands per docs/core/IMPLEMENTATION-READY-FEATURES.md
- * Pattern: src/features/loan/**
- */
+import { buyCrypto } from "../commands/buy.js";
+
 export function capabilities() {
   return {
     edition: "crypto-only",
-    status: "SPECIFIED",
-    implements: [],
+    status: "PARTIAL",
+    implements: ["crypto.buy"],
   };
 }
 
-export const commands = {};
+export const commands = {
+  buy: buyCrypto,
+};
+
+export { buyCrypto };
 export const queries = {};

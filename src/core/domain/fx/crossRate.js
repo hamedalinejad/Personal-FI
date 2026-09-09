@@ -4,17 +4,14 @@ import { toDecimal } from "../../money/canonicalDecimal.js";
 import { assertPositive } from "../../money/decimalMath.js";
 
 /**
- * FX conversion with provenance. Missing rate → throw (never silent zero).
- * rates: { "EUR/USD": { rate: "1.1", asOf: "2026-01-01", source: "manual" } }
- *   or legacy string map "EUR/USD": "1.1"
+ * FX: string rates only, MISSING_RATE never 0.
+ * Multi-hop: BFS fewest hops, then lexical path.
  */
 function normalizeRate(entry) {
   if (entry == null) return null;
-  if (typeof entry === "number") {
-    throw new Error("FX_RATE_NOT_STRING");
-  }
+  if (typeof entry === "number") throw new Error("FX_RATE_NOT_STRING");
   if (typeof entry === "string") {
-    return { rate: entry, asOf: null, source: "map" };
+    return { rate: entry, asOf: null, source: "map", isStale: false };
   }
   if (typeof entry.rate !== "string") throw new Error("FX_RATE_NOT_STRING");
   return {
@@ -25,64 +22,88 @@ function normalizeRate(entry) {
   };
 }
 
-function lookup(rates, pair) {
-  if (rates[pair] != null) return normalizeRate(rates[pair]);
-  // inverse
-  const [a, b] = pair.split("/");
-  const inv = rates[`${b}/${a}`];
-  if (inv != null) {
-    const n = normalizeRate(inv);
-    return {
+function buildGraph(rates) {
+  const edges = new Map(); // from -> [{to, rate, asOf, source, inverted}]
+  function add(from, to, meta) {
+    if (!edges.has(from)) edges.set(from, []);
+    edges.get(from).push({ to, ...meta });
+  }
+  for (const [pair, raw] of Object.entries(rates)) {
+    const n = normalizeRate(raw);
+    if (!n) continue;
+    const [a, b] = pair.split("/");
+    if (!a || !b) continue;
+    add(a, b, { rate: n.rate, asOf: n.asOf, source: n.source, inverted: false });
+    add(b, a, {
       rate: toDecimal("1").div(toDecimal(n.rate)).toFixed(),
       asOf: n.asOf,
       source: n.source,
-      isStale: n.isStale,
       inverted: true,
-    };
+    });
+  }
+  // stable order
+  for (const [, list] of edges) list.sort((x, y) => x.to.localeCompare(y.to));
+  return edges;
+}
+
+function findPath(edges, from, to) {
+  if (from === to) return { path: [from], hops: [] };
+  const queue = [{ node: from, path: [from], hops: [] }];
+  const seen = new Set([from]);
+  while (queue.length) {
+    const cur = queue.shift();
+    const outs = edges.get(cur.node) || [];
+    for (const e of outs) {
+      if (seen.has(e.to)) continue;
+      const path = [...cur.path, e.to];
+      const hops = [
+        ...cur.hops,
+        { from: cur.node, to: e.to, rate: e.rate, asOf: e.asOf, inverted: e.inverted },
+      ];
+      if (e.to === to) return { path, hops };
+      seen.add(e.to);
+      queue.push({ node: e.to, path, hops });
+    }
   }
   return null;
 }
 
-export function convertAmount({ amount, from, to, rates, pivot = "USD", asOf }) {
+export function convertAmount({ amount, from, to, rates, asOf }) {
   assertPositive(amount);
+  if (typeof amount !== "string") throw new Error("FX_AMOUNT_NOT_STRING");
   if (from === to) {
     return {
       amount: toDecimal(amount).toFixed(),
       path: [from],
+      conversionPath: [],
       asOf: asOf || null,
       contextHash: hashContext({ amount, from, to, path: [from], asOf }),
     };
   }
-
-  const hops = [];
-  const direct = lookup(rates, `${from}/${to}`);
-  if (direct) {
-    const out = toDecimal(amount).times(toDecimal(direct.rate));
-    hops.push({ from, to, rate: direct.rate, asOf: direct.asOf || asOf, inverted: !!direct.inverted });
-    return finish(out, [from, to], hops, asOf, amount, from, to);
+  const edges = buildGraph(rates);
+  const found = findPath(edges, from, to);
+  if (!found) throw new Error("MISSING_RATE");
+  let out = toDecimal(amount);
+  for (const h of found.hops) {
+    if (asOf && h.asOf && h.asOf > asOf) {
+      // observation after asOf not allowed for historical
+      throw new Error("MISSING_RATE");
+    }
+    out = out.times(toDecimal(h.rate));
   }
-
-  const a = lookup(rates, `${from}/${pivot}`);
-  const b = lookup(rates, `${pivot}/${to}`);
-  if (a && b) {
-    const out = toDecimal(amount).times(toDecimal(a.rate)).times(toDecimal(b.rate));
-    hops.push(
-      { from, to: pivot, rate: a.rate, asOf: a.asOf || asOf, inverted: !!a.inverted },
-      { from: pivot, to, rate: b.rate, asOf: b.asOf || asOf, inverted: !!b.inverted },
-    );
-    return finish(out, [from, pivot, to], hops, asOf, amount, from, to);
-  }
-
-  throw new Error("FX_PATH_MISSING");
-}
-
-function finish(out, path, hops, asOf, amount, from, to) {
   return {
     amount: out.toFixed(),
-    path,
-    conversionPath: hops,
+    path: found.path,
+    conversionPath: found.hops,
     asOf: asOf || null,
-    contextHash: hashContext({ amount, from, to, path, hops, asOf }),
+    contextHash: hashContext({
+      amount,
+      from,
+      to,
+      path: found.path,
+      hops: found.hops,
+      asOf,
+    }),
   };
 }
 

@@ -13,26 +13,6 @@ jobs:
           node-version: "22"
           cache: npm
       - name: Install
-        run: npm install
-      - name: Unit tests
-        run: npm test
-      - name: Dependency graph
-        run: node scripts/dependency-graph-check.js
-      - name: Docs validator
-        run: node scripts/docs-validator.js
-      - name: Lint boundaries
-        run: npm run lint
-      - name: Schema presence
-        run: |
-          test -f docs/core/db/schema.sql
-          test -f docs/core/ARCHITECTURE-LOCKED.md
-          test -f docs/core/GO-NO-GO.md
-          test -d src
-      - name: Schema drift
-        run: node scripts/schema-drift-test.js
-      - name: Field inventory
-        run: node scripts/field-inventory-verify.js
-      - name: Registry index
-        run: node scripts/registry-index.js
-      - name: Bench smoke
-        run: node scripts/bench-smoke.js
+        run: npm ci
+      - name: Full gates
+        run: npm run gates

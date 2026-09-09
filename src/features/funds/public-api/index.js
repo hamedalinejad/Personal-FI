@@ -1,15 +1,13 @@
-/**
- * funds public API — scaffold.
- * Implement commands per docs/core/IMPLEMENTATION-READY-FEATURES.md
- * Pattern: src/features/loan/**
- */
+import { subscribeFund } from "../commands/subscribe.js";
+
 export function capabilities() {
   return {
-    edition: "funds-only",
-    status: "SPECIFIED",
-    implements: [],
+    edition: "fund-only",
+    status: "PARTIAL",
+    implements: ["fund.subscribe"],
   };
 }
 
-export const commands = {};
+export const commands = { subscribe: subscribeFund };
+export { subscribeFund };
 export const queries = {};
