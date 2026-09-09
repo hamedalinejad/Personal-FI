@@ -30,3 +30,5 @@
 ## Production
 
 Always **NO-GO** until GO-NO-GO gates all green with evidence.
+
+| Durability vs business status | RESOLVED — `PERSISTENCE-DURABILITY.md`; dual-write db_meta |

@@ -1,3 +1,5 @@
+> **FINAL:** Any historical section below that ranks P0-FINAL/*-LOCKS above concept homes is **obsolete**. Live hierarchy: `DOC-AUTHORITY-CHAIN.md` only.
+
 > **RESOLVED hierarchy:** see `DOC-AUTHORITY-CHAIN.md`. Older B-005 ranking of P0-FINAL/LOCKS is obsolete.
 
 # Documentation Consolidation Policy

@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   operation_type    TEXT NOT NULL,
   status            TEXT NOT NULL CHECK (status IN ('draft', 'posted', 'voided', 'failed')),
   -- reversal is relationship via reverses_operation_id / corrects_operation_id, not a status value (P0-SCHEMA-001)
+  -- LEGACY compatibility: prefer db_meta keys durability.* — do not treat as business status
   durability_state  TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')),
   -- transport-only states (temp_written/swapped) live in persistence layer, not public schema (P0-SCHEMA-002)
   business_date     TEXT NOT NULL, -- DATE-only

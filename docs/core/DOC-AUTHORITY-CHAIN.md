@@ -37,3 +37,5 @@
 | Domain contracts | DOMAIN-CONTRACTS-31-44.md |
 
 P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority.
+
+| Persistence durability vs status | PERSISTENCE-DURABILITY.md |

@@ -206,6 +206,13 @@ function persistOperationSqlite(record, dir) {
     db.prepare(
       `UPDATE fin_operations SET durability_state = 'sql_committed' WHERE id = ?`,
     ).run(id);
+    // Prefer db_meta for persistence durability (business status stays on fin_operations.status)
+    db.prepare(
+      `INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, ?)`,
+    ).run(`durability.operation.${id}`, "sql_committed");
+    db.prepare(
+      `INSERT OR REPLACE INTO db_meta(key, value) VALUES ('durability.last', ?)`,
+    ).run("sql_committed");
     db.exec("COMMIT");
 
     return { ...resultSnapshot, durability_state: "sql_committed", idempotentReplay: false };

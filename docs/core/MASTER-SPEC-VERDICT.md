@@ -24,3 +24,7 @@
 ## Implementer path
 
 `READY-FOR-CODING.md` → `CODING-GATE` → `LOAN-SLICE` → `LOAN-V1-RESOLUTIONS` → `LOAN-V1-SCHEMA-DISPOSITION`
+
+## Durability
+
+`PERSISTENCE-DURABILITY.md` — business status ≠ transport durability.
