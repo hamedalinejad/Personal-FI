@@ -34,3 +34,9 @@ Always **NO-GO** until GO-NO-GO gates all green with evidence.
 | Durability vs business status | RESOLVED — `PERSISTENCE-DURABILITY.md`; dual-write db_meta |
 
 | Domain contracts 26–39 | FINAL in DOMAIN-CONTRACTS-31-44.md |
+
+## 2026-09-10 — B-028 PWA sql.js adapter
+
+**Status:** Deferred (not a code defect of the Node path).
+
+Persistence **port** is the contract. Browser adapter (`sql.js` + IndexedDB) remains **not release-proven**. Track as implementation work after Loan RELEASE-PROVEN; not required for Node scaffold gates.

@@ -16,15 +16,25 @@ export async function buyMetal(input, { dataDir } = {}) {
   const operationId = input.operationId;
   const p = input.payload || input;
 
-  for (const k of ["instrumentId", "platformId", "grossWeight", "currency", "businessDate"]) {
+  for (const k of ["instrumentId", "platformId", "currency", "businessDate"]) {
     if (p[k] == null || p[k] === "") throw new Error(`VALIDATION_ERROR:${k}`);
+  }
+  // B-020: canonical mass is quantityMg; grossWeight retained as UI alias (mg)
+  const quantityMgRaw = p.quantityMg ?? p.grossWeight;
+  if (quantityMgRaw == null || quantityMgRaw === "") throw new Error("VALIDATION_ERROR:quantityMg");
+  if (p.inputMassUnit === "g" || p.inputMassUnit === "gram") {
+    // UI grams → mg
+    // quantityMg = grams * 1000 (handled below after parse)
   }
   const unitPrice = p.metalPricePerMg ?? p.metalPrice;
   if (unitPrice == null || unitPrice === "") throw new Error("VALIDATION_ERROR:metalPricePerMg");
 
-  const grossMg = toDecimal(p.grossWeight);
+  let grossMg = toDecimal(quantityMgRaw);
+  if (p.inputMassUnit === "g" || p.inputMassUnit === "gram") {
+    grossMg = grossMg.times("1000");
+  }
   const purity = toDecimal(p.purityRatio || "1");
-  const fine = grossMg.times(purity);
+  const fine = grossMg.times(purity); // fineWeightMg
   const metalCost = fine.times(toDecimal(unitPrice));
   const premium = toDecimal(p.premiumAmount ?? p.premium ?? "0");
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
@@ -90,7 +100,13 @@ export async function buyMetal(input, { dataDir } = {}) {
     baseCurrency: currency,
     payload: {
       ...p,
+      quantityMg: grossMg.toFixed(),
+      fineWeightMg: fine.toFixed(),
+      originalMassInput: quantityMgRaw,
+      inputMassUnit: p.inputMassUnit || "mg",
       fineWeight: fine.toFixed(),
+      fineWeightMg: fine.toFixed(),
+      quantityMg: grossMg.toFixed(),
       metalCost: metalCost.toFixed(),
       premium: premium.toFixed(),
       fee: fee.toFixed(),
@@ -104,6 +120,8 @@ export async function buyMetal(input, { dataDir } = {}) {
       holdingId,
       transactionId: txId,
       fineWeight: fine.toFixed(),
+      fineWeightMg: fine.toFixed(),
+      quantityMg: grossMg.toFixed(),
       metalCost: metalCost.toFixed(),
       premium: premium.toFixed(),
       fee: fee.toFixed(),
@@ -147,7 +165,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         holdingId,
         p.platformId,
         p.instrumentId,
-        p.grossWeight,
+        grossMg.toFixed(),
         p.purityCode || "unknown",
         p.purityRatio || "1",
         carrying.toFixed(),
@@ -168,7 +186,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         holdingId,
         p.instrumentId,
         p.businessDate,
-        p.grossWeight,
+        grossMg.toFixed(),
         String(unitPrice),
         premium.toFixed(),
         fee.toFixed(),

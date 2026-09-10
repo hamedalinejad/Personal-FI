@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyStock } from "../public-api/index.js";
-import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
+import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
 test("stocks.buy keeps tradeDate ≠ settlementDate", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-st-"));

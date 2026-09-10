@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyCrypto, capabilities } from "../public-api/index.js";
-import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
+import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
 test("crypto.buy fee_from_received posts journal + holding", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-crypto-"));

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyMetal } from "../public-api/index.js";
-import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
+import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
 test("metals.buy fineWeight and separate premium", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-mt-"));

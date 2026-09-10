@@ -12,7 +12,7 @@ import {
   getStatement,
   capabilities,
 } from "../public-api/index.js";
-import { closeAllDbs } from "../../../core/persistence/worker.js";
+import { closeAllDbs } from "../../../core/persistence/port.js";
 
 test("A9 Loan-only standalone without Accounts UI surface", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-sa-"));

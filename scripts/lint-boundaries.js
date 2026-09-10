@@ -46,5 +46,20 @@ for (const f of coreFiles) {
   }
 }
 
+
+for (const f of featureFiles) {
+  const text = readFileSync(f, "utf8");
+  const rel = f.slice(root.length + 1);
+  if (/\.test\.js$|\/tests\//.test(rel) || /\/fixtures\//.test(rel)) continue;
+  if (/core\/persistence\/worker/.test(text)) {
+    console.error("BOUNDARY forbidden feature→worker:", rel);
+    failed = true;
+  }
+  if (/from\s+[\"'].*core\/db\//.test(text)) {
+    console.error("BOUNDARY forbidden feature→core/db:", rel);
+    failed = true;
+  }
+}
+
 if (failed) process.exit(1);
 console.log("lint-boundaries: OK (features", featureFiles.length, "core", coreFiles.length, ")");

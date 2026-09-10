@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { createLoan, capabilities } from "../public-api/index.js";
-import { closeAllDbs } from "../../../core/persistence/worker.js";
+import { closeAllDbs } from "../../../core/persistence/port.js";
 
 test("loan create posts journal", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-loan-"));

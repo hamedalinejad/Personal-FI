@@ -1,3 +1,15 @@
+
+## Status vocabulary (B-031)
+
+| Term | Meaning |
+|------|---------|
+| **READY TO IMPLEMENT** | Spec/contracts are locked enough to code against |
+| **PARTIAL** | Some runtime commands exist; not feature-complete |
+| **IMPLEMENTED** | Public API surface complete for claimed edition |
+| **RELEASE-PROVEN** | Gates green (tests, fixtures, recovery, no-field-loss) |
+
+`READY TO IMPLEMENT ≠ IMPLEMENTED ≠ RELEASE-PROVEN`.
+
 **Gate:** Parallel production packages for Crypto/Stocks/Funds/Metals are forbidden until Loan is RELEASE-PROVEN. Scaffold-only work may exist under that constraint.
 
 # Implementation-Ready — All Feature Verticals

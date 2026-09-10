@@ -150,13 +150,10 @@ export async function runAtomicFinancialOperation(command) {
         };
       }
     } catch (e) {
+      // B-023: only OP_NOT_FOUND means "new operation". All other errors surface.
       if (e && e.message === "OP_IDEMPOTENCY_CONFLICT") throw e;
       if (e && e.message === "OP_NOT_FOUND") {
-        /* continue */
-      } else if (e && e.code === "ENOENT") {
-        /* json missing */
-      } else if (e && /no such file|ENOENT|OP_NOT_FOUND/i.test(String(e.message))) {
-        /* continue */
+        /* continue as new operation */
       } else {
         throw e;
       }
@@ -192,6 +189,18 @@ export async function runAtomicFinancialOperation(command) {
       domainResult,
       engineVersions: norm.engineVersions,
       source: norm.source,
+      payload: norm.payload ?? null,
+      normalizedRequest: {
+        type: norm.type,
+        businessDate: norm.businessDate,
+        baseCurrency: norm.baseCurrency,
+        payload: norm.payload ?? null,
+        journalLines: norm.journalLines,
+      },
+      rates: norm.rates ?? null,
+      settlementDate: norm.settlementDate ?? null,
+      eventAt: norm.eventAt ?? null,
+      provenance: norm.provenance ?? null,
       withinTransaction: norm.withinTransaction,
     };
 

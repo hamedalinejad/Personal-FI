@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { subscribeFund, capabilities } from "../public-api/index.js";
-import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
+import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
 test("fund.subscribe uses transactionPrice not NAV for cost", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-fund-"));

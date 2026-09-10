@@ -6,7 +6,6 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
-import { openDb } from "../../../core/persistence/port.js";
 
 /**
  * crypto.buy — all master mutations inside the financial transaction.

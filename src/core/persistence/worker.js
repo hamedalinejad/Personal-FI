@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { assertJournalBalanced } from "../domain/invariants/index.js";
 import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
+import { ensureSchemaSync } from "../db/migration.js";
 
 const DEFAULT_DIR = join(process.cwd(), ".pf-data");
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -42,25 +43,8 @@ export function openDb(dataDir) {
   const dbPath = join(dataDir, "personal-fi.sqlite");
   if (openDbs.has(dbPath)) return openDbs.get(dbPath);
   const db = new DatabaseSync(dbPath);
-  const meta = db
-    .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='fin_operations'")
-    .get();
-  if (!meta) {
-    db.exec(prepareSchema(resolveSchemaSql()));
-  }
-  try {
-    db.exec("DROP INDEX IF EXISTS uq_fin_operations_command_hash");
-    db.exec("DROP INDEX IF EXISTS uq_fin_op_command");
-  } catch {
-    /* ignore */
-  }
-  try {
-    db.exec(
-      "CREATE INDEX IF NOT EXISTS idx_fin_operations_command_hash ON fin_operations(command_hash)",
-    );
-  } catch {
-    /* ignore */
-  }
+  // B-026: single schema entry via migration manager (sync ensure)
+  ensureSchemaSync(db);
   openDbs.set(dbPath, db);
   return db;
 }
@@ -122,6 +106,14 @@ function persistOperationSqlite(record, dir) {
     domainResult: record.domainResult ?? null,
     journalLines,
     durability_state: "sql_committed",
+    // B-022: preserve request envelope for no-field-loss / replay (domain tables remain SoT for owned fields)
+    payload: record.payload ?? null,
+    normalizedRequest: record.normalizedRequest ?? null,
+    source: record.source ?? null,
+    rates: record.rates ?? null,
+    settlementDate: record.settlementDate ?? null,
+    eventAt: record.eventAt ?? null,
+    provenance: record.provenance ?? null,
   };
 
   try {
@@ -326,6 +318,10 @@ async function persistOperationJson(record, dir) {
     domainResult: record.domainResult ?? null,
     durability_state: "sql_committed",
     journalLines,
+    payload: record.payload ?? null,
+    normalizedRequest: record.normalizedRequest ?? null,
+    source: record.source ?? null,
+    rates: record.rates ?? null,
     _transportState: "swapped",
   };
   const tempPath = join(dir, `${id}.tmp.json`);

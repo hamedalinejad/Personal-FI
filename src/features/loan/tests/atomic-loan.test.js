@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { createLoan, recordPayment, getLoan } from "../public-api/index.js";
-import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
+import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
 function createInput(extra = {}) {
   return {
