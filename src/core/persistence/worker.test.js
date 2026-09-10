@@ -146,5 +146,5 @@ test("P0-007 json mode requires date/currency", async () => {
     },
     { dataDir, mode: "json" },
   );
-  assert.equal(r.durability_state, "sql_committed");
+  assert.equal(r.durability_state, "persisted");
 });

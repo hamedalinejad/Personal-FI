@@ -6,6 +6,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resolve.js";
 
 /**
  * funds.subscribe — holding identity = instrument_id + account_id (nullable standalone)
@@ -90,11 +91,14 @@ export async function subscribeFund(input, { dataDir } = {}) {
         displayName: "Fund investment",
       });
 
-      db.prepare(
-        `INSERT OR IGNORE INTO ref_instruments (
-          id, asset_class, symbol, name, created_at, updated_at, is_active
-        ) VALUES (?, 'fund', ?, ?, ?, ?, 1)`,
-      ).run(p.instrumentId, p.symbol || "FUND", p.name || p.symbol || "FUND", now, now);
+      if (!p.symbol) throw new Error("INSTRUMENT_SYMBOL_REQUIRED_ON_CREATE");
+      resolveOrCreateInstrument(db, {
+        instrumentId: p.instrumentId,
+        assetClass: "fund",
+        symbol: p.symbol,
+        name: p.name || p.symbol,
+        now,
+      });
 
       let holding;
       if (accountId) {

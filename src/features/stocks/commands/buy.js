@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
 
 /**
  * stocks.buy — persists inv_stocks_iran_transactions; fee treatment explicit.
@@ -141,22 +142,22 @@ export async function buyStock(input, { dataDir } = {}) {
         });
       }
 
-      db.prepare(
-        `INSERT OR IGNORE INTO inv_stocks_iran_brokerages (id, name, created_at) VALUES (?, ?, ?)`,
-      ).run(p.brokerageId, p.brokerageName || p.brokerageId, now);
-
-      db.prepare(
-        `INSERT OR IGNORE INTO ref_instruments (
-          id, asset_class, symbol, name, isin, created_at, updated_at, is_active
-        ) VALUES (?, 'stock', ?, ?, ?, ?, ?, 1)`,
-      ).run(
-        p.instrumentId,
-        p.symbol || "STOCK",
-        p.name || p.symbol || "STOCK",
-        p.isin || null,
+      resolveOrCreateNamedMaster(db, {
+        table: "inv_stocks_iran_brokerages",
+        id: p.brokerageId,
+        existingSelect: `SELECT * FROM inv_stocks_iran_brokerages WHERE id = ?`,
+        insertSql: `INSERT INTO inv_stocks_iran_brokerages (id, name, created_at) VALUES (?, ?, ?)`,
+        insertArgs: [p.brokerageId, p.brokerageName || p.brokerageId, now],
+      });
+      if (!p.symbol) throw new Error("INSTRUMENT_SYMBOL_REQUIRED_ON_CREATE");
+      resolveOrCreateInstrument(db, {
+        instrumentId: p.instrumentId,
+        assetClass: "stock",
+        symbol: p.symbol,
+        name: p.name || p.symbol,
+        isin: p.isin || null,
         now,
-        now,
-      );
+      });
 
       db.prepare(
         `INSERT OR IGNORE INTO inv_stocks_iran_instruments (

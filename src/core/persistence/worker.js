@@ -316,13 +316,13 @@ async function persistOperationJson(record, dir) {
     baseCurrency: record.baseCurrency,
     engineVersions: record.engineVersions || null,
     domainResult: record.domainResult ?? null,
-    durability_state: "sql_committed",
+    durability_state: "persisted",
     journalLines,
     payload: record.payload ?? null,
     normalizedRequest: record.normalizedRequest ?? null,
     source: record.source ?? null,
     rates: record.rates ?? null,
-    _transportState: "swapped",
+    _transportState: "file_swapped",
   };
   const tempPath = join(dir, `${id}.tmp.json`);
   const finalPath = join(dir, `${id}.json`);

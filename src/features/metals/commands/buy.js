@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
 
 /**
  * metals.buy — persists inv_metals_transactions; metal / premium / fee separated.
@@ -146,15 +147,21 @@ export async function buyMetal(input, { dataDir } = {}) {
         });
       }
 
-      db.prepare(
-        `INSERT OR IGNORE INTO inv_metals_platforms (id, name, created_at) VALUES (?, ?, ?)`,
-      ).run(p.platformId, p.platformName || p.platformId, now);
-
-      db.prepare(
-        `INSERT OR IGNORE INTO ref_instruments (
-          id, asset_class, symbol, name, created_at, updated_at, is_active
-        ) VALUES (?, 'metal', ?, ?, ?, ?, 1)`,
-      ).run(p.instrumentId, p.symbol || "GOLD", p.name || p.symbol || "GOLD", now, now);
+      resolveOrCreateNamedMaster(db, {
+        table: "inv_metals_platforms",
+        id: p.platformId,
+        existingSelect: `SELECT * FROM inv_metals_platforms WHERE id = ?`,
+        insertSql: `INSERT INTO inv_metals_platforms (id, name, created_at) VALUES (?, ?, ?)`,
+        insertArgs: [p.platformId, p.platformName || p.platformId, now],
+      });
+      if (!p.symbol) throw new Error("INSTRUMENT_SYMBOL_REQUIRED_ON_CREATE");
+      resolveOrCreateInstrument(db, {
+        instrumentId: p.instrumentId,
+        assetClass: "metal",
+        symbol: p.symbol,
+        name: p.name || p.symbol,
+        now,
+      });
 
       db.prepare(
         `INSERT INTO inv_metals_holdings (

@@ -6,6 +6,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
 
 /**
  * crypto.buy — all master mutations inside the financial transaction.
@@ -119,37 +120,24 @@ export async function buyCrypto(input, { dataDir } = {}) {
         displayName: "Crypto investment",
       });
 
-      db.prepare(
-        `INSERT OR IGNORE INTO inv_crypto_exchanges (id, name, created_at) VALUES (?, ?, ?)`,
-      ).run(p.exchangeId, p.exchangeName || p.exchangeId, now);
-
-      const existingInst = db
-        .prepare(`SELECT id, network_identifier, contract_address, asset_class FROM ref_instruments WHERE id = ?`)
-        .get(p.instrumentId);
-      if (existingInst) {
-        if (existingInst.asset_class !== "crypto") throw new Error("INSTRUMENT_ASSET_CLASS_MISMATCH");
-        if (networkId && existingInst.network_identifier && existingInst.network_identifier !== networkId) {
-          throw new Error("CRYPTO_NETWORK_MISMATCH");
-        }
-        if (contractAddress && existingInst.contract_address && existingInst.contract_address !== contractAddress) {
-          throw new Error("CRYPTO_CONTRACT_MISMATCH");
-        }
-      } else {
-        db.prepare(
-          `INSERT INTO ref_instruments (
-            id, asset_class, symbol, name, network_identifier, contract_address,
-            created_at, updated_at, is_active
-          ) VALUES (?, 'crypto', ?, ?, ?, ?, ?, ?, 1)`,
-        ).run(
-          p.instrumentId,
-          p.symbol || "ASSET",
-          p.name || p.symbol || "ASSET",
-          networkId,
-          contractAddress,
-          now,
-          now,
-        );
-      }
+      if (!p.symbol) throw new Error("INSTRUMENT_SYMBOL_REQUIRED_ON_CREATE");
+      resolveOrCreateNamedMaster(db, {
+        table: "inv_crypto_exchanges",
+        id: p.exchangeId,
+        name: p.exchangeName || p.exchangeId,
+        existingSelect: `SELECT * FROM inv_crypto_exchanges WHERE id = ?`,
+        insertSql: `INSERT INTO inv_crypto_exchanges (id, name, created_at) VALUES (?, ?, ?)`,
+        insertArgs: [p.exchangeId, p.exchangeName || p.exchangeId, now],
+      });
+      resolveOrCreateInstrument(db, {
+        instrumentId: p.instrumentId,
+        assetClass: "crypto",
+        symbol: p.symbol,
+        name: p.name || p.symbol,
+        networkIdentifier: networkId,
+        contractAddress,
+        now,
+      });
 
       // Holding scoped by exchange + instrument + network
       let holding;

@@ -5,15 +5,30 @@ import { runInvariantGate } from "../invariants/index.js";
 import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
 import { persistOperation, loadOperation } from "../../persistence/port.js";
 
+/**
+ * B-038: optional undefined fields are OMITTED (never serialized as null unless caller set null).
+ * Arrays preserve index order; object keys sorted.
+ */
 export function stableStringify(value) {
+  if (value === undefined) {
+    return undefined; // signal omit to parent
+  }
   if (value === null || typeof value !== "object") {
+    if (typeof value === "number" && !Number.isFinite(value)) {
+      throw new Error("HASH_NON_FINITE_NUMBER");
+    }
     return JSON.stringify(value);
   }
   if (Array.isArray(value)) {
-    return `[${value.map((v) => stableStringify(v)).join(",")}]`;
+    return `[${value.map((v) => (v === undefined ? "null" : stableStringify(v))).join(",")}]`;
   }
   const keys = Object.keys(value).sort();
-  return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(",")}}`;
+  const parts = [];
+  for (const k of keys) {
+    if (value[k] === undefined) continue; // omit optional undefined
+    parts.push(`${JSON.stringify(k)}:${stableStringify(value[k])}`);
+  }
+  return `{${parts.join(",")}}`;
 }
 
 function stableHash(obj) {
@@ -117,12 +132,15 @@ export async function runAtomicFinancialOperation(command) {
     const dataDir = norm.dataDir || join(process.cwd(), ".pf-data");
     const mode = norm.persistMode;
 
+    // B-037: economic idempotency hash — exclude machine paths / non-economic metadata
     const payloadForHash = {
-      type: norm.type,
+      operationType: norm.type,
       payload: norm.payload,
       journalLines: norm.journalLines,
       businessDate: norm.businessDate,
       baseCurrency: norm.baseCurrency,
+      rates: norm.rates ?? null,
+      engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
     };
     const commandHash = norm.commandHash || stableHash(payloadForHash);
 
@@ -131,7 +149,7 @@ export async function runAtomicFinancialOperation(command) {
       const existing = await loadOperation(norm.operationId, { dataDir, mode });
       if (
         existing &&
-        ["sql_committed", "swapped", "persisted"].includes(existing.durability_state)
+        ["sql_committed", "swapped", "persisted", "durable"].includes(existing.durability_state)
       ) {
         if (existing.commandHash && existing.commandHash !== commandHash) {
           throw new Error("OP_IDEMPOTENCY_CONFLICT");

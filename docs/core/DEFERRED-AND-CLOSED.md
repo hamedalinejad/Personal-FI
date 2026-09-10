@@ -40,3 +40,8 @@ Always **NO-GO** until GO-NO-GO gates all green with evidence.
 **Status:** Deferred (not a code defect of the Node path).
 
 Persistence **port** is the contract. Browser adapter (`sql.js` + IndexedDB) remains **not release-proven**. Track as implementation work after Loan RELEASE-PROVEN; not required for Node scaffold gates.
+
+## 2026-09-10 — B-044 CI evidence
+
+Local `npm test` / `gates` green is **not** equivalent to GitHub Actions evidence.
+After each main push: open Actions, confirm run for commit SHA, record link in release evidence.
