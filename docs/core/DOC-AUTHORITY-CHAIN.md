@@ -40,3 +40,13 @@
 P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority.
 
 | Persistence durability vs status | PERSISTENCE-DURABILITY.md |
+
+
+## Binding authority additions (2026-09-10)
+
+- docs/core/authority/IMMUTABLE-ACCOUNTING-RULES.md
+- docs/core/authority/API-CONTRACT.md
+- docs/core/authority/IMPLEMENTATION-ORDER.md
+- docs/core/authority/STATUS-TAXONOMY.md
+- docs/core/authority/FILE-LIFECYCLE.md
+- docs/core/authority/GOLDEN-FIXTURE-MATRIX.md
