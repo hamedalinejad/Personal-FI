@@ -1,3 +1,5 @@
+> **P0-TEST-002:** `IMPLEMENTED` never implies Golden/Recovery/Standalone proven. Release needs separate evidence fields green.
+
 ---
 id: DOC-AUTH-STATUS
 title: Status Taxonomy — Final

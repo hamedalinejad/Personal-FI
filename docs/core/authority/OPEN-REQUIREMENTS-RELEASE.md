@@ -1,3 +1,5 @@
+> See also `docs/core/AUDIT-BATCH-6-13-STATUS.md` for test/offline/mod status.
+
 # Open requirements (release)
 
 > **Command lifecycle SoT:** `docs/core/registry/status.registry.json`  

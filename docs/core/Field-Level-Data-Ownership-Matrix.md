@@ -1,3 +1,5 @@
+> **P0-FIELD-003:** `deletedAt` **forbidden** on posted financial ledger rows. Soft-delete only on non-financial metadata where policy allows.
+
 > Kind SoT: `docs/core/authority/FIELD-KIND-VOCABULARY.md`
 
 # Field-Level Data Ownership Matrix
