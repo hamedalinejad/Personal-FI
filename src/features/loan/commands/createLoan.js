@@ -12,8 +12,8 @@ function parsePeriods(v) {
   if (v == null || v === "") throw new Error("VALIDATION_ERROR:periods");
   const s = String(v).trim();
   if (!/^[0-9]+$/.test(s)) throw new Error("VALIDATION_ERROR:periods");
-  const n = Number(s);
-  if (!Number.isFinite(n) || n <= 0) throw new Error("VALIDATION_ERROR:periods");
+  const n = parseInt(s, 10);
+  if (!Number.isFinite(n) || n <= 0 || String(n) !== s) throw new Error("VALIDATION_ERROR:periods");
   return n;
 }
 
