@@ -2,7 +2,7 @@
   "name": "personal-fi",
   "private": true,
   "type": "module",
-  "description": "Personal-FI — implementation scaffold (docs are specification authority; production NO-GO)",
+  "description": "Personal-FI \u2014 implementation scaffold (docs are specification authority; production NO-GO)",
   "scripts": {
     "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/features/**/*.test.js src/features/**/tests/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
@@ -15,10 +15,12 @@
     "docs:validate": "node scripts/docs-validator.js",
     "registry:index": "node scripts/registry-index.js",
     "bench:smoke": "node scripts/bench-smoke.js",
-    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke",
+    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke",
     "schema:manifest:check": "node scripts/schema-manifest-check.js",
     "docs:consistency": "node scripts/docs-consistency.js",
-    "lint:money-sql": "node scripts/lint-no-sql-sum-money.js"
+    "lint:money-sql": "node scripts/lint-no-sql-sum-money.js",
+    "status:check": "node scripts/status-registry-check.js",
+    "status:gen": "node scripts/generate-command-status-md.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"

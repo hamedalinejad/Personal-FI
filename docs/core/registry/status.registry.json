@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updated": "2026-09-12",
+  "schema_status": {
+    "SPEC_LOCKED": true,
+    "FREEZE_PROVEN": false,
+    "note": "SPEC_LOCKED = semantic contract frozen; FREEZE_PROVEN = manifest/checksum/inventory evidence aligned for release"
+  },
+  "features": {
+    "loan": {
+      "surface": "PARTIAL",
+      "commands": {
+        "loan.create": "IMPLEMENTED",
+        "loan.payment": "IMPLEMENTED",
+        "loan.reversePayment": "IMPLEMENTED"
+      }
+    },
+    "crypto": {
+      "surface": "PARTIAL",
+      "commands": {
+        "crypto.buy": "IMPLEMENTED",
+        "crypto.sell": "IMPLEMENTED",
+        "crypto.transfer": "IMPLEMENTED"
+      }
+    },
+    "funds": {
+      "surface": "PARTIAL",
+      "commands": {
+        "fund.subscribe": "IMPLEMENTED",
+        "fund.redeem": "IMPLEMENTED",
+        "fund.distribution": "IMPLEMENTED"
+      }
+    },
+    "stocks": {
+      "surface": "PARTIAL",
+      "commands": {
+        "stocks.buy": "IMPLEMENTED",
+        "stocks.sell": "IMPLEMENTED",
+        "stocks.settle": "IMPLEMENTED",
+        "stocks.dividend": "IMPLEMENTED"
+      }
+    },
+    "metals": {
+      "surface": "PARTIAL",
+      "commands": {
+        "metals.buy": "IMPLEMENTED",
+        "metals.sell": "IMPLEMENTED",
+        "metals.delivery": "IMPLEMENTED"
+      }
+    }
+  },
+  "release": {
+    "production": "NO-GO",
+    "golden_family": "PARTIAL",
+    "recovery_suite": "PARTIAL",
+    "browser_offline_adapter": "NOT_IMPLEMENTED",
+    "full_accounting_statements": "PARTIAL",
+    "investment_reporting": "NOT_IMPLEMENTED"
+  },
+  "gates": {
+    "phase0_docs": "SPEC_LOCKED",
+    "loan_reference": "IMPLEMENTED",
+    "parallel_spec_work": "ALLOWED",
+    "parallel_production_integration": "FORBIDDEN_UNTIL_PHASE_ORDER"
+  }
+}

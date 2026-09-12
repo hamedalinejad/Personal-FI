@@ -1,3 +1,23 @@
+# Open requirements (release)
+
+> **Command lifecycle SoT:** `docs/core/registry/status.registry.json`  
+> Do not hand-author conflicting IMPLEMENTED/PARTIAL for the same command elsewhere.
+
+## Package-level (still open for RELEASE-PROVEN)
+
+- Golden family CI matrix (full)
+- Recovery suite (full crash/restore matrix)
+- Browser offline adapter (sql.js + IndexedDB)
+- Full BS/IS/CF release-proven
+- Investment reporting pack
+- Iran settlement **policy engine** version persistence on every op (stocks.settle **command** exists; policy versioning still open)
+- Tax runtime events
+
+## Schema statuses (separate)
+
+- `SPEC_LOCKED` = semantic contract frozen
+- `FREEZE_PROVEN` = manifest/checksum/inventory evidence for release (currently false)
+
 ---
 id: DOC-AUTH-OPEN-REQ
 title: Requirements Still Not Release-Proven

@@ -24,3 +24,6 @@ Pending settlement: `settlementStatus = pending_settlement`. A future `stocks.se
 ## stocks.settle (IMPLEMENTED)
 
 Command clears broker payable with cash. Position quantity unchanged. Double settle → ALREADY_SETTLED.
+
+
+> Lifecycle state for `stocks.settle`: see `docs/core/registry/status.registry.json` (single SoT).

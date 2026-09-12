@@ -58,3 +58,13 @@ Production: NO-GO
 2. Extend features only via `Canonical Financial Operation` + Fee Engine + journal SoT.
 3. New commands need: contract section → implementation → Gate H → golden → recovery.
 4. No RELEASE-PROVEN claim without evidence listed in FINAL-VERDICT-AND-GATES.md §34.
+
+
+## Schema dual status (P0-B03)
+
+| Token | Meaning |
+|-------|---------|
+| SPEC_LOCKED | Semantic/schema **contract** frozen for coding |
+| FREEZE_PROVEN | Evidence (manifest, checksum, inventory, drift=0) ready for **release** |
+
+Current: SPEC_LOCKED=yes, FREEZE_PROVEN=no (see status.registry.json).

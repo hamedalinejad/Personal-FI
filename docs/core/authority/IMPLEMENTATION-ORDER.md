@@ -53,3 +53,13 @@ create, schedule, payment, allocation, reverse, fees, penalty, multi-currency, s
 Crypto → Funds → Stocks Iran → Metals → Cheques → Accounts UI  
 
 Each: `IMPLEMENTED → INTEGRATED → GOLDEN-GREEN → RECOVERY-GREEN → RELEASE-PROVEN`
+
+
+## Parallel work policy (P0-B02)
+
+| Allowed in parallel | Forbidden until phase order |
+|---------------------|----------------------------|
+| Specification / docs / unit tests / scaffolds for later features | Production integration of Feature B before Phase gates for Loan/Core correctness |
+| Reading Loan as reference while drafting Crypto contracts | Claiming Feature B RELEASE-PROVEN before Phase 0–5 evidence |
+
+Only Phases 0–5 gate **correctness**. Parallel **spec/scaffold** is allowed; **production integration** follows canonical order.

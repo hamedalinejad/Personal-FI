@@ -2,18 +2,33 @@
 id: DOC-CMD-STATUS
 title: Feature Command Status Registry
 status: approved
-version: 0.6
+version: generated
 updated: 2026-09-12
+generated_from: docs/core/registry/status.registry.json
 ---
+
+# Generated — do not hand-edit status cells
+
+Source of truth: `docs/core/registry/status.registry.json`
 
 | Feature | Command | Status |
 |---------|---------|--------|
-| Loan | create, payment, reverse | IMPLEMENTED |
-| Crypto | buy, sell, transfer | IMPLEMENTED |
-| Funds | subscribe, redeem, distribution | IMPLEMENTED |
-| Stocks | buy, sell, settle, dividend | IMPLEMENTED |
-| Metals | buy, sell, delivery | IMPLEMENTED |
+| loan | loan.create | IMPLEMENTED |
+| loan | loan.payment | IMPLEMENTED |
+| loan | loan.reversePayment | IMPLEMENTED |
+| crypto | crypto.buy | IMPLEMENTED |
+| crypto | crypto.sell | IMPLEMENTED |
+| crypto | crypto.transfer | IMPLEMENTED |
+| funds | fund.subscribe | IMPLEMENTED |
+| funds | fund.redeem | IMPLEMENTED |
+| funds | fund.distribution | IMPLEMENTED |
+| stocks | stocks.buy | IMPLEMENTED |
+| stocks | stocks.sell | IMPLEMENTED |
+| stocks | stocks.settle | IMPLEMENTED |
+| stocks | stocks.dividend | IMPLEMENTED |
+| metals | metals.buy | IMPLEMENTED |
+| metals | metals.sell | IMPLEMENTED |
+| metals | metals.delivery | IMPLEMENTED |
 
-Still not product-complete: corporate actions complex, cheque, multi-hop FX UI, browser offline proof, full golden CI matrix.
-
-**Production: NO-GO** (RELEASE-PROVEN evidence still required).
+Surface levels and release flags live in the JSON registry.
+Production: **NO-GO**
