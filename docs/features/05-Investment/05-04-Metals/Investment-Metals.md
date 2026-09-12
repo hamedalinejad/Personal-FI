@@ -30,7 +30,7 @@ Must Have:
 - محاسبه سود و زیان (realized و unrealized)
 - مشاهده ارزش کل پرتفوی فلزات
 - ذخیره exchangeRateToBase در هر معامله (نه الزام تتر)
-- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase`)
+- ثبت کارمزد (با `feeAmount` + `feeCurrency` + `exchangeRateToBase` + `feeToLegRate` (اگر متفاوت از ارز تراکنش))
 
 Should Have:
 
@@ -275,7 +275,10 @@ Reports / Dashboard / Portfolio: ارزش پرتفوی فلزات و سود/زی
 Physical Assets (در صورت نیاز): پس از تحویل فیزیکی می‌توان به دارایی فیزیکی منتقل کرد
 
 
-منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L) — MATH-006 LOCK
+
+> **ممنوع**: تعریف فرمول ساده realized P&L در feature prose.  
+> تمام محاسبات realized P&L باید دقیقاً از **Core CostBasisEngine** آمده و آن را با event context خود تراکنش تطبیق دهند (fee currency, FX, instrumentId).
 
 فرمول رسمی برای `calculateProfitLoss` و به‌روزرسانی Holding هنگام خرید/فروش.
 
@@ -313,7 +316,7 @@ fineWeightMg = quantityMg × purityRatio
 > **نکات الزامی**:
 > - تمام محاسبات با `decimal.js` (هرگز `Number`).
 > - `type=physical_delivery`: بدون `realizedPL`؛ فقط کاهش `quantityMg` و کسر `deliveryFee` از نقد پلتفرم.
-> - `calculateProfitLoss(metalType?, platformId?, purity?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند.
+> - `calculateProfitLoss(metalType?, platformId?, purity?)` مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند — **اما این محاسبه باید از `CostBasisEngine` باشد**.
 > - `1g 18K` و `1g 24K` دو دارایی جدا با قیمت و میانگین جدا هستند.
 
 

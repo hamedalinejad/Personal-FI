@@ -154,6 +154,7 @@ Expense reverse → reverse link effect (restore envelope)
 ## Residual checklist
 
 - [x] REL-001…005 **contracts written** (this file)
+- [x] P0-010 **operation_id nullability rule documented** (draft vs posted)
 - [ ] Runtime engines enforce all edges
 - [ ] Drift test schema ↔ matrix = 0
 - [ ] Field inventory complete for related tables
@@ -175,6 +176,29 @@ Expense reverse → reverse link effect (restore envelope)
 
 **Cash:** never stored in inc/exp tables; always via CashSettlementPort → journal lines.
 
+## Tax Events vs Tax Records (P0-012)
+
+| From | To | FK / rule | ON DELETE | Cardinality | Owner |
+|------|-----|-----------|-----------|-------------|-------|
+| tax_events.operation_id | fin_operations.id | FK | RESTRICT | N:1 | Core |
+| tax_events.linked_tax_event_id | tax_events.id | FK | SET NULL | 1:1 | Tax |
+| tax_events.id | tax_records.linked_tax_event_id | FK | SET NULL | 1:1 (optional) | Tax |
+
+**Ownership:**
+- `tax_events`: **ledger SoT** for individual tax events (capital gain, income, withholding, adjustment)
+- `tax_records`: **reporting container** for grouped tax events (filing, submission, payment tracking)
+
+**Relationship:**
+- Each tax_event can optionally link to a tax_record via `linked_tax_event_id`
+- One tax_record can aggregate multiple tax_events (via summary_json)
+- Payment of tax (payTax operation) updates tax_records.status → 'paid'
+- Reversal/correction: tax_events.status → 'void' or 'amended'; tax_records.status → 'amended'
+
+**Flow:**
+```
+Investment sale → tax_event (capital_gain) → [optional] tax_record (for filing)
+Tax payment → payTax operation → tax_records.status = 'paid'
+
 ---
 
 ## Completeness note 2026-09-05
@@ -182,6 +206,33 @@ Expense reverse → reverse link effect (restore envelope)
 Core, instruments, accounts, loan, cheque, income/expense, metals delivery edges documented.  
 Remaining edges (CA full graph, fee funding, import batch → operation) tracked under OPEN-002; schema FKs present for all created tables.  
 Status: **residual edges documented 2026-09-07**.
+
+## P0-010 — operation_id nullability (draft vs posted)
+
+| Table | operation_id NULL allowed? | Condition |
+|-------|---------------------------|-----------|
+| acc_transactions | **yes** | draft only (if cash event not yet linked to operation) |
+| chk_cheques | **yes** | draft only (cheque not yet issued) |
+| tax_events | **yes** | draft only OR is_manual_adjustment=1 |
+| inc_transactions | **yes** | draft only |
+| exp_transactions | **yes** | draft only |
+| ln_loans | **yes** | draft only |
+| br_occurrences | **yes** | unpaid/draft only |
+| fg_contributions | **yes** | voluntary contribution (not tied to operation) |
+| inv_crypto_transactions | **no** | posted path only |
+| inv_stocks_iran_transactions | **no** | posted path only |
+| inv_fif_transactions | **no** | posted path only |
+| inv_metals_transactions | **no** | posted path only |
+| ln_transactions | **no** | posted path only |
+| pa_transactions | **no** | posted path only |
+| pa_valuations | **no** | posted path only |
+| inv_metals_physical_deliveries | **no** | posted path only |
+| inv_stocks_iran_corporate_actions | **no** | posted path only |
+| bg_transaction_links | **no** | always tied to operation |
+| import_dedupe_keys | **yes** | optional link to operation |
+| ln_schedule_snapshots | **yes** | optional for snapshot-only entries |
+
+**Rule:** Every financial mutation that affects accounting MUST eventually have operation_id → fin_operations when posted. Draft records may temporarily lack operation_id only if explicitly allowed per domain contract.
 
 
 ## Corporate Actions (OPEN-002 residual)

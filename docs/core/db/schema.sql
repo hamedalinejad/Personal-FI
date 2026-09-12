@@ -68,6 +68,12 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   created_at    TEXT NOT NULL,
   reference_number TEXT,
   fiscal_period_id TEXT,
+  -- post_state: DERIVED/CACHE only (P0-014)
+  -- - Mirrors fin_operations.status for read performance and UI convenience
+  -- - MUST match operation.status at all times; never independently writable
+  -- - On create: set post_state = 'posted' if operation.status='posted', else 'draft'
+  -- - On void: set post_state = 'void' only via Core.reverseOperation
+  -- - Read-only view of operation status; write-only via canonical Core paths
   post_state TEXT CHECK (post_state IS NULL OR post_state IN ('draft','posted','void'))  -- mirrors operation; entry exists for posted path
 );
 
@@ -85,7 +91,16 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')),
   memo            TEXT,
   reference TEXT,
+  -- source_type: business provenance of the journal line
+  -- - 'ui': user action via UI
+  -- - 'api': API request
+  -- - 'import': imported from external source (via Import module)
+  -- - 'migration': one-time migration data
+  -- - 'system': automated system operation (reconciliation, tax calc, rebuild)
+  -- - 'reconciliation': manual reconciliation adjustment
+  -- sourceChannel (deprecated): use source_type instead
   source_type TEXT CHECK (source_type IS NULL OR source_type IN ('ui','api','import','migration','system','reconciliation')),
+  -- sourceReference: external reference for audit trail (file name, URL, batch label)
   source_reference TEXT
 );
 
@@ -147,21 +162,33 @@ CREATE TABLE IF NOT EXISTS ref_parties (
 
 -- ─── Accounts banking (event log — not cash SoT) ─────────────
 CREATE TABLE IF NOT EXISTS acc_accounts (
-  id              TEXT PRIMARY KEY,
-  fin_account_id  TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  name            TEXT NOT NULL,
+  id TEXT PRIMARY KEY,
+  fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- identity (RAW):
+  name TEXT NOT NULL, -- **غیریکتا** — برچسب نمایشی کاربر
+  account_number TEXT, -- (P0-020)
+  iban TEXT,
+  card_last4 TEXT, -- فقط ۴ رقم آخر (P0-020)
+  card_token TEXT, -- توکن اختیاری — **نه PAN** (P0-020)
+  -- bank metadata (RAW):
+  branch_name TEXT,
+  bank_name TEXT,
+  currency TEXT NOT NULL,
   account_kind TEXT NOT NULL CHECK (account_kind IN ('bank','cash','investment','loan','credit','wallet','other')),
-  currency        TEXT NOT NULL,
-  iban            TEXT,
-  bank_name       TEXT,
-  branch_name     TEXT,
-  is_archived     INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
-  created_at      TEXT NOT NULL,
-  updated_at      TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed')),
+  bank_product_type TEXT CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')), -- Iran-specific (P0-020)
+  -- account classification (RAW):
   role TEXT CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')),
+  -- snapshot (RAW - cached, rebuildable from ledger):
+  current_balance TEXT, -- snapshot (P0-020)
+  -- provenance (RAW):
+  notes TEXT, -- (P0-020)
+  external_ref_json TEXT,
+  -- status:
+  is_archived INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive','closed')),
   reconciliation_status TEXT CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')),
-  external_ref_json TEXT
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
@@ -170,6 +197,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
 CREATE TABLE IF NOT EXISTS acc_transactions (
   id             TEXT PRIMARY KEY,
   account_id     TEXT NOT NULL REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- operation_id: NULLABLE only for draft cash events (not yet linked to operation)
+  -- All posted cash events MUST have operation_id → fin_operations
   operation_id   TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date  TEXT NOT NULL,
   amount         TEXT NOT NULL,
@@ -182,7 +211,7 @@ CREATE TABLE IF NOT EXISTS acc_transactions (
 CREATE TABLE IF NOT EXISTS acc_transaction_links (
   id               TEXT PRIMARY KEY,
   transaction_id   TEXT NOT NULL REFERENCES acc_transactions(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  related_feature  TEXT NOT NULL CHECK (related_feature IN ('crypto','stocks','funds','metals','loans','income','expense','cheque','budget','goals','bills','tax','physical_assets','accounts')),
+  related_feature  TEXT NOT NULL CHECK (related_feature IN ('accounts','income','expense','cheque','loan','investment.crypto','investment.stocks','investment.funds','investment.metals','physical_assets','budget','goals','bills','tax')),
   related_id       TEXT NOT NULL,
   UNIQUE (transaction_id, related_feature, related_id)
 );
@@ -228,11 +257,49 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
   updated_at      TEXT NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uq_crypto_holding_venue
-  ON inv_crypto_holdings(exchange_id, instrument_id) WHERE network_id IS NULL;
+-- CRYPTO-002: Holding identity is explicit and includes venue
+-- - Exchange → Wallet transfer creates NEW holding identity (not same holding)
+-- - Same asset moved from Exchange A to Wallet B = two holdings: (A, null, asset) and (B, network, asset)
+-- - Transfer provenance is recorded in inv_crypto_transactions via transfer_in/out pairs with same operation_id
+CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_key ON price_history(instrument_id, market_date, source_id, quote_type);
 
-CREATE UNIQUE INDEX IF NOT EXISTS uq_crypto_holding_wallet
-  ON inv_crypto_holdings(exchange_id, network_id, instrument_id) WHERE network_id IS NOT NULL;
+-- ─── Price Provider Mapping (STOCK-004) ─────────────────────
+-- Preserves symbol-change history and prevents provider identity from leaking into core instrument identity.
+CREATE TABLE IF NOT EXISTS instrument_price_mappings (
+  id              TEXT PRIMARY KEY,
+  instrument_id   TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  source_id       TEXT NOT NULL REFERENCES price_sources(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  provider_symbol TEXT NOT NULL, -- symbol at the provider (may change over time)
+  market          TEXT CHECK (market IS NULL OR market IN ('bourse','fara_bourse','base_market','other')),
+  valid_from      TEXT NOT NULL, -- start of validity (inclusive)
+  valid_to        TEXT, -- end of validity (exclusive, nullable for current)
+  status TEXT NOT NULL CHECK (status IN ('active','archived')),
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ipm_instrument_source ON instrument_price_mappings(instrument_id, source_id);
+CREATE INDEX IF NOT EXISTS idx_ipm_provider_symbol ON instrument_price_mappings(provider_symbol);
+CREATE INDEX IF NOT EXISTS idx_ipm_active ON instrument_price_mappings(instrument_id, source_id) WHERE status = 'active';
+
+-- ─── Crypto holdings (projection of ledger events) ───────────
+
+-- ─── Crypto Transactions ─────────────────────────────────────
+-- Field Mapping (CRYPTO-001, P0-019):
+-- | feature field                 | SQL column                   | kind     | constraints                                    |
+-- |-------------------------------|------------------------------|----------|------------------------------------------------|
+-- | id                            | id                           | RAW      | PK                                             |
+-- | operation_id                  | operation_id                 | RAW      | FK fin_operations (required for posted txs)   |
+-- | holding_id                    | holding_id                   | RAW      | FK inv_crypto_holdings (nullable)             |
+-- | instrument_id                 | instrument_id                | RAW      | FK ref_instruments (required)                 |
+-- | tx_type                       | tx_type                      | RAW      | enum                                           |
+-- | business_date                 | business_date                | RAW      | required                                       |
+-- | gross_quantity                | gross_quantity               | RAW      | nullable (buy/sell)                            |
+-- | fee_quantity                  | fee_quantity                 | RAW      | nullable                                       |
+-- | net_quantity                  | net_quantity                 | RAW      | required (always > 0)                          |
+-- | feeFundingKind                | feeFundingKind               | RAW      | 'cash'|'asset' (required)                      |
+-- | fee_currency                  | fee_currency                 | RAW      | XOR with fee_instrument_id                     |
+-- | fee_instrument_id             | fee_instrument_id            | RAW      | XOR with fee_currency                          |
+-- | economic_kind                 | economic_kind                | RAW      | optional                                       |
 
 CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   id              TEXT PRIMARY KEY,
@@ -244,28 +311,119 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   gross_quantity  TEXT,
   fee_quantity    TEXT,
   net_quantity    TEXT NOT NULL,
+  feeFundingKind  TEXT NOT NULL CHECK (feeFundingKind IN ('cash','asset')),
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- CRYPTO-001: Exactly one of fee_currency or fee_instrument_id must be non-null
+  CHECK (
+    (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL) OR
+    (feeFundingKind = 'asset' AND fee_currency IS NULL AND fee_instrument_id IS NOT NULL)
+  ),
+  -- CRYPTO-003: Network and address history (audit trail; nullable in v1)
+  fromAddressId   TEXT, -- FK to inv_crypto_wallet_addresses (optional audit trail)
+  toAddressId     TEXT, -- FK to inv_crypto_wallet_addresses (optional audit trail)
+  -- CRYPTO-003 NOTE: These fields are for address history tracking and audit trail.
+  -- They are nullable in v1 and may be deferred if wallet_address tracking is not yet integrated.
+  -- When used: fromAddressId → holding_id source; toAddressId → holding_id destination.
   economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')),
   created_at      TEXT NOT NULL
 );
 
 -- ─── Loans ───────────────────────────────────────────────────
+-- Field Mapping (P0-018):
+-- | feature field                 | SQL column                   | kind     | formula                                          | migration           |
+-- |-------------------------------|------------------------------|----------|--------------------------------------------------|---------------------|
+-- | name                          | name                         | RAW      | -                                                | migrate directly    |
+-- | loanType                      | loan_type                    | RAW      | -                                                | enum map            |
+-- | direction                     | direction                    | RAW      | -                                                | enum map            |
+-- | principalAmount               | principal                    | RAW      | -                                                | preserve            |
+-- | dayCountConvention            | day_count_convention         | RAW      | -                                                | enum map            |
+-- | dayCountDenominator           | day_count_denominator        | RAW      | -                                                | preserve nullable   |
+-- | disbursementDate              | disbursement_date            | RAW      | -                                                | datetime parse      |
+-- | firstPaymentDate              | first_payment_date           | RAW      | -                                                | datetime parse      |
+-- | endDate                       | end_date                     | RAW      | -                                                | datetime parse      |
+-- | irregularFirstPeriod          | irregular_first_period       | RAW      | boolean → int                                    | cast                |
+-- | firstPeriodEndDate            | first_period_end_date        | RAW      | -                                                | datetime parse      |
+-- | paymentHolidayCalendarId      | payment_holiday_calendar_id  | RAW      | -                                                | FK nullable         |
+-- | interestType                  | interest_type                | RAW      | -                                                | enum map            |
+-- | interestRate                  | interest_rate                | RAW      | % (18 for 18%)                                   | preserve            |
+-- | interestRatePeriod            | interest_rate_period         | RAW      | -                                                | enum map            |
+-- | installmentFrequency          | installment_frequency        | RAW      | -                                                | enum map            |
+-- | customIntervalDays            | custom_interval_days         | RAW      | -                                                | int                 |
+-- | calculatedInstallment         | calculated_installment       | RAW      | from schedule engine                             | computed            |
+-- | fixedInstallmentAmount        | fixed_installment_amount     | RAW      | user-entered or computed                         | preserve            |
+-- | recalculateOnEarlyPayment     | recalculate_on_early_payment | RAW      | boolean → int                                    | cast                |
+-- | penaltyRate                   | penalty_rate                 | RAW      | % (6 for 6%)                                     | preserve            |
+-- | penaltyBasis                  | penalty_basis                | RAW      | -                                                | enum map            |
+-- | calculationMethod             | calculation_method           | RAW      | -                                                | enum map            |
+-- | totalInstallments             | total_installments           | RAW      | -                                                | int                 |
+-- | dayCount                      | day_count                    | RAW      | legacy alias (deprecated, use day_count_convention) | rename → copy    |
+-- | start_date                    | start_date                   | RAW      | alias for disbursement_date                      | copy                |
+-- | maturity_date                 | maturity_date                | RAW      | alias for end_date                               | copy                |
+-- | operation_id                  | operation_id                 | RAW      | FK fin_operations                              | preserve            |
+-- | status                        | status                       | RAW      | -                                                | enum map            |
+-- | schedule_engine_version       | schedule_engine_version      | RAW      | -                                                | JSON                |
+-- | notes                         | notes                        | RAW      | -                                                | preserve            |
+
 CREATE TABLE IF NOT EXISTS ln_loans (
-  id                 TEXT PRIMARY KEY,
-  party_id           TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  role               TEXT NOT NULL,
-  calculation_method TEXT NOT NULL,
-  principal          TEXT NOT NULL,
-  currency           TEXT NOT NULL,
-  interest_rate      TEXT,
-  status TEXT NOT NULL CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')),
-  created_at         TEXT NOT NULL,
-  start_date TEXT,
-  maturity_date TEXT,
-  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  id TEXT PRIMARY KEY,
+  -- identity and metadata (RAW):
+  name TEXT, -- نام وام (P0-018)
+  loan_type TEXT CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')), -- (P0-018)
+  direction TEXT CHECK (direction IS NULL OR direction IN ('borrowed','lent')), -- (P0-018)
+  party_id TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  role TEXT NOT NULL,
+  -- amounts and currency (RAW):
+  principal TEXT NOT NULL, -- مبلغ اصلی
+  currency TEXT NOT NULL,
+  -- day count (RAW):
+  day_count_convention TEXT CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','actual_365','actual_360','30_360','actual_actual','custom_days')), -- (P0-018)
+  day_count_denominator TEXT, -- فقط وقتی custom_days (P0-018)
+  exchange_rate_to_base TEXT, -- نرخ ارز وام/قسط → baseCurrency (P0-018)
+  -- dates (RAW):
+  disbursement_date TEXT, -- تاریخ دریافت/واریز وام (P0-018)
+  first_payment_date TEXT, -- تاریخ اولین قسط (P0-018)
+  end_date TEXT, -- تاریخ پایان وام (P0-018)
+  irregular_first_period INTEGER NOT NULL DEFAULT 0 CHECK (irregular_first_period IN (0, 1)), -- (P0-018)
+  first_period_end_date TEXT, -- وقتی irregular first (P0-018)
+  payment_holiday_calendar_id TEXT, -- لینک به تقویم (P0-018)
+  -- account (RAW):
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- فقط حالت Integrated (P0-018)
+  account_transaction_id TEXT, -- لینک cash leg (P0-018)
+  -- calculation (RAW):
+  calculation_method TEXT NOT NULL CHECK (calculation_method IN ('declining_balance','flat_rate','bullet','qarz_al_hasaneh')),
+  interest_type TEXT CHECK (interest_type IS NULL OR interest_type IN ('none','fixed','variable')), -- (P0-018)
+  interest_rate TEXT, -- درصد کامل (P0-018)
+  interest_rate_period TEXT CHECK (interest_rate_period IS NULL OR interest_rate_period IN ('annual','monthly')), -- (P0-018)
+  installment_frequency TEXT CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','custom')), -- (P0-018)
+  custom_interval_days INTEGER, -- اجباری اگر frequency=custom (P0-018)
   total_installments INTEGER,
-  day_count TEXT DEFAULT 'period_based',
+  -- grace (RAW):
+  grace_mode TEXT CHECK (grace_mode IS NULL OR grace_mode IN ('none','periods','date_range')), -- (P0-018)
+  grace_periods INTEGER, -- وقتی graceMode=periods (P0-018)
+  grace_period_unit TEXT CHECK (grace_period_unit IS NULL OR grace_period_unit IN ('installment')), -- deprecated 'month' (P0-018)
+  grace_start_date TEXT, -- وقتی graceMode=date_range (P0-018)
+  grace_end_date TEXT, -- وقتی graceMode=date_range (P0-018)
+  grace_interest_policy TEXT CHECK (grace_interest_policy IS NULL OR grace_interest_policy IN ('interest_only','payment_holiday')), -- (P0-018)
+  -- installment (RAW):
+  calculated_installment TEXT, -- محاسبه‌شده برای Declining/Bullet (P0-018)
+  fixed_installment_amount TEXT, -- ثابت برای Flat Rate/Qarz (P0-018)
+  -- early payment (RAW):
+  recalculate_on_early_payment INTEGER NOT NULL DEFAULT 0 CHECK (recalculate_on_early_payment IN (0, 1)), -- فقط declining_balance (P0-018)
+  penalty_rate TEXT, -- نرخ جریمه دیرکرد سالانه (P0-018)
+  penalty_basis TEXT CHECK (penalty_basis IS NULL OR penalty_basis IN ('overdue_installment','remaining_balance')), -- (P0-018)
+  -- operation and status:
+  -- operation_id: NULLABLE only for draft loans (not yet posted)
+  -- All posted loan actions MUST have operation_id → fin_operations
+  status TEXT NOT NULL CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT,
+  -- legacy aliases (for backward compatibility):
+  start_date TEXT, -- alias for disbursement_date
+  maturity_date TEXT, -- alias for end_date
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- legacy:
+  day_count TEXT DEFAULT 'period_based', -- deprecated, use day_count_convention
   schedule_engine_version TEXT,
   notes TEXT
 );
@@ -328,6 +486,8 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
   cleared_date    TEXT,
   effective_cash_date TEXT,
   bounced_date    TEXT,
+  -- operation_id: NULLABLE only for draft cheques (not yet issued/paid)
+  -- Issued/Paid cheques MUST have operation_id → fin_operations
   operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at      TEXT NOT NULL,
   bounced_reason TEXT);
@@ -336,8 +496,15 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
 CREATE TABLE IF NOT EXISTS import_raw_records (
   id                    TEXT PRIMARY KEY,
   batch_id              TEXT NOT NULL, -- import batch (MR-230)
-  source_provider       TEXT NOT NULL,
-  source_schema_version TEXT,
+  source_provider       TEXT NOT NULL, -- provider name (e.g., 'mellat', 'tsetmc', 'coinbase')
+  source_schema_version TEXT, -- schema version of source data
+  -- source_type: type of source data format (not interface channel)
+  -- - 'csv': CSV file
+  -- - 'json': JSON file
+  -- - 'api': API response (structured)
+  -- - 'manual': manually entered data
+  -- - 'broker_export': broker/export-specific format
+  -- This is the BUSINESS provenance format, NOT the interface channel
   source_type           TEXT, -- csv|json|api|manual|broker_export (MR-231)
   source_reference      TEXT, -- file name / URL / batch label (MR-232)
   source_document_id    TEXT, -- link to docs_documents (MR-233)
@@ -350,7 +517,7 @@ CREATE TABLE IF NOT EXISTS import_raw_records (
   reconciliation_status TEXT NOT NULL DEFAULT 'unreconciled', -- unreconciled|matched|partial|ignored (MR-240)
   imported_at           TEXT NOT NULL,
   created_at            TEXT NOT NULL DEFAULT (datetime('now')),
-  source_file_name TEXT);
+  source_file_name TEXT); -- source file name (MR-242)
 
 CREATE INDEX IF NOT EXISTS idx_import_raw_batch ON import_raw_records(batch_id);
 CREATE INDEX IF NOT EXISTS idx_import_raw_hash ON import_raw_records(raw_record_hash);
@@ -364,6 +531,8 @@ CREATE TABLE IF NOT EXISTS import_dedupe_keys (
   log_index       TEXT,
   external_ref    TEXT,
   command_hash    TEXT,
+  -- operation_id: NULLABLE optional link to operation if linked
+  -- Many import records never become operations (raw/import-only)
   operation_id    TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   raw_record_id   TEXT REFERENCES import_raw_records(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
@@ -388,8 +557,13 @@ INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
 CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL, -- display label; duplicates allowed (user may have multiple accounts at same exchange)
-  venue_kind TEXT CHECK (venue_kind IN ('cex','dex','wallet','other')), -- exchange|wallet
-  created_at TEXT NOT NULL
+  -- identity/product fields (P0-019):
+  type TEXT CHECK (type IS NULL OR type IN ('cex','dex','wallet','other')), -- exchange type
+  url TEXT, -- سایت/اپ صرافی (P0-019)
+  description TEXT, -- توضیحات (P0-019)
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)), -- active state (P0-019)
+  created_at TEXT NOT NULL,
+  updated_at TEXT -- updated timestamp (P0-019)
 );
 
 CREATE TABLE IF NOT EXISTS inv_crypto_wallet_networks (
@@ -403,19 +577,27 @@ CREATE TABLE IF NOT EXISTS inv_crypto_wallet_networks (
 CREATE TABLE IF NOT EXISTS inv_crypto_wallet_addresses (
   id TEXT PRIMARY KEY,
   network_id TEXT NOT NULL REFERENCES inv_crypto_wallet_networks(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- address identity (RAW):
   address TEXT NOT NULL,
+  -- derivation metadata (P0-019 - historically valuable, should be RAW):
+  derivation_path TEXT, -- derivation path (e.g., m/44'/0'/0'/0/0) (P0-019)
+  account_index INTEGER, -- account index (BIP44/BIP84) (P0-019)
+  address_type TEXT CHECK (address_type IS NULL OR address_type IN ('legacy','p2sh','bech32','eth','other')), -- (P0-019)
+  labels TEXT, -- labels/comma-separated tags (P0-019)
+  -- core:
   is_primary INTEGER NOT NULL DEFAULT 0 CHECK (is_primary IN (0, 1)),
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT -- (P0-019)
 );
 
 CREATE TABLE IF NOT EXISTS inv_crypto_cash (
   id TEXT PRIMARY KEY,
   exchange_id TEXT NOT NULL REFERENCES inv_crypto_exchanges(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   currency TEXT NOT NULL,
-  -- fin_account_id NULLABLE: standalone crypto edition may omit Core bank account link;
-  -- cash SoT remains journal when linked; when null, balance is local projection only (rebuild from domain txs).
+  -- fin_account_id: NULLABLE only for non-cash crypto records (e.g., holding snapshot)
+  -- for actual cash, Core journal is always SoT even in standalone mode
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  balance TEXT NOT NULL, -- SNAPSHOT only; NO default — must be written by rebuild from journal
+  balance TEXT NOT NULL, -- SNAPSHOT only; rebuild from journal (P0-DOC-012)
   updated_at TEXT NOT NULL,
   UNIQUE (exchange_id, currency)
 );
@@ -442,8 +624,17 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
   id TEXT PRIMARY KEY,
   brokerage_id TEXT NOT NULL REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  quantity TEXT NOT NULL,
+  -- RAW fields (persisted from trade documents, not derived):
+  isin TEXT, -- ISIN رسمی وقتی شناخته شده (P0-015)
+  symbol TEXT, -- نماد نمایشی فعلی (فولاد، …)؛ با corporate action قابل تغییر است (P0-015)
+  name TEXT, -- نام شرکت/سهم (P0-015)
+  provider_symbol TEXT, -- شناسه نزد Provider فعلی (P0-015)
+  price_provider_id TEXT REFERENCES price_sources(id) ON DELETE SET NULL ON UPDATE CASCADE, -- FK → price_sources.id (P0-015)
+  market TEXT CHECK (market IS NULL OR market IN ('bourse','fara_bourse','base_market','other')), -- context بازار (P0-015)
+  -- DERIVED fields (computed from transactions by CostBasisEngine):
+  quantity TEXT NOT NULL, -- net quantity (DERIVED; rebuild on tx/reversal/CA)
   total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
+  total_fees_paid_base TEXT, -- total fees in base currency (DERIVED; P0-015)
   cost_currency TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
@@ -456,10 +647,31 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   holding_id TEXT REFERENCES inv_stocks_iran_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','dividend','corporate_action','fee','adjustment')),
-  trade_date TEXT NOT NULL, -- synonym of market_date (invariant §11); business/market event date for the trade,
-  settlement_date TEXT,
-  quantity TEXT NOT NULL,
+  -- tx_type expanded per P0-016 to support full CA model:
+  -- buy/sell/dividend: basic operations
+  -- corporate_action: generic CA event (use ca_type in inv_stocks_iran_corporate_actions for details)
+  -- capital_increase: افزایش سرمایه (نقدی/از محل مطالبات)
+  -- rights_issue: تخصیص حق تقدم
+  -- rights_exercise: تبدیل/استفاده حق تقدم
+  -- rights_sell: فروش حق تقدم
+  -- bonus_share: سهام جایزه
+  -- split: تجزیه سهم
+  -- reverse_split: تجمیع سهم
+  -- symbol_change: تغییر نماد (quantity ثابت؛ metadata)
+  -- isin_change: تغییر ISIN/شناسه
+  -- transfer_ca: انتقال ناشی از corporate action بین instrumentها
+  -- suspension_note: اختیاری ثبت توقف/بازگشایی (معمولاً بدون اثر quantity)
+  tx_type TEXT NOT NULL CHECK (
+    tx_type IN (
+      'buy','sell','dividend','corporate_action',
+      'capital_increase','rights_issue','rights_exercise','rights_sell','bonus_share',
+      'split','reverse_split','symbol_change','isin_change','transfer_ca','suspension_note',
+      'fee','adjustment'
+    )
+  ),
+  trade_date TEXT NOT NULL, -- exchange trade date (T+0); distinct from market_date (quote/session date)
+  settlement_date TEXT, -- cash/settlement date (T+2 for Iranian market)
+  quantity TEXT,
   price TEXT,
   fee_amount TEXT,
   currency TEXT NOT NULL,
@@ -483,17 +695,39 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_corporate_actions (
 CREATE TABLE IF NOT EXISTS inv_fif_funds (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL UNIQUE REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- RAW product fields (persisted from fund documentation):
+  name TEXT, -- نام صندوق (P0-017)
+  symbol TEXT, -- نماد (در صورت ETF، nullable برای issuance_redemption) (P0-017)
   fund_kind TEXT CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')),
-  created_at TEXT NOT NULL
+  profit_kind TEXT CHECK (profit_kind IS NULL OR profit_kind IN ('distribution','accumulation')), -- distribution یا accumulation (P0-017)
+  predicted_annual_rate TEXT, -- سود پیش‌بینی‌شده سالانه (درصد) (P0-017)
+  distribution_period TEXT CHECK (distribution_period IS NULL OR distribution_period IN ('monthly','quarterly','none','other')), (P0-017)
+  base_price TEXT, -- قیمت پایه (nullable) (P0-017)
+  platform TEXT, -- سایت صندوق یا کارگزاری (P0-017)
+  url TEXT, -- (P0-017)
+  description TEXT, -- (P0-017)
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS inv_fif_holdings (
   id TEXT PRIMARY KEY,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  quantity TEXT NOT NULL,
-  total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
+  brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- nullable — لینک به کارگزاری برای ETFها (P0-017)
+  -- DERIVED fields (computed from transactions by CostBasisEngine):
+  quantity TEXT NOT NULL, -- DERIVED: net units (rebuild on tx/reversal/CA)
+  total_invested TEXT NOT NULL, -- DERIVED: total cost basis (rebuild on tx/reversal)
+  total_fees_paid_base TEXT, -- total fees in base currency (DERIVED; P0-017)
+  -- RAW snapshot fields (for pricing/metrics):
+  current_nav TEXT, -- آخرین NAV (فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با transactionPrice قاطی نشود) (P0-017)
+  last_subscription_price TEXT, -- آخرین قیمت صدور دیده‌شده (nullable) (P0-017)
+  last_redemption_price TEXT, -- آخرین قیمت ابطال دیده‌شده (nullable) (P0-017)
+  -- FUND-002: external_reported_profit is deferred to v2
+  -- Never overwrite calculated return with provider-reported return
+  external_reported_profit TEXT, -- nullable; v2 observation model (see FUND-002)
   cost_currency TEXT NOT NULL,
-  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- nullable — برای issuance_redemption (P0-017)
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -502,7 +736,20 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  tx_type TEXT NOT NULL CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment')),
+  -- tx_type expanded per P0-017 to support full fund model:
+  -- buy/subscribe: صدور واحد جدید
+  -- sell/redeem: ابطال واحد
+  -- dividend/distribution: تقسیم سود نقدی
+  -- reinvest: سرمایه‌گذاری مجدد سود (خرید واحد جدید)
+  -- nav_update: روزشمار NAV (valuation-only, no quantity change)
+  -- fee: کارمزد (subscription, redemption, brokerage, management, other)
+  -- adjustment: اصلاح دستی
+  tx_type TEXT NOT NULL CHECK (
+    tx_type IN (
+      'subscribe','redeem','distribution','reinvest','nav_update',
+      'fee','adjustment'
+    )
+  ),
   trade_date TEXT NOT NULL,
   settlement_date TEXT,
   quantity TEXT,
@@ -511,6 +758,11 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   amount TEXT,
   currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- FUND-002: operationRole for multi-leg operations (reinvest, dividend+acquisition)
+  operation_role TEXT CHECK (operation_role IS NULL OR operation_role IN ('dividend_income','reinvest_purchase','standalone')),
+  -- FUND-002: external_reported_profit is deferred to v2
+  -- Never overwrite calculated return with provider-reported return
+  external_reported_profit TEXT, -- nullable; v2 observation model
   created_at TEXT NOT NULL
 );
 
@@ -661,6 +913,8 @@ CREATE TABLE IF NOT EXISTS fg_goals (
 CREATE TABLE IF NOT EXISTS fg_contributions (
   id TEXT PRIMARY KEY,
   goal_id TEXT NOT NULL REFERENCES fg_goals(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- operation_id: NULLABLE for voluntary contributions (not tied to operation)
+  -- If contribution triggers journal entries, operation_id MUST be present
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   amount TEXT NOT NULL,
   currency TEXT NOT NULL,
@@ -686,12 +940,16 @@ CREATE TABLE IF NOT EXISTS br_occurrences (
   scheduled_amount TEXT NOT NULL,
   paid_amount TEXT,
   status TEXT NOT NULL CHECK (status IN ('pending','due','paid','skipped','cancelled')) NOT NULL,
+  -- operation_id: NULLABLE only for unpaid/draft occurrences
+  -- Paid occurrences MUST have operation_id → fin_operations
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   UNIQUE (item_id, occurrence_key)
 );
 
 CREATE TABLE IF NOT EXISTS tax_events (
   id TEXT PRIMARY KEY,
+  -- operation_id: NULLABLE only for draft events or manual adjustments
+  -- Investment/realized ops that create tax MUST have operation_id → fin_operations
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- source investment/realized op (MR-202)
   tax_kind TEXT NOT NULL, -- capital_gain|income|withholding|adjustment|...
   amount TEXT NOT NULL, -- tax amount (decimal string)
@@ -849,6 +1107,8 @@ CREATE TABLE IF NOT EXISTS sec_access_log (
 -- Income domain (01-Income) — standalone usable without full accounting UI
 CREATE TABLE IF NOT EXISTS inc_transactions (
   id                      TEXT PRIMARY KEY,
+  -- operation_id: NULLABLE only for draft income (not yet posted)
+  -- All posted income MUST have operation_id → fin_operations
   operation_id            TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date           TEXT NOT NULL, -- DATE-only
   amount                  TEXT NOT NULL, -- decimal string
@@ -896,6 +1156,8 @@ CREATE INDEX IF NOT EXISTS idx_inc_recurring_next ON inc_recurring(next_occurren
 -- Expense domain (02-Expense) — symmetric to Income for modularity
 CREATE TABLE IF NOT EXISTS exp_transactions (
   id                      TEXT PRIMARY KEY,
+  -- operation_id: NULLABLE only for draft expense (not yet posted)
+  -- All posted expense MUST have operation_id → fin_operations
   operation_id            TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date           TEXT NOT NULL,
   amount                  TEXT NOT NULL,
@@ -964,8 +1226,8 @@ CREATE INDEX IF NOT EXISTS idx_ln_fee_tiers_loan ON ln_loan_fee_tiers(loan_id, t
 -- Notifications: canonical not_notifications already present; docs notif_* migrated to not_
 -- Reports: canonical rpt_snapshots; docs rep_* → rpt_
 
--- Crypto/Stocks/Metals cash: inv_crypto_cash present as projection;
--- stocks/metals cash modeled via Core fin_accounts + CashSettlementPort (no ghost table)
+-- Crypto/Stocks/Metals cash: inv_crypto_cash, inv_stocks_iran_brokerages.cashBalance, inv_metals_platforms.cashBalance are projections only;
+-- All cash SoT = Core fin_accounts + fin_journal_lines via CashSettlementPort (no ghost table)
 
 -- Tax: tax_events is event ledger; configuration stays in settings or separate tax_categories if needed later
 CREATE TABLE IF NOT EXISTS tax_categories (
@@ -1080,13 +1342,23 @@ CREATE TABLE IF NOT EXISTS dash_widget_configs (
 );
 
 -- Tax records (config/reporting companion to tax_events ledger)
+-- tax_events: individual tax events linked to operations ( ledger SoT )
+-- tax_records: reporting containers for grouped tax events (filing)
 CREATE TABLE IF NOT EXISTS tax_records (
-  id           TEXT PRIMARY KEY,
-  period_key   TEXT NOT NULL,
-  jurisdiction TEXT NOT NULL,
-  summary_json TEXT,
-  status       TEXT NOT NULL CHECK (status IN ('draft','filed','amended')),
-  created_at   TEXT NOT NULL
+  id TEXT PRIMARY KEY,
+  period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR
+  jurisdiction TEXT NOT NULL, -- IR|US|...
+  -- linked_tax_event_id: optional link to original tax event that triggered this record
+  -- For automatic filings, link to the tax_event that initiated the record
+  linked_tax_event_id TEXT REFERENCES tax_events(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  summary_json TEXT, -- JSON aggregation of tax events (total tax, breakdown by kind)
+  -- status enum expanded per P0-013: added 'pending', 'paid', 'cancelled'
+  status TEXT NOT NULL CHECK (status IN ('draft','pending','filed','paid','amended','cancelled')),
+  created_at TEXT NOT NULL,
+  filed_at TEXT, -- when status changed to 'filed'
+  paid_at TEXT, -- when status changed to 'paid'
+  amended_to TEXT REFERENCES tax_records(id) ON DELETE SET NULL ON UPDATE CASCADE, -- link to amended record if this was superseded
+  amended_at TEXT -- when status changed to 'amended'
 );
 
 -- Settings

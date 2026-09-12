@@ -29,6 +29,29 @@ Asset Position  (inv_crypto_holdings)     Cash Position (inv_crypto_cash)
 
 ---
 
+## Canonical economicKind for Crypto Operations (MATH-008)
+
+**قانون اصلی:**
+> هر عملیات رمزارز باید یک `economicKind` مشخص داشته باشد که به **CostBasisEngine** اطلاع می‌دهد چه اتفاقی افتاده:
+>
+> | kind | معنی | realizedPL | cost basis |
+> |------|------|------------|------------|
+> | `internal_transfer` | جابه‌جایی بین holdingهای خودی (بدون تغییر assetKey) | 0 | همان cost (transferredCost) |
+> | `same_owner_bridge` | جابه‌جایی assetKey (مثلاً USDT-ERC20 → USDT-TRC20) | 0 | transferredCost |
+> | `economic_trade` | معامله واقعی (دریافت مبلغ متفاوت) | cost vs proceeds | consideration-based |
+> | `gift_in` | دریافت هدیه | 0 | 0 یا FMV طبق policy |
+> | `gift_out` | اهدا | cost آزادشده | 0 |
+> | `income` | دریافت درآمد (staking, reward) | 0 (income) | FMV at receipt |
+> | `expense` | هزینه خارجی | cost آزادشده | 0 |
+> | `unknown_acquisition` | کاربر باید cost وارد کند | 0 | user-entered |
+> | `unknown_disposal` | فروش خارج سیستم | user-entered proceeds | cost |
+>
+> **ممنوع:** استفاده از قیمت برای محاسبه disposal در `internal_transfer` یا `same_owner_bridge`.
+>
+> **نکته:** CostBasisEngine از Cost-Basis-Engine.md استفاده کند؛ این فیچر فقط event mapping می‌دهد.
+
+---
+
 ## User Stories
 
 ### Must Have
@@ -80,7 +103,7 @@ Asset Position  (inv_crypto_holdings)     Cash Position (inv_crypto_cash)
  - *Transfer با network fee*: مجموع اقتصادی `Σ holdings` کاربر **کاهش می‌یابد** به‌اندازه fee — این «جابه‌جایی خالص» نیست؛ سوزاندن کارمزد است و باید در journal به‌عنوان `fee` ثبت شود.
  - جملهٔ «موجودی کل تغییر نمی‌کند» **فقط** برای transfer بدون fee یا fee_external (پرداخت از دارایی دیگر) صدق می‌کند.
 7. میانگین خرید با هر خرید جدید به‌روزرسانی می‌شود.
-8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` در لحظه ثبت می‌شوند.
+8. کارمزدها با `feeAmount` + `feeCurrency` + `exchangeRateToBase` + `feeToLegRate` (اگر متفاوت از ارز تراکنش) در لحظه ثبت می‌شوند.
 9. موجودی حساب بانکی نمی‌تواند منفی شود.
 9a. موجودی Asset (`inv_crypto_holdings.quantity`) و CashPosition (`inv_crypto_cash.balance`) هیچ‌کدام منفی نمی‌شوند.
 10. نرخ تبدیل لحظه معامله ذخیره و قفل می‌شود.

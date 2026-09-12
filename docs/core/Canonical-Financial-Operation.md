@@ -1,5 +1,22 @@
 > **این سند از مهم‌ترین قراردادهای پروژه است.** هر رویداد مالی = یک `operationId`.
 
+## operationId Nullability Rule (P0-010)
+
+| State | operation_id required? | Rule |
+|-------|----------------------|------|
+| Draft | **optional** | Only allowed if explicitly defined per domain table contract |
+| Posted | **mandatory** | Every posted financial mutation MUST have operation_id → fin_operations |
+| Voided/Failed | **mandatory** | Reversal/correction requires operation_id lineage |
+
+**Enforcement:**
+- Domain tables with `operation_id` nullable: `acc_transactions`, `chk_cheques`, `tax_events`, `inc_transactions`, `exp_transactions`, `ln_loans`, `br_occurrences`, `fg_contributions`
+- Domain tables with `operation_id` NOT NULL: `inv_crypto_transactions`, `inv_stocks_iran_transactions`, `inv_fif_transactions`, `inv_metals_transactions`, `ln_transactions`, `pa_transactions`, `pa_valuations`, `inv_metals_physical_deliveries`, `inv_stocks_iran_corporate_actions`, `bg_transaction_links`, `import_dedupe_keys`
+
+**Status transition:**
+- draft → posted: operation_id may be NULL (if not yet generated) or present
+- Any state → posted: operation_id MUST be present before COMMIT
+- posted → voided: operation_id MUST be present (for reversal lineage)
+
 ## ارجاع الزامی
 
 - `docs/core/Financial-Invariants.md`

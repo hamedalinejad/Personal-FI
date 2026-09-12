@@ -319,39 +319,42 @@ Unrealized NAV Gain   →  NAV path without cash distribution
 `nav_update` بدون cash ≠ `dividend`.  
 `dividend` می‌تواند با کاهش NAV همراه باشد؛ این دو event جدا ثبت می‌شوند (یا یک atomic op با دو leg صریح).
 
-## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L)
+## منطق محاسبه سود/زیان تحقق‌یافته (Realized P&L) — MATH-006 LOCK
 
-فرمول رسمی برای `calculateProfitLoss` و به‌روزرسانی Holding هنگام خرید/فروش یا ابطال واحد (مستقل از سود تقسیمی نقدی که در Business Rules جداگانه توضیح داده شده).
+> **ممنوع**: تعریف فرمول ساده realized P&L در feature prose.  
+> تمام محاسبات realized P&L باید دقیقاً از **Core CostBasisEngine** آمده و آن را با event context خود تراکنش تطبیق دهند.
 
-> **قانون اصلی**: محاسبات خرید و میانگین و Realized P&L همیشه بر اساس `transactionPrice` (قیمت واقعی صدور/ابطال) انجام می‌شود. `nav` فقط برای ارزش‌گذاری و Unrealized P&L استفاده می‌شود.
+**قانون اصلی:**
+> تمام محاسبات realized P&L از **Core CostBasisEngine** می‌آید.  
+> این فرمول‌ها فقط **توضیحات مفهومی** برای درک طراحی هستند؛ پیاده‌سازی **حتماً** باید از `CostBasisEngine` استفاده کند.
+
+**فرمول‌های مفهومی (توضیحی — نه پیاده‌سازی):**
 
 **هنگام خرید/صدور واحد یا سرمایه‌گذاری مجدد سود** (Weighted Average):
-```
+```text
 cost = (unitsBought × transactionPrice) + feeAmount
 newTotalInvested = totalInvested + cost
 newUnits = units + unitsBought
 newAverageBuyPrice = newTotalInvested / newUnits
 ```
-(در صورت وجود، `lastSubscriptionPrice` را با `transactionPrice` به‌روز کنید.)
 
-**هنگام فروش/ابطال واحد** (`averageBuyPrice` استفاده‌شده = میانگین خرید **قبل از این فروش**):
-```
+**هنگام فروش/ابطال واحد:**
+```text
 soldPortionCost = unitsSold × averageBuyPrice
-saleProceeds = unitsSold × transactionPrice // قیمت ابطال واقعی
+saleProceeds = unitsSold × transactionPrice
 realizedPL = saleProceeds - soldPortionCost - feeAmount
-totalInvested -= soldPortionCost // کاهش متناسب با بخش فروخته‌شده
-units -= unitsSold
-averageBuyPrice بدون تغییر می‌ماند // Weighted Average فقط با خرید/صدور جدید تغییر می‌کند
 ```
-(در صورت وجود، `lastRedemptionPrice` را با `transactionPrice` به‌روز کنید.)
 
-> **نکات الزامی**:
-> - تمام محاسبات بالا باید با `decimal.js` انجام شوند (هرگز `Number`).
-> - سود تقسیمی نقدی (`dividend`) بخشی از `realizedPL` نیست؛ به‌عنوان درآمد جداگانه ثبت می‌شود (طبق Business Rules).
-> - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند.
-> - **Unrealized پیش‌فرض issuance/redemption:** `liquidationValue - totalInvested` با `liquidationValue = units × lastRedemptionPrice` (یا redemption روز).
-> - **Unrealized حالت nav:** `(currentNAV - averageBuyPrice) × units` فقط وقتی `valuationMode='nav'` صریح انتخاب شود.
-> - ETF: `(marketPrice - averageBuyPrice) × units`.
+**نکات الزامی:**
+> - تمام محاسبات باید از `CostBasisEngine.applyAll(events)` عبور کنند.
+> - هر تراکنش ساده `buy`, `sell`, `reinvest`, `feeIn`, `feeOut`, `transfer` یک CostBasisEvent می‌سازد.
+> - `realizedPL` فقط از `CostBasisEngine.realizedOnDisposal()` می‌آید.
+> - سود تقسیمی نقدی (`dividend`) بخشی از `realizedPL` نیست؛ به‌عنوان درآمد جداگانه ثبت می‌شود.
+> - `calculateProfitLoss(fundId?)` فقط مجموع `realizedPL` تراکنش‌های `type=sell` را برمی‌گرداند — اما این محاسبه باید از `CostBasisEngine` باشد.
+
+> **Unrealized پیش‌فرض issuance/redemption:** `liquidationValue - totalInvested` با `liquidationValue = units × lastRedemptionPrice`.
+> **Unrealized حالت nav:** `(currentNAV - averageBuyPrice) × units` فقط وقتی `valuationMode='nav'`.
+> ETF: `(marketPrice - averageBuyPrice) × units`.
 
 
 نکات طراحی

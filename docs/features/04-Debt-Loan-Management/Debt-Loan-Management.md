@@ -444,9 +444,20 @@ r = interestRate / 100 // نرخ ماهانه مستقیم — بدون تقسی
 #### مثال: وام هفتگی
 
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۵۲ قسط هفتگی، ۱۸٪ سالانه
-- `r = 0.18 / 52 = 0.003461538...`
+- `r = 0.18 / 52 = 0.003461538461538...`
 - `n = 52`
-- قسط هفتگی = `100000000 × [r(1+r)^52] / [(1+r)^52 - 1] ≈ 2,115,000 ریال`
+- `PMT = 100000000 × [r(1+r)^52] / [(1+r)^52 - 1] = 2,104,660.886207...`
+- **Exact unrounded PMT:** `2,104,660.886207...` ریال
+- **Rounded PMT (round-half-up to 2 decimal):** `2,104,660.89` ریال
+- **Note:** Schedule Engine must produce exact unrounded PMT for formula verification; rounded values only for UI display and posted schedule.
+
+**Test vector:**
+```
+P = 100000000
+r = 0.18 / 52 = 0.00346153846153846153846153846...
+n = 52
+PMT = 2104660.886207...
+```
 
 #### مثال: وام فصلی (quarterly)
 
@@ -458,9 +469,19 @@ r = interestRate / 100 // نرخ ماهانه مستقیم — بدون تقسی
 #### مثال: وام سفارشی هر ۴۵ روز
 
 - وام ۵۰,۰۰۰,۰۰۰ ریال، ۸ قسط هر ۴۵ روز، ۱۸٪ سالانه
-- `r = 0.18 × 45 / 365 = 0.022191...`
+- `r = 0.18 × 45 / 365 = 0.022191780821917...`
 - `n = 8`
-- قسط = `50000000 × [r(1+r)^8] / [(1+r)^8 - 1] ≈ 6,956,000 ریال`
+- `PMT = 50000000 × [r(1+r)^8] / [(1+r)^8 - 1] = 6,890,118.148128...`
+- **Exact unrounded PMT:** `6,890,118.148128...` ریال
+- **Rounded PMT (round-half-up to 2 decimal):** `6,890,118.15` ریال
+
+**Test vector:**
+```
+P = 50000000
+r = 0.18 * 45 / 365 = 0.02219178082191780821917808219...
+n = 8
+PMT = 6890118.148128...
+```
 
 ---
 
@@ -480,7 +501,11 @@ function getYearBasis(dayCountConvention: DayCountConvention, dayCountDenominato
     case 'actual_360': return 360;
     case '30_360': return 360;
     case 'actual_365': return 365;
-    case 'actual_actual': return 365; // v1 ساده؛ leap در major بعد
+    case 'actual_actual':
+      // v1 simplified: returns 365 for all years (no leap-year support)
+      // real actual/actual requires date-aware calculation and is deferred to v2
+      // DO NOT use 'actual_actual' in v1 for production - use 'actual_365' instead
+      return 365;
     case 'custom_days':
       if (!dayCountDenominator || dayCountDenominator <= 0)
         throw new Error('dayCountDenominator برای custom_days الزامی است');
@@ -573,11 +598,24 @@ installment_n = principalPortion_n + interestPortion_n // ممکن است با �
 
 ### ب) Flat Rate (سود ثابت)
 
+> **مهم — مدت کل وام در Flat Rate:**
+> - `yearsTotal` = **نه** ساده `n / periodsPerYear`
+> - برای روش‌های دیگر: تعداد دوره‌ها تقسیم بر فرکانس (مثلاً ۱۲ ماه / ۱۲ = ۱ سال)
+> - برای Flat Rate v1: **متد اصلی فقط اقساط منظم (period_based)** پشتیبانی می‌شود
+> - برای اقساط نامنظم (custom): duration = `n × customIntervalDays / 365` (_actual_365 approximation)
+> - اگر `dayCountConvention = 'actual_365'` یا `period_based`: `yearsTotal = n / periodsPerYear`
+> - اگر `dayCountConvention = 'custom_days'`: `yearsTotal = n × customIntervalDays / 365`
+> - اگر irregular first/last period: **defers to v2** ( Flat Rate v1 = regular schedules only)
+
 **محاسبه:**
 ```
 r = getPeriodRate(loan) // نرخ دوره‌ای
 n = getTotalPeriods(loan) // تعداد اقساط
-yearsTotal = n / periodsPerYear(loan) // مدت کل وام به سال
+
+// duration calculation per convention:
+// period_based/actual_365/actual_360/30_360 → yearsTotal = n / periodsPerYear
+// custom_days → yearsTotal = n × customIntervalDays / 365
+yearsTotal = n / periodsPerYear(loan) // مدت کل وام به سال (v1: regular schedules only)
 
 totalInterest = principalAmount × (interestRate/100) × yearsTotal
 fixedInstallmentAmount = (principalAmount + totalInterest) / n
@@ -591,13 +629,19 @@ interestPortion = totalInterest / n // ثابت برای تمام اقساط
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۱۲ ماه، ۱۲٪ سالانه
 - yearsTotal = 12/12 = 1
 - totalInterest = 12,000,000
-- fixedInstallmentAmount ≈ 9,333,333
+- fixedInstallmentAmount = 112,000,000 / 12 = 9,333,333.33
 
 **مثال فصلی:**
 - وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۸ قسط فصلی، ۲۴٪ سالانه
 - yearsTotal = 8/4 = 2
 - totalInterest = 100,000,000 × 0.24 × 2 = 48,000,000
 - fixedInstallmentAmount = 148,000,000 / 8 = 18,500,000
+
+**مثال custom (هر ۴۵ روز):**
+- وام ۱۰۰,۰۰۰,۰۰۰ ریال، ۸ قسط هر ۴۵ روز، ۱۸٪ سالانه
+- yearsTotal = 8 × 45 / 365 = 0.9863...
+- totalInterest = 100,000,000 × 0.18 × 0.9863... = 17,753,424.65...
+- fixedInstallmentAmount = 117,753,424.65... / 8 = 14,719,178.08...
 
 ---
 
@@ -708,7 +752,14 @@ remainingBalance_atChange = آخرین remainingBalance از ln_transactions (ب
 remainingInstallments_atChange = totalInstallments - installmentsPaidSoFar
 
 // ۵. بازمحاسبه قسط با نرخ جدید
+// **مهم — MATH-005**: نرخ باید از ln_rate_history رزولو شود، نه از نرخ اولیه استفاده شود
+//   - اگر رکوردی در ln_rate_history با effectiveDate ≤ dueDate قسط بعدی وجود داشت:
+//     → از آن نرخ استفاده شود
+//   - وگرنه: از newRate استفاده شود
+//   - سپس: r_new = getPeriodRate(resolvedRate) با همان frequency محاسبه شود
+
 r_new = getNewPeriodRate(newRate, loan.installmentFrequency, loan.customIntervalDays)
+// مانده: getNewPeriodRate باید نرخ را از last ln_rate_history rate یا newRate بگیرد
 
 if loan.recalculateOnEarlyPayment = true (حالت: تعداد ثابت، مبلغ تغییر می‌کند):
  calculatedInstallment = remainingBalance_atChange × [r_new(1+r_new)^n] / [(1+r_new)^n - 1]
@@ -721,6 +772,8 @@ else (حالت: مبلغ قسط ثابت — recalculateOnEarlyPayment = false):
  newRemainingInstallments = ceil( -ln(1 - (remainingBalance_atChange × r_new) / calculatedInstallment) / ln(1 + r_new) )
  UPDATE ln_loans SET totalInstallments = installmentsPaidSoFar + newRemainingInstallments
 ```
+
+> **قانون MATH-005**: هیچ‌وقت از `r = getPeriodRate(originalLoanRate)` برای بازمحاسبه بعد از تغییر نرخ استفاده نشود. نرخ باید از آخرین رکورد `ln_rate_history` (یا `newRate` اگر رکوردی نبود) محاسبه شود.
 
 #### accrued interest — دقیقاً چه اتفاقی می‌افتد؟
 

@@ -19,6 +19,26 @@ tradeDate, settlementDate, cashSettlementStatus = pending|settled|failed
 
 IranSettlement Core — hard-code داخل UI ممنوع.
 
+## ST-002 — T+2 Settlement with Iran Business Calendar
+
+Settlement date calculation MUST use a **versioned Iran business calendar**, not `+2 calendar days`.
+
+```text
+settlementDate = nextTradingDay(nextTradingDay(tradeDate))  // T+2 business days
+```
+
+- T+2 = two business days after tradeDate (T+0)
+- تا T+2: settlement pending; T+2: settlement posted
+- weekend (پنجشنبه/جمعه) و تعطیلات رسمی در محاسبه محض نیستند
+- Holiday-shift: اگر T+2 تعطیل باشد، settlementDate = اولین روز کاری بعدی
+
+**Acceptance fixtures must include:**
+- Trade on Friday → settlement on Tuesday (T+2 business days)
+- Trade on Thursday → settlement on Monday (T+2 business days, skip Friday/Saturday)
+- Trade before public holiday → T+2 shifted past holiday
+
+See: `iran/IRAN-SETTLEMENT.md` (or similar) for Iran business calendar spec.
+
 ---
 
 ## Trade vs Settlement (قفل)

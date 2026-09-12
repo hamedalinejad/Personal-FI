@@ -176,7 +176,7 @@
 - ارزش پرتفوی سهام ایران
 - ارزش صندوق‌های درآمد ثابت
 - ارزش فلزات (پلتفرم‌ها — holding)
-- **موجودی نقدی پلتفرم‌ها/کارگزاری‌های سرمایه‌گذاری** (شرطی — فقط اگر `includeCashInWealth = true` در تنظیمات پرتفوی؛ منابع: `inv_metals_platforms.cashBalance` + `inv_stocks_iran_brokerages.cashBalance`)
+- **موجودی نقدی سیستم (Core journal)**: `fin_accounts` + `fin_journal_lines` از `CashSettlementPort` — **نه** `inv_metals_platforms.cashBalance` / `inv_stocks_iran_brokerages.cashBalance` (این‌ها فقط cache است)
 - ارزش دارایی‌های فیزیکی
 
 ### بدهی‌ها:

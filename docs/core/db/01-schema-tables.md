@@ -7,7 +7,7 @@
 | جدول | فیچر | توضیح |
 |------|------|------|
 | `acc_accounts` | Accounts & Banking | حساب‌های بانکی |
-| `acc_transactions` | Accounts & Banking | **Bank/account event log + projection** (linked by operationId). **Cash balance SoT = journal lines, not this table.** |
+| `acc_transactions` | Accounts & Banking | **Cash event log + UX projection** (operationId link). **Cash balance SoT = fin_journal_lines, not this table.** |
 | `fin_accounts` | Core Accounting | **Chart of accounts** — حساب واقعی (بانک ملت، هزینه خوراک، …) — **Must** |
 | `db_meta` / schema_version store | Infrastructure | persistence state, schemaVersion, databaseId — **Must** |
 | `fin_operations` | Core Accounting | عملیات کاربر (BUY/PAY/TRANSFER/…) — operationId, commandHash, status — **Must** |
@@ -95,6 +95,85 @@
 - همه جداول تمام فیچرها در اینجا لیست شده‌اند
 - هر جدول با نام یکپارچه و پیشوند معین آمده
 - برای جزئیات فیلدها، به فایل فیچر مربوطه مراجعه شود
+
+---
+
+## source_type و sourceReference (P0-011)
+
+### source_type (business provenance)
+
+فیلد `source_type` در تمام جداولی که ارجاع به منبع داده دارند، **نوع منبع داده از نظر تجاری** را مشخص می‌کند (نه کانال ورودی):
+
+| مقدار | معنی | مثال |
+|-------|------|------|
+| `ui` | کاربر از طریق UI عمل کرد | کلیک دکمه خرید |
+| `api` | درخواست API از خارج | webhook، کلاینت موبایل |
+| `import` | داده‌ای از خارج وارد شد | CSV، JSON، فایل صورت حساب |
+| `migration` | انتقال داده یکبار مصرف | مهاجرت از سیستم قبلی |
+| `system` | عملیات خودکار سیستم | محاسبه مالیات، تصحیح پیش‌فرض |
+| `reconciliation` | تنظیم دستی توسط کاربر | تطبیق دستی چک |
+
+### source_type vs sourceChannel (تفاوت مهم)
+
+- `source_type`: **نوع منبع داده** (csv، api، ui)
+- `sourceChannel` (اختیاری - در آینده ممکن است اضافه شود): **کانال ورودی** (web، mobile، desktop)
+
+### sourceReference (audit trail)
+
+فیلد `sourceReference` اطلاعات ارجاع به منبع اصلی را نگه می‌دارد:
+
+| جدول | مقدار پیشنهادی |
+|------|----------------|
+| `import_raw_records` | file name، URL، batch label |
+| `acc_transactions` | transaction id in external system |
+| `fin_audit_log` | idempotency key، command hash |
+
+**Invariant:** source_type و sourceReference برای audit و debugging ضروری هستند، اما برای محاسبات مالی مؤثر نیستند.
+
+---
+
+## tax_records Status Transitions (P0-013)
+
+### Status Enum
+
+| Value | Meaning | Notes |
+|-------|---------|-------|
+| `draft` | Pending review | Can be edited |
+| `pending` | Ready to file | Cannot be edited |
+| `filed` | Submitted to authority | Payment pending |
+| `paid` | Paid in full | **Only via payTax operation** |
+| `amended` | Superseded by correction | Links to new record |
+| `cancelled` | Withdrawn before filing | No payment occurred |
+
+### Valid Status Transitions
+
+```
+draft → pending → filed → paid
+draft → pending → filed → amended
+draft → cancelled
+pending → cancelled
+amended (creates new record with amended_to link)
+```
+
+### Invalid Transitions
+
+- `paid` → any other status: **FORBIDDEN** (payment is final)
+- `filed` → `paid` directly: **FORBIDDEN** (must go through pending)
+- `paid` → `amended`: **FORBIDDEN** (amended creates new record)
+- `cancelled` → `draft`: **FORBIDDEN**
+
+### Payment Flow (payTax Operation)
+
+**Only allowed path to 'paid' status:**
+
+```
+payTax operation
+  → tax_records.status = 'paid'
+  → paid_at = current timestamp
+  → fin_journal_lines: Dr tax_payable, Cr cash
+```
+
+**Invariant:** Direct status updates to 'paid' without payTax operation are FORBIDDEN. Tax payment is an atomic financial operation with full audit trail.
 
 ---
 

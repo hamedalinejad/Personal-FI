@@ -54,7 +54,7 @@ fin_journal_lines     خطوط Dr/Cr با accountId
 
 ### `fin_accounts` — **Must Have از v1 (نه Future)**
 
-حداقل ستون‌ها: `id, code, name, type, parentId, currency, systemRole, linkedEntityType, linkedEntityId, isActive, createdAt, updatedAt`
+حداقل ستون‌ها: `id, code, name, account_kind, currency, parent_id, is_archived, status, role, reconciliation_status, external_ref_json, created_at, updated_at`
 
 Seed خودکار: «بانک ملت» → `1101 بانک ملت`؛ خرید BTC → account دارایی مربوط. کاربر UI دوطرفه نمی‌بیند — complexity در Engine.
 
@@ -65,12 +65,14 @@ Seed خودکار: «بانک ملت» → `1101 بانک ملت`؛ خرید BTC
 | `id` | UUID |
 | `code` | کد اختیاری (مثلاً 1101) |
 | `name` | «بانک ملت»، «هزینه خوراک» |
-| `type` | `asset` \| `liability` \| `equity` \| `income` \| `expense` |
-| `parentId` | nullable — گروه ساده |
+| `account_kind` | `asset` \| `liability` \| `equity` \| `income` \| `expense` |
 | `currency` | ارز حساب (یا multi با rate روی line) |
-| `isActive` | |
-| `systemRole` | نقش سیستمی: `bank_link` \| `broker_cash` \| `crypto_holding` \| `loan_liability` \| `opening_equity` \| `user` \| … |
-| `linkedEntityType` / `linkedEntityId` | اختیاری: پیوند به `acc_accounts.id`، holding، loan |
+| `parent_id` | nullable — گروه ساده |
+| `is_archived` | boolean |
+| `status` | `active` \| `inactive` \| `closed` |
+| `role` | نقش سیستمی: `checking` \| `savings` \| `brokerage` \| `credit_card` \| `wallet` \| `cash_box` \| … |
+| `reconciliation_status` | `unreconciled` \| `matched` \| `partial` \| `stale` \| null |
+| `external_ref_json` | JSON برای ارجاع خارجی |
 
 **Seed:** هنگام ساخت حساب بانکی / دسته هزینه / وام، سیستم **خودکار** `fin_accounts` می‌سازد. کاربر عادی فقط «بانک ملت» و «خوراک» را می‌بیند — نه ERP.
 
@@ -79,11 +81,13 @@ Seed خودکار: «بانک ملت» → `1101 بانک ملت`؛ خرید BTC
 | فیلد | نقش |
 |------|-----|
 | `id` | UUID سند |
-| `operationId` | FK → fin_operations |
-| `businessDate` | |
+| `operation_id` | FK → fin_operations |
+| `business_date` | |
 | `memo` | |
-| `isVoided` | |
-| `createdAt` | |
+| `post_state` | `draft` \| `posted` \| `void` (mirrors operation status) |
+| `reference_number` | اختیاری |
+| `fiscal_period_id` | اختیاری |
+| `created_at` | |
 
 معمولاً **یک entry per operation**؛ reversal = operation + entry جدید.
 
@@ -92,18 +96,26 @@ Seed خودکار: «بانک ملت» → `1101 بانک ملت`؛ خرید BTC
 | فیلد | نقش |
 |------|-----|
 | `id` | |
-| `operationId` | FK به fin_operations |
-| `accountId` | **FK به fin_accounts — اجباری** |
-| `direction` | debit \| credit |
-| `amount`, `currency`, `exchangeRateToBase`, `amountInBase` | |
-| `lineKind` | WHY: fee, fx_rounding, asset, … |
-| `accountClass` | **مشتق/کش** از `fin_accounts.type` + systemRole برای فیلتر سریع — نه جایگزین accountId |
-| `relatedFeature`, `relatedId` | |
-| `memo` | |
+| `entry_id` | **FK به fin_journal_entries — اجباری** |
+| `account_id` | **FK به fin_accounts — اجباری** |
+| `side` | `debit` \| `credit` |
+| `amount` | مبلغ |
+| `currency` | ارز خط |
+| `amount_in_base` | مبلغ به ارز پایه |
+| `exchange_rate_to_base` | نرخ تبدیل |
+| `conversion_path` | JSON وقتی چندین مسیر تبدیل وجود دارد |
+| `line_number` | شماره خط (1-based) |
+| `line_kind` | WHY: `fee` \| `tax` \| `principal` \| `interest` \| `fx` \| `fx_gain` \| `fx_loss` \| `adjustment` \| `other` |
+| `memo` | توضیحات |
+| `reference` | ارجاع |
+| `source_type` | `ui` \| `api` \| `import` \| `migration` \| `system` \| `reconciliation` |
+| `source_reference` | ارجاع منبع |
 
 ```text
-Σ amountInBase debit = credit per operationId
+Σ amount_in_base debit = credit per operation_id
 ```
+
+> **نکته مهم:** `operation_id` روی `fin_journal_lines` **وجود ندارد**. این فیلد از طریق `entry_id → fin_journal_entries.operation_id` مشتق می‌شود. تکرار `operation_id` در هر خط فقط وقتی می‌تواند معتبر باشد که تیم آن را به صورت عمداً denormalize کرده و محدودیت‌های سازگاری تعریف کرده باشد.
 
 ### مثال UI ساده
 
@@ -217,7 +229,7 @@ Accounting Core = حقیقت مالی میان‌فیچری؛ Investment = speci
 
 | Field | |
 |-------|--|
-| `isVoided` / void via reversal | حذف سخت DELETE ممنوع |
+| `post_state` / void via reversal | حذف سخت DELETE ممنوع |
 | `reconciledAt` | nullable — پس از reconcile موفق |
 | `idempotencyKey` / operationId | روی fin_operations |
 

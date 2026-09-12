@@ -44,30 +44,38 @@
 
 ### ۲. Transaction — `acc_transactions`
 
+> **Canonical schema (minimal cash event log):**
+> ```sql
+> CREATE TABLE acc_transactions (
+>   id             TEXT PRIMARY KEY,
+>   account_id     TEXT NOT NULL REFERENCES acc_accounts(id),
+>   operation_id   TEXT REFERENCES fin_operations(id),
+>   business_date  TEXT NOT NULL,
+>   amount         TEXT NOT NULL,
+>   currency       TEXT NOT NULL,
+>   direction      TEXT,
+>   memo           TEXT,
+>   created_at     TEXT NOT NULL
+> );
+> ```
+
 | فیلد | نوع | توضیح |
 |------|-----|--------|
 | `id` | UUID | PK |
-| `date` | datetime | زمان رویداد |
-| `businessDate` | date nullable | روز کسب‌وکار در صورت نیاز گزارش |
-| `type` | `TransactionType` | فقط از `core/types/types.md` |
-| `amount` | decimal string | همیشه > 0؛ جهت از `type` |
-| `feeAmount` | decimal string nullable | >= 0 |
-| `feeCurrency` | string nullable | |
-| `exchangeRateToBase` | decimal string | ارز حساب → baseCurrency در لحظه ثبت |
-| `balanceAfterTransaction` | decimal string | snapshot مشتق؛ authoritative نیست |
-| `accountId` | UUID | FK RESTRICT |
-| `description` | string nullable | |
-| `relatedFeature` | `RelatedFeature` nullable | |
-| `relatedId` | UUID nullable | |
-| `isVoided` | boolean | |
-| `relatedTransactionId` | UUID nullable | reversal → اصل |
-| `operationId` | UUID | مشترک در یک atomic op |
-| `source` | enum | `ui` \| `import` \| `system` \| `migration` |
-| `createdAt` / `updatedAt` | datetime UTC | |
+| `account_id` | UUID | FK به `acc_accounts` |
+| `operation_id` | UUID | FK به `fin_operations` — برای اتصال به معامله کل |
+| `business_date` | date | روز کسب‌وکار (برای گزارش) |
+| `amount` | decimal string | مبلغ (همیشه > 0، جهت از `direction` یا `operation_type` مشخص می‌شود) |
+| `currency` | string | ارز حساب |
+| `direction` | string | `in` \| `out` \| `transfer` \| null (کمینه برای UI/UX) |
+| `memo` | string nullable | توضیحات |
+| `created_at` | datetime | |
+
+> **نکته مهم:** `acc_transactions` فقط **cash event log** است. نوع معامله (`type`) و وضعیت (`isVoided`) از طریق `operation_id → fin_operations` مشتق می‌شود. برای جزئیات بیشتر (fee، exchange rate، ...) به جدول دامنه خاص (crypto، stocks، loan، ...) مراجعه کنید.
 
 **اثر روی مانده (ساده):**
-- انواع `deposit-*` / `transfer-in` → +amount (− fee در صورت کسر از حساب)
-- انواع `withdrawal-*` / `transfer-out` → −amount (− fee)
+- `direction = in` / `transfer` → +amount
+- `direction = out` → −amount
 
 > سرمایه‌گذاری: `deposit-investment` / `withdrawal-investment` با `relatedFeature` یکی از `crypto_exchange` | `stocks_iran` | `fif` | `metals` و `relatedId` به جدول دامنه همان فیچر.
 

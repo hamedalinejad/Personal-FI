@@ -728,8 +728,15 @@ See also: `IranSettlement` in `docs/core/iran/README.md`.
 
 | Use | Date |
 |-----|------|
-| Position / trade P&L recognition timing | `tradeDate` (business/trade) |
-| Cash leg / brokerage cash availability | `settlementDate` (+ `effectiveCashDate` when distinct) |
+| Position / trade P&L recognition timing | `tradeDate` (exchange trade date, T+0) |
+| Quote/session reference | `marketDate` (session date for pricing) |
+| Cash leg / brokerage cash availability | `settlementDate` (+ `effectiveCashDate` when distinct, T+2 for Iranian market) |
+
+**STOCK-001 LOCK:** `tradeDate` is NOT a synonym of `marketDate`. These are distinct semantics:
+- `tradeDate` = exchange trade execution date
+- `marketDate` = quote/session pricing date
+- `settlementDate` = cash/settlement date (T+2 for Iranian market)
+- `businessDate` = accounting book date (typically same as tradeDate unless policy says otherwise)
 
 Reports must not use a single `date` for both position P&L and cash. See Settlement-Accounting + Date-Semantics-Matrix.
 
@@ -742,7 +749,32 @@ Reports must not use a single `date` for both position P&L and cash. See Settlem
 
 ---
 
-## ST-003 — Rights / fractional / cash-in-lieu
+## ST-003 — Corporate Action Identity (STOCK-003)
+
+**Freeze:**
+
+```
+CA event = inv_stocks_iran_corporate_actions (canonical source)
+operation_id = operation (economic event)
+stock transaction rows = projections/effects (derived)
+```
+
+- Each CA is **idempotent** and applied **exactly once** per instrument
+- `inv_stocks_iran_corporate_actions` is the canonical CA record (source of truth)
+- `operation_id` links the CA to its economic operation
+- Stock transactions are **projections** of the CA effect; they never modify CA metadata
+
+**Rules:**
+1. One CA per `operation_id` (no duplicate CA operations)
+2. CA can be applied multiple times (e.g., rights for multiple holdigns) but only **once per instrument**
+3. Rebuild/verification: CA ledger must match CA count per instrument
+4. CA history preserved in `inv_stocks_iran_corporate_actions`; never modified
+
+See also: `Corporate-Action-Engine.md`.
+
+---
+
+## ST-004 — Rights / fractional / cash-in-lieu
 
 ```text
 entitlement = f(holdingQty, ratio, instrument precision, market rules)
