@@ -495,6 +495,22 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
   bounced_reason TEXT);
 
 -- ─── Import preservation envelope (P0-FINAL-039) ─────────────
+
+-- DATA-002: explicit import batch header (batch_id on import_raw_records references this)
+CREATE TABLE IF NOT EXISTS import_batches (
+  id                    TEXT PRIMARY KEY,
+  source_provider       TEXT NOT NULL,
+  source_type           TEXT, -- csv|json|api|manual|broker_export
+  source_reference      TEXT,
+  source_schema_version TEXT,
+  document_id           TEXT REFERENCES docs_documents(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  status                TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','processing','completed','failed','cancelled')),
+  record_count          INTEGER,
+  content_hash          TEXT,
+  created_at            TEXT NOT NULL,
+  completed_at          TEXT
+);
+
 CREATE TABLE IF NOT EXISTS import_raw_records (
   id                    TEXT PRIMARY KEY,
   batch_id              TEXT NOT NULL, -- import batch (MR-230)
@@ -969,7 +985,12 @@ CREATE TABLE IF NOT EXISTS tax_events (
   is_manual_adjustment INTEGER NOT NULL DEFAULT 0 CHECK (is_manual_adjustment IN (0, 1)),
   adjustment_reason TEXT, -- required when manual (MR-207)
   document_id TEXT, -- link to docs_documents evidence (MR-206)
-  status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')), -- draft|posted|amended|void
+  status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')),
+  -- TAX-002 period semantics (do not infer bounds from bare year)
+  tax_year TEXT,
+  calendar_system TEXT CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')),
+  period_start TEXT,
+  period_end TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)
@@ -1262,11 +1283,16 @@ CREATE TABLE IF NOT EXISTS docs_documents (
   id           TEXT PRIMARY KEY,
   title        TEXT,
   mime_type    TEXT,
-  storage_path TEXT NOT NULL,
+  -- DATA-001: never absolute OS path as business identity
+  relative_path TEXT, -- preferred relative path within vault
+  blob_id       TEXT, -- content-addressed / storage key
+  storage_kind  TEXT CHECK (storage_kind IS NULL OR storage_kind IN ('relative','blob','external_ref')),
+  storage_path  TEXT, -- DEPRECATED alias; prefer relative_path or blob_id
   checksum     TEXT,
   size_bytes INTEGER CHECK (size_bytes IS NULL OR size_bytes >= 0),
   created_at   TEXT NOT NULL,
-  updated_at   TEXT NOT NULL
+  updated_at   TEXT NOT NULL,
+  CHECK (relative_path IS NOT NULL OR blob_id IS NOT NULL OR storage_path IS NOT NULL)
 );
 
 CREATE TABLE IF NOT EXISTS docs_links (

@@ -26,27 +26,58 @@ export function recordTaxEvent(dataDir, {
   const db = openDb(dataDir);
   const id = randomUUID();
   const now = new Date().toISOString();
-  db.prepare(
-    `INSERT INTO tax_events (
-      id, operation_id, tax_kind, amount, currency, period_key,
-      jurisdiction, rule_version, basis_amount, is_deductible, is_manual_adjustment,
-      adjustment_reason, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'posted', ?, ?)`,
-  ).run(
-    id,
-    operationId,
-    taxKind,
-    taxAmount,
-    currency,
-    period,
-    jurisdiction,
-    policyVersion,
-    baseAmount,
-    isManualAdjustment ? 1 : 0,
-    adjustmentReason,
-    now,
-    now,
-  );
+  const cols = db.prepare(`PRAGMA table_info(tax_events)`).all().map((c) => c.name);
+  const hasPeriod = cols.includes("tax_year");
+  if (hasPeriod) {
+    db.prepare(
+      `INSERT INTO tax_events (
+        id, operation_id, tax_kind, amount, currency, period_key,
+        jurisdiction, rule_version, basis_amount, is_deductible, is_manual_adjustment,
+        adjustment_reason, status, tax_year, calendar_system, period_start, period_end,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'posted', ?, ?, ?, ?, ?, ?)`,
+    ).run(
+      id,
+      operationId,
+      taxKind,
+      taxAmount,
+      currency,
+      period,
+      jurisdiction,
+      policyVersion,
+      baseAmount,
+      isManualAdjustment ? 1 : 0,
+      adjustmentReason,
+      period,
+      "gregorian",
+      businessDate || null,
+      businessDate || null,
+      now,
+      now,
+    );
+  } else {
+    db.prepare(
+      `INSERT INTO tax_events (
+        id, operation_id, tax_kind, amount, currency, period_key,
+        jurisdiction, rule_version, basis_amount, is_deductible, is_manual_adjustment,
+        adjustment_reason, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'posted', ?, ?)`,
+    ).run(
+      id,
+      operationId,
+      taxKind,
+      taxAmount,
+      currency,
+      period,
+      jurisdiction,
+      policyVersion,
+      baseAmount,
+      isManualAdjustment ? 1 : 0,
+      adjustmentReason,
+      now,
+      now,
+    );
+  }
   return { id, persisted: true, operationId, taxKind, taxAmount, currency, periodKey: period };
 }
 
