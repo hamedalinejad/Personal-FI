@@ -40,3 +40,9 @@ npm run gates
 | Full product | not integrated / not release-proven |
 
 Loan under `src/features/loan` is the reference implementation pattern.
+
+
+## Phase declaration
+
+Documentation-first + implementation scaffold / reference runtime + **pre-production**. Production: **NO-GO**.
+See `docs/core/authority/SCAFFOLD-FINAL-STATUS.md`.

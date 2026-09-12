@@ -24,3 +24,8 @@ See `OPEN-ISSUES-REGISTER.md` — not documentation blockers.
 
 
 See also: docs/core/authority/FINAL-VERDICT-AND-GATES.md (binding verdict 2026-09-12).
+
+
+### Scaffold freeze
+
+See `authority/SCAFFOLD-FINAL-STATUS.md`. Runtime tests green does not equal production GO.

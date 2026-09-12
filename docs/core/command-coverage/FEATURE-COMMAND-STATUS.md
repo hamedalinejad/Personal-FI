@@ -21,3 +21,8 @@ updated: 2026-09-10
 | Metals | sell/delivery | SPEC_LOCKED |
 
 Edition release proof (B-041) is separate and **not green**.
+
+## Scaffold freeze (2026-09-12)
+
+Integrated commands have Gate H + Fee Engine where applicable.
+Next implementation priority: Loan RELEASE-PROVEN matrix, then Crypto sell under same contracts.
