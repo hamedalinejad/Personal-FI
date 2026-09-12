@@ -53,3 +53,4 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 
 - docs/core/authority/DATA-OWNERSHIP-AND-MODELS.md
 - docs/core/authority/FINAL-VERDICT-AND-GATES.md
+- docs/core/authority/DOCUMENTATION-READY.md

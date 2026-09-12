@@ -6,6 +6,16 @@ import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
 import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
 import { normalizeRatePercentage } from "../../../core/domain/loan/scheduleEngine.js";
 
+/** Integer period count only (not a money amount). */
+function parsePeriods(v) {
+  if (v == null || v === "") throw new Error("VALIDATION_ERROR:periods");
+  const s = String(v).trim();
+  if (!/^[0-9]+$/.test(s)) throw new Error("VALIDATION_ERROR:periods");
+  const n = Number(s);
+  if (!Number.isFinite(n) || n <= 0) throw new Error("VALIDATION_ERROR:periods");
+  return n;
+}
+
 /**
  * loan.create — no silent defaults; all domain writes inside one SQLite txn.
  */
@@ -117,7 +127,7 @@ export async function createLoan(
         now,
         p.startDate,
         operationId,
-        Number(p.periods),
+        parsePeriods(p.periods),
         p.dayCount,
         engineVersion,
         p.notes || null,

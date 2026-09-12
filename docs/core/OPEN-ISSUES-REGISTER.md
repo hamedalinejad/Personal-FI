@@ -23,3 +23,9 @@
 ## Production ship
 
 Still requires green Actions on `main` + product recovery checklist.
+
+
+## Snapshot 2026-09-12
+
+Runtime scaffold tests green (114+). Production NO-GO. See authority/OPEN-REQUIREMENTS-RELEASE.md and FINAL-VERDICT-AND-GATES.md.
+Historical `FINAL-AUDIT-STATUS-2026-09-08.md` removed (zero inbound refs).
