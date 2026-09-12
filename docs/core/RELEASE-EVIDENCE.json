@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-09-12T21:06:36.393Z",
+  "schemaHash": "8d1398576a7a55a3",
+  "gatesScript": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity",
+  "status": {
+    "production": "NO-GO",
+    "loanVerticalCoding": "ALLOWED_UNDER_CODING_GATE",
+    "browserSqlJs": "OPEN",
+    "fullReports": "PARTIAL",
+    "standaloneAll": "PARTIAL"
+  },
+  "requiredGreenForRelease": [
+    "npm run gates",
+    "Golden families claimed",
+    "Recovery matrix COVERED",
+    "Standalone editions claimed",
+    "Browser adapter RELEASE-PROVEN if shipping browser",
+    "REQ-001 deferred commands explicit"
+  ],
+  "docs": {
+    "reqStatus": "docs/core/REQ-001-032-STATUS.md",
+    "audit613": "docs/core/AUDIT-BATCH-6-13-STATUS.md",
+    "authority": "docs/core/DOC-AUTHORITY-CHAIN.md"
+  }
+}

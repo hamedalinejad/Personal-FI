@@ -1,3 +1,5 @@
+> Live REQ matrix: `docs/core/REQ-001-032-STATUS.md` + `docs/core/RELEASE-EVIDENCE.json`.
+
 > See also `docs/core/AUDIT-BATCH-6-13-STATUS.md` for test/offline/mod status.
 
 # Open requirements (release)

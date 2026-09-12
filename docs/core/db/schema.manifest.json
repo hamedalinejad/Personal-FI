@@ -1,5 +1,5 @@
 {
-  "schemaHash": "8fde38e5c5eeaf486920df6f82c54df629021fbea9021cc8a9eb28bc4fe32003",
+  "schemaHash": "77b4095f611d6caf04c0686bd2ea9bebdf3b6f4e22d104cc818161b803dee21c",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -179,7 +179,7 @@
         }
       ],
       "checks": [
-        "CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account','bank','investment','loan','credit','other')",
+        "CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account')",
         "CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')",
         "CHECK (is_archived IN (0, 1)",
         "CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')",
@@ -4039,7 +4039,7 @@
           "pk": 0
         },
         {
-          "name": "feeFundingKind",
+          "name": "fee_funding_kind",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -4060,14 +4060,14 @@
           "pk": 0
         },
         {
-          "name": "fromAddressId",
+          "name": "from_address_id",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
           "pk": 0
         },
         {
-          "name": "toAddressId",
+          "name": "to_address_id",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -4145,9 +4145,9 @@
         }
       ],
       "checks": [
-        "CHECK ( feeFundingKind IS NULL OR (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)",
-        "CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')",
-        "CHECK (feeFundingKind IS NULL OR feeFundingKind IN ('cash','asset')",
+        "CHECK ( fee_funding_kind IS NULL OR (fee_funding_kind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)",
+        "CHECK (economic_kind IS NULL OR economic_kind IN ( 'acquisition','disposal','transfer','internal_transfer','bridge','economic_swap','fee','income','adjustment','swap' )",
+        "CHECK (fee_funding_kind IS NULL OR fee_funding_kind IN ('cash','asset')",
         "CHECK (tx_type IN ('buy','sell','transfer_in','transfer_out','deposit','withdraw','fee','adjustment','swap')"
       ]
     },
@@ -5895,9 +5895,37 @@
           "pk": 0
         },
         {
-          "name": "rate_or_amount",
+          "name": "calculation_method",
           "type": "TEXT",
           "notnull": true,
+          "dflt": "'rate_or_fixed'",
+          "pk": 0
+        },
+        {
+          "name": "calculation_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rate",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fixed_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "rate_or_amount",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -5923,14 +5951,28 @@
           "pk": 0
         },
         {
-          "name": "day_count",
+          "name": "period",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
           "pk": 0
         },
         {
-          "name": "calculation_base",
+          "name": "application_moment",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "priority",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "100",
+          "pk": 0
+        },
+        {
+          "name": "day_count",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -5973,9 +6015,12 @@
         }
       ],
       "checks": [
-        "CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment')",
-        "CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual')",
-        "CHECK (is_percentage IN (0, 1)"
+        "CHECK ( calculation_method IN ('percentage_of_base','fixed_amount','rate_or_fixed','tiered_lookup')",
+        "CHECK (application_moment IS NULL OR application_moment IN ( 'origination','per_installment','on_default','on_early_settlement','on_payment','other' )",
+        "CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment','payment')",
+        "CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual','period_based')",
+        "CHECK (is_percentage IN (0, 1)",
+        "CHECK (period IS NULL OR period IN ('once','per_installment','per_year','on_event')"
       ]
     },
     "ln_loan_fees": {
@@ -6432,6 +6477,7 @@
         "CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')",
         "CHECK (penalty_basis IS NULL OR penalty_basis IN ('overdue_installment','remaining_balance')",
         "CHECK (recalculate_on_early_payment IN (0, 1)",
+        "CHECK (role IN ('borrower','lender')",
         "CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')"
       ]
     },
@@ -8750,6 +8796,27 @@
           "pk": 0
         },
         {
+          "name": "calendar_system",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "period_start",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "period_end",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "jurisdiction",
           "type": "TEXT",
           "notnull": true,
@@ -8889,6 +8956,7 @@
         }
       ],
       "checks": [
+        "CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')",
         "CHECK (status IN ('draft','pending','overdue','filed','paid','amended','cancelled')"
       ]
     },

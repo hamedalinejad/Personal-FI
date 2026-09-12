@@ -2,7 +2,7 @@
   "name": "personal-fi",
   "private": true,
   "type": "module",
-  "description": "Personal-FI — implementation scaffold (docs are specification authority; production NO-GO)",
+  "description": "Personal-FI \u2014 implementation scaffold (docs are specification authority; production NO-GO)",
   "scripts": {
     "test": "node --test src/core/money/*.test.js src/core/price/*.test.js src/core/integrity/*.test.js src/core/api/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/persistence/browser/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/tax/*.test.js src/core/accounting/reports/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js src/core/acceptance/*.test.js src/features/**/*.test.js src/core/persistence/browser/*.test.js src/core/sync/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js src/core/acceptance/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
@@ -15,7 +15,7 @@
     "docs:validate": "node scripts/docs-validator.js",
     "registry:index": "node scripts/registry-index.js",
     "bench:smoke": "node scripts/bench-smoke.js",
-    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync",
+    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity",
     "schema:manifest:check": "node scripts/schema-manifest-check.js",
     "docs:consistency": "node scripts/docs-consistency.js",
     "lint:money-sql": "node scripts/lint-no-sql-sum-money.js",
@@ -26,7 +26,9 @@
     "fixture:empty": "node scripts/fixture-empty-check.js",
     "lint:money-number": "node scripts/lint-no-number-money.js",
     "schema:sync": "node scripts/schema-sync-pipeline.js",
-    "schema:field-diff": "node scripts/feature-field-diff.js"
+    "schema:field-diff": "node scripts/feature-field-diff.js",
+    "release:evidence": "node scripts/release-evidence.js",
+    "lint:query-purity": "node scripts/lint-query-purity.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"
