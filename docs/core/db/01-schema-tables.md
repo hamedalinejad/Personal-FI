@@ -114,7 +114,7 @@ export interface AccAccount {
 
 export interface AccTransaction {
  id: string;
- date: string;
+ businessDate: string; // was generic `date` — forbidden; use explicit semantic field
  type: string;
  amount: string /* DecimalString */; // استفاده از decimal.js — صفاف و دقیق
  feeAmount?: string /* DecimalString */;
@@ -156,7 +156,7 @@ export interface InvFifTransaction {
  accountId?: string;
  accountTransactionId?: string;
  description?: string;
- date: string;
+ businessDate: string; // was generic `date` — forbidden; use explicit semantic field
 }
 ```
 
@@ -190,7 +190,7 @@ export interface InvMetalsTransaction {
  feeCurrency?: string;
  exchangeRateToBase?: string /* DecimalString */;
  deliveryFee?: string /* DecimalString */;
- date: string;
+ businessDate: string; // was generic `date` — forbidden; use explicit semantic field
 }
 ```
 

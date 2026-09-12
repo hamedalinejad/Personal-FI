@@ -87,7 +87,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       carryingInCostCurrency = carryingInCostCurrency.plus(feeInBase.div(exchangeRateToBase));
     }
   }
-  const invId = scopedAccountId("crypto_inventory", baseCurrency);
+  const invId = scopedAccountId("crypto_inventory", costCurrency); // account currency = journal line currency
   const networkId = p.networkId || p.network_identifier || null;
   const contractAddress = p.contractAddress || p.contract_address || null;
 

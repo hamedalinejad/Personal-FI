@@ -63,3 +63,6 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/RELATIONSHIP-PROOF-STATUS.md
 - docs/core/authority/COST-CURRENCY-MATRIX.md
 - docs/core/authority/THINK-TANK-FINAL-ANSWER.md
+- docs/core/authority/FIELD-KIND-VOCABULARY.md
+- docs/core/authority/CROSS-DOCUMENT-CONSISTENCY.md
+- docs/core/authority/SECTION-STATUS-SNAPSHOT.md

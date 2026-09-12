@@ -47,7 +47,7 @@ Ledger/journal (and immutable domain events) are SoT. balance/holding/cashBalanc
 
 ## P1 field matrix (20.1)
 
-Every Feature completes RAW/DERIVED/SNAPSHOT/EXTERNAL_REPORTED/LABEL + Owner + Editable + SoT + Rebuild + Migration per field. See `P1-GLOBAL-CONTRACTS.md`. No field dropped only for being “old”.
+Every Feature completes RAW/DERIVED/SNAPSHOT/EXTERNAL_REPORTED/LABEL/SYSTEM_INDEX + Owner + Editable + SoT + Rebuild + Migration per field. See `P1-GLOBAL-CONTRACTS.md`. No field dropped only for being “old”.
 
 **P0-FINAL-049:** reports/export must not merge EXTERNAL_REPORTED into calculated fields.
 
