@@ -50,3 +50,6 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/STATUS-TAXONOMY.md
 - docs/core/authority/FILE-LIFECYCLE.md
 - docs/core/authority/GOLDEN-FIXTURE-MATRIX.md
+
+- docs/core/authority/DATA-OWNERSHIP-AND-MODELS.md
+- docs/core/authority/FINAL-VERDICT-AND-GATES.md
