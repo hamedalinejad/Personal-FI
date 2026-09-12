@@ -53,6 +53,13 @@ export async function buyMetal(input, { dataDir } = {}) {
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
+  // BUG-CUR-015
+  let exchangeRateToBase = p.exchangeRateToBase || "1";
+  if (baseCurrency !== currency) {
+    if (!p.exchangeRateToBase) throw new Error("FX_RATE_REQUIRED");
+    exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
+  }
+
   const feeCurrency = p.feeCurrency || currency;
   // P0-04: never sum fee in foreign currency into transaction-currency cashOut
   if (!fee.isZero() && feeCurrency !== currency) {
@@ -70,13 +77,21 @@ export async function buyMetal(input, { dataDir } = {}) {
       { feeAmount: premium.toFixed(), treatment: p.premiumTreatment || "capitalized_cost", label: "premium", feeCurrency: currency },
       { feeAmount: fee.toFixed(), treatment: p.feeTreatment || "expense", label: "fee", feeCurrency, feeExchangeRateToBase: p.feeExchangeRateToBase },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
-    { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
+    { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
   const feeResult = applyFeeEvents(feeEvents, {
     expenseAccountId: scopedAccountId("metal_fee_expense", baseCurrency),
     cashAccountId: cashId,
   });
-  const carrying = metalCost.plus(toDecimal(feeResult.carryingDeltaBase));
+  // carrying stays in transaction currency; base delta must not mix units
+  const feeCarryTx = feeResult.carryingDelta?.amount != null
+    ? toDecimal(feeResult.carryingDelta.amount)
+    : (currency === baseCurrency ? toDecimal(feeResult.carryingDeltaBase) : toDecimal("0"));
+  const carrying = metalCost.plus(feeCarryTx);
+  const carryingBase = carrying.times(toDecimal(exchangeRateToBase)).plus(
+    currency === baseCurrency ? toDecimal("0") : toDecimal(feeResult.carryingDeltaBase || "0"),
+  );
+
   const cashOutTx = metalCost.plus(premium).plus(feeCurrency === currency ? fee : toDecimal("0"));
   const cashOut = cashOutTx; // transaction-currency cash only
 
@@ -94,8 +109,8 @@ export async function buyMetal(input, { dataDir } = {}) {
       side: "debit",
       amount: carrying.toFixed(),
       currency,
-      amountInBase: carrying.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: carryingBase.toFixed(),
+      exchangeRateToBase,
       lineKind: "principal",
     },
     {
@@ -104,7 +119,7 @@ export async function buyMetal(input, { dataDir } = {}) {
       amount: cashPrincipal.toFixed(),
       currency,
       amountInBase: cashPrincipal.toFixed(),
-      exchangeRateToBase: "1",
+      exchangeRateToBase,
       lineKind: "principal",
     },
     ...feeResult.journalLines,

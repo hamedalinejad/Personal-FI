@@ -30,23 +30,39 @@ function computeOutstanding(db, loanId, loan) {
 
   const priorTx = db
     .prepare(
-      `SELECT principal_portion, interest_portion, fee_portion, penalty_portion
+      `SELECT tx_type, principal_portion, interest_portion, fee_portion, penalty_portion
        FROM ln_transactions WHERE loan_id = ? AND tx_type IN ('payment','reversal')`,
     )
     .all(loanId);
 
   let paidPrin = toDecimal("0");
   let paidInt = toDecimal("0");
-  for (const t of priorTx) {
-    paidPrin = paidPrin.plus(toDecimal(t.principal_portion || "0"));
-    paidInt = paidInt.plus(toDecimal(t.interest_portion || "0"));
+  let paidFee = toDecimal("0");
+  let paidPen = toDecimal("0");
+  for (const row of priorTx) {
+    const sign = row.tx_type === "reversal" ? toDecimal("-1") : toDecimal("1");
+    paidPrin = paidPrin.plus(toDecimal(row.principal_portion || "0").times(sign));
+    paidInt = paidInt.plus(toDecimal(row.interest_portion || "0").times(sign));
+    paidFee = paidFee.plus(toDecimal(row.fee_portion || "0").times(sign));
+    paidPen = paidPen.plus(toDecimal(row.penalty_portion || "0").times(sign));
   }
+
+  let feeDue = toDecimal("0");
+  try {
+    const fees = db.prepare(`SELECT amount_due, amount_paid, amount_waived FROM ln_loan_fees WHERE loan_id = ?`).all(loanId);
+    for (const f of fees) {
+      feeDue = feeDue.plus(toDecimal(f.amount_due || "0").minus(toDecimal(f.amount_paid || "0")).minus(toDecimal(f.amount_waived || "0")));
+    }
+  } catch { /* empty */ }
+  // payments already reduce via amount_paid on fees if updated; also fee_portion on txs
+  feeDue = feeDue.minus(paidFee);
+  if (feeDue.lt(0)) feeDue = toDecimal("0");
 
   return {
     principal: max0(schedPrin.minus(paidPrin)),
     interest: max0(schedInt.minus(paidInt)),
-    fee: "0",
-    penalty: "0",
+    fee: max0(feeDue),
+    penalty: "0", // v1: no accrued penalty events yet; portions still tracked on txs with sign
   };
 }
 
@@ -69,7 +85,6 @@ export async function recordPayment(
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
 
   const currency = p.currency;
-  bootstrapLoanEditionAccounts(dataDir, currency);
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
   if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
   if (!interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);
@@ -123,6 +138,7 @@ export async function recordPayment(
     domainResult: { loanId: p.loanId, allocation, lnTransactionId: txId },
     engineVersions: { loanSchedule: "1.0.0-period_based-equal-principal", money: "1.0.0" },
     withinTransaction(db2) {
+      bootstrapLoanEditionAccounts(dataDir, currency);
       // Authoritative re-check inside the same COMMIT boundary
       const loan2 = db2.prepare(`SELECT * FROM ln_loans WHERE id = ?`).get(p.loanId);
       const fresh = computeOutstanding(db2, p.loanId, loan2);

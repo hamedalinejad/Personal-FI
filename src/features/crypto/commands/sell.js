@@ -202,8 +202,8 @@ export async function sellCrypto(input, { dataDir } = {}) {
         `INSERT INTO inv_crypto_transactions (
           id, operation_id, holding_id, instrument_id,
           tx_type, business_date, gross_quantity, fee_quantity, net_quantity,
-          fee_currency, fee_instrument_id, economic_kind, created_at
-        ) VALUES (?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          fee_funding_kind, fee_currency, fee_instrument_id, economic_kind, created_at
+        ) VALUES (?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -213,6 +213,7 @@ export async function sellCrypto(input, { dataDir } = {}) {
         qty.toFixed(),
         p.feeAmount || "0",
         qty.toFixed(),
+        p.feeFundingKind || p.fee_funding_kind || (p.feeInstrumentId ? "asset" : (p.feeAmount && p.feeAmount !== "0" ? "cash" : null)),
         p.feeCurrency || proceedsCurrency,
         p.feeInstrumentId || null,
         "disposal",

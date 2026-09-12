@@ -20,7 +20,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
   if (!p.instrumentId) throw new Error("VALIDATION_ERROR:instrumentId");
   if (!p.businessDate) throw new Error("VALIDATION_ERROR:businessDate");
   const qty = toDecimal(p.quantity ?? p.units);
-  if (qty.isZero()) throw new Error("VALIDATION_ERROR:quantity");
+  if (qty.lte(0)) throw new Error("VALIDATION_ERROR:quantity");
 
   // BUG-002/003/004: explicit price modes — never treat amount as unit price
   const nav = p.nav != null && p.nav !== "" ? toDecimal(p.nav) : null;

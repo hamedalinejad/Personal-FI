@@ -115,22 +115,22 @@ export function normalizeCommand(command) {
     status,
     businessDate: command.businessDate,
     baseCurrency,
+    settlementDate: command.settlementDate ?? command.settlement_date ?? null,
+    eventAt: command.eventAt ?? command.event_at ?? null,
+    provenance: command.provenance ?? null,
+    sourceChannel: command.sourceChannel ?? command.source_channel ?? command.source ?? null,
+    sourceType: command.sourceType ?? command.source_type ?? null,
+    sourceReference: command.sourceReference ?? command.source_reference ?? null,
     payload: command.payload ?? null,
     journalLines,
     rates: command.rates || [],
     domainResult: command.domainResult ?? null,
     engineVersions: command.engineVersions || null,
-    source: command.source || "api",
+    source: command.sourceChannel ?? command.source_channel ?? command.source ?? "api",
     dataDir: command.dataDir,
     persistMode: command.persistMode || "sqlite",
     withinTransaction: command.withinTransaction,
     prepareDomain: command.prepareDomain || command.applyDomain,
-    // Dates / provenance — must survive normalize → persist
-    settlementDate: command.settlementDate ?? command.settlement_date ?? null,
-    eventAt: command.eventAt ?? command.event_at ?? null,
-    provenance: command.provenance ?? null,
-    // Caller-supplied commandHash is IGNORED for new hashes (anti-tamper).
-    // Only used after we compute canonical hash for conflict detection if needed.
     clientCommandHash: command.commandHash ?? null,
   };
 }

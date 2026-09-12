@@ -69,7 +69,7 @@ function feeAmountInBase(event) {
  * Apply fee events: returns { carryingDeltaBase, quantityDelta, journalLines, derivedFeeBases }
  * quantityDelta is negative string for fee_from_received (caller applies to gross qty).
  */
-export function applyFeeEvents(events, { expenseAccountId, cashAccountId } = {}) {
+export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receivedInstrumentId, receivedQuantityUnit } = {}) {
   let carryingDeltaBase = toDecimal("0");
   let quantityDelta = toDecimal("0");
   const journalLines = [];
@@ -131,10 +131,21 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId } = {})
         );
         break;
       }
-      case "fee_from_received":
+      case "fee_from_received": {
+        // BUG-CUR-017: fee amount must be same instrument/quantity unit as received asset
+        if (event.feeCurrency && receivedInstrumentId && event.feeInstrumentId &&
+            event.feeInstrumentId !== receivedInstrumentId) {
+          throw new Error("FEE_UNIT_MISMATCH");
+        }
+        if (event.feeCurrency && !event.feeInstrumentId && receivedQuantityUnit === "asset") {
+          // currency-denominated fee cannot reduce asset quantity
+          throw new Error("FEE_UNIT_MISMATCH");
+        }
+
         // quantity reduction is caller's domain (received asset units); no carrying increase
         quantityDelta = quantityDelta.minus(toDecimal(event.feeAmount));
         break;
+      }
       case "from_cash":
         // already embedded in principal cash out — no extra journal
         break;
@@ -145,6 +156,10 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId } = {})
 
   return {
     carryingDeltaBase: carryingDeltaBase.toFixed(),
+    // BUG-CUR-016: explicit dimensions
+    carryingDelta: { amount: carryingDeltaBase.toFixed(), currency: "BASE_ONLY_LEGACY" },
+    carryingDeltaBaseObj: { amount: carryingDeltaBase.toFixed(), currency: null },
+
     quantityDelta: quantityDelta.toFixed(),
     journalLines,
     derivedFeeBases,

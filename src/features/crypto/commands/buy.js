@@ -219,8 +219,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
         `INSERT INTO inv_crypto_transactions (
           id, operation_id, holding_id, instrument_id,
           tx_type, business_date, gross_quantity, fee_quantity, net_quantity,
-          fee_currency, fee_instrument_id, economic_kind, created_at
-        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          fee_funding_kind, fee_currency, fee_instrument_id, economic_kind, created_at
+        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -230,6 +230,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
         gross.toFixed(),
         fee.toFixed(),
         net.toFixed(),
+        p.feeFundingKind || p.fee_funding_kind || (p.feeInstrumentId || p.fee_instrument_id ? "asset" : (p.feeCurrency || p.fee_currency ? "cash" : null)),
         p.feeCurrency || costCurrency,
         p.feeInstrumentId || null,
         "acquisition",

@@ -37,8 +37,9 @@ export async function createLoan(
   const p = input.payload || input;
 
   const role = normalizeLoanRole(p.role);
-  // v1 posts lender (lent) path fully; borrower path may share schedule but journal signs differ later
-  if (role !== "lender" && role !== "borrower") throw new Error("LOAN_ROLE_UNSUPPORTED");
+  // BUG-CUR-002: v1 only lender (receivable). Borrower liability path deferred.
+  if (role === "borrower") throw new Error("LOAN_ROLE_DEFERRED");
+  if (role !== "lender") throw new Error("LOAN_ROLE_UNSUPPORTED");
   if (!p.principal) throw new Error("LOAN_PRINCIPAL_REQUIRED");
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
   if (p.annualRate == null || p.annualRate === "") throw new Error("LOAN_RATE_REQUIRED");
@@ -58,7 +59,7 @@ export async function createLoan(
   const engineVersion = "1.0.0-period_based-equal-principal";
   const rateFractional = normalizeRatePercentage(p.annualRate).toFixed();
 
-  bootstrapLoanEditionAccounts(dataDir, currency);
+  // BUG-CUR-003: no DB mutation before atomic op — only stable ids
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
   if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
 
@@ -115,6 +116,7 @@ export async function createLoan(
     },
     engineVersions: { loanSchedule: engineVersion, money: "1.0.0" },
     withinTransaction(db) {
+      bootstrapLoanEditionAccounts(dataDir, currency);
       db.prepare(
         `INSERT INTO ln_loans (
           id, role, calculation_method, principal, currency, interest_rate, status, created_at,

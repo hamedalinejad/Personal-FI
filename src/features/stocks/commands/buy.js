@@ -33,6 +33,16 @@ export async function buyStock(input, { dataDir } = {}) {
   const gross = qty.times(price);
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
+  // BUG-CUR-014: require explicit FX when currencies differ
+  let exchangeRateToBase = p.exchangeRateToBase || p.exchange_rate_to_base || null;
+  if (baseCurrency !== currency) {
+    if (exchangeRateToBase == null || exchangeRateToBase === "") {
+      throw new Error("FX_RATE_REQUIRED");
+    }
+    exchangeRateToBase = toDecimal(exchangeRateToBase).toFixed();
+  } else {
+    exchangeRateToBase = "1";
+  }
 
   const feeEvents = buildFeeEvents(
     [
@@ -40,7 +50,7 @@ export async function buyStock(input, { dataDir } = {}) {
       { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "capitalized_cost", label: "tax", feeCurrency: currency },
       { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || "capitalized_cost", label: "otherFee", feeCurrency: currency },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
-    { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
+    { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
   // P0-03 T+n: trade credits broker payable; cash only on settlement leg
   const payableId =
@@ -54,7 +64,8 @@ export async function buyStock(input, { dataDir } = {}) {
     expenseAccountId: scopedAccountId("stock_fee_expense", baseCurrency),
     cashAccountId: payableId,
   });
-  const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase));
+  const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase)); // carrying in transaction currency when fees same ccy
+  const carryingBase = carrying.times(toDecimal(exchangeRateToBase));
   const totalDue = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
   let settlementDate = p.settlementDate || null;
@@ -95,8 +106,8 @@ export async function buyStock(input, { dataDir } = {}) {
       side: "debit",
       amount: carrying.toFixed(),
       currency,
-      amountInBase: carrying.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: carryingBase.toFixed(),
+      exchangeRateToBase: exchangeRateToBase,
       lineKind: "principal",
     },
     {
@@ -104,8 +115,8 @@ export async function buyStock(input, { dataDir } = {}) {
       side: "credit",
       amount: payablePrincipal.toFixed(),
       currency,
-      amountInBase: payablePrincipal.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: payablePrincipal.times(toDecimal(exchangeRateToBase)).toFixed(),
+      exchangeRateToBase: exchangeRateToBase,
       lineKind: "principal",
     },
     ...feeResult.journalLines,
@@ -119,8 +130,8 @@ export async function buyStock(input, { dataDir } = {}) {
         side: "debit",
         amount: totalDue.toFixed(),
         currency,
-        amountInBase: totalDue.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: totalDue.times(toDecimal(exchangeRateToBase)).toFixed(),
+        exchangeRateToBase: exchangeRateToBase,
         lineKind: "principal",
       },
       {
@@ -128,8 +139,8 @@ export async function buyStock(input, { dataDir } = {}) {
         side: "credit",
         amount: totalDue.toFixed(),
         currency,
-        amountInBase: totalDue.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: totalDue.times(toDecimal(exchangeRateToBase)).toFixed(),
+        exchangeRateToBase: exchangeRateToBase,
         lineKind: "principal",
       },
     );
