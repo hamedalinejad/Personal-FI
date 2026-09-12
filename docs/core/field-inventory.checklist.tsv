@@ -369,18 +369,15 @@ inv_crypto_holdings	updated_at	SYSTEM_INDEX	Crypto	yes	inv_crypto_holdings	canon
 inv_crypto_transactions	business_date	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	created_at	SYSTEM_INDEX	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	economic_kind	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
-inv_crypto_transactions	feeFundingKind	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	fee_currency	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	fee_instrument_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	fee_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
-inv_crypto_transactions	fromAddressId	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	gross_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	holding_id	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	id	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	instrument_id	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	net_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	operation_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
-inv_crypto_transactions	toAddressId	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	tx_type	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_wallet_addresses	account_index	RAW	Crypto	no	inv_crypto_wallet_addresses	canonical	yes
 inv_crypto_wallet_addresses	address	RAW	Crypto	yes	inv_crypto_wallet_addresses	canonical	yes
@@ -846,3 +843,6 @@ tax_records	currency	RAW	Tax	no	tax_records	canonical	yes
 tax_records	due_date	RAW	Tax	no	tax_records	canonical	yes
 tax_records	payment_operation_id	RAW	Tax	no	tax_records	canonical	yes
 tax_records	updated_at	SYSTEM_INDEX	Tax	yes	tax_records	canonical	yes
+inv_crypto_transactions	fee_funding_kind	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	from_address_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	to_address_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes

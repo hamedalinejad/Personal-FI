@@ -330,17 +330,22 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   gross_quantity  TEXT,
   fee_quantity    TEXT,
   net_quantity    TEXT NOT NULL,
-  feeFundingKind  TEXT CHECK (feeFundingKind IS NULL OR feeFundingKind IN ('cash','asset')),
+  -- CRYPTO-001: exactly one funding source when fee present
+  fee_funding_kind  TEXT CHECK (fee_funding_kind IS NULL OR fee_funding_kind IN ('cash','asset')),
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  fromAddressId   TEXT,
-  toAddressId     TEXT,
-  economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')),
+  -- CRYPTO-003: optional address audit FKs
+  from_address_id TEXT, -- soft FK → inv_crypto_wallet_addresses.id (table defined later; CRYPTO-003)
+  to_address_id   TEXT, -- soft FK → inv_crypto_wallet_addresses.id
+  -- CRYPTO-002 / MATH-008
+  economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN (
+    'acquisition','disposal','transfer','internal_transfer','bridge','economic_swap','fee','income','adjustment','swap'
+  )),
   created_at      TEXT NOT NULL,
   CHECK (
-    feeFundingKind IS NULL
-    OR (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)
-    OR (feeFundingKind = 'asset' AND fee_currency IS NULL AND fee_instrument_id IS NOT NULL)
+    fee_funding_kind IS NULL
+    OR (fee_funding_kind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)
+    OR (fee_funding_kind = 'asset' AND fee_currency IS NULL AND fee_instrument_id IS NOT NULL)
   )
 );
 

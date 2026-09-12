@@ -1,3 +1,5 @@
+> **CRYPTO-001…003 LOCK:** fee_funding_kind cash|asset exclusive; holding moves create new holdingId; from/to_address_id optional. See `DOMAIN-CRYPTO-STOCKS-FUNDS-METALS-LOCK.md`.
+
 > **P0-004 LOCK:** `inv_crypto_exchange_transactions` does **not** exist. Cash = CashSettlementPort → Core journal.
 > **relatedFeature** = `investment.crypto` (not `crypto_exchange`). See `P0-SCHEMA-VOCABULARY-LOCK.md`.
 

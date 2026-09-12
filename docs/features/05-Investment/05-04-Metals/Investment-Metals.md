@@ -1,3 +1,5 @@
+> **METAL-001…003 LOCK:** platform cash = cache; coin≠bullion default valuation; delivery fee ≠ trade fee. See domain lock.
+
 > **P0-006 LOCK:** `inv_metals_platform_transactions` does **not** exist. Platform cash is never independent SoT.
 > **relatedFeature** = `investment.metals`. See `P0-SCHEMA-VOCABULARY-LOCK.md`.
 

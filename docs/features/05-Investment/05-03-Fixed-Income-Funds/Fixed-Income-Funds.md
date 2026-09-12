@@ -1,3 +1,5 @@
+> **FUND-001…003 LOCK:** NAV≠txPrice; external_reported_profit deferred; reinvest = one op two legs; ETF cash via Port. See domain lock.
+
 > **P0-003 LOCK:** **relatedFeature** = `investment.funds` (not `fif`). Cash via CashSettlementPort → journal.
 
 > **Invariant:** `NAV ≠ transactionPrice`؛ valuation و تحقق می‌توانند redemption/subscription جدا داشته باشند.
