@@ -354,6 +354,8 @@ Canonical prefixes enforced in this file and schema.sql; any remaining notif_/re
 
 Cash projection tables (`inv_*_exchange/brokerage/platform_transactions`, `bg_transfers` ⚠️ INTENTIONAL OMISSION (no ghost cash ledger)) are **intentionally not created** — cash SoT is Core journal only.
 
+| `import_batches` | Import | بچ ورود داده |
+| `instrument_price_mappings` | Market | نگاشت قیمت ابزار |
 | `import_raw_records` | Import | رکورد خام وارداتی |
 | `import_dedupe_keys` | Import | کلیدهای جلوگیری از تکرار |
 | `rpt_snapshots` | Reports | اسنپ‌شات گزارش |
