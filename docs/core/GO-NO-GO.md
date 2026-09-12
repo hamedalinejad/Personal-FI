@@ -29,3 +29,11 @@ See also: docs/core/authority/FINAL-VERDICT-AND-GATES.md (binding verdict 2026-0
 ### Scaffold freeze
 
 See `authority/SCAFFOLD-FINAL-STATUS.md`. Runtime tests green does not equal production GO.
+
+
+## Think-Tank final answer (2026-09-12)
+
+See `authority/THINK-TANK-FINAL-ANSWER.md`.
+Coding baseline: YES for Core + Loan reference.
+Production: NO-GO.
+No full documentation rewrite.

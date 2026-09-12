@@ -45,3 +45,5 @@ Documentation-first
 ```
 
 Production remains **NO-GO** until RELEASE-PROVEN evidence (golden + recovery + CI + no-field-loss + standalone) is green per feature.
+
+- `authority/THINK-TANK-FINAL-ANSWER.md` — final Q&A / coding vs production
