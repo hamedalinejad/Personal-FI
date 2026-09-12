@@ -49,3 +49,7 @@ Production remains **NO-GO** until RELEASE-PROVEN evidence exists.
 ## R-M01…R-M30
 
 See `docs/core/registry/requirements-matrix.json` — coding must not guess undefined gaps.
+
+
+## P1-REPORT-005
+Full BS/IS/CF golden vectors: OPEN (PARTIAL implementation may exist).

@@ -63,7 +63,7 @@ Derived / Report
 - `inv_crypto_holdings` (کش)
 - `currentBalance` / `remainingBalance`
 - `portfolioSnapshot` / `port_snapshots`
-- `rep_net_worth_snapshots`
+- `rpt_net_worth_snapshots`
 
 **نباید** تنها منبع حقیقتی داشته باشند که در transactions نیست.
 

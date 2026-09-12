@@ -88,3 +88,29 @@ export function listTaxEvents(dataDir, { operationId = null } = {}) {
   }
   return db.prepare(`SELECT * FROM tax_events ORDER BY period_key, created_at`).all();
 }
+
+/**
+ * P0-TAX-001 — forbid direct paid status mutation without payTax operation.
+ */
+export function changeTaxRecordStatus(dataDir, taxRecordId, status) {
+  if (status === "paid") {
+    throw new Error("TAX_PAID_REQUIRES_PAYTAX_OPERATION");
+  }
+  const db = openDb(dataDir);
+  const now = new Date().toISOString();
+  const row = db.prepare(`SELECT id, status FROM tax_records WHERE id = ?`).get(taxRecordId);
+  if (!row) throw new Error("TAX_RECORD_NOT_FOUND");
+  db.prepare(`UPDATE tax_records SET status = ?, updated_at = ? WHERE id = ?`).run(status, now, taxRecordId);
+  return { id: taxRecordId, status };
+}
+
+/** Mark paid only from payTax after journal success */
+export function markTaxRecordPaidAfterPayTax(dataDir, taxRecordId, { operationId, paidDate }) {
+  if (!operationId) throw new Error("TAX_PAY_NEEDS_OPERATION");
+  const db = openDb(dataDir);
+  const now = new Date().toISOString();
+  db.prepare(
+    `UPDATE tax_records SET status = 'paid', updated_at = ? WHERE id = ?`,
+  ).run(now, taxRecordId);
+  return { id: taxRecordId, status: "paid", operationId, paidDate: paidDate || null };
+}

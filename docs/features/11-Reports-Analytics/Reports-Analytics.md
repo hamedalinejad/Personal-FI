@@ -95,7 +95,7 @@
 > این فیچر عمدتاً داده‌محور نیست و بیشتر از داده‌های سایر فیچرها استفاده می‌کند. 
 > در صورت نیاز به کش یا ذخیره تنظیمات گزارش، جداول زیر پیشنهاد می‌شود.
 
-### ۱. Report Preset (جدول: `rep_presets`)
+### ۱. Report Preset (جدول: `rpt_presets`)
 
 - `id` → UUID
 - `name` → string (نام گزارش ذخیره‌شده)
@@ -104,7 +104,7 @@
 - `createdAt` → datetime
 - `updatedAt` → datetime
 
-### ۲. Net Worth Snapshot (جدول: `rep_net_worth_snapshots`) — اختیاری
+### ۲. Net Worth Snapshot (جدول: `rpt_net_worth_snapshots`) — اختیاری
 
 - `id` → UUID
 - `date` → datetime
@@ -129,7 +129,7 @@
 > ### P0-079 — Historical as-of reconstruction
 > - اگر `date` داده شود، **ممنوع** است از current cash/holding snapshots خام استفاده شود.
 > - باید cash / asset / liability را as-of آن تاریخ از ledgerها (و snapshotهای validated تا آن تاریخ) reconstruct کند.
-> - `rep_net_worth_snapshots` فقط cache rebuildپذیر است؛ SoT = ledgers + price/fx as-of.
+> - `rpt_net_worth_snapshots` فقط cache rebuildپذیر است؛ SoT = ledgers + price/fx as-of.
 > - Wrapper حق ندارد current balances را برای historical date برگرداند.
 - `getNetWorthTrend(startDate, endDate)` → روند Net Worth
 - `getInvestmentPerformance(startDate?, endDate?)`

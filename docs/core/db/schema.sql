@@ -271,6 +271,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_key ON price_history(instrume
 -- OFFLINE-003: SQLite allows multiple NULLs in UNIQUE; partial index for manual/null source
 CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_null_source
   ON price_history(instrument_id, market_date, quote_type) WHERE source_id IS NULL;
+-- P1-PRICE-005: prefer source_id = canonical 'manual' / 'import' rows in price_sources;
+-- NULL source_id only for true ad-hoc; is_manual=1 required when source is manual.
 
 -- ─── Price Provider Mapping (STOCK-004) ─────────────────────
 -- Preserves symbol-change history and prevents provider identity from leaking into core instrument identity.
