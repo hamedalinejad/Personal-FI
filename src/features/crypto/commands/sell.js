@@ -165,7 +165,7 @@ export async function sellCrypto(input, { dataDir } = {}) {
       ensureAccount(db, {
         id: pnlId,
         name: `Crypto realized P&L (${proceedsCurrency})`,
-        accountKind: realized.gte(0) ? "income" : "expense",
+        accountKind: "income",
         currency: proceedsCurrency,
         systemRole: "crypto_realized_pnl",
       });

@@ -124,7 +124,7 @@ export async function redeemFund(input, { dataDir } = {}) {
       ensureAccount(db, {
         id: pnlId,
         name: `Fund realized P&L (${currency})`,
-        accountKind: realized.gte(0) ? "income" : "expense",
+        accountKind: "income",
         currency,
         systemRole: "fund_realized_pnl",
       });

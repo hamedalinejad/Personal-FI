@@ -107,7 +107,7 @@ export async function sellMetal(input, { dataDir } = {}) {
       ensureAccount(db, {
         id: pnlId,
         name: `Metal realized P&L (${currency})`,
-        accountKind: realized.gte(0) ? "income" : "expense",
+        accountKind: "income",
         currency,
         systemRole: "metal_realized_pnl",
       });
