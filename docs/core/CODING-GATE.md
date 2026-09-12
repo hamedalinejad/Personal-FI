@@ -110,3 +110,9 @@ See `IMPLEMENTATION-READY-INDEX.md` · `IMPLEMENTATION-READY-LOAN-SLICE.md`
 ## Loan v1 schema
 
 Only columns in `LOAN-V1-SCHEMA-DISPOSITION.md` REQUIRED set. Deferred fields → reject until migration.
+
+## Binding semantic contracts (do not guess)
+
+- `docs/core/authority/DATA-MODEL-RELATIONSHIP-CONTRACT.md`
+- `docs/core/authority/FIELD-PRESERVATION-PROTOCOL.md`
+- `docs/core/authority/ACCOUNTING-CALCULATION-MASTER-RULES.md`
