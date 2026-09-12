@@ -7,6 +7,7 @@ import {
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
+import { applySingleFee } from "../../../core/domain/fee/feeEngine.js";
 
 /**
  * crypto.buy — all master mutations inside the financial transaction.
@@ -51,32 +52,28 @@ export async function buyCrypto(input, { dataDir } = {}) {
   }
   const amountInBase = cost.times(exchangeRateToBase);
 
-  // Resolve fee treatment (default: fee_from_received reduces quantity, not cash cost)
-  // BUG-010: feeAmountBase is DERIVED — never authoritative input
+  // BUG-011: Fee Engine owns treatment; feature only selects policy
   const feeTreatment = p.feeTreatment || "fee_from_received";
-  let carryingCost = amountInBase;
-  if (feeTreatment === "capitalized_cost") {
-    if (p.feeAmount == null || p.feeAmount === "") {
-      // no fee to capitalize
-    } else {
-      const feeAmt = toDecimal(p.feeAmount);
-      const feeCurrency = p.feeCurrency || costCurrency;
-      let feeRate;
-      if (feeCurrency === baseCurrency) {
-        feeRate = toDecimal("1");
-      } else if (feeCurrency === costCurrency) {
-        feeRate = exchangeRateToBase;
-      } else if (p.feeExchangeRateToBase != null) {
-        feeRate = toDecimal(p.feeExchangeRateToBase);
-      } else {
-        throw new Error("VALIDATION_ERROR:feeExchangeRateToBase");
-      }
-      const derivedFeeBase = feeAmt.times(feeRate);
-      carryingCost = amountInBase.plus(derivedFeeBase);
-    }
-  }
-
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
+  const feeResult = applySingleFee(
+    p.feeAmount != null && p.feeAmount !== ""
+      ? {
+          feeAmount: p.feeAmount,
+          feeCurrency: p.feeCurrency || costCurrency,
+          feeInstrumentId: p.feeInstrumentId || null,
+          treatment: feeTreatment,
+          feeExchangeRateToBase: p.feeExchangeRateToBase,
+        }
+      : null,
+    {
+      baseCurrency,
+      transactionCurrency: costCurrency,
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
+      cashAccountId: cashId,
+    },
+  );
+  let carryingCost = amountInBase.plus(toDecimal(feeResult.carryingDeltaBase));
+  // fee_from_received: quantity already reduced via net = gross - fee in caller
   const invId = scopedAccountId("crypto_inventory", baseCurrency);
   const networkId = p.networkId || p.network_identifier || null;
   const contractAddress = p.contractAddress || p.contract_address || null;
@@ -100,6 +97,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
+    ...feeResult.journalLines,
   ];
 
   const holdingId = randomUUID();
@@ -123,6 +121,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
     },
     journalLines,
     domainResult: {
+      fees: feeResult.derivedFeeBases,
       holdingId,
       transactionId: txId,
       netQuantity: net.toFixed(),
