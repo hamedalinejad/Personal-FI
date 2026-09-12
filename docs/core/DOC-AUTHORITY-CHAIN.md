@@ -66,3 +66,5 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/FIELD-KIND-VOCABULARY.md
 - docs/core/authority/CROSS-DOCUMENT-CONSISTENCY.md
 - docs/core/authority/SECTION-STATUS-SNAPSHOT.md
+- docs/core/registry/REQUIREMENTS-MATRIX.md
+- docs/core/registry/requirements-matrix.json

@@ -44,3 +44,8 @@ updated: 2026-09-12
 | R-012 | Deterministic rebuild | Contract only |
 
 Production remains **NO-GO** until RELEASE-PROVEN evidence exists.
+
+
+## R-M01…R-M30
+
+See `docs/core/registry/requirements-matrix.json` — coding must not guess undefined gaps.
