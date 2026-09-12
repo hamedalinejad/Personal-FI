@@ -1,9 +1,22 @@
 {
   "id": "LOAN-FLAT",
-  "engineVersions": {},
-  "input": {},
+  "engineVersions": { "loanSchedule": "1.0.0-period_based-flat-annual-term" },
+  "input": {
+    "method": "flat_rate",
+    "principal": "1200",
+    "annualRate": "12",
+    "periods": "12",
+    "startDate": "2026-01-01",
+    "dayCount": "period_based",
+    "flatConvention": "annual_times_term_years"
+  },
   "expected": {
-    "domain": {},
+    "domain": {
+      "rowCount": 12,
+      "finalBalance": "0.00",
+      "totalPrincipal": "1200.00",
+      "totalInterest": "144.00"
+    },
     "journal": [],
     "cash": {},
     "holding": {},

@@ -61,9 +61,29 @@ export function assertDayCountSupported(dayCount) {
   throw new Error(`LOAN_DAY_COUNT_UNSUPPORTED:${dayCount}`);
 }
 
+/** P0-LOAN-006 — canonical v1 enum */
+export function normalizeDayCount(dayCount) {
+  assertDayCountSupported(dayCount);
+  if (dayCount == null || dayCount === "monthly" || dayCount === "period_based") {
+    return "period_based";
+  }
+  return dayCount;
+}
+
+/** P0-LOAN-007 — v1 rejects variable-rate events */
+export function assertFixedRateV1(params = {}) {
+  if (params.rateHistory || params.rateChanges || params.variableRate) {
+    throw new Error("LOAN_VARIABLE_RATE_UNSUPPORTED_V1");
+  }
+  if (params.commandType === "rate_change" || params.commandType === "reschedule") {
+    throw new Error("LOAN_COMMAND_UNSUPPORTED_V1");
+  }
+}
+
 export function scheduleDeclining({ principal, annualRate, periods, startDate, dayCount, frequency = "monthly" }) {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
-  assertDayCountSupported(dayCount);
+  assertFixedRateV1(arguments[0] || {});
+  const dayCountNorm = normalizeDayCount(dayCount);
   const P = assertPositive(principal);
   const r = periodRateFromAnnual(annualRate, frequency);
   const n = parsePeriodCount(periods);
@@ -84,18 +104,22 @@ export function scheduleDeclining({ principal, annualRate, periods, startDate, d
       balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
     });
   }
-  return { method: "declining_balance", startDate, dayCount: "period_based", rows };
+  return { method: "declining_balance", startDate, dayCount: dayCountNorm, rows };
 }
 
-export function scheduleFlat({ principal, annualRate, periods, startDate, dayCount })
+export function scheduleFlat({ principal, annualRate, periods, startDate, dayCount, frequency = "monthly" })
 {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
-  assertDayCountSupported(dayCount);
+  assertFixedRateV1(arguments[0] || {});
+  const dayCountNorm = normalizeDayCount(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
-  // annualRate is percentage-points (12 = 12%), same as declining/bullet.
+  // P0-LOAN-003: annual flat = P * annualFraction * termYears
+  // termYears from period count / periods-per-year (monthly → /12)
   const rateFrac = normalizeRatePercentage(annualRate);
-  const totalInterest = P.times(rateFrac);
+  const periodsPerYear = frequency === "monthly" ? 12 : frequency === "quarterly" ? 4 : frequency === "weekly" ? 52 : 1;
+  const termYears = toDecimal(String(n)).div(String(periodsPerYear));
+  const totalInterest = P.times(rateFrac).times(termYears);
   const pPartExact = P.div(n);
   const iPartExact = totalInterest.div(n);
   let bal = P;
@@ -123,12 +147,14 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
       balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
     });
   }
-  return { method: "flat_rate", startDate, dayCount: "period_based", rows };
+  return { method: "flat_rate", startDate, dayCount: dayCountNorm, flatConvention: "annual_times_term_years", rows };
 }
 
-export function scheduleQarz({ principal, periods, feePercent = "0", startDate, dayCount }) {
+export function scheduleQarz({ principal, periods, feePercent = "0", feePercentPoints, startDate, dayCount }) {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
-  assertDayCountSupported(dayCount);
+  const dayCountNorm = normalizeDayCount(dayCount);
+  // P0-LOAN-002: feePercentPoints alias preferred; feePercent still percentage-points
+  if (feePercentPoints != null) feePercent = feePercentPoints;
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
   // feePercent is percentage-points (2 = 2% of principal), not a raw fraction.
@@ -150,13 +176,14 @@ export function scheduleQarz({ principal, periods, feePercent = "0", startDate, 
       balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
     });
   }
-  return { method: "qarz_al_hasaneh", startDate, dayCount: "period_based", rows };
+  return { method: "qarz_al_hasaneh", startDate, dayCount: dayCountNorm, rows };
 }
 
 export function scheduleBullet({ principal, annualRate, periods, startDate, dayCount, frequency = "monthly" })
 {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
-  assertDayCountSupported(dayCount);
+  assertFixedRateV1(arguments[0] || {});
+  const dayCountNorm = normalizeDayCount(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
   const r = periodRateFromAnnual(annualRate, frequency);
@@ -182,7 +209,7 @@ export function scheduleBullet({ principal, annualRate, periods, startDate, dayC
       });
     }
   }
-  return { method: "bullet", startDate, dayCount: "period_based", rows };
+  return { method: "bullet", startDate, dayCount: dayCountNorm, rows };
 }
 
 export function buildSchedule(method, params) {

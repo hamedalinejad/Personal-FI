@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS price_history (
   price           TEXT NOT NULL,
   currency        TEXT NOT NULL,
   quote_basis     TEXT, -- per_unit|per_coin|per_mg|nav|... (MR-211)
-  quote_type TEXT CHECK (quote_type IS NULL OR quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- last|close|nav|manual|imported
+  quote_type TEXT NOT NULL DEFAULT 'last' CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- P0-PRICE-001 NOT NULL
   is_manual       INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- MR-221 / MR-224
   is_stale        INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- MR-218
   is_degraded     INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- MR-220 DEGRADED mode
@@ -382,7 +382,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   principal TEXT NOT NULL, -- مبلغ اصلی
   currency TEXT NOT NULL,
   -- day count (RAW):
-  day_count_convention TEXT CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','actual_365','actual_360','30_360','actual_actual','custom_days')), -- (P0-018)
+  day_count_convention TEXT CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','monthly')), -- P0-LOAN-005 v1 only; other conventions require DayCountEngine
   day_count_denominator TEXT, -- فقط وقتی custom_days (P0-018)
   exchange_rate_to_base TEXT, -- نرخ ارز وام/قسط → baseCurrency (P0-018)
   -- dates (RAW):
