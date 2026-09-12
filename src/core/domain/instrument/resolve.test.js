@@ -74,7 +74,7 @@ test("R-019 same fund two accounts stay separate holdings", async () => {
   for (const id of ["acc-a", "acc-b"]) {
     db0.prepare(
       `INSERT INTO acc_accounts (id, name, account_kind, currency, is_archived, created_at, updated_at, status)
-       VALUES (?, ?, 'investment', 'IRR', 0, ?, ?, 'active')`,
+       VALUES (?, ?, 'brokerage_cash', 'IRR', 0, ?, ?, 'active')`,
     ).run(id, id, now, now);
   }
   closeAllDbs();
