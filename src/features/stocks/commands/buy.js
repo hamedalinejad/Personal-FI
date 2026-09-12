@@ -41,12 +41,20 @@ export async function buyStock(input, { dataDir } = {}) {
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
   );
+  // P0-03 T+n: trade credits broker payable; cash only on settlement leg
+  const payableId =
+    p.brokerPayableAccountId ||
+    scopedAccountId(`broker_payable_${p.brokerageId}`, currency);
+  const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
+  const invId = scopedAccountId("stock_inventory", currency);
+
+  // Fee expense credits payable (not cash) until settlement
   const feeResult = applyFeeEvents(feeEvents, {
     expenseAccountId: scopedAccountId("stock_fee_expense", baseCurrency),
-    cashAccountId: p.cashAccountId || scopedAccountId("local_settlement_cash", currency),
+    cashAccountId: payableId,
   });
   const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase));
-  const cashOut = gross.plus(commission).plus(tax).plus(other);
+  const totalDue = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
   const settlementDate = p.settlementDate || null;
   if (settlementDate && settlementDate < tradeDate) {
@@ -56,18 +64,21 @@ export async function buyStock(input, { dataDir } = {}) {
     throw new Error("SETTLEMENT_SAME_DAY_REQUIRES_POLICY");
   }
 
-  const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
-  const invId = scopedAccountId("stock_inventory", currency);
+  const settleSameOp =
+    settlementDate != null &&
+    settlementDate === tradeDate &&
+    p.allowSameDaySettlement === true;
+
   const now = new Date().toISOString();
   const holdingId = randomUUID();
   const txId = randomUUID();
 
-  // Inventory carries principal + capitalized fees; cash out = gross + all fees;
-  // expense fees come from Fee Engine journal (already credits cash — adjust cash leg)
-  const expenseCash = feeResult.journalLines
+  // Trade leg (T+0 position): Dr Stock / Cr Broker Payable
+  const expensePayable = feeResult.journalLines
     .filter((l) => l.side === "credit")
     .reduce((s, l) => s.plus(toDecimal(l.amount)), toDecimal("0"));
-  const cashPrincipal = cashOut.minus(expenseCash);
+  const payablePrincipal = totalDue.minus(expensePayable);
+
   const journalLines = [
     {
       accountId: invId,
@@ -79,16 +90,40 @@ export async function buyStock(input, { dataDir } = {}) {
       lineKind: "principal",
     },
     {
-      accountId: cashId,
+      accountId: payableId,
       side: "credit",
-      amount: cashPrincipal.toFixed(),
+      amount: payablePrincipal.toFixed(),
       currency,
-      amountInBase: cashPrincipal.toFixed(),
+      amountInBase: payablePrincipal.toFixed(),
       exchangeRateToBase: "1",
       lineKind: "principal",
     },
     ...feeResult.journalLines,
   ];
+
+  // Settlement leg only when policy allows same-day T+0 cash
+  if (settleSameOp) {
+    journalLines.push(
+      {
+        accountId: payableId,
+        side: "debit",
+        amount: totalDue.toFixed(),
+        currency,
+        amountInBase: totalDue.toFixed(),
+        exchangeRateToBase: "1",
+        lineKind: "principal",
+      },
+      {
+        accountId: cashId,
+        side: "credit",
+        amount: totalDue.toFixed(),
+        currency,
+        amountInBase: totalDue.toFixed(),
+        exchangeRateToBase: "1",
+        lineKind: "principal",
+      },
+    );
+  }
 
   return runAtomicFinancialOperation({
     operationId,
@@ -100,7 +135,7 @@ export async function buyStock(input, { dataDir } = {}) {
       ...p,
       gross: gross.toFixed(),
       carrying: carrying.toFixed(),
-      cashOut: cashOut.toFixed(),
+      totalDue: totalDue.toFixed(),
     },
     journalLines,
     domainResult: {
@@ -108,7 +143,9 @@ export async function buyStock(input, { dataDir } = {}) {
       holdingId,
       transactionId: txId,
       carrying: carrying.toFixed(),
-      total: cashOut.toFixed(),
+      totalDue: totalDue.toFixed(),
+      settlementStatus: settleSameOp ? "settled_same_op" : "pending_settlement",
+      brokerPayableAccountId: payableId,
       tradeDate,
       settlementDate,
       expectedSettlementDate: p.expectedSettlementDate || settlementDate,
@@ -122,6 +159,13 @@ export async function buyStock(input, { dataDir } = {}) {
         featureKey: "stock",
         currency,
         displayName: "Stock investment",
+      });
+      ensureAccount(db, {
+        id: payableId,
+        name: `Broker payable ${p.brokerageId} (${currency})`,
+        accountKind: "liability",
+        currency,
+        systemRole: "broker_payable",
       });
       if (feeResult.journalLines.some((l) => l.lineKind === "fee")) {
         ensureAccount(db, {

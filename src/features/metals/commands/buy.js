@@ -52,13 +52,22 @@ export async function buyMetal(input, { dataDir } = {}) {
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
+  const feeCurrency = p.feeCurrency || currency;
+  // P0-04: never sum fee in foreign currency into transaction-currency cashOut
+  if (!fee.isZero() && feeCurrency !== currency) {
+    if (p.feeExchangeRateToBase == null && baseCurrency !== feeCurrency) {
+      throw new Error("VALIDATION_ERROR:feeExchangeRateToBase");
+    }
+    // foreign fee must be a separate cash leg via Fee Engine (expense/capitalized in base);
+    // cashOut stays metalCost+premium in transaction currency only
+  }
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);
 
   const feeEvents = buildFeeEvents(
     [
       { feeAmount: premium.toFixed(), treatment: p.premiumTreatment || "capitalized_cost", label: "premium", feeCurrency: currency },
-      { feeAmount: fee.toFixed(), treatment: p.feeTreatment || "expense", label: "fee", feeCurrency: p.feeCurrency || currency },
+      { feeAmount: fee.toFixed(), treatment: p.feeTreatment || "expense", label: "fee", feeCurrency, feeExchangeRateToBase: p.feeExchangeRateToBase },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
   );
@@ -67,7 +76,9 @@ export async function buyMetal(input, { dataDir } = {}) {
     cashAccountId: cashId,
   });
   const carrying = metalCost.plus(toDecimal(feeResult.carryingDeltaBase));
-  const cashOut = metalCost.plus(premium).plus(fee);
+  const cashOutTx = metalCost.plus(premium).plus(feeCurrency === currency ? fee : toDecimal("0"));
+  const cashOut = cashOutTx; // transaction-currency cash only
+
   const expenseCash = feeResult.journalLines
     .filter((l) => l.side === "credit")
     .reduce((s, l) => s.plus(toDecimal(l.amount)), toDecimal("0"));

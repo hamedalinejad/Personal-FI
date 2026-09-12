@@ -31,8 +31,9 @@ test("stocks.buy keeps tradeDate ≠ settlementDate", async () => {
     { dataDir },
   );
   assert.equal(r.domainResult.tradeDate, "2026-01-01");
+  assert.equal(r.domainResult.settlementStatus, "pending_settlement");
   assert.equal(r.domainResult.settlementDate, "2026-01-03");
-  assert.equal(r.domainResult.total, "510000"); // 100*5000+10000
+  assert.equal(r.domainResult.totalDue, "510000"); // 100*5000+10000
   const db = openDb(dataDir);
   const h = db.prepare(`SELECT * FROM inv_stocks_iran_holdings WHERE instrument_id = ?`).get("stk-1");
   assert.equal(h.quantity, "100");

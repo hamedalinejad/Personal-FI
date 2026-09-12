@@ -59,3 +59,6 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/JOURNAL-ACCOUNT-CURRENCY.md
 - docs/core/authority/COST-POOL-MODEL.md
 - docs/core/authority/LOCAL-IRAN-V1-CURRENCY-POLICY.md
+- docs/core/authority/STOCKS-TN-SETTLEMENT.md
+- docs/core/authority/RELATIONSHIP-PROOF-STATUS.md
+- docs/core/authority/COST-CURRENCY-MATRIX.md
