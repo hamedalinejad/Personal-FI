@@ -28,7 +28,7 @@
 | Cheque | `partyId` اختیاری |
 | Transfer توضیحی | memo + اختیاری partyId |
 
-Journal: می‌تواند `fin_accounts` با `systemRole` مربوط به party داشته باشد (حساب اشخاص).
+Journal: می‌تواند `fin_accounts` با `role` مربوط به party داشته باشد (حساب اشخاص).
 
 ## گزارش‌های ممکن
 

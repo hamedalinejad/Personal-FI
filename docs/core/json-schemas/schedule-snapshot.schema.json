@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "personal-fi/schedule-snapshot.schema.json",
+  "type": "object",
+  "required": ["snapshotSchemaVersion", "engineVersion", "rows"],
+  "properties": {
+    "snapshotSchemaVersion": { "type": "string" },
+    "engineVersion": { "type": "string" },
+    "calendarVersion": { "type": "string" },
+    "roundingVersion": { "type": "string" },
+    "rateVersion": { "type": "string" },
+    "method": { "type": "string" },
+    "startDate": { "type": "string" },
+    "dayCount": { "type": "string" },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["period", "payment", "principal"],
+        "properties": {
+          "period": { "type": "integer" },
+          "payment": { "type": "string" },
+          "principal": { "type": "string" },
+          "interest": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

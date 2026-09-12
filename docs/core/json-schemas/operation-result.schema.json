@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "personal-fi/operation-result.schema.json",
+  "type": "object",
+  "description": "fin_operations.result_json — replay snapshot only, not accounting SoT",
+  "properties": {
+    "operationId": { "type": "string" },
+    "commandHash": { "type": "string" },
+    "engineVersions": { "type": "object" },
+    "domainResult": { "type": "object" }
+  },
+  "additionalProperties": true
+}

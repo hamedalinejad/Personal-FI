@@ -1,3 +1,5 @@
+> **DOC-003:** DOCUMENTATION-COVERAGE-COMPLETE; CANONICAL-RECONCILIATION closed for audited P0 conflicts. Runtime evidence separate.
+
 # Master Spec Verdict
 
 | | |

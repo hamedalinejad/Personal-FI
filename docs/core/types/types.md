@@ -112,7 +112,7 @@ export type RelatedFeature =
  | 'expense'
  | 'cheque'
  | 'loan'
- | 'crypto_exchange'
+ | 'investment.crypto'
  | 'stocks_iran'
  | 'fif'
  | 'metals'

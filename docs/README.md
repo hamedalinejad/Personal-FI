@@ -33,3 +33,9 @@ docs/DEVELOPER-HANDOFF.md
 ## Production
 
 **NO-GO** تا evidence در GO-NO-GO و checklist Loan RELEASE-PROVEN سبز شود.
+
+
+## Requirements map
+- `core/MISSING-REQUIREMENTS-REGISTER.md` — P0/P1/P2 closed vs open
+- `core/CROSS-FEATURE-DEPENDENCY-GRAPH.md`
+- `core/json-schemas/`

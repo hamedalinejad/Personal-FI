@@ -136,7 +136,7 @@ interface CashSettlementPort {
 }
 ```
 
-- **LocalSettlementAdapter:** resolves `fin_accounts` where systemRole = `local_settlement_cash` (create if missing in edition bootstrap).
+- **LocalSettlementAdapter:** resolves `fin_accounts` where role = `local_settlement_cash` (create if missing in edition bootstrap).
 - **AccountsCashAdapter:** resolves user-selected bank `fin_accounts` / linkage.
 - **Never** write cash balance to `ln_*` tables.
 
@@ -224,7 +224,7 @@ Only then: enable Full Accounting UI without migration.
 
 On edition bootstrap, ensure these `fin_accounts` rows exist (create-if-absent):
 
-| code | name | account_kind | systemRole |
+| code | name | account_kind | role |
 |------|------|--------------|------------|
 | LOC-CASH | Local settlement cash | asset | local_settlement_cash |
 | LOAN-REC | Loans receivable | asset | loan_receivable |
@@ -236,7 +236,7 @@ On edition bootstrap, ensure these `fin_accounts` rows exist (create-if-absent):
 
 ### Disbursement (`loan.create`)
 
-| side | account systemRole | amount |
+| side | account role | amount |
 |------|--------------------|--------|
 | debit | loan_receivable | principal |
 | credit | local_settlement_cash | principal |

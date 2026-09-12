@@ -1,3 +1,5 @@
+> **Missing requirements map:** `MISSING-REQUIREMENTS-REGISTER.md` (P0/P1/P2). Documentation reconciliation closed; production still NO-GO.
+
 # Go / No-Go
 
 **Team entry:** `docs/DEVELOPER-HANDOFF.md`

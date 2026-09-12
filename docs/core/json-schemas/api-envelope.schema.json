@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "personal-fi/api-envelope.schema.json",
+  "type": "object",
+  "required": ["success", "data", "errors", "meta"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "data": {},
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "details": { "type": "object" }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "required": ["api_version", "schema_version"],
+      "properties": {
+        "request_id": { "type": "string" },
+        "operation_id": { "type": "string" },
+        "api_version": { "type": "string" },
+        "schema_version": { "type": "string" }
+      }
+    },
+    "engine_versions": { "type": "object" }
+  }
+}

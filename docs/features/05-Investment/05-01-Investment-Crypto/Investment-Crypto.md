@@ -83,17 +83,17 @@ Asset Position  (inv_crypto_holdings)     Cash Position (inv_crypto_cash)
 1. هر معامله رمزارز باید به یک صرافی یا والت مرتبط باشد.
 2. هنگام **خرید**:
  - موجودی رمزارز افزایش می‌یابد.
- - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` + `inv_crypto_exchange_transactions` ثبت می‌شود.
+ - در صورت پرداخت از حساب بانکی → تراکنش در `acc_transactions` و journal از طریق CashSettlementPort ثبت می‌شود.
 3. هنگام **فروش**:
  - موجودی رمزارز کاهش می‌یابد.
  - مبلغ حاصل می‌تواند به موجودی ریال/تتر همان صرافی یا والت اضافه شود (نه الزاماً حساب بانکی).
 4. **واریز از حساب بانکی** به صرافی/ولت:
  - موجودی حساب بانکی کاهش و موجودی ریال/تتر صرافی افزایش می‌یابد.
- - تراکنش در `acc_transactions` با `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` ثبت می‌شود.
- - تراکنش در `inv_crypto_exchange_transactions` نیز ثبت و به تراکنش بانکی لینک می‌شود.
+ - تراکنش در `acc_transactions` با `relatedFeature = 'investment.crypto'` و `relatedId = domain entity id (holding/tx)` ثبت می‌شود.
+ - فقط Core journal + اختیاری acc_transactions projection؛ جدول cash صرافی وجود ندارد.
 5. **برداشت به حساب بانکی**:
  - موجودی ریال/تتر صرافی کاهش و موجودی حساب بانکی افزایش می‌یابد.
- - هر دو تراکنش (`acc_transactions` و `inv_crypto_exchange_transactions`) ثبت و به هم لینک می‌شوند.
+ - acc_transactions projection + journal؛ بدون ghost cash ledger.
 6. **انتقال بین صرافی‌ها/والت‌ها**:
  - حتماً دو تراکنش لینک‌شده ثبت می‌شود، با یک `transferGroupId` مشترک (UUID تازه، ساخته‌شده در لحظه ثبت انتقال) که در هر دو رکورد ذخیره می‌شود:
  - یکی در صرافی مبدا با `type: transfer_out`، `counterExchangeId` به مقصد و `transferGroupId` مشترک
@@ -311,15 +311,15 @@ Holding با **netQuantity** به‌روز می‌شود؛ gross/fee برای ب
 - `createdAt` → datetime
 
 > **نکته لینک**: هنگام ایجاد این تراکنش، یک تراکنش در `acc_transactions` نیز ایجاد می‌شود با: 
-> - `relatedFeature = 'crypto_exchange'` 
-> - `relatedId = inv_crypto_exchange_transactions.id`
+> - `relatedFeature = 'investment.crypto'` 
+> - `relatedId = domain entity id (holding/tx)`
 > 
 > **نکته مهم**: برای لینک معکوس، در جدول `acc_transactions` فیلدهای `relatedFeature` و `relatedId` تعریف شده‌اند که به `inv_crypto_exchange_transactions.id` اشاره می‌کند. این یکی از دلایل ایجاد دو تراکنش (یکی در حساب بانکی، یکی در صرافی) است.
 
 ### ۶. acc_transactions
 
 - فقط زمانی که پول واقعاً از/به حساب بانکی جابه‌جا شود ثبت می‌شود و با `inv_crypto_exchange_transactions` لینک می‌گردد.
-- لینک از طریق `relatedFeature = 'crypto_exchange'` و `relatedId = inv_crypto_exchange_transactions.id` انجام می‌شود.
+- لینک از طریق `relatedFeature = 'investment.crypto'` و `relatedId = domain entity id (holding/tx)` انجام می‌شود.
 
 ---
 
@@ -776,7 +776,7 @@ costTransferred = 0.999 × 50,000 = 49,950 USDT ← این است که به مق
 
  **برداشت از صرافی به حساب بانکی** (`type='withdraw'`):
  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='withdraw'` ثبت شود
- > 2. رکورد در `acc_transactions` با `type='withdrawal-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+ > 2. رکورد در `acc_transactions` با `type='withdrawal-investment'` و `relatedFeature='investment.crypto'` ثبت شود
  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز برداشتی)` آپدیت شود**: `quantity -= amount` (و اگر `quantity <= 0` رکورد holding غیرفعال یا حذف شود)
  > 4. اگر نقد صرافی است: آپدیت **`inv_crypto_cash`** (CashPosition) — نه `inv_crypto_holdings` با symbol ساختگی
  >
@@ -784,7 +784,7 @@ costTransferred = 0.999 × 50,000 = 49,950 USDT ← این است که به مق
 
  **واریز از حساب بانکی به صرافی** (`type='deposit'`):
  > 1. رکورد در `inv_crypto_exchange_transactions` با `type='deposit'` ثبت شود
- > 2. رکورد در `acc_transactions` با `type='deposit-investment'` و `relatedFeature='crypto_exchange'` ثبت شود
+ > 2. رکورد در `acc_transactions` با `type='deposit-investment'` و `relatedFeature='investment.crypto'` ثبت شود
  > 3. **`inv_crypto_holdings` برای `(exchangeId, symbol=ارز واریزی)` آپدیت شود**: `quantity += amount` (اگر رکورد وجود نداشت، ایجاد شود)
  > 4. واریز نقد به **`inv_crypto_cash`**: cost basis طبق economicKind؛ par=1 فقط اگر policy صریح cash_like_par
 - `getCryptoTransactions(filters)` → شامل `type` برای تشخیص
@@ -1416,7 +1416,7 @@ executeExternalSale({
 
 `inv_crypto_cash` = **تنها** Domain SoT موجودی نقد صرافی/ولت.
 
-`fin_accounts` با `systemRole=exchange_cash` = projection حسابداری (linked) — **نه** balance موازی که جدا update شود.
+`fin_accounts` با `role=exchange_cash` = projection حسابداری (linked) — **نه** balance موازی که جدا update شود.
 
 Binance 1000 USDT settlement → یک حقیقت در fin_accounts + fin_journal_lines؛ crypto cash فقط projection (P0-DOC-001).
 

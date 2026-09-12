@@ -1,3 +1,5 @@
+> **P0-7:** Expand every command row to SPEC_LOCKED + field matrix link before marking IMPLEMENTED. Existence of a file ≠ RELEASE-PROVEN.
+
 ---
 id: DOC-CMD-COVERAGE-FULL
 title: Full financial command coverage matrix
