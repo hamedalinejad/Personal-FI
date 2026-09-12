@@ -240,12 +240,26 @@ export async function runAtomicFinancialOperation(command) {
 
     runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates });
 
+    const operationContext = Object.freeze({
+      operationId: norm.operationId,
+      status: norm.status,
+      businessDate: norm.businessDate,
+      baseCurrency: norm.baseCurrency,
+      settlementDate: norm.settlementDate ?? null,
+      eventAt: norm.eventAt ?? null,
+      sourceChannel: norm.sourceChannel ?? null,
+      sourceType: norm.sourceType ?? null,
+      sourceReference: norm.sourceReference ?? null,
+      source: norm.source,
+      provenance: norm.provenance ?? null,
+      commandHash,
+      engineVersions: norm.engineVersions ?? null,
+      payload: norm.payload ?? null,
+      mode: "prepare",
+    });
+
     const domainResult = norm.prepareDomain
-      ? await norm.prepareDomain({
-          operationId: norm.operationId,
-          payload: norm.payload,
-          mode: "prepare",
-        })
+      ? await norm.prepareDomain(operationContext)
       : norm.domainResult;
 
     const record = {
@@ -259,6 +273,9 @@ export async function runAtomicFinancialOperation(command) {
       domainResult,
       engineVersions: norm.engineVersions,
       source: norm.source,
+      sourceChannel: norm.sourceChannel ?? null,
+      sourceType: norm.sourceType ?? null,
+      sourceReference: norm.sourceReference ?? null,
       payload: norm.payload ?? null,
       normalizedRequest: {
         type: norm.type,
@@ -266,6 +283,12 @@ export async function runAtomicFinancialOperation(command) {
         baseCurrency: norm.baseCurrency,
         payload: norm.payload ?? null,
         journalLines: norm.journalLines,
+        settlementDate: norm.settlementDate ?? null,
+        eventAt: norm.eventAt ?? null,
+        provenance: norm.provenance ?? null,
+        sourceChannel: norm.sourceChannel ?? null,
+        sourceType: norm.sourceType ?? null,
+        sourceReference: norm.sourceReference ?? null,
       },
       rates: norm.rates ?? null,
       settlementDate: norm.settlementDate ?? null,

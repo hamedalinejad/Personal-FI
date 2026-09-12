@@ -132,10 +132,7 @@ function persistOperationSqlite(record, dir) {
         throw new Error("OP_IDEMPOTENCY_CONFLICT");
       }
       db.exec("ROLLBACK");
-      if (existing.result_json) {
-        return { ...JSON.parse(existing.result_json), idempotentReplay: true };
-      }
-      // fall through load path
+      // BUG-FINAL-017: never trust result_json alone — rebuild from relational SoT
       return loadOperationSync(db, id, true);
     }
 
@@ -286,9 +283,7 @@ function persistOperationSqlite(record, dir) {
       const existing = db.prepare(`SELECT command_hash, result_json FROM fin_operations WHERE id = ?`).get(id);
       if (existing) {
         if (existing.command_hash !== record.commandHash) throw new Error("OP_IDEMPOTENCY_CONFLICT");
-        if (existing.result_json) {
-          return { ...JSON.parse(existing.result_json), idempotentReplay: true };
-        }
+        return loadOperationSync(db, id, true);
       }
       throw new Error("OP_IDEMPOTENCY_CONFLICT");
     }
@@ -327,6 +322,10 @@ function loadOperationSync(db, operationId, replay = false) {
       settlementDate: row.settlement_date ?? snap.settlementDate ?? null,
       eventAt: row.event_at ?? snap.eventAt ?? null,
       provenance: snap.provenance ?? null,
+      sourceChannel: row.source_channel ?? snap.sourceChannel ?? null,
+      sourceType: row.source_type ?? snap.sourceType ?? null,
+      sourceReference: row.source_reference ?? snap.sourceReference ?? null,
+      result_hash: row.result_hash ?? snap.result_hash ?? null,
       idempotentReplay: replay,
     };
   }
@@ -357,6 +356,7 @@ function loadOperationSync(db, operationId, replay = false) {
 }
 
 async function persistOperationJson(record, dir) {
+  // BUG-FINAL-019: shared validity gate with SQLite path
   if (!record.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!record.baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
   const id = record.operationId || randomUUID();
@@ -364,6 +364,9 @@ async function persistOperationJson(record, dir) {
   if (journalLines.length) assertJournalBalanced(journalLines);
   for (const line of journalLines) {
     if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+    if ((record.status || "posted") === "posted" && (line.amountInBase == null || line.amountInBase === "")) {
+      throw new Error("INV_JOURNAL_MISSING_AMOUNT_IN_BASE");
+    }
   }
   const status = record.status || "posted";
   const body = {
@@ -380,6 +383,12 @@ async function persistOperationJson(record, dir) {
     payload: record.payload ?? null,
     normalizedRequest: record.normalizedRequest ?? null,
     source: record.source ?? null,
+    sourceChannel: record.sourceChannel ?? null,
+    sourceType: record.sourceType ?? null,
+    sourceReference: record.sourceReference ?? null,
+    settlementDate: record.settlementDate ?? null,
+    eventAt: record.eventAt ?? null,
+    provenance: record.provenance ?? null,
     rates: record.rates ?? null,
     _transportState: "file_swapped",
   };

@@ -27,11 +27,16 @@ export async function redeemFund(input, { dataDir } = {}) {
   }
 
   const units = toDecimal(p.units);
+  if (!units.gt(0)) throw new Error("FUND_UNITS_NONPOSITIVE");
+  if (p.transactionPrice != null && p.transactionPrice !== "" && !toDecimal(p.transactionPrice).gt(0)) {
+    throw new Error("FUND_PRICE_NONPOSITIVE");
+  }
   const currency = p.currency;
   const proceeds =
     p.proceedsTotal != null
       ? toDecimal(p.proceedsTotal)
       : units.times(toDecimal(p.transactionPrice));
+  if (!proceeds.gt(0)) throw new Error("FUND_PROCEEDS_NONPOSITIVE");
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("fund_inventory", currency);

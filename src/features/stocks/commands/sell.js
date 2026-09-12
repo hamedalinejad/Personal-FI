@@ -26,9 +26,12 @@ export async function sellStock(input, { dataDir } = {}) {
 
   const qty = toDecimal(p.quantity);
   const price = toDecimal(p.price);
+  if (!qty.gt(0)) throw new Error("STOCK_QTY_NONPOSITIVE");
+  if (!price.gt(0)) throw new Error("STOCK_PRICE_NONPOSITIVE");
   const currency = p.currency;
   const proceeds = qty.times(price);
   const commission = toDecimal(p.commission || "0");
+  if (commission.isNegative()) throw new Error("STOCK_COMMISSION_NEGATIVE");
   const netProceeds = proceeds.minus(commission);
   if (netProceeds.lt(0)) throw new Error("VALIDATION_ERROR:commission");
 

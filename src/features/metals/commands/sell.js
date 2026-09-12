@@ -24,6 +24,8 @@ export async function sellMetal(input, { dataDir } = {}) {
 
   const qty = toDecimal(p.quantityMg);
   const proceeds = toDecimal(p.proceedsTotal);
+  if (!qty.gt(0)) throw new Error("METAL_QTY_NONPOSITIVE");
+  if (!proceeds.gt(0)) throw new Error("METAL_PROCEEDS_NONPOSITIVE");
   const currency = p.currency;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);

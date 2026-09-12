@@ -140,8 +140,8 @@ test("P0-007 json mode requires date/currency", async () => {
       businessDate: "2026-01-01",
       baseCurrency: "IRR",
       journalLines: [
-        { accountId: "a", side: "debit", amount: "1", currency: "IRR" },
-        { accountId: "b", side: "credit", amount: "1", currency: "IRR" },
+        { accountId: "a", side: "debit", amount: "1", currency: "IRR", amountInBase: "1" },
+        { accountId: "b", side: "credit", amount: "1", currency: "IRR", amountInBase: "1" },
       ],
     },
     { dataDir, mode: "json" },

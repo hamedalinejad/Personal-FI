@@ -25,6 +25,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
   }
 
   const qty = toDecimal(p.quantityMg);
+  if (!qty.gt(0)) throw new Error("METAL_DELIVERY_QTY_NONPOSITIVE");
   const currency = p.currency;
   const fee = toDecimal(p.deliveryFee || "0");
   if (p.feeCurrency && p.feeCurrency !== currency && fee.gt(0)) {
