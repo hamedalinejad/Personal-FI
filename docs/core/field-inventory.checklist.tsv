@@ -721,3 +721,5 @@ ln_transactions	interest_portion	RAW	Loan	no	ln_transactions	canonical	yes
 ln_transactions	fee_portion	RAW	Loan	no	ln_transactions	canonical	yes
 ln_transactions	penalty_portion	RAW	Loan	no	ln_transactions	canonical	yes
 ln_transactions	reverses_transaction_id	RAW	Loan	no	ln_transactions	canonical	yes
+fin_operations	result_schema_version	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	result_hash	RAW	Core	no	fin_operations	canonical	yes

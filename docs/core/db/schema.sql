@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   voided_at TEXT,
   corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   result_json TEXT, -- idempotent replay snapshot ONLY; not accounting SoT
+  result_schema_version TEXT, -- PRES-002
+  result_hash TEXT, -- PRES-002 sha256 of canonical result payload
   CHECK (status != 'posted' OR command_hash IS NOT NULL)
 );
 
