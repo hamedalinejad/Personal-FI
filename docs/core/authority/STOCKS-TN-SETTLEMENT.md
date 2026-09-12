@@ -19,3 +19,8 @@ Position quantity follows **tradeDate**. Cash follows **settlementDate** (or `ac
 Same-day settlement only when `settlementDate === tradeDate` **and** `allowSameDaySettlement === true` (policy explicit).
 
 Pending settlement: `settlementStatus = pending_settlement`. A future `stocks.settle` command clears payable.
+
+
+## stocks.settle (IMPLEMENTED)
+
+Command clears broker payable with cash. Position quantity unchanged. Double settle → ALREADY_SETTLED.
