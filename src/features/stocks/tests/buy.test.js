@@ -19,6 +19,7 @@ test("stocks.buy keeps tradeDate ≠ settlementDate", async () => {
         quantity: "100",
         price: "5000",
         tradeDate: "2026-01-01",
+        businessDate: "2026-01-01",
         settlementDate: "2026-01-03",
         currency: "IRR",
         brokerageId: "br-1",

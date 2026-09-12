@@ -37,3 +37,27 @@ test("metals.buy fineWeight and separate premium", async () => {
   assert.equal(h.purity_ratio, "0.995");
   closeAllDbs();
 });
+
+test("BUG-008 missing purity rejects", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-metal-p-"));
+  await assert.rejects(
+    () =>
+      buyMetal(
+        {
+          operationId: randomUUID(),
+          payload: {
+            instrumentId: "gold-1",
+            symbol: "GOLD",
+            platformId: "plat-1",
+            grossWeight: "1000",
+            metalPricePerMg: "1",
+            currency: "IRR",
+            businessDate: "2026-01-01",
+          },
+        },
+        { dataDir },
+      ),
+    (e) => /purityRatio/.test(String(e && e.message)),
+  );
+  closeAllDbs();
+});

@@ -17,18 +17,52 @@ export async function subscribeFund(input, { dataDir } = {}) {
   const p = input.payload || input;
 
   if (!p.instrumentId) throw new Error("VALIDATION_ERROR:instrumentId");
-  if (!p.currency) throw new Error("VALIDATION_ERROR:currency");
   if (!p.businessDate) throw new Error("VALIDATION_ERROR:businessDate");
   const qty = toDecimal(p.quantity ?? p.units);
-  const nav = p.nav != null ? toDecimal(p.nav) : null;
-  const txPrice = toDecimal(p.transactionPrice ?? p.nav ?? p.amount);
-  // Cost uses transactionPrice when present (not NAV alone)
-  const amount = p.amount != null ? toDecimal(p.amount) : qty.times(txPrice);
   if (qty.isZero()) throw new Error("VALIDATION_ERROR:quantity");
-  const currency = p.currency;
-  const accountId = p.accountId || p.cashAccountId || null;
+
+  // BUG-002/003/004: explicit price modes — never treat amount as unit price
+  const nav = p.nav != null && p.nav !== "" ? toDecimal(p.nav) : null;
+  let txPrice = null;
+  if (p.transactionPrice != null && p.transactionPrice !== "") {
+    txPrice = toDecimal(p.transactionPrice);
+  } else if (p.pricingMode === "nav" && nav != null) {
+    txPrice = nav;
+  } else if (p.pricingMode === "amount_based" && p.amount != null && p.amount !== "") {
+    txPrice = toDecimal(p.amount).div(qty);
+  } else if (nav != null) {
+    // allowed fallback only when transactionPrice omitted and nav present
+    txPrice = nav;
+  } else {
+    throw new Error("VALIDATION_ERROR:transactionPrice_or_nav");
+  }
+
+  let amount;
+  if (p.amount != null && p.amount !== "") {
+    amount = toDecimal(p.amount);
+    const expected = qty.times(txPrice);
+    if (!amount.eq(expected)) {
+      throw new Error(`AMOUNT_PRICE_MISMATCH:expected=${expected.toFixed()},got=${amount.toFixed()}`);
+    }
+  } else {
+    amount = qty.times(txPrice);
+  }
+
+  // BUG-005: transaction vs base currency
+  const transactionCurrency = p.transactionCurrency || p.currency;
+  if (!transactionCurrency) throw new Error("VALIDATION_ERROR:transactionCurrency");
+  const baseCurrency = p.baseCurrency || transactionCurrency;
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (transactionCurrency === baseCurrency) {
+    exchangeRateToBase = toDecimal("1");
+  } else if (exchangeRateToBase == null) {
+    throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  }
+  const amountInBase = amount.times(exchangeRateToBase);
+  const currency = transactionCurrency; // journal line currency = transaction currency
+  const accountId = p.accountId || null;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
-  const invId = scopedAccountId("fund_inventory", currency);
+  const invId = scopedAccountId("fund_inventory", baseCurrency);
   const holdingId = randomUUID();
   const txId = randomUUID();
   const now = new Date().toISOString();
@@ -39,8 +73,8 @@ export async function subscribeFund(input, { dataDir } = {}) {
       side: "debit",
       amount: amount.toFixed(),
       currency,
-      amountInBase: amount.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: amountInBase.toFixed(),
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
     {
@@ -48,8 +82,8 @@ export async function subscribeFund(input, { dataDir } = {}) {
       side: "credit",
       amount: amount.toFixed(),
       currency,
-      amountInBase: amount.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: amountInBase.toFixed(),
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
   ];
@@ -59,7 +93,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
     type: "funds.subscribe",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency,
     payload: { ...p, accountId },
     journalLines,
     domainResult: {
@@ -70,6 +104,10 @@ export async function subscribeFund(input, { dataDir } = {}) {
       nav: nav ? nav.toFixed() : null,
       transactionPrice: txPrice.toFixed(),
       quantity: qty.toFixed(),
+      transactionCurrency,
+      baseCurrency,
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
+      amountInBase: amountInBase.toFixed(),
       valuation: {
         nav: nav ? nav.toFixed() : null,
         transactionPrice: txPrice.toFixed(),
@@ -87,7 +125,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
       ensureLocalSettlementAccounts(db, currency);
       ensureFeatureInventoryAccount(db, {
         featureKey: "fund",
-        currency,
+        currency: baseCurrency,
         displayName: "Fund investment",
       });
 
@@ -153,7 +191,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
         p.settlementDate || p.businessDate,
         qty.toFixed(),
         nav ? nav.toFixed() : null,
-        p.transactionPrice || nav ? nav.toFixed() : null,
+        txPrice.toFixed(),
         amount.toFixed(),
         currency,
         accountId,

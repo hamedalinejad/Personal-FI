@@ -34,7 +34,17 @@ export async function buyMetal(input, { dataDir } = {}) {
   if (p.inputMassUnit === "g" || p.inputMassUnit === "gram") {
     grossMg = grossMg.times("1000");
   }
-  const purity = toDecimal(p.purityRatio || "1");
+  // BUG-008: never default purity to 1
+  const purityPolicy = p.purityPolicy || null;
+  if (p.purityRatio == null || p.purityRatio === "") {
+    if (purityPolicy === "fixed_1") {
+      p.purityRatio = "1";
+    } else {
+      throw new Error("VALIDATION_ERROR:purityRatio");
+    }
+  }
+  const purity = toDecimal(p.purityRatio);
+  if (purity.lte(0) || purity.gt(1)) throw new Error("VALIDATION_ERROR:purityRatio_range");
   const fine = grossMg.times(purity); // fineWeightMg
   const metalCost = fine.times(toDecimal(unitPrice));
   const premium = toDecimal(p.premiumAmount ?? p.premium ?? "0");
@@ -58,7 +68,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   const invId = scopedAccountId("metal_inventory", currency);
   const feeExpId = scopedAccountId("metal_fee_expense", currency);
   const now = new Date().toISOString();
-  const holdingId = randomUUID();
+  let holdingId = randomUUID();
   const txId = randomUUID();
 
   const journalLines = [
@@ -163,23 +173,38 @@ export async function buyMetal(input, { dataDir } = {}) {
         now,
       });
 
-      db.prepare(
-        `INSERT INTO inv_metals_holdings (
-          id, platform_id, instrument_id, quantity_mg, purity_code, purity_ratio,
-          total_invested, cost_currency, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      ).run(
-        holdingId,
-        p.platformId,
-        p.instrumentId,
-        grossMg.toFixed(),
-        p.purityCode || "unknown",
-        p.purityRatio || "1",
-        carrying.toFixed(),
-        currency,
-        now,
-        now,
-      );
+      // BUG-009: aggregate position (platform + instrument)
+      let holding = db
+        .prepare(
+          `SELECT * FROM inv_metals_holdings WHERE platform_id = ? AND instrument_id = ?`,
+        )
+        .get(p.platformId, p.instrumentId);
+      if (holding) {
+        const newQty = toDecimal(holding.quantity_mg).plus(grossMg);
+        const newCost = toDecimal(holding.total_invested || "0").plus(carrying);
+        db.prepare(
+          `UPDATE inv_metals_holdings SET quantity_mg = ?, total_invested = ?, updated_at = ? WHERE id = ?`,
+        ).run(newQty.toFixed(), newCost.toFixed(), now, holding.id);
+        holdingId = holding.id;
+      } else {
+        db.prepare(
+          `INSERT INTO inv_metals_holdings (
+            id, platform_id, instrument_id, quantity_mg, purity_code, purity_ratio,
+            total_invested, cost_currency, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ).run(
+          holdingId,
+          p.platformId,
+          p.instrumentId,
+          grossMg.toFixed(),
+          p.purityCode || "unknown",
+          p.purityRatio,
+          carrying.toFixed(),
+          currency,
+          now,
+          now,
+        );
+      }
 
       db.prepare(
         `INSERT INTO inv_metals_transactions (

@@ -20,7 +20,8 @@ export async function buyStock(input, { dataDir } = {}) {
   for (const k of ["instrumentId", "brokerageId", "quantity", "price", "currency", "tradeDate"]) {
     if (p[k] == null || p[k] === "") throw new Error(`VALIDATION_ERROR:${k}`);
   }
-  if (!p.businessDate) p.businessDate = p.tradeDate;
+  if (!p.businessDate) throw new Error("VALIDATION_ERROR:businessDate");
+  if (!p.tradeDate) throw new Error("VALIDATION_ERROR:tradeDate");
 
   const qty = toDecimal(p.quantity);
   const price = toDecimal(p.price);
@@ -122,6 +123,8 @@ export async function buyStock(input, { dataDir } = {}) {
       total: cashOut.toFixed(),
       tradeDate,
       settlementDate,
+      expectedSettlementDate: p.expectedSettlementDate || settlementDate,
+      settlementPolicyVersion: p.settlementPolicyVersion || null,
       gross: gross.toFixed(),
     },
     engineVersions: { stocks: "1.1.0", money: "1.0.0" },

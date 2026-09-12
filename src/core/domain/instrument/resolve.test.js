@@ -124,3 +124,39 @@ test("R-019 scoped cash accounts differ by currency", () => {
     scopedAccountId("local_settlement_cash", "USD"),
   );
 });
+
+test("BUG-001 null network cannot be enriched to TRC20 without allowIdentityEnrichment", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-null-"));
+  const db = openDb(dataDir);
+  const now = new Date().toISOString();
+  resolveOrCreateInstrument(db, {
+    instrumentId: "usdt-incomplete",
+    assetClass: "crypto",
+    symbol: "USDT",
+    networkIdentifier: null,
+    now,
+  });
+  assert.throws(
+    () =>
+      resolveOrCreateInstrument(db, {
+        instrumentId: "usdt-incomplete",
+        assetClass: "crypto",
+        symbol: "USDT",
+        networkIdentifier: "TRC20",
+        now,
+      }),
+    (e) => /NETWORK_MISMATCH|null_to_value/.test(String(e && e.message)),
+  );
+  // enrichment allowed path
+  resolveOrCreateInstrument(db, {
+    instrumentId: "usdt-incomplete",
+    assetClass: "crypto",
+    symbol: "USDT",
+    networkIdentifier: "TRC20",
+    now,
+    allowIdentityEnrichment: true,
+  });
+  const row = db.prepare(`SELECT network_identifier FROM ref_instruments WHERE id=?`).get("usdt-incomplete");
+  assert.equal(row.network_identifier, "TRC20");
+  closeAllDbs();
+});

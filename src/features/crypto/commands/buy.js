@@ -52,10 +52,28 @@ export async function buyCrypto(input, { dataDir } = {}) {
   const amountInBase = cost.times(exchangeRateToBase);
 
   // Resolve fee treatment (default: fee_from_received reduces quantity, not cash cost)
+  // BUG-010: feeAmountBase is DERIVED — never authoritative input
   const feeTreatment = p.feeTreatment || "fee_from_received";
   let carryingCost = amountInBase;
-  if (feeTreatment === "capitalized_cost" && p.feeAmountBase) {
-    carryingCost = amountInBase.plus(toDecimal(p.feeAmountBase));
+  if (feeTreatment === "capitalized_cost") {
+    if (p.feeAmount == null || p.feeAmount === "") {
+      // no fee to capitalize
+    } else {
+      const feeAmt = toDecimal(p.feeAmount);
+      const feeCurrency = p.feeCurrency || costCurrency;
+      let feeRate;
+      if (feeCurrency === baseCurrency) {
+        feeRate = toDecimal("1");
+      } else if (feeCurrency === costCurrency) {
+        feeRate = exchangeRateToBase;
+      } else if (p.feeExchangeRateToBase != null) {
+        feeRate = toDecimal(p.feeExchangeRateToBase);
+      } else {
+        throw new Error("VALIDATION_ERROR:feeExchangeRateToBase");
+      }
+      const derivedFeeBase = feeAmt.times(feeRate);
+      carryingCost = amountInBase.plus(derivedFeeBase);
+    }
   }
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
