@@ -1,5 +1,5 @@
 {
-  "schemaHash": "5e00e7f51cfd6d51752bc5c997b440280c7fa3c5d60d3e37087bbeb950e0d799",
+  "schemaHash": "18b7bd98abe369855d1fa53f89c7d15b44ec505f2e3d7c3a28c228654bb9d85d",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -25,16 +25,9 @@
           "pk": 0
         },
         {
-          "name": "account_kind",
+          "name": "account_number",
           "type": "TEXT",
-          "notnull": true,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "currency",
-          "type": "TEXT",
-          "notnull": true,
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -46,7 +39,14 @@
           "pk": 0
         },
         {
-          "name": "bank_name",
+          "name": "card_last4",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "card_token",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -60,10 +60,80 @@
           "pk": 0
         },
         {
+          "name": "bank_name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_kind",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "bank_product_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "role",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "current_balance",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_ref_json",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "is_archived",
           "type": "INTEGER",
           "notnull": true,
           "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'active'",
+          "pk": 0
+        },
+        {
+          "name": "reconciliation_status",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
           "pk": 0
         },
         {
@@ -77,34 +147,6 @@
           "name": "updated_at",
           "type": "TEXT",
           "notnull": true,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "status",
-          "type": "TEXT",
-          "notnull": true,
-          "dflt": "'active'",
-          "pk": 0
-        },
-        {
-          "name": "role",
-          "type": "TEXT",
-          "notnull": false,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "reconciliation_status",
-          "type": "TEXT",
-          "notnull": false,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "external_ref_json",
-          "type": "TEXT",
-          "notnull": false,
           "dflt": null,
           "pk": 0
         }
@@ -137,7 +179,8 @@
         }
       ],
       "checks": [
-        "CHECK (account_kind IN ('bank','cash','investment','loan','credit','wallet','other')",
+        "CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account','bank','investment','loan','credit','other')",
+        "CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')",
         "CHECK (is_archived IN (0, 1)",
         "CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')",
         "CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')",
@@ -213,7 +256,7 @@
         }
       ],
       "checks": [
-        "CHECK (related_feature IN ('crypto','stocks','funds','metals','loans','income','expense','cheque','budget','goals','bills','tax','physical_assets','accounts')"
+        "CHECK (related_feature IN ('accounts','income','expense','cheque','loan','investment.crypto','investment.stocks','investment.funds','investment.metals','physical_assets','budget','goals','bills','tax')"
       ]
     },
     "acc_transactions": {
@@ -324,7 +367,9 @@
           ]
         }
       ],
-      "checks": []
+      "checks": [
+        "CHECK (direction IS NULL OR direction IN ('in','out')"
+      ]
     },
     "bg_budgets": {
       "columns": [
@@ -1318,9 +1363,30 @@
           "pk": 0
         },
         {
+          "name": "relative_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "blob_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "storage_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "storage_path",
           "type": "TEXT",
-          "notnull": true,
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -1365,7 +1431,9 @@
         }
       ],
       "checks": [
-        "CHECK (size_bytes IS NULL OR size_bytes >= 0)"
+        "CHECK (relative_path IS NOT NULL OR blob_id IS NOT NULL OR storage_path IS NOT NULL)",
+        "CHECK (size_bytes IS NULL OR size_bytes >= 0)",
+        "CHECK (storage_kind IS NULL OR storage_kind IN ('relative','blob','external_ref')"
       ]
     },
     "docs_links": {
@@ -2100,6 +2168,14 @@
           ]
         },
         {
+          "name": "uq_fin_accounts_code",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "code"
+          ]
+        },
+        {
           "name": "sqlite_autoindex_fin_accounts_1",
           "unique": true,
           "origin": "pk",
@@ -2585,6 +2661,20 @@
           "notnull": false,
           "dflt": null,
           "pk": 0
+        },
+        {
+          "name": "result_schema_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "result_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
         }
       ],
       "foreignKeys": [
@@ -2739,6 +2829,109 @@
       ],
       "checks": [
         "CHECK (status IN ('running','completed','failed','cancelled')"
+      ]
+    },
+    "import_batches": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "source_provider",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_schema_version",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "document_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "'open'",
+          "pk": 0
+        },
+        {
+          "name": "record_count",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "content_hash",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "table": "docs_documents",
+          "from": "document_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "sqlite_autoindex_import_batches_1",
+          "unique": true,
+          "origin": "pk",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "checks": [
+        "CHECK (status IN ('open','processing','completed','failed','cancelled')"
       ]
     },
     "import_dedupe_keys": {
@@ -3391,6 +3584,129 @@
         "CHECK (is_voided IN (0, 1)"
       ]
     },
+    "instrument_price_mappings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 1
+        },
+        {
+          "name": "instrument_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "provider_symbol",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "market",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "valid_to",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": "datetime('now')",
+          "pk": 0
+        }
+      ],
+      "foreignKeys": [
+        {
+          "table": "price_sources",
+          "from": "source_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
+          "table": "ref_instruments",
+          "from": "instrument_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "idx_ipm_active",
+          "unique": false,
+          "origin": "c",
+          "columns": [
+            "instrument_id",
+            "source_id"
+          ]
+        },
+        {
+          "name": "idx_ipm_provider_symbol",
+          "unique": false,
+          "origin": "c",
+          "columns": [
+            "provider_symbol"
+          ]
+        },
+        {
+          "name": "idx_ipm_instrument_source",
+          "unique": false,
+          "origin": "c",
+          "columns": [
+            "instrument_id",
+            "source_id"
+          ]
+        },
+        {
+          "name": "sqlite_autoindex_instrument_price_mappings_1",
+          "unique": true,
+          "origin": "pk",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "checks": [
+        "CHECK (market IS NULL OR market IN ('bourse','fara_bourse','base_market','other')",
+        "CHECK (status IN ('active','archived')"
+      ]
+    },
     "inv_crypto_cash": {
       "columns": [
         {
@@ -3490,16 +3806,44 @@
           "pk": 0
         },
         {
-          "name": "venue_kind",
+          "name": "type",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
           "pk": 0
         },
         {
+          "name": "url",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         }
@@ -3516,7 +3860,8 @@
         }
       ],
       "checks": [
-        "CHECK (venue_kind IN ('cex','dex','wallet','other')"
+        "CHECK (is_active IN (0, 1)",
+        "CHECK (type IS NULL OR type IN ('cex','dex','wallet','other')"
       ]
     },
     "inv_crypto_holdings": {
@@ -3596,25 +3941,6 @@
       ],
       "indexes": [
         {
-          "name": "uq_crypto_holding_wallet",
-          "unique": true,
-          "origin": "c",
-          "columns": [
-            "exchange_id",
-            "network_id",
-            "instrument_id"
-          ]
-        },
-        {
-          "name": "uq_crypto_holding_venue",
-          "unique": true,
-          "origin": "c",
-          "columns": [
-            "exchange_id",
-            "instrument_id"
-          ]
-        },
-        {
           "name": "sqlite_autoindex_inv_crypto_holdings_1",
           "unique": true,
           "origin": "pk",
@@ -3691,6 +4017,13 @@
           "pk": 0
         },
         {
+          "name": "feeFundingKind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "fee_currency",
           "type": "TEXT",
           "notnull": false,
@@ -3699,6 +4032,20 @@
         },
         {
           "name": "fee_instrument_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fromAddressId",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "toAddressId",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -3776,7 +4123,9 @@
         }
       ],
       "checks": [
+        "CHECK ( feeFundingKind IS NULL OR (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)",
         "CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')",
+        "CHECK (feeFundingKind IS NULL OR feeFundingKind IN ('cash','asset')",
         "CHECK (tx_type IN ('buy','sell','transfer_in','transfer_out','deposit','withdraw','fee','adjustment','swap')"
       ]
     },
@@ -3804,6 +4153,34 @@
           "pk": 0
         },
         {
+          "name": "derivation_path",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_index",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "address_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "labels",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "is_primary",
           "type": "INTEGER",
           "notnull": true,
@@ -3814,6 +4191,13 @@
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         }
@@ -3837,6 +4221,14 @@
           ]
         },
         {
+          "name": "uq_wallet_primary_per_network",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "network_id"
+          ]
+        },
+        {
           "name": "sqlite_autoindex_inv_crypto_wallet_addresses_1",
           "unique": true,
           "origin": "pk",
@@ -3846,6 +4238,7 @@
         }
       ],
       "checks": [
+        "CHECK (address_type IS NULL OR address_type IN ('legacy','p2sh','bech32','eth','other')",
         "CHECK (is_primary IN (0, 1)"
       ]
     },
@@ -3933,6 +4326,20 @@
           "pk": 0
         },
         {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "symbol",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "fund_kind",
           "type": "TEXT",
           "notnull": false,
@@ -3940,7 +4347,70 @@
           "pk": 0
         },
         {
+          "name": "profit_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "predicted_annual_rate",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "distribution_period",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "base_price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "platform",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "url",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "1",
+          "pk": 0
+        },
+        {
           "name": "created_at",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
           "type": "TEXT",
           "notnull": true,
           "dflt": null,
@@ -3975,7 +4445,10 @@
         }
       ],
       "checks": [
-        "CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')"
+        "CHECK (distribution_period IS NULL OR distribution_period IN ('monthly','quarterly','none','other')",
+        "CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')",
+        "CHECK (is_active IN (0, 1)",
+        "CHECK (profit_kind IS NULL OR profit_kind IN ('distribution','accumulation')"
       ]
     },
     "inv_fif_holdings": {
@@ -3995,6 +4468,13 @@
           "pk": 0
         },
         {
+          "name": "brokerage_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "quantity",
           "type": "TEXT",
           "notnull": true,
@@ -4005,6 +4485,41 @@
           "name": "total_invested",
           "type": "TEXT",
           "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_fees_paid_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "current_nav",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "last_subscription_price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "last_redemption_price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_reported_profit",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -4041,6 +4556,13 @@
         {
           "table": "acc_accounts",
           "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
+          "table": "inv_stocks_iran_brokerages",
+          "from": "brokerage_id",
           "to": "id",
           "on_update": "CASCADE",
           "on_delete": "RESTRICT"
@@ -4152,6 +4674,20 @@
           "pk": 0
         },
         {
+          "name": "operation_role",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "external_reported_profit",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
@@ -4201,7 +4737,8 @@
         }
       ],
       "checks": [
-        "CHECK (tx_type IN ('subscribe','redeem','distribution','reinvest','fee','adjustment')"
+        "CHECK ( tx_type IN ( 'subscribe','redeem','distribution','reinvest','nav_update', 'fee','adjustment' )",
+        "CHECK (operation_role IS NULL OR operation_role IN ('dividend_income','reinvest_purchase','standalone')"
       ]
     },
     "inv_metals_holdings": {
@@ -4844,6 +5381,48 @@
           "pk": 0
         },
         {
+          "name": "isin",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "symbol",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "provider_symbol",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_provider_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "market",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "quantity",
           "type": "TEXT",
           "notnull": true,
@@ -4854,6 +5433,13 @@
           "name": "total_invested",
           "type": "TEXT",
           "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_fees_paid_base",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -4880,6 +5466,13 @@
         }
       ],
       "foreignKeys": [
+        {
+          "table": "price_sources",
+          "from": "price_provider_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        },
         {
           "table": "ref_instruments",
           "from": "instrument_id",
@@ -4914,7 +5507,9 @@
           ]
         }
       ],
-      "checks": []
+      "checks": [
+        "CHECK (market IS NULL OR market IN ('bourse','fara_bourse','base_market','other')"
+      ]
     },
     "inv_stocks_iran_instruments": {
       "columns": [
@@ -5060,7 +5655,7 @@
         {
           "name": "quantity",
           "type": "TEXT",
-          "notnull": true,
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -5164,7 +5759,7 @@
         }
       ],
       "checks": [
-        "CHECK (tx_type IN ('buy','sell','dividend','corporate_action','fee','adjustment')"
+        "CHECK ( tx_type IN ( 'buy','sell','dividend','corporate_action', 'capital_increase','rights_issue','rights_exercise','rights_sell','bonus_share', 'split','reverse_split','symbol_change','isin_change','transfer_ca','suspension_note', 'fee','adjustment' )"
       ]
     },
     "ln_loan_collateral": {
@@ -5453,6 +6048,27 @@
           "pk": 1
         },
         {
+          "name": "name",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "loan_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "direction",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "party_id",
           "type": "TEXT",
           "notnull": false,
@@ -5461,13 +6077,6 @@
         },
         {
           "name": "role",
-          "type": "TEXT",
-          "notnull": true,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "calculation_method",
           "type": "TEXT",
           "notnull": true,
           "dflt": null,
@@ -5488,7 +6097,203 @@
           "pk": 0
         },
         {
+          "name": "day_count_convention",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "day_count_denominator",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "disbursement_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "first_payment_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "end_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "irregular_first_period",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "first_period_end_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payment_holiday_calendar_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "account_transaction_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calculation_method",
+          "type": "TEXT",
+          "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interest_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "interest_rate",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "interest_rate_period",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "installment_frequency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "custom_interval_days",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "total_installments",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_mode",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_periods",
+          "type": "INTEGER",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_period_unit",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_start_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_end_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "grace_interest_policy",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calculated_installment",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fixed_installment_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "recalculate_on_early_payment",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
+          "name": "penalty_rate",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "penalty_basis",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -5509,6 +6314,13 @@
           "pk": 0
         },
         {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "start_date",
           "type": "TEXT",
           "notnull": false,
@@ -5525,13 +6337,6 @@
         {
           "name": "operation_id",
           "type": "TEXT",
-          "notnull": false,
-          "dflt": null,
-          "pk": 0
-        },
-        {
-          "name": "total_installments",
-          "type": "INTEGER",
           "notnull": false,
           "dflt": null,
           "pk": 0
@@ -5567,6 +6372,13 @@
           "on_delete": "RESTRICT"
         },
         {
+          "table": "acc_accounts",
+          "from": "account_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
           "table": "ref_parties",
           "from": "party_id",
           "to": "id",
@@ -5585,6 +6397,19 @@
         }
       ],
       "checks": [
+        "CHECK (calculation_method IN ('declining_balance','flat_rate','bullet','qarz_al_hasaneh')",
+        "CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','monthly')",
+        "CHECK (direction IS NULL OR direction IN ('borrowed','lent')",
+        "CHECK (grace_interest_policy IS NULL OR grace_interest_policy IN ('interest_only','payment_holiday')",
+        "CHECK (grace_mode IS NULL OR grace_mode IN ('none','periods','date_range')",
+        "CHECK (grace_period_unit IS NULL OR grace_period_unit IN ('installment')",
+        "CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','custom')",
+        "CHECK (interest_rate_period IS NULL OR interest_rate_period IN ('annual','monthly')",
+        "CHECK (interest_type IS NULL OR interest_type IN ('none','fixed','variable')",
+        "CHECK (irregular_first_period IN (0, 1)",
+        "CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')",
+        "CHECK (penalty_basis IS NULL OR penalty_basis IN ('overdue_installment','remaining_balance')",
+        "CHECK (recalculate_on_early_payment IN (0, 1)",
         "CHECK (status IN ('draft','active','paid_off','defaulted','restructured','cancelled')"
       ]
     },
@@ -6623,8 +7448,8 @@
         {
           "name": "quote_type",
           "type": "TEXT",
-          "notnull": false,
-          "dflt": null,
+          "notnull": true,
+          "dflt": "'last'",
           "pk": 0
         },
         {
@@ -6705,6 +7530,27 @@
           ]
         },
         {
+          "name": "uq_price_history_null_source",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "instrument_id",
+            "market_date",
+            "quote_type"
+          ]
+        },
+        {
+          "name": "uq_price_history_key",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "instrument_id",
+            "market_date",
+            "source_id",
+            "quote_type"
+          ]
+        },
+        {
           "name": "sqlite_autoindex_price_history_2",
           "unique": true,
           "origin": "u",
@@ -6728,7 +7574,7 @@
         "CHECK (is_degraded IN (0, 1)",
         "CHECK (is_manual IN (0, 1)",
         "CHECK (is_stale IN (0, 1)",
-        "CHECK (quote_type IS NULL OR quote_type IN ('last','close','nav','manual','imported','bid','ask')"
+        "CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')"
       ]
     },
     "price_sources": {
@@ -7788,6 +8634,34 @@
           "pk": 0
         },
         {
+          "name": "tax_year",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "calendar_system",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "period_start",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "period_end",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
@@ -7830,6 +8704,7 @@
         }
       ],
       "checks": [
+        "CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')",
         "CHECK (is_deductible IN (0, 1)",
         "CHECK (is_manual_adjustment IN (0, 1)",
         "CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)",
@@ -7860,6 +8735,13 @@
           "pk": 0
         },
         {
+          "name": "linked_tax_event_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "summary_json",
           "type": "TEXT",
           "notnull": false,
@@ -7879,9 +8761,52 @@
           "notnull": true,
           "dflt": null,
           "pk": 0
+        },
+        {
+          "name": "filed_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "paid_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amended_to",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amended_at",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
         }
       ],
-      "foreignKeys": [],
+      "foreignKeys": [
+        {
+          "table": "tax_records",
+          "from": "amended_to",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        },
+        {
+          "table": "tax_events",
+          "from": "linked_tax_event_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        }
+      ],
       "indexes": [
         {
           "name": "sqlite_autoindex_tax_records_1",
@@ -7893,7 +8818,7 @@
         }
       ],
       "checks": [
-        "CHECK (status IN ('draft','filed','amended')"
+        "CHECK (status IN ('draft','pending','filed','paid','amended','cancelled')"
       ]
     },
     "usr_settings": {

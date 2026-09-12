@@ -830,3 +830,10 @@ tax_records	status	RAW	Tax	yes	tax_records	canonical	yes
 tax_records	summary_json	RAW	Tax	yes	tax_records	canonical	yes
 usr_settings	key	RAW	Settings	yes	usr_settings	canonical	yes
 usr_settings	value	RAW	Settings	yes	usr_settings	canonical	yes
+inv_stocks_iran_transactions	settlement_date	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	quantity	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	price	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fee_amount	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	currency	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	account_id	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	created_at	SYSTEM_INDEX	Stocks	no	inv_stocks_iran_transactions	canonical	yes

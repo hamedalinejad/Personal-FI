@@ -1,8 +1,10 @@
 /**
  * Single-writer semantics for multi-tab browser access.
- * Node harness: in-process map. Browser: navigator.locks + BroadcastChannel.
+ * Node harness: in-process map.
+ * Browser: navigator.locks + BroadcastChannel (same API).
  */
 const writers = new Map();
+const listeners = new Set();
 
 export function acquireWriter(dbKey, ownerId) {
   const cur = writers.get(dbKey);
@@ -12,11 +14,15 @@ export function acquireWriter(dbKey, ownerId) {
     throw err;
   }
   writers.set(dbKey, ownerId);
+  broadcast({ type: "writer-acquired", dbKey, ownerId });
   return { dbKey, ownerId, role: "writer" };
 }
 
 export function releaseWriter(dbKey, ownerId) {
-  if (writers.get(dbKey) === ownerId) writers.delete(dbKey);
+  if (writers.get(dbKey) === ownerId) {
+    writers.delete(dbKey);
+    broadcast({ type: "writer-released", dbKey, ownerId });
+  }
 }
 
 export function assertWriter(dbKey, ownerId) {
@@ -32,6 +38,37 @@ export function tryWrite(dbKey, ownerId, fn) {
   return fn();
 }
 
+/** Browser: subscribe to writer changes (BroadcastChannel polyfill in tests). */
+export function onWriterEvent(fn) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+function broadcast(evt) {
+  for (const fn of listeners) {
+    try {
+      fn(evt);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/**
+ * Simulate multi-tab: two owners cannot both write.
+ * In browser, wrap with navigator.locks.request(dbKey, ...).
+ */
+export async function withBrowserLock(dbKey, ownerId, fn) {
+  // Node/test path — same semantics as locks
+  acquireWriter(dbKey, ownerId);
+  try {
+    return await fn();
+  } finally {
+    releaseWriter(dbKey, ownerId);
+  }
+}
+
 export function _resetWritersForTests() {
   writers.clear();
+  listeners.clear();
 }

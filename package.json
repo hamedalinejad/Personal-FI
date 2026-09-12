@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Personal-FI \u2014 implementation scaffold (docs are specification authority; production NO-GO)",
   "scripts": {
-    "test": "node --test src/core/money/*.test.js src/core/price/*.test.js src/core/integrity/*.test.js src/core/api/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/persistence/browser/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/tax/*.test.js src/core/accounting/reports/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/features/**/*.test.js src/core/persistence/browser/*.test.js src/core/sync/*.test.js src/core/recovery/*.test.js",
+    "test": "node --test src/core/money/*.test.js src/core/price/*.test.js src/core/integrity/*.test.js src/core/api/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/persistence/browser/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/tax/*.test.js src/core/accounting/reports/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js src/features/**/*.test.js src/core/persistence/browser/*.test.js src/core/sync/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
     "docs:check-refs": "node scripts/docs-check-refs.js",
     "schema:smoke": "node scripts/schema-drift-smoke.js",
@@ -25,7 +25,8 @@
     "schema:inventory:soft": "node scripts/field-inventory-verify.js",
     "fixture:empty": "node scripts/fixture-empty-check.js",
     "lint:money-number": "node scripts/lint-no-number-money.js",
-    "schema:sync": "node scripts/schema-sync-pipeline.js"
+    "schema:sync": "node scripts/schema-sync-pipeline.js",
+    "schema:field-diff": "node scripts/feature-field-diff.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"

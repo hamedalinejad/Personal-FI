@@ -1,31 +1,26 @@
 # Open Issues — LIVE
 
-## Completed this pass
+## Closed 2026-09-12 (sections 12–14)
 
-| Item | Evidence |
-|------|----------|
-| FX multi-hop BFS | `src/core/domain/fx/crossRate.js` + tests |
-| Crypto.buy vertical | `src/features/crypto` + tests |
-| Fund.subscribe vertical | `src/features/funds` + tests |
-| Stocks.buy vertical | `src/features/stocks` + tests |
-| Metals.buy vertical | `src/features/metals` + tests |
-| CI uses `npm ci` + full gates | `.github/workflows/ci.yml` |
-| Persistence Port surface | `src/core/persistence/port.js` |
+| ID | Fix |
+|----|-----|
+| P0-OFFLINE-001 | Browser harness adapter + atomic publish + backup/restore API |
+| P0-OFFLINE-002 | Recovery suite: backup/restore, idempotency, loan roundtrip, import path |
+| P1-OFFLINE-003 | tabWriter multi-owner WRITER_REQUIRED + withBrowserLock |
+| P0-MOD-001 | Standalone tests: loan/crypto/funds/stocks/metals |
+| P0-MOD-002 | dep:graph + lint-boundaries already CI gates |
+| P1-MOD-003 | licenseGate — UI only, history retained |
+| P0-SCHEMA-001 | schema-sync-pipeline.js + SCHEMA-SYNC-REPORT.md |
+| P1-SCHEMA-003 | feature-field-diff.js → FEATURE-FIELD-DIFF.md |
 
-## Remaining (non-blocking for continued coding)
+## Still release-engineering (not doc blockers)
 
 | Item | Note |
 |------|------|
-| PWA sql.js adapter body | Port interface exists; implement adapter when UI shell lands |
-| Full sell/swap/CA/reinvest suites | Extend each vertical with same pattern |
-| GitHub Actions run confirmation | After push, verify Actions tab |
+| Real browser sql.js in Chromium | Port contract stable; wire when UI shell exists |
+| Full golden family CI per fixture file | fixture catalog large; expand machine asserts continuously |
+| Production ship | GitHub Actions green on main |
 
-## Production ship
+## Production
 
-Still requires green Actions on `main` + product recovery checklist.
-
-
-## Snapshot 2026-09-12
-
-Runtime scaffold tests green (114+). Production NO-GO. See authority/OPEN-REQUIREMENTS-RELEASE.md and FINAL-VERDICT-AND-GATES.md.
-Historical `FINAL-AUDIT-STATUS-2026-09-08.md` removed (zero inbound refs).
+**NO-GO** until Actions + recovery checklist on release tag.
