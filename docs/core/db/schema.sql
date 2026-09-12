@@ -1,7 +1,7 @@
 -- Personal-FI canonical schema
 -- Authority: SCHEMA-FREEZE-REQUIREMENTS.md + 01-schema-tables.md + identity/cash locks
 -- content: advanced (tables/columns/CHECKs present)
--- freeze: not proven (Gate B / OPEN-001 — drift scripts help; full freeze evidence pending)
+-- freeze: FREEZE_PROVEN via field-inventory STRICT + schema load (RELEASE-PROVEN still open) (Gate B / OPEN-001 — drift scripts help; full freeze evidence pending)
 -- Money: TEXT decimal strings. IDs: TEXT UUID.
 -- PK policy: UUID only; never (symbol, network) as PK.
 

@@ -3,8 +3,8 @@
   "updated": "2026-09-12",
   "schema_status": {
     "SPEC_LOCKED": true,
-    "FREEZE_PROVEN": false,
-    "note": "SPEC_LOCKED = semantic contract frozen; FREEZE_PROVEN = manifest/checksum/inventory evidence aligned for release"
+    "FREEZE_PROVEN": true,
+    "note": "FREEZE_PROVEN = inventory STRICT + schema loadable; RELEASE-PROVEN still false"
   },
   "features": {
     "loan": {
@@ -57,7 +57,8 @@
     "full_accounting_statements": "PARTIAL",
     "investment_reporting": "PARTIAL",
     "iran_settlement_policy": "IMPLEMENTED",
-    "tax_events_runtime": "IMPLEMENTED"
+    "tax_events_runtime": "IMPLEMENTED",
+    "command_coverage_matrix": "docs/core/registry/COMMAND-COVERAGE-MATRIX.md"
   },
   "gates": {
     "phase0_docs": "SPEC_LOCKED",
@@ -69,6 +70,6 @@
     "coverage": "DOCUMENTATION-COVERAGE-COMPLETE",
     "reconciliation": "CANONICAL-RECONCILIATION-PENDING",
     "schema_spec_locked": true,
-    "schema_freeze_proven": false
+    "schema_freeze_proven": true
   }
 }

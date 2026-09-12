@@ -9,7 +9,7 @@
     "docs:check-refs": "node scripts/docs-check-refs.js",
     "schema:smoke": "node scripts/schema-drift-smoke.js",
     "schema:drift": "node scripts/schema-drift-test.js",
-    "schema:inventory": "node scripts/field-inventory-verify.js",
+    "schema:inventory": "STRICT_INVENTORY=1 node scripts/field-inventory-verify.js",
     "schema:manifest": "node scripts/schema-manifest.js",
     "dep:graph": "node scripts/dependency-graph-check.js",
     "docs:validate": "node scripts/docs-validator.js",
@@ -21,7 +21,8 @@
     "lint:money-sql": "node scripts/lint-no-sql-sum-money.js",
     "status:check": "node scripts/status-registry-check.js",
     "status:gen": "node scripts/generate-command-status-md.js",
-    "requirements:check": "node scripts/requirements-matrix-check.js"
+    "requirements:check": "node scripts/requirements-matrix-check.js",
+    "schema:inventory:soft": "node scripts/field-inventory-verify.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"
