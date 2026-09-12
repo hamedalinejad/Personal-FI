@@ -2,16 +2,18 @@
 id: DOC-CMD-STATUS
 title: Feature Command Status Registry
 status: approved
-version: 0.5
+version: 0.6
 updated: 2026-09-12
 ---
 
-| Feature | Command | Status | Notes |
-|---------|---------|--------|-------|
-| Loan | create / payment / reverse | IMPLEMENTED | Reference vertical |
-| Crypto | buy / sell | IMPLEMENTED | Model A; WAC sell |
-| Funds | subscribe / redeem | IMPLEMENTED | NAV ≠ tx price |
-| Stocks | buy / sell / settle | IMPLEMENTED | T+n payable/receivable |
-| Metals | buy / sell | IMPLEMENTED | Purity; WAC sell |
+| Feature | Command | Status |
+|---------|---------|--------|
+| Loan | create, payment, reverse | IMPLEMENTED |
+| Crypto | buy, sell, transfer | IMPLEMENTED |
+| Funds | subscribe, redeem, distribution | IMPLEMENTED |
+| Stocks | buy, sell, settle, dividend | IMPLEMENTED |
+| Metals | buy, sell, delivery | IMPLEMENTED |
 
-Feature surface still PARTIAL (no CA/transfer/delivery). Production NO-GO.
+Still not product-complete: corporate actions complex, cheque, multi-hop FX UI, browser offline proof, full golden CI matrix.
+
+**Production: NO-GO** (RELEASE-PROVEN evidence still required).
