@@ -31,6 +31,7 @@
 | Live work | OPEN-ISSUES-REGISTER.md |
 | Handoff | EXECUTION-HANDOFF.md |
 | Coding rules | CODING-GATE.md |
+| Schema vocabulary P0 | P0-SCHEMA-VOCABULARY-LOCK.md |
 | Team handoff | docs/DEVELOPER-HANDOFF.md |
 | UX | docs/00-Product/Pages-IA.md |
 | Schema | db/schema.sql |

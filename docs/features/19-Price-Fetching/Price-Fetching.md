@@ -1,3 +1,5 @@
+> **P0-008 LOCK:** All prices key by `ref_instruments.id` → `price_history.instrument_id`. No composite identity strings. See `P0-SCHEMA-VOCABULARY-LOCK.md`.
+
 # Price Fetching
 
 > **Invariant:** Price Fetching **secondary** است.  

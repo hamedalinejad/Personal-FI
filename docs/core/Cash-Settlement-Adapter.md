@@ -58,7 +58,7 @@ All calls inside `runAtomicFinancialOperation`.
 | Mode | Adapter | Account resolution | Truth |
 |------|---------|-------------------|--------|
 | Accounts UI on | AccountsCashAdapter | bank-linked `fin_accounts` | journal lines |
-| Standalone edition | LocalSettlementAdapter | edition default `fin_accounts` (systemRole e.g. `local_settlement_cash`) | **same** journal lines |
+| Standalone edition | LocalSettlementAdapter | edition default `fin_accounts` (role e.g. `local_settlement_cash`) | **same** journal lines |
 
 Both always emit balanced journal. Standalone UI ≠ second ledger.
 
@@ -98,7 +98,7 @@ NEVER:
   “local settlement ledger” outside fin_accounts
 ```
 
-Local settlement account **is** a `fin_accounts` row (e.g. systemRole `local_settlement_cash`).  
+Local settlement account **is** a `fin_accounts` row (e.g. role `local_settlement_cash`).  
 Feature cash tables = **projection** with optional `finAccountId` FK; rebuild from journal.
 
 
@@ -127,4 +127,4 @@ interface CashSettlementPort {
 }
 ```
 
-Bootstrap standalone editions must ensure a `fin_accounts` row with role/systemRole `local_settlement_cash`.
+Bootstrap standalone editions must ensure a `fin_accounts` row with role/role `local_settlement_cash`.

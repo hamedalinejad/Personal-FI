@@ -1,3 +1,5 @@
+> **P0-003 LOCK:** **relatedFeature** = `investment.funds` (not `fif`). Cash via CashSettlementPort → journal.
+
 > **Invariant:** `NAV ≠ transactionPrice`؛ valuation و تحقق می‌توانند redemption/subscription جدا داشته باشند.
 
 نام زیر‌فیچر: Investment - Fixed Income Funds (صندوق‌های درآمد ثابت)

@@ -1,3 +1,6 @@
+> **P0-006 LOCK:** `inv_metals_platform_transactions` does **not** exist. Platform cash is never independent SoT.
+> **relatedFeature** = `investment.metals`. See `P0-SCHEMA-VOCABULARY-LOCK.md`.
+
 # Investment — Metals (Canonical)
 
 > **Canonical path:** `docs/features/05-Investment/05-04-Metals/Investment-Metals.md`  

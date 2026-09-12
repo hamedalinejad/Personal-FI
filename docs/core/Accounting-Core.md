@@ -1,3 +1,6 @@
+> **P0-VOCABULARY LOCK:** Field names = `docs/core/db/schema.sql` + `P0-SCHEMA-VOCABULARY-LOCK.md` only.  
+> Obsolete: `role`, `type` (as account column), `isVoided`, `operation_id` on journal lines, ghost `inv_*_*_transactions` cash tables.
+
 > **P0:** `Accounting Core ≠ Accounting UI`. Journal پشت‌صحنه برای صحت مالی؛ UI دفترکل/تراز آزمایشی اختیاری است. ببین `Feature-Independence-Contract.md` · `Module-Architecture.md`.
 
 # Accounting Core — قلب واقعی سیستم (نه ERP)

@@ -26,7 +26,7 @@ fin_journal_lines     ← تنها منبع حقیقت مانده نقد (rebuil
 
 هر «جیب پول» یک ردیف `fin_accounts` است، مثلاً:
 
-| code (نمونه) | name | systemRole | currency |
+| code (نمونه) | name | role | currency |
 |--------------|------|------------|----------|
 | 1000 | Bank - Mellat - IRR | `bank_cash` | IRR |
 | 1100 | Bank - Saman - IRR | `bank_cash` | IRR |

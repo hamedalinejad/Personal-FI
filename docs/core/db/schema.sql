@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   side            TEXT NOT NULL CHECK (side IN ('debit', 'credit')),
   amount          TEXT NOT NULL, -- decimal string in line currency / book
   currency        TEXT NOT NULL,
-  amount_in_base  TEXT,
+  amount_in_base TEXT, -- P0-009: REQUIRED when posted; =amount if currency=base else rate+amount_in_base required
   exchange_rate_to_base TEXT,
   conversion_path TEXT, -- JSON when hops > 1
   line_number INTEGER NOT NULL DEFAULT 1,

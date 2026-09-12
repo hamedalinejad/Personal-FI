@@ -1,3 +1,6 @@
+> **P0-005 LOCK:** `inv_stocks_iran_brokerage_transactions` does **not** exist. Cash = CashSettlementPort → Core journal.
+> **relatedFeature** = `investment.stocks` (not `stocks_iran`). See `P0-SCHEMA-VOCABULARY-LOCK.md`.
+
 > **Iran Market Rules (لایه مستقل):** `Iran-Market-Rules.md` — هویت، settlement، CA.
 
 # زیر‌فیچر: Investment - Stocks Iran (سهام بورس ایران)

@@ -8,8 +8,8 @@
 | Income detail | Income Domain + Journal lines |
 | Expense detail | Expense Domain + Journal lines |
 | Cash movement (bank) | Journal lines + `acc_transactions` event (نه balance موازی) |
-| Crypto / exchange / wallet **cash** | **`fin_accounts` (systemRole=exchange_cash/wallet_cash) + journal**؛ `inv_crypto_cash` فقط projection |
-| Brokerage cash | `fin_accounts` (systemRole=broker_cash) + journal |
+| Crypto / exchange / wallet **cash** | **`fin_accounts` (role=exchange_cash/wallet_cash) + journal**؛ `inv_crypto_cash` فقط projection |
+| Brokerage cash | `fin_accounts` (role=broker_cash) + journal |
 | Crypto Holding qty | Crypto Domain Ledger |
 | Loan Outstanding | Loan Domain Ledger (`ln_transactions`) |
 | Book Cost / average cost | Cost Basis Engine (derived from domain) |

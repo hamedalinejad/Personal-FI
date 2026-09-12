@@ -1,3 +1,6 @@
+> **P0-004 LOCK:** `inv_crypto_exchange_transactions` does **not** exist. Cash = CashSettlementPort → Core journal.
+> **relatedFeature** = `investment.crypto` (not `crypto_exchange`). See `P0-SCHEMA-VOCABULARY-LOCK.md`.
+
 
 ## Canonical: Asset vs Cash + نقش USDT
 

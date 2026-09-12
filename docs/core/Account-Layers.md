@@ -19,7 +19,7 @@
 - استفاده از `fin_accounts` به‌جای `acc_accounts` برای موجودی قابل‌برداشت بانکی
 - مخلوط کردن party با bank account
 
-پیوند: `fin_accounts.linkedEntityType/Id` می‌تواند به `acc_accounts` یا `ref_parties` اشاره کند.
+پیوند: `fin_accounts.external_ref_json` می‌تواند به `acc_accounts` یا `ref_parties` اشاره کند.
 جزئیات journal: `Accounting-Core.md` · parties: `Parties.md`
 
 ---
@@ -39,7 +39,7 @@ Feature می‌تواند مالکیت داده را جدا نگه دارد:
 
 ```text
 fin_accounts.type = asset|…
-fin_accounts.systemRole = bank_link | broker_cash | exchange_cash | crypto_holding | …
+fin_accounts.role = bank_link | broker_cash | exchange_cash | crypto_holding | …
 fin_accounts.linkedEntityId = …
 ```
 

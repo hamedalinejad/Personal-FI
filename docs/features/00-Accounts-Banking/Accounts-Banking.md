@@ -1,3 +1,5 @@
+> **P0-002 LOCK:** `acc_transactions` is projection only (`direction` in|out). Semantic type = `fin_operations.operation_type`. See `P0-SCHEMA-VOCABULARY-LOCK.md`.
+
 # فیچر: Accounts & Banking
 
 ## توضیح کلی
