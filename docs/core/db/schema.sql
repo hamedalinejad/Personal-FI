@@ -90,7 +90,9 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   post_state TEXT CHECK (post_state IS NULL OR post_state IN ('draft','posted','void'))  -- mirrors operation; entry exists for posted path
 );
 
+-- BUG-CUR-021 LOCKED: operation_id is NOT on lines; derive via entry_id → fin_journal_entries.operation_id only
 CREATE TABLE IF NOT EXISTS fin_journal_lines (
+
   id              TEXT PRIMARY KEY,
   entry_id        TEXT NOT NULL REFERENCES fin_journal_entries(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   account_id      TEXT NOT NULL REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -188,7 +190,7 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   branch_name TEXT,
   bank_name TEXT,
   currency TEXT NOT NULL,
-  account_kind TEXT NOT NULL CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account','bank','investment','loan','credit','other')),
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account')), -- BUG-CUR-023: no legacy bank|investment|loan|credit|other
   bank_product_type TEXT CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')), -- Iran-specific (P0-020)
   -- account classification (RAW):
   role TEXT CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')),
@@ -211,8 +213,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
 CREATE TABLE IF NOT EXISTS acc_transactions (
   id             TEXT PRIMARY KEY,
   account_id     TEXT NOT NULL REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- operation_id: NULLABLE only for draft cash events (not yet linked to operation)
-  -- All posted cash events MUST have operation_id → fin_operations
+  -- BUG-CUR-022: NULL only for draft; domain MUST reject posted path without operation_id
   operation_id   TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date  TEXT NOT NULL,
   amount         TEXT NOT NULL,

@@ -1,3 +1,4 @@
+import { toDecimal } from "../money/canonicalDecimal.js";
 import { openDb } from "../persistence/port.js";
 
 export function ensureAccount(db, { id, name, accountKind, currency, systemRole = null }) {
@@ -97,4 +98,26 @@ export function bootstrapLoanEditionAccounts(dataDir, currency = "IRR") {
     scopedAccountId("loan_fee_income", currency),
     scopedAccountId("loan_penalty_income", currency),
   ];
+}
+
+/** P0-CASH-006 — reject archive when journal balance ≠ 0 */
+export function archiveAccount(db, accountId) {
+  const rows = db
+    .prepare(
+      `SELECT jl.side, jl.amount_in_base, jl.amount
+       FROM fin_journal_lines jl
+       JOIN fin_journal_entries je ON je.id = jl.entry_id
+       JOIN fin_operations o ON o.id = je.operation_id
+       WHERE jl.account_id = ? AND o.status = 'posted'`,
+    )
+    .all(accountId);
+  let bal = toDecimal("0");
+  for (const r of rows) {
+    const a = toDecimal(r.amount_in_base != null ? r.amount_in_base : r.amount);
+    bal = r.side === "debit" ? bal.plus(a) : bal.minus(a);
+  }
+  if (!bal.isZero()) throw new Error("ACCOUNT_ARCHIVE_NONZERO_BALANCE");
+  const now = new Date().toISOString();
+  db.prepare(`UPDATE fin_accounts SET is_archived = 1, status = 'closed', updated_at = ? WHERE id = ?`).run(now, accountId);
+  return { id: accountId, archived: true };
 }
