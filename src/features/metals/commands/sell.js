@@ -81,7 +81,8 @@ export async function sellMetal(input, { dataDir } = {}) {
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "metals.sell",
     dataDir,
     businessDate: p.businessDate,

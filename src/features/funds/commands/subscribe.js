@@ -91,7 +91,8 @@ export async function subscribeFund(input, { dataDir } = {}) {
   ];
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "funds.subscribe",
     dataDir,
     businessDate: p.businessDate,

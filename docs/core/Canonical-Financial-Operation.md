@@ -1,3 +1,6 @@
+
+> **P0-OP-006:** `status` ∈ {draft,posted,voided,failed}. `pending` is durability only.
+
 > **این سند از مهم‌ترین قراردادهای پروژه است.** هر رویداد مالی = یک `operationId`.
 
 ## operationId Nullability Rule (P0-010)
@@ -95,7 +98,7 @@ fin_operations (header, one per atomic op) — **Must in SQLite schema**:
   sourceFeature
   reversesOperationId?
   conversionPath?           // Must اگر >1 hop
-  status                    // pending | posted | voided | failed — business only
+  status                    // pending (durability_state only; business status never pending) | posted | voided | failed — business only
   failurePhase?             // validation | domain_write | sql_commit | null when ok
   failureCode?              // machine code
   commandHash               // idempotency fingerprint — **Must**

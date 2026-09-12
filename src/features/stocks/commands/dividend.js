@@ -67,7 +67,8 @@ export async function stockDividend(input, { dataDir } = {}) {
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "stocks.dividend",
     dataDir,
     businessDate: p.businessDate,

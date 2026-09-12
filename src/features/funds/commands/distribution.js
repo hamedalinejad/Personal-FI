@@ -48,7 +48,8 @@ export async function distributeFund(input, { dataDir } = {}) {
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "fund.distribution",
     dataDir,
     businessDate: p.businessDate,

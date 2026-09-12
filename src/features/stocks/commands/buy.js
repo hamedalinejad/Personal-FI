@@ -136,7 +136,8 @@ export async function buyStock(input, { dataDir } = {}) {
   }
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "stocks.buy",
     dataDir,
     businessDate: p.businessDate,

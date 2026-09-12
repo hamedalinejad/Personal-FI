@@ -120,7 +120,8 @@ export async function settleStock(input, { dataDir } = {}) {
   ];
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "stocks.settle",
     dataDir,
     businessDate: p.businessDate,

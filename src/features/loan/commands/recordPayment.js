@@ -112,7 +112,8 @@ export async function recordPayment(
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "loan.recordPayment",
     dataDir,
     businessDate: p.businessDate,

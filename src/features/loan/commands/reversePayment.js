@@ -78,7 +78,8 @@ export async function reversePayment(
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "loan.reversePayment",
     dataDir,
     businessDate: p.businessDate,

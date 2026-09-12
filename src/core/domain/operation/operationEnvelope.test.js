@@ -18,7 +18,8 @@ test("B-022 result_json preserves payload envelope", async () => {
   const inv = scopedAccountId("crypto_inventory", "IRR");
   const opId = randomUUID();
   await runAtomicFinancialOperation({
-    operationId: opId,
+    
+    status: "posted",operationId: opId,
     type: "test.envelope",
     dataDir,
     businessDate: "2026-01-01",

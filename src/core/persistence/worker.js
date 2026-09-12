@@ -73,19 +73,22 @@ function persistOperationSqlite(record, dir) {
   const id = record.operationId;
   const journalLines = record.journalLines || [];
 
-  if (journalLines.length) assertJournalBalanced(journalLines);
-
-  const status = record.status || "posted";
-  if (!["draft", "posted", "voided", "failed"].includes(status)) {
-    throw new Error(`OP_STATUS_INVALID:${status}`);
-  }
-
-  // P0: no implicit date/currency
+  // P0: no implicit date/currency (before status)
   if (!record.businessDate || typeof record.businessDate !== "string") {
     throw new Error("OP_BUSINESS_DATE_REQUIRED");
   }
   if (!record.baseCurrency || typeof record.baseCurrency !== "string") {
     throw new Error("OP_BASE_CURRENCY_REQUIRED");
+  }
+
+  // P0-OP-005: no silent posted default when lines present
+  let status = record.status;
+  if (status == null || status === "") {
+    if (journalLines.length) throw new Error("OP_STATUS_REQUIRED");
+    status = "draft";
+  }
+  if (!["draft", "posted", "voided", "failed"].includes(status)) {
+    throw new Error(`OP_STATUS_INVALID:${status}`);
   }
 
   const db = openDb(dir);
@@ -134,22 +137,26 @@ function persistOperationSqlite(record, dir) {
       return loadOperationSync(db, id, true);
     }
 
+    // P0-OP-008: insert row first as draft while durability=pending; promote after journal
+    const insertStatus = status === "posted" ? "draft" : status;
     db.prepare(
       `INSERT INTO fin_operations (
         id, command_hash, operation_type, status, durability_state,
-        business_date, base_currency, engine_versions, created_at, posted_at, result_json
-      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)`,
+        business_date, event_at, settlement_date, base_currency, engine_versions,
+        source, created_at, posted_at, result_json
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`,
     ).run(
       id,
       record.commandHash || null,
       record.type || "unknown",
-      status,
+      insertStatus,
       businessDate,
+      record.eventAt ?? null,
+      record.settlementDate ?? null,
       baseCurrency,
       record.engineVersions ? JSON.stringify(record.engineVersions) : null,
+      record.source ?? null,
       now,
-      status === "posted" ? now : null,
-      JSON.stringify(resultSnapshot),
     );
 
     // Domain bootstrap + subledger (operation row already exists for FKs)
@@ -157,18 +164,32 @@ function persistOperationSqlite(record, dir) {
       record.withinTransaction(db, { operationId: id, businessDate, baseCurrency });
     }
 
-    // Verify accounts after bootstrap — never invent missing accounts
+    // P0-OP-009 ordered validation after bootstrap:
+    // account identity/currency → FX/base → balance → domain already applied
     for (const line of journalLines) {
       const aid = line.accountId || line.account_id;
-      const lineCur = line.currency || baseCurrency;
-      if (!line.currency) {
-        throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
-      }
+      if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
+      const lineCur = line.currency;
       const acc = assertAccountUsable(db, aid);
-      if (acc.currency !== lineCur) {
-        throw new Error("ACCOUNT_CURRENCY_MISMATCH");
+      if (acc.currency !== lineCur) throw new Error("ACCOUNT_CURRENCY_MISMATCH");
+      // P0-OP-010: fill same-currency base; require FX path for cross-currency when posting
+      if (line.amountInBase == null && line.amount_in_base == null) {
+        if (lineCur === baseCurrency) {
+          line.amountInBase = line.amount;
+          line.exchangeRateToBase = line.exchangeRateToBase ?? "1";
+        } else if (status === "posted") {
+          throw new Error("INV_JOURNAL_MISSING_AMOUNT_IN_BASE");
+        }
+      }
+      if (status === "posted" && lineCur !== baseCurrency) {
+        const fx = line.exchangeRateToBase ?? line.exchange_rate_to_base;
+        if (fx == null) throw new Error("INV_JOURNAL_MISSING_EXCHANGE_RATE");
+        if (line.conversionPath == null && line.conversion_path == null) {
+          line.conversionPath = "direct";
+        }
       }
     }
+    if (journalLines.length) assertJournalBalanced(journalLines);
 
     const entryId = randomUUID();
     const postState = status === "posted" ? "posted" : status === "voided" ? "void" : "draft";
@@ -207,9 +228,28 @@ function persistOperationSqlite(record, dir) {
       );
     });
 
+    // P0-OP-008/007: only after relational truth exists — promote status + snapshot
+    resultSnapshot.durability_state = "sql_committed";
+    resultSnapshot.status = status;
     db.prepare(
-      `UPDATE fin_operations SET durability_state = 'sql_committed' WHERE id = ?`,
-    ).run(id);
+      `UPDATE fin_operations SET
+         status = ?,
+         durability_state = 'sql_committed',
+         posted_at = ?,
+         result_json = ?,
+         result_schema_version = ?,
+         event_at = COALESCE(event_at, ?),
+         settlement_date = COALESCE(settlement_date, ?)
+       WHERE id = ?`,
+    ).run(
+      status,
+      status === "posted" ? now : null,
+      JSON.stringify(resultSnapshot),
+      "1.0.0",
+      record.eventAt ?? null,
+      record.settlementDate ?? null,
+      id,
+    );
     // Prefer db_meta for persistence durability (business status stays on fin_operations.status)
     db.prepare(
       `INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, ?)`,
@@ -257,6 +297,7 @@ function loadOperationSync(db, operationId, replay = false) {
          ORDER BY jl.line_number`,
       )
       .all(operationId);
+    // P0-OP-007: typed columns authoritative for canonical fields
     return {
       ...snap,
       operationId: row.id,
@@ -268,6 +309,9 @@ function loadOperationSync(db, operationId, replay = false) {
       engineVersions: snap.engineVersions ?? (row.engine_versions ? JSON.parse(row.engine_versions) : null),
       businessDate: row.business_date,
       baseCurrency: row.base_currency,
+      settlementDate: row.settlement_date ?? snap.settlementDate ?? null,
+      eventAt: row.event_at ?? snap.eventAt ?? null,
+      provenance: snap.provenance ?? null,
       idempotentReplay: replay,
     };
   }

@@ -52,7 +52,8 @@ test("VECTOR expense journal balanced 100", async () => {
   ensureAccount(db, { id: "cash", name: "Cash", accountKind: "asset", currency: "IRR" });
   ensureAccount(db, { id: "expense", name: "Expense", accountKind: "expense", currency: "IRR" });
   const r = await runAtomicFinancialOperation({
-    operationId: randomUUID(),
+    
+    status: "posted",operationId: randomUUID(),
     type: "expense",
     dataDir,
     businessDate: "2026-01-01",
@@ -72,7 +73,8 @@ test("VECTOR transfer 250", async () => {
   ensureAccount(db, { id: "src", name: "Src", accountKind: "asset", currency: "IRR" });
   ensureAccount(db, { id: "dst", name: "Dst", accountKind: "asset", currency: "IRR" });
   const r = await runAtomicFinancialOperation({
-    operationId: randomUUID(),
+    
+    status: "posted",operationId: randomUUID(),
     type: "transfer",
     dataDir,
     businessDate: "2026-01-01",
@@ -97,7 +99,8 @@ test("VECTOR idempotency O1 H1 replay / H2 conflict", async () => {
     { accountId: "b", side: "credit", amount: "10", currency: "IRR" },
   ];
   const first = await runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "adj",
     dataDir,
     businessDate: "2026-01-01",
@@ -105,7 +108,8 @@ test("VECTOR idempotency O1 H1 replay / H2 conflict", async () => {
     journalLines: lines,
   });
   const second = await runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "adj",
     dataDir,
     businessDate: "2026-01-01",
@@ -116,7 +120,8 @@ test("VECTOR idempotency O1 H1 replay / H2 conflict", async () => {
   assert.equal(first.operationId, second.operationId);
   await assert.rejects(() =>
     runAtomicFinancialOperation({
-      operationId,
+      
+    status: "posted",operationId,
       type: "adj",
       dataDir,
       businessDate: "2026-01-01",

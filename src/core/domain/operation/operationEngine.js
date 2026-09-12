@@ -20,7 +20,11 @@ export function stableStringify(value) {
     return JSON.stringify(value);
   }
   if (Array.isArray(value)) {
-    return `[${value.map((v) => (v === undefined ? "null" : stableStringify(v))).join(",")}]`;
+    // P0-OP-004: undefined in arrays is forbidden (not coerced to null)
+    for (const v of value) {
+      if (v === undefined) throw new Error("HASH_ARRAY_UNDEFINED_FORBIDDEN");
+    }
+    return `[${value.map((v) => stableStringify(v)).join(",")}]`;
   }
   const keys = Object.keys(value).sort();
   const parts = [];
@@ -33,6 +37,26 @@ export function stableStringify(value) {
 
 function stableHash(obj) {
   return createHash("sha256").update(stableStringify(obj)).digest("hex");
+}
+
+/** P0-OP-003 — fields that participate in economic identity / commandHash */
+export function buildEconomicIdentity(norm) {
+  return {
+    operationType: norm.type,
+    payload: norm.payload,
+    journalLines: norm.journalLines,
+    businessDate: norm.businessDate,
+    baseCurrency: norm.baseCurrency,
+    settlementDate: norm.settlementDate ?? null,
+    eventAt: norm.eventAt ?? null,
+    provenance: norm.provenance ?? null,
+    rates: norm.rates ?? null,
+    engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
+  };
+}
+
+export function computeCommandHash(norm) {
+  return stableHash(buildEconomicIdentity(norm));
 }
 
 /**
@@ -73,7 +97,14 @@ export function normalizeCommand(command) {
   // Business status only: draft|posted|voided|failed (schema). Never "pending" here —
   // durability_state owns pending/sql_committed/persisted (OFFLINE-002).
   const allowedStatus = new Set(["draft", "posted", "voided", "failed"]);
-  let status = command.status || "posted";
+  // P0-OP-005: financial writes with journal lines must declare status explicitly
+  let status = command.status;
+  if (status == null || status === "") {
+    if ((command.journalLines || []).length > 0) {
+      throw new Error("OP_STATUS_REQUIRED");
+    }
+    status = "draft"; // non-financial / empty journal preview default only
+  }
   if (!allowedStatus.has(status)) {
     throw new Error(`OP_STATUS_INVALID:${status}`);
   }
@@ -147,12 +178,16 @@ export async function runAtomicFinancialOperation(command) {
     const mode = norm.persistMode;
 
     // B-037: economic idempotency hash — exclude machine paths / non-economic metadata
+    // P0-OP-003 EconomicIdentity — temporal fields that affect accounting enter the hash
     const payloadForHash = {
       operationType: norm.type,
       payload: norm.payload,
       journalLines: norm.journalLines,
       businessDate: norm.businessDate,
       baseCurrency: norm.baseCurrency,
+      settlementDate: norm.settlementDate ?? null,
+      eventAt: norm.eventAt ?? null,
+      provenance: norm.provenance ?? null,
       rates: norm.rates ?? null,
       engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
     };

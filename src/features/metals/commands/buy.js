@@ -111,7 +111,8 @@ export async function buyMetal(input, { dataDir } = {}) {
   ];
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "metals.buy",
     dataDir,
     businessDate: p.businessDate,

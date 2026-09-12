@@ -101,7 +101,8 @@ export async function createLoan(
   const now = new Date().toISOString();
 
   const result = await runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "loan.create",
     dataDir,
     businessDate: p.businessDate,

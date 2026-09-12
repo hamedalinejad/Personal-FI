@@ -96,7 +96,8 @@ export async function redeemFund(input, { dataDir } = {}) {
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "fund.redeem",
     dataDir,
     businessDate: p.businessDate,

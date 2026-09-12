@@ -118,7 +118,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
   const now = new Date().toISOString();
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "crypto.buy",
     dataDir,
     businessDate: p.businessDate,

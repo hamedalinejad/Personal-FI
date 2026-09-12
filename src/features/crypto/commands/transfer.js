@@ -148,7 +148,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
   const baseCurrency = p.currency || costCurrency;
 
   return runAtomicFinancialOperation({
-    operationId,
+    
+    status: "posted",operationId,
     type: "crypto.transfer",
     dataDir,
     businessDate: p.businessDate,
