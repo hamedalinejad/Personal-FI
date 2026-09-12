@@ -1,14 +1,17 @@
-# Browser durable adapter (P0-B08)
+# Browser offline adapter (OFFLINE-001)
 
-**Status:** NOT_IMPLEMENTED in runtime (see `status.registry.json` → `browser_offline_adapter`).
+## Status
 
-Target:
+- **Protocol path (Node-testable):** `durableMemoryAdapter.js` — ACK only after durable marker.
+- **Production path (browser):** sql.js + IndexedDB behind the same `persistence/port.js` methods:
+  - `openDb` · `persistOperation` · `loadOperation` · `closeAllDbs`
 
-```text
-same persistence port
-→ sql.js in-memory/page
-→ durable commit to IndexedDB
-→ ACK only after durable write
-```
+## Required proofs before RELEASE-PROVEN
 
-Node adapter remains the reference implementation under `src/core/persistence/`.
+1. Airplane-mode writes
+2. Reload after write
+3. Crash mid-persist recovery
+4. Backup restore
+5. Multi-tab single-writer
+
+Financial operation `status` remains independent of durability_state (see PERSISTENCE-VS-OPERATION-STATE.md).

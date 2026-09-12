@@ -893,3 +893,16 @@ Cash SoT = journal lines + fin_accounts. `acc_transactions` = event/UX projectio
 | Transport (internal) | persistence worker only | temp_written / swapped — **never** public schema |
 
 API, TypeScript, fixtures, and schema **must** use this vocabulary only.
+
+## ACCOUNTING-002 — Journal balance pre-commit algorithm
+
+Before any SQL commit of journal lines:
+
+1. **Normalize** every amount with `canonicalDecimalString` / `toDecimal`.
+2. **Convert** each line to base using **locked** `exchangeRateToBase` on the line (never “latest FX”).
+3. **Sum** debits and credits with Decimal (`sumDecimalStrings` / `assertJournalBalanced`).
+4. **Compare exactly** (string-decimal equality via Decimal.eq) — no float epsilon.
+5. **Reject** the operation **before** SQL commit if unbalanced (`INV_JOURNAL_UNBALANCED`).
+6. **Audit on failure**: only non-financial diagnostic logs; do **not** post partial journal rows.
+
+Enforced by: `assertJournalBalanced` in persistence worker prior to insert.

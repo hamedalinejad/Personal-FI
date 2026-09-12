@@ -24,3 +24,8 @@ Persistence must not drop optional/canonical fields when provided.
 ## Account currency lock
 
 See `authority/JOURNAL-ACCOUNT-CURRENCY.md` (binding).
+
+## Pre-commit balance (ACCOUNTING-002)
+
+See Canonical-Financial-Operation.md § ACCOUNTING-002.  
+`assertJournalBalanced` is mandatory before commit. Multi-currency requires `amountInBase` on every line.

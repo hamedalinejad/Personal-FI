@@ -29,6 +29,9 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   reconciliation_status TEXT CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')),
   external_ref_json TEXT
 );
+-- ACCOUNTING-001: code is ledger-facing identifier; unique when present (single-user local book scope)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_accounts_code ON fin_accounts(code) WHERE code IS NOT NULL;
+
 
 CREATE TABLE IF NOT EXISTS fin_operations (
   id                TEXT PRIMARY KEY, -- operationId
@@ -262,6 +265,9 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
 -- - Same asset moved from Exchange A to Wallet B = two holdings: (A, null, asset) and (B, network, asset)
 -- - Transfer provenance is recorded in inv_crypto_transactions via transfer_in/out pairs with same operation_id
 CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_key ON price_history(instrument_id, market_date, source_id, quote_type);
+-- OFFLINE-003: SQLite allows multiple NULLs in UNIQUE; partial index for manual/null source
+CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_null_source
+  ON price_history(instrument_id, market_date, quote_type) WHERE source_id IS NULL;
 
 -- ─── Price Provider Mapping (STOCK-004) ─────────────────────
 -- Preserves symbol-change history and prevents provider identity from leaking into core instrument identity.
@@ -585,6 +591,10 @@ CREATE TABLE IF NOT EXISTS inv_crypto_wallet_addresses (
   created_at TEXT NOT NULL,
   updated_at TEXT -- (P0-019)
 );
+
+-- OFFLINE-004: at most one primary address per network
+CREATE UNIQUE INDEX IF NOT EXISTS uq_wallet_primary_per_network
+  ON inv_crypto_wallet_addresses(network_id) WHERE is_primary = 1;
 
 CREATE TABLE IF NOT EXISTS inv_crypto_cash (
   id TEXT PRIMARY KEY,

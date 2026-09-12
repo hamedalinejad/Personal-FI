@@ -33,3 +33,29 @@ export function toDecimal(input) {
 }
 
 export { Decimal };
+
+/**
+ * ACCOUNTING-003 — sole canonical financial aggregation helper.
+ * All reports must use this instead of ad-hoc loops or SQL SUM on TEXT.
+ */
+export function sumDecimalStrings(values) {
+  if (!Array.isArray(values)) throw new Error("SUM_DECIMAL_NOT_ARRAY");
+  let total = toDecimal("0");
+  for (const v of values) {
+    if (v == null || v === "") continue;
+    total = total.plus(toDecimal(v));
+  }
+  return total.toFixed();
+}
+
+export function sumDecimalSides(lines, { amountField = "amount", sideField = "side" } = {}) {
+  let debit = toDecimal("0");
+  let credit = toDecimal("0");
+  for (const line of lines) {
+    const a = toDecimal(line[amountField] ?? line.amount);
+    if (line[sideField] === "debit") debit = debit.plus(a);
+    else if (line[sideField] === "credit") credit = credit.plus(a);
+    else throw new Error("SUM_DECIMAL_SIDE");
+  }
+  return { debit: debit.toFixed(), credit: credit.toFixed(), balanced: debit.eq(credit) };
+}

@@ -3,7 +3,7 @@
  * Aggregation uses decimal.js — never SQL SUM on TEXT money columns.
  */
 import { openDb } from "../../persistence/port.js";
-import { toDecimal } from "../../money/canonicalDecimal.js";
+import { toDecimal, sumDecimalStrings } from "../../money/canonicalDecimal.js";
 
 export function generalLedger(dataDir, { accountId = null, fromDate = null, toDate = null } = {}) {
   const db = openDb(dataDir);
@@ -51,18 +51,14 @@ export function trialBalance(dataDir, { asOf = null, baseCurrency = null } = {})
     credit: a.credit.toFixed(),
     balance: a.debit.minus(a.credit).toFixed(),
   }));
-  let totalDebit = toDecimal("0");
-  let totalCredit = toDecimal("0");
-  for (const r of rows) {
-    totalDebit = totalDebit.plus(toDecimal(r.debit));
-    totalCredit = totalCredit.plus(toDecimal(r.credit));
-  }
+  const totalDebit = sumDecimalStrings(rows.map((r) => r.debit));
+  const totalCredit = sumDecimalStrings(rows.map((r) => r.credit));
   return {
     asOf: asOf || null,
     rows,
-    totalDebit: totalDebit.toFixed(),
-    totalCredit: totalCredit.toFixed(),
-    balanced: totalDebit.eq(totalCredit),
+    totalDebit,
+    totalCredit,
+    balanced: toDecimal(totalDebit).eq(toDecimal(totalCredit)),
   };
 }
 
