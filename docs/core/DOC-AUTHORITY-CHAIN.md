@@ -71,3 +71,11 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/DATA-MODEL-RELATIONSHIP-CONTRACT.md
 - docs/core/authority/FIELD-PRESERVATION-PROTOCOL.md
 - docs/core/authority/ACCOUNTING-CALCULATION-MASTER-RULES.md
+- docs/core/authority/DOCUMENTATION-STATUS-TAXONOMY.md
+- docs/core/authority/CANONICAL-PIPELINE.md
+- docs/core/authority/CALCULATION-CONTEXT.md
+- docs/core/authority/DO-NOT-GUESS.md
+- docs/core/authority/NAVIGATION-IA.md
+- docs/core/authority/COMMAND-MATRIX-TEMPLATE.md
+- docs/core/authority/DOCUMENTATION-REPAIR-PLAN.md
+- docs/core/authority/RESULT-JSON-CONTRACT.md

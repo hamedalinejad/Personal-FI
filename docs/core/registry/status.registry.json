@@ -64,5 +64,11 @@
     "loan_reference": "IMPLEMENTED",
     "parallel_spec_work": "ALLOWED",
     "parallel_production_integration": "FORBIDDEN_UNTIL_PHASE_ORDER"
+  },
+  "documentation": {
+    "coverage": "DOCUMENTATION-COVERAGE-COMPLETE",
+    "reconciliation": "CANONICAL-RECONCILIATION-PENDING",
+    "schema_spec_locked": true,
+    "schema_freeze_proven": false
   }
 }
