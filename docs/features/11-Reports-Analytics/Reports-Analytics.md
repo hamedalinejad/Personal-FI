@@ -1,3 +1,5 @@
+> **MATH-007 LOCK:** Net Worth cash = Core journal (`fin_accounts`+`fin_journal_lines`) only. `*.cashBalance` on platforms/brokerages = **cache**, never historical SoT.
+
 # فیچر: Reports & Analytics (گزارش‌ها و تحلیل‌ها)
 
 ## توضیح کلی

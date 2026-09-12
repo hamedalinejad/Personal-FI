@@ -1,3 +1,5 @@
+> **P0-016:** Prefer `tx_type=corporate_action` + `inv_stocks_iran_corporate_actions` payload; specific CA kinds optional. Idempotent via operationId.
+
 > **P0-015:** Holding RAW labels (isin/symbol/name/provider/market) on `inv_stocks_iran_holdings`; averageBuyPrice = DERIVED. See `P0-011-015-LOCK.md`.
 
 > **P0-005 LOCK:** `inv_stocks_iran_brokerage_transactions` does **not** exist. Cash = CashSettlementPort → Core journal.

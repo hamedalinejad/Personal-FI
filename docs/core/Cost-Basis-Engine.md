@@ -1,3 +1,5 @@
+> **MATH-008:** Every crypto transfer-like op must set `economicKind` ∈ {internal_transfer, same_owner_bridge, economic_swap}. Internal transfer: no realized P&L from spot price.
+
 # Cost Basis Engine (Core)
 
 ## هدف
