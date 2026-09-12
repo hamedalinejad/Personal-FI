@@ -351,3 +351,8 @@ Fee must not be double-counted inside principal amount without breakdown.
 
 Use **`account_kind`** (snake_case) matching `acc_accounts.account_kind` CHECK in `schema.sql`.
 Do not invent parallel `accountKind` enums in feature prose without mapping 1:1 to SQL.
+
+
+## P0-CASH-002 frozen operational kinds
+
+SQL `acc_accounts.account_kind` values: see `docs/core/authority/ACCOUNT-KIND-VOCABULARY.md`.

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   id           TEXT PRIMARY KEY,
   code         TEXT,
   name         TEXT NOT NULL,
-  account_kind TEXT NOT NULL CHECK (account_kind IN ('asset','liability','equity','income','expense')),
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('asset','liability','equity','income','expense')), -- ACCOUNTING CLASS (not operational cashAccountKind)
   currency     TEXT NOT NULL,
   parent_id    TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0, 1)),
@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS ref_parties (
 
 -- ─── Accounts banking (event log — not cash SoT) ─────────────
 CREATE TABLE IF NOT EXISTS acc_accounts (
+  -- operational cashAccountKind lives in account_kind (P0-CASH-001/002)
   id TEXT PRIMARY KEY,
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- identity (RAW):
@@ -179,7 +180,7 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   branch_name TEXT,
   bank_name TEXT,
   currency TEXT NOT NULL,
-  account_kind TEXT NOT NULL CHECK (account_kind IN ('bank','cash','investment','loan','credit','wallet','other')),
+  account_kind TEXT NOT NULL CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account','bank','investment','loan','credit','other')),
   bank_product_type TEXT CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')), -- Iran-specific (P0-020)
   -- account classification (RAW):
   role TEXT CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')),
@@ -208,7 +209,7 @@ CREATE TABLE IF NOT EXISTS acc_transactions (
   business_date  TEXT NOT NULL,
   amount         TEXT NOT NULL,
   currency       TEXT NOT NULL,
-  direction      TEXT,
+  direction      TEXT CHECK (direction IS NULL OR direction IN ('in','out')),
   memo           TEXT,
   created_at     TEXT NOT NULL
 );

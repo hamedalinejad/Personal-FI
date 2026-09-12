@@ -1,5 +1,15 @@
 # Canonical Cash Model (P0)
 
+
+## P0-CASH-008 / 009 — DomainCashEvent (conceptual only)
+
+There is **no** persisted table named `inv_crypto_exchange_transactions`, `inv_stocks_iran_brokerage_transactions`, or `inv_metals_platform_transactions` as cash SoT.
+
+Cash effects are expressed as **DomainCashEvent** API semantics → `CashSettlementPort` → Core journal.
+
+Any `inv_*_cash.balance` field is **projection-only** (rebuildable from journal via `finAccountId`); never authoritative.
+
+
 > **AUTHORITATIVE (2026-09-12):** Cash SoT is **only** Core `fin_accounts` + `fin_journal_lines` via CashSettlementPort.
 > Any `inv_*_cash`, brokerage cash ledger table names in historical prose are **ghost / deprecated conceptual labels** — not implementable parallel cash ledgers.
 
