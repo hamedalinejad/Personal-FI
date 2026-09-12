@@ -131,3 +131,10 @@ Production محصول = همه فیچرهای scope v1 + CI Actions سبز + off
 Number برای پول · mutate posted · symbol به‌جای instrumentId
 فرمول بدون version bump · «implemented» بدون تست
 ```
+
+
+## Reconciliation order
+
+`docs/core/RECONCILIATION-ORDER.md` (Gates 1–9)
+
+Loan math lock: `docs/core/LOAN-V1-RESOLUTIONS.md` (annuity = non-v1)
