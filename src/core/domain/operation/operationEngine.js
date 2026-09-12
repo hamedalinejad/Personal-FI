@@ -70,10 +70,18 @@ export function normalizeCommand(command) {
     };
   });
 
+  // Business status only: draft|posted|voided|failed (schema). Never "pending" here —
+  // durability_state owns pending/sql_committed/persisted (OFFLINE-002).
+  const allowedStatus = new Set(["draft", "posted", "voided", "failed"]);
+  let status = command.status || "posted";
+  if (!allowedStatus.has(status)) {
+    throw new Error(`OP_STATUS_INVALID:${status}`);
+  }
+
   return {
     operationId: command.operationId,
     type: command.type || "unknown",
-    status: command.status || "posted",
+    status,
     businessDate: command.businessDate,
     baseCurrency,
     payload: command.payload ?? null,
@@ -86,7 +94,13 @@ export function normalizeCommand(command) {
     persistMode: command.persistMode || "sqlite",
     withinTransaction: command.withinTransaction,
     prepareDomain: command.prepareDomain || command.applyDomain,
-    commandHash: command.commandHash,
+    // Dates / provenance — must survive normalize → persist
+    settlementDate: command.settlementDate ?? command.settlement_date ?? null,
+    eventAt: command.eventAt ?? command.event_at ?? null,
+    provenance: command.provenance ?? null,
+    // Caller-supplied commandHash is IGNORED for new hashes (anti-tamper).
+    // Only used after we compute canonical hash for conflict detection if needed.
+    clientCommandHash: command.commandHash ?? null,
   };
 }
 
@@ -142,7 +156,10 @@ export async function runAtomicFinancialOperation(command) {
       rates: norm.rates ?? null,
       engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
     };
-    const commandHash = norm.commandHash || stableHash(payloadForHash);
+    const commandHash = stableHash(payloadForHash);
+    if (norm.clientCommandHash && norm.clientCommandHash !== commandHash) {
+      throw new Error("OP_COMMAND_HASH_MISMATCH");
+    }
 
     // Durable identity first — only OP_NOT_FOUND continues
     try {

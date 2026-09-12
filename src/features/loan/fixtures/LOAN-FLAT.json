@@ -1,0 +1,19 @@
+{
+  "fixtureId": "LOAN-FLAT-001",
+  "engineVersion": "1.0.0-period_based-flat",
+  "input": {
+    "method": "flat_rate",
+    "principal": "1200",
+    "annualRate": "12",
+    "periods": "12",
+    "startDate": "2026-01-01",
+    "dayCount": "period_based"
+  },
+  "expected": {
+    "rowCount": 12,
+    "finalBalance": "0.00",
+    "totalPrincipal": "1200.00",
+    "totalInterest": "144.00",
+    "rateSemantics": "percentage_points"
+  }
+}

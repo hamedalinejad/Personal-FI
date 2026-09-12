@@ -468,6 +468,8 @@ UI:  ۱۴۰۵/۰۶/۱۰
 ---
 ## P0-008 — relatedFeature enum ownership
 
+**SINGLE SOURCE 2026-09-12:** Only the `RelatedFeature` union in this file is valid. Feature docs listing local strings are non-authoritative.
+
 **Sole source:** this file (`types.md`).
 Feature docs must not invent local string lists for relatedFeature.
 Unknown value → validation error at operation boundary.

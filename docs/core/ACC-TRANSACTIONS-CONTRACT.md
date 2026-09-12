@@ -1,6 +1,10 @@
+---
+status: accepted
+---
+
 # acc_transactions Contract — P0-002 Resolution
 
-**Status:** PROPOSED (requires schema update or documentation alignment)
+**Status:** ACCEPTED — minimal contract aligned with schema `acc_transactions` + links (2026-09-12)
 
 ---
 

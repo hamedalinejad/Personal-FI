@@ -1,5 +1,10 @@
 # Canonical Cash Model (P0)
 
+> **AUTHORITATIVE (2026-09-12):** Cash SoT is **only** Core `fin_accounts` + `fin_journal_lines` via CashSettlementPort.
+> Any `inv_*_cash`, brokerage cash ledger table names in historical prose are **ghost / deprecated conceptual labels** — not implementable parallel cash ledgers.
+
+
+
 **قانون مطلق:** برای یک پول نقد، **دو سیستم balance مستقل ممنوع است.**
 
 ## Canonical Cash

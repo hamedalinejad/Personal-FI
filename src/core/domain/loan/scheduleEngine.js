@@ -93,31 +93,35 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
-  const totalInterest = P.times(assertNonNegative(annualRate));
-  const payment = P.plus(totalInterest).div(n);
-  const pPart = P.div(n);
-  const iPart = totalInterest.div(n);
+  // annualRate is percentage-points (12 = 12%), same as declining/bullet.
+  const rateFrac = normalizeRatePercentage(annualRate);
+  const totalInterest = P.times(rateFrac);
+  const pPartExact = P.div(n);
+  const iPartExact = totalInterest.div(n);
   let bal = P;
+  let principalAllocated = toDecimal("0");
+  let interestAllocated = toDecimal("0");
   const rows = [];
   for (let i = 1; i <= n; i++) {
+    let pPart = pPartExact;
+    let iPart = iPartExact;
     if (i === n) {
-      rows.push({
-        period: i,
-        payment: money2str(bal.plus(iPart)),
-        principal: money2str(bal),
-        interest: money2str(iPart),
-        balance: "0.00",
-      });
-    } else {
-      bal = bal.minus(pPart);
-      rows.push({
-        period: i,
-        payment: money2str(payment),
-        principal: money2str(pPart),
-        interest: money2str(iPart),
-        balance: money2str(bal),
-      });
+      // residual: force principal+interest totals to exact P and totalInterest
+      pPart = bal;
+      iPart = totalInterest.minus(interestAllocated);
+      if (iPart.lt(0)) iPart = toDecimal("0");
     }
+    const payment = pPart.plus(iPart);
+    bal = bal.minus(pPart);
+    principalAllocated = principalAllocated.plus(pPart);
+    interestAllocated = interestAllocated.plus(iPart);
+    rows.push({
+      period: i,
+      payment: money2str(payment),
+      principal: money2str(pPart),
+      interest: money2str(iPart),
+      balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
+    });
   }
   return { method: "flat_rate", startDate, dayCount: "period_based", rows };
 }
@@ -127,7 +131,8 @@ export function scheduleQarz({ principal, periods, feePercent = "0", startDate, 
   assertDayCountSupported(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
-  const feeTotal = P.times(assertNonNegative(feePercent));
+  // feePercent is percentage-points (2 = 2% of principal), not a raw fraction.
+  const feeTotal = P.times(normalizeRatePercentage(feePercent));
   const pPart = P.div(n);
   const feePart = feeTotal.div(n);
   let bal = P;

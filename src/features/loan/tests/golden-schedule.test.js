@@ -21,7 +21,6 @@ test("GOLDEN zero interest equal principal", () => {
 });
 
 test("GOLDEN declining equal-principal 12% annual period_based", () => {
-  // engineVersions: 1.0.0-period_based-equal-principal
   const s = buildSchedule("declining_balance", {
     principal: "1200",
     annualRate: "12",
@@ -33,12 +32,11 @@ test("GOLDEN declining equal-principal 12% annual period_based", () => {
   assert.deepEqual(interests, [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
   const payments = s.rows.map((r) => Number(r.payment));
   assert.deepEqual(payments, [112, 111, 110, 109, 108, 107, 106, 105, 104, 103, 102, 101]);
-  const totalInt = interests.reduce((a, b) => a + b, 0);
-  assert.equal(totalInt, 78);
+  assert.equal(interests.reduce((a, b) => a + b, 0), 78);
   assert.equal(s.rows[11].balance, "0.00");
 });
 
-test("GOLDEN flat residual zero", () => {
+test("GOLDEN flat residual zero and total interest = principal * 12%", () => {
   const s = buildSchedule("flat_rate", {
     principal: "1200",
     annualRate: "12",
@@ -46,6 +44,12 @@ test("GOLDEN flat residual zero", () => {
     startDate: "2026-01-01",
   });
   assert.equal(s.rows[11].balance, "0.00");
+  const sumP = s.rows.reduce((a, r) => a + Number(r.principal), 0);
+  const sumI = s.rows.reduce((a, r) => a + Number(r.interest), 0);
+  assert.ok(Math.abs(sumP - 1200) < 0.02, `sumP=${sumP}`);
+  // 12% of 1200 = 144 (not 14400)
+  assert.ok(Math.abs(sumI - 144) < 0.05, `sumI=${sumI} expected ~144`);
+  assert.ok(sumI < 200, "rate must be percentage-points not fraction*100 error");
 });
 
 test("GOLDEN bullet residual zero", () => {
@@ -68,4 +72,15 @@ test("GOLDEN qarz zero fee", () => {
   });
   assert.equal(s.rows[0].interest, "0.00");
   assert.equal(s.rows[0].fee, "0.00");
+});
+
+test("GOLDEN qarz feePercent is percentage-points", () => {
+  const s = buildSchedule("qarz_al_hasaneh", {
+    principal: "1000",
+    periods: "10",
+    startDate: "2026-01-01",
+    feePercent: "2", // 2% of principal total fee = 20
+  });
+  const sumFee = s.rows.reduce((a, r) => a + Number(r.fee), 0);
+  assert.ok(Math.abs(sumFee - 20) < 0.05, `sumFee=${sumFee}`);
 });

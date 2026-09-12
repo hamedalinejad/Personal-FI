@@ -67,3 +67,12 @@ Must stay consistent with `CANONICAL-FINANCIAL-REQUIREMENTS.md` and `Source-of-T
 
 If conflict: CANONICAL-FINANCIAL-REQUIREMENTS + LOCK files win.
 
+
+
+## KIND ALIGNMENT (2026-09-12)
+
+Canonical Kind vocabulary (must match Field-Level-Data-Ownership-Matrix + inventory):
+
+`RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX | REFERENCE | STATUS`
+
+Inventory TSV `kind` column uses the same set.
