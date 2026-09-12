@@ -311,22 +311,18 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   gross_quantity  TEXT,
   fee_quantity    TEXT,
   net_quantity    TEXT NOT NULL,
-  feeFundingKind  TEXT NOT NULL CHECK (feeFundingKind IN ('cash','asset')),
+  feeFundingKind  TEXT CHECK (feeFundingKind IS NULL OR feeFundingKind IN ('cash','asset')),
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- CRYPTO-001: Exactly one of fee_currency or fee_instrument_id must be non-null
-  CHECK (
-    (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL) OR
-    (feeFundingKind = 'asset' AND fee_currency IS NULL AND fee_instrument_id IS NOT NULL)
-  ),
-  -- CRYPTO-003: Network and address history (audit trail; nullable in v1)
-  fromAddressId   TEXT, -- FK to inv_crypto_wallet_addresses (optional audit trail)
-  toAddressId     TEXT, -- FK to inv_crypto_wallet_addresses (optional audit trail)
-  -- CRYPTO-003 NOTE: These fields are for address history tracking and audit trail.
-  -- They are nullable in v1 and may be deferred if wallet_address tracking is not yet integrated.
-  -- When used: fromAddressId → holding_id source; toAddressId → holding_id destination.
+  fromAddressId   TEXT,
+  toAddressId     TEXT,
   economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN ('acquisition','disposal','transfer','fee','income','adjustment','swap')),
-  created_at      TEXT NOT NULL
+  created_at      TEXT NOT NULL,
+  CHECK (
+    feeFundingKind IS NULL
+    OR (feeFundingKind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)
+    OR (feeFundingKind = 'asset' AND fee_currency IS NULL AND fee_instrument_id IS NOT NULL)
+  )
 );
 
 -- ─── Loans ───────────────────────────────────────────────────
@@ -372,7 +368,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   loan_type TEXT CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')), -- (P0-018)
   direction TEXT CHECK (direction IS NULL OR direction IN ('borrowed','lent')), -- (P0-018)
   party_id TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  role TEXT NOT NULL,
+  role TEXT NOT NULL, -- LOAN-001: borrower|lender (aliases borrowed/lent normalized in app)
   -- amounts and currency (RAW):
   principal TEXT NOT NULL, -- مبلغ اصلی
   currency TEXT NOT NULL,
@@ -701,7 +697,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_funds (
   fund_kind TEXT CHECK (fund_kind IS NULL OR fund_kind IN ('mutual','etf','fixed_income','money_market','other')),
   profit_kind TEXT CHECK (profit_kind IS NULL OR profit_kind IN ('distribution','accumulation')), -- distribution یا accumulation (P0-017)
   predicted_annual_rate TEXT, -- سود پیش‌بینی‌شده سالانه (درصد) (P0-017)
-  distribution_period TEXT CHECK (distribution_period IS NULL OR distribution_period IN ('monthly','quarterly','none','other')), (P0-017)
+  distribution_period TEXT CHECK (distribution_period IS NULL OR distribution_period IN ('monthly','quarterly','none','other')), -- (P0-017)
   base_price TEXT, -- قیمت پایه (nullable) (P0-017)
   platform TEXT, -- سایت صندوق یا کارگزاری (P0-017)
   url TEXT, -- (P0-017)

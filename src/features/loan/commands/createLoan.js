@@ -4,6 +4,7 @@ import { runAtomicFinancialOperation } from "../../../core/domain/operation/oper
 import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
 import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
 import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
+import { normalizeLoanRole } from "../domain/role.js";
 import { normalizeRatePercentage } from "../../../core/domain/loan/scheduleEngine.js";
 
 /** Integer period count only (not a money amount). */
@@ -35,9 +36,9 @@ export async function createLoan(
   const operationId = input.operationId;
   const p = input.payload || input;
 
-  if (!p.role) throw new Error("LOAN_ROLE_REQUIRED");
-  if (p.role === "borrowed") throw new Error("LOAN_ROLE_DEFERRED:borrowed");
-  if (p.role !== "lent") throw new Error("LOAN_ROLE_UNSUPPORTED");
+  const role = normalizeLoanRole(p.role);
+  // v1 posts lender (lent) path fully; borrower path may share schedule but journal signs differ later
+  if (role !== "lender" && role !== "borrower") throw new Error("LOAN_ROLE_UNSUPPORTED");
   if (!p.principal) throw new Error("LOAN_PRINCIPAL_REQUIRED");
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
   if (p.annualRate == null || p.annualRate === "") throw new Error("LOAN_RATE_REQUIRED");
@@ -117,9 +118,10 @@ export async function createLoan(
         `INSERT INTO ln_loans (
           id, role, calculation_method, principal, currency, interest_rate, status, created_at,
           start_date, operation_id, total_installments, day_count, schedule_engine_version, notes
-        ) VALUES (?, 'lent', ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         loanId,
+        role,
         p.method,
         p.principal,
         currency,

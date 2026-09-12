@@ -6,6 +6,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { fundCashJournalLines } from "../domain/cashPath.js";
 import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resolve.js";
 
 /**
@@ -62,6 +63,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
   const currency = transactionCurrency; // journal line currency = transaction currency
   const accountId = p.accountId || null;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
+  // FUND-003: same CashSettlementPort/Accounts pattern as stocks — no brokerage cash ledger
   const invId = scopedAccountId("fund_inventory", currency); // Model A: inventory account currency = transaction currency
   const holdingId = randomUUID();
   const txId = randomUUID();

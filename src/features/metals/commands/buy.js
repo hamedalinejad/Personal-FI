@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertInstrumentValuationPolicy } from "../domain/valuationBasis.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
 import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
 
