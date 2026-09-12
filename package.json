@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Personal-FI \u2014 implementation scaffold (docs are specification authority; production NO-GO)",
   "scripts": {
-    "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/features/**/*.test.js src/features/**/tests/*.test.js",
+    "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/persistence/browser/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/tax/*.test.js src/core/accounting/reports/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/features/**/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
     "docs:check-refs": "node scripts/docs-check-refs.js",
     "schema:smoke": "node scripts/schema-drift-smoke.js",

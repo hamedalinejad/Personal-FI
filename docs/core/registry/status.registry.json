@@ -53,9 +53,11 @@
     "production": "NO-GO",
     "golden_family": "PARTIAL",
     "recovery_suite": "PARTIAL",
-    "browser_offline_adapter": "NOT_IMPLEMENTED",
+    "browser_offline_adapter": "DURABLE_MEMORY_PROTOCOL",
     "full_accounting_statements": "PARTIAL",
-    "investment_reporting": "NOT_IMPLEMENTED"
+    "investment_reporting": "PARTIAL",
+    "iran_settlement_policy": "IMPLEMENTED",
+    "tax_events_runtime": "IMPLEMENTED"
   },
   "gates": {
     "phase0_docs": "SPEC_LOCKED",

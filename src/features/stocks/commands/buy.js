@@ -9,6 +9,7 @@ import {
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
 import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
+import { computeEquitySettlementDate, SETTLEMENT_POLICY_VERSION } from "../../../core/iran/settlementPolicy.js";
 
 /**
  * stocks.buy — persists inv_stocks_iran_transactions; fee treatment explicit.
@@ -56,7 +57,16 @@ export async function buyStock(input, { dataDir } = {}) {
   const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase));
   const totalDue = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
-  const settlementDate = p.settlementDate || null;
+  let settlementDate = p.settlementDate || null;
+  let settlementPolicyVersion = p.settlementPolicyVersion || null;
+  if (!settlementDate && p.autoSettlementDate !== false) {
+    const computed = computeEquitySettlementDate(tradeDate, {
+      tPlus: p.tPlus != null ? Number(p.tPlus) : 2,
+      policyVersion: p.settlementPolicyVersion || SETTLEMENT_POLICY_VERSION,
+    });
+    settlementDate = computed.settlementDate;
+    settlementPolicyVersion = computed.policyVersion;
+  }
   if (settlementDate && settlementDate < tradeDate) {
     throw new Error("SETTLEMENT_BEFORE_TRADE");
   }
@@ -149,7 +159,7 @@ export async function buyStock(input, { dataDir } = {}) {
       tradeDate,
       settlementDate,
       expectedSettlementDate: p.expectedSettlementDate || settlementDate,
-      settlementPolicyVersion: p.settlementPolicyVersion || null,
+      settlementPolicyVersion: settlementPolicyVersion || p.settlementPolicyVersion || null,
       gross: gross.toFixed(),
     },
     engineVersions: { stocks: "1.1.0", money: "1.0.0" },

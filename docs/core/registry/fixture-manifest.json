@@ -1,0 +1,357 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-CORRECTION.md",
+      "hash": "e95dfcb7bbd2ebbd"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-EXPENSE.md",
+      "hash": "adab213d0dddd2a5"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-FEE.md",
+      "hash": "67c181127d6cf831"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-INCOME.md",
+      "hash": "440567b5893fcac6"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-MULTI-CURRENCY.md",
+      "hash": "e7599cd58202e304"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-OPENING-BALANCE.md",
+      "hash": "17e9f28a6ad97385"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-REVERSAL-BEFORE-AFTER.md",
+      "hash": "2fcaabbb918edbf8"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-REVERSAL.md",
+      "hash": "1a9e8ec09f7f55c8"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CORE-TRANSFER.md",
+      "hash": "89d9ed635b1f6dd6"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRITICAL-C2C-SWAP.md",
+      "hash": "4a2c17189f269a3b"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRITICAL-TOMAN-INPUT.md",
+      "hash": "848905afea76c84b"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRITICAL-TRANSFER-FEE.md",
+      "hash": "964f434de0453693"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-BRIDGE-FEE.md",
+      "hash": "cd927bc45226768b"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-BRIDGE.md",
+      "hash": "3ea5911d961c47a9"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-BTC-USDT-IRR-PNL.md",
+      "hash": "cc54aedccc882027"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-BUY-FEE-FROM-BASE.md",
+      "hash": "ae1956f6b3aaaf68"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-BUY-FEE-IN-QUOTE.md",
+      "hash": "7c428fc5247c82bf"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-C2C-ECONOMIC-SWAP.md",
+      "hash": "314bfdfde8f8f739"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-EXTERNAL-GIFT.md",
+      "hash": "bde2fac2ddf02278"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-INTERNAL-TRANSFER.md",
+      "hash": "22c07950429d9eb1"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-IRR-USDT-FX-GAIN.md",
+      "hash": "f1f92630f321d879"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-IRR-USDT-FX-OPPOSITE.md",
+      "hash": "944b47ac9821b9c7"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-NETWORK-FEE-BURN.md",
+      "hash": "96864a831a363ea2"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-OPENING.md",
+      "hash": "84b2a9998e7e5382"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-QUOTE-FEE.md",
+      "hash": "d9db9a7d4aee3b83"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-SAME-ASSET-ACQ-FEE.md",
+      "hash": "1787c42ce706aff3"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-CRYPTO-SELL-FEE.md",
+      "hash": "a5b594bf135e3647"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-FUND-DIST-REINVEST.md",
+      "hash": "ecc538cd80d5904b"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-FUND-DIVIDEND-REINVEST.md",
+      "hash": "f28862d72a47fb27"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-FUND-NAV-VS-TX-PRICE.md",
+      "hash": "4fa957091e3303b2"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-FUND-SUB-REDEEM.md",
+      "hash": "085f81beddb38ccd"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-GATE.md",
+      "hash": "25826abe771d33bf"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-BULLET.md",
+      "hash": "96697efa61c5c079"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-DECLINING.md",
+      "hash": "8842911e49e9a193"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-EARLY.md",
+      "hash": "4c36667d53d1146a"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-FLAT.md",
+      "hash": "5f5d5430aeb4d02c"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-GRACE.md",
+      "hash": "56bd11ba30e30e93"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-MULTI-CCY-REPAY.md",
+      "hash": "1ed87891bc305ccc"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-PARTIAL.md",
+      "hash": "28c81dbd07feab68"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-PENALTY.md",
+      "hash": "118c1a73def21929"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-QARZ.md",
+      "hash": "2caba35dd4ef1357"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-REVERSAL.md",
+      "hash": "60ff33bb29398ce8"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-LOAN-VARIABLE-MID.md",
+      "hash": "5d383597bae3da5a"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-METAL-DELIVERY.md",
+      "hash": "bcd7a91dbdd66b8e"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-METAL-PURITY.md",
+      "hash": "598ba56d06415f4d"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-BACKUP-RESTORE.md",
+      "hash": "2cd2c61067d6086c"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-CRASH-PERSIST.md",
+      "hash": "993d761398749343"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-IMPORT-UNKNOWN.md",
+      "hash": "d17e205b256e3f9d"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-OFFLINE.md",
+      "hash": "e1440f3b6e28057a"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-ROUNDTRIP.md",
+      "hash": "c7cd9cd8b7fc6f7d"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-RECOVERY-STANDALONE.md",
+      "hash": "50c7a92b102b1ca6"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STANDALONE-CRYPTO.md",
+      "hash": "7b7ad251ca331555"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STANDALONE-FUND.md",
+      "hash": "c24fc0fa714b5fd6"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STANDALONE-LOAN.md",
+      "hash": "a355a68a11a0a6e9"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STANDALONE-METALS.md",
+      "hash": "2fb399a34c14d4ec"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STANDALONE-STOCKS.md",
+      "hash": "99988346466e047a"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-BUY-SELL-FEE.md",
+      "hash": "b8bbc3ac82c1335d"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-CA.md",
+      "hash": "d40cdad257346463"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-CORPORATE-ACTION.md",
+      "hash": "c71550d2b3ad3baa"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-DIVIDEND.md",
+      "hash": "7adeff2ef38053d6"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-RIGHTS-CIL.md",
+      "hash": "58609a6ee5907297"
+    },
+    {
+      "path": "docs/core/fixtures/GOLDEN-STOCK-T2-SETTLEMENT.md",
+      "hash": "bd75f3ed59dccb44"
+    },
+    {
+      "path": "docs/core/fixtures/HARNESS.md",
+      "hash": "8f1791a6ec4b8a34"
+    },
+    {
+      "path": "docs/core/fixtures/OPEN-004-FIXTURE-GAP.md",
+      "hash": "e05b7d3324d18fd2"
+    },
+    {
+      "path": "docs/core/fixtures/README.md",
+      "hash": "3eb782d8a75cfe4d"
+    },
+    {
+      "path": "fixtures/CORE-OPENING-BALANCE.json",
+      "hash": "ba8dee2c08056208"
+    },
+    {
+      "path": "fixtures/CORE-REVERSAL-BEFORE-AFTER.json",
+      "hash": "9c7f2dbd955d8126"
+    },
+    {
+      "path": "fixtures/CRITICAL-C2C-SWAP.json",
+      "hash": "3d398ec2b1faa983"
+    },
+    {
+      "path": "fixtures/CRITICAL-TOMAN-INPUT.json",
+      "hash": "832c47d230e8f9b8"
+    },
+    {
+      "path": "fixtures/CRITICAL-TRANSFER-FEE.json",
+      "hash": "3c157bf07c4f1ef8"
+    },
+    {
+      "path": "fixtures/CRYPTO-BRIDGE-FEE.json",
+      "hash": "c246f5618854ab7d"
+    },
+    {
+      "path": "fixtures/CRYPTO-BTC-USDT-IRR-PNL.json",
+      "hash": "e20930b362a7564c"
+    },
+    {
+      "path": "fixtures/CRYPTO-BUY-FEE-FROM-BASE.json",
+      "hash": "5f0df1091730074f"
+    },
+    {
+      "path": "fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json",
+      "hash": "13e3de5acc5e086d"
+    },
+    {
+      "path": "fixtures/CRYPTO-SELL-FEE.json",
+      "hash": "4ff40087fd06f6ce"
+    },
+    {
+      "path": "fixtures/FUND-DIVIDEND-REINVEST.json",
+      "hash": "16f05a573cc6732a"
+    },
+    {
+      "path": "fixtures/FUND-NAV-VS-TX-PRICE.json",
+      "hash": "ed8389d40a181ef3"
+    },
+    {
+      "path": "fixtures/LOAN-BULLET.json",
+      "hash": "bdbf1f99e2ff0299"
+    },
+    {
+      "path": "fixtures/LOAN-FLAT.json",
+      "hash": "ab6c16ab31e766f0"
+    },
+    {
+      "path": "fixtures/LOAN-QARZ.json",
+      "hash": "92b1a33497d58499"
+    },
+    {
+      "path": "fixtures/STANDALONE-CRYPTO.json",
+      "hash": "78961e052e0734d1"
+    },
+    {
+      "path": "fixtures/STANDALONE-FUND.json",
+      "hash": "08bc8eece39f1f84"
+    },
+    {
+      "path": "fixtures/STANDALONE-LOAN.json",
+      "hash": "a43f3842628dc25a"
+    },
+    {
+      "path": "fixtures/STANDALONE-METALS.json",
+      "hash": "d788304769aa8133"
+    },
+    {
+      "path": "fixtures/STANDALONE-STOCKS.json",
+      "hash": "26b49564e2eac350"
+    },
+    {
+      "path": "fixtures/STOCK-BUY-SELL-FEE.json",
+      "hash": "67f63111d57c2dd5"
+    },
+    {
+      "path": "fixtures/STOCK-CORPORATE-ACTION.json",
+      "hash": "443d840a529fb4e8"
+    },
+    {
+      "path": "fixtures/STOCK-T2-SETTLEMENT.json",
+      "hash": "b6c70bc1fe531edb"
+    }
+  ]
+}
