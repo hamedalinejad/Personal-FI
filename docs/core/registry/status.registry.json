@@ -4,7 +4,8 @@
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": true,
-    "note": "FREEZE_PROVEN = inventory STRICT + schema loadable; RELEASE-PROVEN still false"
+    "FREEZE_EVIDENCE": "field-inventory STRICT + schema loadable + schema-manifest check",
+    "RELEASE_PROVEN": false
   },
   "features": {
     "loan": {
@@ -56,8 +57,8 @@
     "browser_offline_adapter": "DURABLE_MEMORY_PROTOCOL",
     "full_accounting_statements": "PARTIAL",
     "investment_reporting": "PARTIAL",
-    "iran_settlement_policy": "IMPLEMENTED",
-    "tax_events_runtime": "IMPLEMENTED",
+    "iran_settlement_policy": "PARTIAL",
+    "tax_events_runtime": "PARTIAL",
     "command_coverage_matrix": "docs/core/registry/COMMAND-COVERAGE-MATRIX.md"
   },
   "gates": {
@@ -71,5 +72,22 @@
     "reconciliation": "CANONICAL-RECONCILIATION-PENDING",
     "schema_spec_locked": true,
     "schema_freeze_proven": true
+  },
+  "status_semantics": {
+    "IMPLEMENTED": "code path exists; NOT release proof",
+    "PARTIAL": "subset of commands/surface",
+    "GOLDEN-GREEN": "golden fixtures pass for claimed surface",
+    "RECOVERY-GREEN": "recovery matrix green",
+    "RELEASE-PROVEN": "golden+recovery+standalone+CI for claimed edition",
+    "NOTE": "IMPLEMENTED never implies Golden/Recovery/Standalone proven"
+  },
+  "authority_owners": {
+    "API": "docs/core/API-CANONICAL-ENVELOPE.md",
+    "Accounting": "docs/core/Financial-Invariants.md",
+    "SchemaFreeze": "docs/core/registry/status.registry.json#schema_status",
+    "Loan": "docs/core/authority/LOAN-V1-SCHEMA-DISPOSITION.md",
+    "Reports": "docs/core/authority/REPORT-DEPENDENCY-ORDER.md",
+    "Offline": "docs/core/Offline-Requirements.md",
+    "FieldKind": "docs/core/authority/FIELD-KIND-VOCABULARY.md"
   }
 }

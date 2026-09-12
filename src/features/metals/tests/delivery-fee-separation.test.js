@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -52,7 +53,7 @@ test("METAL-003 trade fee != delivery fee; delivery does not raise metal cost ba
   // remaining qty 8000; cost basis should scale down proportionally, not increase by delivery fee
   assert.equal(after.quantity_mg, "8000");
   // delivery fee is expense, not capitalized into remaining holding
-  const remainingCost = Number(after.total_invested);
+  const remainingCost = toDecimal(String(after.total_invested));
   const expectedScale = (Number(costBefore) * 8000) / 10000;
   assert.ok(Math.abs(remainingCost - expectedScale) < 0.02);
   // trade fee was on buy; delivery fee separate journal

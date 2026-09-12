@@ -1,3 +1,5 @@
+> Kind SoT: `docs/core/authority/FIELD-KIND-VOCABULARY.md`
+
 # Field-Level Data Ownership Matrix
 
 **وضعیت:** اجباری برای هر برنامه‌نویس آینده. حدس زدن مالک فیلد ممنوع است.
@@ -9,7 +11,7 @@
 | ستون | معنی |
 |------|------|
 | Field | نام فیلد (جدول.فیلد یا مفهوم منطقی) |
-| Kind | `RAW` \| `DERIVED` \| `SNAPSHOT` \| `EXTERNAL_REPORTED` \| `LABEL` |
+| Kind | `RAW` \| `DERIVED` \| `SNAPSHOT` \| `EXTERNAL_REPORTED` \| `LABEL` \| `SYSTEM_INDEX` \| `REFERENCE` \| `STATUS` |  <!-- P0-FIELD-001 single vocab -->
 | Owner | Feature / Engine که حق write دارد |
 | Editable | آیا کاربر/API می‌تواند مستقیم ویرایش کند؟ |
 | Source | منبع ورود داده |

@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { toDecimal } from "../../money/canonicalDecimal.js";
 import {
   applyAcquisition,
   applyDisposal,
@@ -31,5 +32,5 @@ test("BUG-005 transfer conserves", () => {
   });
   assert.equal(from.realizedPnl, "0");
   assert.ok(Number(to.quantity) > 0);
-  assert.ok(Number(transfer.feeCarrying) > 0);
+  assert.ok(toDecimal(String(transfer.feeCarrying)).gt(0));
 });

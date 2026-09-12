@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { allocatePayment, allocationJournalLines } from "../domain/paymentAllocation.js";
 
 test("waterfall penalty fee interest principal", () => {
@@ -28,11 +29,11 @@ test("allocation journal balances", () => {
     feeIncomeId: "fee",
     penaltyIncomeId: "pen",
   });
-  let d = 0;
-  let c = 0;
+  let d = toDecimal("0");
+  let c = toDecimal("0");
   for (const l of lines) {
-    if (l.side === "debit") d += Number(l.amount);
-    else c += Number(l.amount);
+    if (l.side === "debit") d = d.plus(toDecimal(String(l.amount)));
+    else c = c.plus(toDecimal(String(l.amount)));
   }
-  assert.equal(d, c);
+  assert.ok(d.eq(c));
 });

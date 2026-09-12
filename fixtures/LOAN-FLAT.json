@@ -1,6 +1,8 @@
 {
   "id": "LOAN-FLAT",
-  "engineVersions": { "loanSchedule": "1.0.0-period_based-flat-annual-term" },
+  "engineVersions": {
+    "loanSchedule": "1.0.0-period_based-flat-annual-term"
+  },
   "input": {
     "method": "flat_rate",
     "principal": "1200",

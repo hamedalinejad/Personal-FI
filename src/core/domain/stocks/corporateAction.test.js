@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { toDecimal } from "../../money/canonicalDecimal.js";
 import { applyCorporateAction } from "./corporateAction.js";
 
 test("BUG-013 bonus", () => {
@@ -8,5 +9,5 @@ test("BUG-013 bonus", () => {
     { type: "bonus", ratio: "1.2" },
   );
   assert.equal(Number(h.quantity), 120);
-  assert.equal(Number(h.totalInvested), 1000);
+  assert.ok(toDecimal(String(h.totalInvested)).eq(toDecimal("1000")));
 });

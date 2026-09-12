@@ -12,5 +12,7 @@
     "unrealizedPnl": {},
     "attribution": {},
     "wealthDelta": {}
-  }
+  },
+  "status": "DEFERRED",
+  "fixtureStatus": "DEFERRED"
 }

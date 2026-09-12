@@ -1,17 +1,37 @@
 ---
 id: DOC-AUTH-FIELD-KIND
-title: Field Kind Vocabulary (Single)
-status: approved
+title: Single field Kind vocabulary
+status: locked
 version: 1.0
-updated: 2026-09-12
-authority: binding
 ---
 
-# Only these kinds
+# P0-FIELD-001 / 002
+
+Authoritative Kind set (Field-Level-SoT, Ownership-Matrix, inventory TSV):
 
 ```text
-RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX
+RAW
+DERIVED
+SNAPSHOT
+EXTERNAL_REPORTED
+LABEL
+SYSTEM_INDEX
+REFERENCE
+STATUS
 ```
 
-- `INDEX` is **not** a synonym of `SYSTEM_INDEX`.
-- All ownership matrices, dictionaries, and AI instructions must use this set only.
+| Kind | Meaning |
+|------|---------|
+| **SYSTEM_INDEX** | System-derived identity/index; non-user-editable; **never financial SoT** |
+| **RAW** | Observed/user/input fact |
+| **DERIVED** | Rebuildable from RAW + engine version |
+| **SNAPSHOT** | Cached projection |
+| **EXTERNAL_REPORTED** | Provider-reported, provenance required |
+| **LABEL** | Display-only |
+| **REFERENCE** | FK / id pointer |
+| **STATUS** | Lifecycle enum |
+
+# P0-FIELD-003 — deletedAt
+
+**Prohibited** on posted financial ledger rows (`fin_journal_*`, posted `fin_operations`, inv_*_transactions when posted).  
+Allowed only on non-financial/metadata entities where soft-delete policy is explicit.

@@ -15,5 +15,8 @@
     "unrealizedPnl": {},
     "attribution": {},
     "wealthDelta": {}
-  }
+  },
+  "status": "DEFERRED",
+  "fixtureStatus": "DEFERRED",
+  "note": "Scaffold until standalone golden vectors filled"
 }
