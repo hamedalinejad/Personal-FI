@@ -51,8 +51,8 @@ test("BUG-CUR-024 overlap detection", () => {
   assert.throws(
     () =>
       assertNoActiveMappingOverlap(
-        [{ instrument_id: "i", source_id: "s", provider_symbol: "X", valid_from: "2026-01-01", valid_to: null, status: "active" }],
-        { instrumentId: "i", sourceId: "s", providerSymbol: "X", validFrom: "2026-03-01", validTo: null },
+        [{ instrument_id: "i", source_id: "s", market: "bourse", provider_symbol: "X", valid_from: "2026-01-01", valid_to: null, status: "active" }],
+        { instrumentId: "i", sourceId: "s", market: "bourse", providerSymbol: "X", validFrom: "2026-03-01", validTo: null },
       ),
     /PRICE_MAPPING_OVERLAP/,
   );

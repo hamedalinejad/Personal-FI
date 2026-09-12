@@ -1,7 +1,6 @@
-import { toDecimal } from "../../money/canonicalDecimal.js";
-
 /**
- * BUG-CUR-024 — reject overlapping active intervals for same instrument+source+provider_symbol.
+ * P0-PRICE-002 — reject overlapping active intervals for same
+ * (instrument_id, source_id, market) [and optional provider_symbol].
  * Intervals are [validFrom, validTo) with null validTo = open-ended.
  */
 export function intervalsOverlap(aFrom, aTo, bFrom, bTo) {
@@ -10,13 +9,23 @@ export function intervalsOverlap(aFrom, aTo, bFrom, bTo) {
   return aFrom < bEnd && bFrom < aEnd;
 }
 
+export function assertValidInterval(validFrom, validTo) {
+  if (validTo != null && validTo !== "" && !(validTo > validFrom)) {
+    throw new Error("PRICE_MAPPING_INVALID_INTERVAL");
+  }
+  return true;
+}
+
 export function assertNoActiveMappingOverlap(existingRows, candidate) {
+  assertValidInterval(candidate.validFrom, candidate.validTo);
+  const market = candidate.market ?? null;
   const actives = (existingRows || []).filter((r) => r.status === "active");
   for (const row of actives) {
+    const sameInstr = row.instrument_id === candidate.instrumentId;
+    const sameSource = row.source_id === candidate.sourceId;
+    const sameMarket = (row.market ?? null) === market;
+    if (!sameInstr || !sameSource || !sameMarket) continue;
     if (
-      row.instrument_id === candidate.instrumentId &&
-      row.source_id === candidate.sourceId &&
-      row.provider_symbol === candidate.providerSymbol &&
       intervalsOverlap(row.valid_from, row.valid_to, candidate.validFrom, candidate.validTo)
     ) {
       throw new Error("PRICE_MAPPING_OVERLAP");

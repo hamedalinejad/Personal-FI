@@ -1,3 +1,5 @@
+> **P0-PRICE-003:** `ref_instruments.id` = financial identity; provider_symbol never SoT. See `P0-PRICE-IDENTITY-LOCK.md`.
+
 > **P0-008 LOCK:** All prices key by `ref_instruments.id` → `price_history.instrument_id`. No composite identity strings. See `P0-SCHEMA-VOCABULARY-LOCK.md`.
 
 # Price Fetching
