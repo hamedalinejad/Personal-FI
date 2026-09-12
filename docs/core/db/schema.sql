@@ -171,6 +171,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_ref_instr_chain_native_symbol
   ON ref_instruments(network_identifier, symbol)
   WHERE contract_address IS NULL AND network_identifier IS NOT NULL AND asset_class = 'crypto';
 
+-- BUG-FINAL-039: stocks ISIN unique when present
+CREATE UNIQUE INDEX IF NOT EXISTS uq_ref_instr_isin
+  ON ref_instruments(isin)
+  WHERE isin IS NOT NULL AND asset_class = 'stock';
+
 CREATE TABLE IF NOT EXISTS ref_parties (
   id         TEXT PRIMARY KEY,
   display_name TEXT NOT NULL,
@@ -712,9 +717,10 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
       'buy','sell','dividend','corporate_action',
       'capital_increase','rights_issue','rights_exercise','rights_sell','bonus_share',
       'split','reverse_split','symbol_change','isin_change','transfer_ca','suspension_note',
-      'fee','adjustment'
+      'fee','adjustment','settlement'
     )
   ),
+  related_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- BUG-FINAL-035 settle→trade link
   trade_date TEXT NOT NULL, -- exchange trade date (T+0); distinct from market_date (quote/session date)
   settlement_date TEXT, -- cash/settlement date (T+2 for Iranian market)
   quantity TEXT,

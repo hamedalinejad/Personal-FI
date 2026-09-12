@@ -1,60 +1,100 @@
+/**
+ * Investment holdings report — requires explicit valuation context for unrealized P&L.
+ */
 import { openDb } from "../../persistence/port.js";
 import { toDecimal } from "../../money/canonicalDecimal.js";
 
 /**
- * Holdings + cost basis snapshot (Model A cost pool).
- * Unrealized requires valuation context (optional prices map).
+ * @param {object} opts
+ * @param {object} [opts.valuationContext] - { reportCurrency, asOf, fxRates?: Record<ccy, rateToReport> }
+ * @param {Record<string, { price: string, currency: string, quoteType?: string, marketDate?: string, sourceId?: string }>} [opts.prices]
  */
 export function investmentHoldings(dataDir, { prices = {}, valuationContext = null } = {}) {
-  // prices[instrumentId] must be { price, currency, asOf, source?, isStale? } or scalar only for same-currency provisional
-  if (valuationContext == null && Object.keys(prices).length) {
-    // allow but mark degraded
-  }
-
   const db = openDb(dataDir);
-  const crypto = db.prepare(`SELECT * FROM inv_crypto_holdings`).all();
-  const stocks = db.prepare(`SELECT * FROM inv_stocks_iran_holdings`).all();
-  const funds = db.prepare(`SELECT * FROM inv_fif_holdings`).all();
-  const metals = db.prepare(`SELECT * FROM inv_metals_holdings`).all();
+  const reportCurrency = valuationContext?.reportCurrency || null;
 
-  function row(assetClass, h, qtyField, costField) {
-    const qty = toDecimal(h[qtyField] || "0");
-    const cost = toDecimal(h[costField] || "0");
-    const avg = qty.isZero() ? toDecimal("0") : cost.div(qty);
-    const px = prices[h.instrument_id];
-    let market = null;
-    let unrealized = null;
-    let valuationMeta = null;
-    if (px != null) {
-      market = qty.times(toDecimal(px));
-      unrealized = market.minus(cost);
+  function normalizePrice(raw, instrumentId) {
+    if (raw == null) return null;
+    if (typeof raw === "object") {
+      if (raw.price == null || raw.currency == null) {
+        throw new Error("VALUATION_PRICE_INCOMPLETE:" + instrumentId);
+      }
+      return {
+        price: toDecimal(raw.price),
+        currency: raw.currency,
+        quoteType: raw.quoteType || "last",
+        marketDate: raw.marketDate || valuationContext?.asOf || null,
+        sourceId: raw.sourceId || null,
+      };
+    }
+    // Scalar only allowed when reportCurrency is known and equals cost currency path
+    if (!reportCurrency) {
+      throw new Error("VALUATION_SCALAR_REQUIRES_CONTEXT:" + instrumentId);
     }
     return {
-      assetClass,
-      instrumentId: h.instrument_id,
-      quantity: qty.toFixed(),
-      totalInvested: cost.toFixed(),
-      costCurrency: h.cost_currency,
-      averageCost: avg.toFixed(),
-      marketValue: market ? market.toFixed() : null,
-      unrealizedPnl: unrealized ? unrealized.toFixed() : null,
-      valuationContext: valuationContext || { degraded: true, note: "scalar price without full context" },
-      valuationPrice: px != null ? String(px) : null,
+      price: toDecimal(raw),
+      currency: reportCurrency,
+      quoteType: "last",
+      marketDate: valuationContext?.asOf || null,
+      sourceId: null,
+      degraded: true,
     };
   }
 
+  function toReport(amount, fromCurrency) {
+    if (!reportCurrency || fromCurrency === reportCurrency) return toDecimal(amount);
+    const rate = valuationContext?.fxRates?.[fromCurrency];
+    if (rate == null) throw new Error("VALUATION_FX_MISSING:" + fromCurrency);
+    return toDecimal(amount).times(toDecimal(rate));
+  }
+
+  const crypto = db.prepare(`SELECT * FROM inv_crypto_holdings`).all().map((h) => {
+    const qty = toDecimal(h.quantity || "0");
+    const cost = toDecimal(h.total_invested || "0");
+    const costCcy = h.cost_currency;
+    const px = normalizePrice(prices[h.instrument_id] || prices[h.instrumentId], h.instrument_id);
+    let market = null;
+    let unrealized = null;
+    let valuationMeta = null;
+    if (px) {
+      if (px.currency !== costCcy && !reportCurrency) {
+        throw new Error("VALUATION_CURRENCY_MISMATCH:" + h.instrument_id);
+      }
+      const marketNative = qty.times(px.price);
+      market = reportCurrency ? toReport(marketNative.toFixed(), px.currency) : marketNative;
+      const costReport = reportCurrency ? toReport(cost.toFixed(), costCcy) : cost;
+      unrealized = market.minus(costReport);
+      valuationMeta = {
+        price: px.price.toFixed(),
+        priceCurrency: px.currency,
+        quoteType: px.quoteType,
+        marketDate: px.marketDate,
+        sourceId: px.sourceId,
+        reportCurrency: reportCurrency || costCcy,
+        degraded: !!px.degraded || !valuationContext,
+      };
+    }
+    return {
+      instrumentId: h.instrument_id,
+      quantity: h.quantity,
+      cost: cost.toFixed(),
+      costCurrency: costCcy,
+      marketValue: market ? market.toFixed() : null,
+      unrealizedPnl: unrealized ? unrealized.toFixed() : null,
+      valuation: valuationMeta,
+    };
+  });
+
   return {
-    crypto: crypto.map((h) => row("crypto", h, "quantity", "total_invested")),
-    stocks: stocks.map((h) => row("stocks", h, "quantity", "total_invested")),
-    funds: funds.map((h) => row("funds", h, "quantity", "total_invested")),
-    metals: metals.map((h) => row("metals", h, "quantity_mg", "total_invested")),
+    crypto,
+    valuationContext: valuationContext || { degraded: true, note: "no valuationContext" },
   };
 }
 
-export function realizedPnlFromJournal(dataDir, { fromDate = null, toDate = null } = {}) {
+export function investmentRealizedPnl(dataDir, { fromDate = null, toDate = null } = {}) {
   const db = openDb(dataDir);
   let sql = `
-    SELECT jl.account_id, jl.side, jl.amount, jl.amount_in_base, je.business_date
+    SELECT jl.side, jl.amount, jl.amount_in_base, je.business_date
     FROM fin_journal_lines jl
     JOIN fin_journal_entries je ON je.id = jl.entry_id
     WHERE jl.account_id LIKE '%realized_pnl%'`;
