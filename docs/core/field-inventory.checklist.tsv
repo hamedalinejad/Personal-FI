@@ -846,3 +846,9 @@ tax_records	updated_at	SYSTEM_INDEX	Tax	yes	tax_records	canonical	yes
 inv_crypto_transactions	fee_funding_kind	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	from_address_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	to_address_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+ln_loan_fee_tiers	calculation_method	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+ln_loan_fee_tiers	rate	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+ln_loan_fee_tiers	fixed_amount	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+ln_loan_fee_tiers	period	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+ln_loan_fee_tiers	application_moment	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+ln_loan_fee_tiers	priority	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes

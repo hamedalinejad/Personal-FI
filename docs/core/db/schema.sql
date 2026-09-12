@@ -392,7 +392,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   loan_type TEXT CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')), -- (P0-018)
   direction TEXT CHECK (direction IS NULL OR direction IN ('borrowed','lent')), -- (P0-018)
   party_id TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  role TEXT NOT NULL, -- LOAN-001: borrower|lender (aliases borrowed/lent normalized in app)
+  role TEXT NOT NULL CHECK (role IN ('borrower','lender')), -- LOAN-001: map borrowed→borrower, lent→lender
   -- amounts and currency (RAW):
   principal TEXT NOT NULL, -- مبلغ اصلی
   currency TEXT NOT NULL,
@@ -1252,14 +1252,25 @@ CREATE TABLE IF NOT EXISTS ln_loan_fee_tiers (
   loan_id         TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   fee_kind        TEXT NOT NULL, -- origination|late|prepayment|service|...
   tier_order      INTEGER NOT NULL DEFAULT 0,
-  effective_from  TEXT NOT NULL, -- DATE
-  effective_to    TEXT, -- nullable = open
-  rate_or_amount  TEXT NOT NULL, -- decimal string; interpretation by fee_kind
+  effective_from  TEXT NOT NULL,
+  effective_to    TEXT,
+  -- LOAN-003 formal fee policy (avoid overloaded rate_or_amount alone)
+  calculation_method TEXT NOT NULL DEFAULT 'rate_or_fixed' CHECK (
+    calculation_method IN ('percentage_of_base','fixed_amount','rate_or_fixed','tiered_lookup')
+  ),
+  calculation_base TEXT CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment','payment')),
+  rate TEXT, -- percentage points as decimal string when percentage_of_base
+  fixed_amount TEXT, -- when fixed_amount
+  rate_or_amount  TEXT, -- legacy; prefer rate + fixed_amount
   is_percentage   INTEGER NOT NULL DEFAULT 0 CHECK (is_percentage IN (0, 1)),
   min_amount      TEXT,
   max_amount      TEXT,
-  day_count TEXT CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual')), -- actual/365|30/360|...
-  calculation_base TEXT CHECK (calculation_base IS NULL OR calculation_base IN ('principal','outstanding','installment')), -- principal|outstanding|installment
+  period TEXT CHECK (period IS NULL OR period IN ('once','per_installment','per_year','on_event')),
+  application_moment TEXT CHECK (application_moment IS NULL OR application_moment IN (
+    'origination','per_installment','on_default','on_early_settlement','on_payment','other'
+  )),
+  priority INTEGER NOT NULL DEFAULT 100,
+  day_count TEXT CHECK (day_count IS NULL OR day_count IN ('actual/365','30/360','actual/360','actual/actual','period_based')),
   created_at      TEXT NOT NULL
 );
 
