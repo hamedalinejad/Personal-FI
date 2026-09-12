@@ -1408,6 +1408,9 @@ CREATE TABLE IF NOT EXISTS dash_widget_configs (
 CREATE TABLE IF NOT EXISTS tax_records (
   id TEXT PRIMARY KEY,
   period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR
+  calendar_system TEXT CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')),
+  period_start TEXT,
+  period_end TEXT,
   jurisdiction TEXT NOT NULL, -- IR|US|...
   -- P0-012: user-facing obligation/filing record (not a second event ledger)
   linked_tax_event_id TEXT REFERENCES tax_events(id) ON DELETE SET NULL ON UPDATE CASCADE,

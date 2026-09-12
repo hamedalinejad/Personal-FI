@@ -1,3 +1,5 @@
+> **API-001/002:** Response shape authority = `API-CANONICAL-ENVELOPE.md` (`errors[].code`, meta.api_version).
+
 # Feature Public API Contract
 
 ## دو سطح API

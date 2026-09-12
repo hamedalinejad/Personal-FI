@@ -1,3 +1,5 @@
+> **Authority:** `API-CANONICAL-ENVELOPE.md` for envelope + error code field.
+
 # API Result و خطاهای Typed (P0)
 
 ## ApiResult\<T\>

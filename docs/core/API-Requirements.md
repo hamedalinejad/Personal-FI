@@ -1,3 +1,5 @@
+> **Authority:** `API-CANONICAL-ENVELOPE.md` for envelope + error code field.
+
 # الزامات API (P0/P1)
 
 هر ماژول API مستقل و مستند دارد (Feature Public API + Capability API).

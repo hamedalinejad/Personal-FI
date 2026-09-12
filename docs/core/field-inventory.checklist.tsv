@@ -852,3 +852,6 @@ ln_loan_fee_tiers	fixed_amount	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
 ln_loan_fee_tiers	period	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
 ln_loan_fee_tiers	application_moment	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
 ln_loan_fee_tiers	priority	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
+tax_records	calendar_system	RAW	Tax	no	tax_records	canonical	yes
+tax_records	period_start	RAW	Tax	no	tax_records	canonical	yes
+tax_records	period_end	RAW	Tax	no	tax_records	canonical	yes
