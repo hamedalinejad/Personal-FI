@@ -27,6 +27,10 @@ export async function sellCrypto(input, { dataDir } = {}) {
 
   const qty = toDecimal(p.quantity);
   const proceeds = toDecimal(p.proceedsTotal);
+  if (!qty.gt(0)) throw new Error("CRYPTO_QTY_NONPOSITIVE");
+  if (!proceeds.gt(0)) throw new Error("CRYPTO_PROCEEDS_NONPOSITIVE");
+  const feeAmt = p.feeAmount != null && p.feeAmount !== "" ? toDecimal(p.feeAmount) : null;
+  if (feeAmt && feeAmt.isNegative()) throw new Error("CRYPTO_FEE_NEGATIVE");
   const proceedsCurrency = p.proceedsCurrency || p.costCurrency;
   const baseCurrency = p.currency || p.baseCurrency || proceedsCurrency;
   if (!proceedsCurrency) throw new Error("VALIDATION_ERROR:proceedsCurrency");

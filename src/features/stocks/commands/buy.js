@@ -150,9 +150,15 @@ export async function buyStock(input, { dataDir } = {}) {
     );
   }
 
+  for (const line of journalLines) {
+    if (line.amountInBase == null || line.amountInBase === "") {
+      throw new Error("JOURNAL_BASE_REQUIRED");
+    }
+  }
+
   return runAtomicFinancialOperation({
-    
-    status: "posted",operationId,
+    status: "posted",
+    operationId,
     type: "stocks.buy",
     dataDir,
     businessDate: p.businessDate,

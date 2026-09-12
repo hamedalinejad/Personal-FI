@@ -39,8 +39,15 @@ export async function buyCrypto(input, { dataDir } = {}) {
   const gross = toDecimal(p.grossQuantity);
   const fee = toDecimal(p.feeQuantity || "0");
   const net = toDecimal(p.netQuantity);
+  if (!gross.gt(0)) throw new Error("CRYPTO_QTY_NONPOSITIVE:gross");
+  if (!net.gt(0)) throw new Error("CRYPTO_QTY_NONPOSITIVE:net");
+  if (fee.isNegative()) throw new Error("CRYPTO_FEE_NEGATIVE");
   if (p.feeRole === "fee_from_received" || p.feeRole === "feeBurnQuantity") {
     if (!gross.minus(fee).eq(net)) throw new Error("INV_QTY_CONSERVATION");
+    // fee quantity must be same asset as received
+    if (p.feeInstrumentId && p.feeInstrumentId !== p.instrumentId) {
+      throw new Error("FEE_UNIT_MISMATCH");
+    }
   }
 
   const cost = toDecimal(p.costTotal);
@@ -71,6 +78,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
       transactionCurrency: costCurrency,
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       cashAccountId: cashId,
+      receivedInstrumentId: p.instrumentId,
+      receivedQuantityUnit: "asset",
     },
   );
   // Capitalized fee in cost-currency units for the cost pool

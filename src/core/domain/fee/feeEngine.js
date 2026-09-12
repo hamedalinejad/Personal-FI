@@ -138,17 +138,21 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
         break;
       }
       case "fee_from_received": {
-        // BUG-CUR-017: fee amount must be same instrument/quantity unit as received asset
-        if (event.feeCurrency && receivedInstrumentId && event.feeInstrumentId &&
-            event.feeInstrumentId !== receivedInstrumentId) {
+        // Quantity fee on received asset — never a foreign cash currency leg
+        if (event.feeInstrumentId && receivedInstrumentId && event.feeInstrumentId !== receivedInstrumentId) {
           throw new Error("FEE_UNIT_MISMATCH");
         }
-        if (event.feeCurrency && !event.feeInstrumentId && receivedQuantityUnit === "asset") {
-          // currency-denominated fee cannot reduce asset quantity
+        // Explicit cash fee currency that is not the principal asset marker is invalid for quantity burn
+        if (
+          receivedQuantityUnit === "asset" &&
+          event.feeInstrumentId == null &&
+          event.feeCurrency &&
+          event.transactionCurrency &&
+          event.feeCurrency !== event.transactionCurrency &&
+          event.feeCurrency !== event.baseCurrency
+        ) {
           throw new Error("FEE_UNIT_MISMATCH");
         }
-
-        // quantity reduction is caller's domain (received asset units); no carrying increase
         quantityDelta = quantityDelta.minus(toDecimal(event.feeAmount));
         break;
       }
@@ -175,10 +179,13 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
 /**
  * Single-fee convenience for feature commands.
  */
-export function applySingleFee(feeInput, ctx) {
+export function applySingleFee(feeInput, ctx = {}) {
   const events = buildFeeEvents(feeInput ? [feeInput] : [], ctx);
   return applyFeeEvents(events, {
-    expenseAccountId: feeInput?.expenseAccountId,
+    expenseAccountId: feeInput?.expenseAccountId || ctx.expenseAccountId,
     cashAccountId: feeInput?.cashAccountId || ctx.cashAccountId,
+    receivedInstrumentId: ctx.receivedInstrumentId || feeInput?.receivedInstrumentId,
+    receivedQuantityUnit: ctx.receivedQuantityUnit || feeInput?.receivedQuantityUnit || "asset",
+    transactionCurrency: ctx.transactionCurrency,
   });
 }
