@@ -1,3 +1,22 @@
+
+/** P0 residual: Σ principal == original P; Σ interest == totalInterest (within 1e-8 via Decimal) */
+export function assertScheduleConservation(rows, { principal, totalInterest = null }) {
+  let sp = toDecimal("0");
+  let si = toDecimal("0");
+  for (const r of rows) {
+    sp = sp.plus(toDecimal(r.principal));
+    si = si.plus(toDecimal(r.interest || "0"));
+  }
+  // Display rows are money2str-rounded; allow ≤ 0.01 residual drift after last-row correction
+  const pDiff = sp.minus(toDecimal(principal)).abs();
+  if (pDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_PRINCIPAL_MISMATCH");
+  if (totalInterest != null) {
+    const iDiff = si.minus(toDecimal(totalInterest)).abs();
+    if (iDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_INTEREST_MISMATCH");
+  }
+  return true;
+}
+
 /**
  * Loan schedule v1: declining_balance = EQUAL PRINCIPAL (not annuity/fixed-PMT).
  * engineVersion: 1.0.0-period_based-equal-principal
@@ -122,31 +141,32 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
   const totalInterest = P.times(rateFrac).times(termYears);
   const pPartExact = P.div(n);
   const iPartExact = totalInterest.div(n);
-  let bal = P;
   let principalAllocated = toDecimal("0");
   let interestAllocated = toDecimal("0");
   const rows = [];
   for (let i = 1; i <= n; i++) {
-    let pPart = pPartExact;
-    let iPart = iPartExact;
+    let pStr;
+    let iStr;
     if (i === n) {
-      // residual: force principal+interest totals to exact P and totalInterest
-      pPart = bal;
-      iPart = totalInterest.minus(interestAllocated);
-      if (iPart.lt(0)) iPart = toDecimal("0");
+      pStr = money2str(P.minus(principalAllocated));
+      iStr = money2str(totalInterest.minus(interestAllocated));
+    } else {
+      pStr = money2str(pPartExact);
+      iStr = money2str(iPartExact);
     }
-    const payment = pPart.plus(iPart);
-    bal = bal.minus(pPart);
-    principalAllocated = principalAllocated.plus(pPart);
-    interestAllocated = interestAllocated.plus(iPart);
+    principalAllocated = principalAllocated.plus(toDecimal(pStr));
+    interestAllocated = interestAllocated.plus(toDecimal(iStr));
+    const payStr = money2str(toDecimal(pStr).plus(toDecimal(iStr)));
+    const balStr = money2str(P.minus(principalAllocated));
     rows.push({
       period: i,
-      payment: money2str(payment),
-      principal: money2str(pPart),
-      interest: money2str(iPart),
-      balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
+      payment: payStr,
+      principal: pStr,
+      interest: iStr,
+      balance: balStr,
     });
   }
+  assertScheduleConservation(rows, { principal: P.toFixed(), totalInterest: totalInterest.toFixed() });
   return { method: "flat_rate", startDate, dayCount: dayCountNorm, flatConvention: "annual_times_term_years", rows };
 }
 

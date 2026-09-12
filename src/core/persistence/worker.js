@@ -1,8 +1,10 @@
+import { createHash } from "node:crypto";
 import { writeFile, rename, readFile } from "node:fs/promises";
 import { mkdirSync, existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
+// createHash via crypto;
 import { DatabaseSync } from "node:sqlite";
 import { assertJournalBalanced } from "../domain/invariants/index.js";
 import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
@@ -239,6 +241,9 @@ function persistOperationSqlite(record, dir) {
     // P0-OP-008/007: only after relational truth exists — promote status + snapshot
     resultSnapshot.durability_state = "sql_committed";
     resultSnapshot.status = status;
+    const snapJson = JSON.stringify(resultSnapshot);
+    const resultHash = createHash("sha256").update(snapJson).digest("hex");
+    resultSnapshot.result_hash = resultHash;
     db.prepare(
       `UPDATE fin_operations SET
          status = ?,
@@ -246,6 +251,7 @@ function persistOperationSqlite(record, dir) {
          posted_at = ?,
          result_json = ?,
          result_schema_version = ?,
+         result_hash = ?,
          event_at = COALESCE(event_at, ?),
          settlement_date = COALESCE(settlement_date, ?)
        WHERE id = ?`,
@@ -254,6 +260,7 @@ function persistOperationSqlite(record, dir) {
       status === "posted" ? now : null,
       JSON.stringify(resultSnapshot),
       "1.0.0",
+      resultHash,
       record.eventAt ?? null,
       record.settlementDate ?? null,
       id,
@@ -295,7 +302,7 @@ function loadOperationSync(db, operationId, replay = false) {
 
   if (row.result_json) {
     const snap = JSON.parse(row.result_json);
-    // Journal SoT from relational tables
+    // result_json is replay metadata only; journal always from relational tables
     const lines = db
       .prepare(
         `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number, jl.amount_in_base as amountInBase, jl.exchange_rate_to_base as exchangeRateToBase, jl.conversion_path as conversionPath, jl.line_kind as lineKind

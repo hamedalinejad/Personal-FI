@@ -61,13 +61,13 @@ export async function buyMetal(input, { dataDir } = {}) {
   }
 
   const feeCurrency = p.feeCurrency || currency;
-  // P0-04: never sum fee in foreign currency into transaction-currency cashOut
+  // P0-04: never sum fee in foreign currency into transaction-currency cashPrincipal
   if (!fee.isZero() && feeCurrency !== currency) {
     if (p.feeExchangeRateToBase == null && baseCurrency !== feeCurrency) {
       throw new Error("VALIDATION_ERROR:feeExchangeRateToBase");
     }
     // foreign fee must be a separate cash leg via Fee Engine (expense/capitalized in base);
-    // cashOut stays metalCost+premium in transaction currency only
+    // cashPrincipal stays metalCost+premium in transaction currency only
   }
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);
@@ -82,23 +82,21 @@ export async function buyMetal(input, { dataDir } = {}) {
   const feeResult = applyFeeEvents(feeEvents, {
     expenseAccountId: scopedAccountId("metal_fee_expense", baseCurrency),
     cashAccountId: cashId,
+    transactionCurrency: currency,
   });
-  // carrying stays in transaction currency; base delta must not mix units
-  const feeCarryTx = feeResult.carryingDelta?.amount != null
-    ? toDecimal(feeResult.carryingDelta.amount)
-    : (currency === baseCurrency ? toDecimal(feeResult.carryingDeltaBase) : toDecimal("0"));
+  // Dimensional carrying — never add BASE fee amounts into TX currency
+  // Premium is a capitalized_cost fee event — already inside carryingDeltaTx/Base; do not add twice
+  const feeCarryTx = toDecimal(feeResult.carryingDeltaTx?.amount || "0");
   const carrying = metalCost.plus(feeCarryTx);
-  const carryingBase = carrying.times(toDecimal(exchangeRateToBase)).plus(
-    currency === baseCurrency ? toDecimal("0") : toDecimal(feeResult.carryingDeltaBase || "0"),
-  );
+  const metalCostBase = metalCost.times(toDecimal(exchangeRateToBase));
+  const carryingBase = metalCostBase.plus(toDecimal(feeResult.carryingDeltaBase || "0"));
 
+  // TX cash: metal+premium+TX fee; subtract TX fee amounts already on fee expense journal credits
   const cashOutTx = metalCost.plus(premium).plus(feeCurrency === currency ? fee : toDecimal("0"));
-  const cashOut = cashOutTx; // transaction-currency cash only
-
-  const expenseCash = feeResult.journalLines
-    .filter((l) => l.side === "credit")
+  const expenseCashTx = feeResult.journalLines
+    .filter((l) => l.side === "credit" && l.currency === currency)
     .reduce((s, l) => s.plus(toDecimal(l.amount)), toDecimal("0"));
-  const cashPrincipal = cashOut.minus(expenseCash);
+  const cashPrincipal = cashOutTx.minus(expenseCashTx);
   const now = new Date().toISOString();
   let holdingId = randomUUID();
   const txId = randomUUID();
@@ -118,7 +116,7 @@ export async function buyMetal(input, { dataDir } = {}) {
       side: "credit",
       amount: cashPrincipal.toFixed(),
       currency,
-      amountInBase: cashPrincipal.toFixed(),
+      amountInBase: cashPrincipal.times(toDecimal(exchangeRateToBase)).toFixed(),
       exchangeRateToBase,
       lineKind: "principal",
     },
@@ -142,7 +140,8 @@ export async function buyMetal(input, { dataDir } = {}) {
       premium: premium.toFixed(),
       fee: fee.toFixed(),
       carrying: carrying.toFixed(),
-      cashOut: cashOut.toFixed(),
+      cashOut: cashOutTx.toFixed(),
+      cashPrincipal: cashPrincipal.toFixed(),
     },
     journalLines,
     domainResult: {
@@ -155,7 +154,7 @@ export async function buyMetal(input, { dataDir } = {}) {
       metalCost: metalCost.toFixed(),
       premium: premium.toFixed(),
       fee: fee.toFixed(),
-      total: cashOut.toFixed(),
+      total: cashOutTx.toFixed(),
       carrying: carrying.toFixed(),
     },
     engineVersions: { metals: "1.1.0", money: "1.0.0" },
@@ -242,7 +241,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         premium.toFixed(),
         fee.toFixed(),
         p.feeCurrency || currency,
-        cashOut.toFixed(),
+        cashPrincipal.toFixed(),
         currency,
         "1",
         now,

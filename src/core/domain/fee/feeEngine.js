@@ -69,11 +69,13 @@ function feeAmountInBase(event) {
  * Apply fee events: returns { carryingDeltaBase, quantityDelta, journalLines, derivedFeeBases }
  * quantityDelta is negative string for fee_from_received (caller applies to gross qty).
  */
-export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receivedInstrumentId, receivedQuantityUnit } = {}) {
+export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receivedInstrumentId, receivedQuantityUnit, transactionCurrency } = {}) {
   let carryingDeltaBase = toDecimal("0");
+  let carryingDeltaTx = toDecimal("0");
   let quantityDelta = toDecimal("0");
   const journalLines = [];
   const derivedFeeBases = [];
+  const txCcy = transactionCurrency || (events[0] && events[0].transactionCurrency) || null;
 
   for (const event of events) {
     const inBase = feeAmountInBase(event);
@@ -88,7 +90,11 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
 
     switch (event.treatment) {
       case "capitalized_cost":
+        // Dimension-safe: base always accumulates fee-in-base; TX only if same currency
         carryingDeltaBase = carryingDeltaBase.plus(inBase);
+        if (txCcy && event.feeCurrency === txCcy) {
+          carryingDeltaTx = carryingDeltaTx.plus(toDecimal(event.feeAmount));
+        }
         break;
       case "expense": {
         const expId =
@@ -156,11 +162,11 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
 
   return {
     carryingDeltaBase: carryingDeltaBase.toFixed(),
-    // BUG-CUR-016: explicit dimensions
-    carryingDelta: { amount: carryingDeltaBase.toFixed(), currency: "BASE_ONLY_LEGACY" },
-    carryingDeltaBaseObj: { amount: carryingDeltaBase.toFixed(), currency: null },
-
-    quantityDelta: quantityDelta.toFixed(),
+    carryingDeltaTx: { amount: carryingDeltaTx.toFixed(), currency: txCcy },
+    carryingDeltaBaseDim: { amount: carryingDeltaBase.toFixed(), currency: "BASE" },
+    /** @deprecated — use carryingDeltaTx (TX) or carryingDeltaBaseDim (BASE) */
+    carryingDelta: { amount: carryingDeltaBase.toFixed(), currency: "BASE", deprecated: true },
+    quantityDelta: quantityDelta.isZero() ? "0" : quantityDelta.toFixed(),
     journalLines,
     derivedFeeBases,
   };

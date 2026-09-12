@@ -46,9 +46,13 @@ export async function redeemFund(input, { dataDir } = {}) {
       )
       .get(p.instrumentId, p.accountId);
   } else {
-    holding = db0
+    const rows = db0
       .prepare(`SELECT * FROM inv_fif_holdings WHERE instrument_id = ?`)
-      .get(p.instrumentId);
+      .all(p.instrumentId);
+    if (rows.length > 1) {
+      throw new Error("HOLDING_AMBIGUOUS:accountId_required");
+    }
+    holding = rows[0];
   }
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
 
@@ -138,7 +142,9 @@ export async function redeemFund(input, { dataDir } = {}) {
           )
           .get(p.instrumentId, p.accountId);
       } else {
-        h2 = db.prepare(`SELECT * FROM inv_fif_holdings WHERE instrument_id = ?`).get(p.instrumentId);
+        const rows2 = db.prepare(`SELECT * FROM inv_fif_holdings WHERE instrument_id = ?`).all(p.instrumentId);
+        if (rows2.length > 1) throw new Error("HOLDING_AMBIGUOUS:accountId_required");
+        h2 = rows2[0];
       }
       if (!h2) throw new Error("HOLDING_NOT_FOUND");
       const d2 = applyDisposal(

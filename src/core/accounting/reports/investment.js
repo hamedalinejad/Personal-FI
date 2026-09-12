@@ -5,7 +5,12 @@ import { toDecimal } from "../../money/canonicalDecimal.js";
  * Holdings + cost basis snapshot (Model A cost pool).
  * Unrealized requires valuation context (optional prices map).
  */
-export function investmentHoldings(dataDir, { prices = {} } = {}) {
+export function investmentHoldings(dataDir, { prices = {}, valuationContext = null } = {}) {
+  // prices[instrumentId] must be { price, currency, asOf, source?, isStale? } or scalar only for same-currency provisional
+  if (valuationContext == null && Object.keys(prices).length) {
+    // allow but mark degraded
+  }
+
   const db = openDb(dataDir);
   const crypto = db.prepare(`SELECT * FROM inv_crypto_holdings`).all();
   const stocks = db.prepare(`SELECT * FROM inv_stocks_iran_holdings`).all();
@@ -19,6 +24,7 @@ export function investmentHoldings(dataDir, { prices = {} } = {}) {
     const px = prices[h.instrument_id];
     let market = null;
     let unrealized = null;
+    let valuationMeta = null;
     if (px != null) {
       market = qty.times(toDecimal(px));
       unrealized = market.minus(cost);
@@ -32,6 +38,7 @@ export function investmentHoldings(dataDir, { prices = {} } = {}) {
       averageCost: avg.toFixed(),
       marketValue: market ? market.toFixed() : null,
       unrealizedPnl: unrealized ? unrealized.toFixed() : null,
+      valuationContext: valuationContext || { degraded: true, note: "scalar price without full context" },
       valuationPrice: px != null ? String(px) : null,
     };
   }

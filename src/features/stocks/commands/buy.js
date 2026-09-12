@@ -63,9 +63,13 @@ export async function buyStock(input, { dataDir } = {}) {
   const feeResult = applyFeeEvents(feeEvents, {
     expenseAccountId: scopedAccountId("stock_fee_expense", baseCurrency),
     cashAccountId: payableId,
+    transactionCurrency: currency,
   });
-  const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase)); // carrying in transaction currency when fees same ccy
-  const carryingBase = carrying.times(toDecimal(exchangeRateToBase));
+  // Dimensional: never add base-currency fee total into TX carrying
+  const feeCarryTx = toDecimal(feeResult.carryingDeltaTx?.amount || "0");
+  const carrying = gross.plus(feeCarryTx);
+  const grossBase = gross.times(toDecimal(exchangeRateToBase));
+  const carryingBase = grossBase.plus(toDecimal(feeResult.carryingDeltaBase || "0"));
   const totalDue = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
   let settlementDate = p.settlementDate || null;
@@ -152,7 +156,7 @@ export async function buyStock(input, { dataDir } = {}) {
     type: "stocks.buy",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency,
     payload: {
       ...p,
       gross: gross.toFixed(),

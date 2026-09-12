@@ -1,3 +1,8 @@
+/**
+ * Migration chain is APPEND-ONLY. Current defaultMigrationChain is schema bootstrap 0→1.
+ * Before production: every schema change must add { from, to, id, up } and proof fixtures.
+ * Never rewrite applied migration checksums.
+ */
 import { mkdirSync, existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

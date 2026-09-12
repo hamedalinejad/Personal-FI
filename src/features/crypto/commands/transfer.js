@@ -231,11 +231,15 @@ export async function transferCrypto(input, { dataDir } = {}) {
         );
       }
 
+      // fee on transfer_out: asset-funded network/burn fee → fee_funding_kind=asset
+      const feeFundingKind = feeQty.gt(0) ? "asset" : null;
+      const feeInstrumentId = feeQty.gt(0) ? p.instrumentId : null;
+      const feeCurrency = null; // XOR: asset fee uses fee_instrument_id not fee_currency
       const ins = `INSERT INTO inv_crypto_transactions (
         id, operation_id, holding_id, instrument_id,
         tx_type, business_date, gross_quantity, fee_quantity, net_quantity,
-        fee_currency, fee_instrument_id, economic_kind, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        fee_currency, fee_instrument_id, fee_funding_kind, economic_kind, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       db.prepare(ins).run(
         txOut,
         operationId,
@@ -246,8 +250,9 @@ export async function transferCrypto(input, { dataDir } = {}) {
         gross.toFixed(),
         feeQty.toFixed(),
         net.toFixed(),
-        costCurrency,
-        null,
+        feeCurrency,
+        feeInstrumentId,
+        feeFundingKind,
         "transfer",
         now,
       );
@@ -261,7 +266,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
         net.toFixed(),
         "0",
         net.toFixed(),
-        costCurrency,
+        null,
+        null,
         null,
         "transfer",
         now,

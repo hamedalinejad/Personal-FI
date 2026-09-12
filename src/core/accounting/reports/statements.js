@@ -33,6 +33,7 @@ export function generalLedger(dataDir, { accountId = null, fromDate = null, toDa
 }
 
 export function trialBalance(dataDir, { asOf = null, baseCurrency = null } = {}) {
+  // baseCurrency: amounts already amount_in_base from journal; param reserved for multi-base filter
   const lines = generalLedger(dataDir, { toDate: asOf || undefined });
   const byAccount = new Map();
   for (const row of lines) {
@@ -83,7 +84,8 @@ export function balanceSheet(dataDir, { asOf = null } = {}) {
   const equity = [];
   for (const row of tb.rows) {
     const meta = accountMeta(db, row.accountId);
-    const kind = meta?.account_kind || "asset";
+    if (!meta?.account_kind) throw new Error("REPORT_ACCOUNT_KIND_MISSING:" + (row.accountId || row.account_id));
+    const kind = meta.account_kind;
     const signed = toDecimal(row.balance);
     const entry = {
       accountId: row.accountId,
@@ -162,11 +164,19 @@ export function incomeStatement(dataDir, { fromDate = null, toDate = null } = {}
  * Cash Flow (simplified): net change on local_settlement_cash* accounts in period.
  */
 export function cashFlow(dataDir, { fromDate = null, toDate = null } = {}) {
+  const db = openDb(dataDir);
   const lines = generalLedger(dataDir, { fromDate, toDate });
   let net = toDecimal("0");
   const details = [];
   for (const row of lines) {
-    if (!String(row.accountId).includes("local_settlement_cash") && !String(row.accountId).includes("cash")) {
+    const meta = accountMeta(db, row.accountId);
+    const isCash =
+      meta &&
+      (meta.role === "cash_box" ||
+        meta.role === "checking" ||
+        String(row.accountId).includes("local_settlement_cash") ||
+        String(meta.name || "").toLowerCase().includes("cash"));
+    if (!isCash) {
       continue;
     }
     const amt = toDecimal(row.amountInBase || row.amount);

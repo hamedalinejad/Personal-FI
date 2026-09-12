@@ -1,3 +1,4 @@
+import { toDecimal } from "../money/canonicalDecimal.js";
 import { openDb } from "../persistence/port.js";
 import { randomUUID } from "node:crypto";
 
@@ -19,6 +20,9 @@ export function recordTaxEvent(dataDir, {
   adjustmentReason = null,
 }) {
   if (!taxKind || !taxAmount || !currency) throw new Error("TAX_EVENT_INVALID");
+  if (toDecimal(taxAmount).isNegative()) throw new Error("TAX_AMOUNT_NEGATIVE");
+  // Tax facts should prefer same txn as financial op via withinTransaction when available;
+  // standalone recordTaxEvent is for assessment-only / manual adjustment paths.
   if (!operationId && !isManualAdjustment) throw new Error("TAX_EVENT_NEEDS_OPERATION_OR_MANUAL");
   const period = periodKey || (businessDate ? businessDate.slice(0, 4) : null);
   if (!period) throw new Error("TAX_EVENT_PERIOD_REQUIRED");
