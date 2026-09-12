@@ -73,7 +73,10 @@ CREATE TABLE IF NOT EXISTS fin_operations (
 CREATE INDEX IF NOT EXISTS idx_fin_operations_command_hash
   ON fin_operations(command_hash);
 
+-- BUG-FINAL-026: post_state is CACHE of fin_operations.status; writers must not set independently.
+-- Integrity: post_state must match linked operation status (enforced in domain + optional audit query).
 CREATE TABLE IF NOT EXISTS fin_journal_entries (
+
   id            TEXT PRIMARY KEY,
   operation_id  TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- entry exists only for posted path; status is on operation
   business_date TEXT NOT NULL,
@@ -214,6 +217,8 @@ CREATE TABLE IF NOT EXISTS acc_transactions (
   id             TEXT PRIMARY KEY,
   account_id     TEXT NOT NULL REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- BUG-CUR-022: NULL only for draft; domain MUST reject posted path without operation_id
+  -- BUG-FINAL-028: v1 requires operation_id for all cash event rows written by Core commands.
+  -- NULL only allowed for explicit draft tooling outside production write path.
   operation_id   TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   business_date  TEXT NOT NULL,
   amount         TEXT NOT NULL,

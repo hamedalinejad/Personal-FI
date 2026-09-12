@@ -113,7 +113,11 @@ export function archiveAccount(db, accountId) {
     .all(accountId);
   let bal = toDecimal("0");
   for (const r of rows) {
-    const a = toDecimal(r.amount_in_base != null ? r.amount_in_base : r.amount);
+    // BUG-FINAL-025: never fall back to foreign amount for archive balance
+    if (r.amount_in_base == null || r.amount_in_base === "") {
+      throw new Error("ACCOUNT_ARCHIVE_MISSING_AMOUNT_IN_BASE");
+    }
+    const a = toDecimal(r.amount_in_base);
     bal = r.side === "debit" ? bal.plus(a) : bal.minus(a);
   }
   if (!bal.isZero()) throw new Error("ACCOUNT_ARCHIVE_NONZERO_BALANCE");

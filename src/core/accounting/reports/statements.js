@@ -32,17 +32,48 @@ export function generalLedger(dataDir, { accountId = null, fromDate = null, toDa
   return db.prepare(sql).all(...params);
 }
 
-export function trialBalance(dataDir, { asOf = null, baseCurrency = null } = {}) {
-  // baseCurrency: amounts already amount_in_base from journal; param reserved for multi-base filter
-  const lines = generalLedger(dataDir, { toDate: asOf || undefined });
+export function trialBalance(dataDir, { asOf = null, baseCurrency = null, bookBaseCurrency = null } = {}) {
+  /**
+   * BUG-FINAL-021/022: amountInBase is per-operation base.
+   * When bookBaseCurrency is set, only include operations whose fo.base_currency matches.
+   * When omitted, detect mixed bases and fail rather than silently sum.
+   */
+  const db = openDb(dataDir);
+  let sql = `
+    SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency,
+           jl.amount_in_base as amountInBase, fo.base_currency as opBase
+    FROM fin_journal_lines jl
+    JOIN fin_journal_entries je ON je.id = jl.entry_id
+    JOIN fin_operations fo ON fo.id = je.operation_id
+    WHERE fo.status = 'posted'`;
+  const params = [];
+  if (asOf) {
+    sql += ` AND je.business_date <= ?`;
+    params.push(asOf);
+  }
+  const targetBase = bookBaseCurrency || baseCurrency;
+  if (targetBase) {
+    sql += ` AND fo.base_currency = ?`;
+    params.push(targetBase);
+  }
+  const lines = db.prepare(sql).all(...params);
+  if (!targetBase && lines.length) {
+    const bases = new Set(lines.map((r) => r.opBase).filter(Boolean));
+    if (bases.size > 1) {
+      throw new Error("REPORT_MIXED_BASE_CURRENCY:" + [...bases].join(","));
+    }
+  }
   const byAccount = new Map();
   for (const row of lines) {
+    if (row.amountInBase == null || row.amountInBase === "") {
+      throw new Error("REPORT_MISSING_AMOUNT_IN_BASE:" + row.accountId);
+    }
     const key = row.accountId;
     if (!byAccount.has(key)) {
-      byAccount.set(key, { accountId: key, debit: toDecimal("0"), credit: toDecimal("0"), currency: row.currency });
+      byAccount.set(key, { accountId: key, debit: toDecimal("0"), credit: toDecimal("0") });
     }
     const acc = byAccount.get(key);
-    const amt = toDecimal(row.amountInBase || row.amount);
+    const amt = toDecimal(row.amountInBase);
     if (row.side === "debit") acc.debit = acc.debit.plus(amt);
     else acc.credit = acc.credit.plus(amt);
   }
@@ -56,6 +87,7 @@ export function trialBalance(dataDir, { asOf = null, baseCurrency = null } = {})
   const totalCredit = sumDecimalStrings(rows.map((r) => r.credit));
   return {
     asOf: asOf || null,
+    bookBaseCurrency: targetBase || (lines[0] && lines[0].opBase) || null,
     rows,
     totalDebit,
     totalCredit,
@@ -76,9 +108,9 @@ function accountMeta(db, accountId) {
  * Balance Sheet (as-of): assets / liabilities / equity from TB + account_kind.
  * Equity residual = assets - liabilities when no explicit equity postings (plug line).
  */
-export function balanceSheet(dataDir, { asOf = null } = {}) {
+export function balanceSheet(dataDir, { asOf = null, bookBaseCurrency = null, baseCurrency = null } = {}) {
   const db = openDb(dataDir);
-  const tb = trialBalance(dataDir, { asOf });
+  const tb = trialBalance(dataDir, { asOf, bookBaseCurrency, baseCurrency });
   const assets = [];
   const liabilities = [];
   const equity = [];
@@ -170,12 +202,15 @@ export function cashFlow(dataDir, { fromDate = null, toDate = null } = {}) {
   const details = [];
   for (const row of lines) {
     const meta = accountMeta(db, row.accountId);
+    // BUG-FINAL-024: canonical cash selector — role/systemRole, not substring on id
     const isCash =
       meta &&
       (meta.role === "cash_box" ||
         meta.role === "checking" ||
-        String(row.accountId).includes("local_settlement_cash") ||
-        String(meta.name || "").toLowerCase().includes("cash"));
+        meta.role === "cash" ||
+        (meta.role && String(meta.role).includes("settlement")) ||
+        row.accountId === "local_settlement_cash" ||
+        (typeof row.accountId === "string" && row.accountId.startsWith("local_settlement_cash")));
     if (!isCash) {
       continue;
     }

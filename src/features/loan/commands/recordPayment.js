@@ -10,7 +10,14 @@ function max0(d) {
 }
 
 /** Decimal-only outstanding from schedule + payment/reversal history. No CAST REAL. */
-function computeOutstanding(db, loanId, loan) {
+/**
+ * BUG-FINAL-030: outstanding as of asOfDate — only installments with dueDate <= asOfDate
+ * (or missing dueDate treated as due). Future installments excluded.
+ * BUG-FINAL-031: penalty accrual deferred in v1 — always zero unless fee engine posts penalty events.
+ * BUG-FINAL-032: fee outstanding from ln_loan_fees projection only (amount_due - paid - waived);
+ * payment txs must update amount_paid; do not subtract fee_portion again.
+ */
+function computeOutstanding(db, loanId, loan, asOfDate = null) {
   const snap = db
     .prepare(`SELECT * FROM ln_schedule_snapshots WHERE loan_id = ? ORDER BY version DESC LIMIT 1`)
     .get(loanId);
@@ -21,6 +28,10 @@ function computeOutstanding(db, loanId, loan) {
     const parsed = JSON.parse(snap.snapshot_json);
     const rows = parsed.installments || parsed.rows || (Array.isArray(parsed) ? parsed : []);
     for (const row of rows) {
+      const due = row.dueDate || row.due_date || null;
+      if (asOfDate && due && due > asOfDate) continue; // future installment
+      const st = row.status || "planned";
+      if (st === "paid" || st === "cancelled") continue;
       schedPrin = schedPrin.plus(toDecimal(row.principal || "0"));
       schedInt = schedInt.plus(toDecimal(row.interest || "0"));
     }
@@ -37,32 +48,31 @@ function computeOutstanding(db, loanId, loan) {
 
   let paidPrin = toDecimal("0");
   let paidInt = toDecimal("0");
-  let paidFee = toDecimal("0");
-  let paidPen = toDecimal("0");
   for (const row of priorTx) {
     const sign = row.tx_type === "reversal" ? toDecimal("-1") : toDecimal("1");
     paidPrin = paidPrin.plus(toDecimal(row.principal_portion || "0").times(sign));
     paidInt = paidInt.plus(toDecimal(row.interest_portion || "0").times(sign));
-    paidFee = paidFee.plus(toDecimal(row.fee_portion || "0").times(sign));
-    paidPen = paidPen.plus(toDecimal(row.penalty_portion || "0").times(sign));
   }
 
   let feeDue = toDecimal("0");
   try {
     const fees = db.prepare(`SELECT amount_due, amount_paid, amount_waived FROM ln_loan_fees WHERE loan_id = ?`).all(loanId);
     for (const f of fees) {
-      feeDue = feeDue.plus(toDecimal(f.amount_due || "0").minus(toDecimal(f.amount_paid || "0")).minus(toDecimal(f.amount_waived || "0")));
+      feeDue = feeDue.plus(
+        toDecimal(f.amount_due || "0")
+          .minus(toDecimal(f.amount_paid || "0"))
+          .minus(toDecimal(f.amount_waived || "0")),
+      );
     }
   } catch { /* empty */ }
-  // payments already reduce via amount_paid on fees if updated; also fee_portion on txs
-  feeDue = feeDue.minus(paidFee);
   if (feeDue.lt(0)) feeDue = toDecimal("0");
 
   return {
     principal: max0(schedPrin.minus(paidPrin)),
     interest: max0(schedInt.minus(paidInt)),
     fee: max0(feeDue),
-    penalty: "0", // v1: no accrued penalty events yet; portions still tracked on txs with sign
+    penalty: "0", // BUG-FINAL-031: v1 DEFERRED — penalty_rate stored but not accrued
+    penaltyPolicy: "DEFERRED_V1",
   };
 }
 
@@ -99,7 +109,7 @@ export async function recordPayment(
   if (loan.status !== "active") throw new Error("LOAN_NOT_ACTIVE");
   if (loan.currency !== currency) throw new Error("LOAN_CURRENCY_MISMATCH");
 
-  const outstanding = computeOutstanding(db, p.loanId, loan);
+  const outstanding = computeOutstanding(db, p.loanId, loan, p.paymentDate || p.businessDate);
   const totalOut = toDecimal(outstanding.principal)
     .plus(outstanding.interest)
     .plus(outstanding.fee)
@@ -141,7 +151,7 @@ export async function recordPayment(
       bootstrapLoanEditionAccounts(dataDir, currency);
       // Authoritative re-check inside the same COMMIT boundary
       const loan2 = db2.prepare(`SELECT * FROM ln_loans WHERE id = ?`).get(p.loanId);
-      const fresh = computeOutstanding(db2, p.loanId, loan2);
+      const fresh = computeOutstanding(db2, p.loanId, loan2, p.paymentDate || p.businessDate);
       const total2 = toDecimal(fresh.principal)
         .plus(fresh.interest)
         .plus(fresh.fee)
