@@ -112,7 +112,7 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId } = {})
                 : event.feeCurrency === event.transactionCurrency
                   ? event.exchangeRateToBase
                   : event.feeExchangeRateToBase,
-            lineKind: "fee_expense",
+            lineKind: "fee",
           },
           {
             accountId: cashId,
@@ -126,7 +126,7 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId } = {})
                 : event.feeCurrency === event.transactionCurrency
                   ? event.exchangeRateToBase
                   : event.feeExchangeRateToBase,
-            lineKind: "fee_cash",
+            lineKind: "fee",
           },
         );
         break;

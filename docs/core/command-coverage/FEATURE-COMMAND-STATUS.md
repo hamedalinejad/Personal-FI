@@ -11,10 +11,10 @@ updated: 2026-09-10
 | Feature | Command | Stage |
 |---------|---------|-------|
 | Loan | create / payment / reverse | INTEGRATED (reference) |
-| Crypto | buy | INTEGRATED (not RELEASE-PROVEN) |
-| Funds | subscribe | INTEGRATED (not RELEASE-PROVEN) |
-| Stocks | buy | INTEGRATED (not RELEASE-PROVEN) |
-| Metals | buy | INTEGRATED (not RELEASE-PROVEN) |
+| Crypto | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
+| Funds | subscribe | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
+| Stocks | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
+| Metals | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
 | Crypto | sell/transfer/swap | SPEC_LOCKED |
 | Funds | redeem/distribution | SPEC_LOCKED |
 | Stocks | sell/CA/dividend | SPEC_LOCKED |

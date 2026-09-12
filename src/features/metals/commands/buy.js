@@ -8,6 +8,7 @@ import {
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
+import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
 
 /**
  * metals.buy — persists inv_metals_transactions; metal / premium / fee separated.
@@ -49,24 +50,28 @@ export async function buyMetal(input, { dataDir } = {}) {
   const metalCost = fine.times(toDecimal(unitPrice));
   const premium = toDecimal(p.premiumAmount ?? p.premium ?? "0");
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
-  const feeTreatment = p.feeTreatment || "expense";
-  const premiumTreatment = p.premiumTreatment || "capitalized_cost";
-
-  let carrying = metalCost;
-  let expenseTotal = toDecimal("0");
-  if (premiumTreatment === "capitalized_cost") carrying = carrying.plus(premium);
-  else if (premiumTreatment === "expense") expenseTotal = expenseTotal.plus(premium);
-  else throw new Error(`FEE_TREATMENT_INVALID:${premiumTreatment}`);
-
-  if (feeTreatment === "capitalized_cost") carrying = carrying.plus(fee);
-  else if (feeTreatment === "expense") expenseTotal = expenseTotal.plus(fee);
-  else throw new Error(`FEE_TREATMENT_INVALID:${feeTreatment}`);
-
-  const cashOut = metalCost.plus(premium).plus(fee);
   const currency = p.currency;
+  const baseCurrency = p.baseCurrency || currency;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);
-  const feeExpId = scopedAccountId("metal_fee_expense", currency);
+
+  const feeEvents = buildFeeEvents(
+    [
+      { feeAmount: premium.toFixed(), treatment: p.premiumTreatment || "capitalized_cost", label: "premium", feeCurrency: currency },
+      { feeAmount: fee.toFixed(), treatment: p.feeTreatment || "expense", label: "fee", feeCurrency: p.feeCurrency || currency },
+    ].filter((f) => !toDecimal(f.feeAmount).isZero()),
+    { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
+  );
+  const feeResult = applyFeeEvents(feeEvents, {
+    expenseAccountId: scopedAccountId("metal_fee_expense", baseCurrency),
+    cashAccountId: cashId,
+  });
+  const carrying = metalCost.plus(toDecimal(feeResult.carryingDeltaBase));
+  const cashOut = metalCost.plus(premium).plus(fee);
+  const expenseCash = feeResult.journalLines
+    .filter((l) => l.side === "credit")
+    .reduce((s, l) => s.plus(toDecimal(l.amount)), toDecimal("0"));
+  const cashPrincipal = cashOut.minus(expenseCash);
   const now = new Date().toISOString();
   let holdingId = randomUUID();
   const txId = randomUUID();
@@ -81,53 +86,39 @@ export async function buyMetal(input, { dataDir } = {}) {
       exchangeRateToBase: "1",
       lineKind: "principal",
     },
-  ];
-  if (expenseTotal.gt(0)) {
-    journalLines.push({
-      accountId: feeExpId,
-      side: "debit",
-      amount: expenseTotal.toFixed(),
+    {
+      accountId: cashId,
+      side: "credit",
+      amount: cashPrincipal.toFixed(),
       currency,
-      amountInBase: expenseTotal.toFixed(),
+      amountInBase: cashPrincipal.toFixed(),
       exchangeRateToBase: "1",
-      lineKind: "fee",
-    });
-  }
-  journalLines.push({
-    accountId: cashId,
-    side: "credit",
-    amount: cashOut.toFixed(),
-    currency,
-    amountInBase: cashOut.toFixed(),
-    exchangeRateToBase: "1",
-    lineKind: "principal",
-  });
+      lineKind: "principal",
+    },
+    ...feeResult.journalLines,
+  ];
 
   return runAtomicFinancialOperation({
     operationId,
     type: "metals.buy",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency,
     payload: {
       ...p,
       quantityMg: grossMg.toFixed(),
       fineWeightMg: fine.toFixed(),
       originalMassInput: quantityMgRaw,
       inputMassUnit: p.inputMassUnit || "mg",
-      fineWeight: fine.toFixed(),
-      fineWeightMg: fine.toFixed(),
-      quantityMg: grossMg.toFixed(),
       metalCost: metalCost.toFixed(),
       premium: premium.toFixed(),
       fee: fee.toFixed(),
       carrying: carrying.toFixed(),
       cashOut: cashOut.toFixed(),
-      feeTreatment,
-      premiumTreatment,
     },
     journalLines,
     domainResult: {
+      fees: feeResult.derivedFeeBases,
       holdingId,
       transactionId: txId,
       fineWeight: fine.toFixed(),
@@ -147,12 +138,12 @@ export async function buyMetal(input, { dataDir } = {}) {
         currency,
         displayName: "Metal investment",
       });
-      if (expenseTotal.gt(0)) {
+      if (feeResult.journalLines.some((l) => l.lineKind === "fee")) {
         ensureAccount(db, {
-          id: feeExpId,
-          name: `Metal fee expense (${currency})`,
+          id: scopedAccountId("metal_fee_expense", baseCurrency),
+          name: `Metal fee expense (${baseCurrency})`,
           accountKind: "expense",
-          currency,
+          currency: baseCurrency,
           systemRole: "metal_fee_expense",
         });
       }

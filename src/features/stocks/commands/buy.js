@@ -8,6 +8,7 @@ import {
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
+import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
 
 /**
  * stocks.buy — persists inv_stocks_iran_transactions; fee treatment explicit.
@@ -30,27 +31,21 @@ export async function buyStock(input, { dataDir } = {}) {
   const other = toDecimal(p.otherFee || "0");
   const gross = qty.times(price);
   const currency = p.currency;
+  const baseCurrency = p.baseCurrency || currency;
 
-  const commissionTreatment = p.commissionTreatment || "capitalized_cost";
-  const taxTreatment = p.taxTreatment || "capitalized_cost";
-  const otherTreatment = p.otherFeeTreatment || "capitalized_cost";
-
-  let carrying = gross;
-  let expenseTotal = toDecimal("0");
-  for (const [amt, treatment] of [
-    [commission, commissionTreatment],
-    [tax, taxTreatment],
-    [other, otherTreatment],
-  ]) {
-    if (treatment === "capitalized_cost") carrying = carrying.plus(amt);
-    else if (treatment === "expense") expenseTotal = expenseTotal.plus(amt);
-    else if (treatment === "proceeds_reduction") {
-      /* sell-side */
-    } else {
-      throw new Error(`FEE_TREATMENT_INVALID:${treatment}`);
-    }
-  }
-
+  const feeEvents = buildFeeEvents(
+    [
+      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "capitalized_cost", label: "commission", feeCurrency: currency },
+      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "capitalized_cost", label: "tax", feeCurrency: currency },
+      { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || "capitalized_cost", label: "otherFee", feeCurrency: currency },
+    ].filter((f) => !toDecimal(f.feeAmount).isZero()),
+    { baseCurrency, transactionCurrency: currency, exchangeRateToBase: "1" },
+  );
+  const feeResult = applyFeeEvents(feeEvents, {
+    expenseAccountId: scopedAccountId("stock_fee_expense", baseCurrency),
+    cashAccountId: p.cashAccountId || scopedAccountId("local_settlement_cash", currency),
+  });
+  const carrying = gross.plus(toDecimal(feeResult.carryingDeltaBase));
   const cashOut = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
   const settlementDate = p.settlementDate || null;
@@ -63,11 +58,16 @@ export async function buyStock(input, { dataDir } = {}) {
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("stock_inventory", currency);
-  const feeExpId = scopedAccountId("trade_fee_expense", currency);
   const now = new Date().toISOString();
   const holdingId = randomUUID();
   const txId = randomUUID();
 
+  // Inventory carries principal + capitalized fees; cash out = gross + all fees;
+  // expense fees come from Fee Engine journal (already credits cash — adjust cash leg)
+  const expenseCash = feeResult.journalLines
+    .filter((l) => l.side === "credit")
+    .reduce((s, l) => s.plus(toDecimal(l.amount)), toDecimal("0"));
+  const cashPrincipal = cashOut.minus(expenseCash);
   const journalLines = [
     {
       accountId: invId,
@@ -78,27 +78,17 @@ export async function buyStock(input, { dataDir } = {}) {
       exchangeRateToBase: "1",
       lineKind: "principal",
     },
-  ];
-  if (expenseTotal.gt(0)) {
-    journalLines.push({
-      accountId: feeExpId,
-      side: "debit",
-      amount: expenseTotal.toFixed(),
+    {
+      accountId: cashId,
+      side: "credit",
+      amount: cashPrincipal.toFixed(),
       currency,
-      amountInBase: expenseTotal.toFixed(),
+      amountInBase: cashPrincipal.toFixed(),
       exchangeRateToBase: "1",
-      lineKind: "fee",
-    });
-  }
-  journalLines.push({
-    accountId: cashId,
-    side: "credit",
-    amount: cashOut.toFixed(),
-    currency,
-    amountInBase: cashOut.toFixed(),
-    exchangeRateToBase: "1",
-    lineKind: "principal",
-  });
+      lineKind: "principal",
+    },
+    ...feeResult.journalLines,
+  ];
 
   return runAtomicFinancialOperation({
     operationId,
@@ -111,12 +101,10 @@ export async function buyStock(input, { dataDir } = {}) {
       gross: gross.toFixed(),
       carrying: carrying.toFixed(),
       cashOut: cashOut.toFixed(),
-      commissionTreatment,
-      taxTreatment,
-      otherTreatment,
     },
     journalLines,
     domainResult: {
+      fees: feeResult.derivedFeeBases,
       holdingId,
       transactionId: txId,
       carrying: carrying.toFixed(),
@@ -135,13 +123,13 @@ export async function buyStock(input, { dataDir } = {}) {
         currency,
         displayName: "Stock investment",
       });
-      if (expenseTotal.gt(0)) {
+      if (feeResult.journalLines.some((l) => l.lineKind === "fee")) {
         ensureAccount(db, {
-          id: feeExpId,
-          name: `Trade fee expense (${currency})`,
+          id: scopedAccountId("stock_fee_expense", baseCurrency),
+          name: `Stock fee expense (${baseCurrency})`,
           accountKind: "expense",
-          currency,
-          systemRole: "trade_fee_expense",
+          currency: baseCurrency,
+          systemRole: "stock_fee_expense",
         });
       }
 
