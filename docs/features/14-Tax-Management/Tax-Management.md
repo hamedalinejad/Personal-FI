@@ -1,3 +1,6 @@
+> **P0-012/013 LOCK:** `tax_events` = economic events; `tax_records` = obligations/filing.  
+> `status=paid` **only** via `payTax` (never `changeStatus(..., paid) // FORBIDDEN — use payTax`). See `docs/core/P0-011-015-LOCK.md`.
+
 # فیچر: Tax Management (مدیریت مالیات)
 
 ## توضیح کلی

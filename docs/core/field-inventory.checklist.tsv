@@ -837,3 +837,12 @@ inv_stocks_iran_transactions	fee_amount	RAW	Stocks	no	inv_stocks_iran_transactio
 inv_stocks_iran_transactions	currency	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
 inv_stocks_iran_transactions	account_id	RAW	Stocks	no	inv_stocks_iran_transactions	canonical	yes
 inv_stocks_iran_transactions	created_at	SYSTEM_INDEX	Stocks	no	inv_stocks_iran_transactions	canonical	yes
+fin_operations	source_channel	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	source_type	RAW	Core	no	fin_operations	canonical	yes
+fin_operations	source_reference	RAW	Core	no	fin_operations	canonical	yes
+tax_records	amount_due	RAW	Tax	no	tax_records	canonical	yes
+tax_records	amount_paid	RAW	Tax	no	tax_records	canonical	yes
+tax_records	currency	RAW	Tax	no	tax_records	canonical	yes
+tax_records	due_date	RAW	Tax	no	tax_records	canonical	yes
+tax_records	payment_operation_id	RAW	Tax	no	tax_records	canonical	yes
+tax_records	updated_at	SYSTEM_INDEX	Tax	yes	tax_records	canonical	yes

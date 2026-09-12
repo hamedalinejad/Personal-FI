@@ -49,6 +49,14 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   engine_versions   TEXT, -- JSON schema: {"money":"x.y","costBasis":"x.y","fx":"x.y","loanSchedule":"x.y","rounding":"x.y"} -- JSON
   attribution_algorithm_version TEXT,
   reverses_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- P0-011 provenance split:
+  -- source_channel = interface (ui|api|import|migration|system)
+  -- source_type = business provenance (manual|bank_statement|broker_statement|exchange_api|opening|correction|…)
+  -- source_reference = external id / file / batch label
+  source_channel    TEXT CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system')),
+  source_type       TEXT, -- business provenance; not the same as source_channel
+  source_reference  TEXT,
+  -- LEGACY alias column: prefer source_channel; kept for migration compatibility
   source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
   created_at        TEXT NOT NULL,
   posted_at         TEXT,
@@ -1385,17 +1393,23 @@ CREATE TABLE IF NOT EXISTS tax_records (
   id TEXT PRIMARY KEY,
   period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR
   jurisdiction TEXT NOT NULL, -- IR|US|...
-  -- linked_tax_event_id: optional link to original tax event that triggered this record
-  -- For automatic filings, link to the tax_event that initiated the record
+  -- P0-012: user-facing obligation/filing record (not a second event ledger)
   linked_tax_event_id TEXT REFERENCES tax_events(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  -- aggregate / obligation amounts (may summarize multiple tax_events)
+  amount_due TEXT, -- decimal string total obligation
+  amount_paid TEXT, -- decimal string paid to date
+  currency TEXT,
+  due_date TEXT, -- DATE-only
+  -- payment_operation_id set ONLY by payTax path (P0-013)
+  payment_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   summary_json TEXT, -- JSON aggregation of tax events (total tax, breakdown by kind)
-  -- status enum expanded per P0-013: added 'pending', 'paid', 'cancelled'
-  status TEXT NOT NULL CHECK (status IN ('draft','pending','filed','paid','amended','cancelled')),
+  status TEXT NOT NULL CHECK (status IN ('draft','pending','overdue','filed','paid','amended','cancelled')),
   created_at TEXT NOT NULL,
-  filed_at TEXT, -- when status changed to 'filed'
-  paid_at TEXT, -- when status changed to 'paid'
-  amended_to TEXT REFERENCES tax_records(id) ON DELETE SET NULL ON UPDATE CASCADE, -- link to amended record if this was superseded
-  amended_at TEXT -- when status changed to 'amended'
+  updated_at TEXT,
+  filed_at TEXT,
+  paid_at TEXT,
+  amended_to TEXT REFERENCES tax_records(id) ON DELETE SET NULL ON UPDATE CASCADE,
+  amended_at TEXT
 );
 
 -- Settings

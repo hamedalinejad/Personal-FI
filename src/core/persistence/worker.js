@@ -139,12 +139,17 @@ function persistOperationSqlite(record, dir) {
 
     // P0-OP-008: insert row first as draft while durability=pending; promote after journal
     const insertStatus = status === "posted" ? "draft" : status;
+    // P0-011: source_channel vs source_type vs source_reference
+    const sourceChannel =
+      record.sourceChannel ?? record.source_channel ?? record.source ?? null;
+    const sourceType = record.sourceType ?? record.source_type ?? null;
+    const sourceReference = record.sourceReference ?? record.source_reference ?? null;
     db.prepare(
       `INSERT INTO fin_operations (
         id, command_hash, operation_type, status, durability_state,
         business_date, event_at, settlement_date, base_currency, engine_versions,
-        source, created_at, posted_at, result_json
-      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`,
+        source_channel, source_type, source_reference, source, created_at, posted_at, result_json
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`,
     ).run(
       id,
       record.commandHash || null,
@@ -155,7 +160,10 @@ function persistOperationSqlite(record, dir) {
       record.settlementDate ?? null,
       baseCurrency,
       record.engineVersions ? JSON.stringify(record.engineVersions) : null,
-      record.source ?? null,
+      sourceChannel,
+      sourceType,
+      sourceReference,
+      sourceChannel, // legacy alias
       now,
     );
 

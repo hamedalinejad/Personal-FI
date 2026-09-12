@@ -93,13 +93,19 @@ export function listTaxEvents(dataDir, { operationId = null } = {}) {
  * P0-TAX-001 — forbid direct paid status mutation without payTax operation.
  */
 export function changeTaxRecordStatus(dataDir, taxRecordId, status) {
+  // P0-013: paid only via payTax
   if (status === "paid") {
     throw new Error("TAX_PAID_REQUIRES_PAYTAX_OPERATION");
   }
+  const allowed = new Set(["draft", "pending", "overdue", "filed", "cancelled", "amended"]);
+  if (!allowed.has(status)) throw new Error(`TAX_STATUS_INVALID:${status}`);
   const db = openDb(dataDir);
   const now = new Date().toISOString();
   const row = db.prepare(`SELECT id, status FROM tax_records WHERE id = ?`).get(taxRecordId);
   if (!row) throw new Error("TAX_RECORD_NOT_FOUND");
+  if (row.status === "paid" && status !== "amended" && status !== "cancelled") {
+    throw new Error("TAX_PAID_LOCKED");
+  }
   db.prepare(`UPDATE tax_records SET status = ?, updated_at = ? WHERE id = ?`).run(status, now, taxRecordId);
   return { id: taxRecordId, status };
 }
@@ -110,7 +116,7 @@ export function markTaxRecordPaidAfterPayTax(dataDir, taxRecordId, { operationId
   const db = openDb(dataDir);
   const now = new Date().toISOString();
   db.prepare(
-    `UPDATE tax_records SET status = 'paid', updated_at = ? WHERE id = ?`,
-  ).run(now, taxRecordId);
+    `UPDATE tax_records SET status = 'paid', payment_operation_id = ?, paid_at = ?, updated_at = ? WHERE id = ?`,
+  ).run(operationId, paidDate || now, now, taxRecordId);
   return { id: taxRecordId, status: "paid", operationId, paidDate: paidDate || null };
 }

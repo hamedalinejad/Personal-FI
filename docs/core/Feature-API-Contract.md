@@ -389,3 +389,13 @@ Forbidden: Feature → another Feature's repository/SQL. Isolation via ESLint wh
 | Full | AccountsCashAdapter |
 
 License gates capability/UI only — never erases journal/history.
+
+## Provenance fields (P0-011 FINAL)
+
+| API / domain field | DB column | Meaning |
+|--------------------|-----------|---------|
+| sourceChannel | fin_operations.source_channel (legacy: source) | ui\|api\|import\|migration\|system |
+| sourceType | fin_operations.source_type | business provenance (manual, bank_statement, …) |
+| sourceReference | fin_operations.source_reference | external identifier |
+
+Do not overload a single `source` field with both channel and provenance.

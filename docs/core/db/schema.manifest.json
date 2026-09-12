@@ -1,5 +1,5 @@
 {
-  "schemaHash": "18b7bd98abe369855d1fa53f89c7d15b44ec505f2e3d7c3a28c228654bb9d85d",
+  "schemaHash": "8fde38e5c5eeaf486920df6f82c54df629021fbea9021cc8a9eb28bc4fe32003",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -2614,6 +2614,27 @@
           "pk": 0
         },
         {
+          "name": "source_channel",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_type",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "source_reference",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "source",
           "type": "TEXT",
           "notnull": false,
@@ -2746,6 +2767,7 @@
       "checks": [
         "CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')",
         "CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')",
+        "CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system')",
         "CHECK (status != 'posted' OR command_hash IS NOT NULL)",
         "CHECK (status IN ('draft', 'posted', 'voided', 'failed')"
       ]
@@ -8742,6 +8764,41 @@
           "pk": 0
         },
         {
+          "name": "amount_due",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount_paid",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "due_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payment_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "summary_json",
           "type": "TEXT",
           "notnull": false,
@@ -8759,6 +8816,13 @@
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "notnull": false,
           "dflt": null,
           "pk": 0
         },
@@ -8800,6 +8864,13 @@
           "on_delete": "SET NULL"
         },
         {
+          "table": "fin_operations",
+          "from": "payment_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
           "table": "tax_events",
           "from": "linked_tax_event_id",
           "to": "id",
@@ -8818,7 +8889,7 @@
         }
       ],
       "checks": [
-        "CHECK (status IN ('draft','pending','filed','paid','amended','cancelled')"
+        "CHECK (status IN ('draft','pending','overdue','filed','paid','amended','cancelled')"
       ]
     },
     "usr_settings": {
