@@ -1,28 +1,27 @@
 ---
 id: DOC-CMD-STATUS
 title: Feature Command Status Registry
-status: reviewed
-version: 0.2
-updated: 2026-09-10
+status: approved
+version: 0.3
+updated: 2026-09-12
 ---
 
-# Feature command status
+# Feature command status (official vocabulary only)
 
-| Feature | Command | Stage |
-|---------|---------|-------|
-| Loan | create / payment / reverse | INTEGRATED (reference) |
-| Crypto | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
-| Funds | subscribe | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
-| Stocks | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
-| Metals | buy | INTEGRATED + Fee Engine (not RELEASE-PROVEN) |
-| Crypto | sell/transfer/swap | SPEC_LOCKED |
-| Funds | redeem/distribution | SPEC_LOCKED |
-| Stocks | sell/CA/dividend | SPEC_LOCKED |
-| Metals | sell/delivery | SPEC_LOCKED |
+See `authority/STATUS-VOCABULARY-MAPPING.md`.
 
-Edition release proof (B-041) is separate and **not green**.
+| Feature | Command | Status | Notes |
+|---------|---------|--------|-------|
+| Loan | create / payment / reverse | IMPLEMENTED | Reference vertical; not RELEASE-PROVEN |
+| Crypto | buy | IMPLEMENTED | Fee Engine; Model A cost pool |
+| Funds | subscribe | IMPLEMENTED | No fee path yet; NAV≠transactionPrice |
+| Stocks | buy | IMPLEMENTED | Fee Engine |
+| Metals | buy | IMPLEMENTED | Fee Engine |
+| Crypto | sell/transfer/swap | SPEC_LOCKED | |
+| Funds | redeem/distribution | SPEC_LOCKED | |
+| Stocks | sell/CA/dividend | SPEC_LOCKED | |
+| Metals | sell/delivery | SPEC_LOCKED | |
 
-## Scaffold freeze (2026-09-12)
+Feature-level surface remains **PARTIAL** until remaining commands exist.
 
-Integrated commands have Gate H + Fee Engine where applicable.
-Next implementation priority: Loan RELEASE-PROVEN matrix, then Crypto sell under same contracts.
+Release proof: none of the above are `RELEASE-PROVEN`.

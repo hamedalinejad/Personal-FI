@@ -53,7 +53,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
   const amountInBase = cost.times(exchangeRateToBase);
 
   // BUG-011: Fee Engine owns treatment; feature only selects policy
-  const feeTreatment = p.feeTreatment || "fee_from_received";
+  // Model A: cost pool / total_invested is always in costCurrency (not base)
+  const feeTreatment = p.feeTreatment || p.feeRole || "fee_from_received";
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
   const feeResult = applySingleFee(
     p.feeAmount != null && p.feeAmount !== ""
@@ -61,7 +62,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
           feeAmount: p.feeAmount,
           feeCurrency: p.feeCurrency || costCurrency,
           feeInstrumentId: p.feeInstrumentId || null,
-          treatment: feeTreatment,
+          treatment: feeTreatment === "feeBurnQuantity" ? "fee_from_received" : feeTreatment,
           feeExchangeRateToBase: p.feeExchangeRateToBase,
         }
       : null,
@@ -72,8 +73,20 @@ export async function buyCrypto(input, { dataDir } = {}) {
       cashAccountId: cashId,
     },
   );
-  let carryingCost = amountInBase.plus(toDecimal(feeResult.carryingDeltaBase));
-  // fee_from_received: quantity already reduced via net = gross - fee in caller
+  // Capitalized fee in cost-currency units for the cost pool
+  let carryingInCostCurrency = cost;
+  if (feeTreatment === "capitalized_cost" && p.feeAmount != null && p.feeAmount !== "") {
+    const feeAmt = toDecimal(p.feeAmount);
+    const feeCurrency = p.feeCurrency || costCurrency;
+    if (feeCurrency === costCurrency) {
+      carryingInCostCurrency = carryingInCostCurrency.plus(feeAmt);
+    } else {
+      // convert fee → cost currency via base: fee/base * cost/base inverse
+      // fee_in_base / exchangeRateToBase = fee in cost currency when fee was converted to base with feeRate
+      const feeInBase = toDecimal(feeResult.carryingDeltaBase);
+      carryingInCostCurrency = carryingInCostCurrency.plus(feeInBase.div(exchangeRateToBase));
+    }
+  }
   const invId = scopedAccountId("crypto_inventory", baseCurrency);
   const networkId = p.networkId || p.network_identifier || null;
   const contractAddress = p.contractAddress || p.contract_address || null;
@@ -117,7 +130,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       amountInBase: amountInBase.toFixed(),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       feeTreatment,
-      carryingCost: carryingCost.toFixed(),
+      carryingCost: carryingInCostCurrency.toFixed(),
     },
     journalLines,
     domainResult: {
@@ -125,7 +138,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       holdingId,
       transactionId: txId,
       netQuantity: net.toFixed(),
-      carryingCost: carryingCost.toFixed(),
+      carryingCost: carryingInCostCurrency.toFixed(),
       networkId,
     },
     engineVersions: { crypto: "1.1.0", money: "1.0.0" },
@@ -133,7 +146,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       ensureLocalSettlementAccounts(db, costCurrency);
       ensureFeatureInventoryAccount(db, {
         featureKey: "crypto",
-        currency: baseCurrency,
+        currency: costCurrency,
         displayName: "Crypto investment",
       });
 
@@ -177,7 +190,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
       const qty = net.toFixed();
       if (holding) {
         const newQty = toDecimal(holding.quantity).plus(net);
-        const newCost = toDecimal(holding.total_invested || "0").plus(carryingCost);
+        const newCost = toDecimal(holding.total_invested || "0").plus(carryingInCostCurrency);
         db.prepare(
           `UPDATE inv_crypto_holdings SET quantity = ?, total_invested = ?, updated_at = ? WHERE id = ?`,
         ).run(newQty.toFixed(), newCost.toFixed(), now, holding.id);
@@ -193,7 +206,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
           networkId,
           p.instrumentId,
           qty,
-          carryingCost.toFixed(),
+          carryingInCostCurrency.toFixed(),
           costCurrency,
           now,
           now,

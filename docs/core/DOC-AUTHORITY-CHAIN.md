@@ -55,3 +55,7 @@ P0-FINAL-*, *-LOCKS.md, audit narratives **do not** create independent authority
 - docs/core/authority/FINAL-VERDICT-AND-GATES.md
 - docs/core/authority/DOCUMENTATION-READY.md
 - docs/core/authority/SCAFFOLD-FINAL-STATUS.md
+- docs/core/authority/STATUS-VOCABULARY-MAPPING.md
+- docs/core/authority/JOURNAL-ACCOUNT-CURRENCY.md
+- docs/core/authority/COST-POOL-MODEL.md
+- docs/core/authority/LOCAL-IRAN-V1-CURRENCY-POLICY.md

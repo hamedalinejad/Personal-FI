@@ -19,3 +19,8 @@ lineKind, memo, reference, source_type, source_reference
 - Multi-currency without base → reject  
 
 Persistence must not drop optional/canonical fields when provided.
+
+
+## Account currency lock
+
+See `authority/JOURNAL-ACCOUNT-CURRENCY.md` (binding).
