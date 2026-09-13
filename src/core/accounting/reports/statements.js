@@ -4,6 +4,7 @@
  */
 import { openDb } from "../../persistence/port.js";
 import { toDecimal, sumDecimalStrings } from "../../money/canonicalDecimal.js";
+import { getBookBaseCurrency } from "../bookSettings.js";
 
 export function generalLedger(dataDir, { accountId = null, fromDate = null, toDate = null } = {}) {
   const db = openDb(dataDir);
@@ -51,7 +52,7 @@ export function trialBalance(dataDir, { asOf = null, baseCurrency = null, bookBa
     sql += ` AND je.business_date <= ?`;
     params.push(asOf);
   }
-  const targetBase = bookBaseCurrency || baseCurrency;
+  const targetBase = bookBaseCurrency || baseCurrency || getBookBaseCurrency(dataDir);
   if (targetBase) {
     sql += ` AND fo.base_currency = ?`;
     params.push(targetBase);
