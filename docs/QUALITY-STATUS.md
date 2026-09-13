@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-6** API.md sole envelope/error/idempotency owner
+Cycle: **std-7** REPORTING.md sole statements/valuation owner
 Production: NO-GO
