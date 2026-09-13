@@ -1,22 +1,20 @@
 #!/usr/bin/env node
-import { readFileSync, existsSync } from "fs";
+import { existsSync } from "fs";
 import { join } from "path";
-
 const required = [
-  "docs/core/ARCHITECTURE-LOCKED.md",
-  "docs/core/GO-NO-GO.md",
-  "docs/core/IMPLEMENTATION-READY-INDEX.md",
-  "docs/core/IMPLEMENTATION-READY-LOAN-SLICE.md",
-  "docs/00-Product/Pages-IA.md",
+  "docs/PRODUCT.md",
+  "docs/ARCHITECTURE.md",
+  "docs/FINANCIAL-CORE.md",
+  "docs/DATA-MODEL.md",
+  "docs/API.md",
+  "docs/modules/loan.md",
   "docs/core/db/schema.sql",
-  "docs/core/db/SCHEMA-FREEZE-PROOF.md",
 ];
-let bad = false;
+let failed = false;
 for (const r of required) {
   if (!existsSync(join(process.cwd(), r))) {
     console.error("MISSING", r);
-    bad = true;
+    failed = true;
   }
 }
-if (bad) process.exit(1);
-console.log("docs-check-refs: OK");
+process.exit(failed ? 1 : 0);

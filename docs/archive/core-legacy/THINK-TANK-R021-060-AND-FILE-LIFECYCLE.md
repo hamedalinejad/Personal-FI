@@ -1,7 +1,0 @@
-# HISTORICAL — R-021…060 + file lifecycle notes
-
-Not live authority. Use:
-
-- `REQUIREMENTS-IMPLEMENTATION-ROADMAP.md`
-- `DOC-CONSOLIDATION-POLICY.md`
-- `DOC-AUTHORITY-CHAIN.md`

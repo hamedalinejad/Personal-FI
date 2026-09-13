@@ -45,3 +45,7 @@ schema.sql + manifest + field inventory with consumers.
 
 ## Money in tests
 Decimal / toDecimal only — never Number/parseFloat on money.
+
+
+## Module template (34 sections)
+Purpose · Scope · Non-Goals · User Stories · Pages · Entities · Fields · Field Kinds · Ownership · Commands · Queries · API In/Out · Normalization · Validation · State Machine · Accounting · Journal · Cash · Fee · Tax · FX · Dates · Identity · Reversal · Rebuild · Reports · Offline · Standalone · Licensing · Edge Cases · Errors · Golden/Recovery · Acceptance.

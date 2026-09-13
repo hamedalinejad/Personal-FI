@@ -1,5 +1,0 @@
-# STANDALONE-FUND
-
-**Accounts UI off.** LocalSettlementAdapter → journal SoT.
-
-Status: SPEC_READY.
