@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-14** modules/crypto.md expanded
+Cycle: **std-15** modules/stocks.md expanded
 Production: NO-GO

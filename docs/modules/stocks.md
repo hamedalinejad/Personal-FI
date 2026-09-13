@@ -1,5 +1,15 @@
 # Module: Stocks Iran
 
-Commands: buy, sell, settle, dividend.
-T+n: trade vs settlement dates distinct; settle supports buy payable and sell receivable.
-ISIN unique when present. CA runtime engine OPEN (GAP-015).
+**Owner:** this file
+
+## SUPPORTED
+buy · sell · settle (buy payable + sell receivable) · dividend · tradeDate ≠ settlementDate · T+n policy version field · ISIN unique when present · commission/tax as fee events.
+
+## OPEN / DEFERRED
+Full CA runtime engine (split/bonus/rights/…) · full holiday calendar · versioned commission policy table · complete investment reversal suite.
+
+## Cash
+Journal + broker payable/receivable accounts — not brokerage cash balance SoT.
+
+## Acceptance
+Settle outstanding from journal; no result_json for settlement detection.
