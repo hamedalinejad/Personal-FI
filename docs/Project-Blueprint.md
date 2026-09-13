@@ -1,3 +1,4 @@
+> **SUPERSEDED for product/architecture entry** — use PRODUCT.md + ARCHITECTURE.md. This blueprint is historical.
 # Project Blueprint
 
 ## Personal Finance & Investment Management System
