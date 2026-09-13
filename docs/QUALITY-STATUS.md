@@ -1,11 +1,8 @@
-# Quality Status
-
-Updated: 2026-09-13 cycle-3
+# Quality Status — cycle-4
 
 | Item | Status |
 |------|--------|
-| Loan frequency unsupported reject | FIXED |
-| ARCHITECTURE.md owner | ADDED |
-| modules/loan.md | ADDED |
-| integrity:audit in gates | WIRED |
+| API/REPORTING/OFFLINE/DEVELOPMENT owners | ADDED |
+| modules crypto/stocks | ADDED |
+| Doc consolidation | IN PROGRESS (no micro-spec spam) |
 | Production | NO-GO |
