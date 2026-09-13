@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-22** modules/accounts.md expanded
+Cycle: **std-23** modules/physical-assets.md expanded
 Production: NO-GO
