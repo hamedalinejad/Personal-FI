@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-15** modules/stocks.md expanded
+Cycle: **std-16** modules/funds.md expanded
 Production: NO-GO
