@@ -15,6 +15,6 @@ docs/core/registry/**	machine	OFFLINE-RELEASE	GENERATED	KEEP
 docs/core/fixtures/**	machine	OFFLINE-RELEASE	GENERATED	KEEP
 fixtures/**	machine	—	GENERATED	KEEP
 docs/Product-Map-*.md	legacy	PRODUCT	MERGE	DELETE_IF_ZERO_REF
-docs/Technical-Architecture.md	legacy	ARCHITECTURE	MERGE	DELETE_IF_ZERO_REF
-docs/API-Reference.md	legacy	API	MERGE	DELETE_IF_ZERO_REF
+docs/ARCHITECTURE.md	legacy	ARCHITECTURE	MERGE	DELETE_IF_ZERO_REF
+docs/API.md	legacy	API	MERGE	DELETE_IF_ZERO_REF
 docs/features/**	legacy	modules	ARCHIVE	KEEP_BANNER

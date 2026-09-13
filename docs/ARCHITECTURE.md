@@ -2,7 +2,7 @@
 
 **Status:** CURRENT · **Class:** CURRENT
 
-Sole architecture authority. Absorbs Technical-Architecture.md, ARCHITECTURE-LOCKED.md, Module-Architecture, Layer-Separation, Domain-Dependency prose as **non-authoritative** after merge.
+Sole architecture authority. Absorbs ARCHITECTURE.md, ARCHITECTURE-LOCKED.md, Module-Architecture, Layer-Separation, Domain-Dependency prose as **non-authoritative** after merge.
 
 ## 1. Layer stack
 ```
@@ -91,7 +91,7 @@ UI          →  features/*/public-api only
 **Cash is derived from Core journal truth.** Feature balances are projections.
 
 ## 13. Supersedes
-`Technical-Architecture.md`, `docs/core/ARCHITECTURE-LOCKED.md`, and similar — **MERGE pointers only**.
+`ARCHITECTURE.md`, `docs/core/ARCHITECTURE-LOCKED.md`, and similar — **MERGE pointers only**.
 
 
 ## 14. Anti-patterns (forbidden)

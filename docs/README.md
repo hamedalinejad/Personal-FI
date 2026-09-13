@@ -1,19 +1,43 @@
 # Personal-FI Documentation
 
-## Start here (CURRENT owners)
-1. [PRODUCT.md](./PRODUCT.md)
-2. [ARCHITECTURE.md](./ARCHITECTURE.md)
-3. [FINANCIAL-CORE.md](./FINANCIAL-CORE.md)
-4. [DATA-MODEL.md](./DATA-MODEL.md)
-5. [API.md](./API.md)
-6. [REPORTING.md](./REPORTING.md)
-7. [OFFLINE-RELEASE.md](./OFFLINE-RELEASE.md)
-8. [DEVELOPMENT.md](./DEVELOPMENT.md)
-9. [modules/](./modules/) — feature owners
-10. [QUALITY-STATUS.md](./QUALITY-STATUS.md) — live gates only
+**One entry path. No archaeology.**
 
-## Process
-[DOCUMENTATION-STANDARD.md](./DOCUMENTATION-STANDARD.md) · [FILE-CLASSIFICATION.md](./FILE-CLASSIFICATION.md) · [MODULE-TEMPLATE.md](./MODULE-TEMPLATE.md)
+## Coding handoff chain
+```
+PRODUCT
+ → ARCHITECTURE
+ → FINANCIAL-CORE
+ → DATA-MODEL
+ → API
+ → REPORTING
+ → OFFLINE-RELEASE
+ → DEVELOPMENT
+ → modules/<feature>.md
+ → schema (docs/core/db/schema.sql)
+ → fixtures
+ → tests
+```
 
-## Legacy
-Files marked MERGE are **pointers only**. `docs/core/**` micro-docs are being absorbed; do not treat as competing authority.
+## Global owners (8)
+| Doc | Question |
+|------|----------|
+| [PRODUCT.md](./PRODUCT.md) | What is the product? |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | How is the system layered? |
+| [FINANCIAL-CORE.md](./FINANCIAL-CORE.md) | What is the financial rule? |
+| [DATA-MODEL.md](./DATA-MODEL.md) | What are the fields / identities? |
+| [API.md](./API.md) | What is the API? |
+| [REPORTING.md](./REPORTING.md) | What is the report rule? |
+| [OFFLINE-RELEASE.md](./OFFLINE-RELEASE.md) | Offline, recovery, release proof? |
+| [DEVELOPMENT.md](./DEVELOPMENT.md) | How do I change the repo? |
+
+## Modules (11)
+[modules/](./modules/) — one human-facing spec per feature.
+
+## Machine (not prose authority)
+`docs/core/db/` · `docs/core/registry/` · `docs/core/fixtures/` · `/fixtures` · tests
+
+## History
+[archive/AUDIT-HISTORY.md](./archive/AUDIT-HISTORY.md) only. Full text in git.
+
+## Live gates
+[QUALITY-STATUS.md](./QUALITY-STATUS.md)

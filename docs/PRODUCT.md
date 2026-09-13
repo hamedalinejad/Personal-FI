@@ -2,7 +2,7 @@
 
 **Status:** CURRENT · **Class:** CURRENT
 
-Sole product authority. Absorbs Product-Map-EN/FA, Project-Blueprint product sections, Pages-IA navigation rules.
+Sole product authority. Absorbs PRODUCT/FA, Project-Blueprint product sections, Pages-IA navigation rules.
 
 ## 1. Vision
 Build an **offline-first** personal finance application for individuals: accurate double-entry accounting, Iran-aware market rules, and **licensable feature editions** (loan-only, crypto-only, etc.) on the same Financial Core.
@@ -19,7 +19,7 @@ Not target: enterprise multi-entity ERP, broker OMS, HFT, cloud-primary multi-te
 3. **Journal is cash truth** — no parallel feature cash ledgers as SoT.
 4. **Decimal-string money** — no IEEE float for money/qty/rates.
 5. **License gates capability only** — never deletes or corrupts history.
-6. **One owner document per concept** — see DOCUMENTATION-STANDARD.md / DEVELOPMENT.md.
+6. **One owner document per concept** — see DEVELOPMENT.md / DEVELOPMENT.md.
 7. **Offline-first** — network enhances prices/FX/import; correctness does not depend on live APIs.
 
 ## 4. Scope v1
@@ -85,8 +85,8 @@ Preserve raw lineage (`import_batches`, provenance fields). No silent field drop
 Product UX labels may be localized. Canonical technical terms live in FINANCIAL-CORE, DATA-MODEL, API — modules must not invent parallel vocabularies.
 
 ## 15. Supersedes (MERGE complete for product prose)
-- `docs/Product-Map-EN.md` / `Product-Map-FA.md` → pointers only
-- `docs/Project-Blueprint.md` product sections
+- `docs/PRODUCT.md` / `PRODUCT.md` → pointers only
+- `docs/PRODUCT.md` product sections
 - `docs/00-Product/Pages-IA.md` nav rules (if present)
 
 ## 16. Non-product owners

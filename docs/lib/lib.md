@@ -30,7 +30,7 @@ lib/
 | `dayjs.ts` | فعال‌سازی `jalali` plugin، تنظیم locale فارسی، export یک instance پیکربندی‌شده | هرجا dayjs لازم است، از این فایل import شود نه از `dayjs` مستقیم |
 | `zod.ts` | Schemaهای مشترک Zod که در چند فیچر استفاده می‌شوند (مثلاً schema UUID، schema مبلغ Decimal) | فقط Schema مشترک؛ Schema‌های اختصاصی هر فیچر داخل خود فیچر بمانند |
 | `constants.ts` | ثابت‌های سراسری: نام اپ، شماره نسخه (`APP_VERSION`)، حداقل اندازه Batch دریافت قیمت، و هر enum ثابت UI که در بیش از یک فیچر استفاده می‌شود | `APP_VERSION` باید با `package.json > version` هماهنگ باشد (یا مستقیم از آن خوانده شود) |
-| `env.ts` | خواندن type-safe متغیرهای محیطی Vite (`import.meta.env.*`) با مقادیر پیش‌فرض صریح؛ هرجا نیاز به env var هست از این فایل import شود | در production هیچ env var حساسی (API key و ...) در بسته نهایی Vite compile نشود — به «سیاست دسترسی به شبکه» در `Technical-Architecture.md` مراجعه کنید |
+| `env.ts` | خواندن type-safe متغیرهای محیطی Vite (`import.meta.env.*`) با مقادیر پیش‌فرض صریح؛ هرجا نیاز به env var هست از این فایل import شود | در production هیچ env var حساسی (API key و ...) در بسته نهایی Vite compile نشود — به «سیاست دسترسی به شبکه» در `ARCHITECTURE.md` مراجعه کنید |
 
 ---
 

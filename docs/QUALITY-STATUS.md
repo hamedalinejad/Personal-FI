@@ -1,16 +1,26 @@
 # QUALITY-STATUS (live only)
 
-**Updated:** 2026-09-13
+**Updated:** 2026-09-13 · **Milestone:** docs(std-final)
 
-| Gate | Status |
-|------|--------|
-| Owner docs complete absorption pass | **YES (wave)** |
-| Modules template | YES |
-| Legacy authority active | **NO** (archive/MERGE) |
-| Machine artifacts | KEPT |
-| Production | **NO-GO** |
-| Documentation Standardized | **~95%** |
-| Comment ticket cleanup | in progress |
-| npm gates | run on CI/dev |
+| Layer | Status |
+|-------|--------|
+| Documentation Standardized | **COMPLETE for owner hierarchy** |
+| Dual normative owners | **NONE intended** |
+| MERGE stubs (Product-Map, etc.) | **REMOVED** |
+| Machine artifacts | **KEPT** |
+| Implementation (overall) | PARTIAL / per feature |
+| Golden / Recovery / Standalone | PARTIAL / OPEN |
+| Release | **NO_GO** |
 
-Completion remaining: zero-ref DELETE of MERGE stubs; TBD cells for unimplemented commands; RELEASE_PROVEN evidence.
+### Feature proof snapshot (summary)
+| Feature | Implementation | Golden | Recovery | Standalone | Release |
+|---------|----------------|--------|----------|------------|---------|
+| Loan | IMPLEMENTED | PARTIAL | OPEN | OPEN | NO_GO |
+| Crypto | IMPLEMENTED (subset) | PARTIAL | OPEN | OPEN | NO_GO |
+| Stocks | IMPLEMENTED (subset) | PARTIAL | OPEN | OPEN | NO_GO |
+| Funds | IMPLEMENTED (subset) | PARTIAL | OPEN | OPEN | NO_GO |
+| Metals | IMPLEMENTED (subset) | PARTIAL | OPEN | OPEN | NO_GO |
+| Accounts / others | SCAFFOLD–PARTIAL | OPEN | OPEN | OPEN | NO_GO |
+
+**Next phase:** software engineering — Code → Test → Fix → Owner update when needed → Release proof.  
+**No further global documentation audit.**
