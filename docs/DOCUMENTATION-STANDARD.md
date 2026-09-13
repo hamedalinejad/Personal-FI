@@ -156,3 +156,13 @@ Feature-only behavior using the 34-section template in DEVELOPMENT.md.
 - Generated docs cannot define business semantics
 - Bug IDs cannot become permanent requirements
 - Audit result → code change, test, owner-doc only if contract changed, quality status
+
+
+## Final change cycle (locked)
+```
+FEATURE → OWNER DOCUMENT → CODE → TEST → FIXTURE/PROOF → QUALITY STATUS → COMMIT
+```
+Forbidden: AUDIT → BUG DOC → FIX DOC → NEW MATRIX → NEW FINAL AUDIT.
+
+## Vertical reference
+`modules/loan.md` is the practical 34-section template reference for other modules.

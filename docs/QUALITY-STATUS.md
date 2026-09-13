@@ -1,12 +1,33 @@
 # QUALITY-STATUS
 
-Live gates only. Not a requirements catalog.
+Live only. Not a requirements catalog.
 
 | ID | Area | Status | Owner | Test | Commit |
 |----|------|--------|-------|------|--------|
-| DOC-TREE | Documentation surface | ALIGNED | DOCUMENTATION-STANDARD | docs:validate | 9256dbb+ |
-| DOC-STD | Structure authority file | LOCKED | DOCUMENTATION-STANDARD | exists | 9256dbb+ |
-| REL | Production release | NO_GO | OFFLINE-RELEASE | — | — |
-| TST | Core+feature suite | GREEN | DEVELOPMENT | npm test | — |
+| DOC-STD | DOCUMENTATION-STANDARD | LOCKED | DOCUMENTATION-STANDARD | docs:validate | 78bb737+ |
+| DOC-TREE | One owner / no dual human core | TRUE | DOCUMENTATION-STANDARD | inventory | 78bb737+ |
+| FIX-LOAN | Duplicate LOAN-FLAT removed | TRUE | fixtures | loan-flat-fixture | 78bb737 |
+| ACC-TAX | Acceptance capability names | TRUE | DEVELOPMENT | npm test | 78bb737 |
+| LOAN-REF | modules/loan.md vertical template | TRUE | modules/loan | — | this |
+| REL | Production release | **NO_GO** | OFFLINE-RELEASE | — | — |
+| TST | Suite | GREEN | DEVELOPMENT | npm test | — |
 
-Detail and history: Git. Contracts: owner docs.
+### Documentation standardization DoD
+```
+[x] DOCUMENTATION-STANDARD.md exists
+[x] One owner map (STANDARD + DEVELOPMENT)
+[x] No competing human contracts under docs/core
+[x] Bug/Audit micro-docs gone from active docs
+[x] Module template shared (DEVELOPMENT §)
+[x] All 11 modules exist
+[x] Machine files remain
+[x] Duplicate LOAN-FLAT removed
+[x] Bug-named acceptance consolidated
+[x] package test globs deduped
+[x] docs validator passes
+[ ] Full gates (run on CI/dev machine: npm run gates)
+[ ] RELEASE_PROVEN
+```
+
+**Cycle locked:** FEATURE → OWNER DOC → CODE → TEST → FIXTURE → QUALITY → COMMIT  
+**Forbidden cycle:** AUDIT → BUG DOC → MATRIX → FINAL AUDIT loop
