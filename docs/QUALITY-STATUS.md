@@ -8,6 +8,7 @@ Live only. Not a requirements catalog.
 | DOC-TREE | One owner / no dual human core | TRUE | DOCUMENTATION-STANDARD | inventory | 78bb737+ |
 | FIX-LOAN | Duplicate LOAN-FLAT removed | TRUE | fixtures | loan-flat-fixture | 78bb737 |
 | ACC-TAX | Acceptance capability names | TRUE | DEVELOPMENT | npm test | 78bb737 |
+| MOD-11 | All 11 modules 34-section | TRUE | modules/* | — | this |
 | LOAN-REF | modules/loan.md vertical template | TRUE | modules/loan | — | this |
 | REL | Production release | **NO_GO** | OFFLINE-RELEASE | — | — |
 | TST | Suite | GREEN | DEVELOPMENT | npm test | — |
@@ -25,6 +26,7 @@ Live only. Not a requirements catalog.
 [x] Bug-named acceptance consolidated
 [x] package test globs deduped
 [x] docs validator passes
+[x] Module docs complete (34-section)
 [ ] Full gates (run on CI/dev machine: npm run gates)
 [ ] RELEASE_PROVEN
 ```

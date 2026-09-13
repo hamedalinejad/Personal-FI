@@ -1,154 +1,106 @@
-# Funds (module owner)
+# Funds
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Fund units subscribe/redeem/distribution with NAV vs transaction price.
+Fund subscribe/redeem with NAV ≠ transaction price discipline.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-subscribe, redeem, distribution; account-scoped holdings.
+## 3. Supported v1 behavior
+subscribe · redeem · distribution (as implemented) · units + amount consistency
 
-## 3. Non-Goals
+## 4. Unsupported / Deferred behavior
+NAV as transaction price · silent fee path without Fee Engine when claimed integrated
 
-Infer liquidationPrice from NAV.
+## 5. Actors / roles
+End user (book owner).
 
-## 4. User Stories
+## 6. UI pages
+Primary surface under product IA for Funds.
 
-N/A / DEFERRED — do not invent.\n
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-## 5. Pages / Sheets / Drawers
+## 8. Entities
+inv_fif_* / fund holdings & transactions · journal
 
-N/A / DEFERRED — do not invent.\n
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-## 6. Entities
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-N/A / DEFERRED — do not invent.\n
+## 11. Commands
+fund.subscribe · redeem · distribute
 
-## 7. Fields
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-NAV, transactionPrice, liquidationPrice (optional explicit), units, amount.
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-## 8. Field Kinds
-
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-N/A / DEFERRED — do not invent.\n
-
-## 10. Commands
-
-fund.subscribe, redeem, distribution.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A / DEFERRED — do not invent.\n
+## 16. Money / quantity semantics
+units decimal; amount and transactionPrice consistency checks
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-N/A / DEFERRED — do not invent.\n
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-N/A / DEFERRED — do not invent.\n
+## 20. Accounting / journal mapping
+All statement effects via Core journal.
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Cost basis on units; NAV for valuation only
 
-Inventory vs cash/settlement.
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-CashSettlementPort; ETF cash same port as stocks — no second cash ledger.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-Via Fee Engine when status claims integration.
-
-## 21. Tax Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-N/A / DEFERRED — do not invent.\n
-
-## 24. Identity
-
-instrumentId + account/portfolio scope.
-
-## 25. Reversal / Correction
-
-N/A / DEFERRED — do not invent.\n
-
-## 26. Rebuild
-
-Holdings from transactions.
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-N/A / DEFERRED — do not invent.\n
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-Funds-only + Core.
+## 32. Fixtures
+FUND-* fixtures · STANDALONE-FUND
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/funds/tests
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-FUND-* marked DEFERRED if empty expected.
-
-## 34. Acceptance Criteria
-
-NAV ≠ transactionPrice enforced; amount consistency checks.
-
-### Extra edge
-Reject subscribe when amount and units×transactionPrice inconsistent beyond tolerance 0.
-
-## Price fields matrix
-| Field | Use in subscribe | Use in valuation |
-|-------|------------------|------------------|
-| transactionPrice | YES execution | NO |
-| NAV | optional check | YES |
-| liquidationPrice | only if explicit | optional explicit |
-
-## Redeem
-Units out; cash in via CashSettlementPort; transactionPrice for execution; NAV optional audit field.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

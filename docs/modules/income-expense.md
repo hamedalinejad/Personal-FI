@@ -1,147 +1,106 @@
-# Income and Expense (module owner)
+# Income / Expense
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Income and expense operations with categories.
+Record income and expense events with categories; journal posts to Core.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-create/reverse income and expense; category assignment.
+## 3. Supported v1 behavior
+Income · expense · categories · optional recurring link to bills (planning only)
 
-## 3. Non-Goals
+## 4. Unsupported / Deferred behavior
+Using projections as cash truth · silent tax
 
-N/A / DEFERRED — do not invent.\n
+## 5. Actors / roles
+End user (book owner).
 
-## 4. User Stories
+## 6. UI pages
+Primary surface under product IA for Income / Expense.
 
-N/A / DEFERRED — do not invent.\n
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-## 5. Pages / Sheets / Drawers
+## 8. Entities
+inc_* / exp_* domain rows + fin_operations/journal
 
-N/A / DEFERRED — do not invent.\n
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-## 6. Entities
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-inc_transactions, exp_transactions, cat_categories.
+## 11. Commands
+income.create · expense.create · reverse (as implemented)
 
-## 7. Fields
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-N/A / DEFERRED — do not invent.\n
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-## 8. Field Kinds
-
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-N/A / DEFERRED — do not invent.\n
-
-## 10. Commands
-
-income.create/reverse, expense.create/reverse.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A / DEFERRED — do not invent.\n
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-N/A / DEFERRED — do not invent.\n
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-N/A / DEFERRED — do not invent.\n
+## 20. Accounting / journal mapping
+Dr/Cr per category and cash settlement accounts via Core
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-N/A / DEFERRED — do not invent.\n
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-Settlement via CashSettlementPort.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-N/A / DEFERRED — do not invent.\n
-
-## 21. Tax Effects
-
-Optional tax_event; feeTax ≠ tax liability.
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-N/A / DEFERRED — do not invent.\n
-
-## 24. Identity
-
-N/A / DEFERRED — do not invent.\n
-
-## 25. Reversal / Correction
-
-Linked reverse operations.
-
-## 26. Rebuild
-
-N/A / DEFERRED — do not invent.\n
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+P&L via REPORTING; category activity queries
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-N/A / DEFERRED — do not invent.\n
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-N/A / DEFERRED — do not invent.\n
+## 32. Fixtures
+fixtures/ and feature tests.
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/<name>/tests + acceptance as applicable.
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-N/A / DEFERRED — do not invent.\n
-
-## 34. Acceptance Criteria
-
-Balanced journal; category optional per policy.
-
-## Category rules
-Categories via cat_categories; optional on post per policy. Recurring templates (inc_recurring/exp_recurring) generate drafts — never auto-post journal without user/operation.
-
-## Reverse
-Creates reversing operation linked to original; projections update; journal balanced inverse.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

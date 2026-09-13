@@ -1,164 +1,112 @@
-# Cheque (module owner)
+# Cheque
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Cheque instruments with lifecycle and cash impact only on defined transitions.
+Cheque lifecycle with journal/cash impact on clear/bounce transitions.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-Issue, receive, deposit, clear, bounce, cancel, return.
+## 3. Supported v1 behavior
+| State | Meaning |
+|-------|--------|
+| issued/received | registered |
+| deposited | in transit |
+| cleared | cash effect |
+| bounced/cancelled/returned | explicit transitions |
 
-## 3. Non-Goals
 
-Central bank cheque clearing network integration.
+## 4. Unsupported / Deferred behavior
+Implicit clear without operation · balance without journal
 
-## 4. User Stories
+## 5. Actors / roles
+End user (book owner).
 
-N/A / DEFERRED — do not invent.\n
+## 6. UI pages
+Primary surface under product IA for Cheque.
 
-## 5. Pages / Sheets / Drawers
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-N/A / DEFERRED — do not invent.\n
+## 8. Entities
+Feature tables + Core fin_operations / journal.
 
-## 6. Entities
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-cheque rows + operation_id links.
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-## 7. Fields
+## 11. Commands
+cheque.register · deposit · clear · bounce · cancel (as implemented)
 
-N/A / DEFERRED — do not invent.\n
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-## 8. Field Kinds
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-N/A / DEFERRED — do not invent.\n
-
-## 10. Commands
-
-cheque.issue, receive, deposit, clear, bounce, cancel, return.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+issued/received → deposited → cleared | bounced | cancelled | returned
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A / DEFERRED — do not invent.\n
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-issued|received → deposited → cleared | bounced; cancel/return branches.
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-Receivable/payable or cash per transition matrix.
+## 20. Accounting / journal mapping
+Clear/bounce create Core operations; cash only via journal
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-Only through operation engine.
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-Journal impact on clear (and bounce rules); not on mere issue if policy holds.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-N/A / DEFERRED — do not invent.\n
-
-## 21. Tax Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-issueDate, dueDate, clearDate distinct.
-
-## 24. Identity
-
-cheque id + account/party references.
-
-## 25. Reversal / Correction
-
-Reverse clear via operation reversal.
-
-## 26. Rebuild
-
-N/A / DEFERRED — do not invent.\n
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-Offline lifecycle updates.
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-With Accounts/Core.
+## 32. Fixtures
+fixtures/ and feature tests.
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/<name>/tests + acceptance as applicable.
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-DEFERRED until filled.
-
-## 34. Acceptance Criteria
-
-Illegal transition rejected; clear posts balanced journal.
-
-### Extra edge
-Bounce after clear requires reversal path not silent status overwrite.
-
-## Transition matrix (normative)
-
-| From | To | Journal? |
-|------|-----|----------|
-| (new) | issued | policy-dependent |
-| (new) | received | policy-dependent |
-| issued/received | deposited | optional hold |
-| deposited | cleared | YES cash/settlement |
-| deposited | bounced | YES reverse hold / expense policy |
-| * | cancelled | if uncleared, no cash or reverse |
-| * | returned | documented path |
-
-Illegal transitions → CHEQUE_INVALID_TRANSITION.
-
-## Clear operation
-Atomic: status→cleared + journal legs + operationId. Failure rolls back both.
-
-## Bounce
-If prior clear posted, bounce requires reversal operation first or combined reversing entry — no silent OHLC-style overwrite of cash.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

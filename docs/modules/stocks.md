@@ -1,180 +1,112 @@
-# Stocks Iran (module owner)
+# Stocks (Iran)
 
-**Status:** CURRENT
-
-Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Iran equity trades with T+n settlement, dividends, corporate actions path.
+Iran equity trades with tradeDate vs settlementDate separation.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-buy, sell, settle, dividend; CA versioned events.
-
-## 3. Non-Goals
-
-Non-Iran multi-exchange OMS.
-
-## 4. User Stories
-
-N/A or DEFERRED — do not invent.
-
-
-## 5. Pages / Sheets / Drawers
-
-N/A or DEFERRED — do not invent.
+## 3. Supported v1 behavior
+| Item | Rule |
+|------|------|
+| buy/sell | implemented |
+| settle | T+n payable/receivable |
+| dividend | income journal |
+| dates | trade ≠ settlement ≠ cash |
 
 
-## 6. Entities
+## 4. Unsupported / Deferred behavior
+T+0 cash as if settled when settlement future · corporate actions full set until specified
 
-inv_stocks_* holdings/transactions, broker payable accounts.
+## 5. Actors / roles
+End user (book owner).
 
-## 7. Fields
+## 6. UI pages
+Primary surface under product IA for Stocks (Iran).
 
-N/A or DEFERRED — do not invent.
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
+## 8. Entities
+inv_stocks_* · brokerage scope · journal
 
-## 8. Field Kinds
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-N/A or DEFERRED — do not invent.
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
+## 11. Commands
+stocks.buy · sell · settle · dividend
 
-## 9. Field Ownership
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-N/A or DEFERRED — do not invent.
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-
-## 10. Commands
-
-stocks.buy, sell, settle, dividend.
-
-## 11. Queries
-
-N/A or DEFERRED — do not invent.
-
-
-## 12. API Input
-
-N/A or DEFERRED — do not invent.
-
-
-## 13. API Output
-
-N/A or DEFERRED — do not invent.
-
-
-## 14. Normalization
-
-N/A or DEFERRED — do not invent.
-
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A or DEFERRED — do not invent.
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-## 16. State Machine
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-Order intent → posted trade → open payable → settled.
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-## 17. Accounting Effects
+## 20. Accounting / journal mapping
+Trade: inventory vs payable; Settle: payable vs cash (FINANCIAL-CORE settlement)
 
-N/A or DEFERRED — do not invent.
+## 21. Cost basis / valuation
+WAC on disposal; valuation asOf
 
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 18. Journal Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-N/A or DEFERRED — do not invent.
+## 24. Idempotency
+operationId idempotency.
 
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-## 19. Cash Effects
-
-T+0: Dr stock / Cr payable; settle: Dr payable / Cr cash.
-
-## 20. Fee Effects
-
-Commission as fee event; tax withhold separate from feeTax confusion.
-
-## 21. Tax Effects
-
-Dividend withholding as tax_event optional.
-
-## 22. FX Effects
-
-N/A or DEFERRED — do not invent.
-
-
-## 23. Date Semantics
-
-tradeDate ≠ settlementDate ≠ businessDate ≠ marketDate. Position on tradeDate; cash on settlementDate.
-
-## 24. Identity
-
-instrumentId + brokerage/account scope.
-
-## 25. Reversal / Correction
-
-Reversal operation linked; CA reverse policy versioned.
-
-## 26. Rebuild
-
-N/A or DEFERRED — do not invent.
-
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-N/A or DEFERRED — do not invent.
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-## 28. Offline Behavior
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-Posted trades offline; prices may be stale flagged.
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-## 29. Standalone Edition
+## 32. Fixtures
+STANDALONE-STOCKS · stock-related fixtures
 
-Stocks-only edition + Core.
+## 33. Tests / proof
+src/features/stocks/tests
 
-## 30. Licensing / Capabilities
-
-N/A or DEFERRED — do not invent.
-
-
-## 31. Edge Cases
-
-N/A or DEFERRED — do not invent.
-
-
-## 32. Errors
-
-N/A or DEFERRED — do not invent.
-
-
-## 33. Golden / Recovery Fixtures
-
-STOCK-* fixtures; empty = DEFERRED.
-
-## 34. Acceptance Criteria
-
-settle clears payable; CA single event id; no tradeDate overwrite of settlementDate.
-
-### Extra edge
-Weekend/holiday settlement uses Iran business calendar policy version when implemented.
-
-## T+n journal pattern
-
-**Trade (T+0):**
-- Dr Stock inventory (transaction currency / base as policy)
-- Cr Broker payable
-
-**Settle (T+n):**
-- Dr Broker payable
-- Cr Cash / settlement account
-
-Dividend: income recognition + optional tax withhold leg.
-
-## Corporate action event
-Single ca_event_id, effective_date, ratio/qty effect, cost_basis_policy_version, operation_id when posted, reversal policy.
-
-## Dividend
-Cash or reinvest policy; withhold tax as separate leg/event; does not mutate past trade prices.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

@@ -1,159 +1,112 @@
-# Crypto (module owner)
+# Crypto
 
-**Status:** CURRENT
-
-Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Crypto acquisition, disposal, transfer with dimensional fees and venue-scoped holdings.
+Crypto holdings and trades with venue/network scope; cash via CashSettlementPort.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-buy, sell, transfer; economic_kind discrimination; network metadata.
+## 3. Supported v1 behavior
+| Item | Rule |
+|------|------|
+| buy/sell/transfer | implemented subset |
+| fee | cash or asset (feeFundingKind) |
+| identity | instrumentId + venue/network |
+| holding | rebuildable from transactions |
 
-## 3. Non-Goals
 
-On-chain indexer, DeFi LP, NFT.
+## 4. Unsupported / Deferred behavior
+Ghost exchange cash ledgers · provider symbol as instrument identity · full C2C without economic_kind
 
-## 4. User Stories
+## 5. Actors / roles
+End user (book owner).
 
-Buy BTC with IRR/USDT fee; transfer exchange→wallet without taxable disposal when internal.
+## 6. UI pages
+Primary surface under product IA for Crypto.
 
-## 5. Pages / Sheets / Drawers
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-Under /investments; buy/sell/transfer sheets.
+## 8. Entities
+inv_crypto_* · ref_instruments · journal
 
-## 6. Entities
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-inv_crypto_holdings, inv_crypto_transactions, ref_instruments, fee legs via Core.
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-## 7. Fields
+## 11. Commands
+crypto.buy · sell · transfer (scope per public-api)
 
-quantity, total_invested, cost_currency, networkId, contractAddress, feeAmount, feeCurrency, feeInstrumentId, feeFundingKind, economic_kind.
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-## 8. Field Kinds
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-qty/price RAW; total_invested DERIVED/rebuildable; provider symbol LABEL/EXTERNAL only.
-
-## 9. Field Ownership
-
-Feature owns crypto tables; journal owned by Core.
-
-## 10. Commands
-
-crypto.buy, crypto.sell, crypto.transfer. swap/bridge: document as OPEN if not implemented.
-
-## 11. Queries
-
-listHoldings, getTransaction, listTransactions.
-
-## 12. API Input
-
-operationId, businessDate, instrument, qty, price, fees as decimal strings.
-
-## 13. API Output
-
-Canonical envelope + domainResult holding/tx ids.
-
-## 14. Normalization
-
-Decimal strings; instrument resolve via Core identity.
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-Reject missing purity-equivalent N/A; reject fee without funding kind; currency match.
+## 16. Money / quantity semantics
+Quantity decimal; fee qty separate from gross/net
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-Holdings rebuild from txs; no parallel cash balance SoT.
+## 18. Fee behavior
+Fee Engine; fee_from_received vs cash fee
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-Inventory asset vs cash/settlement per buy/sell.
+## 20. Accounting / journal mapping
+All statement effects via Core journal.
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+WAC/cost in costCurrency; valuation via price_history asOf
 
-Balanced legs via operation engine.
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-CashSettlementPort only — no inv_*_cash ledger SoT.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-cash|asset funding; conservation on qty when asset fee.
-
-## 21. Tax Effects
-
-Optional tax_event link on disposal; not automatic legal tax.
-
-## 22. FX Effects
-
-exchangeRateToBase locked on post.
-
-## 23. Date Semantics
-
-businessDate required; eventAt optional.
-
-## 24. Identity
-
-instrumentId + venue/network; never symbol alone.
-
-## 25. Reversal / Correction
-
-reverse operation; no in-place mutation of posted amounts.
-
-## 26. Rebuild
-
-Holdings from transaction ledger + cost-basis engine version.
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-Via REPORTING investment performance.
+## 28. Standalone edition behavior
+Crypto-only edition + local settlement
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-Full offline post when data local.
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-Crypto-only + Core journal + local settlement.
+## 32. Fixtures
+fixtures/CRYPTO-* · STANDALONE-CRYPTO.json
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/crypto/tests · recovery-roundtrip
 
-License disables commands only.
-
-## 31. Edge Cases
-
-Dust qty; fee > proceeds policy explicit reject/allow.
-
-## 32. Errors
-
-CRYPTO_* / OP_* / INV_JOURNAL_*.
-
-## 33. Golden / Recovery Fixtures
-
-fixtures/CRYPTO-*; DEFERRED marked until filled.
-
-## 34. Acceptance Criteria
-
-Gate-H field survival; no feature cash table as SoT; fee dimensions persisted.
-
-### Extra edge
-Asset fee reduces qty; cost basis feeCarrying derived not caller-trusted float.
-
-## economic_kind matrix
-| kind | Taxable disposal? | Cost basis |
-|------|-------------------|------------|
-| acquisition | no | opens lot/WAC |
-| disposal | yes (policy) | reduces |
-| transfer_internal | no | carry |
-| swap_economic | yes legs | dispose+acquire |
-| fee | per funding | qty or cash |
-
-## Transfer vs bridge
-Internal transfer: same economic owner, carry cost. Bridge: may be transfer_internal or swap_economic per venue policy — explicit economic_kind required.
-
-## Sell
-disposal economic_kind; WAC/qty reduce; proceeds via settlement; fees dimensional.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

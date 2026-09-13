@@ -1,154 +1,114 @@
-# Metals (module owner)
+# Metals
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Bullion and coin metals with purity snapshot and physical delivery.
+Bullion/coin metals with purity, fine weight, premium/fee separation, delivery.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-buy, sell, delivery; premium and trade fee vs delivery fee.
+## 3. Supported v1 behavior
+| Item | Rule |
+|------|------|
+| quantityMg | canonical mass |
+| purityRatio | required unless fixed_1 policy |
+| fineWeight | DERIVED = qty × purity |
+| premium vs fee | separate |
+| delivery fee | ≠ trade fee; not auto-capitalize unless policy |
+| gold_coin | own instrument identity |
 
-## 3. Non-Goals
 
-Derive coin valuation from fine-weight unless analytical mode explicit.
+## 4. Unsupported / Deferred behavior
+Default purity=1 on non-pure · mixing coin with bullion price blindly
 
-## 4. User Stories
+## 5. Actors / roles
+End user (book owner).
 
-N/A / DEFERRED — do not invent.\n
+## 6. UI pages
+Primary surface under product IA for Metals.
 
-## 5. Pages / Sheets / Drawers
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-N/A / DEFERRED — do not invent.\n
+## 8. Entities
+inv_metals_* · platform scope · journal
 
-## 6. Entities
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-N/A / DEFERRED — do not invent.\n
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-## 7. Fields
+## 11. Commands
+metals.buy · sell · delivery
 
-quantityMg RAW, purityRatio RAW, fineWeightMg DERIVED, premium, fees.
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-## 8. Field Kinds
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-N/A / DEFERRED — do not invent.\n
-
-## 10. Commands
-
-metals.buy, sell, delivery.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-Missing purity reject unless instrument fixed_1 pure policy.
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-N/A / DEFERRED — do not invent.\n
+## 18. Fee behavior
+Premium often capitalized_cost; trade fee expense unless policy says otherwise
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-N/A / DEFERRED — do not invent.\n
+## 20. Accounting / journal mapping
+All statement effects via Core journal.
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-Inventory asset vs cash; delivery moves carrying to physical asset.
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-CashSettlementPort; platform cashBalance projection only.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-Trade fee ≠ delivery fee; delivery fee capitalization only if policy says.
-
-## 21. Tax Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-N/A / DEFERRED — do not invent.\n
-
-## 24. Identity
-
-instrumentId + platform/account; gold_coin ≠ bullion class.
-
-## 25. Reversal / Correction
-
-N/A / DEFERRED — do not invent.\n
-
-## 26. Rebuild
-
-Holdings from metals transactions.
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-N/A / DEFERRED — do not invent.\n
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-N/A / DEFERRED — do not invent.\n
+## 32. Fixtures
+STANDALONE-METALS · metals tests
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/metals/tests
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-N/A / DEFERRED — do not invent.\n
-
-## 34. Acceptance Criteria
-
-METAL-003 fee separation; purity not silent 1.
-
-### Extra edge
-Delivery fee never increases metal inventory cost unless capitalizeDeliveryFee policy true.
-
-## Fee separation matrix
-| Event | Affects metal cost basis? |
-|-------|---------------------------|
-| Trade/premium fee (policy capitalize) | per Fee Engine treatment |
-| Delivery fee | default NO unless capitalizeDeliveryFee |
-| Network N/A | — |
-
-## Coin vs bullion
-gold_coin instruments carry own unit/valuation basis; fine-weight metal price only for analytical equivalent mode.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

@@ -1,156 +1,106 @@
-# Tax (module owner)
+# Tax
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Tax obligations and events without parallel cash truth.
+Tax obligations and payment events separate from fees.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-N/A / DEFERRED — do not invent.\n
+## 3. Supported v1 behavior
+TaxRecord = obligation · TaxEvent = assessment/payment/adjustment · paid only after payment operation
 
-## 3. Non-Goals
+## 4. Unsupported / Deferred behavior
+changeStatus(... paid) without payment op · feeTax confusion
 
-Full government e-filing product.
+## 5. Actors / roles
+End user (book owner).
 
-## 4. User Stories
+## 6. UI pages
+Primary surface under product IA for Tax.
 
-N/A / DEFERRED — do not invent.\n
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-## 5. Pages / Sheets / Drawers
+## 8. Entities
+tax tables + journal for payments
 
-N/A / DEFERRED — do not invent.\n
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-## 6. Entities
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-tax_records (obligation), tax_events (assessment/adjustment).
+## 11. Commands
+tax.assess · pay · adjust (as implemented)
 
-## 7. Fields
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-N/A / DEFERRED — do not invent.\n
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-## 8. Field Kinds
-
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-Core tax tables; payment is financial operation.
-
-## 10. Commands
-
-tax.recordEvent, payTax; changeStatus excluding paid.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A / DEFERRED — do not invent.\n
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-draft/assessed → paid only after payTax operation.
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+This module owns tax; features must not invent tax legs silently
 
-N/A / DEFERRED — do not invent.\n
+## 20. Accounting / journal mapping
+Payment: Dr liability / Cr cash via Core
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-N/A / DEFERRED — do not invent.\n
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-payTax uses CashSettlementPort + journal.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-N/A / DEFERRED — do not invent.\n
-
-## 21. Tax Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-N/A / DEFERRED — do not invent.\n
-
-## 24. Identity
-
-N/A / DEFERRED — do not invent.\n
-
-## 25. Reversal / Correction
-
-Amend via new event/operation; void prior.
-
-## 26. Rebuild
-
-N/A / DEFERRED — do not invent.\n
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-N/A / DEFERRED — do not invent.\n
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-N/A / DEFERRED — do not invent.\n
+## 32. Fixtures
+fixtures/ and feature tests.
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/core/tax · acceptance tax/provenance-tax
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-N/A / DEFERRED — do not invent.\n
-
-## 34. Acceptance Criteria
-
-changeStatus(paid) throws TAX_PAID_REQUIRES_PAYTAX_OPERATION.
-
-### Extra edge
-periodKey/taxYear required on events; bare year without bounds forbidden for new rows.
-
-## Status derivation
-```
-assessed --payTax operation success--> paid
-changeStatus(paid) --> TAX_PAID_REQUIRES_PAYTAX_OPERATION
-```
-
-## payTax
-Creates financial operation + cash settlement + marks TaxRecord paid. Amount decimal string; currency match obligation.
-
-## TaxEvent fields
-taxKind, amount, currency, periodKey/taxYear, jurisdiction, ruleVersion, operationId or manual flag.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

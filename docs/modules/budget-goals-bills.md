@@ -1,147 +1,106 @@
-# Budget Goals Bills (module owner)
+# Budget / Goals / Bills
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Planning layer only — budgets, goals, recurring bills.
+Planning layer: budgets, goals, recurring bills — **not** cash truth.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-plan → forecast → optional link to actual operation.
+## 3. Supported v1 behavior
+Plan amounts · periods · optional link to actual operations after the fact
 
-## 3. Non-Goals
+## 4. Unsupported / Deferred behavior
+Using budget remaining as account balance · posting journal from forecast alone
 
-Replace journal or cash truth.
+## 5. Actors / roles
+End user (book owner).
 
-## 4. User Stories
+## 6. UI pages
+Primary surface under product IA for Budget / Goals / Bills.
 
-N/A / DEFERRED — do not invent.\n
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-## 5. Pages / Sheets / Drawers
+## 8. Entities
+Feature tables + Core fin_operations / journal.
 
-N/A / DEFERRED — do not invent.\n
+## 9. Field ownership
+Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 
-## 6. Entities
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-N/A / DEFERRED — do not invent.\n
+## 11. Commands
+budget.set · goal.create · bill.schedule (as implemented)
 
-## 7. Fields
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-N/A / DEFERRED — do not invent.\n
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-## 8. Field Kinds
-
-N/A / DEFERRED — do not invent.\n
-
-## 9. Field Ownership
-
-N/A / DEFERRED — do not invent.\n
-
-## 10. Commands
-
-budget.*, goal.*, bill.* as implemented.
-
-## 11. Queries
-
-N/A / DEFERRED — do not invent.\n
-
-## 12. API Input
-
-N/A / DEFERRED — do not invent.\n
-
-## 13. API Output
-
-N/A / DEFERRED — do not invent.\n
-
-## 14. Normalization
-
-N/A / DEFERRED — do not invent.\n
+## 14. State machine
+Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-N/A / DEFERRED — do not invent.\n
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-N/A / DEFERRED — do not invent.\n
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-N/A / DEFERRED — do not invent.\n
+## 20. Accounting / journal mapping
+No automatic journal from plans; actual spend uses income-expense or feature ops
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-N/A / DEFERRED — do not invent.\n
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-None until user posts real operation.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-N/A / DEFERRED — do not invent.\n
-
-## 21. Tax Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 22. FX Effects
-
-N/A / DEFERRED — do not invent.\n
-
-## 23. Date Semantics
-
-N/A / DEFERRED — do not invent.\n
-
-## 24. Identity
-
-N/A / DEFERRED — do not invent.\n
-
-## 25. Reversal / Correction
-
-N/A / DEFERRED — do not invent.\n
-
-## 26. Rebuild
-
-N/A / DEFERRED — do not invent.\n
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Plan vs actual reports are analytical; SoT remains journal for actuals
 
-N/A / DEFERRED — do not invent.\n
+## 28. Standalone edition behavior
+Standalone edition uses local settlement + Core; no second cash ledger.
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-N/A / DEFERRED — do not invent.\n
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-N/A / DEFERRED — do not invent.\n
+## 32. Fixtures
+fixtures/ and feature tests.
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+src/features/<name>/tests + acceptance as applicable.
 
-N/A / DEFERRED — do not invent.\n
-
-## 31. Edge Cases
-
-N/A / DEFERRED — do not invent.\n
-
-## 32. Errors
-
-N/A / DEFERRED — do not invent.\n
-
-## 33. Golden / Recovery Fixtures
-
-N/A / DEFERRED — do not invent.\n
-
-## 34. Acceptance Criteria
-
-Projection rows never post journal automatically.
-
-## Link to actuals
-Optional bg_transaction_links / bill occurrence → operationId. Link is REFERENCE only; deleting plan must not delete journal.
-
-## Bills occurrence
-Occurrence is plan state; payment creates real expense/transfer operation — never auto journal from occurrence alone.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.

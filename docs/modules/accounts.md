@@ -1,153 +1,117 @@
-# Accounts (module owner)
+# Accounts
 
-**Status:** CURRENT
-
-Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Module owner.** Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
+**Template reference:** [loan.md](./loan.md)
 
 ## 1. Purpose
-
-Operational money accounts (cash, bank, card, wallet) linked to Core fin_accounts for journal truth.
+Operational cash/bank/card accounts as projections over Core journal — not a second cash truth.
 
 ## 2. Scope
+Personal offline edition; Core journal is cash/accounting truth.
 
-Create/update/archive accounts; deposit, withdraw, transfer as operations; bank metadata; multi-currency display with IRR ledger storage.
+## 3. Supported v1 behavior
+| Item | Rule |
+|------|------|
+| accountClass (fin) | asset/liability/equity/income/expense |
+| cashAccountKind (acc) | cash/bank/card/... operational kinds |
+| balance | **DERIVED from journal** |
+| transfer/deposit/withdraw | Core operations |
 
-## 3. Non-Goals
 
-Chart-of-accounts designer UI; investment holding ledgers; parallel cash SoT tables.
+## 4. Unsupported / Deferred behavior
+Parallel cash ledgers · treating acc balance as SoT · silent currency default
 
-## 4. User Stories
+## 5. Actors / roles
+End user (book owner).
 
-Add bank IRR account; transfer between cash and bank; archive empty account.
+## 6. UI pages
+Accounts list · account detail · transfer
 
-## 5. Pages / Sheets / Drawers
+## 7. Sheets / drawers
+Create / edit / detail sheets as product IA defines.
 
-/money; account detail sheet; transfer sheet.
+## 8. Entities
+`acc_accounts` · related links · Core `fin_accounts` / journal
 
-## 6. Entities
+## 9. Field ownership
+| Field | Kind |
+|-------|------|
+| name, kind, currency | RAW |
+| balance | DERIVED |
+| fin_account mapping | REFERENCE |
 
-acc_accounts, acc_transactions (projection), acc_transaction_links, fin_accounts (class asset/liability/…).
 
-## 7. Fields
+## 10. Identity
+Feature entity ids + operationId on mutations.
 
-name, account_kind (operational), currency, fin_account_id, iban/external ids, status active|archived.
+## 11. Commands
+account.create · update · archive · transfer · deposit · withdraw (as implemented)
 
-## 8. Field Kinds
+## 12. Queries
+List / get / statement-style reads as applicable.
 
-Balances DERIVED from journal; name/kind RAW; fin_account_id REFERENCE.
+## 13. API contract
+API.md envelope; decimal strings; operationId on mutations.
 
-## 9. Field Ownership
-
-Feature owns operational rows; Core owns fin_* and journal.
-
-## 10. Commands
-
-accounts.create, update, archive, deposit, withdraw, transfer.
-
-## 11. Queries
-
-listAccounts, getAccount, listActivity.
-
-## 12. API Input
-
-operationId for money moves; decimal-string amounts; currency explicit.
-
-## 13. API Output
-
-Envelope + accountId + operationId.
-
-## 14. Normalization
-
-currency uppercase; amounts decimal strings; scopedAccountId for system roles.
+## 14. State machine
+active → archived (archive only if journal balance zero)
 
 ## 15. Validation
+Reject missing required fields; no silent financial defaults.
 
-archive only if journal balance zero; currency match on legs.
+## 16. Money / quantity semantics
+Decimal strings for money/qty; units explicit.
 
-## 16. State Machine
+## 17. FX behavior
+Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
 
-active → archived (zero balance only).
+## 18. Fee behavior
+Fees via Fee Engine / FINANCIAL-CORE treatments.
 
-## 17. Accounting Effects
+## 19. Tax behavior
+No silent tax; tax module owns obligations when linked.
 
-Maps operational moves to fin account classes.
+## 20. Accounting / journal mapping
+Transfers: balanced journal legs in settlement accounts; no domain cash table as truth
 
-## 18. Journal Effects
+## 21. Cost basis / valuation
+Per feature cost/valuation rules; snapshots not SoT.
 
-All money moves via operation engine balanced journal.
+## 22. Persistence impact
+SQLite + feature tables inside atomic operation txn.
 
-## 19. Cash Effects
+## 23. Transaction boundary
+runAtomicFinancialOperation boundary.
 
-CashSettlementPort; never store authoritative cashBalance outside journal.
+## 24. Idempotency
+operationId idempotency.
 
-## 20. Fee Effects
+## 25. Reversal / correction
+Reversal operation; no in-place rewrite of posted amounts.
 
-Transfer fees via Fee Engine when policy says so.
-
-## 21. Tax Effects
-
-N/A unless tax payment uses settlement account.
-
-## 22. FX Effects
-
-Cross-currency transfer requires locked rates on post.
-
-## 23. Date Semantics
-
-businessDate required on operations.
-
-## 24. Identity
-
-acc_accounts.id; fin_accounts.id; uniqueness policy on code if used.
-
-## 25. Reversal / Correction
-
-Reverse operation; no overwrite of posted amounts.
-
-## 26. Rebuild
-
-Activity projections rebuildable from journal + links.
+## 26. Historical / asOf behavior
+asOf queries rebuild from ledger; no live price required for history.
 
 ## 27. Reports
+Module statements + REPORTING from journal.
 
-Account statement via REPORTING.
+## 28. Standalone edition behavior
+Other features may use local settlement without Accounts UI
 
-## 28. Offline Behavior
+## 29. Licensing / capabilities
+Capability/license gates UI and commands only.
 
-Full offline.
+## 30. Edge cases
+Missing rate/price → reject or mark missing; never zero-fill.
 
-## 29. Standalone Edition
+## 31. Error codes
+VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 
-Hidden settlement accounts when Accounts UI off.
+## 32. Fixtures
+Feature tests under accounts when present; Core journal fixtures
 
-## 30. Licensing / Capabilities
+## 33. Tests / proof
+Accounting/chart tests in src/core/accounting
 
-Always available as Core dependency for other editions.
-
-## 31. Edge Cases
-
-Zero-amount reject; same-account transfer reject.
-
-## 32. Errors
-
-ACCOUNT_ARCHIVE_NONZERO, CURRENCY_MISMATCH.
-
-## 33. Golden / Recovery Fixtures
-
-CORE transfer fixtures.
-
-## 34. Acceptance Criteria
-
-Archive gate; journal SoT; operational kind ≠ accounting class.
-
-### Extra edge
-Reject archive with open linked operations in draft; multi-currency display must not create TOM ledger currency.
-
-## Code uniqueness
-If fin_accounts.code used: UNIQUE per dataset where code IS NOT NULL (single-user local book).
-
-## Deposit / withdraw
-Always operations with balanced journal; acc_transactions is projection/link surface not second cash truth.
-
-## Transfer
-Two settlement legs same operationId; FX if currencies differ; reject identical account ids.
+## 34. Machine-file references
+docs/core/db/schema.sql · registry · fixtures.
