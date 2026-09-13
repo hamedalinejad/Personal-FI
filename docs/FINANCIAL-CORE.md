@@ -115,3 +115,6 @@ acquisition | disposal | transfer_internal | swap_economic | fee — C2C economi
 
 ## Funds prices
 NAV, transactionPrice, liquidationPrice are distinct; never infer liquidation from NAV.
+
+## Projection tables
+Tables such as `inv_crypto_cash.balance` are **projections**. Rebuild from journal; never authoritative cash.

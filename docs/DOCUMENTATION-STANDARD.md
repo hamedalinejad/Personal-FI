@@ -34,3 +34,6 @@ Vocabulary → Identity → Financial Core → Data Model → API → Reports �
 
 ## Classification
 See FILE-CLASSIFICATION.md: CURRENT | MERGE | ARCHIVE | GENERATED | DELETE
+
+## Progress
+See CONSOLIDATION-LOG.md and QUALITY-STATUS.md. Target: single CURRENT generation.
