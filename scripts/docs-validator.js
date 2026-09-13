@@ -1,8 +1,5 @@
 #!/usr/bin/env node
-/**
- * Documentation tree validator — owner hierarchy only.
- */
-import { readFileSync, existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
 const root = process.cwd();
@@ -19,11 +16,19 @@ const required = [
   "docs/DEVELOPMENT.md",
   "docs/QUALITY-STATUS.md",
   "docs/core/db/schema.sql",
-  "docs/modules/loan.md",
+  "docs/core/registry/status.registry.json",
+  "docs/core/registry/requirements-matrix.json",
   "docs/modules/accounts.md",
+  "docs/modules/income-expense.md",
+  "docs/modules/cheque.md",
+  "docs/modules/loan.md",
   "docs/modules/crypto.md",
   "docs/modules/stocks.md",
-  "README.md",
+  "docs/modules/funds.md",
+  "docs/modules/metals.md",
+  "docs/modules/physical-assets.md",
+  "docs/modules/budget-goals-bills.md",
+  "docs/modules/tax.md",
 ];
 
 let failed = false;
@@ -35,17 +40,16 @@ for (const r of required) {
 }
 
 const qs = readFileSync(join(root, "docs/QUALITY-STATUS.md"), "utf8");
-if (/Production release\s*\|\s*\*\*GO\*\*/i.test(qs) || /\|\s*GO\s*\|/.test(qs) && /Production/.test(qs) && !/NO_GO|NO-GO/.test(qs)) {
-  // soft: QUALITY must not claim GO without RELEASE_PROVEN language
-}
 if (!/NO_GO|NO-GO/i.test(qs)) {
-  console.error("QUALITY-STATUS should state NO_GO / NO-GO for release");
+  console.error("QUALITY-STATUS must state NO_GO");
   failed = true;
 }
 
-const readme = readFileSync(join(root, "README.md"), "utf8");
-if (!/docs\/README/i.test(readme) && !/PRODUCT/i.test(readme)) {
-  console.error("Root README should point at docs entry");
+const reg = JSON.parse(readFileSync(join(root, "docs/core/registry/status.registry.json"), "utf8"));
+const ss = reg.schema_status || {};
+const doc = reg.documentation || {};
+if (ss.FREEZE_PROVEN !== doc.schema_freeze_proven) {
+  console.error("schema freeze flags disagree between schema_status and documentation");
   failed = true;
 }
 

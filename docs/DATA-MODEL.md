@@ -41,3 +41,17 @@ See schema.sql for full table list (fin_*, acc_*, ln_*, inv_*, tax_*, rpt_*, …
 Operation → journal entries/lines → accounts.  
 Feature tx rows link operationId.  
 Holdings rebuild from feature transactions + cost basis version.
+
+
+## Cached / control-plane fields (not second ledgers)
+
+| Field | Kind | Owner | Writer | Rebuild source | Direct write |
+|-------|------|-------|--------|----------------|--------------|
+| fin_operations.durability_state | STATUS | OFFLINE-RELEASE / Core | persistence worker | n/a (transport) | Forbidden outside worker |
+| fin_operations.source | RAW/LABEL | FINANCIAL-CORE | operation engine | command provenance | Only at create |
+| fin_journal_entries.post_state | STATUS | FINANCIAL-CORE | journal writer | entry lifecycle | Forbidden ad-hoc |
+| acc_accounts.current_balance | SNAPSHOT/DERIVED | modules/accounts | rebuild job / query | **sum journal lines** | **Forbidden as SoT** |
+
+**Accounting SoT = journal lines + fin_accounts classification.**  
+`current_balance` is a cache; if present it must reconcile to journal or be ignored by statements.
+

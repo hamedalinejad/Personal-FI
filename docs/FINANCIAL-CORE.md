@@ -83,3 +83,23 @@ rateFraction = annualRate/100. Methods: declining, flat, qarz, bullet. dayCount 
 
 ## 17. Machine proof
 schema.sql · fixtures · tests · scheduleEngine · operationEngine · worker.
+
+
+## Money / unit table (global)
+| Type | API/DB | Arithmetic | Notes |
+|------|--------|------------|-------|
+| money | decimal string | Decimal | currency required |
+| quantity | decimal string | Decimal | unit required |
+| price | decimal string | Decimal | per unit |
+| rate (FX) | decimal string | Decimal | base per 1 txn unit |
+| percentage | decimal string points | /100 for fraction | e.g. 12 → 12% |
+| weight | decimal string | Decimal | e.g. mg |
+| purity | decimal string | Decimal | (0,1] |
+| fine weight | DERIVED | qty × purity | not RAW input |
+
+No IEEE float in domain logic.
+
+## FX
+`exchangeRateToBase` = base units per 1 transaction-currency unit.  
+`amountInBase = amount × exchangeRateToBase`.  
+Historical rebuild uses **stored** rates, never “latest now”. Missing rate → fail-closed.

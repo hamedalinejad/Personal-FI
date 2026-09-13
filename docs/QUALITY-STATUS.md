@@ -33,3 +33,12 @@ Live only. Not a requirements catalog.
 
 **Cycle locked:** FEATURE → OWNER DOC → CODE → TEST → FIXTURE → QUALITY → COMMIT  
 **Forbidden cycle:** AUDIT → BUG DOC → MATRIX → FINAL AUDIT loop
+
+
+| ID | Area | Status | Owner | Test | Commit |
+|----|------|--------|-------|------|--------|
+| P0-04 | requirements live refs FAIL | FIXED | scripts | requirements-matrix-check.test | this |
+| P0-05 | freeze flags single source | FIXED | status.registry | docs-validator | this |
+| P0-06 | authority_owners current | FIXED | status.registry | docs-consistency | this |
+| P0-07 | RELEASE-EVIDENCE live docs | FIXED | RELEASE-EVIDENCE | — | this |
+| P0-08 | balance cache not SoT | FIXED | DATA-MODEL | — | this |

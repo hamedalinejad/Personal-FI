@@ -87,3 +87,8 @@ unless updating an existing **owner** listed in DOCUMENTATION-STANDARD.
 34. Machine-file references
 ```
 Module files hold **feature-specific** behavior only. Global rules stay in global owners.
+
+
+## Universal command contract (required fields)
+command ID · purpose · request fields · required/optional · types · units · currency · precision · normalization · defaults · identity · validation · journal mapping · fees · FX · cost basis · DB writes · transaction boundary · idempotency · reversal · result · errors · queries · reports · standalone · fixture · invariants · recovery  
+Detail per command lives in the owning `modules/<feature>.md` + API schemas when present.

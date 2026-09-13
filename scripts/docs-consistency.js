@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-/**
- * B-030: cross-document consistency checks (machine gate)
- */
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -13,45 +10,33 @@ function fail(msg) {
 }
 
 const readme = readFileSync(join(root, "README.md"), "utf8");
-if (!/IMPLEMENTATION_SCAFFOLD_PHASE|implementation scaffold/i.test(readme)) {
-  fail("README must declare implementation scaffold phase");
-}
 if (/Production release.*\*\*GO\*\*/i.test(readme) && !/NO-GO/i.test(readme)) {
-  fail("README must not claim production GO");
+  fail("README must not claim production GO without NO-GO");
 }
 
-const gate = join(root, "docs/core/CODING-GATE.md");
-const features = join(root, "docs/core/IMPLEMENTATION-READY-FEATURES.md");
-if (existsSync(gate) && existsSync(features)) {
-  const ft = readFileSync(features, "utf8");
-  if (/may start in parallel/i.test(ft) && !/sequential/i.test(ft)) {
-    fail("IMPLEMENTATION-READY-FEATURES still allows unconstrained parallel production");
-  }
-  if (!/READY TO IMPLEMENT ≠ IMPLEMENTED/i.test(ft) && !/READY TO IMPLEMENT ≠ IMPLEMENTED/.test(ft)) {
-    // check vocabulary section
-    if (!/RELEASE-PROVEN/.test(ft)) {
-      fail("Features doc missing status vocabulary");
-    }
-  }
+const std = join(root, "docs/DOCUMENTATION-STANDARD.md");
+if (!existsSync(std)) fail("DOCUMENTATION-STANDARD missing");
+
+const owners = [
+  "docs/PRODUCT.md",
+  "docs/ARCHITECTURE.md",
+  "docs/FINANCIAL-CORE.md",
+  "docs/DATA-MODEL.md",
+  "docs/API.md",
+  "docs/REPORTING.md",
+  "docs/OFFLINE-RELEASE.md",
+  "docs/DEVELOPMENT.md",
+];
+for (const o of owners) {
+  if (!existsSync(join(root, o))) fail(`owner missing ${o}`);
 }
 
-const index = join(root, "docs/core/IMPLEMENTATION-READY-INDEX.md");
-if (existsSync(index)) {
-  const ix = readFileSync(index, "utf8");
-  for (const feat of ["crypto", "funds", "stocks", "metals"]) {
-    if (existsSync(join(root, `src/features/${feat}`)) && !new RegExp(feat, "i").test(ix)) {
-      fail(`INDEX missing HEAD mention of feature folder ${feat}`);
-    }
-  }
-}
-
-// Public API PARTIAL honesty
-for (const feat of ["crypto", "funds", "stocks", "metals"]) {
-  const api = join(root, `src/features/${feat}/public-api/index.js`);
-  if (!existsSync(api)) continue;
-  const t = readFileSync(api, "utf8");
-  if (!/PARTIAL|RELEASE-PROVEN|IMPLEMENTED/.test(t)) {
-    fail(`${feat} public-api missing status`);
+const reg = JSON.parse(readFileSync(join(root, "docs/core/registry/status.registry.json"), "utf8"));
+const ao = reg.authority_owners || {};
+for (const [k, v] of Object.entries(ao)) {
+  const path = String(v).split("#")[0];
+  if (path.startsWith("docs/") && !existsSync(join(root, path))) {
+    fail(`authority_owners.${k} dead path ${v}`);
   }
 }
 

@@ -6,7 +6,7 @@ import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
 import { persistOperation, loadOperation } from "../../persistence/port.js";
 
 /**
- * B-038: optional undefined fields are OMITTED (never serialized as null unless caller set null).
+ * invariant: optional undefined fields are OMITTED (never serialized as null unless caller set null).
  * Arrays preserve index order; object keys sorted.
  */
 export function stableStringify(value) {
@@ -39,7 +39,7 @@ function stableHash(obj) {
   return createHash("sha256").update(stableStringify(obj)).digest("hex");
 }
 
-/** P0-OP-003 — fields that participate in economic identity / commandHash */
+/** economic-identity — fields that participate in economic identity / commandHash */
 export function buildEconomicIdentity(norm) {
   return {
     operationType: norm.type,
@@ -95,7 +95,7 @@ export function normalizeCommand(command) {
   });
 
   // Business status only: draft|posted|voided|failed (schema). Never "pending" here —
-  // durability_state owns pending/sql_committed/persisted (OFFLINE-002).
+  // durability_state owns pending/sql_committed/persisted (durability-plane).
   const allowedStatus = new Set(["draft", "posted", "voided", "failed"]);
   // financial writes with journal lines must declare status explicitly
   let status = command.status;
@@ -177,7 +177,7 @@ export async function runAtomicFinancialOperation(command) {
     const dataDir = norm.dataDir || join(process.cwd(), ".pf-data");
     const mode = norm.persistMode;
 
-    // Single economic identity path — never rebuild payloadForHash separately (P0-01)
+    // Single economic identity path — never rebuild payloadForHash separately (integrity)
     const commandHash = computeCommandHash(norm);
     if (norm.clientCommandHash && norm.clientCommandHash !== commandHash) {
       throw new Error("OP_COMMAND_HASH_MISMATCH");

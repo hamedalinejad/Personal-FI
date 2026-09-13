@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "updated": "2026-09-13-cycle-10",
+  "updated": "2026-09-13",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
-    "FREEZE_EVIDENCE": "SPEC_LOCKED content; FREEZE_PROVEN=false until semantic freeze gate complete (see SCHEMA-FREEZE-STATUS.md)",
-    "RELEASE_PROVEN": false
+    "RELEASE_PROVEN": false,
+    "FREEZE_EVIDENCE": "SPEC_LOCKED only until semantic freeze evidence exists"
   },
   "features": {
     "loan": {
@@ -68,10 +68,10 @@
     "parallel_production_integration": "FORBIDDEN_UNTIL_PHASE_ORDER"
   },
   "documentation": {
-    "coverage": "DOCUMENTATION-COVERAGE-COMPLETE",
-    "reconciliation": "CANONICAL-RECONCILIATION-PENDING",
+    "coverage": "OWNER_TREE",
     "schema_spec_locked": true,
-    "schema_freeze_proven": true
+    "schema_freeze_proven": false,
+    "standard": "docs/DOCUMENTATION-STANDARD.md"
   },
   "status_semantics": {
     "IMPLEMENTED": "code path exists; NOT release proof",
@@ -82,13 +82,17 @@
     "NOTE": "IMPLEMENTED never implies Golden/Recovery/Standalone proven"
   },
   "authority_owners": {
-    "API": "docs/core/API-CANONICAL-ENVELOPE.md",
-    "Accounting": "docs/core/Financial-Invariants.md",
+    "API": "docs/API.md",
+    "Accounting": "docs/FINANCIAL-CORE.md",
     "SchemaFreeze": "docs/core/registry/status.registry.json#schema_status",
-    "Loan": "docs/core/authority/LOAN-V1-SCHEMA-DISPOSITION.md",
-    "Reports": "docs/core/authority/REPORT-DEPENDENCY-ORDER.md",
-    "Offline": "docs/core/Offline-Requirements.md",
-    "FieldKind": "docs/core/authority/FIELD-KIND-VOCABULARY.md"
+    "Loan": "docs/modules/loan.md",
+    "Reports": "docs/REPORTING.md",
+    "Offline": "docs/OFFLINE-RELEASE.md",
+    "FieldKind": "docs/DATA-MODEL.md",
+    "Product": "docs/PRODUCT.md",
+    "Architecture": "docs/ARCHITECTURE.md",
+    "DataModel": "docs/DATA-MODEL.md",
+    "Development": "docs/DEVELOPMENT.md"
   },
   "deferred_v1": {
     "loan.borrower": "LOAN_ROLE_DEFERRED",
