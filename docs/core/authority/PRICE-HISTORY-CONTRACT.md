@@ -5,6 +5,9 @@ status: locked
 version: 1.0
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # P1-PRICE-004 / 005
 
 - `quote_type` **NOT NULL**: `last|close|nav|manual|imported|bid|ask`

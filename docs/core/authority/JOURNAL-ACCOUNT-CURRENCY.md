@@ -7,6 +7,9 @@ updated: 2026-09-12
 authority: binding
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # P0 Contract clarification
 
 `currency` on a journal line **must** match the currency of the account it posts to.

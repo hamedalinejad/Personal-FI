@@ -1,43 +1,54 @@
-# DATA-MODEL (sole data/field ownership owner)
+# DATA-MODEL (sole data / field owner)
 
-**Status:** CURRENT · Normative for field kinds, ownership, identity, no-field-loss.  
-**Machine proof:** `docs/core/db/schema.sql`, field-inventory, schema.manifest.
+**Status:** CURRENT
 
-## 1. Identity
-Canonical IDs: featureId, instrumentId, accountId, partyId, operationId, holdingId, sourceReference.  
-Provider symbol ≠ financial identity.
+## 1. Field Kind vocabulary (locked — only set)
+```
+RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX | REFERENCE | STATUS
+```
+No document may invent alternate kind enums.
 
-## 2. Field kinds (closed vocabulary)
-`RAW` · `DERIVED` · `SNAPSHOT` · `EXTERNAL_REPORTED` · `LABEL` · `SYSTEM_INDEX` · `REFERENCE` · `STATUS`  
-No other document may invent field-kind enums.
+| Kind | Meaning |
+|------|---------|
+| RAW | Observed/input fact |
+| DERIVED | Rebuildable from RAW + engine version |
+| SNAPSHOT | Cached projection |
+| EXTERNAL_REPORTED | Provider data + provenance |
+| LABEL | Display only |
+| SYSTEM_INDEX | System id/index; never financial SoT |
+| REFERENCE | FK / pointer |
+| STATUS | Lifecycle enum |
 
-## 3. Ownership
-Each column: owner domain, SoT, editable_after_post, migration disposition.
+## 2. No-field-loss
+Every documented field needs: source · kind · owner · schema column or VIRTUAL/DERIVED/DEFERRED · nullable · unit · currency · formula · migration · export · reversal policy.
 
-## 4. No-field-loss
-RAW financial facts preserved through import/export/migration. Rename ⇒ explicit mapping.
+## 3. Identity (canonical)
+| Id | Owner |
+|----|--------|
+| operationId | Financial operation envelope |
+| instrumentId | ref_instruments |
+| accountId | fin_accounts / acc_accounts (scoped) |
+| holdingId | feature holding tables |
+| partyId | parties (when present) |
+| featureId | package id |
 
-## 5. Schema contract
-schema.sql is bootstrap authority. Manifest + inventory must cover columns. FREEZE_PROVEN is evidence-level (registry), not mere SPEC_LOCKED.
+**Provider symbol is never instrument identity.**
 
-## 6. Provenance
-sourceChannel / sourceType / sourceReference — see FINANCIAL-CORE + SOURCE-VOCABULARY.
+## 4. Money / quantity
+Decimal **strings** in DB and API for money, qty, rates, prices.
 
-## 7. Ghost tables
-No feature cash transaction tables as SoT (intentional omissions in schema remain).
+## 5. deletedAt
+**Forbidden** on posted financial ledger rows. Soft-delete only on non-financial metadata when policy allows.
 
-## 8. Absorbs
-Field-Level-SoT, ownership matrices, data dictionary prose → this file (detail tables may remain generated).
+## 6. Machine artifacts (GENERATED)
+- `docs/core/db/schema.sql`
+- field-inventory.checklist.tsv
+- schema.manifest.json
 
+Prose authority is **this file**; SQL is structural truth for columns.
 
-## 9. Field metadata matrix (required columns)
-For every persisted financial field document:
-`field · entity · kind · owner · source · nullable · unit · currency · formula · migration · reversal · export`
+## 7. RelatedFeature enum
+Single source values: accounts, income, expense, cheque, loan, investment.crypto|stocks|funds|metals, physical_assets, budget, goals, bills, tax.
 
-If not in SQL: only DERIVED | VIRTUAL | DEFERRED — never silent drop.
-
-
-## Absorbed topics
-Field-Level-SoT · Field-Level-Data-Ownership-Matrix · RELATED-FEATURE-ENUM · PRICE-IDENTITY · instrument vs provider mapping · no-field-loss doctrine.
-
-Machine artifacts: `docs/core/db/schema.sql`, field-inventory, schema.manifest (GENERATED/MACHINE — not prose authority).
+## 8. Absorbed
+Field-Level-SoT · Ownership-Matrix · PRICE-IDENTITY · RELATED-FEATURE-ENUM docs.

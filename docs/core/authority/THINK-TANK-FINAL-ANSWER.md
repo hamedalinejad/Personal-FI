@@ -7,6 +7,9 @@ updated: 2026-09-12
 authority: binding
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # 23. Is the documentation package ready for coding?
 
 **Yes**, for this scope:

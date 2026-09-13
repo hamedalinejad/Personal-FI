@@ -1,3 +1,5 @@
+> **SUPERSEDED as authority** — use top-level owner docs.
+
 # Source Vocabulary (BUG-FINAL-040 — sole owner)
 
 | Field | Meaning | Allowed values (v1) |

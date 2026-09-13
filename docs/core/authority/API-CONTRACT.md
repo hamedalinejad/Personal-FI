@@ -6,6 +6,9 @@ version: 1.0
 updated: 2026-09-10
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # Required API contract
 
 ## Request

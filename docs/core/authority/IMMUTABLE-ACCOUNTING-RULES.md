@@ -7,6 +7,9 @@ updated: 2026-09-10
 authority: binding
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # Accounting rules that must remain immutable
 
 These are **not** suggestions.

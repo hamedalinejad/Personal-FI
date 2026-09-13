@@ -5,6 +5,9 @@ status: approved
 version: 1.0
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 Posted operations that calculate should lock relevant engines in `fin_operations.engine_versions`:
 
 ```json

@@ -4,6 +4,9 @@ title: Minimum provenance envelope for imported/reported facts
 status: approved
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # DATA-003
 
 For imported or externally reported financial facts, prefer:

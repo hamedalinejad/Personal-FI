@@ -4,6 +4,9 @@ title: Investment feeTax vs tax liability
 status: approved
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # TAX-001
 
 ```text

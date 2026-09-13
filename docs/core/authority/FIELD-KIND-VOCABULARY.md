@@ -1,3 +1,5 @@
+> **SUPERSEDED as authority** — use top-level owner docs.
+
 # FIELD-KIND-VOCABULARY (BUG-CUR-027 — sole normative owner)
 
 ```

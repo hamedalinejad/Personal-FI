@@ -6,6 +6,9 @@ version: 1.0
 updated: 2026-09-12
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 | Feature | Cost pool currency | Valuation currency | Base currency | Transaction currency | Fee currency |
 |---------|-------------------|--------------------|---------------|----------------------|--------------|
 | Crypto | costCurrency (Model A) | valuation context | operation base | costCurrency | feeCurrency (explicit) |

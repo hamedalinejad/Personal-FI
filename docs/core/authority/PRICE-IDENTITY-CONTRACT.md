@@ -5,6 +5,9 @@ status: locked
 version: 1.0
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # P0-PRICE-003
 
 | Identity | Location | Role |

@@ -7,6 +7,9 @@ updated: 2026-09-12
 authority: binding
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # 11. Final data ownership rule
 
 | Layer | Truth |

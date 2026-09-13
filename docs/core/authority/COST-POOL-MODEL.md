@@ -7,6 +7,9 @@ updated: 2026-09-12
 authority: binding
 ---
 
+> **SUPERSEDED as authority** — see docs/FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, modules/*.
+
+
 # Chosen model: **Model A**
 
 ```text
