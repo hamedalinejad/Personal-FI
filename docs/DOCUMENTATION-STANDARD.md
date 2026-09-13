@@ -146,3 +146,13 @@ Live status only — not a second requirements system. Rows at most: ID · area 
 ### modules/*.md
 Feature-only behavior using the 34-section template in DEVELOPMENT.md.
 
+
+
+## Authority rules
+- ONE CONCEPT → ONE OWNER
+- OWNER docs are normative
+- Machine proof is not human authority
+- Historical docs are not normative
+- Generated docs cannot define business semantics
+- Bug IDs cannot become permanent requirements
+- Audit result → code change, test, owner-doc only if contract changed, quality status

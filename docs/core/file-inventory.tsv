@@ -1,0 +1,249 @@
+path	category	owner	notes
+docs/API.md	A	API	human owner
+docs/ARCHITECTURE.md	A	ARCHITECTURE	human owner
+docs/DATA-MODEL.md	A	DATA-MODEL	human owner
+docs/DEVELOPMENT.md	A	DEVELOPMENT	human owner
+docs/DOCUMENTATION-STANDARD.md	A	DOCUMENTATION-STANDARD	human owner
+docs/FINANCIAL-CORE.md	A	FINANCIAL-CORE	human owner
+docs/OFFLINE-RELEASE.md	A	OFFLINE-RELEASE	human owner
+docs/PRODUCT.md	A	PRODUCT	human owner
+docs/QUALITY-STATUS.md	A	QUALITY-STATUS	human owner
+docs/README.md	A	README	human owner
+docs/REPORTING.md	A	REPORTING	human owner
+docs/archive/AUDIT-HISTORY.md	C	archive	history pointer
+docs/core/RELEASE-EVIDENCE.json	B	machine	keep
+docs/core/db/schema.manifest.json	B	machine	keep
+docs/core/db/schema.sql	B	machine	keep
+docs/core/field-inventory.checklist.tsv	B	machine	keep
+docs/core/json-schemas/api-envelope.schema.json	B	machine	keep
+docs/core/json-schemas/operation-result.schema.json	B	machine	keep
+docs/core/json-schemas/schedule-snapshot.schema.json	B	machine	keep
+docs/core/registry/fixture-manifest.json	B	machine	keep
+docs/core/registry/requirements-matrix.json	B	machine	keep
+docs/core/registry/status.registry.json	B	machine	keep
+docs/core/registry.index.json	B	machine	keep
+docs/modules/accounts.md	A	accounts	module owner
+docs/modules/budget-goals-bills.md	A	budget-goals-bills	module owner
+docs/modules/cheque.md	A	cheque	module owner
+docs/modules/crypto.md	A	crypto	module owner
+docs/modules/funds.md	A	funds	module owner
+docs/modules/income-expense.md	A	income-expense	module owner
+docs/modules/loan.md	A	loan	module owner
+docs/modules/metals.md	A	metals	module owner
+docs/modules/physical-assets.md	A	physical-assets	module owner
+docs/modules/stocks.md	A	stocks	module owner
+docs/modules/tax.md	A	tax	module owner
+src/core/acceptance/domain-feature.acceptance.test.js	D	tests	keep
+src/core/acceptance/fee-fx.acceptance.test.js	D	tests	keep
+src/core/acceptance/financial-core.acceptance.test.js	D	tests	keep
+src/core/acceptance/journal-base.acceptance.test.js	D	tests	keep
+src/core/acceptance/journal.acceptance.test.js	D	tests	keep
+src/core/acceptance/loan-accounting-offline.acceptance.test.js	D	tests	keep
+src/core/acceptance/loan-flat-fixture.acceptance.test.js	D	tests	keep
+src/core/acceptance/loan.acceptance.test.js	D	tests	keep
+src/core/acceptance/math-vectors.acceptance.test.js	D	tests	keep
+src/core/acceptance/operation.acceptance.test.js	D	tests	keep
+src/core/acceptance/provenance-tax.acceptance.test.js	D	tests	keep
+src/core/acceptance/reporting.acceptance.test.js	D	tests	keep
+src/core/acceptance/standalone.acceptance.test.js	D	tests	keep
+src/core/acceptance/tax.acceptance.test.js	D	tests	keep
+src/core/accounting/bookSettings.js	E	implementation	keep
+src/core/accounting/bookSettings.test.js	D	tests	keep
+src/core/accounting/chartOfAccounts.js	E	implementation	keep
+src/core/accounting/reports/investment.js	E	implementation	keep
+src/core/accounting/reports/statements.js	E	implementation	keep
+src/core/accounting/reports/statements.test.js	D	tests	keep
+src/core/api/pagination.js	E	implementation	keep
+src/core/api/responseEnvelope.js	E	implementation	keep
+src/core/api/responseEnvelope.test.js	D	tests	keep
+src/core/costBasis/acquisitionFeeFromReceived.js	E	implementation	keep
+src/core/costBasis/acquisitionFeeFromReceived.test.js	D	tests	keep
+src/core/costBasis/applyEconomicSwap.js	E	implementation	keep
+src/core/costBasis/applyEconomicSwap.test.js	D	tests	keep
+src/core/costBasis/transferCost.js	E	implementation	keep
+src/core/costBasis/transferCost.test.js	D	tests	keep
+src/core/costBasis/valuationAttribution.js	E	implementation	keep
+src/core/costBasis/valuationAttribution.test.js	D	tests	keep
+src/core/dates/isoDate.js	E	implementation	keep
+src/core/dates/isoDate.test.js	D	tests	keep
+src/core/db/migration.js	E	implementation	keep
+src/core/db/migration.test.js	D	tests	keep
+src/core/domain/cash/cashSettlementPort.js	E	implementation	keep
+src/core/domain/cash/settlementAdapter.js	E	implementation	keep
+src/core/domain/cash/settlementAdapter.test.js	D	tests	keep
+src/core/domain/costBasis/engine.js	E	implementation	keep
+src/core/domain/costBasis/engine.test.js	D	tests	keep
+src/core/domain/fee/feeEngine.js	E	implementation	keep
+src/core/domain/fee/feeEngine.test.js	D	tests	keep
+src/core/domain/funds/engine.js	E	implementation	keep
+src/core/domain/funds/engine.test.js	D	tests	keep
+src/core/domain/fx/crossRate.js	E	implementation	keep
+src/core/domain/fx/crossRate.test.js	D	tests	keep
+src/core/domain/instrument/registry.js	E	implementation	keep
+src/core/domain/instrument/registry.test.js	D	tests	keep
+src/core/domain/instrument/resolve.js	E	implementation	keep
+src/core/domain/instrument/resolve.test.js	D	tests	keep
+src/core/domain/invariants/index.js	E	implementation	keep
+src/core/domain/loan/rate-normalize.test.js	D	tests	keep
+src/core/domain/loan/scheduleEngine.js	E	implementation	keep
+src/core/domain/loan/scheduleEngine.test.js	D	tests	keep
+src/core/domain/metals/fineWeight.js	E	implementation	keep
+src/core/domain/metals/fineWeight.test.js	D	tests	keep
+src/core/domain/operation/gateH.fieldLoss.test.js	D	tests	keep
+src/core/domain/operation/operationEngine.js	E	implementation	keep
+src/core/domain/operation/operationEngine.test.js	D	tests	keep
+src/core/domain/operation/operationEnvelope.test.js	D	tests	keep
+src/core/domain/operation/p0-op-roundtrip.test.js	D	tests	keep
+src/core/domain/operation/recovery.idempotency.test.js	D	tests	keep
+src/core/domain/price/mappingConflict.js	E	implementation	keep
+src/core/domain/price/mappingConflict.test.js	D	tests	keep
+src/core/domain/price/provider.js	E	implementation	keep
+src/core/domain/reconcile/engine.js	E	implementation	keep
+src/core/domain/reconcile/engine.test.js	D	tests	keep
+src/core/domain/stocks/corporateAction.js	E	implementation	keep
+src/core/domain/stocks/corporateAction.test.js	D	tests	keep
+src/core/domain/validation/index.js	E	implementation	keep
+src/core/domain/validation/positiveMoney.js	E	implementation	keep
+src/core/domain/validation/positiveMoney.test.js	D	tests	keep
+src/core/fixtures/core-vectors.test.js	D	tests	keep
+src/core/fixtures/harness.js	E	implementation	keep
+src/core/fixtures/harness.test.js	D	tests	keep
+src/core/import/lineage.js	E	implementation	keep
+src/core/import/lineage.test.js	D	tests	keep
+src/core/integrity/accAccountCurrencyScan.js	E	implementation	keep
+src/core/integrity/archivedZeroBalance.js	E	implementation	keep
+src/core/integrity/integrity.test.js	D	tests	keep
+src/core/integrity/postedJournalCurrencyScan.js	E	implementation	keep
+src/core/iran/settlementPolicy.js	E	implementation	keep
+src/core/iran/settlementPolicy.test.js	D	tests	keep
+src/core/iran/toman.js	E	implementation	keep
+src/core/iran/toman.test.js	D	tests	keep
+src/core/license/licenseGate.js	E	implementation	keep
+src/core/license/licenseGate.test.js	D	tests	keep
+src/core/money/canonicalDecimal.js	E	implementation	keep
+src/core/money/canonicalDecimal.test.js	D	tests	keep
+src/core/money/decimalMath.js	E	implementation	keep
+src/core/money/sumDecimal.test.js	D	tests	keep
+src/core/persistence/browser/durableMemoryAdapter.js	E	implementation	keep
+src/core/persistence/browser/durableMemoryAdapter.test.js	D	tests	keep
+src/core/persistence/browser/port.contract.js	E	implementation	keep
+src/core/persistence/browser/sqlJsIndexedDbAdapter.js	E	implementation	keep
+src/core/persistence/browser/sqlJsIndexedDbAdapter.test.js	D	tests	keep
+src/core/persistence/port.js	E	implementation	keep
+src/core/persistence/resultSnapshot.js	E	implementation	keep
+src/core/persistence/worker.js	E	implementation	keep
+src/core/persistence/worker.test.js	D	tests	keep
+src/core/price/mappingResolver.js	E	implementation	keep
+src/core/price/mappingResolver.test.js	D	tests	keep
+src/core/rebuild/ordering.js	E	implementation	keep
+src/core/rebuild/ordering.test.js	D	tests	keep
+src/core/recovery/backup.js	E	implementation	keep
+src/core/recovery/backup.test.js	D	tests	keep
+src/core/recovery/offlineRecovery.test.js	D	tests	keep
+src/core/sync/tabWriter.js	E	implementation	keep
+src/core/sync/tabWriter.test.js	D	tests	keep
+src/core/tax/taxEvents.js	E	implementation	keep
+src/core/tax/taxEvents.test.js	D	tests	keep
+src/core/tax/taxStatus.test.js	D	tests	keep
+src/core/valuation/reportContext.js	E	implementation	keep
+src/core/valuation/reportContext.test.js	D	tests	keep
+src/core/valuation/valuationContext.js	E	implementation	keep
+src/core/valuation/valuationContext.test.js	D	tests	keep
+src/features/crypto/commands/buy.js	E	implementation	keep
+src/features/crypto/commands/sell.js	E	implementation	keep
+src/features/crypto/commands/transfer.js	E	implementation	keep
+src/features/crypto/public-api/index.js	E	implementation	keep
+src/features/crypto/tests/buy.test.js	D	tests	keep
+src/features/crypto/tests/multicurrency.test.js	D	tests	keep
+src/features/crypto/tests/recovery-roundtrip.test.js	D	tests	keep
+src/features/crypto/tests/sell.test.js	D	tests	keep
+src/features/crypto/tests/standalone.test.js	D	tests	keep
+src/features/crypto/tests/transfer.test.js	D	tests	keep
+src/features/funds/commands/distribution.js	E	implementation	keep
+src/features/funds/commands/redeem.js	E	implementation	keep
+src/features/funds/commands/subscribe.js	E	implementation	keep
+src/features/funds/domain/cashPath.js	E	implementation	keep
+src/features/funds/public-api/index.js	E	implementation	keep
+src/features/funds/tests/distribution.test.js	D	tests	keep
+src/features/funds/tests/gateH.test.js	D	tests	keep
+src/features/funds/tests/redeem.test.js	D	tests	keep
+src/features/funds/tests/standalone.test.js	D	tests	keep
+src/features/funds/tests/subscribe.test.js	D	tests	keep
+src/features/loan/adapters/accountsCashAdapter.js	E	implementation	keep
+src/features/loan/adapters/localSettlementAdapter.js	E	implementation	keep
+src/features/loan/commands/capabilities.js	E	implementation	keep
+src/features/loan/commands/createLoan.js	E	implementation	keep
+src/features/loan/commands/generateSchedule.js	E	implementation	keep
+src/features/loan/commands/previewSchedule.js	E	implementation	keep
+src/features/loan/commands/recordPayment.js	E	implementation	keep
+src/features/loan/commands/reversePayment.js	E	implementation	keep
+src/features/loan/domain/feeTier.js	E	implementation	keep
+src/features/loan/domain/loanState.js	E	implementation	keep
+src/features/loan/domain/paymentAllocation.js	E	implementation	keep
+src/features/loan/domain/remainingBalance.js	E	implementation	keep
+src/features/loan/domain/role.js	E	implementation	keep
+src/features/loan/domain/scheduleFacade.js	E	implementation	keep
+src/features/loan/domain/scheduleSnapshot.js	E	implementation	keep
+src/features/loan/fixtures/loan-create.test.js	D	tests	keep
+src/features/loan/ledger/feeRepository.js	E	implementation	keep
+src/features/loan/ledger/loanRepository.js	E	implementation	keep
+src/features/loan/ledger/scheduleRepository.js	E	implementation	keep
+src/features/loan/ledger/transactionRepository.js	E	implementation	keep
+src/features/loan/ports/cashSettlementPort.js	E	implementation	keep
+src/features/loan/public-api/index.js	E	implementation	keep
+src/features/loan/queries/getLoan.js	E	implementation	keep
+src/features/loan/queries/getSchedule.js	E	implementation	keep
+src/features/loan/queries/getStatement.js	E	implementation	keep
+src/features/loan/queries/listLoans.js	E	implementation	keep
+src/features/loan/reports/statement.js	E	implementation	keep
+src/features/loan/tests/atomic-loan.test.js	D	tests	keep
+src/features/loan/tests/fee-repository.test.js	D	tests	keep
+src/features/loan/tests/golden-schedule.test.js	D	tests	keep
+src/features/loan/tests/payment-allocation.test.js	D	tests	keep
+src/features/loan/tests/recovery-roundtrip.test.js	D	tests	keep
+src/features/loan/tests/standalone-boot.test.js	D	tests	keep
+src/features/metals/commands/buy.js	E	implementation	keep
+src/features/metals/commands/delivery.js	E	implementation	keep
+src/features/metals/commands/sell.js	E	implementation	keep
+src/features/metals/domain/valuationBasis.js	E	implementation	keep
+src/features/metals/public-api/index.js	E	implementation	keep
+src/features/metals/tests/buy.test.js	D	tests	keep
+src/features/metals/tests/delivery-fee-separation.test.js	D	tests	keep
+src/features/metals/tests/delivery.test.js	D	tests	keep
+src/features/metals/tests/gateH.test.js	D	tests	keep
+src/features/metals/tests/sell.test.js	D	tests	keep
+src/features/metals/tests/standalone.test.js	D	tests	keep
+src/features/stocks/commands/buy.js	E	implementation	keep
+src/features/stocks/commands/dividend.js	E	implementation	keep
+src/features/stocks/commands/sell.js	E	implementation	keep
+src/features/stocks/commands/settle.js	E	implementation	keep
+src/features/stocks/public-api/index.js	E	implementation	keep
+src/features/stocks/tests/buy.test.js	D	tests	keep
+src/features/stocks/tests/dividend.test.js	D	tests	keep
+src/features/stocks/tests/gateH.test.js	D	tests	keep
+src/features/stocks/tests/sell.test.js	D	tests	keep
+src/features/stocks/tests/settle.test.js	D	tests	keep
+src/features/stocks/tests/standalone.test.js	D	tests	keep
+fixtures/CORE-OPENING-BALANCE.json	B	fixtures	canonical fixture
+fixtures/CORE-REVERSAL-BEFORE-AFTER.json	B	fixtures	canonical fixture
+fixtures/CRITICAL-C2C-SWAP.json	B	fixtures	canonical fixture
+fixtures/CRITICAL-TOMAN-INPUT.json	B	fixtures	canonical fixture
+fixtures/CRITICAL-TRANSFER-FEE.json	B	fixtures	canonical fixture
+fixtures/CRYPTO-BRIDGE-FEE.json	B	fixtures	canonical fixture
+fixtures/CRYPTO-BTC-USDT-IRR-PNL.json	B	fixtures	canonical fixture
+fixtures/CRYPTO-BUY-FEE-FROM-BASE.json	B	fixtures	canonical fixture
+fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json	B	fixtures	canonical fixture
+fixtures/CRYPTO-SELL-FEE.json	B	fixtures	canonical fixture
+fixtures/FUND-DIVIDEND-REINVEST.json	B	fixtures	canonical fixture
+fixtures/FUND-NAV-VS-TX-PRICE.json	B	fixtures	canonical fixture
+fixtures/LOAN-BULLET.json	B	fixtures	canonical fixture
+fixtures/LOAN-FLAT.json	B	fixtures	canonical fixture
+fixtures/LOAN-QARZ.json	B	fixtures	canonical fixture
+fixtures/STANDALONE-CRYPTO.json	B	fixtures	canonical fixture
+fixtures/STANDALONE-FUND.json	B	fixtures	canonical fixture
+fixtures/STANDALONE-LOAN.json	B	fixtures	canonical fixture
+fixtures/STANDALONE-METALS.json	B	fixtures	canonical fixture
+fixtures/STANDALONE-STOCKS.json	B	fixtures	canonical fixture
+fixtures/STOCK-BUY-SELL-FEE.json	B	fixtures	canonical fixture
+fixtures/STOCK-CORPORATE-ACTION.json	B	fixtures	canonical fixture
+fixtures/STOCK-T2-SETTLEMENT.json	B	fixtures	canonical fixture
