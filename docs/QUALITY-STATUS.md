@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-39** OFFLINE-RELEASE result hash contract
+Cycle: **std-40** FILE-CLASSIFICATION.md consolidation tracker
 Production: NO-GO
