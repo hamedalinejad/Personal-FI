@@ -1,3 +1,4 @@
+> **SUPERSEDED** — See [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) (dependency rules / standalone).
 # Feature Independence Contract
 
 هر Feature مشخص می‌کند:
