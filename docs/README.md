@@ -1,41 +1,16 @@
-# Personal-FI Documentation
+# Documentation index
 
-## تیم توسعه — شروع از اینجا
+| Doc | Role |
+|-----|------|
+| PRODUCT.md | Product scope / editions |
+| ARCHITECTURE.md | Layers / boundaries |
+| FINANCIAL-CORE.md | Money / journal / SoT |
+| DATA-MODEL.md | Schema / fields / identity |
+| API.md | Envelope / errors |
+| REPORTING.md | Statements / valuation |
+| OFFLINE-RELEASE.md | Persistence / release |
+| DEVELOPMENT.md | Gates / workflow |
+| QUALITY-STATUS.md | **Live status only** |
+| modules/* | Per-feature owner |
 
-```text
-docs/DEVELOPER-HANDOFF.md
-```
-
-سپس: `READY-FOR-CODING.md` · `core/CODING-GATE.md` · `core/GO-NO-GO.md`
-
-## Authority
-
-| موضوع | مرجع |
-|--------|------|
-| Handoff تیم | `DEVELOPER-HANDOFF.md` |
-| سلسله‌مراتب | `core/DOC-AUTHORITY-CHAIN.md` |
-| معماری | `core/ARCHITECTURE-LOCKED.md` |
-| UX ≤۶ | `00-Product/Pages-IA.md` |
-| Schema | `core/db/schema.sql` |
-| Loan v1 | `core/LOAN-V1-RESOLUTIONS.md` + `LOAN-V1-SCHEMA-DISPOSITION.md` |
-| Domain contracts | `core/DOMAIN-CONTRACTS-31-44.md` |
-| وضعیت زنده | `core/OPEN-ISSUES-REGISTER.md` · `MASTER-SPEC-VERDICT.md` |
-| Closed / deferred | `core/DEFERRED-AND-CLOSED.md` |
-
-## Feature specs
-
-`docs/features/**` — جزئیات domain. در تعارض با concept home، **concept home برنده است**.
-
-## Historical
-
-`FINAL-THINK-TANK-*`، `THINK-TANK-*`، audit تاریخ‌دار = تاریخچه، نه مرجع اجرایی.
-
-## Production
-
-**NO-GO** تا evidence در GO-NO-GO و checklist Loan RELEASE-PROVEN سبز شود.
-
-
-## Requirements map
-- `core/MISSING-REQUIREMENTS-REGISTER.md` — P0/P1/P2 closed vs open
-- `core/CROSS-FEATURE-DEPENDENCY-GRAPH.md`
-- `core/json-schemas/`
+Machine: `core/db/schema.sql`, registries, fixtures.

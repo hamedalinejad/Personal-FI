@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertPositive, assertNonNegative } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { applySingleFee } from "../../../core/domain/fee/feeEngine.js";
 import { openDb } from "../../../core/persistence/port.js";

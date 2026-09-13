@@ -6,6 +6,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertPositive } from "../../../core/domain/validation/positiveMoney.js";
 import { fundCashJournalLines } from "../domain/cashPath.js";
 import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resolve.js";
 
@@ -37,8 +38,8 @@ export async function subscribeFund(input, { dataDir } = {}) {
   } else {
     throw new Error("VALIDATION_ERROR:transactionPrice_or_nav");
   }
-  if (!txPrice.gt(0)) throw new Error("FUND_PRICE_NONPOSITIVE");
-  if (nav != null && !nav.gt(0)) throw new Error("FUND_NAV_NONPOSITIVE");
+  assertPositive(txPrice.toFixed(), "FUND_PRICE_NONPOSITIVE");
+  if (nav != null) assertPositive(nav.toFixed(), "FUND_NAV_NONPOSITIVE");
 
   let amount;
   if (p.amount != null && p.amount !== "") {
@@ -50,7 +51,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
   } else {
     amount = qty.times(txPrice);
   }
-  if (!amount.gt(0)) throw new Error("FUND_AMOUNT_NONPOSITIVE");
+  assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
 
   // BUG-005: transaction vs base currency
   const transactionCurrency = p.transactionCurrency || p.currency;
