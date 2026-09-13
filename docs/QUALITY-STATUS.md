@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-21** Technical-Architecture superseded → ARCHITECTURE.md
+Cycle: **std-22** modules/accounts.md expanded
 Production: NO-GO
