@@ -103,3 +103,12 @@ No IEEE float in domain logic.
 `exchangeRateToBase` = base units per 1 transaction-currency unit.  
 `amountInBase = amount × exchangeRateToBase`.  
 Historical rebuild uses **stored** rates, never “latest now”. Missing rate → fail-closed.
+
+
+## Deterministic rebuild
+```
+rebuild(asOf, engineVersions, sourceLedger) → projections
+```
+Same ledger + same engineVersions + same asOf/context ⇒ same output.  
+No live provider calls during historical reconstruction.
+

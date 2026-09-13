@@ -55,3 +55,14 @@ Legacy values `swapped` / `durable` are **not** schema states (transport markers
 | Reversal | inverse accounting + linkage |
 
 Browser sql.js+IndexedDB must be RELEASE-PROVEN before shipping browser production; durable-memory protocol alone is insufficient.
+
+
+## Backup package (machine)
+formatVersion · schemaVersion · database payload · metadata · checksums · createdAt · engineVersions · restore validation · atomic replace · corrupt → reject
+
+## Import lineage
+```
+import_batch → raw_record → dedupe_key → normalized → operation → journal → provenance
+```
+Unknown provider fields survive unless user chooses destructive transform.
+
