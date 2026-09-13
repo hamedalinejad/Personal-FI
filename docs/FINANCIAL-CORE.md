@@ -99,3 +99,19 @@ Core: originalOperationId → reversalOperationId. Feature reverse links are con
 
 ## Rate units
 Percentage points: 12 means 12%. Internal fraction = value/100. Never treat 12 as 12.0 interest multiple.
+
+
+## Settlement (Stocks T+n)
+Trade date posts inventory vs payable/receivable. Settlement date posts payable/receivable vs cash. Never post cash on trade date when settlementDate is future.
+
+## Tax
+TaxRecord = obligation. TaxEvent = assessment/adjustment. Status `paid` only after `payTax` financial operation.
+
+## Metals purity
+purityRatio is RAW; fineWeightMg = quantityMg × purityRatio (DERIVED). Missing purity rejected unless instrument policy fixed_1.
+
+## Crypto economic_kind
+acquisition | disposal | transfer_internal | swap_economic | fee — C2C economic swap ≠ internal transfer.
+
+## Funds prices
+NAV, transactionPrice, liquidationPrice are distinct; never infer liquidation from NAV.

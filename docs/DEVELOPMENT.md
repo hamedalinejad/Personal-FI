@@ -22,3 +22,13 @@ PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API → module �
 
 ## 6. Absorbs
 DOCUMENTATION-STANDARD process text · DEVELOPER-HANDOFF · READY-FOR-CODING (pointers only at those paths).
+
+
+## Consolidation progress
+Generation A owners are CURRENT. Generation B under docs/core prose is ARCHIVE or MERGE pointer. Schema/registry remain MACHINE under docs/core/db and docs/core/registry.
+
+## AI coding rules
+1. Read PRODUCT → ARCHITECTURE → FINANCIAL-CORE → module → schema.sql
+2. Do not treat archive/ or SUPERSEDED files as requirements
+3. One defect → one fix → one test → QUALITY-STATUS
+4. Never create new BUG-*.md authority files
