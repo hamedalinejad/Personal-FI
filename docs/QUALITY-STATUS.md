@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-13** Product-Map-EN superseded pointer → PRODUCT.md
+Cycle: **std-14** modules/crypto.md expanded
 Production: NO-GO

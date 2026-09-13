@@ -1,5 +1,24 @@
 # Module: Crypto
 
-Commands v1: buy, sell, transfer. Fee funding kind required when fee present.
-Identity: instrumentId + network for chain assets.
-Deferred: swap, deposit, airdrop, full reversal suite (or explicit DEFER in registry).
+**Owner:** this file
+
+## 1. Purpose
+Spot crypto holdings with fee-aware cost basis.
+
+## 2. Scope SUPPORTED
+buy · sell · transfer · fee_funding_kind cash|asset · positive qty gates · instrumentId identity (network-aware instruments distinct).
+
+## 3. DEFERRED / OPEN
+swap · deposit/withdraw full surface · airdrop · complete reversal suite · DeFi.
+
+## 4. Economic kind
+transfer-like ops must declare internal_transfer | bridge | economic_swap | acquisition | disposal as applicable.
+
+## 5. Fees
+feeCurrency XOR feeInstrumentId; fee_from_received requires receivedInstrumentId context.
+
+## 6. Cash
+No exchange cash ledger SoT — journal only.
+
+## 7. Acceptance
+Dimensional fee tests · conservation · standalone crypto-only path partial.
