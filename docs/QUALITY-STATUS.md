@@ -17,6 +17,7 @@ Live only. History in Git. **No new audit documents.**
 | METALS | purity/delivery | PARTIAL | module |
 | LOAN | formulas | STRONG | modules/loan + scheduleEngine |
 | BROWSER | sql.js RELEASE-PROVEN | OPEN | — |
+| INV | Field inventory covers schema columns | GREEN | schema:inventory strict |
 | FREEZE | semantic freeze | false | — |
 | PROD | Production | **NO_GO** | — |
 
