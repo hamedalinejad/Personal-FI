@@ -14,3 +14,5 @@
 
 Target: Documentation Standardized when QUALITY-STATUS says so and competing CURRENT prose is gone.
 | 76-80 | core.md pointer; module edges; anti-patterns; edition matrix; QUALITY 85% |
+| 81-83 | Entity catalog from schema; projection cash rule |
+| 84 | MERGE file inbound-ref policy: safe DELETE only after scripts/docs-validator |
