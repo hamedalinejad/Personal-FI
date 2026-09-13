@@ -1,27 +1,27 @@
 # Module: Income & Expense
 
-**Owner:** this file · **Cash SoT:** FINANCIAL-CORE (journal)
+**Owner:** this file · Template: ../MODULE-TEMPLATE.md
 
 ## 1. Purpose
-Record personal income and expense with categories; optional tax/fee links.
+Record income and expense with categories; optional tax/fee links.
 
 ## 2. Scope
-Create/edit/list income & expense; recurring metadata; category taxonomy.
+create/list/filter; category taxonomy; recurring metadata (DEFERRED engine).
 
-## 3. Non-goals
-Separate cash ledger · payroll · multi-entity.
+## 3. Non-Goals
+Separate cash ledger · payroll.
 
-## 4. Commands (target)
-`income.create` · `expense.create` · reversals via Core reverse path.
+## 5. Pages
+`/transactions` filters + sheets.
 
-## 5. Journal
-Income: Dr cash / Cr income. Expense: Dr expense / Cr cash (or payable). Amounts decimal strings.
+## 10. Commands
+`income.create` · `expense.create` · reverse via Core.
 
-## 6. Validation
-Positive amount; currency; businessDate required; category optional but if set must exist.
+## 18. Journal Effects
+Income: Dr cash / Cr income. Expense: Dr expense / Cr cash.
 
-## 7. Deferred
-Full recurring engine automation · installment expense products.
+## 19. Cash Effects
+Journal only.
 
-## 8. Acceptance
-Posted op + balanced journal + reversible · no ghost cash table.
+## 34. Acceptance
+Balanced journal · decimal strings · reversible.

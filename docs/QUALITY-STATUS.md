@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-37** modules/cheque.md state machine + template alignment
+Cycle: **std-38** modules/income-expense.md template alignment
 Production: NO-GO
