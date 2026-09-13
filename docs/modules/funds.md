@@ -104,3 +104,8 @@ src/features/funds/tests
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+
+### Price fields
+NAV · transactionPrice · liquidationPrice are distinct. **NAV must never** auto-fill transaction or liquidation price.
+Distribution vs reinvestment: explicit commands; cash vs units effects via journal.

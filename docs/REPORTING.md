@@ -24,3 +24,10 @@ TB balances; NW cash matches journal; historical includes valuation context.
 
 ## Release
 Full golden suite PARTIAL until RELEASE_PROVEN.
+
+
+## Investment performance definitions
+- **Realized P&L:** from disposal operations (cost basis vs proceeds − fees) in base.
+- **Unrealized P&L:** valuation(asOf) − cost basis; uses priceAsOf + fxAsOf context; never rewrites cost.
+- **Fees / FX gain:** separate attribution lines when reported.
+- Cash flows for TWR/MWR: explicit dated external flows only; formulas versioned in engineVersions.

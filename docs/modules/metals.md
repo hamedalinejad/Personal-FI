@@ -112,3 +112,7 @@ src/features/metals/tests
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+
+### Physical fields
+gross weight (quantityMg RAW) · purityRatio RAW · fineWeight DERIVED · optional serial/certificate/location · delivery fee ≠ trade fee.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-13",
+  "updated": "2026-09-13-proof-pack",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
@@ -95,9 +95,32 @@
     "Development": "docs/DEVELOPMENT.md"
   },
   "deferred_v1": {
-    "loan.borrower": "LOAN_ROLE_DEFERRED",
-    "corporate_action_engine": "GAP-015",
-    "browser_sqljs": "GAP-005",
-    "penalty_accrual": "DEFERRED_V1"
+    "crypto": [
+      "deposit",
+      "withdrawal",
+      "swap",
+      "airdrop",
+      "opening_balance"
+    ],
+    "stocks": [
+      "bonus",
+      "split",
+      "reverse_split",
+      "rights",
+      "merger",
+      "spinoff",
+      "symbol_change"
+    ],
+    "loan": [
+      "borrower_role",
+      "variable_rate",
+      "actual_365"
+    ],
+    "browser": [
+      "sqljs_indexeddb_release_proven"
+    ],
+    "schema": [
+      "FREEZE_PROVEN"
+    ]
   }
 }
