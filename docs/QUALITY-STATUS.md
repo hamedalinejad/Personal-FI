@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-10** modules/income-expense.md created
+Cycle: **std-11** modules/cheque.md created
 Production: NO-GO
