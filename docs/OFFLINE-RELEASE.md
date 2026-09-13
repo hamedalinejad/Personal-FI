@@ -1,34 +1,36 @@
-# OFFLINE-RELEASE (sole offline/persistence/release owner)
+# OFFLINE-RELEASE (sole offline + release evidence owner)
 
 **Status:** CURRENT
 
-## 1. Persistence port
-Node SQLite is production path for server/desktop tooling.  
-Browser sql.js + IndexedDB adapter: **OPEN** (durable-memory is not RELEASE_PROVEN).
+## 1. Persistence
+| Runtime | Store | Status |
+|---------|-------|--------|
+| Node | SQLite `personal-fi.sqlite` | primary |
+| Browser | Persistence port → sql.js + IndexedDB | PROTOCOL_PROVEN harness; browser E2E OPEN |
 
-## 2. States
-* Financial operation `status`: draft | posted | voided | failed  
-* Persistence durability: separate (sql_committed / persisted / …) — never confused with business status.
+## 2. Durability
+ACK only after publish. Atomic temp → rename/publish pattern. `result_json` after relational journal commit.
 
-## 3. Recovery
-Crash points around txn/commit/ack must yield no duplicate ops/journals; deterministic replay from relational SoT.  
-`result_json` is diagnostic/replay envelope only.
+## 3. Multi-tab
+Single writer; non-writer → `WRITER_REQUIRED` (`tabWriter`).
 
-## 4. Backup/restore
-Versioned package + schema version + integrity hash required for RELEASE_PROVEN (format OPEN until implemented).
+## 4. Recovery vectors (required for RELEASE_PROVEN)
+crash before/after commit · backup/restore · same operationId replay · conflict on hash mismatch · offline reopen · standalone boot.
 
-## 5. Release ladder
-SPEC_LOCKED → IMPLEMENTED → INTEGRATED → GOLDEN_GREEN → RECOVERY_GREEN → STANDALONE_GREEN → REBUILD_GREEN → NO_FIELD_LOSS → CI_GREEN → **RELEASE_PROVEN**
+## 5. Migration
+Forward schema migrations; backup before migrate; no silent destructive drop of financial history.
 
-## 6. Evidence
-RELEASE_PROVEN is **computed** from evidence, not a hand-edited label.
+## 6. Release vocabulary
+| Token | Meaning |
+|-------|---------|
+| IMPLEMENTED | code path exists |
+| PARTIAL | subset |
+| GOLDEN-GREEN | golden fixtures pass |
+| RECOVERY-GREEN | recovery matrix pass |
+| RELEASE-PROVEN | golden+recovery+standalone+CI for claimed edition |
+| Production | NO-GO until RELEASE-PROVEN |
 
+**IMPLEMENTED ≠ RELEASE-PROVEN.**
 
-## 7. Result hash contract
-```
-canonicalResultPayload (no result_hash field)
-  → stable canonical serialization
-  → SHA-256
-  → stored result_hash
-```
-Load may recompute and flag mismatch; relational journal remains SoT.
+## 7. Live status
+QUALITY-STATUS.md is the only live dashboard — do not duplicate competing status matrices.

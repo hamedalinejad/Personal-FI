@@ -1,34 +1,24 @@
-# DEVELOPMENT (sole engineering workflow owner)
+# DEVELOPMENT (sole workflow owner)
 
 **Status:** CURRENT
 
-## 1. Entry path for humans / Coding AI
-PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API → REPORTING → OFFLINE-RELEASE → DEVELOPMENT → `modules/<feature>.md` → schema + fixtures + tests.
-
-## 2. Change protocol
+## 1. Defect workflow
 ```
-ONE DEFECT → ONE CODE FIX → ONE TEST → QUALITY-STATUS update
-(+ OWNER DOC only if contract changes)
+ONE DEFECT → ONE CODE FIX → ONE TEST → QUALITY-STATUS
 ```
-Forbidden: defect → new audit → new matrix → new competing contract.
+Do **not** create new `BUG-*` / `GAP-*` authority markdown files.
 
-## 3. Gates
-`npm run gates` (tests, schema drift/inventory/manifest, lints, integrity:audit, release:evidence skeleton).
+## 2. Documentation workflow
+EXTRACT → MERGE into owner → REPOINT → VALIDATE → ARCHIVE/DELETE
 
-## 4. Status vocabulary
-* Docs: DRAFT | REVIEW | LOCKED | ARCHIVED | GENERATED  
-* Impl: SPEC_ONLY | SCAFFOLD | IMPLEMENTED | INTEGRATED  
-* Proof: UNPROVEN | GOLDEN_GREEN | RECOVERY_GREEN | STANDALONE_GREEN | RELEASE_PROVEN  
-* Release: NO_GO | CONDITIONALLY_GO | GO  
+## 3. Coding gates
+`npm test` · `npm run gates` (boundaries, inventory STRICT, fixture empty, money-number lint, schema sync).
 
-IMPLEMENTED ≠ RELEASE_PROVEN.
+## 4. Do not guess
+Missing contract → leave OPEN/PARTIAL; do not invent column names, fee treatment, T+n calendar, or purity defaults.
 
-## 5. Coding order
-Loan vertical proof first; then copy pattern to other features. No parallel production release claims.
+## 5. Entry path
+PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API → module → tests.
 
-## 6. Documentation
-DOCUMENTATION-STANDARD.md is process authority. Do not create micro BUG-*-STATUS files.
-
-
-## 7. File classification
-Track CURRENT/MERGE/ARCHIVE/GENERATED/DELETE in FILE-CLASSIFICATION.md during consolidation.
+## 6. Absorbs
+DOCUMENTATION-STANDARD process text · DEVELOPER-HANDOFF · READY-FOR-CODING (pointers only at those paths).

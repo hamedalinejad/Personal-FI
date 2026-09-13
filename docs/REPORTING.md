@@ -1,21 +1,28 @@
-# REPORTING (sole reporting/valuation owner)
+# REPORTING (sole reports owner)
 
 **Status:** CURRENT
 
-## 1. Accounting set
-GL · Trial Balance · Balance Sheet · Income Statement · Cash Flow · Account activity · Opening · Reconciliation  
-All derived from **journal SoT**.
+## 1. Report set
+GL · Trial Balance · Balance Sheet · Income Statement · Cash Flow · Account activity · Net Worth · Investment performance · Historical as-of valuation.
 
-## 2. Book base
-TB/BS use one bookBaseCurrency (arg or `db_meta.book_base_currency`). Mixed operation bases without filter → reject.
+## 2. Cash / Net Worth SoT
+**Cash and NW cash legs derive from Core journal only.**  
+`rpt_*` snapshots may accelerate; must reconcile to journal. Never `rep_*` prefix.
 
-## 3. Investment set
-Holdings · cost basis · realized/unrealized P&L · fees · external flows · wealth bridge.  
-External contribution ≠ P&L.
+## 3. Historical as-of order (locked)
+```
+ledger cutoff → corporate actions → cost basis rebuild → settlement cutoff
+→ price selection → FX selection → valuation → report
+```
 
-## 4. Valuation
-Prices are typed objects (price, currency, quoteType, marketDate, source…).  
-Historical pipeline order (locked): ledger cutoff → CA cutoff → cost rebuild → settlement cutoff → price → FX → valuation → report.
+## 4. Valuation context (required on historical results)
+`asOf` · `priceAsOf` · `fxAsOf` · `engineVersions` · `staleStatus`
 
-## 5. Cash in reports
-Journal only — not platform/brokerage cash caches.
+## 5. Tables
+`rpt_presets` · `rpt_snapshots` · `rpt_net_worth_snapshots` only.
+
+## 6. Release
+Full BS/IS/CF golden suite: **PARTIAL** until RELEASE_PROVEN (QUALITY-STATUS).
+
+## 7. Supersedes
+Reports-Analytics feature prose as secondary; Essential-Reports absorbed here.
