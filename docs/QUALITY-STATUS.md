@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-3** ARCHITECTURE.md sole architecture owner
+Cycle: **std-4** FINANCIAL-CORE.md sole financial semantics owner
 Production: NO-GO
