@@ -855,3 +855,5 @@ ln_loan_fee_tiers	priority	RAW	Loan	no	ln_loan_fee_tiers	canonical	yes
 tax_records	calendar_system	RAW	Tax	no	tax_records	canonical	yes
 tax_records	period_start	RAW	Tax	no	tax_records	canonical	yes
 tax_records	period_end	RAW	Tax	no	tax_records	canonical	yes
+fin_journal_lines	source_channel	RAW	Core	No	fin_operations	preserve	yes
+inv_stocks_iran_transactions	related_operation_id	RAW	Stocks	No	fin_operations	preserve	yes

@@ -109,15 +109,9 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')),
   memo            TEXT,
   reference TEXT,
-  -- source_type: business provenance of the journal line
-  -- - 'ui': user action via UI
-  -- - 'api': API request
-  -- - 'import': imported from external source (via Import module)
-  -- - 'migration': one-time migration data
-  -- - 'system': automated system operation (reconciliation, tax calc, rebuild)
-  -- - 'reconciliation': manual reconciliation adjustment
-  -- sourceChannel (deprecated): use source_type instead
-  source_type TEXT CHECK (source_type IS NULL OR source_type IN ('ui','api','import','migration','system','reconciliation')),
+  -- BUG-FINAL-040: source_channel = interface; source_type = business provenance (see SOURCE-VOCABULARY.md)
+  source_channel TEXT CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system','reconciliation')),
+  source_type TEXT, -- business provenance (manual|bank_statement|broker_statement|…) — NOT channel
   -- sourceReference: external reference for audit trail (file name, URL, batch label)
   source_reference TEXT
 );

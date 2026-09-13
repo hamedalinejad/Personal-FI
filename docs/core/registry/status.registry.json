@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "updated": "2026-09-12",
+  "updated": "2026-09-13",
   "schema_status": {
     "SPEC_LOCKED": true,
-    "FREEZE_PROVEN": true,
-    "FREEZE_EVIDENCE": "field-inventory STRICT + schema loadable + schema-manifest check",
+    "FREEZE_PROVEN": false,
+    "FREEZE_EVIDENCE": "SPEC_LOCKED content; FREEZE_PROVEN=false until semantic freeze gate complete (see SCHEMA-FREEZE-STATUS.md)",
     "RELEASE_PROVEN": false
   },
   "features": {

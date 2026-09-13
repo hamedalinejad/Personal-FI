@@ -15,7 +15,7 @@
     "docs:validate": "node scripts/docs-validator.js",
     "registry:index": "node scripts/registry-index.js",
     "bench:smoke": "node scripts/bench-smoke.js",
-    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity",
+    "gates": "npm test && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity && npm run lint:source-vocab",
     "schema:manifest:check": "node scripts/schema-manifest-check.js",
     "docs:consistency": "node scripts/docs-consistency.js",
     "lint:money-sql": "node scripts/lint-no-sql-sum-money.js",
@@ -28,7 +28,8 @@
     "schema:sync": "node scripts/schema-sync-pipeline.js",
     "schema:field-diff": "node scripts/feature-field-diff.js",
     "release:evidence": "node scripts/release-evidence.js",
-    "lint:query-purity": "node scripts/lint-query-purity.js"
+    "lint:query-purity": "node scripts/lint-query-purity.js",
+    "lint:source-vocab": "node scripts/source-vocab-check.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"
