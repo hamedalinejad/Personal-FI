@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertPositive, assertNonNegative } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { openDb } from "../../../core/persistence/port.js";
 
@@ -26,12 +27,12 @@ export async function sellStock(input, { dataDir } = {}) {
 
   const qty = toDecimal(p.quantity);
   const price = toDecimal(p.price);
-  if (!qty.gt(0)) throw new Error("STOCK_QTY_NONPOSITIVE");
-  if (!price.gt(0)) throw new Error("STOCK_PRICE_NONPOSITIVE");
+  assertPositive(p.quantity, "STOCK_QTY_NONPOSITIVE");
+  assertPositive(p.price, "STOCK_PRICE_NONPOSITIVE");
   const currency = p.currency;
   const proceeds = qty.times(price);
   const commission = toDecimal(p.commission || "0");
-  if (commission.isNegative()) throw new Error("STOCK_COMMISSION_NEGATIVE");
+  assertNonNegative(p.commission || "0", "STOCK_COMMISSION_NEGATIVE");
   const netProceeds = proceeds.minus(commission);
   if (netProceeds.lt(0)) throw new Error("VALIDATION_ERROR:commission");
 
