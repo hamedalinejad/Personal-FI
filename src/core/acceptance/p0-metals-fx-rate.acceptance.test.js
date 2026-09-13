@@ -14,6 +14,7 @@ test("P0-02 metals stores real exchange_rate_to_base", async () => {
       operationId: randomUUID(),
       payload: {
         instrumentId: "au-1",
+        symbol: "XAU",
         platformId: "plat-1",
         quantityMg: "1000",
         purityRatio: "0.999",
