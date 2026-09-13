@@ -1,19 +1,21 @@
-# Quality Status — continuous cycles 1–14
+# Quality Status — cycles 1–25 (continuous)
 
-**HEAD:** f53483f  
-**Tests:** 238 pass  
+**HEAD target after this commit**  
+**Tests:** 239+  
 **Production:** NO-GO
 
-## Code fixes
-| Cycle | Work |
-|-------|------|
-| 1 | P0-01 fee expense ccy, P0-02 metals FX rate, P0-03 fee ccy policy, transfer qty |
-| 2 | integrity:audit, result hash flag, FINANCIAL-CORE |
-| 3 | loan frequency gate, ARCHITECTURE, modules/loan |
-| 4–5 | Owner docs + DATA-MODEL + modules |
-| 6–9 | Acceptance tests P0-01/02 green |
-| 10–11 | deferred_v1 registry, P0-03 test, module stubs |
-| 12–14 | positiveMoney helpers; stocks.sell + funds.redeem |
+## Done this session
+- P0-01 fee expense currency matches line
+- P0-02 metals exchange_rate_to_base real value
+- P0-03 third-currency fee rejected
+- integrity:audit script
+- Owner docs structure (PRODUCT…modules)
+- positiveMoney shared validators
+- book_base_currency + TB default
+- deferred_v1 in registry
 
-## Doc rule
-Owner docs only. No new BUG-*-STATUS micro files. Live status = this file.
+## Still OPEN (not bugs — release gaps)
+GAP-001 evidence, GAP-005 browser, GAP-015 CA engine, full reversal suite, …
+
+## Workflow
+one defect → fix → test → this file only
