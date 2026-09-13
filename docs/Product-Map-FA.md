@@ -1,3 +1,4 @@
+> **SUPERSEDED** — محصول: [`docs/PRODUCT.md`](PRODUCT.md).
 > **اصل UX:** 20 Feature ≠ 20 آیتم ناوبار — جزئیات `Pages-IA.md`.
 
 > **SoT Scope محصول:** این نقشه لیست Featureهای **محصول کامل** است.
