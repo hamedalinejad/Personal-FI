@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-53** Canonical-Financial-Operation superseded → FINANCIAL-CORE
+Cycle: **std-54** Cost-Basis-Engine superseded → FINANCIAL-CORE
 Production: NO-GO
