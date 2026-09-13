@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertPositive } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { openDb } from "../../../core/persistence/port.js";
 
@@ -24,8 +25,8 @@ export async function sellMetal(input, { dataDir } = {}) {
 
   const qty = toDecimal(p.quantityMg);
   const proceeds = toDecimal(p.proceedsTotal);
-  if (!qty.gt(0)) throw new Error("METAL_QTY_NONPOSITIVE");
-  if (!proceeds.gt(0)) throw new Error("METAL_PROCEEDS_NONPOSITIVE");
+  assertPositive(p.quantityMg, "METAL_QTY_NONPOSITIVE");
+  assertPositive(p.proceedsTotal, "METAL_PROCEEDS_NONPOSITIVE");
   const currency = p.currency;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);

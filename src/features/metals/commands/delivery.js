@@ -7,6 +7,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
+import { assertPositive } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { openDb } from "../../../core/persistence/port.js";
 
@@ -25,7 +26,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
   }
 
   const qty = toDecimal(p.quantityMg);
-  if (!qty.gt(0)) throw new Error("METAL_DELIVERY_QTY_NONPOSITIVE");
+  assertPositive(p.quantityMg, "METAL_DELIVERY_QTY_NONPOSITIVE");
   const currency = p.currency;
   const fee = toDecimal(p.deliveryFee || "0");
   if (p.feeCurrency && p.feeCurrency !== currency && fee.gt(0)) {
