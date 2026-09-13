@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Product scope/nav: see [`docs/PRODUCT.md`](../PRODUCT.md). This file is historical product map detail only; not normative.
 > **SoT Scope v1:** این نقشه لیست Featureهای محصول است و بر تفسیر محدود Blueprint قدیمی مقدم است.
 
 English Version - Product Map

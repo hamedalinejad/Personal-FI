@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-12** modules/loan.md expanded SUPPORTED/DEFERRED/UNSUPPORTED
+Cycle: **std-13** Product-Map-EN superseded pointer → PRODUCT.md
 Production: NO-GO
