@@ -28,3 +28,10 @@ No feature cash transaction tables as SoT (intentional omissions in schema remai
 
 ## 8. Absorbs
 Field-Level-SoT, ownership matrices, data dictionary prose → this file (detail tables may remain generated).
+
+
+## 9. Field metadata matrix (required columns)
+For every persisted financial field document:
+`field · entity · kind · owner · source · nullable · unit · currency · formula · migration · reversal · export`
+
+If not in SQL: only DERIVED | VIRTUAL | DEFERRED — never silent drop.

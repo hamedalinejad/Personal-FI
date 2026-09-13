@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-41** FINANCIAL-CORE algorithm doctrine (A/B/golden)
+Cycle: **std-42** DATA-MODEL field metadata matrix requirement
 Production: NO-GO
