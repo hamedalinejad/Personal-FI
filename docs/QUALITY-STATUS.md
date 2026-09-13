@@ -1,8 +1,8 @@
-# Quality Status — cycle-4
+# Quality Status — cycle-5
 
 | Item | Status |
 |------|--------|
-| API/REPORTING/OFFLINE/DEVELOPMENT owners | ADDED |
-| modules crypto/stocks | ADDED |
-| Doc consolidation | IN PROGRESS (no micro-spec spam) |
+| DATA-MODEL.md | ADDED |
+| funds/metals modules | ADDED |
+| P0-01 acceptance USD/IRR | ADDED |
 | Production | NO-GO |
