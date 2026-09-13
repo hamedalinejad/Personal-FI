@@ -139,3 +139,6 @@ N/A / DEFERRED — do not invent.\n
 ## 34. Acceptance Criteria
 
 Projection rows never post journal automatically.
+
+## Link to actuals
+Optional bg_transaction_links / bill occurrence → operationId. Link is REFERENCE only; deleting plan must not delete journal.

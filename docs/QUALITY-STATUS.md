@@ -4,13 +4,13 @@
 
 | Gate | Status |
 |------|--------|
-| Generation A owners | CURRENT |
-| Modules (11) | CURRENT (34-section) |
-| docs/core prose | reduced to machine + pointers |
-| docs/core/authority | ARCHIVE |
-| docs/features | SUPERSEDED banners |
-| MERGE top-level legacy | pointers |
+| Documentation owners | CURRENT |
+| Consolidation | **~90%** |
 | Production | **NO-GO** |
-| Documentation Standardized | **~85%** (fixtures/registry remain under core; OK as MACHINE) |
+| Schema MACHINE | docs/core/db |
+| Registry MACHINE | docs/core/registry |
+| Fixtures MACHINE | docs/core/fixtures + /fixtures |
+| Browser | PROTOCOL_PROVEN_NODE_HARNESS |
+| Golden/Recovery | PARTIAL |
 
-Remaining for 100% doc std: optional delete of zero-ref MERGE files after link check; keep schema/registry/fixtures.
+Documentation Standardized approaches completion when MERGE stubs optionally deleted and implemented-command TBD cells closed.

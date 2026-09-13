@@ -77,3 +77,6 @@ API-Reference and docs/core API micro-docs as authority.
 | CHEQUE_ | Cheque |
 | INV_ | Inventory/journal invariants |
 | WRITER_ | Multi-tab |
+
+## Cursor encoding
+Base64url JSON: `{"businessDate":"...","createdAt":"...","id":"..."}` matching sort keys. Invalid cursor → API_CURSOR_INVALID.

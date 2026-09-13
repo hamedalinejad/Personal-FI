@@ -42,3 +42,6 @@ Only QUALITY-STATUS.md for live gates.
 | EV-BROWSER-001 | Node harness durable ACK |
 | EV-RECOVERY-001 | backup restore load operation |
 | EV-IDEM-001 | same operationId replay |
+
+## Writer lock semantics
+acquireWriter(dbKey, ownerId); second owner → WRITER_REQUIRED. releaseWriter on tab close/unload.

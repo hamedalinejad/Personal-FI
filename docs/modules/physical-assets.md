@@ -139,3 +139,6 @@ N/A / DEFERRED — do not invent.\n
 ## 34. Acceptance Criteria
 
 Posted costs immutable; valuation EXTERNAL_REPORTED with asOf.
+
+## Valuation
+pa_valuations are EXTERNAL_REPORTED with asOf; do not rewrite purchase cost. Disposal posts operation reducing asset and recognizing gain/loss per policy.

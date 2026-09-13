@@ -142,3 +142,6 @@ Archive gate; journal SoT; operational kind ≠ accounting class.
 
 ### Extra edge
 Reject archive with open linked operations in draft; multi-currency display must not create TOM ledger currency.
+
+## Code uniqueness
+If fin_accounts.code used: UNIQUE per dataset where code IS NOT NULL (single-user local book).

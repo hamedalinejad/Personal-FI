@@ -37,3 +37,12 @@ See FILE-CLASSIFICATION.md: CURRENT | MERGE | ARCHIVE | GENERATED | DELETE
 
 ## Progress
 See CONSOLIDATION-LOG.md and QUALITY-STATUS.md. Target: single CURRENT generation.
+
+## Final standardization checklist
+- [x] Owner map defined
+- [x] Modules present (11)
+- [x] Legacy top-level MERGE pointers
+- [x] core/authority archived
+- [x] features SUPERSEDED
+- [ ] Optional zero-ref DELETE of MERGE stubs
+- [ ] All module TBD cells closed for implemented commands

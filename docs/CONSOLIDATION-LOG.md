@@ -19,3 +19,5 @@ Target: Documentation Standardized when QUALITY-STATUS says so and competing CUR
 | 85-90 | Cheque matrix; loan formulas; stocks T+n; API errors; report AC |
 | 91-100 | Domain matrices; UX glossary; evidence IDs; PR checklist |
 | 101-110 | Holding identity; failure containment; opening balance |
+| 111-120 | recurring; physical valuation; budget links; code unique; cursor; writer; checklist |
+| 121-130 | QUALITY ~90%; standardization checklist |
