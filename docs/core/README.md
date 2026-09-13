@@ -1,3 +1,0 @@
-# Machine artifacts
-
-See [DOCUMENTATION-STANDARD.md](../DOCUMENTATION-STANDARD.md) §5.

@@ -2,9 +2,10 @@
 
 | Gate | Status |
 |------|--------|
-| Doc tree standardized | YES |
-| Extra audit/bug docs | REMOVED |
-| Release | NO_GO |
-| Tests | see CI / `npm test` |
+| Target docs tree (DOCUMENTATION-STANDARD) | **ALIGNED** |
+| DOCUMENTATION-STANDARD present | **YES** |
+| Dual human authority under docs/core | **NO** |
+| Release | **NO_GO** |
+| Tests | `npm test` |
 
-Next: implement features against owner docs + schema + tests.
+Next: feature implementation against owner docs + schema + fixtures/tests — not new documentation sprawl.
