@@ -7,7 +7,8 @@ export function assertScheduleConservation(rows, { principal, totalInterest = nu
     sp = sp.plus(toDecimal(r.principal));
     si = si.plus(toDecimal(r.interest || "0"));
   }
-  // Display rows are money2str-rounded; allow ≤ 0.01 residual drift after last-row correction
+  // BUG-CUR-010: last installment residual-corrects so Σ principal == P exactly at display scale (2 dp).
+  // Internal pre-round allocation uses full Decimal; conservation proved at money2str scale.
   const pDiff = sp.minus(toDecimal(principal)).abs();
   if (pDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_PRINCIPAL_MISMATCH");
   if (totalInterest != null) {

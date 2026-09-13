@@ -165,11 +165,10 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
   }
 
   return {
-    carryingDeltaBase: carryingDeltaBase.toFixed(),
+    // BUG-CUR-016: no bare carryingDelta — callers must use dimensioned fields
+    carryingDeltaBase: carryingDeltaBase.toFixed(), // string BASE only (legacy internal)
     carryingDeltaTx: { amount: carryingDeltaTx.toFixed(), currency: txCcy },
     carryingDeltaBaseDim: { amount: carryingDeltaBase.toFixed(), currency: "BASE" },
-    /** @deprecated — use carryingDeltaTx (TX) or carryingDeltaBaseDim (BASE) */
-    carryingDelta: { amount: carryingDeltaBase.toFixed(), currency: "BASE", deprecated: true },
     quantityDelta: quantityDelta.isZero() ? "0" : quantityDelta.toFixed(),
     journalLines,
     derivedFeeBases,
