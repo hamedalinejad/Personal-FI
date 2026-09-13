@@ -298,6 +298,15 @@ function loadOperationSync(db, operationId, replay = false) {
   if (row.result_json) {
     const snap = JSON.parse(row.result_json);
     // result_json is replay metadata only; journal always from relational tables
+    // P1-06: verify stored hash against payload without result_hash field
+    if (row.result_hash && snap && typeof snap === "object") {
+      const { result_hash: _rh, ...canonical } = snap;
+      const recomputed = createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
+      if (recomputed !== row.result_hash) {
+        // soft warn path: do not fail load of relational truth; surface flag
+        snap._resultHashMismatch = true;
+      }
+    }
     const lines = db
       .prepare(
         `SELECT jl.account_id as accountId, jl.side, jl.amount, jl.currency, jl.line_number, jl.amount_in_base as amountInBase, jl.exchange_rate_to_base as exchangeRateToBase, jl.conversion_path as conversionPath, jl.line_kind as lineKind

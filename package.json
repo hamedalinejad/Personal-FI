@@ -2,7 +2,7 @@
   "name": "personal-fi",
   "private": true,
   "type": "module",
-  "description": "Personal-FI — implementation scaffold (docs are specification authority; production NO-GO)",
+  "description": "Personal-FI \u2014 implementation scaffold (docs are specification authority; production NO-GO)",
   "scripts": {
     "test": "node --test src/core/money/*.test.js src/core/price/*.test.js src/core/integrity/*.test.js src/core/api/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/persistence/browser/*.test.js src/core/db/*.test.js src/core/iran/*.test.js src/core/tax/*.test.js src/core/accounting/reports/*.test.js src/core/valuation/*.test.js src/core/dates/*.test.js src/core/rebuild/*.test.js src/core/import/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js src/core/acceptance/*.test.js src/features/**/*.test.js src/core/persistence/browser/*.test.js src/core/sync/*.test.js src/core/recovery/*.test.js src/core/license/*.test.js src/core/acceptance/*.test.js",
     "lint": "node scripts/lint-boundaries.js",
@@ -29,7 +29,8 @@
     "schema:field-diff": "node scripts/feature-field-diff.js",
     "release:evidence": "node scripts/release-evidence.js",
     "lint:query-purity": "node scripts/lint-query-purity.js",
-    "lint:source-vocab": "node scripts/source-vocab-check.js"
+    "lint:source-vocab": "node scripts/source-vocab-check.js",
+    "integrity:audit": "node scripts/integrity-audit.js"
   },
   "dependencies": {
     "decimal.js": "^10.6.0"

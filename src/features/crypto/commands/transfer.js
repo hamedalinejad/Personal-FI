@@ -47,6 +47,7 @@ export async function transferCrypto(input, { dataDir } = {}) {
 
   const gross = toDecimal(p.grossQuantity);
   if (!gross.gt(0)) throw new Error("CRYPTO_TRANSFER_QTY_NONPOSITIVE");
+  // net computed later; see fee conservation
   const feeQty = toDecimal(p.feeQuantity || "0");
   if (feeQty.isNegative()) throw new Error("CRYPTO_TRANSFER_FEE_NEGATIVE");
   const net = toDecimal(p.netQuantity);
