@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Canonical API: [`docs/API.md`](API.md). This reference is historical detail pending merge.
 # API Reference — Personal-FI
 
 v1 = **in-process TypeScript Feature API** (نه HTTP اجباری). همان Contract بعداً REST/IPC می‌شود.

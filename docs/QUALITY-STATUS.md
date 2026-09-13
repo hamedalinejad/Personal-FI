@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-31** modules/loan.md mathematical formulas section
+Cycle: **std-32** API-Reference superseded → API.md
 Production: NO-GO
