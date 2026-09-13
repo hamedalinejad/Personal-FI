@@ -1,3 +1,5 @@
+# See also: docs/core/STATUS-SEMANTICS.md
+
 # GAP-001…013 Status (honest)
 
 | ID | Status | Notes |
