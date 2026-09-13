@@ -175,3 +175,6 @@ Dividend: income recognition + optional tax withhold leg.
 
 ## Corporate action event
 Single ca_event_id, effective_date, ratio/qty effect, cost_basis_policy_version, operation_id when posted, reversal policy.
+
+## Dividend
+Cash or reinvest policy; withhold tax as separate leg/event; does not mutate past trade prices.

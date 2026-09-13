@@ -23,3 +23,6 @@ Forbidden: new public BUG/GAP authority files.
 
 ## MERGE deletion policy
 Run reference search across repo before DELETE. Prefer ARCHIVE over DELETE.
+
+## fixtures classification
+GENERATED/MACHINE — expected empty requires status:DEFERRED.

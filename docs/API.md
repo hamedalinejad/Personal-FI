@@ -83,3 +83,6 @@ Base64url JSON: `{"businessDate":"...","createdAt":"...","id":"..."}` matching s
 
 ## Money fields
 All money/qty/rate/price in request and response bodies are decimal **strings**.
+
+## capabilities() shape
+`{ "commands": ["loan.create", ...], "edition": "loan-only", "entitlements": {...} }`

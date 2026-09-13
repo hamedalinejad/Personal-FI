@@ -149,3 +149,6 @@ Delivery fee never increases metal inventory cost unless capitalizeDeliveryFee p
 | Trade/premium fee (policy capitalize) | per Fee Engine treatment |
 | Delivery fee | default NO unless capitalizeDeliveryFee |
 | Network N/A | — |
+
+## Coin vs bullion
+gold_coin instruments carry own unit/valuation basis; fine-weight metal price only for analytical equivalent mode.

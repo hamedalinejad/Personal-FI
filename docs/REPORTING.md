@@ -43,3 +43,6 @@ BS/IS/CF full golden suite PARTIAL until RELEASE_PROVEN (QUALITY-STATUS).
 
 ## Trial Balance algorithm
 For each fin_account: sum Decimal amount_in_base by side; pair debit/credit totals; imbalance → report error not silent fix.
+
+## Investment performance inputs
+Holdings rebuild + cost basis engine version + price_history as-of + FX as-of + fee history.

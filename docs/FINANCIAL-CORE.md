@@ -127,3 +127,6 @@ Opening balance is a controlled financial operation with provenance — not a si
 - amountInBase = amount × exchangeRateToBase (Decimal)
 - Historical rebuild never uses "latest" rate
 - Missing rate → fail closed (no zero fallback)
+
+## Fee treatments (summary)
+expense | capitalize_inventory | reduce_proceeds | equity_adjustment — pick exactly one economic treatment per fee event.

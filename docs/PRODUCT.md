@@ -127,3 +127,6 @@ Disabled modules: commands return capability error; data remains.
 | Toman display | IRR/10 presentation |
 | Wallet | operational account or crypto wallet entity |
 | Portfolio | report/projection, not cash SoT |
+
+## 20. Backup product requirement
+User-accessible backup/restore from Settings; restore replaces DB file via persistence port; post-restore integrity check.

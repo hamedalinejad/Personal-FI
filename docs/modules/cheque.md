@@ -159,3 +159,6 @@ Illegal transitions → CHEQUE_INVALID_TRANSITION.
 
 ## Clear operation
 Atomic: status→cleared + journal legs + operationId. Failure rolls back both.
+
+## Bounce
+If prior clear posted, bounce requires reversal operation first or combined reversing entry — no silent OHLC-style overwrite of cash.

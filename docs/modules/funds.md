@@ -149,3 +149,6 @@ Reject subscribe when amount and units×transactionPrice inconsistent beyond tol
 | transactionPrice | YES execution | NO |
 | NAV | optional check | YES |
 | liquidationPrice | only if explicit | optional explicit |
+
+## Redeem
+Units out; cash in via CashSettlementPort; transactionPrice for execution; NAV optional audit field.

@@ -142,3 +142,6 @@ Projection rows never post journal automatically.
 
 ## Link to actuals
 Optional bg_transaction_links / bill occurrence → operationId. Link is REFERENCE only; deleting plan must not delete journal.
+
+## Bills occurrence
+Occurrence is plan state; payment creates real expense/transfer operation — never auto journal from occurrence alone.

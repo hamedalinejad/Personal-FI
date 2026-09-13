@@ -23,3 +23,4 @@ Target: Documentation Standardized when QUALITY-STATUS says so and competing CUR
 | 121-130 | QUALITY ~90%; standardization checklist |
 | 131-150 | FX; import; rebuild; TB; residual; CA; transfer; deposit; payTax; clear |
 | 151-160 | Decimal test rule; API money strings |
+| 161-200 | Backup; fee treatments; price_history; license gate; domain command details |

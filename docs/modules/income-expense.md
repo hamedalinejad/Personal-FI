@@ -142,3 +142,6 @@ Balanced journal; category optional per policy.
 
 ## Category rules
 Categories via cat_categories; optional on post per policy. Recurring templates (inc_recurring/exp_recurring) generate drafts — never auto-post journal without user/operation.
+
+## Reverse
+Creates reversing operation linked to original; projections update; journal balanced inverse.

@@ -156,3 +156,6 @@ Cash SoT remains `fin_journal_*`. Feature `inv_*_cash` if present is projection-
 
 ## 11. Import lineage
 import_batches + import_raw_records + import_dedupe_keys. Preserve sourceReference, provider ids, unknown fields JSON.
+
+## 12. price_history
+quote_type NOT NULL; prefer source_id; null source only with is_manual; uniqueness partial indexes as in schema.

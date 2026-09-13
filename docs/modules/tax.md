@@ -151,3 +151,6 @@ changeStatus(paid) --> TAX_PAID_REQUIRES_PAYTAX_OPERATION
 
 ## payTax
 Creates financial operation + cash settlement + marks TaxRecord paid. Amount decimal string; currency match obligation.
+
+## TaxEvent fields
+taxKind, amount, currency, periodKey/taxYear, jurisdiction, ruleVersion, operationId or manual flag.

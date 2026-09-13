@@ -175,3 +175,6 @@ rateFraction = annualRate_percentage_points / 100.
 
 ## Residual policy
 Last installment adjusts principal portion so Σ principal portions = original principal exactly (Decimal).
+
+## create atomic set
+ln_loans + schedule snapshot + fin_operations + journal + optional fees in one transaction.

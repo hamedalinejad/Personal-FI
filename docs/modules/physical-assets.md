@@ -142,3 +142,6 @@ Posted costs immutable; valuation EXTERNAL_REPORTED with asOf.
 
 ## Valuation
 pa_valuations are EXTERNAL_REPORTED with asOf; do not rewrite purchase cost. Disposal posts operation reducing asset and recognizing gain/loss per policy.
+
+## Documents
+docs_links may attach invoices; missing blob does not delete metadata (checksum required when blob present).

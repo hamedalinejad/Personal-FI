@@ -148,3 +148,6 @@ If fin_accounts.code used: UNIQUE per dataset where code IS NOT NULL (single-use
 
 ## Deposit / withdraw
 Always operations with balanced journal; acc_transactions is projection/link surface not second cash truth.
+
+## Transfer
+Two settlement legs same operationId; FX if currencies differ; reject identical account ids.

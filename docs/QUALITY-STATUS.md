@@ -4,13 +4,9 @@
 
 | Gate | Status |
 |------|--------|
-| Documentation owners | CURRENT |
-| Consolidation | **~90%** |
+| Documentation Standardized | **~92%** |
 | Production | **NO-GO** |
-| Schema MACHINE | docs/core/db |
-| Registry MACHINE | docs/core/registry |
-| Fixtures MACHINE | docs/core/fixtures + /fixtures |
-| Browser | PROTOCOL_PROVEN_NODE_HARNESS |
-| Golden/Recovery | PARTIAL |
-
-Documentation Standardized approaches completion when MERGE stubs optionally deleted and implemented-command TBD cells closed.
+| Owners CURRENT | yes |
+| Archive complete for authority tree | yes |
+| Module depth | high for v1 locks |
+| MERGE stub DELETE | optional pending |

@@ -42,3 +42,6 @@ Generation A owners are CURRENT. Generation B under docs/core prose is ARCHIVE o
 
 ## Test expectations
 Domain finance tests use Decimal/toDecimal — never Number()/parseFloat on money.
+
+## Schema changes
+Update schema.sql + manifest + field inventory STRICT in same PR as code using new columns.

@@ -45,3 +45,6 @@ Only QUALITY-STATUS.md for live gates.
 
 ## Writer lock semantics
 acquireWriter(dbKey, ownerId); second owner → WRITER_REQUIRED. releaseWriter on tab close/unload.
+
+## Backup artifact
+Copy of SQLite file + optional attachment blobs; checksum recorded; restore closes DBs first.

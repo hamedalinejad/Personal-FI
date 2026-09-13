@@ -110,3 +110,6 @@ UI          →  features/*/public-api only
 
 ## 16. Rebuild determinism
 same ledger + engineVersions + asOf/context → same outputs; no live provider calls in historical path.
+
+## 17. License gate placement
+Capability check at public-api boundary; never in journal writer as data delete path.
