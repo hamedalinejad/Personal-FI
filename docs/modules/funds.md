@@ -10,3 +10,12 @@ Full reinvest lifecycle · externalReportedProfit as calculated return · comple
 
 ## Acceptance
 Multi-holding redeem requires accountId.
+
+
+## Price distinctions (locked)
+| Concept | Use |
+|---------|-----|
+| NAV | valuation |
+| transactionPrice | subscribe/redeem accounting |
+| liquidationPrice | if product supports |
+| externalReportedProfit | never overwrites calculated P&L |

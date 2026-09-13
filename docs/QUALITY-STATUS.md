@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-44** modules/stocks.md date semantics table
+Cycle: **std-45** modules/funds.md price distinctions
 Production: NO-GO
