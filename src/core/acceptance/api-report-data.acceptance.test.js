@@ -57,7 +57,7 @@ test("TAX-002 period bounds columns", () => {
 });
 
 test("API-001 envelope doc exists", () => {
-  const t = readFileSync("docs/core/API-CANONICAL-ENVELOPE.md", "utf8");
+  const t = readFileSync("docs/API.md", "utf8");
   assert.match(t, /errors\[\]\.code/);
   assert.match(t, /api_version/);
 });

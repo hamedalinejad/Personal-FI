@@ -1,25 +1,26 @@
 # QUALITY-STATUS (live only)
 
-**HEAD policy:** post-`docs(std-final)` · Playbook §31–47
+**Phase:** Engineering (post documentation std-final)  
+**Updated:** 2026-09-13
 
-| Gate | Status |
-|------|--------|
-| Owner hierarchy (8 + 11 modules) | **COMPLETE** |
-| One concept → one owner | **YES** |
-| Legacy Product-Map / Technical-Architecture / API-Reference | **DELETED** |
-| BUG/GAP as specification | **NO** (archive only) |
-| Machine proof kept | **YES** |
-| Coding handoff chain | **docs/README.md** |
-| Dual generation A/B active authority | **ENDED** for human prose |
-| docs/features | **ARCHIVED** (modules are owners) |
-| Implementation | PARTIAL per feature |
-| Golden / Recovery / Standalone | PARTIAL / OPEN |
+| Layer | Status |
+|-------|--------|
+| Documentation hierarchy | COMPLETE |
 | Release | **NO_GO** |
-| Next work | **Code → Test → Fix → Owner update** — no global doc audit |
+| Core + feature tests | **GREEN** (local suite) |
+| Loan recovery roundtrip | **GREEN** (backup/restore) |
+| Golden family | PARTIAL |
+| Recovery suite (all features) | PARTIAL |
+| Standalone editions | PARTIAL |
+| Browser E2E sql.js+IDB | OPEN (Node harness proven) |
 
 ### Feature snapshot
 | Feature | Implementation | Golden | Recovery | Standalone | Release |
 |---------|----------------|--------|----------|------------|---------|
-| Loan | IMPLEMENTED | PARTIAL | OPEN | OPEN | NO_GO |
-| Crypto/Stocks/Funds/Metals | IMPLEMENTED subset | PARTIAL | OPEN | OPEN | NO_GO |
-| Accounts & others | SCAFFOLD–PARTIAL | OPEN | OPEN | OPEN | NO_GO |
+| Loan | IMPLEMENTED | PARTIAL | **PARTIAL→improving** | OPEN | NO_GO |
+| Crypto | IMPLEMENTED subset | PARTIAL | OPEN | PARTIAL | NO_GO |
+| Stocks | IMPLEMENTED subset | PARTIAL | OPEN | PARTIAL | NO_GO |
+| Funds | IMPLEMENTED subset | PARTIAL | OPEN | OPEN | NO_GO |
+| Metals | IMPLEMENTED subset | PARTIAL | OPEN | PARTIAL | NO_GO |
+
+**Next:** expand golden vectors; recovery for each vertical; browser E2E; then RELEASE_PROVEN per edition.

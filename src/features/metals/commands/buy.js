@@ -53,9 +53,11 @@ export async function buyMetal(input, { dataDir } = {}) {
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
-  // let exchangeRateToBase = p.exchangeRateToBase || "1";
+  let exchangeRateToBase = "1";
   if (baseCurrency !== currency) {
     if (!p.exchangeRateToBase) throw new Error("FX_RATE_REQUIRED");
+    exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
+  } else if (p.exchangeRateToBase != null && p.exchangeRateToBase !== "") {
     exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
   }
 
