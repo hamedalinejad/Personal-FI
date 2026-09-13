@@ -23,9 +23,20 @@ test("BUG-011 expense fee posts balanced journal", () => {
 
 test("BUG-011 fee_from_received with matching currencies", () => {
   const r = applySingleFee(
-    { feeAmount: "0.01", feeCurrency: "IRR", treatment: "fee_from_received" },
-    { baseCurrency: "IRR", transactionCurrency: "IRR", exchangeRateToBase: "1" },
+    { feeAmount: "0.01", feeCurrency: "IRR", treatment: "fee_from_received", feeInstrumentId: "asset-1" },
+    { baseCurrency: "IRR", transactionCurrency: "IRR", exchangeRateToBase: "1", receivedInstrumentId: "asset-1" },
   );
   assert.equal(r.quantityDelta, "-0.01");
   assert.equal(r.carryingDeltaBase, "0");
+});
+
+test("BUG-FINAL-006 fee_from_received without context rejects", () => {
+  assert.throws(
+    () =>
+      applySingleFee(
+        { feeAmount: "0.01", feeCurrency: "IRR", treatment: "fee_from_received" },
+        { baseCurrency: "IRR", transactionCurrency: "IRR", exchangeRateToBase: "1" },
+      ),
+    /FEE_FROM_RECEIVED_CONTEXT_REQUIRED/,
+  );
 });

@@ -138,8 +138,11 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
         break;
       }
       case "fee_from_received": {
-        // Quantity fee on received asset — never a foreign cash currency leg
-        if (event.feeInstrumentId && receivedInstrumentId && event.feeInstrumentId !== receivedInstrumentId) {
+        // BUG-FINAL-006: dimension context mandatory
+        if (!receivedInstrumentId) {
+          throw new Error("FEE_FROM_RECEIVED_CONTEXT_REQUIRED");
+        }
+        if (event.feeInstrumentId && event.feeInstrumentId !== receivedInstrumentId) {
           throw new Error("FEE_UNIT_MISMATCH");
         }
         // Explicit cash fee currency that is not the principal asset marker is invalid for quantity burn
