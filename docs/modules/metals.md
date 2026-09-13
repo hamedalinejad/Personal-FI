@@ -10,3 +10,9 @@ Physical serial/assay identity · coin≠bullion full model · third-currency fe
 
 ## Cash
 Journal only.
+
+
+## Purity rules
+* `purityRatio` = RAW (snapshot at acquisition)
+* `fineWeight` = DERIVED = quantityMg × purityRatio
+* Coin instrument identity ≠ bullion instrument identity

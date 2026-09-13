@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-45** modules/funds.md price distinctions
+Cycle: **std-46** modules/metals.md purity RAW/DERIVED rules
 Production: NO-GO
