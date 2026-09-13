@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-54** Cost-Basis-Engine superseded → FINANCIAL-CORE
+Cycle: **std-55** Field-Level-SoT superseded → DATA-MODEL
 Production: NO-GO

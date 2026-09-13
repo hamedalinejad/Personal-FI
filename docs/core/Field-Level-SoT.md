@@ -1,3 +1,4 @@
+> **SUPERSEDED** — See [`docs/DATA-MODEL.md`](../DATA-MODEL.md).
 # Field-Level Source of Truth
 
 Entity-level کافی نیست. هر فیلد مهم:
