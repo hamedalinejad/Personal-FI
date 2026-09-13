@@ -1,3 +1,4 @@
+> **SUPERSEDED** — See [`docs/DATA-MODEL.md`](../DATA-MODEL.md) (Identity).
 # Global Instrument Identity
 
 **تنها SoT هویت دارایی:** `ref_instruments.id` (`instrumentId`)
