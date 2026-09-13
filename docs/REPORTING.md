@@ -35,3 +35,8 @@ Use Core `sumDecimalStrings` / Decimal only — no SQL SUM on money TEXT without
 
 ## 7. Release
 BS/IS/CF full golden suite PARTIAL until RELEASE_PROVEN (QUALITY-STATUS).
+
+## Acceptance
+- Trial balance debits = credits in base Decimal
+- NW cash legs match journal cash accounts
+- Historical report includes valuation context object

@@ -161,3 +161,14 @@ Flat 12% on 1200 / 12m → interest 144; residual last row; atomic create.
 
 ### Extra edge
 Overpayment: explicit policy (reject or prepay principal). Variable rate command must error LOAN_VARIABLE_RATE_UNSUPPORTED_V1.
+
+## Formula table (v1)
+
+| Method | Interest | Principal pattern |
+|--------|----------|-------------------|
+| declining | remaining × rateFraction / periodsPerYear | P/n equal + residual last |
+| flat | P × rateFraction × years | amortize total/n |
+| qarz | 0 | P/n; fee separate |
+| bullet | per policy | principal at end |
+
+rateFraction = annualRate_percentage_points / 100.

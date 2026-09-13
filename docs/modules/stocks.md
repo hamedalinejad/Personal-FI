@@ -160,3 +160,15 @@ settle clears payable; CA single event id; no tradeDate overwrite of settlementD
 
 ### Extra edge
 Weekend/holiday settlement uses Iran business calendar policy version when implemented.
+
+## T+n journal pattern
+
+**Trade (T+0):**
+- Dr Stock inventory (transaction currency / base as policy)
+- Cr Broker payable
+
+**Settle (T+n):**
+- Dr Broker payable
+- Cr Cash / settlement account
+
+Dividend: income recognition + optional tax withhold leg.

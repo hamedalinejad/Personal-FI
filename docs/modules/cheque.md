@@ -142,3 +142,17 @@ Illegal transition rejected; clear posts balanced journal.
 
 ### Extra edge
 Bounce after clear requires reversal path not silent status overwrite.
+
+## Transition matrix (normative)
+
+| From | To | Journal? |
+|------|-----|----------|
+| (new) | issued | policy-dependent |
+| (new) | received | policy-dependent |
+| issued/received | deposited | optional hold |
+| deposited | cleared | YES cash/settlement |
+| deposited | bounced | YES reverse hold / expense policy |
+| * | cancelled | if uncleared, no cash or reverse |
+| * | returned | documented path |
+
+Illegal transitions → CHEQUE_INVALID_TRANSITION.

@@ -62,3 +62,18 @@ Exact request schemas live with module docs; envelope always as above.
 
 ## 10. Supersedes
 API-Reference and docs/core API micro-docs as authority.
+
+## Error code families
+| Prefix | Domain |
+|--------|--------|
+| OP_ | Operation engine |
+| ACCOUNT_ | Accounts |
+| LOAN_ | Loan |
+| CRYPTO_ | Crypto |
+| STOCK_ | Stocks |
+| FUND_ | Funds |
+| METAL_ | Metals |
+| TAX_ | Tax |
+| CHEQUE_ | Cheque |
+| INV_ | Inventory/journal invariants |
+| WRITER_ | Multi-tab |
