@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-17** modules/metals.md expanded
+Cycle: **std-18** modules/tax.md TaxEvent vs TaxRecord lock
 Production: NO-GO
