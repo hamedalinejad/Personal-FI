@@ -2,8 +2,6 @@
 
 **Status:** CURRENT
 
-Absorbs API-Reference, API-Requirements, API-Result-and-Errors, API-CANONICAL-ENVELOPE micro-docs.
-
 ## 1. Envelope (locked)
 ```json
 {
@@ -19,40 +17,48 @@ Absorbs API-Reference, API-Requirements, API-Result-and-Errors, API-CANONICAL-EN
   "engine_versions": {}
 }
 ```
-- `errors[].code` only (not `errorCode` as primary).
-- `engine_versions` on financial mutations / rebuild.
+Primary error field: `errors[].code`. Feature-specific codes in `errors[].details.featureCode` when needed.
 
-## 2. Idempotency
-- Client sends stable `operationId`.
-- Server computes **canonical command hash** over economic identity (payload, journal, dates, rates, settlement/event/provenance).
-- Caller-supplied hash must match or `OP_COMMAND_HASH_MISMATCH`.
-- Replay same id + same hash → idempotent success; different hash → conflict.
+## 2. Idempotency & hash
+- Client `operationId` (UUID).
+- Server recomputes SHA-256 over canonical economic identity.
+- Mismatch → `OP_COMMAND_HASH_MISMATCH`.
+- Same id + same hash → idempotent replay.
 
-## 3. Operation status vs durability
-| Field | Values |
-|-------|--------|
+## 3. Status vs durability
 | status | draft \| posted \| voided \| failed |
 | durability_state | pending \| sql_committed \| persisted \| persist_failed |
 
-Never use `pending` as business status. Journal writes require **explicit** status.
-
 ## 4. Pagination
-Stable order default: `businessDate, createdAt, id`. Cursor encodes all order keys.
+Order: `businessDate ASC, createdAt ASC, id ASC`. Cursor encodes full keyset.
 
-## 5. Capabilities
-Each feature `capabilities()` lists commands/queries and edition flags.
+## 5. Query purity
+Queries never post journal lines.
 
-## 6. Minimum feature surface
-`capabilities` · `getById` · `list` · `reconcile` (when applicable) · `rebuild` (when applicable)
+## 6. Validation order (writes)
+canonicalize → account/currency → FX/base → balance → domain → commit.
 
-## 7. Query purity
-Query/list/report endpoints must not post journal lines.
+## 7. Command catalog (module-owned details)
+| Area | Commands |
+|------|----------|
+| Accounts | create, update, archive, deposit, withdraw, transfer |
+| Income/Expense | income.create/reverse, expense.create/reverse |
+| Cheque | issue, receive, deposit, clear, bounce, cancel, return |
+| Loan | create, recordPayment, reversePayment |
+| Crypto | buy, sell, transfer |
+| Stocks | buy, sell, settle, dividend |
+| Funds | subscribe, redeem, distribution |
+| Metals | buy, sell, delivery |
+| Tax | recordEvent, payTax |
+| Core | capabilities, health, backup/restore (ops) |
 
-## 8. Validation order (writes)
-canonicalize → account identity/currency → FX/base amounts → journal balance → domain constraints → commit.
+Exact request schemas live with module docs; envelope always as above.
 
-## 9. Implementation
-`src/core/api/responseEnvelope.js`, `pagination.js`, `operationEngine.js`.
+## 8. Capabilities
+`capabilities()` lists command ids + edition entitlement.
+
+## 9. Implementation refs
+`src/core/api/*`, `operationEngine.js`, feature `public-api/`.
 
 ## 10. Supersedes
-API-Reference.md · docs/core/API-*.md as authority.
+API-Reference and docs/core API micro-docs as authority.

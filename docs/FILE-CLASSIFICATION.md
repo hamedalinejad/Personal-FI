@@ -1,34 +1,22 @@
-# File classification (consolidation tracker)
+# File classification
 
-Statuses: CURRENT | MERGE | ARCHIVE | GENERATED | DELETE
+Statuses: **CURRENT** | **MERGE** | **ARCHIVE** | **GENERATED** | **DELETE**
 
-| Path | Status | Notes |
-|------|--------|-------|
-| docs/PRODUCT.md | CURRENT | product owner |
-| docs/ARCHITECTURE.md | CURRENT | arch owner |
-| docs/FINANCIAL-CORE.md | CURRENT | finance owner |
-| docs/DATA-MODEL.md | CURRENT | data owner |
-| docs/API.md | CURRENT | API owner |
-| docs/REPORTING.md | CURRENT | reports owner |
-| docs/OFFLINE-RELEASE.md | CURRENT | offline/release |
-| docs/DEVELOPMENT.md | CURRENT | workflow |
-| docs/modules/* | CURRENT | module owners |
-| docs/QUALITY-STATUS.md | CURRENT | live status only |
-| docs/DOCUMENTATION-STANDARD.md | CURRENT | process (later ARCHIVE→DEVELOPMENT) |
-| docs/MODULE-TEMPLATE.md | CURRENT | template |
-| docs/archive/* | ARCHIVE | non-normative |
-| docs/Product-Map-*.md | MERGE | superseded pointers |
-| docs/Project-Blueprint.md | MERGE | superseded |
-| docs/Technical-Architecture.md | MERGE | superseded |
-| docs/API-Reference.md | MERGE | superseded |
-| docs/READY-FOR-CODING.md | MERGE | superseded |
-| docs/DEVELOPER-HANDOFF.md | MERGE | superseded |
-| docs/core/db/schema.sql | GENERATED/MACHINE | schema authority |
-| docs/core/** micro BUG/GAP | MERGE→ARCHIVE | absorb then archive |
-| fixtures/** | GENERATED/MACHINE | proofs |
+## CURRENT
+docs/PRODUCT.md · ARCHITECTURE.md · FINANCIAL-CORE.md · DATA-MODEL.md · API.md · REPORTING.md · OFFLINE-RELEASE.md · DEVELOPMENT.md · modules/* · QUALITY-STATUS.md · DOCUMENTATION-STANDARD.md · MODULE-TEMPLATE.md · README.md
 
+## MERGE (pointer only)
+Product-Map-*.md · Project-Blueprint.md · Technical-Architecture.md · API-Reference.md · READY-FOR-CODING.md · DEVELOPER-HANDOFF.md
 
-## Update 2026-09-13 (std consolidation)
-- Product-Map-*, Project-Blueprint, Technical-Architecture, API-Reference, READY-FOR-CODING, DEVELOPER-HANDOFF → **MERGE pointers**
-- All 11 modules expanded to 34-section template skeleton + seeds
-- DOCUMENTATION-STANDARD validated: modules complete (income-expense, cheque present)
+## ARCHIVE
+docs/archive/** — including core-status, core-legacy, authority-pointers
+
+## GENERATED / MACHINE
+docs/core/db/schema.sql · schema.manifest.json · field-inventory · fixtures · scripts/
+
+## DELETE
+Only after unique rules = 0 and inbound refs = 0 (prefer ARCHIVE first).
+
+## Protocol
+EXTRACT → MERGE → REPOINT → VALIDATE → ARCHIVE/DELETE  
+Forbidden: new public BUG/GAP authority files.
