@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-8** OFFLINE-RELEASE.md sole persistence/release owner
+Cycle: **std-9** DEVELOPMENT.md sole workflow/gates owner
 Production: NO-GO
