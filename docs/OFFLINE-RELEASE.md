@@ -22,3 +22,13 @@ SPEC_LOCKED → IMPLEMENTED → INTEGRATED → GOLDEN_GREEN → RECOVERY_GREEN �
 
 ## 6. Evidence
 RELEASE_PROVEN is **computed** from evidence, not a hand-edited label.
+
+
+## 7. Result hash contract
+```
+canonicalResultPayload (no result_hash field)
+  → stable canonical serialization
+  → SHA-256
+  → stored result_hash
+```
+Load may recompute and flag mismatch; relational journal remains SoT.
