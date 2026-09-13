@@ -1,45 +1,93 @@
 # PRODUCT (sole product owner)
 
-**Status:** CURRENT
+**Status:** CURRENT · **Class:** CURRENT
+
+Sole product authority. Absorbs Product-Map-EN/FA, Project-Blueprint product sections, Pages-IA navigation rules.
 
 ## 1. Vision
-Offline-first personal accounting and investments for individuals, with Iran-aware policies and licensable feature editions.
+Build an **offline-first** personal finance application for individuals: accurate double-entry accounting, Iran-aware market rules, and **licensable feature editions** (loan-only, crypto-only, etc.) on the same Financial Core.
 
 ## 2. Target users
-Individuals tracking cash, income/expense, cheques, loans, and investments (crypto, Iran stocks, funds, metals, physical assets).
+Individuals and households tracking:
+cash & bank accounts · income/expense · cheques · loans · crypto · Iran stocks · funds · metals · physical assets · budgets/goals/bills · tax notes · documents.
+
+Not target: enterprise multi-entity ERP, broker OMS, HFT, cloud-primary multi-tenant SaaS.
 
 ## 3. Product principles
-* Accounting Core always present (may be hidden in standalone).
-* Feature ≠ Page; max 6 navigation destinations.
-* Decimal-string money; journal is cash truth.
-* License gates capability only — never deletes history.
-* Documentation: one owner per concept (DOCUMENTATION-STANDARD.md).
+1. **Accounting Core always present** — even when UI hides it in standalone editions.
+2. **Feature ≠ Page** — features are packages; navigation is a small IA.
+3. **Journal is cash truth** — no parallel feature cash ledgers as SoT.
+4. **Decimal-string money** — no IEEE float for money/qty/rates.
+5. **License gates capability only** — never deletes or corrupts history.
+6. **One owner document per concept** — see DOCUMENTATION-STANDARD.md / DEVELOPMENT.md.
+7. **Offline-first** — network enhances prices/FX/import; correctness does not depend on live APIs.
 
 ## 4. Scope v1
-Accounts · multi-currency display · income · expense · cheques · loans · investments (crypto, stocks Iran, funds, metals) · physical assets · budget · goals · bills · notifications · reports · dashboard · portfolio · tax · documents · settings · security · price observations.
+| Area | In scope |
+|------|----------|
+| Money | Accounts, transfers, deposit/withdrawal, multi-currency display (IRR storage) |
+| Cashflow | Income, expense, categories |
+| Instruments | Cheques, loans (v1 methods locked in modules/loan.md) |
+| Investments | Crypto, Stocks Iran, Funds, Metals |
+| Assets | Physical assets (basic) |
+| Planning | Budget, goals, bills (planning only — not cash SoT) |
+| Tax | Tax events/records (obligation tracking; not full tax authority filing product) |
+| Ops | Reports, dashboard, portfolio, documents, settings, security, price observations |
 
-## 5. Explicit exclusions
-Enterprise multi-entity · cloud as primary truth · futures/DeFi/NFT · hard-coded Iran rates in Core (use versioned policies).
+## 5. Explicit exclusions (v1)
+Enterprise multi-entity · cloud as primary truth · futures/options/DeFi/NFT · hard-coded Iran official rates inside Core (use versioned policy packages) · guaranteed sub-second market data · multi-user concurrent accounting on one DB without writer lock.
 
 ## 6. Editions / licensing
-Loan-only · Crypto-only · Stocks-only · Funds-only · Metals-only · Full.  
-Disable = UI/capability only; export/history remain.
+| Edition | Surfaces |
+|---------|----------|
+| Loan-only | Loan UI + Core journal (hidden) + export/backup |
+| Crypto-only | Crypto + Core |
+| Stocks-only | Stocks Iran + Core |
+| Funds-only | Funds + Core |
+| Metals-only | Metals + Core |
+| Full | All licensed modules |
 
-## 7. Navigation (locked)
-`/` · `/money` · `/transactions` · `/investments` · `/loans` · `/more`  
-Sheets for create/edit. No top-level `/accounting`.
+**Downgrade:** hide/disable commands; **retain** all rows, export, and rebuild.
 
-## 8. Offline philosophy
-Local SQLite (Node path); browser adapter OPEN until RELEASE_PROVEN.
+## 7. Navigation (locked — max 6 top-level)
+| Route | Role |
+|-------|------|
+| `/` | Home / dashboard summaries |
+| `/money` | Accounts & cash surfaces |
+| `/transactions` | Cross-cutting activity |
+| `/investments` | Crypto/stocks/funds/metals |
+| `/loans` | Debt & loan |
+| `/more` | Tax, documents, settings, security, planning |
 
-## 9. Import/export philosophy
-Preserve raw lineage; no silent field loss.
+Sheets/drawers for create/edit. **No** top-level `/accounting` page.
 
-## 10. Release boundaries
-Production NO-GO until RELEASE_PROVEN evidence (OFFLINE-RELEASE.md).
+## 8. Page vs feature
+- **Feature** = domain package (`src/features/*`) with public API.
+- **Page** = UI composition that may call one or more feature public APIs.
+- UI never opens SQLite or invents journal lines.
 
-## 11. Terminology
-Canonical names in FINANCIAL-CORE / DATA-MODEL / API; product language here only for UX labels.
+## 9. UX philosophy
+Minimal navigation · context-heavy sheets · decimal-safe inputs · Jalali **display** allowed; storage dates ISO · Toman is **display unit** only (ledger currency IRR).
 
-## 12. Supersedes
-Product-Map-EN/FA · Project-Blueprint product sections · Pages-IA nav rules (absorbed).
+## 10. Standalone behavior
+Standalone edition boots **without** Accounts UI and **without** importing other feature internals. Uses `CashSettlementPort` + local settlement accounts. Journal remains SoT. Export/report/backup required for RELEASE_PROVEN of that edition.
+
+## 11. Offline philosophy
+Node: SQLite file. Browser: persistence port → sql.js + IndexedDB (see OFFLINE-RELEASE.md). Durable ACK after publish. Single-writer multi-tab.
+
+## 12. Import/export philosophy
+Preserve raw lineage (`import_batches`, provenance fields). No silent field drop. Unknown source fields retained in payload JSON when policy says so.
+
+## 13. Release boundaries
+**Production = NO-GO** until edition claims meet RELEASE_PROVEN (golden + recovery + standalone + CI) per OFFLINE-RELEASE.md and QUALITY-STATUS.md.
+
+## 14. Terminology
+Product UX labels may be localized. Canonical technical terms live in FINANCIAL-CORE, DATA-MODEL, API — modules must not invent parallel vocabularies.
+
+## 15. Supersedes (MERGE complete for product prose)
+- `docs/Product-Map-EN.md` / `Product-Map-FA.md` → pointers only
+- `docs/Project-Blueprint.md` product sections
+- `docs/00-Product/Pages-IA.md` nav rules (if present)
+
+## 16. Non-product owners
+Architecture → ARCHITECTURE.md · Finance math → FINANCIAL-CORE.md · Schema/fields → DATA-MODEL.md · HTTP/API → API.md · Reports → REPORTING.md

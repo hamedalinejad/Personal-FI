@@ -1,14 +1,17 @@
-> **SUPERSEDED** — Entry path: [`docs/DEVELOPMENT.md`](DEVELOPMENT.md) + [`docs/README.md`](README.md).
-# Ready for Coding
+# READY-FOR-CODING (MERGE → superseded)
 
-**کل محصول از نظر مستند و الگوی اجرا: آماده شروع کدنویسی است.**
+**Status:** MERGE / pointer only · **Not authoritative**
 
-```text
-docs/DEVELOPER-HANDOFF.md
-```
+| Topic | Owner |
+|-------|--------|
+| Product | [PRODUCT.md](./PRODUCT.md) |
+| Architecture | [ARCHITECTURE.md](./ARCHITECTURE.md) |
+| Finance | [FINANCIAL-CORE.md](./FINANCIAL-CORE.md) |
+| Data | [DATA-MODEL.md](./DATA-MODEL.md) |
+| API | [API.md](./API.md) |
+| Reports | [REPORTING.md](./REPORTING.md) |
+| Offline/Release | [OFFLINE-RELEASE.md](./OFFLINE-RELEASE.md) |
+| Development | [DEVELOPMENT.md](./DEVELOPMENT.md) |
+| Modules | [modules/](./modules/) |
 
-```bash
-npm ci && npm test && npm run gates
-```
-
-Production release هنوز NO-GO است (CI/release evidence) — این مانع شروع توسعه فیچرها نیست.
+Full historical text remains in git history prior to standardization commits.

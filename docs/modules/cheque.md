@@ -1,36 +1,105 @@
-# Module: Cheque
-
-**Owner:** this file · Template: ../MODULE-TEMPLATE.md
+# Cheque (module owner)
+**Status:** CURRENT
+Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
 
 ## 1. Purpose
-Manage issued and received cheques with journal-linked lifecycle.
+Cheque lifecycle with cash impact only on clearing transitions.
 
 ## 2. Scope
-Issue, receive, deposit, clear, bounce, cancel, return; due dates; available-balance policy hooks.
+issue, receive, deposit, clear, bounce, cancel, return.
 
 ## 3. Non-Goals
-Bank feed as authority · cheque as cash SoT.
+_See prior module notes in git history if expanded content existed._
 
 ## 4. User Stories
-As a user I record issued/received cheques and track clearance/bounce.
+_See prior module notes in git history if expanded content existed._
 
-## 5. Pages / Sheets
-Under `/money` or `/transactions` filters; forms as sheets.
+## 5. Pages / Sheets / Drawers
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
 
 ## 6. Entities
-Cheque · ChequeTransition (via operation)
+_See prior module notes in git history if expanded content existed._
+
+## 7. Fields
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 8. Field Kinds
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 9. Field Ownership
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 10. Commands
+cheque.issue, deposit, clear, bounce, cancel, return.
+
+## 11. Queries
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 12. API Input
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 13. API Output
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 14. Normalization
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 15. Validation
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
 
 ## 16. State Machine
-`issued|received → deposited → cleared|bounced` · also `cancelled|returned` from allowable states.
+issued|received → deposited → cleared | bounced | cancelled | returned.
 
-## 17–19. Accounting / Journal / Cash
-Each transition = CanonicalFinancialOperation + journal; cash impact only via journal.
+## 17. Accounting Effects
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
 
-## 25. Reversal
-Core reverse operation; original posted rows immutable.
+## 18. Journal Effects
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 19. Cash Effects
+Available balance / journal only on defined transitions (clear/bounce rules).
+
+## 20. Fee Effects
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 21. Tax Effects
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 22. FX Effects
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 23. Date Semantics
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 24. Identity
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 25. Reversal / Correction
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 26. Rebuild
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 27. Reports
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 28. Offline Behavior
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 29. Standalone Edition
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 30. Licensing / Capabilities
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 31. Edge Cases
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
 
 ## 32. Errors
-CHEQUE_INVALID_TRANSITION · CHEQUE_NOT_FOUND · …
+_See prior module notes in git history if expanded content existed._
 
-## 34. Acceptance
-Every transition has operationId; no orphan cash movement.
+## 33. Golden / Recovery Fixtures
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+## 34. Acceptance Criteria
+TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.

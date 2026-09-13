@@ -26,3 +26,9 @@ Statuses: CURRENT | MERGE | ARCHIVE | GENERATED | DELETE
 | docs/core/db/schema.sql | GENERATED/MACHINE | schema authority |
 | docs/core/** micro BUG/GAP | MERGE→ARCHIVE | absorb then archive |
 | fixtures/** | GENERATED/MACHINE | proofs |
+
+
+## Update 2026-09-13 (std consolidation)
+- Product-Map-*, Project-Blueprint, Technical-Architecture, API-Reference, READY-FOR-CODING, DEVELOPER-HANDOFF → **MERGE pointers**
+- All 11 modules expanded to 34-section template skeleton + seeds
+- DOCUMENTATION-STANDARD validated: modules complete (income-expense, cheque present)

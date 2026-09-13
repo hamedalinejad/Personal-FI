@@ -35,3 +35,9 @@ For every persisted financial field document:
 `field · entity · kind · owner · source · nullable · unit · currency · formula · migration · reversal · export`
 
 If not in SQL: only DERIVED | VIRTUAL | DEFERRED — never silent drop.
+
+
+## Absorbed topics
+Field-Level-SoT · Field-Level-Data-Ownership-Matrix · RELATED-FEATURE-ENUM · PRICE-IDENTITY · instrument vs provider mapping · no-field-loss doctrine.
+
+Machine artifacts: `docs/core/db/schema.sql`, field-inventory, schema.manifest (GENERATED/MACHINE — not prose authority).

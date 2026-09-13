@@ -69,3 +69,9 @@ Every financial algorithm documents:
 3. Executable golden vector  
 
 If prose and fixture disagree, fixture/test is investigated — developer must not guess.
+
+
+## Absorbed micro-doc topics (no longer independent authority)
+Money/decimal/precision/unit/JSON policies · Financial-Invariants · Accounting-Calculation-Invariants · Canonical-Financial-Operation · Canonical-Cash-Model · JOURNAL-LINE / BASE-AMOUNT contracts · Fee-Treatment-Matrix · Cost-Basis-Engine · Date-Semantics-Matrix · Reversal identity · Operation status vs durability_state.
+
+See git history under `docs/core/` for prior long-form text. **This file is the sole finance owner.**

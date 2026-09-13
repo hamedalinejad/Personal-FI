@@ -1,3 +1,7 @@
+# Loan (module owner)
+
+**Status:** CURRENT
+
 # Module: Loan
 
 **Owner:** this file · Shared math conventions → FINANCIAL-CORE
@@ -56,3 +60,8 @@ Interest 0; optional fee percent normalized like rates; never silent interest co
 
 ### Golden authority
 Executable fixtures/tests — not prose alone.
+
+
+---
+## Template checklist
+All 34 sections required; expand TBD before RELEASE_PROVEN.
