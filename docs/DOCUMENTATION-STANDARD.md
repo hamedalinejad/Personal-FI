@@ -1,32 +1,32 @@
-# Documentation Standardization Master (LOCKED)
+# Documentation Standardization (process authority)
 
-Status: **LOCKED** as process authority for consolidation.
-This file is not a financial authority; it defines documentation system architecture only.
+**Status:** LOCKED process · After consolidation complete, unique rules move to DEVELOPMENT.md and this file may ARCHIVE.
 
-## Validation of the master (2026-09-13)
+## Principle
+ONE CONCEPT → ONE OWNER DOCUMENT → MACHINE PROOF → CODE
 
-| Claim in master | Verdict | Note |
-|-----------------|---------|------|
-| ONE CONCEPT → ONE OWNER | CORRECT | Matches project risk (competing authorities) |
-| 8 global + 11 modules + archive | CORRECT target | income-expense.md, cheque.md still missing on disk |
-| Machine files stay SQL/JSON/TSV | CORRECT | schema.sql, fixtures, registries |
-| DELETE only if unique rule=0 AND refs=0 | CORRECT | do not mass-delete |
-| Bug/Audit files → QUALITY-STATUS or archive | CORRECT | stop micro BUG-*-STATUS |
-| SPEC_LOCKED ≠ FREEZE_PROVEN ≠ RELEASE_PROVEN | CORRECT | already in registry |
-| Ghost cash forbidden | CORRECT | journal is SoT |
-| Module doc = implementation-ready sections 1–34 | CORRECT | current modules are stubs; expand required |
-| End endless audit loop | CORRECT | code-first after consolidation |
+Forbidden: new public audit / bug micro-file / competing contract.
 
-## Gaps in current repo vs master
+## Owner map (CURRENT)
+| Area | Owner |
+|------|--------|
+| Product | PRODUCT.md |
+| Architecture | ARCHITECTURE.md |
+| Finance | FINANCIAL-CORE.md |
+| Data | DATA-MODEL.md |
+| API | API.md |
+| Reports | REPORTING.md |
+| Offline/Release | OFFLINE-RELEASE.md |
+| Workflow | DEVELOPMENT.md |
+| Modules | modules/*.md (11 files) |
+| Live status | QUALITY-STATUS.md |
+| History | archive/AUDIT-HISTORY.md |
 
-* Missing module files: `income-expense.md`, `cheque.md`
-* Global owners exist but are thin; unique rules still in `docs/core/**` micro files
-* Competing product maps: Product-Map-*, Project-Blueprint, Technical-Architecture
+## Module set (validated 2026-09-13)
+Present: accounts, income-expense, cheque, loan, crypto, stocks, funds, metals, physical-assets, budget-goals-bills, tax.
 
-## Build order (from master §41)
+## Consolidation protocol
+EXTRACT → MERGE into owner → REPOINT → VALIDATE → ARCHIVE/DELETE (only if unique rules=0 and inbound refs=0)
 
-1 Vocabulary → 2 Identity → 3 Financial Core → 4 Data Model → 5 API → 6 Reports → 7 Features → 8 Offline/Release
-
-## Cycle protocol
-
-ONE discrete work unit → ONE commit → push → next cycle.
+## Build order
+Vocabulary → Identity → Financial Core → Data Model → API → Reports → Features → Offline/Release
