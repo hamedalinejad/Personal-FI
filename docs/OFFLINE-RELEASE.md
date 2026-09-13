@@ -35,3 +35,10 @@ IMPLEMENTED ≠ GOLDEN-GREEN ≠ RECOVERY-GREEN ≠ RELEASE-PROVEN ≠ Productio
 
 ## 6. Live dashboard
 Only QUALITY-STATUS.md for live gates.
+
+## Evidence IDs (placeholders)
+| ID | Claim |
+|----|-------|
+| EV-BROWSER-001 | Node harness durable ACK |
+| EV-RECOVERY-001 | backup restore load operation |
+| EV-IDEM-001 | same operationId replay |

@@ -142,3 +142,10 @@ METAL-003 fee separation; purity not silent 1.
 
 ### Extra edge
 Delivery fee never increases metal inventory cost unless capitalizeDeliveryFee policy true.
+
+## Fee separation matrix
+| Event | Affects metal cost basis? |
+|-------|---------------------------|
+| Trade/premium fee (policy capitalize) | per Fee Engine treatment |
+| Delivery fee | default NO unless capitalizeDeliveryFee |
+| Network N/A | — |

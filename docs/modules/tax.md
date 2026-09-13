@@ -142,3 +142,9 @@ changeStatus(paid) throws TAX_PAID_REQUIRES_PAYTAX_OPERATION.
 
 ### Extra edge
 periodKey/taxYear required on events; bare year without bounds forbidden for new rows.
+
+## Status derivation
+```
+assessed --payTax operation success--> paid
+changeStatus(paid) --> TAX_PAID_REQUIRES_PAYTAX_OPERATION
+```

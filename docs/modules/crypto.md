@@ -142,3 +142,12 @@ Gate-H field survival; no feature cash table as SoT; fee dimensions persisted.
 
 ### Extra edge
 Asset fee reduces qty; cost basis feeCarrying derived not caller-trusted float.
+
+## economic_kind matrix
+| kind | Taxable disposal? | Cost basis |
+|------|-------------------|------------|
+| acquisition | no | opens lot/WAC |
+| disposal | yes (policy) | reduces |
+| transfer_internal | no | carry |
+| swap_economic | yes legs | dispose+acquire |
+| fee | per funding | qty or cash |

@@ -142,3 +142,10 @@ NAV ≠ transactionPrice enforced; amount consistency checks.
 
 ### Extra edge
 Reject subscribe when amount and units×transactionPrice inconsistent beyond tolerance 0.
+
+## Price fields matrix
+| Field | Use in subscribe | Use in valuation |
+|-------|------------------|------------------|
+| transactionPrice | YES execution | NO |
+| NAV | optional check | YES |
+| liquidationPrice | only if explicit | optional explicit |

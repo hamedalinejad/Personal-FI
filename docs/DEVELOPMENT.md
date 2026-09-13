@@ -32,3 +32,10 @@ Generation A owners are CURRENT. Generation B under docs/core prose is ARCHIVE o
 2. Do not treat archive/ or SUPERSEDED files as requirements
 3. One defect → one fix → one test → QUALITY-STATUS
 4. Never create new BUG-*.md authority files
+
+## PR checklist
+- [ ] Touches only one defect theme
+- [ ] Test added/updated
+- [ ] No new authority markdown under docs/core
+- [ ] Module/owner updated if behavior changed
+- [ ] QUALITY-STATUS if gate status changes

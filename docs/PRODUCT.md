@@ -120,3 +120,10 @@ Architecture → ARCHITECTURE.md · Finance math → FINANCIAL-CORE.md · Schema
 | Full | all modules licensed |
 
 Disabled modules: commands return capability error; data remains.
+
+## 19. UX glossary (labels only)
+| UX label | Canonical |
+|----------|-----------|
+| Toman display | IRR/10 presentation |
+| Wallet | operational account or crypto wallet entity |
+| Portfolio | report/projection, not cash SoT |
