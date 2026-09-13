@@ -18,3 +18,4 @@ Target: Documentation Standardized when QUALITY-STATUS says so and competing CUR
 | 84 | MERGE file inbound-ref policy: safe DELETE only after scripts/docs-validator |
 | 85-90 | Cheque matrix; loan formulas; stocks T+n; API errors; report AC |
 | 91-100 | Domain matrices; UX glossary; evidence IDs; PR checklist |
+| 101-110 | Holding identity; failure containment; opening balance |

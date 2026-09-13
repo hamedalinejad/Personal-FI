@@ -102,3 +102,8 @@ UI          →  features/*/public-api only
 * Using NAV as liquidation price
 * Collapsing tradeDate into settlementDate
 * Treating archive/** as requirements
+
+## 15. Failure containment
+* Risk/ops kill paths independent of feature UI
+* Persistence failure does not mark operation posted
+* Model/feature crash must not leave unbalanced journal (transaction rollback)

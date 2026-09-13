@@ -118,3 +118,6 @@ NAV, transactionPrice, liquidationPrice are distinct; never infer liquidation fr
 
 ## Projection tables
 Tables such as `inv_crypto_cash.balance` are **projections**. Rebuild from journal; never authoritative cash.
+
+## Opening balance
+Opening balance is a controlled financial operation with provenance — not a silent account property write.

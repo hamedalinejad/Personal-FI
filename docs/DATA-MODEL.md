@@ -145,3 +145,11 @@ Field-Level-SoT · Ownership-Matrix · PRICE-IDENTITY · RELATED-FEATURE-ENUM do
 | `usr_settings` | Other |
 
 Cash SoT remains `fin_journal_*`. Feature `inv_*_cash` if present is projection-only.
+
+## 10. Holding identity patterns
+| Feature | Scope keys |
+|---------|------------|
+| Crypto | instrumentId + venue/network |
+| Stocks | instrumentId + brokerage/account |
+| Funds | instrumentId + account |
+| Metals | instrumentId + platform/account |
