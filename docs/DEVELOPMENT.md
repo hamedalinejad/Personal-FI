@@ -28,3 +28,7 @@ Loan vertical proof first; then copy pattern to other features. No parallel prod
 
 ## 6. Documentation
 DOCUMENTATION-STANDARD.md is process authority. Do not create micro BUG-*-STATUS files.
+
+
+## 7. File classification
+Track CURRENT/MERGE/ARCHIVE/GENERATED/DELETE in FILE-CLASSIFICATION.md during consolidation.

@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-46** modules/metals.md purity RAW/DERIVED rules
+Cycle: **std-47** DEVELOPMENT links FILE-CLASSIFICATION
 Production: NO-GO
