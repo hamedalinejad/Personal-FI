@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-56** Feature-API-Contract superseded → API.md
+Cycle: **std-57** Financial-Invariants superseded → FINANCIAL-CORE
 Production: NO-GO
