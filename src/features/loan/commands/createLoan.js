@@ -49,6 +49,10 @@ export async function createLoan(
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!p.dayCount) throw new Error("LOAN_DAY_COUNT_REQUIRED");
   if (p.dayCount !== "period_based") throw new Error("LOAN_DAY_COUNT_UNSUPPORTED");
+  const freq = p.installmentFrequency || p.frequency || "monthly";
+  if (!["monthly", "weekly", "quarterly", "annual", "yearly"].includes(freq)) {
+    throw new Error("LOAN_FREQUENCY_UNSUPPORTED");
+  }
 
   const currency = p.currency;
   const baseCurrency = operationBaseCurrency || p.baseCurrency || currency;
