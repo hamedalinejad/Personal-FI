@@ -1,16 +1,19 @@
-# Documentation index
+# Documentation entry (human)
 
-| Doc | Role |
-|-----|------|
-| PRODUCT.md | Product scope / editions |
-| ARCHITECTURE.md | Layers / boundaries |
-| FINANCIAL-CORE.md | Money / journal / SoT |
-| DATA-MODEL.md | Schema / fields / identity |
-| API.md | Envelope / errors |
-| REPORTING.md | Statements / valuation |
-| OFFLINE-RELEASE.md | Persistence / release |
-| DEVELOPMENT.md | Gates / workflow |
-| QUALITY-STATUS.md | **Live status only** |
-| modules/* | Per-feature owner |
+Follow **one path only**:
 
-Machine: `core/db/schema.sql`, registries, fixtures.
+1. [PRODUCT.md](PRODUCT.md)
+2. [ARCHITECTURE.md](ARCHITECTURE.md)
+3. [FINANCIAL-CORE.md](FINANCIAL-CORE.md)
+4. [DATA-MODEL.md](DATA-MODEL.md)
+5. [API.md](API.md)
+6. [REPORTING.md](REPORTING.md)
+7. [OFFLINE-RELEASE.md](OFFLINE-RELEASE.md)
+8. [DEVELOPMENT.md](DEVELOPMENT.md)
+9. [modules/](modules/) — exactly one module file per feature
+10. Live status: [QUALITY-STATUS.md](QUALITY-STATUS.md)
+11. Process: [DOCUMENTATION-STANDARD.md](DOCUMENTATION-STANDARD.md)
+
+Machine: `core/db/schema.sql`, registries, fixtures, tests.
+
+**Do not** start from historical audits under `core/` or `archive/`.
