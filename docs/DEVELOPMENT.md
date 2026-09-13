@@ -1,51 +1,89 @@
-# DEVELOPMENT (sole workflow / governance owner)
+# DEVELOPMENT
 
-**Status:** LOCKED process
+**Owner:** engineering process · **Status:** LOCKED structure
 
-## Coding handoff chain
-```
-PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API
-→ REPORTING → OFFLINE-RELEASE → DEVELOPMENT → modules/<feature>
-→ schema → fixtures → tests
-```
-If a Coding AI must ask “which document is newer / which enum wins / is balance authoritative?”, that concept is **not standardized** — fix the owner doc, do not invent.
+## Coding workflow
+1. Read `DOCUMENTATION-STANDARD.md` → relevant owner → `modules/<feature>.md` → `schema.sql`
+2. Implement behind public API / ports only
+3. Add or update fixture + test
+4. Run `npm test` (and relevant gates)
+5. Update `QUALITY-STATUS.md` only if a **live status** changes
 
-## Status layers (never collapse into one enum)
+## Test workflow
+- Domain money: Decimal only; no `Number()` on money in domain tests
+- Acceptance tests named by **capability**, not ticket IDs
+- Golden/recovery fixtures under `fixtures/` (machine proof)
+
+## Definition of done (implementation unit)
+- Spec in one owner or one module
+- Schema/field ownership clear if persisted
+- Command/query path tested
+- No silent defaults on financial fields
+- Idempotent mutations where required
+- Release remains NO_GO until RELEASE_PROVEN
+
+## Status vocabulary
 | Layer | Values |
 |-------|--------|
-| Documentation | DRAFT · REVIEW · LOCKED · ARCHIVED · GENERATED |
 | Implementation | SPEC_ONLY · SCAFFOLD · IMPLEMENTED · INTEGRATED |
 | Proof | UNPROVEN · GOLDEN_GREEN · RECOVERY_GREEN · STANDALONE_GREEN · RELEASE_PROVEN |
 | Release | NO_GO · CONDITIONALLY_GO · GO |
 
-Live summary: QUALITY-STATUS.md + `docs/core/registry/` JSON.
+Do not use READY/DONE/GREEN as synonyms across layers.
 
-## Change rules
-| Change | Path |
-|--------|------|
-| Bug | fix code → regression test → QUALITY-STATUS |
-| Business rule | update owner → fixture/test → code |
-| Architecture | ARCHITECTURE → affected owners → tests |
-| History | git / archive only |
+## Commit policy
+- `docs:` structure only — no silent financial rule change
+- `fix:` code + test
+- `feat:` capability with tests
+- No new BUG/AUDIT/MATRIX specification files
 
-## Forbidden
-New public BUG/GAP/REQ/AUDIT authority docs · duplicate Core rules in every module · ghost cash · ticket IDs as domain terms · silent field loss · snapshots as cash SoT · prose stronger than fixtures.
+## Documentation lifecycle
+```
+NO NEW DOC · NO NEW BUG DOC · NO NEW AUDIT DOC · NO NEW MATRIX
+```
+unless updating an existing **owner** listed in DOCUMENTATION-STANDARD.
 
-## Defect workflow
-ONE DEFECT → ONE CODE FIX → ONE TEST → status update.
+## Forbidden documentation behavior
+- Second owner for one concept
+- Ticket IDs as domain vocabulary in normative text
+- Ghost cash tables
+- Treating QUALITY-STATUS as a requirements catalog
 
-## Gates
-`npm test` · `npm run gates` · boundary lint · inventory STRICT · fixture empty check · money-number lint · schema sync.
-
-## Do not guess
-Missing contract → leave OPEN; do not invent columns, fee treatment, T+n calendar, or purity defaults.
-
-## Schema PRs
-schema.sql + manifest + field inventory with consumers.
-
-## Money in tests
-Decimal / toDecimal only — never Number/parseFloat on money.
-
-
-## Module template (34 sections)
-Purpose · Scope · Non-Goals · User Stories · Pages · Entities · Fields · Field Kinds · Ownership · Commands · Queries · API In/Out · Normalization · Validation · State Machine · Accounting · Journal · Cash · Fee · Tax · FX · Dates · Identity · Reversal · Rebuild · Reports · Offline · Standalone · Licensing · Edge Cases · Errors · Golden/Recovery · Acceptance.
+## Module template (mandatory headings)
+```
+1. Purpose
+2. Scope
+3. Supported v1 behavior
+4. Unsupported / Deferred behavior
+5. Actors / roles
+6. UI pages
+7. Sheets / drawers
+8. Entities
+9. Field ownership
+10. Identity
+11. Commands
+12. Queries
+13. API contract
+14. State machine
+15. Validation
+16. Money / quantity semantics
+17. FX behavior
+18. Fee behavior
+19. Tax behavior
+20. Accounting / journal mapping
+21. Cost basis / valuation
+22. Persistence impact
+23. Transaction boundary
+24. Idempotency
+25. Reversal / correction
+26. Historical / asOf behavior
+27. Reports
+28. Standalone edition behavior
+29. Licensing / capabilities
+30. Edge cases
+31. Error codes
+32. Fixtures
+33. Tests / proof
+34. Machine-file references
+```
+Module files hold **feature-specific** behavior only. Global rules stay in global owners.

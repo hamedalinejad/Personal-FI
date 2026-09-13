@@ -112,4 +112,37 @@ PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API
 3. Machine files remain  
 4. `npm run docs:validate` passes  
 5. `npm test` passes  
-6. Release remains **NO_GO** until RELEASE_PROVEN  
+6. Release remains **NO_GO** until RELEASE_PROVEN
+
+## Owner responsibilities (exact)
+
+### PRODUCT.md
+scope · users · editions · licensing philosophy · navigation · product non-goals
+
+### ARCHITECTURE.md
+layer boundaries · dependency direction · ports · write/read pipeline · feature isolation · standalone architecture
+
+### FINANCIAL-CORE.md
+money · Decimal policy · quantity · FX · operation · journal · cash truth · fee semantics · cost basis · reversal · financial invariants
+
+### DATA-MODEL.md
+identity · field kinds · ownership · source of truth · RAW/DERIVED/SNAPSHOT/… · no-field-loss · schema policy · provenance
+
+### API.md
+envelope · errors · commands · queries · pagination · idempotency semantics · capabilities
+
+### REPORTING.md
+statement concepts · valuation concepts · investment performance · asOf semantics · historical reconstruction
+
+### OFFLINE-RELEASE.md
+persistence durability · backup/recovery · browser adapter · offline truth · release gates · recovery proof
+
+### DEVELOPMENT.md
+coding workflow · test workflow · definition of done · status vocabulary · commit policy · documentation lifecycle · forbidden documentation behavior
+
+### QUALITY-STATUS.md
+Live status only — not a second requirements system. Rows at most: ID · area · status · owner · test · commit. History in Git/archive.
+
+### modules/*.md
+Feature-only behavior using the 34-section template in DEVELOPMENT.md.
+
