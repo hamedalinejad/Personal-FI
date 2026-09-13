@@ -1,180 +1,136 @@
 # Loan (module owner)
 
-**Status:** CURRENT
-
-Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
+**Status:** LOCKED for v1 scope · Shared math: FINANCIAL-CORE
 
 ## 1. Purpose
+Lender receivables: create loan, generate schedule, record payments, reverse payments, journal via Core.
 
-Lender receivables: schedules, payments, journal integration.
-
-## 2. Scope
-
-role lender only; methods declining, flat, qarz, bullet; dayCount period_based; rate percentage points.
+## 2. Scope (v1)
+| Item | Value |
+|------|--------|
+| role | **lender** only (borrower = DEFERRED) |
+| methods | declining, flat, qarz, bullet |
+| dayCount | **period_based** only |
+| frequency | monthly \| weekly \| quarterly \| annual |
+| annualRate | **percentage points** (`12` → 0.12) |
+| variable rate | **rejected** |
+| penalty accrual | **DEFERRED** (waterfall still allocates penalty if outstanding) |
 
 ## 3. Non-Goals
-
-Borrower path, actual/365, variable rate, annuity silent change.
+actual/365, 30/360, custom frequency, borrower liability path, silent annuity formula change, mid-loan reschedule as supported.
 
 ## 4. User Stories
-
-N/A or DEFERRED — do not invent.
-
+As lender, create fixed-rate loan with schedule; record payment applying penalty→fee→interest→principal; reverse a payment; export statement.
 
 ## 5. Pages / Sheets / Drawers
-
-N/A or DEFERRED — do not invent.
-
+`/loans`; create sheet; payment sheet; schedule view.
 
 ## 6. Entities
+`ln_loans`, `ln_schedule_snapshots`, `ln_transactions`, `ln_loan_fees`, `ln_loan_fee_tiers`, `ln_rate_history` (v1 unused for variable), Core `fin_operations` / journal.
 
-N/A or DEFERRED — do not invent.
+## 7–9. Fields / Kinds / Ownership
+| Field | Kind | Notes |
+|-------|------|--------|
+| principal | RAW | decimal string |
+| annualRate | RAW | percentage points |
+| method | STATUS | enum |
+| role | STATUS | lender |
+| schedule snapshot_json | SNAPSHOT | versioned engine |
+| portions on payment | DERIVED | allocation engine |
 
-
-## 7. Fields
-
-principal, rate, method, schedule snapshot_json, role lender|borrower(deferred).
-
-## 8. Field Kinds
-
-N/A or DEFERRED — do not invent.
-
-
-## 9. Field Ownership
-
-N/A or DEFERRED — do not invent.
-
+Owner: this module for ln_*; FINANCIAL-CORE for journal.
 
 ## 10. Commands
-
-loan.create, recordPayment, reversePayment.
+| Command | Purpose |
+|---------|---------|
+| loan.create | Create loan + schedule + journal |
+| loan.recordPayment | Allocate payment + journal |
+| loan.reversePayment | Reverse payment operation |
 
 ## 11. Queries
+getLoan, listLoans, getSchedule, getStatement (read-model; journal remains SoT).
 
-N/A or DEFERRED — do not invent.
-
-
-## 12. API Input
-
-N/A or DEFERRED — do not invent.
-
-
-## 13. API Output
-
-N/A or DEFERRED — do not invent.
-
+## 12–13. API I/O
+Envelope: API.md. Money fields decimal strings. operationId required on mutations.
 
 ## 14. Normalization
-
-annualRate 12 → 0.12; feePercentPoints same; period count integer Decimal.
+- `rateFraction = annualRate / 100` via `normalizeRatePercentage`
+- periods: positive integer (Decimal parse then integer count)
+- dates: ISO businessDate
 
 ## 15. Validation
-
-Reject variable rate / unsupported dayCount.
+Reject: non-positive principal; unsupported dayCount; variable rate; unsupported frequency; empty schedule methods.
 
 ## 16. State Machine
+Loan: draft/active → payments → closed. Payment ops: posted or voided via reverse.
 
-Loan active → payments → closed; schedule snapshot versioned.
+## 17–19. Accounting / Journal / Cash
+**create:** Dr receivable / Cr cash (settlement).  
+**payment:** Dr cash / Cr receivable + interest (+ fee/penalty income as allocated).  
+Cash only via CashSettlementPort.
 
-## 17. Accounting Effects
-
-N/A or DEFERRED — do not invent.
-
-
-## 18. Journal Effects
-
-Create Dr receivable Cr cash; payment waterfall penalty→fee→interest→principal.
-
-## 19. Cash Effects
-
-CashSettlementPort.
-
-## 20. Fee Effects
-
-N/A or DEFERRED — do not invent.
-
-
-## 21. Tax Effects
-
-N/A or DEFERRED — do not invent.
-
-
-## 22. FX Effects
-
-N/A or DEFERRED — do not invent.
-
+## 20–22. Fee / Tax / FX
+Fee tiers optional; tax N/A default; FX if multi-currency settlement (rate locked on post).
 
 ## 23. Date Semantics
-
-N/A or DEFERRED — do not invent.
-
+businessDate on operations; schedule startDate; installment due dates derived.
 
 ## 24. Identity
+loanId; operationId on each financial effect; schedule snapshot id/version.
 
-N/A or DEFERRED — do not invent.
-
-
-## 25. Reversal / Correction
-
-N/A or DEFERRED — do not invent.
-
+## 25. Reversal
+reversePayment → reversing operation linked to original; no in-place amount edit.
 
 ## 26. Rebuild
-
-Schedule from snapshotSchemaVersion + engine versions.
+Schedule from snapshotSchemaVersion + engineVersion + inputs; holdings N/A.
 
 ## 27. Reports
+Statement read-model; GL via REPORTING.
 
-N/A or DEFERRED — do not invent.
+## 28–30. Offline / Standalone / License
+Full offline; Loan-only edition + Core settlement; license gates commands only.
 
+## 31–32. Edge Cases / Errors
+Overpayment policy explicit; `LOAN_VARIABLE_RATE_UNSUPPORTED_V1`; schedule conservation assert.
 
-## 28. Offline Behavior
-
-N/A or DEFERRED — do not invent.
-
-
-## 29. Standalone Edition
-
-Loan-only reference vertical.
-
-## 30. Licensing / Capabilities
-
-N/A or DEFERRED — do not invent.
-
-
-## 31. Edge Cases
-
-N/A or DEFERRED — do not invent.
-
-
-## 32. Errors
-
-LOAN_* , LOAN_VARIABLE_RATE_UNSUPPORTED_V1.
-
-## 33. Golden / Recovery Fixtures
-
-LOAN-FLAT etc.; Decimal assertions.
+## 33. Golden / Recovery
+Fixtures under `fixtures/LOAN-*` and tests `golden-schedule.test.js`. Empty expected ⇒ DEFERRED.
 
 ## 34. Acceptance Criteria
+- Atomic create includes ln_loans + snapshot + operation + journal  
+- Flat 12% uses /100 not ×12  
+- Σ principal portions = original principal (residual last row)  
+- Idempotent operationId replay  
 
-Flat 12% on 1200 / 12m → interest 144; residual last row; atomic create.
+---
 
-### Extra edge
-Overpayment: explicit policy (reject or prepay principal). Variable rate command must error LOAN_VARIABLE_RATE_UNSUPPORTED_V1.
+## Algorithms (v1)
 
-## Formula table (v1)
+### ALG-LOAN-RATE
+- **Inputs:** annualRate (percentage points)  
+- **Formula:** rateFraction = annualRate / 100  
+- **Unsupported:** treating 12 as 12.0 interest multiple  
 
-| Method | Interest | Principal pattern |
-|--------|----------|-------------------|
-| declining | remaining × rateFraction / periodsPerYear | P/n equal + residual last |
-| flat | P × rateFraction × years | amortize total/n |
-| qarz | 0 | P/n; fee separate |
-| bullet | per policy | principal at end |
+### ALG-LOAN-DECLINING
+- principalPortion = P / n  
+- interest_i = remaining × (rateFraction / periodsPerYear)  
+- residual last row  
 
-rateFraction = annualRate_percentage_points / 100.
+### ALG-LOAN-FLAT
+- termYears = n / periodsPerYear  
+- totalInterest = P × rateFraction × termYears  
+- payment components split; last row residual for interest/principal conservation  
 
-## Residual policy
-Last installment adjusts principal portion so Σ principal portions = original principal exactly (Decimal).
+### ALG-LOAN-QARZ
+- interest = 0  
+- feeTotal = P × normalizeRatePercentage(feePercent) when fee used  
+- principal portions P/n  
 
-## create atomic set
-ln_loans + schedule snapshot + fin_operations + journal + optional fees in one transaction.
+### ALG-LOAN-BULLET
+- interest per period on outstanding; principal at end (see scheduleEngine)  
+
+### ALG-LOAN-PAYMENT-WATERFALL
+Order: penalty → fee → interest → principal.
+
+### Proof
+Executable tests + fixtures — prose examples are not stronger than fixtures.

@@ -1,12 +1,10 @@
 # Audit history (lightweight)
 
-Non-normative. Canonical rules live in top-level owner docs.
+| Date | Scope | Milestone |
+|------|-------|-----------|
+| 2026-09 | Multi-generation docs | core/contracts proliferation |
+| 2026-09-10–12 | Financial P0 / loan / offline | Runtime fixes |
+| 2026-09-13 | std-61…std-final | Owner hierarchy; MERGE delete; features archived |
+| After std-final | Engineering mode | Code → Test → Fix; release NO_GO until RELEASE_PROVEN |
 
-| Date | Scope | Milestone | Notes |
-|------|-------|-----------|-------|
-| 2026-09 | Phase 0–1 docs | Multi-generation core/contracts | Superseded by owner docs |
-| 2026-09-10–12 | P0 financial / loan / offline | Runtime fixes + registry | Rules absorbed into FINANCIAL-CORE / modules |
-| 2026-09-13 | Documentation standardization | std-61…200 | MERGE→ARCHIVE; authority tree archived |
-| Ongoing | Implementation | Production NO-GO until RELEASE_PROVEN | See QUALITY-STATUS.md |
-
-Full prior audit text is in git history under `docs/archive/core-*` and deleted paths.
+Prior playbook §0.2/§44 describing “Generation B still active” applied to **pre-std-final** trees (e.g. 05e8310). Current main uses Generation A owners only for normative prose.
