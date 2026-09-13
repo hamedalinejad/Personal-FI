@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-42** DATA-MODEL field metadata matrix requirement
+Cycle: **std-43** modules/crypto.md economic kinds table
 Production: NO-GO

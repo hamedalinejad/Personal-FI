@@ -22,3 +22,13 @@ No exchange cash ledger SoT — journal only.
 
 ## 7. Acceptance
 Dimensional fee tests · conservation · standalone crypto-only path partial.
+
+
+## Economic kinds (locked)
+| Kind | Realized P&L | Cost basis |
+|------|--------------|------------|
+| internal_transfer | no | carry |
+| bridge_transfer | no | carry (+ fee policy) |
+| economic_swap | yes on source | dest = consideration |
+| acquisition | n/a | new cost |
+| disposal | yes | release cost |
