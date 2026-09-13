@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Entry path: [`docs/DEVELOPMENT.md`](DEVELOPMENT.md) + [`docs/README.md`](README.md).
 # Ready for Coding
 
 **کل محصول از نظر مستند و الگوی اجرا: آماده شروع کدنویسی است.**
