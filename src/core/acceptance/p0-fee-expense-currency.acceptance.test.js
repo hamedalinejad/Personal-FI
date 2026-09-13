@@ -14,6 +14,7 @@ test("P0-01 USD trade IRR base fee expense account matches USD line", async () =
       operationId: randomUUID(),
       payload: {
         instrumentId: "stk-usd",
+        symbol: "STKUSD",
         quantity: "1",
         price: "10",
         commission: "1",
