@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-36** MODULE-TEMPLATE.md 34-section standard
+Cycle: **std-37** modules/cheque.md state machine + template alignment
 Production: NO-GO
