@@ -46,7 +46,9 @@ export async function transferCrypto(input, { dataDir } = {}) {
   if (p.fromExchangeId === p.toExchangeId) throw new Error("TRANSFER_SAME_EXCHANGE");
 
   const gross = toDecimal(p.grossQuantity);
+  if (!gross.gt(0)) throw new Error("CRYPTO_TRANSFER_QTY_NONPOSITIVE");
   const feeQty = toDecimal(p.feeQuantity || "0");
+  if (feeQty.isNegative()) throw new Error("CRYPTO_TRANSFER_FEE_NEGATIVE");
   const net = toDecimal(p.netQuantity);
   if (!gross.eq(net.plus(feeQty))) throw new Error("TRANSFER_GROSS_NET_FEE_MISMATCH");
 

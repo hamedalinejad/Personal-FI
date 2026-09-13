@@ -60,8 +60,10 @@ export async function buyStock(input, { dataDir } = {}) {
   const invId = scopedAccountId("stock_inventory", currency);
 
   // Fee expense credits payable (not cash) until settlement
+  // P0-01: expense account currency must match fee journal line currency (tx currency)
+  const feeExpenseId = scopedAccountId("stock_fee_expense", currency);
   const feeResult = applyFeeEvents(feeEvents, {
-    expenseAccountId: scopedAccountId("stock_fee_expense", baseCurrency),
+    expenseAccountId: feeExpenseId,
     cashAccountId: payableId,
     transactionCurrency: currency,
   });
@@ -201,10 +203,10 @@ export async function buyStock(input, { dataDir } = {}) {
       });
       if (feeResult.journalLines.some((l) => l.lineKind === "fee")) {
         ensureAccount(db, {
-          id: scopedAccountId("stock_fee_expense", baseCurrency),
-          name: `Stock fee expense (${baseCurrency})`,
+          id: feeExpenseId,
+          name: `Stock fee expense (${currency})`,
           accountKind: "expense",
-          currency: baseCurrency,
+          currency: currency,
           systemRole: "stock_fee_expense",
         });
       }

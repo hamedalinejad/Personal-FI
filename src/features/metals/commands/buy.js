@@ -61,6 +61,9 @@ export async function buyMetal(input, { dataDir } = {}) {
   }
 
   const feeCurrency = p.feeCurrency || currency;
+  if (fee.gt(0) && feeCurrency !== currency && feeCurrency !== (p.baseCurrency || currency)) {
+    throw new Error("FEE_CURRENCY_UNSUPPORTED");
+  }
   // P0-04: never sum fee in foreign currency into transaction-currency cashPrincipal
   if (!fee.isZero() && feeCurrency !== currency) {
     if (p.feeExchangeRateToBase == null && baseCurrency !== feeCurrency) {
@@ -80,7 +83,7 @@ export async function buyMetal(input, { dataDir } = {}) {
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
   const feeResult = applyFeeEvents(feeEvents, {
-    expenseAccountId: scopedAccountId("metal_fee_expense", baseCurrency),
+    expenseAccountId: scopedAccountId("metal_fee_expense", feeCurrency),
     cashAccountId: cashId,
     transactionCurrency: currency,
   });
@@ -167,10 +170,10 @@ export async function buyMetal(input, { dataDir } = {}) {
       });
       if (feeResult.journalLines.some((l) => l.lineKind === "fee")) {
         ensureAccount(db, {
-          id: scopedAccountId("metal_fee_expense", baseCurrency),
-          name: `Metal fee expense (${baseCurrency})`,
+          id: scopedAccountId("metal_fee_expense", feeCurrency),
+          name: `Metal fee expense (${feeCurrency})`,
           accountKind: "expense",
-          currency: baseCurrency,
+          currency: feeCurrency,
           systemRole: "metal_fee_expense",
         });
       }
@@ -243,7 +246,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         p.feeCurrency || currency,
         cashPrincipal.toFixed(),
         currency,
-        "1",
+        exchangeRateToBase,
         now,
       );
     },

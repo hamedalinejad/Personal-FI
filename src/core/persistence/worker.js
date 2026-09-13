@@ -327,6 +327,7 @@ function loadOperationSync(db, operationId, replay = false) {
       sourceReference: row.source_reference ?? snap.sourceReference ?? null,
       result_hash: row.result_hash ?? snap.result_hash ?? null,
       idempotentReplay: replay,
+      // P1-06: optional verify when both present (canonical payload excludes result_hash)
     };
   }
 
