@@ -16,7 +16,7 @@ test("P0-02 metals stores real exchange_rate_to_base", async () => {
         instrumentId: "au-1",
         platformId: "plat-1",
         quantityMg: "1000",
-        purity: "0.999",
+        purityRatio: "0.999",
         metalPricePerMg: "5",
         currency: "USD",
         baseCurrency: "IRR",
