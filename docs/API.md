@@ -1,11 +1,42 @@
-# API (owner)
+# API (sole API contract owner)
 
-Envelope success:
+**Status:** CURRENT · Normative for envelope, errors, idempotency, pagination, capabilities.
+
+## 1. Success envelope
+```json
+{
+  "success": true,
+  "data": {},
+  "errors": [],
+  "meta": {
+    "request_id": "...",
+    "operation_id": "...",
+    "api_version": "1",
+    "schema_version": "1"
+  },
+  "engine_versions": {}
+}
 ```
-{ success, data, errors, meta: { request_id, operation_id, api_version, schema_version }, engine_versions }
-```
-errors[].code — central taxonomy; details.featureCode optional.
 
-Every mutation: operationId UUID, commandHash idempotency, Decimal strings.
+## 2. Errors
+* `errors[].code` — central taxonomy only.
+* Feature-specific codes under `errors[].details.featureCode` only.
+* No competing `errorCode` field name.
 
-Capabilities via feature.public-api capabilities().
+## 3. Mutation requirements
+* `operationId` (UUID) required.
+* Canonical command hash / idempotency: same id + same hash → replay; same id + different hash → conflict.
+* Money fields are decimal strings.
+
+## 4. Pagination
+Stable order keys (default): `businessDate`, `createdAt`, `id`.  
+Cursor encodes all order keys.
+
+## 5. Capabilities
+`capabilities()` per feature public-api; license gates availability without data destruction.
+
+## 6. Queries
+Never mutate financial state. Optional `asOf` for historical reads.
+
+## 7. Absorbs
+API-Requirements, API-Result-and-Errors, Feature-API-Contract prose (conflict → this file).

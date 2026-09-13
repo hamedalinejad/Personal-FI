@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-5** DATA-MODEL.md sole field/identity owner
+Cycle: **std-6** API.md sole envelope/error/idempotency owner
 Production: NO-GO
