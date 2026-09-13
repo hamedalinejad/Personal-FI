@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Navigation rules live in [`docs/PRODUCT.md`](../PRODUCT.md).
 # Pages & Information Architecture
 
 > **اصل محصول:** `20 Features ≠ 20 Navigation Items`  
