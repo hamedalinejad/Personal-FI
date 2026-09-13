@@ -1,3 +1,4 @@
+> **SUPERSEDED** — See [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) (Fee).
 # Fee Treatment Matrix (سراسری)
 
 | Field | |

@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-51** Canonical-Cash-Model superseded → FINANCIAL-CORE
+Cycle: **std-52** Fee-Treatment-Matrix superseded → FINANCIAL-CORE
 Production: NO-GO
