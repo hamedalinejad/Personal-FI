@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-4** FINANCIAL-CORE.md sole financial semantics owner
+Cycle: **std-5** DATA-MODEL.md sole field/identity owner
 Production: NO-GO

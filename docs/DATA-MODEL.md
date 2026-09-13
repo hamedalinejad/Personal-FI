@@ -1,8 +1,30 @@
-# Data Model (owner)
+# DATA-MODEL (sole data/field ownership owner)
 
-* schema.sql = bootstrap authority
-* field-inventory.checklist.tsv = Gate H coverage
-* Field kinds: RAW / DERIVED / SNAPSHOT / EXTERNAL_REPORTED / LABEL / SYSTEM_INDEX
-* Instrument identity: ref_instruments.id only
-* source_channel vs source_type: SOURCE-VOCABULARY.md
-* Money always TEXT decimal strings
+**Status:** CURRENT · Normative for field kinds, ownership, identity, no-field-loss.  
+**Machine proof:** `docs/core/db/schema.sql`, field-inventory, schema.manifest.
+
+## 1. Identity
+Canonical IDs: featureId, instrumentId, accountId, partyId, operationId, holdingId, sourceReference.  
+Provider symbol ≠ financial identity.
+
+## 2. Field kinds (closed vocabulary)
+`RAW` · `DERIVED` · `SNAPSHOT` · `EXTERNAL_REPORTED` · `LABEL` · `SYSTEM_INDEX` · `REFERENCE` · `STATUS`  
+No other document may invent field-kind enums.
+
+## 3. Ownership
+Each column: owner domain, SoT, editable_after_post, migration disposition.
+
+## 4. No-field-loss
+RAW financial facts preserved through import/export/migration. Rename ⇒ explicit mapping.
+
+## 5. Schema contract
+schema.sql is bootstrap authority. Manifest + inventory must cover columns. FREEZE_PROVEN is evidence-level (registry), not mere SPEC_LOCKED.
+
+## 6. Provenance
+sourceChannel / sourceType / sourceReference — see FINANCIAL-CORE + SOURCE-VOCABULARY.
+
+## 7. Ghost tables
+No feature cash transaction tables as SoT (intentional omissions in schema remain).
+
+## 8. Absorbs
+Field-Level-SoT, ownership matrices, data dictionary prose → this file (detail tables may remain generated).
