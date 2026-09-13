@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Cash truth: [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) § Cash truth.
 # Canonical Cash Model (P0)
 
 
