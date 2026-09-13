@@ -1,44 +1,42 @@
 # QUALITY-STATUS
 
-Live only. Not a requirements catalog.
+Live only. History in Git.
 
-| ID | Area | Status | Owner | Test | Commit |
-|----|------|--------|-------|------|--------|
-| DOC-STD | DOCUMENTATION-STANDARD | LOCKED | DOCUMENTATION-STANDARD | docs:validate | 78bb737+ |
-| DOC-TREE | One owner / no dual human core | TRUE | DOCUMENTATION-STANDARD | inventory | 78bb737+ |
-| FIX-LOAN | Duplicate LOAN-FLAT removed | TRUE | fixtures | loan-flat-fixture | 78bb737 |
-| ACC-TAX | Acceptance capability names | TRUE | DEVELOPMENT | npm test | 78bb737 |
-| MOD-11 | All 11 modules 34-section | TRUE | modules/* | — | this |
-| LOAN-REF | modules/loan.md vertical template | TRUE | modules/loan | — | this |
-| REL | Production release | **NO_GO** | OFFLINE-RELEASE | — | — |
-| TST | Suite | GREEN | DEVELOPMENT | npm test | — |
+| ID | Area | Status | Owner | Evidence |
+|----|------|--------|-------|----------|
+| DOC | Owner architecture | GOOD | DOCUMENTATION-STANDARD | tree |
+| HASH | Single computeCommandHash | FIXED | operationEngine | economicHash.test |
+| DUR | durability vocabulary | FIXED | OFFLINE-RELEASE + schema | CHECK constraint |
+| REQ | matrix live refs hard-fail | FIXED | requirements-matrix-check | script tests |
+| FRZ | FREEZE_PROVEN single flag | FIXED | status.registry | false/false |
+| AUTH | authority_owners live | FIXED | status.registry | docs-consistency |
+| REL-E | RELEASE-EVIDENCE live paths | FIXED | RELEASE-EVIDENCE.json | — |
+| CACHE | journal SoT / balance cache | FIXED | DATA-MODEL | table |
+| FX | FX contract | PARTIAL | FINANCIAL-CORE | expand tests |
+| CRYPTO | events/fees | PARTIAL | modules/crypto | — |
+| STOCKS | T+n/calendar | PARTIAL | modules/stocks | — |
+| FUNDS | NAV vs tx price | PARTIAL | modules/funds | — |
+| METALS | purity/delivery | PARTIAL | modules/metals | — |
+| LOAN | formulas in module | STRONG | modules/loan | scheduleEngine |
+| CA | corporate actions | DEFERRED | modules/stocks | — |
+| BROWSER | offline proof | PARTIAL | OFFLINE-RELEASE | — |
+| FREEZE | schema FREEZE_PROVEN | false | status.registry | — |
+| PROD | Production | **NO_GO** | OFFLINE-RELEASE | — |
 
-### Documentation standardization DoD
+### P0 closure (runtime/registry)
 ```
-[x] DOCUMENTATION-STANDARD.md exists
-[x] One owner map (STANDARD + DEVELOPMENT)
-[x] No competing human contracts under docs/core
-[x] Bug/Audit micro-docs gone from active docs
-[x] Module template shared (DEVELOPMENT §)
-[x] All 11 modules exist
-[x] Machine files remain
-[x] Duplicate LOAN-FLAT removed
-[x] Bug-named acceptance consolidated
-[x] package test globs deduped
-[x] docs validator passes
-[x] Module docs complete (34-section)
-[ ] Full gates (run on CI/dev machine: npm run gates)
-[ ] RELEASE_PROVEN
+[x] Remove duplicate economic hash construction
+[x] Canonicalize durability-state vocabulary
+[x] Clean dead requirements-matrix references
+[x] Requirements checker fails on missing live paths
+[x] Remove contradictory FREEZE_PROVEN field
+[x] Repair authority_owners registry
+[x] Repair RELEASE-EVIDENCE references
+[x] Classify cached/source fields
+[ ] Complete field preservation machine proof (ongoing)
+[ ] Complete FX/crypto/stocks/funds/metals/loan proof packs
+[ ] Browser recovery RELEASE-PROVEN
+[ ] Standalone golden packs complete
 ```
 
-**Cycle locked:** FEATURE → OWNER DOC → CODE → TEST → FIXTURE → QUALITY → COMMIT  
-**Forbidden cycle:** AUDIT → BUG DOC → MATRIX → FINAL AUDIT loop
-
-
-| ID | Area | Status | Owner | Test | Commit |
-|----|------|--------|-------|------|--------|
-| P0-04 | requirements live refs FAIL | FIXED | scripts | requirements-matrix-check.test | this |
-| P0-05 | freeze flags single source | FIXED | status.registry | docs-validator | this |
-| P0-06 | authority_owners current | FIXED | status.registry | docs-consistency | this |
-| P0-07 | RELEASE-EVIDENCE live docs | FIXED | RELEASE-EVIDENCE | — | this |
-| P0-08 | balance cache not SoT | FIXED | DATA-MODEL | — | this |
+**No new global audit documents.** Spec = owners · Proof = tests/fixtures · Status = this file + registry · History = Git.
