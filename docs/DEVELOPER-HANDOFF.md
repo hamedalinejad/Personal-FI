@@ -1,3 +1,4 @@
+> **SUPERSEDED** — Developer entry: [`docs/DEVELOPMENT.md`](DEVELOPMENT.md).
 # Developer Handoff — Personal-FI (FINAL)
 
 **وضعیت کدنویسی کل محصول: READY**  
