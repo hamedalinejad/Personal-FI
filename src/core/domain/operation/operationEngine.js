@@ -20,7 +20,7 @@ export function stableStringify(value) {
     return JSON.stringify(value);
   }
   if (Array.isArray(value)) {
-    // P0-OP-004: undefined in arrays is forbidden (not coerced to null)
+    // undefined in arrays is forbidden (not coerced to null)
     for (const v of value) {
       if (v === undefined) throw new Error("HASH_ARRAY_UNDEFINED_FORBIDDEN");
     }
@@ -97,7 +97,7 @@ export function normalizeCommand(command) {
   // Business status only: draft|posted|voided|failed (schema). Never "pending" here —
   // durability_state owns pending/sql_committed/persisted (OFFLINE-002).
   const allowedStatus = new Set(["draft", "posted", "voided", "failed"]);
-  // P0-OP-005: financial writes with journal lines must declare status explicitly
+  // financial writes with journal lines must declare status explicitly
   let status = command.status;
   if (status == null || status === "") {
     if ((command.journalLines || []).length > 0) {
@@ -177,8 +177,8 @@ export async function runAtomicFinancialOperation(command) {
     const dataDir = norm.dataDir || join(process.cwd(), ".pf-data");
     const mode = norm.persistMode;
 
-    // B-037: economic idempotency hash — exclude machine paths / non-economic metadata
-    // P0-OP-003 EconomicIdentity — temporal fields that affect accounting enter the hash
+    // economic idempotency hash — exclude machine paths / non-economic metadata
+    // EconomicIdentity — temporal fields that affect accounting enter the hash
     const payloadForHash = {
       operationType: norm.type,
       payload: norm.payload,
@@ -220,7 +220,7 @@ export async function runAtomicFinancialOperation(command) {
         };
       }
     } catch (e) {
-      // B-023: only OP_NOT_FOUND means "new operation". All other errors surface.
+      // only OP_NOT_FOUND means "new operation". All other errors surface.
       if (e && e.message === "OP_IDEMPOTENCY_CONFLICT") throw e;
       if (e && e.message === "OP_NOT_FOUND") {
         /* continue as new operation */

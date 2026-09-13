@@ -22,7 +22,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   for (const k of ["instrumentId", "platformId", "currency", "businessDate"]) {
     if (p[k] == null || p[k] === "") throw new Error(`VALIDATION_ERROR:${k}`);
   }
-  // B-020: canonical mass is quantityMg; grossWeight retained as UI alias (mg)
+  // canonical mass is quantityMg; grossWeight retained as UI alias (mg)
   const quantityMgRaw = p.quantityMg ?? p.grossWeight;
   if (quantityMgRaw == null || quantityMgRaw === "") throw new Error("VALIDATION_ERROR:quantityMg");
   if (p.inputMassUnit === "g" || p.inputMassUnit === "gram") {
@@ -36,7 +36,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   if (p.inputMassUnit === "g" || p.inputMassUnit === "gram") {
     grossMg = grossMg.times("1000");
   }
-  // BUG-008: never default purity to 1
+  // never default purity to 1
   const purityPolicy = p.purityPolicy || null;
   if (p.purityRatio == null || p.purityRatio === "") {
     if (purityPolicy === "fixed_1") {
@@ -53,8 +53,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
-  // BUG-CUR-015
-  let exchangeRateToBase = p.exchangeRateToBase || "1";
+  // let exchangeRateToBase = p.exchangeRateToBase || "1";
   if (baseCurrency !== currency) {
     if (!p.exchangeRateToBase) throw new Error("FX_RATE_REQUIRED");
     exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
@@ -64,7 +63,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   if (fee.gt(0) && feeCurrency !== currency && feeCurrency !== (p.baseCurrency || currency)) {
     throw new Error("FEE_CURRENCY_UNSUPPORTED");
   }
-  // P0-04: never sum fee in foreign currency into transaction-currency cashPrincipal
+  // never sum fee in foreign currency into transaction-currency cashPrincipal
   if (!fee.isZero() && feeCurrency !== currency) {
     if (p.feeExchangeRateToBase == null && baseCurrency !== feeCurrency) {
       throw new Error("VALIDATION_ERROR:feeExchangeRateToBase");
@@ -194,7 +193,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         now,
       });
 
-      // BUG-009: aggregate position (platform + instrument)
+      // aggregate position (platform + instrument)
       let holding = db
         .prepare(
           `SELECT * FROM inv_metals_holdings WHERE platform_id = ? AND instrument_id = ?`,

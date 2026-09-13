@@ -203,7 +203,7 @@ export function cashFlow(dataDir, { fromDate = null, toDate = null } = {}) {
   const details = [];
   for (const row of lines) {
     const meta = accountMeta(db, row.accountId);
-    // BUG-FINAL-024: canonical cash selector — role/systemRole, not substring on id
+    // canonical cash selector — role/systemRole, not substring on id
     const isCash =
       meta &&
       (meta.role === "cash_box" ||

@@ -7,7 +7,7 @@ export function assertScheduleConservation(rows, { principal, totalInterest = nu
     sp = sp.plus(toDecimal(r.principal));
     si = si.plus(toDecimal(r.interest || "0"));
   }
-  // BUG-CUR-010: last installment residual-corrects so Σ principal == P exactly at display scale (2 dp).
+  // Final installment absorbs rounding residual to preserve principal conservation. residual-corrects so Σ principal == P exactly at display scale (2 dp).
   // Internal pre-round allocation uses full Decimal; conservation proved at money2str scale.
   const pDiff = sp.minus(toDecimal(principal)).abs();
   if (pDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_PRINCIPAL_MISMATCH");
@@ -134,7 +134,7 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
   const dayCountNorm = normalizeDayCount(dayCount);
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);
-  // P0-LOAN-003: annual flat = P * annualFraction * termYears
+  // annual flat = P * annualFraction * termYears
   // termYears from period count / periods-per-year (monthly → /12)
   const rateFrac = normalizeRatePercentage(annualRate);
   const periodsPerYear = frequency === "monthly" ? 12 : frequency === "quarterly" ? 4 : frequency === "weekly" ? 52 : 1;
@@ -174,7 +174,7 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
 export function scheduleQarz({ principal, periods, feePercent = "0", feePercentPoints, startDate, dayCount }) {
   if (!startDate || typeof startDate !== "string") throw new Error("LOAN_START_DATE_REQUIRED");
   const dayCountNorm = normalizeDayCount(dayCount);
-  // P0-LOAN-002: feePercentPoints alias preferred; feePercent still percentage-points
+  // feePercentPoints alias preferred; feePercent still percentage-points
   if (feePercentPoints != null) feePercent = feePercentPoints;
   const P = assertPositive(principal);
   const n = parsePeriodCount(periods);

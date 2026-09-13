@@ -2,7 +2,9 @@
 
 **Status:** CURRENT
 
-## 1. Envelope (locked)
+Absorbs: API-Reference, API-Requirements, API-Result-and-Errors, API-CANONICAL-ENVELOPE, Feature-API-Contract, Capability-API, surface checklist, pagination prose.
+
+## Envelope
 ```json
 {
   "success": true,
@@ -17,72 +19,28 @@
   "engine_versions": {}
 }
 ```
-Primary error field: `errors[].code`. Feature-specific codes in `errors[].details.featureCode` when needed.
+`errors[].code` primary. Money/qty/rate/price = decimal strings.
 
-## 2. Idempotency & hash
-- Client `operationId` (UUID).
-- Server recomputes SHA-256 over canonical economic identity.
-- Mismatch → `OP_COMMAND_HASH_MISMATCH`.
-- Same id + same hash → idempotent replay.
+## Idempotency
+operationId + canonical economic hash. Mismatch → OP_COMMAND_HASH_MISMATCH. Replay same hash → idempotent.
 
-## 3. Status vs durability
-| status | draft \| posted \| voided \| failed |
-| durability_state | pending \| sql_committed \| persisted \| persist_failed |
+## Status vs durability
+Business status ≠ durability_state (see FINANCIAL-CORE).
 
-## 4. Pagination
-Order: `businessDate ASC, createdAt ASC, id ASC`. Cursor encodes full keyset.
+## Pagination
+Stable order: businessDate, createdAt, id. Cursor encodes full keyset.
 
-## 5. Query purity
-Queries never post journal lines.
+## Query purity
+Queries do not post journal.
 
-## 6. Validation order (writes)
+## Validation order
 canonicalize → account/currency → FX/base → balance → domain → commit.
 
-## 7. Command catalog (module-owned details)
-| Area | Commands |
-|------|----------|
-| Accounts | create, update, archive, deposit, withdraw, transfer |
-| Income/Expense | income.create/reverse, expense.create/reverse |
-| Cheque | issue, receive, deposit, clear, bounce, cancel, return |
-| Loan | create, recordPayment, reversePayment |
-| Crypto | buy, sell, transfer |
-| Stocks | buy, sell, settle, dividend |
-| Funds | subscribe, redeem, distribution |
-| Metals | buy, sell, delivery |
-| Tax | recordEvent, payTax |
-| Core | capabilities, health, backup/restore (ops) |
+## Command catalog
+See modules/* for per-command detail. Families: accounts, income/expense, cheque, loan, crypto, stocks, funds, metals, tax, core ops.
 
-Exact request schemas live with module docs; envelope always as above.
+## capabilities()
+Lists command ids, edition, entitlements.
 
-## 8. Capabilities
-`capabilities()` lists command ids + edition entitlement.
-
-## 9. Implementation refs
-`src/core/api/*`, `operationEngine.js`, feature `public-api/`.
-
-## 10. Supersedes
-API-Reference and docs/core API micro-docs as authority.
-
-## Error code families
-| Prefix | Domain |
-|--------|--------|
-| OP_ | Operation engine |
-| ACCOUNT_ | Accounts |
-| LOAN_ | Loan |
-| CRYPTO_ | Crypto |
-| STOCK_ | Stocks |
-| FUND_ | Funds |
-| METAL_ | Metals |
-| TAX_ | Tax |
-| CHEQUE_ | Cheque |
-| INV_ | Inventory/journal invariants |
-| WRITER_ | Multi-tab |
-
-## Cursor encoding
-Base64url JSON: `{"businessDate":"...","createdAt":"...","id":"..."}` matching sort keys. Invalid cursor → API_CURSOR_INVALID.
-
-## Money fields
-All money/qty/rate/price in request and response bodies are decimal **strings**.
-
-## capabilities() shape
-`{ "commands": ["loan.create", ...], "edition": "loan-only", "entitlements": {...} }`
+## Error families
+OP_ ACCOUNT_ LOAN_ CRYPTO_ STOCK_ FUND_ METAL_ TAX_ CHEQUE_ INV_ WRITER_ API_

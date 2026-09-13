@@ -4,9 +4,13 @@
 
 | Gate | Status |
 |------|--------|
-| Documentation Standardized | **~92%** |
+| Owner docs complete absorption pass | **YES (wave)** |
+| Modules template | YES |
+| Legacy authority active | **NO** (archive/MERGE) |
+| Machine artifacts | KEPT |
 | Production | **NO-GO** |
-| Owners CURRENT | yes |
-| Archive complete for authority tree | yes |
-| Module depth | high for v1 locks |
-| MERGE stub DELETE | optional pending |
+| Documentation Standardized | **~95%** |
+| Comment ticket cleanup | in progress |
+| npm gates | run on CI/dev |
+
+Completion remaining: zero-ref DELETE of MERGE stubs; TBD cells for unimplemented commands; RELEASE_PROVEN evidence.

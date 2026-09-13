@@ -113,7 +113,7 @@ export function archiveAccount(db, accountId) {
     .all(accountId);
   let bal = toDecimal("0");
   for (const r of rows) {
-    // BUG-FINAL-025: never fall back to foreign amount for archive balance
+    // never fall back to foreign amount for archive balance
     if (r.amount_in_base == null || r.amount_in_base === "") {
       throw new Error("ACCOUNT_ARCHIVE_MISSING_AMOUNT_IN_BASE");
     }

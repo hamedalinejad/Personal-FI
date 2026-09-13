@@ -50,7 +50,7 @@ test("GOLDEN flat residual zero and total interest = P * 12% * 1y", () => {
   });
   assert.equal(s.rows[11].balance, "0.00");
   assert.ok(sumField(s.rows, "principal").eq(toDecimal("1200")));
-  // P0-LOAN-003: annual * termYears (12/12=1) → 144
+  // annual * termYears (12/12=1) → 144
   assert.ok(sumField(s.rows, "interest").eq(toDecimal("144")));
   assert.equal(s.flatConvention, "annual_times_term_years");
 });

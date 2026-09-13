@@ -68,7 +68,7 @@ export async function settleStock(input, { dataDir } = {}) {
     .get(p.originalTradeOperationId, side);
   if (!tradeTx) throw new Error("TRADE_TX_NOT_FOUND");
 
-  // BUG-FINAL-035: relational prior settlement — settle tx linked to original op
+  // relational prior settlement — settle tx linked to original op
   const priorSettle = db0
     .prepare(
       `SELECT t.id FROM inv_stocks_iran_transactions t
@@ -101,7 +101,7 @@ export async function settleStock(input, { dataDir } = {}) {
       : scopedAccountId(`broker_receivable_${brokerageId}`, currency));
   const resolvedCashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
 
-  // BUG-FINAL-034: outstanding from journal
+  // outstanding from journal
   const bal = accountBalance(db0, brokerAccountId);
   // buy payable: credit-normal → balance negative; outstanding = -bal
   // sell receivable: debit-normal → balance positive; outstanding = bal

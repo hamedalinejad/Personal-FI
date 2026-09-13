@@ -37,7 +37,7 @@ export async function createLoan(
   const p = input.payload || input;
 
   const role = normalizeLoanRole(p.role);
-  // BUG-CUR-002: v1 only lender (receivable). Borrower liability path deferred.
+  // v1 only lender (receivable). Borrower liability path deferred.
   if (role === "borrower") throw new Error("LOAN_ROLE_DEFERRED");
   if (role !== "lender") throw new Error("LOAN_ROLE_UNSUPPORTED");
   if (!p.principal) throw new Error("LOAN_PRINCIPAL_REQUIRED");
@@ -63,7 +63,7 @@ export async function createLoan(
   const engineVersion = "1.0.0-period_based-equal-principal";
   const rateFractional = normalizeRatePercentage(p.annualRate).toFixed();
 
-  // BUG-CUR-003: no DB mutation before atomic op — only stable ids
+  // no DB mutation before atomic op — only stable ids
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
   if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
 

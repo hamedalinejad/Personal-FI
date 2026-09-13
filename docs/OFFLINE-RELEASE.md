@@ -1,50 +1,26 @@
-# OFFLINE-RELEASE (sole offline + release evidence owner)
+# OFFLINE-RELEASE (sole offline + release owner)
 
 **Status:** CURRENT
 
-## 1. Persistence matrix
-| Runtime | Implementation | Evidence status |
-|---------|----------------|-----------------|
-| Node SQLite | `personal-fi.sqlite` + worker | primary path |
-| Browser | Persistence port; sql.js+IDB target | PROTOCOL_PROVEN_NODE_HARNESS |
+Absorbs: Offline-Requirements, Offline-Modes, PERSISTENCE-DURABILITY, Persistence-State-Machine, Multi-Tab-Writer, Storage-Abstraction, RECOVERY-MATRIX, License-Offline, release gate prose.
 
-## 2. Durability
-- BEGIN IMMEDIATE
-- draft/pending operation row
-- domain + journal
-- result snapshot + hash after relational truth
-- COMMIT
-- durable ACK / publish
+## Persistence
+Node SQLite primary. Browser: persistence port → sql.js+IDB (PROTOCOL_PROVEN harness; E2E OPEN).
 
-## 3. Multi-tab
-Single writer; `WRITER_REQUIRED` for non-writer.
+## Durability pipeline
+BEGIN IMMEDIATE → draft op → domain → validate currency/FX/balance → journal → result snapshot/hash → COMMIT → durable ACK.
 
-## 4. Recovery matrix (must go GREEN for RELEASE_PROVEN)
-| Vector | Status |
-|--------|--------|
-| Crash before commit | PARTIAL |
-| Crash after SQL | PARTIAL |
-| Backup/restore | harness tests exist |
-| Same operationId replay | tests exist |
-| Hash conflict | required |
-| Standalone boot | PARTIAL |
-| Browser airplane mode | OPEN |
+## Multi-tab
+Single writer; WRITER_REQUIRED otherwise.
 
-## 5. Vocabulary
-IMPLEMENTED ≠ GOLDEN-GREEN ≠ RECOVERY-GREEN ≠ RELEASE-PROVEN ≠ Production GO
+## Recovery vectors
+crash before/after commit · backup/restore · idempotent replay · hash conflict · offline reopen · standalone — PARTIAL until RELEASE_PROVEN.
 
-## 6. Live dashboard
-Only QUALITY-STATUS.md for live gates.
+## License offline
+Gates capability/UI only; never deletes history.
 
-## Evidence IDs (placeholders)
-| ID | Claim |
-|----|-------|
-| EV-BROWSER-001 | Node harness durable ACK |
-| EV-RECOVERY-001 | backup restore load operation |
-| EV-IDEM-001 | same operationId replay |
+## Vocabulary
+IMPLEMENTED ≠ GOLDEN-GREEN ≠ RECOVERY-GREEN ≠ RELEASE-PROVEN. Production NO-GO until RELEASE_PROVEN.
 
-## Writer lock semantics
-acquireWriter(dbKey, ownerId); second owner → WRITER_REQUIRED. releaseWriter on tab close/unload.
-
-## Backup artifact
-Copy of SQLite file + optional attachment blobs; checksum recorded; restore closes DBs first.
+## Live status
+QUALITY-STATUS.md only.

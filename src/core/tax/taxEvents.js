@@ -97,7 +97,7 @@ export function listTaxEvents(dataDir, { operationId = null } = {}) {
  * P0-TAX-001 — forbid direct paid status mutation without payTax operation.
  */
 export function changeTaxRecordStatus(dataDir, taxRecordId, status) {
-  // P0-013: paid only via payTax
+  // paid only via payTax
   if (status === "paid") {
     throw new Error("TAX_PAID_REQUIRES_PAYTAX_OPERATION");
   }

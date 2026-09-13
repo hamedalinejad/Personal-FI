@@ -138,7 +138,7 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
         break;
       }
       case "fee_from_received": {
-        // BUG-FINAL-006: dimension context mandatory
+        // dimension context mandatory
         if (!receivedInstrumentId) {
           throw new Error("FEE_FROM_RECEIVED_CONTEXT_REQUIRED");
         }
@@ -168,7 +168,7 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
   }
 
   return {
-    // BUG-CUR-016: no bare carryingDelta — callers must use dimensioned fields
+    // no bare carryingDelta — callers must use dimensioned fields
     carryingDeltaBase: carryingDeltaBase.toFixed(), // string BASE only (legacy internal)
     carryingDeltaTx: { amount: carryingDeltaTx.toFixed(), currency: txCcy },
     carryingDeltaBaseDim: { amount: carryingDeltaBase.toFixed(), currency: "BASE" },

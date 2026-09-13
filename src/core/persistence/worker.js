@@ -45,7 +45,7 @@ export function openDb(dataDir) {
   const dbPath = join(dataDir, "personal-fi.sqlite");
   if (openDbs.has(dbPath)) return openDbs.get(dbPath);
   const db = new DatabaseSync(dbPath);
-  // B-026: single schema entry via migration manager (sync ensure)
+  // single schema entry via migration manager (sync ensure)
   ensureSchemaSync(db);
   openDbs.set(dbPath, db);
   return db;
@@ -83,7 +83,7 @@ function persistOperationSqlite(record, dir) {
     throw new Error("OP_BASE_CURRENCY_REQUIRED");
   }
 
-  // P0-OP-005: no silent posted default when lines present
+  // no silent posted default when lines present
   let status = record.status;
   if (status == null || status === "") {
     if (journalLines.length) throw new Error("OP_STATUS_REQUIRED");
@@ -111,7 +111,7 @@ function persistOperationSqlite(record, dir) {
     domainResult: record.domainResult ?? null,
     journalLines,
     durability_state: "sql_committed",
-    // B-022: preserve request envelope for no-field-loss / replay (domain tables remain SoT for owned fields)
+    // preserve request envelope for no-field-loss / replay (domain tables remain SoT for owned fields)
     payload: record.payload ?? null,
     normalizedRequest: record.normalizedRequest ?? null,
     source: record.source ?? null,
@@ -132,13 +132,13 @@ function persistOperationSqlite(record, dir) {
         throw new Error("OP_IDEMPOTENCY_CONFLICT");
       }
       db.exec("ROLLBACK");
-      // BUG-FINAL-017: never trust result_json alone — rebuild from relational SoT
+      // never trust result_json alone — rebuild from relational SoT
       return loadOperationSync(db, id, true);
     }
 
-    // P0-OP-008: insert row first as draft while durability=pending; promote after journal
+    // insert row first as draft while durability=pending; promote after journal
     const insertStatus = status === "posted" ? "draft" : status;
-    // P0-011: source_channel vs source_type vs source_reference
+    // source_channel vs source_type vs source_reference
     const sourceChannel =
       record.sourceChannel ?? record.source_channel ?? record.source ?? null;
     const sourceType = record.sourceType ?? record.source_type ?? null;
@@ -171,7 +171,7 @@ function persistOperationSqlite(record, dir) {
       record.withinTransaction(db, { operationId: id, businessDate, baseCurrency });
     }
 
-    // P0-OP-009 ordered validation after bootstrap:
+    // ordered validation after bootstrap:
     // account identity/currency → FX/base → balance → domain already applied
     for (const line of journalLines) {
       const aid = line.accountId || line.account_id;
@@ -179,7 +179,7 @@ function persistOperationSqlite(record, dir) {
       const lineCur = line.currency;
       const acc = assertAccountUsable(db, aid);
       if (acc.currency !== lineCur) throw new Error("ACCOUNT_CURRENCY_MISMATCH");
-      // P0-OP-010: fill same-currency base; require FX path for cross-currency when posting
+      // fill same-currency base; require FX path for cross-currency when posting
       if (line.amountInBase == null && line.amount_in_base == null) {
         if (lineCur === baseCurrency) {
           line.amountInBase = line.amount;
@@ -235,7 +235,7 @@ function persistOperationSqlite(record, dir) {
       );
     });
 
-    // P0-OP-008/007: only after relational truth exists — promote status + snapshot
+    // /007: only after relational truth exists — promote status + snapshot
     resultSnapshot.durability_state = "sql_committed";
     resultSnapshot.status = status;
     const snapJson = JSON.stringify(resultSnapshot);
@@ -298,7 +298,7 @@ function loadOperationSync(db, operationId, replay = false) {
   if (row.result_json) {
     const snap = JSON.parse(row.result_json);
     // result_json is replay metadata only; journal always from relational tables
-    // P1-06: verify stored hash against payload without result_hash field
+    // verify stored hash against payload without result_hash field
     if (row.result_hash && snap && typeof snap === "object") {
       const { result_hash: _rh, ...canonical } = snap;
       const recomputed = createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
@@ -316,7 +316,7 @@ function loadOperationSync(db, operationId, replay = false) {
          ORDER BY jl.line_number`,
       )
       .all(operationId);
-    // P0-OP-007: typed columns authoritative for canonical fields
+    // typed columns authoritative for canonical fields
     return {
       ...snap,
       operationId: row.id,
@@ -336,7 +336,7 @@ function loadOperationSync(db, operationId, replay = false) {
       sourceReference: row.source_reference ?? snap.sourceReference ?? null,
       result_hash: row.result_hash ?? snap.result_hash ?? null,
       idempotentReplay: replay,
-      // P1-06: optional verify when both present (canonical payload excludes result_hash)
+      // optional verify when both present (canonical payload excludes result_hash)
     };
   }
 
@@ -366,7 +366,7 @@ function loadOperationSync(db, operationId, replay = false) {
 }
 
 async function persistOperationJson(record, dir) {
-  // BUG-FINAL-019: shared validity gate with SQLite path
+  // shared validity gate with SQLite path
   if (!record.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!record.baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
   const id = record.operationId || randomUUID();

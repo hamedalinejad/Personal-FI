@@ -60,7 +60,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
   }
   const amountInBase = cost.times(exchangeRateToBase);
 
-  // BUG-011: Fee Engine owns treatment; feature only selects policy
+  // Fee Engine owns treatment; feature only selects policy
   // Model A: cost pool / total_invested is always in costCurrency (not base)
   const feeTreatment = p.feeTreatment || p.feeRole || "fee_from_received";
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);

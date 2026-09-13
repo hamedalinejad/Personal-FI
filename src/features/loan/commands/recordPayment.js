@@ -71,7 +71,7 @@ function computeOutstanding(db, loanId, loan, asOfDate = null) {
     principal: max0(schedPrin.minus(paidPrin)),
     interest: max0(schedInt.minus(paidInt)),
     fee: max0(feeDue),
-    penalty: "0", // BUG-FINAL-031: v1 DEFERRED — penalty_rate stored but not accrued
+    penalty: "0", // v1 DEFERRED — penalty_rate stored but not accrued
     penaltyPolicy: "DEFERRED_V1",
   };
 }

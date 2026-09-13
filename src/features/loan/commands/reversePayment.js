@@ -29,7 +29,7 @@ export async function reversePayment(
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
   const currency = p.currency;
 
-  // BUG-CUR-007: bootstrap only inside transaction
+  // bootstrap only inside transaction
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
   if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
   if (typeof interestIncomeId !== "undefined" && !interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);

@@ -23,7 +23,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
   const qty = toDecimal(p.quantity ?? p.units);
   if (qty.lte(0)) throw new Error("VALIDATION_ERROR:quantity");
 
-  // BUG-002/003/004: explicit price modes — never treat amount as unit price
+  // /003/004: explicit price modes — never treat amount as unit price
   const nav = p.nav != null && p.nav !== "" ? toDecimal(p.nav) : null;
   let txPrice = null;
   if (p.transactionPrice != null && p.transactionPrice !== "") {
@@ -53,7 +53,7 @@ export async function subscribeFund(input, { dataDir } = {}) {
   }
   assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
 
-  // BUG-005: transaction vs base currency
+  // transaction vs base currency
   const transactionCurrency = p.transactionCurrency || p.currency;
   if (!transactionCurrency) throw new Error("VALIDATION_ERROR:transactionCurrency");
   const baseCurrency = p.baseCurrency || transactionCurrency;

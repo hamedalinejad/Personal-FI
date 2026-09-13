@@ -33,7 +33,7 @@ export async function buyStock(input, { dataDir } = {}) {
   const gross = qty.times(price);
   const currency = p.currency;
   const baseCurrency = p.baseCurrency || currency;
-  // BUG-CUR-014: require explicit FX when currencies differ
+  // require explicit FX when currencies differ
   let exchangeRateToBase = p.exchangeRateToBase || p.exchange_rate_to_base || null;
   if (baseCurrency !== currency) {
     if (exchangeRateToBase == null || exchangeRateToBase === "") {
@@ -52,7 +52,7 @@ export async function buyStock(input, { dataDir } = {}) {
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
-  // P0-03 T+n: trade credits broker payable; cash only on settlement leg
+  // T+n: trade credits broker payable; cash only on settlement leg
   const payableId =
     p.brokerPayableAccountId ||
     scopedAccountId(`broker_payable_${p.brokerageId}`, currency);
@@ -60,7 +60,7 @@ export async function buyStock(input, { dataDir } = {}) {
   const invId = scopedAccountId("stock_inventory", currency);
 
   // Fee expense credits payable (not cash) until settlement
-  // P0-01: expense account currency must match fee journal line currency (tx currency)
+  // expense account currency must match fee journal line currency (tx currency)
   const feeExpenseId = scopedAccountId("stock_fee_expense", currency);
   const feeResult = applyFeeEvents(feeEvents, {
     expenseAccountId: feeExpenseId,
