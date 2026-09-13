@@ -34,3 +34,25 @@ Loan-only edition uses LocalSettlementAdapter + Core journal.
 
 ## 9. Acceptance
 Atomic txn includes ln_loans + schedule + operation + journal; idempotent replay; overpayment policy explicit.
+
+
+## Mathematical formulas (v1)
+
+### Rate
+Business: `annualRate=12` means 12%.  
+Math: `rateFraction = annualRate / 100`.
+
+### Declining equal-principal
+`principalPortion = P / n`  
+`interest_i = remainingBalance * (rateFraction / periodsPerYear)`  
+Last row residual-corrects so Σ principal = P.
+
+### Flat
+`totalInterest = P * rateFraction * years`  
+`payment = (P + totalInterest) / n`
+
+### Qarz
+Interest 0; optional fee percent normalized like rates; never silent interest conversion.
+
+### Golden authority
+Executable fixtures/tests — not prose alone.

@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-30** Pages-IA superseded → PRODUCT.md (if present)
+Cycle: **std-31** modules/loan.md mathematical formulas section
 Production: NO-GO
