@@ -1,8 +1,4 @@
-# Quality Status — cycle-5
+# Quality Status — cycle-10
 
-| Item | Status |
-|------|--------|
-| DATA-MODEL.md | ADDED |
-| funds/metals modules | ADDED |
-| P0-01 acceptance USD/IRR | ADDED |
-| Production | NO-GO |
+234 tests green. Owner docs in place. Production NO-GO.
+Deferred: borrower, CA engine, browser sql.js, penalty accrual (registry.deferred_v1).

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-13",
+  "updated": "2026-09-13-cycle-10",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
@@ -89,5 +89,11 @@
     "Reports": "docs/core/authority/REPORT-DEPENDENCY-ORDER.md",
     "Offline": "docs/core/Offline-Requirements.md",
     "FieldKind": "docs/core/authority/FIELD-KIND-VOCABULARY.md"
+  },
+  "deferred_v1": {
+    "loan.borrower": "LOAN_ROLE_DEFERRED",
+    "corporate_action_engine": "GAP-015",
+    "browser_sqljs": "GAP-005",
+    "penalty_accrual": "DEFERRED_V1"
   }
 }
