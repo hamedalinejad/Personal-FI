@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-55** Field-Level-SoT superseded → DATA-MODEL
+Cycle: **std-56** Feature-API-Contract superseded → API.md
 Production: NO-GO
