@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-27** PRODUCT.md full product charter sections
+Cycle: **std-28** ARCHITECTURE.md ports/txn ownership expanded
 Production: NO-GO
