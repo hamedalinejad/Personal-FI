@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-2** PRODUCT.md sole product owner expanded
+Cycle: **std-3** ARCHITECTURE.md sole architecture owner
 Production: NO-GO
