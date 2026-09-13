@@ -1,11 +1,3 @@
-# Machine artifacts only
+# Machine artifacts
 
-| Path | Role |
-|------|------|
-| `db/schema.sql` | Schema |
-| `registry/*.json` | Status / requirements matrices |
-| `fixtures/` | Golden notes (optional) |
-| `json-schemas/` | JSON schemas |
-| `field-inventory.checklist.tsv` | Field inventory |
-
-Human rules: `docs/*.md` and `docs/modules/`.
+See [DOCUMENTATION-STANDARD.md](../DOCUMENTATION-STANDARD.md) §5.

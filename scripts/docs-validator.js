@@ -8,6 +8,7 @@ import { join } from "path";
 const root = process.cwd();
 const required = [
   "docs/README.md",
+  "docs/DOCUMENTATION-STANDARD.md",
   "docs/PRODUCT.md",
   "docs/ARCHITECTURE.md",
   "docs/FINANCIAL-CORE.md",

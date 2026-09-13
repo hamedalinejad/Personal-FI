@@ -1,5 +1,8 @@
 # Documentation
 
+**Structure authority:** [DOCUMENTATION-STANDARD.md](./DOCUMENTATION-STANDARD.md)
+
+
 ```
 PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL → API
 → REPORTING → OFFLINE-RELEASE → DEVELOPMENT → modules/<feature>
