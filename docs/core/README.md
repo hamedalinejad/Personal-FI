@@ -1,7 +1,13 @@
-> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+# docs/core (machine + residual)
 
-# docs/core
+**Normative prose lives at `docs/*.md` and `docs/modules/`.**
 
-Concept homes and machine artifacts live here.
-**Human entry:** ../PRODUCT.md, ../DEVELOPMENT.md, ../QUALITY-STATUS.md
-Do not add new BUG-*-STATUS micro files; update ../QUALITY-STATUS.md
+## Keep here
+- `db/` — schema.sql, manifest (MACHINE)
+- `registry/` — status.registry.json etc.
+- `fixtures/` — machine fixtures if present
+- `json-schemas/` — machine schemas
+- Field inventory / Data-Dictionary (migration aids; vocabulary owned by DATA-MODEL.md)
+- GO-NO-GO.md — release gate pointer
+
+Do not add new authority markdown here.
