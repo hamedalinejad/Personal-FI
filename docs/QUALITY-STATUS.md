@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-28** ARCHITECTURE.md ports/txn ownership expanded
+Cycle: **std-29** FINANCIAL-CORE canonical operation identity + result snapshot (no bug IDs)
 Production: NO-GO

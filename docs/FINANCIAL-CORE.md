@@ -48,3 +48,15 @@ Detail engines may live under `docs/core/` as **implementation notes** until ful
 
 ## 10. Pipeline
 Feature API → normalize → domain → journal → invariants → single transaction → persist → result (result_json is **not** financial SoT).
+
+
+## 11. Canonical Operation Identity
+* Identity key: `operationId` (UUID).
+* Idempotency: same `operationId` + same canonical `commandHash` → replay; mismatch → conflict.
+* Hash inputs include economic fields: type, businessDate, baseCurrency, settlementDate, eventAt, provenance, sourceChannel, sourceType, sourceReference, normalized payload.
+* Caller-supplied hash must equal server-computed hash or reject.
+
+## 12. Result snapshot
+* Relational journal/operations are financial SoT.
+* `result_json` = diagnostic/replay envelope only.
+* `result_hash` = SHA-256 of canonical payload (excluding the hash field itself).
