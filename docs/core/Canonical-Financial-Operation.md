@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **SUPERSEDED** — See [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) (Operation).
 
 > **P0-OP-006:** `status` ∈ {draft,posted,voided,failed}. `pending` is durability only.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Single Writer / Multi-Tab (P0)
 
 sql.js: **یک active writer**.

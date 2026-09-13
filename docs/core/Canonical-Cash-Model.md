@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **SUPERSEDED** — Cash truth: [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) § Cash truth.
 # Canonical Cash Model (P0)
 

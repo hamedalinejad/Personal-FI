@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **SUPERSEDED** — See [`docs/API.md`](../API.md).
 > **API-001/002:** Response shape authority = `API-CANONICAL-ENVELOPE.md` (`errors[].code`, meta.api_version).
 

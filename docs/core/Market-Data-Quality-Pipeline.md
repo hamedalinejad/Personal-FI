@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Market Data Quality Pipeline (قبل از هر مصرف‌کننده / AI)
 
 > **اصل P0:** Data Quality **قبل از** Model / AI / Signal است.  

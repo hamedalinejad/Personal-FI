@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # P1 — Global Contracts (All Features)
 
 این سند قراردادهای **P1** سراسری است. Featureها باید آن را تکمیل کنند (field matrices، reverse plans، rebuild determinism). در تعارض با مثال قدیمی Feature، قفل‌های P0 موجود + این P1 مبنا هستند.

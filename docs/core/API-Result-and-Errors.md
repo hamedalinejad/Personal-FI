@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **Authority:** `API-CANONICAL-ENVELOPE.md` for envelope + error code field.
 
 # API Result و خطاهای Typed (P0)

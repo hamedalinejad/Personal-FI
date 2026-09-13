@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # P1 — Iranian Detail · Performance · Golden Fixtures · Acceptance Matrix
 
 مکمل `P1-GLOBAL-CONTRACTS.md`. قبل از **SPEC freeze** این موارد باید در قراردادها پوشش داده شده باشند (نه لزوماً همه در UI).

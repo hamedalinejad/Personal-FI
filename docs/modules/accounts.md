@@ -1,105 +1,141 @@
 # Accounts (module owner)
+
 **Status:** CURRENT
-Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
+
+Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
 
 ## 1. Purpose
-Operational cash/bank/card/wallet accounts linked to Core fin_accounts.
+
+Operational money accounts (cash, bank, card, wallet) linked to Core fin_accounts for journal truth.
 
 ## 2. Scope
-CRUD accounts, deposit/withdraw/transfer projections, archive rules, bank metadata.
+
+Create/update/archive accounts; deposit, withdraw, transfer as operations; bank metadata; multi-currency display with IRR ledger storage.
 
 ## 3. Non-Goals
-Not the accounting chart of accounts UI; not investment holding ledgers.
+
+Chart-of-accounts designer UI; investment holding ledgers; parallel cash SoT tables.
 
 ## 4. User Stories
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Add bank IRR account; transfer between cash and bank; archive empty account.
 
 ## 5. Pages / Sheets / Drawers
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+/money; account detail sheet; transfer sheet.
 
 ## 6. Entities
-acc_accounts, acc_transactions, acc_transaction_links, fin_accounts (class).
+
+acc_accounts, acc_transactions (projection), acc_transaction_links, fin_accounts (class asset/liability/…).
 
 ## 7. Fields
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+name, account_kind (operational), currency, fin_account_id, iban/external ids, status active|archived.
 
 ## 8. Field Kinds
-See DATA-MODEL.md. Operational account_kind ≠ accounting account_kind (class).
+
+Balances DERIVED from journal; name/kind RAW; fin_account_id REFERENCE.
 
 ## 9. Field Ownership
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Feature owns operational rows; Core owns fin_* and journal.
 
 ## 10. Commands
-createAccount, updateAccount, archiveAccount, deposit, withdraw, transfer (via operations).
+
+accounts.create, update, archive, deposit, withdraw, transfer.
 
 ## 11. Queries
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+listAccounts, getAccount, listActivity.
 
 ## 12. API Input
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+operationId for money moves; decimal-string amounts; currency explicit.
 
 ## 13. API Output
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Envelope + accountId + operationId.
 
 ## 14. Normalization
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+currency uppercase; amounts decimal strings; scopedAccountId for system roles.
 
 ## 15. Validation
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+archive only if journal balance zero; currency match on legs.
 
 ## 16. State Machine
-active → inactive/closed; archive only if journal balance zero.
+
+active → archived (zero balance only).
 
 ## 17. Accounting Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Maps operational moves to fin account classes.
 
 ## 18. Journal Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+All money moves via operation engine balanced journal.
 
 ## 19. Cash Effects
-Only through CashSettlementPort → journal.
+
+CashSettlementPort; never store authoritative cashBalance outside journal.
 
 ## 20. Fee Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Transfer fees via Fee Engine when policy says so.
 
 ## 21. Tax Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A unless tax payment uses settlement account.
 
 ## 22. FX Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Cross-currency transfer requires locked rates on post.
 
 ## 23. Date Semantics
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+businessDate required on operations.
 
 ## 24. Identity
-acc_accounts.id; fin_account_id link required for posted cash.
+
+acc_accounts.id; fin_accounts.id; uniqueness policy on code if used.
 
 ## 25. Reversal / Correction
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Reverse operation; no overwrite of posted amounts.
 
 ## 26. Rebuild
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Activity projections rebuildable from journal + links.
 
 ## 27. Reports
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Account statement via REPORTING.
 
 ## 28. Offline Behavior
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Full offline.
 
 ## 29. Standalone Edition
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Hidden settlement accounts when Accounts UI off.
 
 ## 30. Licensing / Capabilities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Always available as Core dependency for other editions.
 
 ## 31. Edge Cases
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Zero-amount reject; same-account transfer reject.
 
 ## 32. Errors
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+ACCOUNT_ARCHIVE_NONZERO, CURRENCY_MISMATCH.
 
 ## 33. Golden / Recovery Fixtures
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+CORE transfer fixtures.
 
 ## 34. Acceptance Criteria
-Archive rejects nonzero balance; currency match account vs tx.
+
+Archive gate; journal SoT; operational kind ≠ accounting class.

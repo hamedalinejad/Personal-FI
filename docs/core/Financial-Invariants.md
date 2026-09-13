@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Financial Invariants — ممنوعیت‌ها و الزامات (Must)
 
 هر implementation که یکی از این‌ها را نقض کند **باگ بحرانی** است و قبل از release مالی قابل قبول نیست.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **P0-FIELD-003:** `deletedAt` **forbidden** on posted financial ledger rows. Soft-delete only on non-financial metadata where policy allows.
 
 > Kind SoT: `docs/core/authority/FIELD-KIND-VOCABULARY.md`

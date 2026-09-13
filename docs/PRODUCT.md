@@ -91,3 +91,19 @@ Product UX labels may be localized. Canonical technical terms live in FINANCIAL-
 
 ## 16. Non-product owners
 Architecture → ARCHITECTURE.md · Finance math → FINANCIAL-CORE.md · Schema/fields → DATA-MODEL.md · HTTP/API → API.md · Reports → REPORTING.md
+
+
+## 17. Module index
+| Module | Path |
+|--------|------|
+| Accounts | modules/accounts.md |
+| Income/Expense | modules/income-expense.md |
+| Cheque | modules/cheque.md |
+| Loan | modules/loan.md |
+| Crypto | modules/crypto.md |
+| Stocks Iran | modules/stocks.md |
+| Funds | modules/funds.md |
+| Metals | modules/metals.md |
+| Physical assets | modules/physical-assets.md |
+| Budget/Goals/Bills | modules/budget-goals-bills.md |
+| Tax | modules/tax.md |

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **این فقط فهرست ID برای رفرنس سریع است؛ شرح کامل در [`Canonical-Financial-Operation.md`](./Canonical-Financial-Operation.md) است.**
 
 # Canonical Financial Operation Catalog (P0)

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **SUPERSEDED** — See [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) (Cost basis).
 > **MATH-008:** Every crypto transfer-like op must set `economicKind` ∈ {internal_transfer, same_owner_bridge, economic_swap}. Internal transfer: no realized P&L from spot price.
 

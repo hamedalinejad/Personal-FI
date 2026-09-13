@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Cash Settlement Adapter (P0) — P0-FIX-001 locked
 
 > **Invariant:** Features never depend on Accounts UI tables for cash **truth**.  

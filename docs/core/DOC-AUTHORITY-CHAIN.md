@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Documentation Authority Chain (RESOLVED)
 
 **Live.** Supersedes older B-005 hierarchy that ranked P0-FINAL/LOCKS above concept homes.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Missing Requirements Register (FINAL pre-coding)
 
 **Purpose:** Map every audit “missing requirement” to **CLOSED (contract)** or **OPEN (implementation/evidence)**.  

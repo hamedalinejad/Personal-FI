@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Fiscal Period Lock (P1)
 
 بدون بستن دوره، گزارش‌های «قطعی» ماه/سال بعداً با ثبت عقب‌افتاده عوض می‌شوند.

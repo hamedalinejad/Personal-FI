@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Data Dictionary
 
 هدف: جلوگیری از اختلاف مستندات و گم‌شدن فیلد. هر فیلد مالی مهم باید اینجا (یا ضمیمه feature) با این ستون‌ها تعریف شود.

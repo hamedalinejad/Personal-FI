@@ -1,105 +1,141 @@
 # Cheque (module owner)
+
 **Status:** CURRENT
-Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
+
+Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
 
 ## 1. Purpose
-Cheque lifecycle with cash impact only on clearing transitions.
+
+Cheque instruments with lifecycle and cash impact only on defined transitions.
 
 ## 2. Scope
-issue, receive, deposit, clear, bounce, cancel, return.
+
+Issue, receive, deposit, clear, bounce, cancel, return.
 
 ## 3. Non-Goals
-_See prior module notes in git history if expanded content existed._
+
+Central bank cheque clearing network integration.
 
 ## 4. User Stories
-_See prior module notes in git history if expanded content existed._
+
+N/A / DEFERRED — do not invent.\n
 
 ## 5. Pages / Sheets / Drawers
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 6. Entities
-_See prior module notes in git history if expanded content existed._
+
+cheque rows + operation_id links.
 
 ## 7. Fields
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 8. Field Kinds
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 9. Field Ownership
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 10. Commands
-cheque.issue, deposit, clear, bounce, cancel, return.
+
+cheque.issue, receive, deposit, clear, bounce, cancel, return.
 
 ## 11. Queries
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 12. API Input
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 13. API Output
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 14. Normalization
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 15. Validation
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 16. State Machine
-issued|received → deposited → cleared | bounced | cancelled | returned.
+
+issued|received → deposited → cleared | bounced; cancel/return branches.
 
 ## 17. Accounting Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Receivable/payable or cash per transition matrix.
 
 ## 18. Journal Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Only through operation engine.
 
 ## 19. Cash Effects
-Available balance / journal only on defined transitions (clear/bounce rules).
+
+Journal impact on clear (and bounce rules); not on mere issue if policy holds.
 
 ## 20. Fee Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 21. Tax Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 22. FX Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 23. Date Semantics
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+issueDate, dueDate, clearDate distinct.
 
 ## 24. Identity
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+cheque id + account/party references.
 
 ## 25. Reversal / Correction
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Reverse clear via operation reversal.
 
 ## 26. Rebuild
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 27. Reports
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 28. Offline Behavior
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Offline lifecycle updates.
 
 ## 29. Standalone Edition
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+With Accounts/Core.
 
 ## 30. Licensing / Capabilities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 31. Edge Cases
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 32. Errors
-_See prior module notes in git history if expanded content existed._
+
+N/A / DEFERRED — do not invent.\n
 
 ## 33. Golden / Recovery Fixtures
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+DEFERRED until filled.
 
 ## 34. Acceptance Criteria
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Illegal transition rejected; clear posts balanced journal.

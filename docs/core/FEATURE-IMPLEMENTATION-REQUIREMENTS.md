@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > Prefer `IMPLEMENTATION-READY-*.md` for coding. This file is supplementary feature requirements matrix.
 
 # Feature-by-Feature Implementation Requirements

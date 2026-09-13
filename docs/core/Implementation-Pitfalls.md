@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Implementation Pitfalls (زمان کدنویسی)
 
 این‌ها **هشدار اجباری**اند تا فیلد/محاسبه خراب نشود.

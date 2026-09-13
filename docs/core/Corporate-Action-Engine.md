@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # CorporateActionEngine (Core — نه فقط Stocks)
 
 رویدادهای ساختاری روی **identity / quantity / cost** که فقط به سهام ایران محدود نیستند.

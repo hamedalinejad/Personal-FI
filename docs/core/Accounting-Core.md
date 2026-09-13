@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **P0-VOCABULARY LOCK:** Field names = `docs/core/db/schema.sql` + `P0-SCHEMA-VOCABULARY-LOCK.md` only.  
 > Obsolete: `role`, `type` (as account column), `isVoided`, `operation_id` on journal lines, ghost `inv_*_*_transactions` cash tables.
 

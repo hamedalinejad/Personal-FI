@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Field Write Contract (P0) — یک حقیقت اجرایی
 
 مفهومی کافی نیست؛ هر فیلد مالی باید **غیرقابل تفسیر** باشد.

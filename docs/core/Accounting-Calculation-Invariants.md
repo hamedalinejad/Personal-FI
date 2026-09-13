@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Accounting Calculation Invariants (قفل ریاضی)
 
 کوچک‌ترین ابهام در فرمول = باگ حسابداری. این سند بر هر توضیح قدیمی‌تر اولویت دارد.

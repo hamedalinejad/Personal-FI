@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Canonical API Envelope (API-001 FINAL)
 
 **Authority for response shape.** Supersedes conflicting prose in API-Requirements.md / Feature-API-Contract.md.

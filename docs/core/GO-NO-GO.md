@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **Missing requirements map:** `MISSING-REQUIREMENTS-REGISTER.md` (P0/P1/P2). Documentation reconciliation closed; production still NO-GO.
 
 # Go / No-Go

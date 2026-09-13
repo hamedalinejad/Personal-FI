@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # License Gate
 
 **جدا از Financial DB.** لایسنس هرگز journal، history، یا domain ledger را پاک/بازنویسی نمی‌کند.  

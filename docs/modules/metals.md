@@ -1,105 +1,141 @@
 # Metals (module owner)
+
 **Status:** CURRENT
-Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
+
+Owners: FINANCIAL-CORE · DATA-MODEL · API · REPORTING · OFFLINE-RELEASE.
 
 ## 1. Purpose
-Bullion/coin metals with purity snapshot and delivery.
+
+Bullion and coin metals with purity snapshot and physical delivery.
 
 ## 2. Scope
-buy, sell, delivery; coin ≠ bullion identity.
+
+buy, sell, delivery; premium and trade fee vs delivery fee.
 
 ## 3. Non-Goals
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Derive coin valuation from fine-weight unless analytical mode explicit.
 
 ## 4. User Stories
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 5. Pages / Sheets / Drawers
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 6. Entities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 7. Fields
-purityRatio RAW; fineWeightMg DERIVED; premium/fee separate.
+
+quantityMg RAW, purityRatio RAW, fineWeightMg DERIVED, premium, fees.
 
 ## 8. Field Kinds
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 9. Field Ownership
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 10. Commands
+
 metals.buy, sell, delivery.
 
 ## 11. Queries
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 12. API Input
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 13. API Output
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 14. Normalization
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 15. Validation
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Missing purity reject unless instrument fixed_1 pure policy.
 
 ## 16. State Machine
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 17. Accounting Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 18. Journal Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Inventory asset vs cash; delivery moves carrying to physical asset.
 
 ## 19. Cash Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+CashSettlementPort; platform cashBalance projection only.
 
 ## 20. Fee Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Trade fee ≠ delivery fee; delivery fee capitalization only if policy says.
 
 ## 21. Tax Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 22. FX Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 23. Date Semantics
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 24. Identity
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+instrumentId + platform/account; gold_coin ≠ bullion class.
 
 ## 25. Reversal / Correction
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 26. Rebuild
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Holdings from metals transactions.
 
 ## 27. Reports
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 28. Offline Behavior
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 29. Standalone Edition
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 30. Licensing / Capabilities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 31. Edge Cases
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 32. Errors
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 33. Golden / Recovery Fixtures
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A / DEFERRED — do not invent.\n
 
 ## 34. Acceptance Criteria
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+METAL-003 fee separation; purity not silent 1.

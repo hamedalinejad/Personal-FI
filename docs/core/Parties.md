@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Parties / Counterparties (طرف حساب — ساده، نه CRM)
 
 برای حسابداری شخصی ایران، نام‌هایی مثل علی، موجر، کارفرما نباید فقط در `description` بمانند.

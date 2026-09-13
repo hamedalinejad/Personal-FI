@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # گزارش‌های ضروری
 
 گزارش‌ها از Ledger + Engine + Valuation می‌آیند؛ نه از cache به‌عنوان SoT.

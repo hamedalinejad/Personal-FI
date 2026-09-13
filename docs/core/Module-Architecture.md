@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Module Architecture (P0)
 
 هدف: سیستم **ماژولار**، آفلاین، قابل لایسنس جزئی — بدون پیچیدگی غیرضروری و بدون حذف هسته مالی.

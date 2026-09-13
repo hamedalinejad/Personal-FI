@@ -75,3 +75,27 @@ If prose and fixture disagree, fixture/test is investigated — developer must n
 Money/decimal/precision/unit/JSON policies · Financial-Invariants · Accounting-Calculation-Invariants · Canonical-Financial-Operation · Canonical-Cash-Model · JOURNAL-LINE / BASE-AMOUNT contracts · Fee-Treatment-Matrix · Cost-Basis-Engine · Date-Semantics-Matrix · Reversal identity · Operation status vs durability_state.
 
 See git history under `docs/core/` for prior long-form text. **This file is the sole finance owner.**
+
+
+## Operation identity (canonical)
+Economic identity for hash includes: type, businessDate, settlementDate, eventAt, provenance, payload amounts/rates/accounts, journal legs. Caller hash must match recomputed hash.
+
+## Journal pre-commit algorithm
+1. Normalize decimal strings
+2. Resolve account currency
+3. Apply FX → amount_in_base
+4. Sum debits/credits in base with Decimal
+5. Exact equality or reject
+6. Commit only after pass
+
+## Fee model
+Single CanonicalFeeEvent: feeAmount, feeCurrency, feeInstrumentId?, feeTreatment, feeFundingKind cash|asset. Feature selects policy; Core Fee Engine applies treatment.
+
+## Cost basis
+WAC v1 unless policy says otherwise. cost pool currency model must be consistent (transaction currency vs base — locked per feature table in module docs).
+
+## Reversal
+Core: originalOperationId → reversalOperationId. Feature reverse links are convenience only.
+
+## Rate units
+Percentage points: 12 means 12%. Internal fraction = value/100. Never treat 12 as 12.0 interest multiple.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Import Infrastructure (Core — نه Feature جدا)
 
 ورود تاریخچه طولانی (مثلاً ۵ سال Binance/Wallet/بانک) دستی نیست.

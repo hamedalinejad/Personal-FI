@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Reconciliation به‌عنوان Feature Foundation (P0/P1)
 
 مغایرت‌گیری فقط «nice-to-have» نیست؛ قابلیت Foundation است.

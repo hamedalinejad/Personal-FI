@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **Live status 2026-09-05:** `src/core` engines v1 present; not docs-only. Historical «src removed» statements are audit-only.
 
 # Architecture Locked — Pre-Coding Constitution

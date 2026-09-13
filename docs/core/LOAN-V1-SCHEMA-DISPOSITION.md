@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Loan v1 Schema Disposition (FINAL for v1)
 
 **Resolution of D-007 / A11:** v1 does **not** silently drop the rich Loan contract.  

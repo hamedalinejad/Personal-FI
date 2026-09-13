@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **Live status:** `GO-NO-GO.md` + `OPEN-ISSUES-REGISTER.md`. This roadmap is tracking; historical rows are not authority.
 
 # Requirements Implementation Roadmap

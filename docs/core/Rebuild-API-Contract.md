@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Rebuild & Reconciliation API (P0)
 
 Snapshot / balance / holding / avg cost / remainingBalance / portfolio value = **DERIVED**.

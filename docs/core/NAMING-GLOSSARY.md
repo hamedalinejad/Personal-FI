@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 # Naming Glossary (P2 — Canonical Vocabulary)
 
 **Canonical path:** `docs/core/NAMING-GLOSSARY.md` only (B-011). `Naming-Glossary.md` is pointer.

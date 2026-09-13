@@ -1,3 +1,5 @@
+> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+
 > **FINAL:** Any historical section below that ranks P0-FINAL/*-LOCKS above concept homes is **obsolete**. Live hierarchy: `DOC-AUTHORITY-CHAIN.md` only.
 
 > **RESOLVED hierarchy:** see `DOC-AUTHORITY-CHAIN.md`. Older B-005 ranking of P0-FINAL/LOCKS is obsolete.
