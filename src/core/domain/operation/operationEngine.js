@@ -177,21 +177,8 @@ export async function runAtomicFinancialOperation(command) {
     const dataDir = norm.dataDir || join(process.cwd(), ".pf-data");
     const mode = norm.persistMode;
 
-    // economic idempotency hash — exclude machine paths / non-economic metadata
-    // EconomicIdentity — temporal fields that affect accounting enter the hash
-    const payloadForHash = {
-      operationType: norm.type,
-      payload: norm.payload,
-      journalLines: norm.journalLines,
-      businessDate: norm.businessDate,
-      baseCurrency: norm.baseCurrency,
-      settlementDate: norm.settlementDate ?? null,
-      eventAt: norm.eventAt ?? null,
-      provenance: norm.provenance ?? null,
-      rates: norm.rates ?? null,
-      engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
-    };
-    const commandHash = stableHash(payloadForHash);
+    // Single economic identity path — never rebuild payloadForHash separately (P0-01)
+    const commandHash = computeCommandHash(norm);
     if (norm.clientCommandHash && norm.clientCommandHash !== commandHash) {
       throw new Error("OP_COMMAND_HASH_MISMATCH");
     }
@@ -201,7 +188,7 @@ export async function runAtomicFinancialOperation(command) {
       const existing = await loadOperation(norm.operationId, { dataDir, mode });
       if (
         existing &&
-        ["sql_committed", "swapped", "persisted", "durable"].includes(existing.durability_state)
+        ["sql_committed", "persisted"].includes(existing.durability_state) // canonical: pending|sql_committed|persisted|persist_failed; pending/failed not replay
       ) {
         if (existing.commandHash && existing.commandHash !== commandHash) {
           throw new Error("OP_IDEMPOTENCY_CONFLICT");

@@ -24,3 +24,14 @@ IMPLEMENTED ≠ GOLDEN-GREEN ≠ RECOVERY-GREEN ≠ RELEASE-PROVEN. Production N
 
 ## Live status
 QUALITY-STATUS.md only.
+
+
+## Operation durability_state (canonical)
+```
+pending → sql_committed → persisted
+                 ↘ persist_failed
+```
+Business `status` is separate: draft | posted | voided | failed.
+
+Replay of existing operations is allowed only for `sql_committed` or `persisted`.
+Legacy values `swapped` / `durable` are **not** schema states (transport markers only).

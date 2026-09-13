@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updated": "2026-09-12",
-  "rule": "Coding must not guess. If status is SPEC_LOCKED only, implement only after contract sections exist. RELEASE-PROVEN requires evidence IDs.",
+  "updated": "2026-09-13",
+  "rule": "Live define paths must resolve to current owners or machine files. Historical paths are not active.",
   "requirements": {
     "R-M01": {
       "title": "Canonical status registry",
@@ -18,7 +18,7 @@
       "status": "IMPLEMENTED",
       "define": [
         "docs/core/registry/status.registry.json#schema_status",
-        "docs/core/authority/SCAFFOLD-FINAL-STATUS.md"
+        "docs/QUALITY-STATUS.md"
       ],
       "note": "SPEC_LOCKED vs FREEZE_PROVEN vs RELEASE-PROVEN separated; FREEZE_PROVEN still false"
     },
@@ -27,24 +27,22 @@
       "status": "PARTIAL",
       "define": [
         "docs/core/field-inventory.checklist.tsv",
-        "docs/core/Field-Level-SoT.md",
-        "docs/core/command-coverage/COMMAND-FIELD-MATRIX.md"
+        "docs/DATA-MODEL.md"
       ],
-      "gap": "Not every command has complete schema\u2192export mapping automated"
+      "gap": "Not every command has complete schema→export mapping automated"
     },
     "R-M04": {
       "title": "Journal cardinality contract",
       "status": "IMPLEMENTED",
       "define": [
-        "docs/core/authority/OPERATION-JOURNAL-CARDINALITY.md",
-        "docs/core/JOURNAL-LINE-CONTRACT.md"
+        "docs/FINANCIAL-CORE.md"
       ]
     },
     "R-M05": {
       "title": "Internal vs external identifier policy",
       "status": "PARTIAL",
       "define": [
-        "docs/core/Instrument-Identity.md"
+        "docs/DATA-MODEL.md"
       ],
       "gap": "Not all scalar columns named external_* in schema"
     },
@@ -52,7 +50,7 @@
       "title": "Money and unit canonicalization table",
       "status": "PARTIAL",
       "define": [
-        "docs/core/Money-Decimal-Policy.md",
+        "docs/FINANCIAL-CORE.md",
         "src/core/money/canonicalDecimal.js"
       ],
       "gap": "Single consolidated unit table for weight/qty still narrative"
@@ -61,8 +59,7 @@
       "title": "FX historical valuation contract",
       "status": "PARTIAL",
       "define": [
-        "docs/core/authority/LOCAL-IRAN-V1-CURRENCY-POLICY.md",
-        "docs/core/authority/COST-POOL-MODEL.md"
+        "docs/FINANCIAL-CORE.md"
       ],
       "gap": "Full cross-rate path + stale override runtime incomplete"
     },
@@ -83,7 +80,7 @@
       "title": "Crypto network fee policy",
       "status": "PARTIAL",
       "define": [
-        "docs/core/Fee-Treatment-Matrix.md",
+        "docs/FINANCIAL-CORE.md",
         "src/features/crypto/commands/transfer.js"
       ],
       "note": "fee_from_received and transfer feeCarrying defined; not all fee roles productized"
@@ -95,7 +92,7 @@
         "src/core/iran/settlementPolicy.js",
         "src/features/stocks/commands/buy.js",
         "src/features/stocks/commands/settle.js",
-        "docs/core/authority/STOCKS-TN-SETTLEMENT.md"
+        "docs/modules/stocks.md"
       ],
       "gap": "Holiday calendar file not full TSE calendar"
     },
@@ -111,7 +108,7 @@
       "title": "Corporate action master model",
       "status": "SPEC_LOCKED",
       "define": [
-        "docs/core/Corporate-Action-Engine.md"
+        "docs/modules/stocks.md"
       ],
       "gap": "No runtime CA command suite"
     },
@@ -194,7 +191,7 @@
       "title": "Deterministic rebuild contract",
       "status": "PARTIAL",
       "define": [
-        "docs/core/authority/"
+        "docs/FINANCIAL-CORE.md"
       ],
       "gap": "Executable rebuild API incomplete"
     },
@@ -202,8 +199,8 @@
       "title": "Import lineage runtime gate",
       "status": "SPEC_LOCKED",
       "define": [
-        "docs/core/Import-Infrastructure.md",
-        "docs/core/Import-Lineage.md"
+        "docs/OFFLINE-RELEASE.md",
+        "docs/FINANCIAL-CORE.md"
       ],
       "gap": "Runtime gate not fully enforced"
     },
@@ -211,7 +208,7 @@
       "title": "Backup format contract",
       "status": "PARTIAL",
       "define": [
-        "docs/core/db/06-migration-backup-audit.md"
+        "docs/OFFLINE-RELEASE.md"
       ],
       "gap": "Archive package format runtime incomplete"
     },
@@ -227,22 +224,22 @@
       "title": "License entitlement model",
       "status": "SPEC_LOCKED",
       "define": [
-        "docs/core/License-Gate.md",
-        "docs/core/License-Offline.md"
+        "docs/OFFLINE-RELEASE.md",
+        "docs/FINANCIAL-CORE.md"
       ]
     },
     "R-M26": {
       "title": "Minimal navigation IA",
       "status": "SPEC_LOCKED",
       "define": [
-        "docs/core/authority/DATA-OWNERSHIP-AND-MODELS.md#24"
+        "docs/FINANCIAL-CORE.md"
       ]
     },
     "R-M27": {
       "title": "API registry coverage",
       "status": "PARTIAL",
       "define": [
-        "docs/core/authority/API-CONTRACT.md",
+        "docs/API.md",
         "docs/core/registry/status.registry.json"
       ],
       "gap": "Per-command OpenAPI-like schema files not complete"
@@ -251,7 +248,7 @@
       "title": "UI/domain separation gate",
       "status": "IMPLEMENTED",
       "define": [
-        "docs/core/CODING-GATE.md",
+        "docs/DEVELOPMENT.md",
         "scripts/lint-boundaries.js"
       ]
     },
