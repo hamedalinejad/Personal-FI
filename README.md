@@ -1,5 +1,12 @@
 # Personal-FI
 
+**Start here (human):** `docs/PRODUCT.md` → `docs/DEVELOPMENT.md` → `docs/QUALITY-STATUS.md`  
+**Machine:** `docs/core/db/schema.sql`, registries, fixtures.
+
+Production: **NO-GO** until release evidence computed.
+
+# Personal-FI
+
 Offline-first personal accounting & investments (Iran-aware).
 
 ## Project phase (canonical)
