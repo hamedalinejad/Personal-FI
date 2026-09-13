@@ -1,5 +1,13 @@
 # Personal-FI
 
+**Docs entry:** [docs/README.md](docs/README.md) → PRODUCT → ARCHITECTURE → FINANCIAL-CORE → … → modules/
+
+**Live status:** [docs/QUALITY-STATUS.md](docs/QUALITY-STATUS.md)  
+**Process:** [docs/DOCUMENTATION-STANDARD.md](docs/DOCUMENTATION-STANDARD.md)
+
+Production: **NO-GO** until RELEASE_PROVEN.
+
+
 **Start here (human):** `docs/PRODUCT.md` → `docs/DEVELOPMENT.md` → `docs/QUALITY-STATUS.md`  
 **Machine:** `docs/core/db/schema.sql`, registries, fixtures.
 
