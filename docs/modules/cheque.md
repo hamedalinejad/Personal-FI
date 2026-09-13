@@ -156,3 +156,6 @@ Bounce after clear requires reversal path not silent status overwrite.
 | * | returned | documented path |
 
 Illegal transitions → CHEQUE_INVALID_TRANSITION.
+
+## Clear operation
+Atomic: status→cleared + journal legs + operationId. Failure rolls back both.

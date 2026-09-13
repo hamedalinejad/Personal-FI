@@ -40,3 +40,6 @@ BS/IS/CF full golden suite PARTIAL until RELEASE_PROVEN (QUALITY-STATUS).
 - Trial balance debits = credits in base Decimal
 - NW cash legs match journal cash accounts
 - Historical report includes valuation context object
+
+## Trial Balance algorithm
+For each fin_account: sum Decimal amount_in_base by side; pair debit/credit totals; imbalance → report error not silent fix.

@@ -80,3 +80,6 @@ API-Reference and docs/core API micro-docs as authority.
 
 ## Cursor encoding
 Base64url JSON: `{"businessDate":"...","createdAt":"...","id":"..."}` matching sort keys. Invalid cursor → API_CURSOR_INVALID.
+
+## Money fields
+All money/qty/rate/price in request and response bodies are decimal **strings**.

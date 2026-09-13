@@ -121,3 +121,9 @@ Tables such as `inv_crypto_cash.balance` are **projections**. Rebuild from journ
 
 ## Opening balance
 Opening balance is a controlled financial operation with provenance — not a silent account property write.
+
+## FX rules
+- exchangeRateToBase = base per 1 transaction unit
+- amountInBase = amount × exchangeRateToBase (Decimal)
+- Historical rebuild never uses "latest" rate
+- Missing rate → fail closed (no zero fallback)

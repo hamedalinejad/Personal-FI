@@ -172,3 +172,6 @@ Weekend/holiday settlement uses Iran business calendar policy version when imple
 - Cr Cash / settlement account
 
 Dividend: income recognition + optional tax withhold leg.
+
+## Corporate action event
+Single ca_event_id, effective_date, ratio/qty effect, cost_basis_policy_version, operation_id when posted, reversal policy.

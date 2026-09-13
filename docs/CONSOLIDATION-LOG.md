@@ -21,3 +21,5 @@ Target: Documentation Standardized when QUALITY-STATUS says so and competing CUR
 | 101-110 | Holding identity; failure containment; opening balance |
 | 111-120 | recurring; physical valuation; budget links; code unique; cursor; writer; checklist |
 | 121-130 | QUALITY ~90%; standardization checklist |
+| 131-150 | FX; import; rebuild; TB; residual; CA; transfer; deposit; payTax; clear |
+| 151-160 | Decimal test rule; API money strings |

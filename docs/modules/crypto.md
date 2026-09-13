@@ -151,3 +151,6 @@ Asset fee reduces qty; cost basis feeCarrying derived not caller-trusted float.
 | transfer_internal | no | carry |
 | swap_economic | yes legs | dispose+acquire |
 | fee | per funding | qty or cash |
+
+## Transfer vs bridge
+Internal transfer: same economic owner, carry cost. Bridge: may be transfer_internal or swap_economic per venue policy — explicit economic_kind required.

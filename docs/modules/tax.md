@@ -148,3 +148,6 @@ periodKey/taxYear required on events; bare year without bounds forbidden for new
 assessed --payTax operation success--> paid
 changeStatus(paid) --> TAX_PAID_REQUIRES_PAYTAX_OPERATION
 ```
+
+## payTax
+Creates financial operation + cash settlement + marks TaxRecord paid. Amount decimal string; currency match obligation.

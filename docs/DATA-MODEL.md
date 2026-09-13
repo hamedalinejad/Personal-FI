@@ -153,3 +153,6 @@ Cash SoT remains `fin_journal_*`. Feature `inv_*_cash` if present is projection-
 | Stocks | instrumentId + brokerage/account |
 | Funds | instrumentId + account |
 | Metals | instrumentId + platform/account |
+
+## 11. Import lineage
+import_batches + import_raw_records + import_dedupe_keys. Preserve sourceReference, provider ids, unknown fields JSON.

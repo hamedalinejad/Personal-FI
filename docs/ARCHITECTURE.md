@@ -107,3 +107,6 @@ UI          →  features/*/public-api only
 * Risk/ops kill paths independent of feature UI
 * Persistence failure does not mark operation posted
 * Model/feature crash must not leave unbalanced journal (transaction rollback)
+
+## 16. Rebuild determinism
+same ledger + engineVersions + asOf/context → same outputs; no live provider calls in historical path.

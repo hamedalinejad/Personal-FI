@@ -39,3 +39,6 @@ Generation A owners are CURRENT. Generation B under docs/core prose is ARCHIVE o
 - [ ] No new authority markdown under docs/core
 - [ ] Module/owner updated if behavior changed
 - [ ] QUALITY-STATUS if gate status changes
+
+## Test expectations
+Domain finance tests use Decimal/toDecimal — never Number()/parseFloat on money.

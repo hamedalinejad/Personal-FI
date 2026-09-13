@@ -172,3 +172,6 @@ Overpayment: explicit policy (reject or prepay principal). Variable rate command
 | bullet | per policy | principal at end |
 
 rateFraction = annualRate_percentage_points / 100.
+
+## Residual policy
+Last installment adjusts principal portion so Σ principal portions = original principal exactly (Decimal).
