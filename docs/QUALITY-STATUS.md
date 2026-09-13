@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-48** root README points to docs entry path
+Cycle: **std-49** modules/tax.md payTax-only paid rule
 Production: NO-GO

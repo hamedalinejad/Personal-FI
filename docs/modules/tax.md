@@ -12,3 +12,7 @@ Relation: record → 0..N events; payment only via `payTax` operation.
 
 ## Deferred
 Full jurisdiction rule engine · loss carry detailed policy.
+
+
+## Paid rule
+`status=paid` only after `payTax` economic operation posts. Bare status mutation forbidden.
