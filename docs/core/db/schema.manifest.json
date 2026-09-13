@@ -1,5 +1,5 @@
 {
-  "schemaHash": "77b4095f611d6caf04c0686bd2ea9bebdf3b6f4e22d104cc818161b803dee21c",
+  "schemaHash": "2544df9c58a594dea458e7e4cfc25120188ea1f7bd5c55df647e3a4f70da5168",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -2465,6 +2465,13 @@
           "pk": 0
         },
         {
+          "name": "source_channel",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "source_type",
           "type": "TEXT",
           "notnull": false,
@@ -2524,7 +2531,7 @@
       "checks": [
         "CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')",
         "CHECK (side IN ('debit', 'credit')",
-        "CHECK (source_type IS NULL OR source_type IN ('ui','api','import','migration','system','reconciliation')"
+        "CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system','reconciliation')"
       ]
     },
     "fin_operations": {
@@ -5661,6 +5668,13 @@
           "pk": 0
         },
         {
+          "name": "related_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "trade_date",
           "type": "TEXT",
           "notnull": true,
@@ -5726,6 +5740,13 @@
           "on_delete": "RESTRICT"
         },
         {
+          "table": "fin_operations",
+          "from": "related_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
           "table": "inv_stocks_iran_brokerages",
           "from": "brokerage_id",
           "to": "id",
@@ -5781,7 +5802,7 @@
         }
       ],
       "checks": [
-        "CHECK ( tx_type IN ( 'buy','sell','dividend','corporate_action', 'capital_increase','rights_issue','rights_exercise','rights_sell','bonus_share', 'split','reverse_split','symbol_change','isin_change','transfer_ca','suspension_note', 'fee','adjustment' )"
+        "CHECK ( tx_type IN ( 'buy','sell','dividend','corporate_action', 'capital_increase','rights_issue','rights_exercise','rights_sell','bonus_share', 'split','reverse_split','symbol_change','isin_change','transfer_ca','suspension_note', 'fee','adjustment','settlement' )"
       ]
     },
     "ln_loan_collateral": {
@@ -7865,6 +7886,14 @@
         }
       ],
       "indexes": [
+        {
+          "name": "uq_ref_instr_isin",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "isin"
+          ]
+        },
         {
           "name": "uq_ref_instr_chain_native_symbol",
           "unique": true,
