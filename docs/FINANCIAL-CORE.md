@@ -60,3 +60,12 @@ Feature API → normalize → domain → journal → invariants → single trans
 * Relational journal/operations are financial SoT.
 * `result_json` = diagnostic/replay envelope only.
 * `result_hash` = SHA-256 of canonical payload (excluding the hash field itself).
+
+
+## 13. Algorithm doctrine
+Every financial algorithm documents:
+1. Business meaning  
+2. Mathematical formula  
+3. Executable golden vector  
+
+If prose and fixture disagree, fixture/test is investigated — developer must not guess.

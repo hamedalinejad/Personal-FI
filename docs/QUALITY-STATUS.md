@@ -1,3 +1,3 @@
 # Quality Status
-Cycle: **std-40** FILE-CLASSIFICATION.md consolidation tracker
+Cycle: **std-41** FINANCIAL-CORE algorithm doctrine (A/B/golden)
 Production: NO-GO
