@@ -139,3 +139,6 @@ CORE transfer fixtures.
 ## 34. Acceptance Criteria
 
 Archive gate; journal SoT; operational kind ≠ accounting class.
+
+### Extra edge
+Reject archive with open linked operations in draft; multi-currency display must not create TOM ledger currency.

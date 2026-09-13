@@ -139,3 +139,6 @@ fixtures/CRYPTO-*; DEFERRED marked until filled.
 ## 34. Acceptance Criteria
 
 Gate-H field survival; no feature cash table as SoT; fee dimensions persisted.
+
+### Extra edge
+Asset fee reduces qty; cost basis feeCarrying derived not caller-trusted float.

@@ -92,3 +92,13 @@ UI          →  features/*/public-api only
 
 ## 13. Supersedes
 `Technical-Architecture.md`, `docs/core/ARCHITECTURE-LOCKED.md`, and similar — **MERGE pointers only**.
+
+
+## 14. Anti-patterns (forbidden)
+* Feature imports another feature internal path
+* UI constructs journal lines
+* Float money arithmetic
+* Advancing “paid” tax without payTax
+* Using NAV as liquidation price
+* Collapsing tradeDate into settlementDate
+* Treating archive/** as requirements

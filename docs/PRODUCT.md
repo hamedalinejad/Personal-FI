@@ -107,3 +107,16 @@ Architecture → ARCHITECTURE.md · Finance math → FINANCIAL-CORE.md · Schema
 | Physical assets | modules/physical-assets.md |
 | Budget/Goals/Bills | modules/budget-goals-bills.md |
 | Tax | modules/tax.md |
+
+
+## 18. Edition capability matrix
+| Edition | Modules enabled |
+|---------|-----------------|
+| Loan-only | loan + core settlement |
+| Crypto-only | crypto + core |
+| Stocks-only | stocks + core |
+| Funds-only | funds + core |
+| Metals-only | metals + core |
+| Full | all modules licensed |
+
+Disabled modules: commands return capability error; data remains.

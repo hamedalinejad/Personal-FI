@@ -1,15 +1,4 @@
-> **SUPERSEDED as independent authority** — use docs/PRODUCT.md, ARCHITECTURE.md, FINANCIAL-CORE.md, DATA-MODEL.md, API.md, REPORTING.md, OFFLINE-RELEASE.md, DEVELOPMENT.md, modules/*.
+# core.md (MERGE)
 
-# core/ — index
-
-قوانین مشترک. **پنج مرجع قانون:** `DOC-AUTHORITY-CHAIN.md`.
-
-| دسته | نمونه |
-|------|--------|
-| Live readiness | GO-NO-GO · CODING-GATE · OPEN-ISSUES · EXECUTION-HANDOFF |
-| Money / op | Canonical-Financial-Operation · Money-Decimal-Policy · Canonical-Cash-Model |
-| Engines | Cost-Basis-Engine · Loan-Schedule-Engine |
-| Schema | db/schema.sql · field-inventory.checklist.tsv |
-| Implement | IMPLEMENTATION-READY-* |
-
-Historical / pointer files do not create authority.
+Use top-level owners: FINANCIAL-CORE, DATA-MODEL, ARCHITECTURE, OFFLINE-RELEASE.
+Machine: `db/`, `registry/`, `fixtures/`, field-inventory.

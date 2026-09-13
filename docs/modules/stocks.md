@@ -157,3 +157,6 @@ STOCK-* fixtures; empty = DEFERRED.
 ## 34. Acceptance Criteria
 
 settle clears payable; CA single event id; no tradeDate overwrite of settlementDate.
+
+### Extra edge
+Weekend/holiday settlement uses Iran business calendar policy version when implemented.

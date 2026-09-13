@@ -139,3 +139,6 @@ FUND-* marked DEFERRED if empty expected.
 ## 34. Acceptance Criteria
 
 NAV ≠ transactionPrice enforced; amount consistency checks.
+
+### Extra edge
+Reject subscribe when amount and units×transactionPrice inconsistent beyond tolerance 0.

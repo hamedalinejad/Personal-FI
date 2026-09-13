@@ -158,3 +158,6 @@ LOAN-FLAT etc.; Decimal assertions.
 ## 34. Acceptance Criteria
 
 Flat 12% on 1200 / 12m → interest 144; residual last row; atomic create.
+
+### Extra edge
+Overpayment: explicit policy (reject or prepay principal). Variable rate command must error LOAN_VARIABLE_RATE_UNSUPPORTED_V1.

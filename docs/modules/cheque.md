@@ -139,3 +139,6 @@ DEFERRED until filled.
 ## 34. Acceptance Criteria
 
 Illegal transition rejected; clear posts balanced journal.
+
+### Extra edge
+Bounce after clear requires reversal path not silent status overwrite.

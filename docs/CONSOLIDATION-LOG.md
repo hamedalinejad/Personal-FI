@@ -13,3 +13,4 @@
 | 75+ | FINANCIAL-CORE absorb domain locks |
 
 Target: Documentation Standardized when QUALITY-STATUS says so and competing CURRENT prose is gone.
+| 76-80 | core.md pointer; module edges; anti-patterns; edition matrix; QUALITY 85% |

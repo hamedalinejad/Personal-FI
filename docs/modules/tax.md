@@ -139,3 +139,6 @@ N/A / DEFERRED — do not invent.\n
 ## 34. Acceptance Criteria
 
 changeStatus(paid) throws TAX_PAID_REQUIRES_PAYTAX_OPERATION.
+
+### Extra edge
+periodKey/taxYear required on events; bare year without bounds forbidden for new rows.

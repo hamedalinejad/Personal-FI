@@ -139,3 +139,6 @@ N/A / DEFERRED — do not invent.\n
 ## 34. Acceptance Criteria
 
 METAL-003 fee separation; purity not silent 1.
+
+### Extra edge
+Delivery fee never increases metal inventory cost unless capitalizeDeliveryFee policy true.
