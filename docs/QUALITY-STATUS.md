@@ -1,5 +1,3 @@
 # Quality Status
-
-Cycle: **std-1** (validate master)
-Production: **NO-GO**
-Documentation standard: LOCKED in DOCUMENTATION-STANDARD.md
+Cycle: **std-2** PRODUCT.md sole product owner expanded
+Production: NO-GO
