@@ -1,3 +1,4 @@
+> **SUPERSEDED** — See [`docs/FINANCIAL-CORE.md`](../FINANCIAL-CORE.md) (Operation).
 
 > **P0-OP-006:** `status` ∈ {draft,posted,voided,failed}. `pending` is durability only.
 
