@@ -2,66 +2,159 @@
 
 **Status:** CURRENT
 
-# Module: Loan
-
-**Owner:** this file · Shared math conventions → FINANCIAL-CORE
+Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
 
 ## 1. Purpose
-Lender receivables: schedule, payment allocation, journal.
 
-## 2. Scope (v1 SUPPORTED)
-* role: **lender only** (borrower = DEFERRED)
-* methods: declining equal-principal, flat, qarz, bullet
-* dayCount: **period_based** only
-* frequency: monthly | weekly | quarterly | annual
-* rate input: percentage points (`12` → 0.12 internal)
-* payment waterfall: penalty → fee → interest → principal
-* penalty accrual: **DEFERRED** (policy fields may exist; operational effect 0)
+Lender receivables: schedules, payments, journal integration.
 
-## 3. Non-goals / UNSUPPORTED v1
-actual/365, 30/360, custom frequency, full borrower liability path, silent annuity formula change.
+## 2. Scope
 
-## 4. Commands
-`loan.create` · `loan.recordPayment` · `loan.reversePayment` · queries list/get/schedule/statement (as implemented).
+role lender only; methods declining, flat, qarz, bullet; dayCount period_based; rate percentage points.
 
-## 5. Journal
-Create: Dr receivable / Cr cash. Payment: Dr cash / Cr receivable + interest (+ fee).
+## 3. Non-Goals
 
-## 6. Rounding
-Full Decimal internal; display money2; last installment residual so Σ principal = original.
+Borrower path, actual/365, variable rate, annuity silent change.
 
-## 7. Golden authority
-Fixtures/tests — not prose examples.
+## 4. User Stories
 
-## 8. Standalone
-Loan-only edition uses LocalSettlementAdapter + Core journal.
-
-## 9. Acceptance
-Atomic txn includes ln_loans + schedule + operation + journal; idempotent replay; overpayment policy explicit.
+N/A or DEFERRED — do not invent.
 
 
-## Mathematical formulas (v1)
+## 5. Pages / Sheets / Drawers
 
-### Rate
-Business: `annualRate=12` means 12%.  
-Math: `rateFraction = annualRate / 100`.
-
-### Declining equal-principal
-`principalPortion = P / n`  
-`interest_i = remainingBalance * (rateFraction / periodsPerYear)`  
-Last row residual-corrects so Σ principal = P.
-
-### Flat
-`totalInterest = P * rateFraction * years`  
-`payment = (P + totalInterest) / n`
-
-### Qarz
-Interest 0; optional fee percent normalized like rates; never silent interest conversion.
-
-### Golden authority
-Executable fixtures/tests — not prose alone.
+N/A or DEFERRED — do not invent.
 
 
----
-## Template checklist
-All 34 sections required; expand TBD before RELEASE_PROVEN.
+## 6. Entities
+
+N/A or DEFERRED — do not invent.
+
+
+## 7. Fields
+
+principal, rate, method, schedule snapshot_json, role lender|borrower(deferred).
+
+## 8. Field Kinds
+
+N/A or DEFERRED — do not invent.
+
+
+## 9. Field Ownership
+
+N/A or DEFERRED — do not invent.
+
+
+## 10. Commands
+
+loan.create, recordPayment, reversePayment.
+
+## 11. Queries
+
+N/A or DEFERRED — do not invent.
+
+
+## 12. API Input
+
+N/A or DEFERRED — do not invent.
+
+
+## 13. API Output
+
+N/A or DEFERRED — do not invent.
+
+
+## 14. Normalization
+
+annualRate 12 → 0.12; feePercentPoints same; period count integer Decimal.
+
+## 15. Validation
+
+Reject variable rate / unsupported dayCount.
+
+## 16. State Machine
+
+Loan active → payments → closed; schedule snapshot versioned.
+
+## 17. Accounting Effects
+
+N/A or DEFERRED — do not invent.
+
+
+## 18. Journal Effects
+
+Create Dr receivable Cr cash; payment waterfall penalty→fee→interest→principal.
+
+## 19. Cash Effects
+
+CashSettlementPort.
+
+## 20. Fee Effects
+
+N/A or DEFERRED — do not invent.
+
+
+## 21. Tax Effects
+
+N/A or DEFERRED — do not invent.
+
+
+## 22. FX Effects
+
+N/A or DEFERRED — do not invent.
+
+
+## 23. Date Semantics
+
+N/A or DEFERRED — do not invent.
+
+
+## 24. Identity
+
+N/A or DEFERRED — do not invent.
+
+
+## 25. Reversal / Correction
+
+N/A or DEFERRED — do not invent.
+
+
+## 26. Rebuild
+
+Schedule from snapshotSchemaVersion + engine versions.
+
+## 27. Reports
+
+N/A or DEFERRED — do not invent.
+
+
+## 28. Offline Behavior
+
+N/A or DEFERRED — do not invent.
+
+
+## 29. Standalone Edition
+
+Loan-only reference vertical.
+
+## 30. Licensing / Capabilities
+
+N/A or DEFERRED — do not invent.
+
+
+## 31. Edge Cases
+
+N/A or DEFERRED — do not invent.
+
+
+## 32. Errors
+
+LOAN_* , LOAN_VARIABLE_RATE_UNSUPPORTED_V1.
+
+## 33. Golden / Recovery Fixtures
+
+LOAN-FLAT etc.; Decimal assertions.
+
+## 34. Acceptance Criteria
+
+Flat 12% on 1200 / 12m → interest 144; residual last row; atomic create.

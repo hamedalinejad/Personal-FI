@@ -1,105 +1,141 @@
 # Crypto (module owner)
+
 **Status:** CURRENT
-Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
+
+Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
 
 ## 1. Purpose
-Crypto holdings and trades with dimensional fees and economic_kind.
+
+Crypto acquisition, disposal, transfer with dimensional fees and venue-scoped holdings.
 
 ## 2. Scope
-buy, sell, transfer, bridge/swap distinctions, network/fee legs.
+
+buy, sell, transfer; economic_kind discrimination; network metadata.
 
 ## 3. Non-Goals
-On-chain indexer; DeFi positions as first-class v1.
+
+On-chain indexer, DeFi LP, NFT.
 
 ## 4. User Stories
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Buy BTC with IRR/USDT fee; transfer exchange→wallet without taxable disposal when internal.
 
 ## 5. Pages / Sheets / Drawers
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Under /investments; buy/sell/transfer sheets.
 
 ## 6. Entities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+inv_crypto_holdings, inv_crypto_transactions, ref_instruments, fee legs via Core.
 
 ## 7. Fields
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+quantity, total_invested, cost_currency, networkId, contractAddress, feeAmount, feeCurrency, feeInstrumentId, feeFundingKind, economic_kind.
 
 ## 8. Field Kinds
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+qty/price RAW; total_invested DERIVED/rebuildable; provider symbol LABEL/EXTERNAL only.
 
 ## 9. Field Ownership
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Feature owns crypto tables; journal owned by Core.
 
 ## 10. Commands
-crypto.buy, sell, transfer; swap/bridge DEFERRED if not implemented.
+
+crypto.buy, crypto.sell, crypto.transfer. swap/bridge: document as OPEN if not implemented.
 
 ## 11. Queries
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+listHoldings, getTransaction, listTransactions.
 
 ## 12. API Input
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+operationId, businessDate, instrument, qty, price, fees as decimal strings.
 
 ## 13. API Output
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Canonical envelope + domainResult holding/tx ids.
 
 ## 14. Normalization
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Decimal strings; instrument resolve via Core identity.
 
 ## 15. Validation
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Reject missing purity-equivalent N/A; reject fee without funding kind; currency match.
 
 ## 16. State Machine
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Holdings rebuild from txs; no parallel cash balance SoT.
 
 ## 17. Accounting Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Inventory asset vs cash/settlement per buy/sell.
 
 ## 18. Journal Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Balanced legs via operation engine.
 
 ## 19. Cash Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+CashSettlementPort only — no inv_*_cash ledger SoT.
 
 ## 20. Fee Effects
-feeFundingKind cash|asset; feeCurrency XOR feeInstrumentId.
+
+cash|asset funding; conservation on qty when asset fee.
 
 ## 21. Tax Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Optional tax_event link on disposal; not automatic legal tax.
 
 ## 22. FX Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+exchangeRateToBase locked on post.
 
 ## 23. Date Semantics
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+businessDate required; eventAt optional.
 
 ## 24. Identity
-instrumentId + venue/network scope; provider symbol not SoT.
+
+instrumentId + venue/network; never symbol alone.
 
 ## 25. Reversal / Correction
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+reverse operation; no in-place mutation of posted amounts.
 
 ## 26. Rebuild
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Holdings from transaction ledger + cost-basis engine version.
 
 ## 27. Reports
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Via REPORTING investment performance.
 
 ## 28. Offline Behavior
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Full offline post when data local.
 
 ## 29. Standalone Edition
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Crypto-only + Core journal + local settlement.
 
 ## 30. Licensing / Capabilities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+License disables commands only.
 
 ## 31. Edge Cases
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Dust qty; fee > proceeds policy explicit reject/allow.
 
 ## 32. Errors
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+CRYPTO_* / OP_* / INV_JOURNAL_*.
 
 ## 33. Golden / Recovery Fixtures
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+fixtures/CRYPTO-*; DEFERRED marked until filled.
 
 ## 34. Acceptance Criteria
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Gate-H field survival; no feature cash table as SoT; fee dimensions persisted.

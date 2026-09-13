@@ -1,105 +1,159 @@
-# Stocks (module owner)
+# Stocks Iran (module owner)
+
 **Status:** CURRENT
-Owner document for this feature domain. Financial math → FINANCIAL-CORE.md; fields → DATA-MODEL.md; API envelope → API.md.
+
+Shared: FINANCIAL-CORE · DATA-MODEL · API · REPORTING.
 
 ## 1. Purpose
-Iran equity trades with T+n settlement and corporate actions path.
+
+Iran equity trades with T+n settlement, dividends, corporate actions path.
 
 ## 2. Scope
+
 buy, sell, settle, dividend; CA versioned events.
 
 ## 3. Non-Goals
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Non-Iran multi-exchange OMS.
 
 ## 4. User Stories
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 5. Pages / Sheets / Drawers
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 6. Entities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+inv_stocks_* holdings/transactions, broker payable accounts.
 
 ## 7. Fields
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 8. Field Kinds
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 9. Field Ownership
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 10. Commands
-stocks.buy, sell, settle, dividend; CA commands per STOCKS-CA path.
+
+stocks.buy, sell, settle, dividend.
 
 ## 11. Queries
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 12. API Input
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 13. API Output
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 14. Normalization
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 15. Validation
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 16. State Machine
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Order intent → posted trade → open payable → settled.
 
 ## 17. Accounting Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 18. Journal Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 19. Cash Effects
-T+0 payable/receivable; cash on settle.
+
+T+0: Dr stock / Cr payable; settle: Dr payable / Cr cash.
 
 ## 20. Fee Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Commission as fee event; tax withhold separate from feeTax confusion.
 
 ## 21. Tax Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Dividend withholding as tax_event optional.
 
 ## 22. FX Effects
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 23. Date Semantics
-tradeDate vs settlementDate vs businessDate vs marketDate — never collapse.
+
+tradeDate ≠ settlementDate ≠ businessDate ≠ marketDate. Position on tradeDate; cash on settlementDate.
 
 ## 24. Identity
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+instrumentId + brokerage/account scope.
 
 ## 25. Reversal / Correction
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Reversal operation linked; CA reverse policy versioned.
 
 ## 26. Rebuild
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 27. Reports
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 28. Offline Behavior
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Posted trades offline; prices may be stale flagged.
 
 ## 29. Standalone Edition
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+Stocks-only edition + Core.
 
 ## 30. Licensing / Capabilities
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 31. Edge Cases
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 32. Errors
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+N/A or DEFERRED — do not invent.
+
 
 ## 33. Golden / Recovery Fixtures
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+STOCK-* fixtures; empty = DEFERRED.
 
 ## 34. Acceptance Criteria
-TBD — fill from feature package + FINANCIAL-CORE; DEFERRED only if command OPEN.
+
+settle clears payable; CA single event id; no tradeDate overwrite of settlementDate.
