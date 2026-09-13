@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **FUND-001…003 LOCK:** NAV≠txPrice; external_reported_profit deferred; reinvest = one op two legs; ETF cash via Port. See domain lock.
 
 > **P0-003 LOCK:** **relatedFeature** = `investment.funds` (not `fif`). Cash via CashSettlementPort → journal.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 نام فیچر: Expense
 توضیح کلی:
 این فیچر مسئولیت ثبت و مدیریت تراکنش‌های هزینه را بر عهده دارد.

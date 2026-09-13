@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Crypto v1 Scope (قفل پیچیدگی)
 
 ## Production-grade در v1

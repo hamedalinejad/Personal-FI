@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # زیر‌فیچر: Price Fetching - Stock Prices (دریافت قیمت سهام بورس ایران)
 
 ## توضیح کلی

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **STOCK-001…004 LOCK:** tradeDate≠marketDate; T+n via Iran calendar; CA table SoT; instrument_price_mappings. See domain lock.
 
 > **P0-016:** Prefer `tx_type=corporate_action` + `inv_stocks_iran_corporate_actions` payload; specific CA kinds optional. Idempotent via operationId.

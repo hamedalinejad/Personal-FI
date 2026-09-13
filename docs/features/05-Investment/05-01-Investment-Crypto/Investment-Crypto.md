@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **CRYPTO-001…003 LOCK:** fee_funding_kind cash|asset exclusive; holding moves create new holdingId; from/to_address_id optional. See `DOMAIN-CRYPTO-STOCKS-FUNDS-METALS-LOCK.md`.
 
 > **P0-004 LOCK:** `inv_crypto_exchange_transactions` does **not** exist. Cash = CashSettlementPort → Core journal.

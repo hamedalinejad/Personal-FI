@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **MATH-007 LOCK:** Net Worth cash = Core journal (`fin_accounts`+`fin_journal_lines`) only. `*.cashBalance` on platforms/brokerages = **cache**, never historical SoT.
 
 # فیچر: Portfolio & Wealth Overview (پرتفوی و نمای ثروت)

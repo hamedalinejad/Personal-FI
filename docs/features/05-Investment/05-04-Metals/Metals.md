@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Metals (Alias)
 
 محتوای canonical: **[Investment-Metals.md](./Investment-Metals.md)**

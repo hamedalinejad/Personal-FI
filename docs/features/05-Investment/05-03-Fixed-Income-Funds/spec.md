@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Spec entry
 
 مشخصات کامل: **[Fixed-Income-Funds.md](./Fixed-Income-Funds.md)**

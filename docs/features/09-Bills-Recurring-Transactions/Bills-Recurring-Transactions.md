@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # فیچر: Bills & Recurring Transactions (قبوض و تراکنش‌های تکرارشونده)
 
 ## توضیح کلی

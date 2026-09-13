@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Settlement Accounting (سهام ایران)
 
 | Date | نقش |

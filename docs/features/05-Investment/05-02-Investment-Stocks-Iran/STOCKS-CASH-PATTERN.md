@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Stocks Iran Cash Flow Pattern — P0-005 Resolution
 
 **Status:** PROPOSED (requires doc updates)

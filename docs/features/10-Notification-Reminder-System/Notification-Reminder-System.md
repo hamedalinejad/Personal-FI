@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # فیچر: Notification & Reminder System (سیستم اعلان و یادآوری)
 
 ## توضیح کلی

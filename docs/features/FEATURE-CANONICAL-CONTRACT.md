@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Feature Canonical Contract
 
 تاریخ: 2026-09-01

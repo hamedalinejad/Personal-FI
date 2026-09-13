@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Metals Cash Flow Pattern — P0-006 Resolution
 
 **Status:** PROPOSED (requires doc updates)

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 نام فیچر: Income
 توضیح کلی:
 این فیچر مسئولیت ثبت و مدیریت تراکنش‌های درآمد را بر عهده دارد.

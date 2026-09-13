@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 ---
 id: DOC-LOAN-EARLY-MATRIX
 title: Early settlement / re-amortization matrix

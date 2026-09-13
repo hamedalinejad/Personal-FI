@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Corporate Actions — اثر روی Quantity / Cost / P&L (v1)
 
 Identity: `instrumentId`. symbol change ≠ holding جدید.

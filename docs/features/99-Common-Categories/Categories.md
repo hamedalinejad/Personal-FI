@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **نام جدول canonical:** `cat_categories` (نه `common_categories`).
 
 نام فیچر: Common Categories (دسته‌بندی مشترک)

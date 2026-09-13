@@ -2,35 +2,36 @@
 
 **Status:** CURRENT
 
-## 1. Persistence
-| Runtime | Store | Status |
-|---------|-------|--------|
-| Node | SQLite `personal-fi.sqlite` | primary |
-| Browser | Persistence port → sql.js + IndexedDB | PROTOCOL_PROVEN harness; browser E2E OPEN |
+## 1. Persistence matrix
+| Runtime | Implementation | Evidence status |
+|---------|----------------|-----------------|
+| Node SQLite | `personal-fi.sqlite` + worker | primary path |
+| Browser | Persistence port; sql.js+IDB target | PROTOCOL_PROVEN_NODE_HARNESS |
 
 ## 2. Durability
-ACK only after publish. Atomic temp → rename/publish pattern. `result_json` after relational journal commit.
+- BEGIN IMMEDIATE
+- draft/pending operation row
+- domain + journal
+- result snapshot + hash after relational truth
+- COMMIT
+- durable ACK / publish
 
 ## 3. Multi-tab
-Single writer; non-writer → `WRITER_REQUIRED` (`tabWriter`).
+Single writer; `WRITER_REQUIRED` for non-writer.
 
-## 4. Recovery vectors (required for RELEASE_PROVEN)
-crash before/after commit · backup/restore · same operationId replay · conflict on hash mismatch · offline reopen · standalone boot.
+## 4. Recovery matrix (must go GREEN for RELEASE_PROVEN)
+| Vector | Status |
+|--------|--------|
+| Crash before commit | PARTIAL |
+| Crash after SQL | PARTIAL |
+| Backup/restore | harness tests exist |
+| Same operationId replay | tests exist |
+| Hash conflict | required |
+| Standalone boot | PARTIAL |
+| Browser airplane mode | OPEN |
 
-## 5. Migration
-Forward schema migrations; backup before migrate; no silent destructive drop of financial history.
+## 5. Vocabulary
+IMPLEMENTED ≠ GOLDEN-GREEN ≠ RECOVERY-GREEN ≠ RELEASE-PROVEN ≠ Production GO
 
-## 6. Release vocabulary
-| Token | Meaning |
-|-------|---------|
-| IMPLEMENTED | code path exists |
-| PARTIAL | subset |
-| GOLDEN-GREEN | golden fixtures pass |
-| RECOVERY-GREEN | recovery matrix pass |
-| RELEASE-PROVEN | golden+recovery+standalone+CI for claimed edition |
-| Production | NO-GO until RELEASE-PROVEN |
-
-**IMPLEMENTED ≠ RELEASE-PROVEN.**
-
-## 7. Live status
-QUALITY-STATUS.md is the only live dashboard — do not duplicate competing status matrices.
+## 6. Live dashboard
+Only QUALITY-STATUS.md for live gates.

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 ---
 id: DOC-METAL-001-002
 title: Metals cash derivation and coin identity

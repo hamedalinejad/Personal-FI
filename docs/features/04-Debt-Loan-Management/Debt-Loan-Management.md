@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **MATH-003:** `actual_actual` is **DEFERRED** in Loan v1 runtime. Use `period_based` (or implement full Actual/Actual before enabling). Fixed 365 must not be labeled actual_actual.
 
 # فیچر: Debt & Loan Management (بدهی، طلب و وام)

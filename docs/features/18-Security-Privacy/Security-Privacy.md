@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # فیچر: Security & Privacy (امنیت و حریم خصوصی)
 
 ## توضیح کلی

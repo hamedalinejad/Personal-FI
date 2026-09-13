@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # زیر‌فیچر: Price Fetching - Crypto Prices (دریافت قیمت ارز دیجیتال)
 
 ## توضیح کلی

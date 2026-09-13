@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 > **P1-FINAL-032:** This file is a short implementation entrypoint. Authority = `Investment-Crypto.md` + Core docs + Core P0-FINAL/P1 docs.
 
 # Spec entry

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # زیر‌فیچر: Price Fetching - Fund NAV (دریافت NAV صندوق‌های درآمد ثابت)
 
 ## توضیح کلی

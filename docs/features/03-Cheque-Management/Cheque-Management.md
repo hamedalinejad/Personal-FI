@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 نام فیچر: Cheque Management
 توضیح کلی:
 این فیچر مسئولیت کامل مدیریت چک‌های پرداختی و دریافتی را بر عهده دارد.

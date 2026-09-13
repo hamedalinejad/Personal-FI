@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 ---
 id: DOC-FUND-003
 title: Fund/ETF cash path (unified with stocks)

@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Crypto Cash Flow Pattern — P0-004 Resolution
 
 **Status:** PROPOSED (requires doc updates)

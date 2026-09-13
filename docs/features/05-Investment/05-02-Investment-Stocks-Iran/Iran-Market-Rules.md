@@ -1,3 +1,5 @@
+> **SUPERSEDED as module authority** — use `docs/modules/*.md` + top-level owners.
+
 # Iran Market Rules (لایه مستقل)
 
 قوانین بازار ایران **جدا از** ledger عمومی سهام نگهداری می‌شوند؛ Stocks adapter از این لایه می‌خواند.
