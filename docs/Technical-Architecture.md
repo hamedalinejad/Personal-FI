@@ -1,3 +1,4 @@
+> **SUPERSEDED for architecture** — see [`ARCHITECTURE.md`](ARCHITECTURE.md). Remaining content is historical detail only.
 Technical Architecture Document
 نام پروژه: Personal Finance & Investment Management System
 نوع سند: Technical Architecture
