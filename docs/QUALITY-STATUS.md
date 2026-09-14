@@ -266,3 +266,10 @@ Standalone editions are a **product requirement**, not an afterthought — see P
 |----|--------|------|
 | BUG-CURRENT-001 file-inventory stale | **CLOSED** | Regenerated from filesystem; `npm run inventory:check` hard-fails on missing paths |
 | BUG-CURRENT-002 phase vocabulary | **CLOSED** | Scaffold ≠ docs-only; see DEVELOPMENT.md |
+
+## Command-card / prose hygiene
+| ID | Status | Note |
+|----|--------|------|
+| BUG-CURRENT-003 command cards incomplete | **CLOSED** | All 42 cards: validation, errors, fixtureRefs, recoveryCases, businessRules, result shape |
+| BUG-CURRENT-004 duplicate owner prose | **CLOSED** | DoD xref; schema ticket IDs stripped; single PRODUCT standalone/routes |
+| BUG-CURRENT-005 schema ticket vocabulary | **CLOSED** | Active schema comments are semantic-only |

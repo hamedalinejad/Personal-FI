@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   command_hash      TEXT,
   operation_type    TEXT NOT NULL,
   status            TEXT NOT NULL CHECK (status IN ('draft', 'posted', 'voided', 'failed')),
-  -- reversal is relationship via reverses_operation_id / corrects_operation_id, not a status value (P0-SCHEMA-001)
+ -- reversal is relationship via reverses_operation_id / corrects_operation_id, not a status value 
   -- LEGACY compatibility: prefer db_meta keys durability.* — do not treat as business status
   durability_state  TEXT CHECK (durability_state IS NULL OR durability_state IN ('pending','sql_committed','persisted','persist_failed')),
-  -- transport-only states (temp_written/swapped) live in persistence layer, not public schema (P0-SCHEMA-002)
+ -- transport-only states (temp_written/swapped) live in persistence layer, not public schema 
   business_date     TEXT NOT NULL, -- DATE-only
   event_at          TEXT,
   settlement_date   TEXT,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_entries (
   post_state TEXT CHECK (post_state IS NULL OR post_state IN ('draft','posted','void'))  -- mirrors operation; entry exists for posted path
 );
 
--- BUG-CUR-021 LOCKED: operation_id is NOT on lines; derive via entry_id → fin_journal_entries.operation_id only
+-- LOCKED: operation_id is NOT on lines; derive via entry_id → fin_journal_entries.operation_id only
 CREATE TABLE IF NOT EXISTS fin_journal_lines (
 
   id              TEXT PRIMARY KEY,
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS fin_reconcile_runs (
   valuation_context_json TEXT
 );
 
--- ─── Instrument registry (BUG-D03 / B-001 identity) ──────────
+-- ─── Instrument registry (/ identity) ──────────
 CREATE TABLE IF NOT EXISTS ref_instruments (
   id                   TEXT PRIMARY KEY,
   asset_class          TEXT NOT NULL CHECK (asset_class IN ('crypto','stock','fund','metal','currency','other')), -- crypto|stock|fund|metal|…
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS ref_parties (
 
 -- ─── Accounts banking (event log — not cash SoT) ─────────────
 CREATE TABLE IF NOT EXISTS acc_accounts (
-  -- operational cashAccountKind lives in account_kind (P0-CASH-001/002)
+ -- operational cashAccountKind column (not fin_accounts.account_kind class)
   id TEXT PRIMARY KEY,
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- identity (RAW):
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS acc_accounts (
   branch_name TEXT,
   bank_name TEXT,
   currency TEXT NOT NULL,
-  account_kind TEXT NOT NULL CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account')), -- BUG-CUR-023: no legacy bank|investment|loan|credit|other
+ account_kind TEXT NOT NULL CHECK (account_kind IN ('cash','bank_account','card','wallet','brokerage_cash','crypto_exchange_cash','cash_equivalent','credit_account')), -- no legacy bank|investment|loan|credit|other
   bank_product_type TEXT CHECK (bank_product_type IS NULL OR bank_product_type IN ('current','qarz','savings','sep','term_deposit','modat','jame','other')), -- Iran-specific 
   -- account classification (RAW):
   role TEXT CHECK (role IS NULL OR role IN ('checking','savings','brokerage','credit_card','wallet','cash_box','other')),
@@ -216,7 +216,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_acc_iban_active
 CREATE TABLE IF NOT EXISTS acc_transactions (
   id             TEXT PRIMARY KEY,
   account_id     TEXT NOT NULL REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- BUG-CUR-022: NULL only for draft; domain MUST reject posted path without operation_id
+ -- NULL only for draft; domain MUST reject posted path without operation_id
   -- : v1 requires operation_id for all cash event rows written by Core commands.
   -- NULL only allowed for explicit draft tooling outside production write path.
   operation_id   TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS acc_transaction_links (
 CREATE TABLE IF NOT EXISTS price_sources (
   id       TEXT PRIMARY KEY,
   name     TEXT NOT NULL,
-  priority INTEGER NOT NULL DEFAULT 100 CHECK (priority >= 0), -- lower = higher priority (MR-216)
+ priority INTEGER NOT NULL DEFAULT 100 CHECK (priority >= 0), -- lower = higher priority 
   kind     TEXT, -- NULL = unknown/legacy; else manual|csv_import|online_adapter|local_cache, -- manual|csv_import|online_adapter|local_cache
   is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
   created_at TEXT
@@ -253,12 +253,12 @@ CREATE TABLE IF NOT EXISTS price_history (
   market_date     TEXT NOT NULL, -- as-of date (never "latest" without as-of)
   price           TEXT NOT NULL,
   currency        TEXT NOT NULL,
-  quote_basis     TEXT, -- per_unit|per_coin|per_mg|nav|... (MR-211)
-  quote_type TEXT NOT NULL DEFAULT 'last' CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- P0-PRICE-001 NOT NULL
-  is_manual       INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- MR-221 / MR-224
-  is_stale        INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- MR-218
-  is_degraded     INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- MR-220 DEGRADED mode
-  provenance_json TEXT, -- instrument, market, price type, currency, timestamp, stale, override (MR-228)
+ quote_basis TEXT, -- per_unit|per_coin|per_mg|nav|... 
+ quote_type TEXT NOT NULL DEFAULT 'last' CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- NOT NULL
+ is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- 
+ is_stale INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- 
+ is_degraded INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- DEGRADED mode
+ provenance_json TEXT, -- instrument, market, price type, currency, timestamp, stale, override 
   fetched_at      TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (instrument_id, market_date, source_id, quote_type)
@@ -288,7 +288,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_key ON price_history(instrume
 -- OFFLINE-003: SQLite allows multiple NULLs in UNIQUE; partial index for manual/null source
 CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_null_source
   ON price_history(instrument_id, market_date, quote_type) WHERE source_id IS NULL;
--- P1-PRICE-005: prefer source_id = canonical 'manual' / 'import' rows in price_sources;
+-- prefer source_id = canonical 'manual' / 'import' rows in price_sources;
 -- NULL source_id only for true ad-hoc; is_manual=1 required when source is manual.
 
 -- ─── Price Provider Mapping (STOCK-004) ─────────────────────
@@ -312,7 +312,7 @@ CREATE INDEX IF NOT EXISTS idx_ipm_active ON instrument_price_mappings(instrumen
 -- ─── Crypto holdings (projection of ledger events) ───────────
 
 -- ─── Crypto Transactions ─────────────────────────────────────
--- Field Mapping (CRYPTO-001, P0-019):
+-- Field Mapping (CRYPTO-001,):
 -- | feature field                 | SQL column                   | kind     | constraints                                    |
 -- |-------------------------------|------------------------------|----------|------------------------------------------------|
 -- | id                            | id                           | RAW      | PK                                             |
@@ -406,7 +406,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   principal TEXT NOT NULL, -- مبلغ اصلی
   currency TEXT NOT NULL,
   -- day count (RAW):
-  day_count_convention TEXT CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','monthly')), -- P0-LOAN-005 v1 only; other conventions require DayCountEngine
+ day_count_convention TEXT CHECK (day_count_convention IS NULL OR day_count_convention IN ('period_based','monthly')), -- v1 only; other conventions require DayCountEngine
   day_count_denominator TEXT, -- فقط وقتی custom_days 
   exchange_rate_to_base TEXT, -- نرخ ارز وام/قسط → baseCurrency 
   -- dates (RAW):
@@ -461,7 +461,7 @@ CREATE TABLE IF NOT EXISTS ln_schedule_snapshots (
   id              TEXT PRIMARY KEY,
   loan_id         TEXT NOT NULL REFERENCES ln_loans(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   version         INTEGER NOT NULL,
-  -- snapshot_json schema (BUG-D18): owned by Loan-Schedule-Engine
+ -- snapshot_json schema : owned by Loan-Schedule-Engine
   -- Required keys: installments[], dayCount, rate, residual, currency, generatedAt, engineVersion
   -- Each installment: { seq, dueDate, principal, interest, fee, total, status }
   -- Domain validates JSON shape before persist; SQLite stores TEXT only.
@@ -521,7 +521,7 @@ CREATE TABLE IF NOT EXISTS chk_cheques (
   created_at      TEXT NOT NULL,
   bounced_reason TEXT);
 
--- ─── Import preservation envelope (P0-FINAL-039) ─────────────
+-- ─── Import preservation envelope  ─────────────
 
 -- DATA-002: explicit import batch header (batch_id on import_raw_records references this)
 CREATE TABLE IF NOT EXISTS import_batches (
@@ -540,7 +540,7 @@ CREATE TABLE IF NOT EXISTS import_batches (
 
 CREATE TABLE IF NOT EXISTS import_raw_records (
   id                    TEXT PRIMARY KEY,
-  batch_id              TEXT NOT NULL, -- import batch (MR-230)
+ batch_id TEXT NOT NULL, -- import batch 
   source_provider       TEXT NOT NULL, -- provider name (e.g., 'mellat', 'tsetmc', 'coinbase')
   source_schema_version TEXT, -- schema version of source data
   -- source_type: type of source data format (not interface channel)
@@ -550,19 +550,19 @@ CREATE TABLE IF NOT EXISTS import_raw_records (
   -- - 'manual': manually entered data
   -- - 'broker_export': broker/export-specific format
   -- This is the BUSINESS provenance format, NOT the interface channel
-  source_type           TEXT, -- csv|json|api|manual|broker_export (MR-231)
-  source_reference      TEXT, -- file name / URL / batch label (MR-232)
-  source_document_id    TEXT, -- link to docs_documents (MR-233)
-  raw_record_hash       TEXT NOT NULL, -- never destroy source identity (MR-241)
+ source_type TEXT, -- csv|json|api|manual|broker_export 
+ source_reference TEXT, -- file name / URL / batch label 
+ source_document_id TEXT, -- link to docs_documents 
+ raw_record_hash TEXT NOT NULL, -- never destroy source identity 
   unknown_fields_json   TEXT,
-  payload_json          TEXT NOT NULL, -- original raw amount/date/time preserved (MR-235/236)
-  normalization_status  TEXT NOT NULL DEFAULT 'raw', -- raw|normalized|mapped|rejected (MR-237)
-  mapping_decision_json TEXT, -- mapping log (MR-238)
-  user_override_json    TEXT, -- user override + reason (MR-239)
-  reconciliation_status TEXT NOT NULL DEFAULT 'unreconciled', -- unreconciled|matched|partial|ignored (MR-240)
+ payload_json TEXT NOT NULL, -- original raw amount/date/time preserved (236)
+ normalization_status TEXT NOT NULL DEFAULT 'raw', -- raw|normalized|mapped|rejected 
+ mapping_decision_json TEXT, -- mapping log 
+ user_override_json TEXT, -- user override + reason 
+ reconciliation_status TEXT NOT NULL DEFAULT 'unreconciled', -- unreconciled|matched|partial|ignored 
   imported_at           TEXT NOT NULL,
   created_at            TEXT NOT NULL DEFAULT (datetime('now')),
-  source_file_name TEXT); -- source file name (MR-242)
+ source_file_name TEXT); -- source file name 
 
 CREATE INDEX IF NOT EXISTS idx_import_raw_batch ON import_raw_records(batch_id);
 CREATE INDEX IF NOT EXISTS idx_import_raw_hash ON import_raw_records(raw_record_hash);
@@ -571,7 +571,7 @@ CREATE INDEX IF NOT EXISTS idx_import_raw_hash ON import_raw_records(raw_record_
 CREATE TABLE IF NOT EXISTS import_dedupe_keys (
   id              TEXT PRIMARY KEY,
   source_provider TEXT NOT NULL,
-  provider_tx_id  TEXT, -- external transaction id (MR-234)
+ provider_tx_id TEXT, -- external transaction id 
   tx_hash         TEXT,
   log_index       TEXT,
   external_ref    TEXT,
@@ -589,14 +589,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_import_provider_tx
 
 
 -- ═══════════════════════════════════════════════════════════
--- BUG-001 expansion + BUG-035…050 column/table gaps (2026-09-04)
+-- expansion + …050 column/table gaps (2026-09-04)
 -- Domain still validates decimal; SQLite stores TEXT
 -- ═══════════════════════════════════════════════════════════
 
 INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaVersion', '1');
 INSERT OR IGNORE INTO db_meta(key, value) VALUES ('schemaId', 'personal-fi-v1');
 
--- durability_state: pending | sql_committed | persisted | persist_failed (P0-SCHEMA-002)
+-- durability_state: pending | sql_committed | persisted | persist_failed 
 -- pending | temp_written | committed | swapped | failed
 
 CREATE TABLE IF NOT EXISTS inv_crypto_exchanges (
@@ -624,7 +624,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_wallet_addresses (
   network_id TEXT NOT NULL REFERENCES inv_crypto_wallet_networks(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- address identity (RAW):
   address TEXT NOT NULL,
-  -- derivation metadata (P0-019 - historically valuable, should be RAW):
+ -- derivation metadata (- historically valuable, should be RAW):
   derivation_path TEXT, -- derivation path (e.g., m/44'/0'/0'/0/0) 
   account_index INTEGER, -- account index (BIP44/BIP84) 
   address_type TEXT CHECK (address_type IS NULL OR address_type IN ('legacy','p2sh','bech32','eth','other')), -- 
@@ -646,7 +646,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_cash (
   -- fin_account_id: NULLABLE only for non-cash crypto records (e.g., holding snapshot)
   -- for actual cash, Core journal is always SoT even in standalone mode
   fin_account_id TEXT REFERENCES fin_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  balance TEXT NOT NULL, -- SNAPSHOT only; rebuild from journal (P0-DOC-012)
+ balance TEXT NOT NULL, -- SNAPSHOT only; rebuild from journal 
   updated_at TEXT NOT NULL,
   UNIQUE (exchange_id, currency)
 );
@@ -683,7 +683,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
   -- DERIVED fields (computed from transactions by CostBasisEngine):
   quantity TEXT NOT NULL, -- net quantity (DERIVED; rebuild on tx/reversal/CA)
   total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
-  total_fees_paid_base TEXT, -- total fees in base currency (DERIVED; P0-015)
+ total_fees_paid_base TEXT, -- total fees in base currency (DERIVED;)
   cost_currency TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
@@ -696,7 +696,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   holding_id TEXT REFERENCES inv_stocks_iran_holdings(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   brokerage_id TEXT REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- tx_type expanded per P0-016 to support full CA model:
+ -- tx_type expanded per to support full CA model:
   -- buy/sell/dividend: basic operations
   -- corporate_action: generic CA event (use ca_type in inv_stocks_iran_corporate_actions for details)
   -- capital_increase: افزایش سرمایه (نقدی/از محل مطالبات)
@@ -772,7 +772,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_holdings (
   -- DERIVED fields (computed from transactions by CostBasisEngine):
   quantity TEXT NOT NULL, -- DERIVED: net units (rebuild on tx/reversal/CA)
   total_invested TEXT NOT NULL, -- DERIVED: total cost basis (rebuild on tx/reversal)
-  total_fees_paid_base TEXT, -- total fees in base currency (DERIVED; P0-017)
+ total_fees_paid_base TEXT, -- total fees in base currency (DERIVED;)
   -- RAW snapshot fields (for pricing/metrics):
   current_nav TEXT, -- آخرین NAV (فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با transactionPrice قاطی نشود) 
   last_subscription_price TEXT, -- آخرین قیمت صدور دیده‌شده (nullable) 
@@ -792,7 +792,7 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- tx_type expanded per P0-017 to support full fund model:
+ -- tx_type expanded per to support full fund model:
   -- buy/subscribe: صدور واحد جدید
   -- sell/redeem: ابطال واحد
   -- dividend/distribution: تقسیم سود نقدی
@@ -855,13 +855,13 @@ CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   business_date TEXT NOT NULL,
   quantity_mg TEXT NOT NULL, -- gross weight moved; for partial sell <= holding.quantity_mg
   metal_price_per_mg TEXT, -- pure metal unit price (ex-premium)
-  premium_amount TEXT, -- fabrication / maker / premium separate from metal price (MR-174)
+ premium_amount TEXT, -- fabrication / maker / premium separate from metal price 
   fee_amount TEXT, -- brokerage/dealer fee
   fee_currency TEXT,
   amount TEXT, -- total consideration (metal + premium ± fees as signed by policy)
   currency TEXT NOT NULL,
   exchange_rate_to_base TEXT,
-  is_partial INTEGER NOT NULL DEFAULT 0 CHECK (is_partial IN (0, 1)), -- MR-179 partial sales
+ is_partial INTEGER NOT NULL DEFAULT 0 CHECK (is_partial IN (0, 1)), -- partial sales
   created_at TEXT NOT NULL
 );
 
@@ -910,7 +910,7 @@ CREATE TABLE IF NOT EXISTS pa_transactions (
   amount TEXT NOT NULL, -- consideration
   currency TEXT NOT NULL,
   quantity TEXT, -- portion sold (partial disposal)
-  realized_gain_loss TEXT, -- calculated on disposal/sale (MR-195)
+ realized_gain_loss TEXT, -- calculated on disposal/sale 
   exchange_rate_to_base TEXT,
   fee_amount TEXT,
   note TEXT,
@@ -920,8 +920,8 @@ CREATE TABLE IF NOT EXISTS pa_transactions (
 CREATE TABLE IF NOT EXISTS pa_valuations (
   id TEXT PRIMARY KEY,
   asset_id TEXT NOT NULL REFERENCES pa_assets(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  as_of TEXT NOT NULL, -- valuation date (MR-188)
-  value TEXT NOT NULL, -- estimated market value (MR-187)
+ as_of TEXT NOT NULL, -- valuation date 
+ value TEXT NOT NULL, -- estimated market value 
   currency TEXT NOT NULL,
   exchange_rate_to_base TEXT,
   source TEXT, -- manual|price_feed|appraisal
@@ -1009,19 +1009,19 @@ CREATE TABLE IF NOT EXISTS tax_events (
   id TEXT PRIMARY KEY,
   -- operation_id: NULLABLE only for draft events or manual adjustments
   -- Investment/realized ops that create tax MUST have operation_id → fin_operations
-  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- source investment/realized op (MR-202)
+ operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- source investment/realized op 
   tax_kind TEXT NOT NULL, -- capital_gain|income|withholding|adjustment|...
   amount TEXT NOT NULL, -- tax amount (decimal string)
   currency TEXT NOT NULL,
-  period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR (MR-197)
-  jurisdiction TEXT, -- denormalized from category or override (MR-198)
-  rule_version TEXT, -- tax rule version applied (MR-199)
-  basis_amount TEXT, -- cost basis used for this tax event (MR-201)
-  holding_period_days INTEGER, -- for short vs long-term (MR-204)
-  is_deductible INTEGER NOT NULL DEFAULT 0 CHECK (is_deductible IN (0, 1)), -- fee/expense deductible flag (MR-203)
+ period_key TEXT NOT NULL, -- tax year / period e.g. 1404 or 2025-IR 
+ jurisdiction TEXT, -- denormalized from category or override 
+ rule_version TEXT, -- tax rule version applied 
+ basis_amount TEXT, -- cost basis used for this tax event 
+ holding_period_days INTEGER, -- for short vs long-term 
+ is_deductible INTEGER NOT NULL DEFAULT 0 CHECK (is_deductible IN (0, 1)), -- fee/expense deductible flag 
   is_manual_adjustment INTEGER NOT NULL DEFAULT 0 CHECK (is_manual_adjustment IN (0, 1)),
-  adjustment_reason TEXT, -- required when manual (MR-207)
-  document_id TEXT, -- link to docs_documents evidence (MR-206)
+ adjustment_reason TEXT, -- required when manual 
+ document_id TEXT, -- link to docs_documents evidence 
   status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')),
   -- TAX-002 period semantics (do not infer bounds from bare year)
   tax_year TEXT,
@@ -1044,11 +1044,11 @@ CREATE TABLE IF NOT EXISTS cur_exchange_rates (
   id TEXT PRIMARY KEY,
   from_currency TEXT NOT NULL REFERENCES cur_currencies(code) ON DELETE RESTRICT ON UPDATE CASCADE,
   to_currency TEXT NOT NULL REFERENCES cur_currencies(code) ON DELETE RESTRICT ON UPDATE CASCADE,
-  rate TEXT NOT NULL, -- always store direct; inverse = 1/rate deterministic (MR-213)
-  as_of TEXT NOT NULL, -- observation date/time (MR-215)
+ rate TEXT NOT NULL, -- always store direct; inverse = 1/rate deterministic 
+ as_of TEXT NOT NULL, -- observation date/time 
   source TEXT,
   source_priority INTEGER NOT NULL DEFAULT 100 CHECK (source_priority >= 0),
-  conversion_path TEXT, -- JSON multi-hop when used (MR-214)
+ conversion_path TEXT, -- JSON multi-hop when used 
   is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)),
   is_stale INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)),
   created_at TEXT NOT NULL
@@ -1151,11 +1151,11 @@ CREATE TABLE IF NOT EXISTS sec_access_log (
 
 
 -- ═══════════════════════════════════════════════════════════
--- BUG-036..050 schema apply (2026-09-05)
+-- ..050 schema apply (2026-09-05)
 -- SQLite cannot easily ALTER CHECK on existing tables; additive tables + notes for migrate
 -- ═══════════════════════════════════════════════════════════
 
--- BUG-040
+-- 
 -- import_raw_records.source_file_name (if table exists from expansion)
 
 -- Ensure price_history has is_manual (recreate-safe: new table shape documented)
@@ -1314,9 +1314,9 @@ CREATE TABLE IF NOT EXISTS tax_categories (
   id           TEXT PRIMARY KEY,
   code         TEXT NOT NULL UNIQUE,
   name         TEXT NOT NULL,
-  jurisdiction TEXT NOT NULL, -- IR|US|... (MR-198)
-  rule_version TEXT, -- active rule set version (MR-199)
-  policy_json  TEXT, -- policy-driven rules, never hard-coded rates (MR-196)
+ jurisdiction TEXT NOT NULL, -- IR|US|... 
+ rule_version TEXT, -- active rule set version 
+ policy_json TEXT, -- policy-driven rules, never hard-coded rates 
   is_active    INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL
@@ -1331,7 +1331,7 @@ CREATE TABLE IF NOT EXISTS tax_categories (
 -- Naming: not_ notifications, rpt_ reports (canonical)
 -- ═══════════════════════════════════════════════════════════
 
--- Documents (MR-192 evidence links)
+-- Documents (evidence links)
 CREATE TABLE IF NOT EXISTS docs_documents (
   id           TEXT PRIMARY KEY,
   title        TEXT,
@@ -1513,7 +1513,7 @@ CREATE TABLE IF NOT EXISTS ref_integrity_queue (
 
 
 -- ═══════════════════════════════════════════════════════════
--- STANDALONE MODE (BUG-D20)
+-- STANDALONE MODE 
 -- Feature UI independence ≠ remove Accounting Core.
 -- Domain tables may have operation_id NULL only while status=draft.
 -- Posted financial events ALWAYS require operation_id → fin_operations.
@@ -1570,7 +1570,7 @@ CREATE INDEX IF NOT EXISTS idx_exp_reversed ON exp_transactions(reversed_expense
 --   realized_gain_loss only on sale/disposal
 --   reverse target must be posted / not already voided
 --   principal, cheque amount, journal line amount > 0
--- See docs/FINANCIAL-CORE.md + BUG-CODE regression suite.
+-- See docs/FINANCIAL-CORE.md + regression suite.
 -- ═══════════════════════════════════════════════════════════
 
 

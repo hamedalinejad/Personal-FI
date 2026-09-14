@@ -47,7 +47,13 @@
           "networkId?",
           "exchangeId?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "MODULE_DEFAULT reduce_received_quantity for qty fee",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -60,15 +66,53 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CRYPTO-BUY-FEE-FROM-BASE.json",
+          "fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json",
+          "fixtures/STANDALONE-CRYPTO.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "crypto",
-        "maturity": "partial"
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "identity instrument+venue+network",
+          "feeQuantity required when reduce_received_quantity"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -89,7 +133,13 @@
           "currency",
           "feeAmount?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "MODULE_DEFAULT expense",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -102,15 +152,52 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CRYPTO-SELL-FEE.json",
+          "fixtures/CRYPTO-BTC-USDT-IRR-PNL.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "crypto.sell",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "holding must cover quantity",
+          "fee treatment explicit"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -128,7 +215,13 @@
           "toScope",
           "networkFee?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -141,15 +234,52 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CRITICAL-TRANSFER-FEE.json",
+          "fixtures/CRYPTO-BRIDGE-FEE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "crypto.transfer",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "from/to venue+network required",
+          "network fee funding kind explicit"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -172,7 +302,13 @@
           "tax?",
           "otherFee?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "module default capitalize_inventory",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -185,15 +321,52 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/STOCK-BUY-SELL-FEE.json",
+          "fixtures/STANDALONE-STOCKS.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "stocks",
-        "maturity": "partial"
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "tradeDate vs settlementDate distinct",
+          "commission/tax/otherFee treatments explicit"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -215,7 +388,13 @@
           "tax?",
           "otherFee?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "module default expense",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -228,15 +407,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/STOCK-BUY-SELL-FEE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "stocks.sell",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "same fee vocabulary as buy",
+          "WAC dispose"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -252,7 +467,13 @@
           "settlementDate",
           "currency"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -265,15 +486,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/STOCK-T2-SETTLEMENT.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "stocks.settle",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "load trade book base + settlement FX",
+          "payable/receivable clear on cash date"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -291,7 +548,13 @@
           "exDate?",
           "payDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr cash / Cr dividend income (withholding optional)",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -304,15 +567,50 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/STOCK-BUY-SELL-FEE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "stocks.dividend",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "cash or reinvest path explicit"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -332,7 +630,13 @@
           "currency",
           "accountId?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -345,15 +649,52 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/FUND-NAV-VS-TX-PRICE.json",
+          "fixtures/STANDALONE-FUND.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "funds",
-        "maturity": "partial"
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "cost uses transactionPrice never silent NAV",
+          "NAV recorded as valuation context only"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -371,7 +712,13 @@
           "currency",
           "accountId?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -384,15 +731,50 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/FUND-NAV-VS-TX-PRICE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "funds.redeem",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "units decrease; cost release WAC"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -409,7 +791,13 @@
           "currency",
           "reinvest?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "income vs return of capital per policy",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -422,15 +810,50 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/FUND-DIVIDEND-REINVEST.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "funds.distribute",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "cash vs reinvest explicit"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -450,7 +873,13 @@
           "fee?",
           "quoteBasis?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "trade fee expense; premium capitalize_inventory",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -463,15 +892,53 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/METAL-FINEWEIGHT.json",
+          "fixtures/STANDALONE-METALS.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "metals",
-        "maturity": "partial"
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "fineWeight = grossMass × purityRatio",
+          "quoteBasis required",
+          "purity required unless fixed_1 instrument"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -489,7 +956,13 @@
           "currency",
           "fee?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -502,15 +975,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/METAL-FINEWEIGHT.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "metals.sell",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "holding by platform+instrument+purity",
+          "trade fee ≠ delivery fee"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -529,7 +1038,13 @@
           "deliveryAddress?",
           "invoiceRef?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -543,15 +1058,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/METAL-FINEWEIGHT.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "partial"
+        "licenseCapability": "metals.delivery",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "PhysicalDeliveryInput: all accepted fields persisted or rejected",
+          "delivery fee separate"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "partial"
     },
@@ -570,7 +1121,13 @@
           "term",
           "role"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -583,7 +1140,17 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [
           "fixtures/LOAN-FLAT.json"
         ],
@@ -593,7 +1160,31 @@
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "loan",
-        "maturity": "strongest"
+        "maturity": "strongest",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "rate is percentage-points (18=18%)",
+          "declining_balance = equal-principal"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "strongest"
     },
@@ -610,7 +1201,13 @@
           "amount",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -623,15 +1220,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/LOAN-DECLINING.json",
+          "fixtures/STANDALONE-LOAN.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
         "licenseCapability": "loan",
-        "maturity": "strongest"
+        "maturity": "strongest",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "waterfall penalty→fee→interest→principal"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "strongest"
     },
@@ -645,7 +1278,13 @@
           "operationId",
           "originalOperationId"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -658,15 +1297,50 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-REVERSAL-BEFORE-AFTER.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "strongest"
+        "licenseCapability": "loan.reversePayment",
+        "maturity": "strongest",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "inverse of original payment operation"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "strongest"
     },
@@ -681,7 +1355,13 @@
           "engineVersion",
           "calendarVersion"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none unless policy posts",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -691,15 +1371,52 @@
         "idempotency": "loanId + schedule schema version",
         "reversal": "n/a generate",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/LOAN-DECLINING.json",
+          "fixtures/LOAN-FLAT.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "strongest"
+        "licenseCapability": "loan.generateSchedule",
+        "maturity": "strongest",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "snapshot schema versioned",
+          "final residual conserves principal"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "strongest"
     },
@@ -715,7 +1432,13 @@
           "method",
           "term"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -725,15 +1448,50 @@
         "idempotency": "n/a pure function",
         "reversal": "n/a",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/LOAN-DECLINING.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "strongest"
+        "licenseCapability": "loan.previewSchedule",
+        "maturity": "strongest",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "no persistence"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "strongest"
     },
@@ -776,8 +1534,29 @@
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.create",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -806,15 +1585,46 @@
         "idempotency": "accountId + payload hash",
         "reversal": "n/a metadata",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.update",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -851,8 +1661,31 @@
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.archive",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "reject non-zero journal balance"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -870,7 +1703,13 @@
           "currency",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr to / Cr from (or explicit legs)",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -887,14 +1726,37 @@
           "ACCOUNT_*",
           "INV_*"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "fixtures/CORE-OPENING-BALANCE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.transfer",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -912,7 +1774,13 @@
           "businessDate",
           "counterparty?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr cash / Cr income or equity per policy",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -924,15 +1792,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-OPENING-BALANCE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.deposit",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -949,7 +1850,13 @@
           "currency",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr expense/equity / Cr cash",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -961,15 +1868,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-OPENING-BALANCE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "accounts.withdraw",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -987,7 +1927,13 @@
           "accountId",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr cash / Cr income",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1000,15 +1946,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-OPENING-BALANCE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "income.create",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1026,7 +2005,13 @@
           "accountId",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr expense / Cr cash",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1039,15 +2024,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-OPENING-BALANCE.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "expense.create",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1061,7 +2079,13 @@
           "operationId",
           "originalOperationId"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "inverse of original",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1074,15 +2098,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-REVERSAL-BEFORE-AFTER.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "income.reverse",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1096,7 +2153,13 @@
           "operationId",
           "originalOperationId"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "inverse of original",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1109,15 +2172,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-REVERSAL-BEFORE-AFTER.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "expense.reverse",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1135,7 +2231,13 @@
           "dueDate",
           "direction"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "may create receivable/payable; not always cash",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1148,15 +2250,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "cheque.register",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1172,7 +2305,13 @@
           "accountId",
           "businessDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1185,15 +2324,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "cheque.deposit",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1208,7 +2378,13 @@
           "chequeId",
           "clearedDate"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1221,15 +2397,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "cheque.clear",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1244,7 +2451,13 @@
           "chequeId",
           "reason?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1257,15 +2470,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "cheque.bounce",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1279,7 +2523,13 @@
           "operationId",
           "chequeId"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1292,15 +2542,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "cheque.cancel",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1317,7 +2598,13 @@
           "acquisitionCost?",
           "currency?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1330,15 +2617,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "assets.register",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1353,7 +2671,13 @@
           "name?",
           "location?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1363,15 +2687,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "assets.update",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1387,7 +2742,13 @@
           "proceeds?",
           "currency?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1400,15 +2761,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "assets.dispose",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1424,7 +2816,13 @@
           "amount",
           "currency"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1436,15 +2834,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "budget.set",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1460,7 +2889,13 @@
           "currency",
           "deadline?"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1472,15 +2907,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "goal.create",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1496,7 +2962,13 @@
           "currency",
           "dueRule"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "none until pay",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1508,15 +2980,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "bill.schedule",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1533,7 +3036,13 @@
           "currency",
           "kind"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Dr tax expense / Cr tax payable when posted",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1546,15 +3055,48 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "tax.assess",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "creates obligation; does not mark paid"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1587,15 +3129,51 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
-        "fixtureRefs": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/CORE-REVERSAL-BEFORE-AFTER.json"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "tax.pay",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "only path to paid status",
+          "no status mutation shortcut"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     },
@@ -1611,7 +3189,13 @@
           "deltaAmount",
           "reason"
         ],
-        "validation": [],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
@@ -1624,15 +3208,46 @@
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [],
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
         "fixtureRefs": [],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
         ],
         "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": null,
-        "maturity": "baseline"
+        "licenseCapability": "tax.adjust",
+        "maturity": "baseline",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ]
       },
       "maturity": "baseline"
     }

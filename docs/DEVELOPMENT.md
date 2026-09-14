@@ -130,8 +130,8 @@ History → Git · proof → tests/fixtures · contract → Owner · status → 
 - Fixtures: business capability (`LOAN-FLAT.json`, `FUND-NAV-VS-TX-PRICE.json`)
 
 ## Definition of Done — 28 questions per command
-owner · field kinds · identity · operationId · book base · tx currency · unit · precision · rounding · formula · FX asOf · fee role · cost basis · P&L fees · journal legs · tables · txn boundary · idempotency · reversal · asOf · standalone · license · errors · fixture · invariant · recovery · report impact · export survival  
-If any undefined → **DOCUMENTATION NOT READY**.
+See **Developer checklist (28 questions)** above; same list is the DoD gate.
+
 
 ## Change workflow
 ```
@@ -284,3 +284,8 @@ flexibility in features · independence in standalone · history in Git.
 
 Forbidden: describing HEAD as “no code yet” while `src/` engines exist.
 
+## Command economics (LOCKED)
+`docs/core/registry/command-catalog.json` is the machine SoT for each public mutation card
+(validation, errors, fixtures, recovery, journal/fee/FX notes).  
+Do **not** invent economics from source when the card is SPEC_LOCKED or richer.
+Human module files own feature narrative; they do not replace the catalog card.
