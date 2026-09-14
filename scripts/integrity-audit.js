@@ -45,17 +45,52 @@ try {
   findings.push(`skip_base:${e.message}`);
 }
 
-// post_state drift
+// post_state is CACHE only — authoritative status is fin_operations.status
+// Reports must JOIN fo.status, never filter solely on post_state.
 try {
   const n = db.prepare(`
     SELECT COUNT(*) as c FROM fin_journal_entries je
     JOIN fin_operations o ON o.id = je.operation_id
-    WHERE je.post_state IS NOT NULL AND je.post_state != o.status
-      AND NOT (je.post_state = 'posted' AND o.status = 'posted')
+    WHERE je.post_state IS NOT NULL
+      AND NOT (
+        (je.post_state = 'posted' AND o.status = 'posted')
+        OR (je.post_state = 'draft' AND o.status IN ('draft', 'failed', 'pending'))
+        OR (je.post_state = 'void' AND o.status IN ('voided', 'void'))
+      )
   `).get().c;
   if (n > 0) findings.push(`post_state_drift:${n}`);
 } catch (e) {
   findings.push(`skip_drift:${e.message}`);
+}
+
+// Empty journal entry attached to posted op
+try {
+  const n = db.prepare(`
+    SELECT COUNT(*) as c FROM fin_journal_entries je
+    JOIN fin_operations o ON o.id = je.operation_id
+    LEFT JOIN fin_journal_lines jl ON jl.entry_id = je.id
+    WHERE o.status = 'posted'
+    GROUP BY je.id
+    HAVING COUNT(jl.id) < 2
+  `).get()?.c ?? 0;
+  // rewrite as subquery
+} catch (e) {
+  /* replaced below */
+}
+try {
+  const n = db.prepare(`
+    SELECT COUNT(*) as c FROM (
+      SELECT je.id FROM fin_journal_entries je
+      JOIN fin_operations o ON o.id = je.operation_id
+      LEFT JOIN fin_journal_lines jl ON jl.entry_id = je.id
+      WHERE o.status = 'posted'
+      GROUP BY je.id
+      HAVING COUNT(jl.id) < 2
+    )
+  `).get().c;
+  if (n > 0) findings.push(`posted_entry_lt_2_lines:${n}`);
+} catch (e) {
+  findings.push(`skip_entry_lines:${e.message}`);
 }
 
 if (findings.length) {

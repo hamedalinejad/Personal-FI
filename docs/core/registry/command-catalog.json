@@ -33,7 +33,39 @@
       "status": "IMPLEMENTED",
       "tests": [
         "src/features/crypto/tests/buy.test.js"
-      ]
+      ],
+      "card": {
+        "purpose": "Buy crypto; module default fee reduce_received_quantity",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "quantity",
+          "price",
+          "currency",
+          "feeAmount?",
+          "feeQuantity?",
+          "networkId?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inv_crypto_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "crypto.sell": {
       "owner": "docs/modules/crypto.md",
@@ -51,18 +83,122 @@
     "stocks.buy": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.buy",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Buy equity; pending settlement optional",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "brokerageId",
+          "quantity",
+          "price",
+          "currency",
+          "tradeDate",
+          "settlementDate",
+          "commission?",
+          "tax?",
+          "otherFee?",
+          "treatments?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "WAC increase",
+        "dbWrites": [
+          "inv_stocks_iran_transactions",
+          "inv_stocks_iran_holdings",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [
+          "STOCK_*",
+          "FEE_*",
+          "INV_*"
+        ],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "stocks.sell": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.sell",
       "status": "IMPLEMENTED",
-      "notes": "fee_commission/tax/other persisted"
+      "notes": "fee_commission/tax/other persisted",
+      "card": {
+        "purpose": "Sell equity; fees expense by module policy v1",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "brokerageId",
+          "quantity",
+          "price",
+          "currency",
+          "commission?",
+          "tax?",
+          "otherFee?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "WAC disposal + realized PnL",
+        "dbWrites": [
+          "inv_stocks_iran_transactions",
+          "holdings",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "stocks.settle": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.settle",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Settle prior trade payable/receivable with settlement-date FX",
+        "requestFields": [
+          "operationId",
+          "relatedOperationId",
+          "settlementDate",
+          "currency",
+          "amount?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "fin_journal_*",
+          "stocks settlement fields"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "stocks.dividend": {
       "owner": "docs/modules/stocks.md",
@@ -73,7 +209,38 @@
       "owner": "docs/modules/funds.md",
       "capability": "funds.subscribe",
       "status": "IMPLEMENTED",
-      "notes": "Never auto-copy NAV\u2192transactionPrice; aliases fund.* forbidden"
+      "notes": "Never auto-copy NAV→transactionPrice; aliases fund.* forbidden",
+      "card": {
+        "purpose": "Subscribe units; transactionPrice ≠ NAV",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "amount",
+          "transactionPrice",
+          "nav?",
+          "currency",
+          "accountId?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "units × transactionPrice",
+        "dbWrites": [
+          "inv_fif_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "funds.redeem": {
       "owner": "docs/modules/funds.md",
@@ -88,7 +255,38 @@
     "metals.buy": {
       "owner": "docs/modules/metals.md",
       "capability": "metals.buy",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Buy metal; purity identity; premium vs trade fee",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "quantityMg",
+          "purityRatio",
+          "metalPricePerMg",
+          "premium?",
+          "fee?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inv_metals_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "metals.sell": {
       "owner": "docs/modules/metals.md",
@@ -103,13 +301,71 @@
     "loan.create": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.create",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Create loan + schedule snapshot",
+        "requestFields": [
+          "operationId",
+          "principal",
+          "rate",
+          "method",
+          "startDate",
+          "term"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "ln_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "loan.recordPayment": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.recordPayment",
       "status": "IMPLEMENTED",
-      "notes": "Not loan.payment"
+      "notes": "Not loan.payment",
+      "card": {
+        "purpose": "Allocate payment principal/interest/fee/penalty",
+        "requestFields": [
+          "operationId",
+          "loanId",
+          "amount",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation",
+        "feeMapping": "Fee Engine when fees present",
+        "fx": "book base from settings; amountInBase = amount × rate",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "ln_transactions",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation; no in-place rewrite",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted journal ≥2 lines",
+          "balanced base"
+        ]
+      }
     },
     "loan.reversePayment": {
       "owner": "docs/modules/loan.md",

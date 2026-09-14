@@ -181,3 +181,13 @@ Not: more features → more docs → more BUG/FIX files.
 
 Golden principle: complexity in Core + Proof; simplicity in UI; precision in Accounting; flexibility in Feature; independence in Standalone; history in Git.
 
+## Command card template (LOCKED)
+Each **mutation** must be machine-described in `docs/core/registry/command-catalog.json` under `commands.<id>.card` (not a separate Markdown file per command).
+
+Required card keys:
+```
+purpose, requestFields, validation, journalMapping, feeMapping, fx,
+costBasis, dbWrites, transactionBoundary, idempotency, reversal,
+result, errors, fixtureRefs, invariants
+```
+Human module file remains **one file per module**; cards live in the catalog.

@@ -176,3 +176,12 @@ Gate: `npm run command:catalog`.
 | 006 stocks fee fields | OK — fee_commission/tax/other + treatments_json on buy+sell |
 | 007 silent expense | OK — MODULE_DEFAULT_FEE_TREATMENT per module |
 | 008–010 holding uniqueness | OK — ifnull sentinels on crypto/funds/metals |
+
+## REVIEW-011…014 + DOC-001 (2026-09-14)
+| ID | Status |
+|----|--------|
+| 011 post_state cache | OK — integrity scan; reports use fo.status |
+| 012 source vocabulary | OK — legacy `source` written NULL |
+| 013 FX rates unique + resolver | OK — uq_cur_exchange_rates_obs + resolveStoredRate |
+| 014 category cycle | OK — assertNoCategoryCycle |
+| DOC-001 command cards | PARTIAL — template + cards on key mutations in command-catalog |

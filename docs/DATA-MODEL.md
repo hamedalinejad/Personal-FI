@@ -108,3 +108,10 @@ instrument + venue + network (symbol alone is not identity)
 Every field: kind · owner · schema column · nullable · unit · currency · precision · formula · source · migration · export · reversal  
 Forbidden: accepted → not stored → not returned → not rejected.
 
+## Cache vs authority
+| Field | Kind | Authority |
+|-------|------|-----------|
+| `fin_operations.status` | RAW/system | Yes — reports/filters |
+| `fin_journal_entries.post_state` | CACHE | No — integrity-scan only |
+| `fin_operations.source` | LEGACY | No — do not write |
+| `source_channel` / `source_type` / `source_reference` | RAW | Yes |

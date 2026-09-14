@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   source_channel    TEXT CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system')),
   source_type       TEXT, -- business provenance; not the same as source_channel
   source_reference  TEXT,
-  -- LEGACY alias column: prefer source_channel; kept for migration compatibility
+  -- LEGACY only (migration compatibility). NEW writers MUST leave NULL. Authority: source_channel + source_type + source_reference.
   source            TEXT CHECK (source IS NULL OR source IN ('ui','api','import','migration','system')),
   created_at        TEXT NOT NULL,
   posted_at         TEXT,
@@ -1050,8 +1050,13 @@ CREATE TABLE IF NOT EXISTS cur_exchange_rates (
   source_priority INTEGER NOT NULL DEFAULT 100 CHECK (source_priority >= 0),
   conversion_path TEXT, -- JSON multi-hop when used (MR-214)
   is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)),
+  is_stale INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)),
   created_at TEXT NOT NULL
 );
+
+-- Deterministic observation identity: one row per (pair, as_of, source)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_cur_exchange_rates_obs
+  ON cur_exchange_rates(from_currency, to_currency, as_of, ifnull(source, ''));
 
 CREATE TABLE IF NOT EXISTS cur_currency_preferences (
   id TEXT PRIMARY KEY,

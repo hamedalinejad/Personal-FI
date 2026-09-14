@@ -167,7 +167,8 @@ export function normalizeCommand(command) {
     rates: command.rates || [],
     domainResult: command.domainResult ?? null,
     engineVersions: command.engineVersions || null,
-    source: command.sourceChannel ?? command.source_channel ?? command.source ?? "api",
+    // legacy `source` field not written; channel only
+    source: null,
     dataDir: command.dataDir,
     persistMode: command.persistMode || "sqlite",
     withinTransaction: command.withinTransaction,

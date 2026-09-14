@@ -115,7 +115,7 @@ function persistOperationSqlite(record, dir) {
     // preserve request envelope for no-field-loss / replay (domain tables remain SoT for owned fields)
     payload: record.payload ?? null,
     normalizedRequest: record.normalizedRequest ?? null,
-    source: record.source ?? null,
+    source: null, // legacy — use sourceChannel
     rates: record.rates ?? null,
     settlementDate: record.settlementDate ?? null,
     eventAt: record.eventAt ?? null,
@@ -163,7 +163,7 @@ function persistOperationSqlite(record, dir) {
       sourceChannel,
       sourceType,
       sourceReference,
-      sourceChannel, // legacy alias
+      null, // legacy source column — non-authoritative; do not write channel into it
       now,
     );
 

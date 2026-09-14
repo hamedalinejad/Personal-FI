@@ -203,5 +203,22 @@ If `feeTreatment = capitalize_inventory` (or equivalent), Fee Engine **must** em
 - **FX:** amountInBase = amount × exchangeRateToBase  
 - **Fees:** every event states economic meaning + cash effect + carrying/P&L effect  
 - **Cost basis WAC v1:** deterministic, reversible, asOf-reproducible  
-- **Dates never collapsed:** businessDate · tradeDate · settlementDate · cashDate · eventAt · marketDate · priceAsOf · fxAsOf  
+- **Dates never collapsed:** businessDate · tradeDate · settlementDate · cashDate · eventAt · marketDate · priceAsOf · fxAsOf
 
+## FX observation resolver (LOCKED)
+Table: `cur_exchange_rates` with unique observation key `(from_currency, to_currency, as_of, ifnull(source,''))`.
+
+Resolver (implementation: `src/core/domain/fx/resolveStoredRate.js`):
+1. `from == to` → rate `"1"` (identity)
+2. require `asOf` (historical path never uses wall-clock "latest now")
+3. candidates: `as_of <= requested asOf`
+4. order: `source_priority ASC`, then `as_of DESC`
+5. if `is_stale=1` and `allowStale=false` → fail closed (`FX_RATE_STALE`)
+6. if no candidate → `FX_RATE_NOT_FOUND`
+
+`post_state` on `fin_journal_entries` is a **cache** of `fin_operations.status`. Reports must filter on `fin_operations.status = 'posted'`, never on `post_state` alone.
+
+Legacy column `fin_operations.source` is **non-authoritative**; writers leave it NULL. Use `source_channel` + `source_type` + `source_reference`.
+
+## Category hierarchy
+`cat_categories.parent_id` must not form a cycle (`assertNoCategoryCycle`).

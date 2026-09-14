@@ -1,5 +1,5 @@
 {
-  "schemaHash": "ba7f52f2b850535383eec2e88f31fe011d22ecf3ce7b643e2a4bda87072ac3fd",
+  "schemaHash": "136e9aa7d886e8f8a6dd5b25fb5738072b196d0a700ab5f754fca3e2933116dc",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -1151,6 +1151,13 @@
           "pk": 0
         },
         {
+          "name": "is_stale",
+          "type": "INTEGER",
+          "notnull": true,
+          "dflt": "0",
+          "pk": 0
+        },
+        {
           "name": "created_at",
           "type": "TEXT",
           "notnull": true,
@@ -1176,6 +1183,17 @@
       ],
       "indexes": [
         {
+          "name": "uq_cur_exchange_rates_obs",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "from_currency",
+            "to_currency",
+            "as_of",
+            null
+          ]
+        },
+        {
           "name": "sqlite_autoindex_cur_exchange_rates_1",
           "unique": true,
           "origin": "pk",
@@ -1186,6 +1204,7 @@
       ],
       "checks": [
         "CHECK (is_manual IN (0, 1)",
+        "CHECK (is_stale IN (0, 1)",
         "CHECK (source_priority >= 0)"
       ]
     },
