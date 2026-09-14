@@ -12,6 +12,7 @@ Live only. History in Git. **No new audit documents.**
 | FRZ | FREEZE_PROVEN=false | LOCKED | status.registry |
 | FX | amountInBase + crossRate | IMPROVING | amountInBase.test · crossRate.test |
 | CRYPTO | buy/sell/transfer | PARTIAL | module + deferred list |
+| IRAN-CAL | Equity weekend Thu+Fri v2 | FIXED | settlementPolicy.js |
 | STOCKS | T+n / CA deferred | PARTIAL | module |
 | FUNDS | NAV ≠ tx price | PARTIAL | module |
 | METALS | purity/delivery | PARTIAL | module |

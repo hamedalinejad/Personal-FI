@@ -110,3 +110,11 @@ src/features/stocks/tests
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+
+### Settlement calendar (versioned)
+- Current default: `iran-equity-T2-v2` — business days **Sat–Wed**; weekend **Thu–Fri** (TSE-oriented package).
+- Legacy `iran-equity-T2-v1` (Fri–Sat skip) retained only for replay of ops that stored that version.
+- Official holiday calendars must be data packages, not hard-coded Core constants beyond this deterministic weekend set.
+- Every equity trade must persist `settlement_policy_version` with the op.
+

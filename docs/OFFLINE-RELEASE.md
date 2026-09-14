@@ -66,3 +66,8 @@ import_batch → raw_record → dedupe_key → normalized → operation → jour
 ```
 Unknown provider fields survive unless user chooses destructive transform.
 
+## Offline security (minimum contract)
+- File-at-rest protection and export protection are product requirements for shared/licensed builds.
+- License gates **capability only** — never deletes financial history.
+- Wallet addresses / bank identifiers are sensitive fields; do not log in plain telemetry.
+- Detailed key-management is a DEFERRED product package; schema may hold encryption metadata without implying a full KMS.
