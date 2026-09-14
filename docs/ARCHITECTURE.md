@@ -127,3 +127,14 @@ Financial Core (Journal / FX / Fee / Decimal / Recovery)
 ```
 Feature API + Core only. No parallel accounting kernels.
 
+## Modular feature package (LOCKED)
+Each feature package:
+```
+commands/ · queries/ · public-api/ · domain/ · tests/ · fixtures/
+```
+UI dependency rule:
+```
+UI → public-api only
+```
+Forbidden: UI → repository · UI → SQL · UI → journal writer.
+

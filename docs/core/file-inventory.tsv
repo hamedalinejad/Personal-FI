@@ -169,7 +169,7 @@ src/core/domain/validation/index.js	E	implementation	keep
 src/core/domain/validation/positiveMoney.js	E	implementation	keep
 src/core/domain/validation/positiveMoney.test.js	D	tests	keep
 src/core/fixtures/core-vectors.test.js	D	tests	keep
-src/core/fixtures/harness.js	D	tests	keep
+src/core/fixtures/harness.js	E	implementation	keep
 src/core/fixtures/harness.test.js	D	tests	keep
 src/core/import/lineage.js	E	implementation	keep
 src/core/import/lineage.test.js	D	tests	keep

@@ -121,3 +121,32 @@ Until all green: `FREEZE_PROVEN = false`. Production remains **NO-GO**.
 11 global owners + 11 modules + archive/AUDIT-HISTORY.md + machine `docs/core/*` only.  
 No `docs/core/authority/` human trees. Command coverage → `command-catalog.json` (machine-only) when expanded.
 
+## Priority matrix (live)
+
+### P0 semantic freeze — status after HEAD
+| Item | Status |
+|------|--------|
+| Fee treatment vocabulary | **FIXED** (canonical enum + aliases) |
+| fee_from_received qty vs money | **FIXED** (`feeQuantity` required) |
+| Fee silent default | **FIXED** (`FEE_TREATMENT_REQUIRED`) |
+| Hash normalization order | **FIXED** (same-currency fill before hash) |
+| Money Number in hash | **FIXED** (`HASH_NUMBER_FORBIDDEN`) |
+| Dead COMMAND-COVERAGE-MATRIX ref | **FIXED** |
+| Inventory regenerated | **FIXED** |
+| field-inventory-live-check.js | **DELETED** (do not restore) |
+| Command machine contracts | **PARTIAL** (`command-catalog.json` skeleton) |
+| Field preservation machine coverage | **PARTIAL** |
+| Golden financial families | **PARTIAL** |
+
+### P1 before production
+Browser E2E · Recovery matrix · Standalone packs · Reporting completeness · Iran policy packages — all **OPEN/PARTIAL**
+
+### P2 cleanup
+Ticket IDs in comments · legacy test names · duplicate tests — ongoing, do not bulk-delete tests
+
+### Gates
+```
+FREEZE_PROVEN = false
+PRODUCTION = NO-GO
+```
+

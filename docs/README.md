@@ -15,3 +15,22 @@
 10. Machine proof: `docs/core/db/schema.sql`, `docs/core/registry/`, `fixtures/`
 
 Live gates: [QUALITY-STATUS.md](./QUALITY-STATUS.md)
+
+## Implementation read order
+1. `DOCUMENTATION-STANDARD.md`
+2. `PRODUCT.md`
+3. `ARCHITECTURE.md`
+4. `FINANCIAL-CORE.md`
+5. `DATA-MODEL.md`
+6. `API.md`
+7. `REPORTING.md`
+8. `OFFLINE-RELEASE.md`
+9. `DEVELOPMENT.md`
+10. `modules/<feature>.md`
+11. `core/db/schema.sql`
+12. `core/registry/*`
+13. `../fixtures/`
+14. `../` tests under `src/**`
+
+No other document is required for semantics. Audit/BUG Markdown is not authority.
+

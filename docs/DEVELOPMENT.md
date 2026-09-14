@@ -138,3 +138,46 @@ If any undefined → **DOCUMENTATION NOT READY**.
 Feature/Bug → Owner check → Code → Test → Fixture → QUALITY-STATUS → Commit
 ```
 
+## Definition of Freeze
+`FREEZE_PROVEN = true` only when all hold:
+```
+NO DEAD REFERENCES
+NO OWNER CONFLICT
+NO VOCABULARY CONFLICT
+NO FIELD LOSS
+NO CANONICAL HASH AMBIGUITY
+NO MONEY FLOAT
+GOLDEN GREEN
+RECOVERY GREEN
+STANDALONE GREEN
+COMMAND CONTRACT GREEN
+```
+Until then: `FREEZE_PROVEN = false` · `PRODUCTION = NO-GO`.
+
+## Release-Proven
+```
+Golden Green + Recovery Green + Standalone Green
++ Browser Green (if shipping browser) + CI Green
+```
+
+## Next stage (do not start UI yet)
+```
+A Fix remaining semantic gaps
+B Keep inventory/registry regenerated
+C Complete command contracts (command-catalog + schemas)
+D Complete financial goldens
+E Complete recovery/standalone proof
+F Freeze docs
+G Accounting kernel hardening
+H Loan vertical reference
+I UI last
+```
+
+## Operating model
+```
+STANDARDIZE → CANONICALIZE → PROVE → FREEZE → CODE
+```
+Not: more features → more docs → more BUG/FIX files.
+
+Golden principle: complexity in Core + Proof; simplicity in UI; precision in Accounting; flexibility in Feature; independence in Standalone; history in Git.
+

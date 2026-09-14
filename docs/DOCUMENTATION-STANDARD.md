@@ -181,3 +181,10 @@ Delete only if: no live reference + knowledge absorbed + no unique proof + no mi
 
 ## Machine command coverage
 Use `docs/core/registry/command-catalog.json` only — never a Markdown coverage matrix under docs/core/.
+
+## Sequence before features
+```
+STANDARDIZE → CANONICALIZE → PROVE → FREEZE → CODE
+```
+UI coding is last. Do not restore BUG/P0/AUDIT normative docs.
+
