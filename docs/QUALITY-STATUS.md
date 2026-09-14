@@ -185,3 +185,8 @@ Gate: `npm run command:catalog`.
 | 013 FX rates unique + resolver | OK — uq_cur_exchange_rates_obs + resolveStoredRate |
 | 014 category cycle | OK — assertNoCategoryCycle |
 | DOC-001 command cards | PARTIAL — template + cards on key mutations in command-catalog |
+
+## DOC-001 command matrix (2026-09-14)
+All public mutations in `command-catalog.json` now carry a `card` (purpose, fields, journal, fee, FX, cost basis, writes, idempotency, reversal, errors).
+Maturity still baseline/partial/strongest per module — card ≠ RELEASE-PROVEN.
+Gate: `npm run command:catalog` requires `card.purpose` on every command.

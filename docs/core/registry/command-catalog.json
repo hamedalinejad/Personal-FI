@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "description": "Machine-only canonical command IDs. One ID per semantic command. Plural feature prefix (funds not fund).",
+  "schemaVersion": 3,
+  "description": "Machine-only canonical command IDs + command cards. One ID per semantic mutation. DOC-001 complete for catalog surface.",
   "naming": {
     "pattern": "<feature>.<verbOrVerbNoun>",
     "featurePrefixes": [
@@ -35,7 +35,7 @@
         "src/features/crypto/tests/buy.test.js"
       ],
       "card": {
-        "purpose": "Buy crypto; module default fee reduce_received_quantity",
+        "purpose": "Buy crypto; quantity fee may reduce received",
         "requestFields": [
           "operationId",
           "instrumentId",
@@ -44,28 +44,33 @@
           "currency",
           "feeAmount?",
           "feeQuantity?",
-          "networkId?"
+          "networkId?",
+          "exchangeId?"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
-        "costBasis": "n/a",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "MODULE_DEFAULT reduce_received_quantity for qty fee",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "WAC increase",
         "dbWrites": [
           "inv_crypto_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "crypto",
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "crypto.sell": {
       "owner": "docs/modules/crypto.md",
@@ -73,19 +78,87 @@
       "status": "IMPLEMENTED",
       "tests": [
         "src/features/crypto/tests/sell.test.js"
-      ]
+      ],
+      "card": {
+        "purpose": "Sell crypto; fee expense by module policy v1",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "quantity",
+          "price",
+          "currency",
+          "feeAmount?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "MODULE_DEFAULT expense",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "WAC disposal + realized PnL",
+        "dbWrites": [
+          "inv_crypto_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "crypto.transfer": {
       "owner": "docs/modules/crypto.md",
       "capability": "crypto.transfer",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Internal transfer / network move; not a taxable disposal unless policy says so",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "quantity",
+          "fromScope",
+          "toScope",
+          "networkFee?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "carrying moves with quantity",
+        "dbWrites": [
+          "inv_crypto_*",
+          "fin_*?"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "stocks.buy": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.buy",
       "status": "IMPLEMENTED",
       "card": {
-        "purpose": "Buy equity; pending settlement optional",
+        "purpose": "Buy equity; T+n settlement dates distinct",
         "requestFields": [
           "operationId",
           "instrumentId",
@@ -97,34 +170,32 @@
           "settlementDate",
           "commission?",
           "tax?",
-          "otherFee?",
-          "treatments?"
+          "otherFee?"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "module default capitalize_inventory",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC increase",
         "dbWrites": [
-          "inv_stocks_iran_transactions",
-          "inv_stocks_iran_holdings",
+          "inv_stocks_iran_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
-        "errors": [
-          "STOCK_*",
-          "FEE_*",
-          "INV_*"
-        ],
+        "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "stocks",
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "stocks.sell": {
       "owner": "docs/modules/stocks.md",
@@ -132,7 +203,7 @@
       "status": "IMPLEMENTED",
       "notes": "fee_commission/tax/other persisted",
       "card": {
-        "purpose": "Sell equity; fees expense by module policy v1",
+        "purpose": "Sell equity; fee fields persisted",
         "requestFields": [
           "operationId",
           "instrumentId",
@@ -145,65 +216,105 @@
           "otherFee?"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "module default expense",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC disposal + realized PnL",
         "dbWrites": [
-          "inv_stocks_iran_transactions",
-          "holdings",
+          "inv_stocks_iran_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "stocks.settle": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.settle",
       "status": "IMPLEMENTED",
       "card": {
-        "purpose": "Settle prior trade payable/receivable with settlement-date FX",
+        "purpose": "Settle broker payable/receivable; settlement-date FX",
         "requestFields": [
           "operationId",
           "relatedOperationId",
           "settlementDate",
-          "currency",
-          "amount?"
+          "currency"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
-        "costBasis": "n/a",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a settlement cash",
         "dbWrites": [
-          "fin_journal_*",
-          "stocks settlement fields"
+          "fin_*",
+          "settlement markers"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "stocks.dividend": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.dividend",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Cash dividend income",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "amount",
+          "currency",
+          "exDate?",
+          "payDate"
+        ],
+        "validation": [],
+        "journalMapping": "Dr cash / Cr dividend income (withholding optional)",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inv_stocks_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "funds.subscribe": {
       "owner": "docs/modules/funds.md",
@@ -211,7 +322,7 @@
       "status": "IMPLEMENTED",
       "notes": "Never auto-copy NAV→transactionPrice; aliases fund.* forbidden",
       "card": {
-        "purpose": "Subscribe units; transactionPrice ≠ NAV",
+        "purpose": "Subscribe fund units; transactionPrice required; NAV ≠ price",
         "requestFields": [
           "operationId",
           "instrumentId",
@@ -222,35 +333,106 @@
           "accountId?"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
-        "costBasis": "units × transactionPrice",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "units from amount/transactionPrice",
         "dbWrites": [
           "inv_fif_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "funds",
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "funds.redeem": {
       "owner": "docs/modules/funds.md",
       "capability": "funds.redeem",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Redeem fund units",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "units",
+          "transactionPrice",
+          "currency",
+          "accountId?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "WAC disposal",
+        "dbWrites": [
+          "inv_fif_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "funds.distribute": {
       "owner": "docs/modules/funds.md",
       "capability": "funds.distribute",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Fund distribution / income",
+        "requestFields": [
+          "operationId",
+          "instrumentId",
+          "amount",
+          "currency",
+          "reinvest?"
+        ],
+        "validation": [],
+        "journalMapping": "income vs return of capital per policy",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inv_fif_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "metals.buy": {
       "owner": "docs/modules/metals.md",
@@ -265,38 +447,113 @@
           "purityRatio",
           "metalPricePerMg",
           "premium?",
-          "fee?"
+          "fee?",
+          "quoteBasis?"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
-        "costBasis": "n/a",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "trade fee expense; premium capitalize_inventory",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "metal + capitalized premium/fees",
         "dbWrites": [
           "inv_metals_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "metals",
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "metals.sell": {
       "owner": "docs/modules/metals.md",
       "capability": "metals.sell",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Sell metal position",
+        "requestFields": [
+          "operationId",
+          "holdingId",
+          "quantityMg",
+          "price",
+          "currency",
+          "fee?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "WAC disposal",
+        "dbWrites": [
+          "inv_metals_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "metals.delivery": {
       "owner": "docs/modules/metals.md",
       "capability": "metals.delivery",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Physical delivery; delivery fee ≠ trade fee; no silent cost capitalize",
+        "requestFields": [
+          "operationId",
+          "holdingId",
+          "quantityMg",
+          "feeAmount?",
+          "feeCurrency?",
+          "deliveryAddress?",
+          "invoiceRef?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "carrying moves to physical asset unless policy capitalizes delivery fee",
+        "dbWrites": [
+          "inv_metals_physical_deliveries",
+          "inv_metals_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "partial"
+      },
+      "maturity": "partial"
     },
     "loan.create": {
       "owner": "docs/modules/loan.md",
@@ -310,28 +567,35 @@
           "rate",
           "method",
           "startDate",
-          "term"
+          "term",
+          "role"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
           "ln_*",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "fixtures/LOAN-FLAT.json"
+        ],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "loan",
+        "maturity": "strongest"
+      },
+      "maturity": "strongest"
     },
     "loan.recordPayment": {
       "owner": "docs/modules/loan.md",
@@ -339,7 +603,7 @@
       "status": "IMPLEMENTED",
       "notes": "Not loan.payment",
       "card": {
-        "purpose": "Allocate payment principal/interest/fee/penalty",
+        "purpose": "Allocate payment to principal/interest/fee/penalty",
         "requestFields": [
           "operationId",
           "loanId",
@@ -347,170 +611,1106 @@
           "businessDate"
         ],
         "validation": [],
-        "journalMapping": "Core journal via runAtomicFinancialOperation",
-        "feeMapping": "Fee Engine when fees present",
-        "fx": "book base from settings; amountInBase = amount × rate",
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
           "ln_transactions",
           "fin_*"
         ],
-        "transactionBoundary": "single SQLite transaction via withinTransaction",
+        "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation; no in-place rewrite",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
         "result": "operationId + domainResult",
         "errors": [],
         "fixtureRefs": [],
         "invariants": [
-          "posted journal ≥2 lines",
-          "balanced base"
-        ]
-      }
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "loan",
+        "maturity": "strongest"
+      },
+      "maturity": "strongest"
     },
     "loan.reversePayment": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.reversePayment",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Reverse a loan payment operation",
+        "requestFields": [
+          "operationId",
+          "originalOperationId"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "ln_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "strongest"
+      },
+      "maturity": "strongest"
     },
     "loan.generateSchedule": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.generateSchedule",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Persist schedule snapshot (may be non-posting)",
+        "requestFields": [
+          "loanId",
+          "engineVersion",
+          "calendarVersion"
+        ],
+        "validation": [],
+        "journalMapping": "none unless policy posts",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "loanId + schedule schema version",
+        "reversal": "n/a generate",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "strongest"
+      },
+      "maturity": "strongest"
     },
     "loan.previewSchedule": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.previewSchedule",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Preview schedule without persist",
+        "requestFields": [
+          "principal",
+          "rate",
+          "method",
+          "term"
+        ],
+        "validation": [],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [],
+        "transactionBoundary": "none (read/compute)",
+        "idempotency": "n/a pure function",
+        "reversal": "n/a",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "strongest"
+      },
+      "maturity": "strongest"
     },
     "accounts.create": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.create",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Create cash/bank/card account projection + optional opening balance path",
+        "requestFields": [
+          "operationId?",
+          "name",
+          "accountKind",
+          "currency",
+          "openingBalance?"
+        ],
+        "validation": [
+          "currency required",
+          "no silent IRR assume if omitted for opening"
+        ],
+        "journalMapping": "opening balance only when explicit",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "acc_accounts",
+          "fin_accounts?",
+          "fin_* if opening"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [
+          "ACCOUNT_*"
+        ],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "accounts.update": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.update",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Update non-financial metadata of an account",
+        "requestFields": [
+          "accountId",
+          "name?",
+          "status?"
+        ],
+        "validation": [
+          "cannot rewrite posted journal via update"
+        ],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "acc_accounts"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "accountId + payload hash",
+        "reversal": "n/a metadata",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "accounts.archive": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.archive",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Archive account only if journal balance is zero",
+        "requestFields": [
+          "accountId"
+        ],
+        "validation": [
+          "balance must be 0 in Decimal"
+        ],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "acc_accounts.is_archived",
+          "fin_accounts?"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [
+          "ACCOUNT_NONZERO_BALANCE"
+        ],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "accounts.transfer": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.transfer",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Transfer between two cash accounts",
+        "requestFields": [
+          "operationId",
+          "fromAccountId",
+          "toAccountId",
+          "amount",
+          "currency",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Dr to / Cr from (or explicit legs)",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "fin_*",
+          "acc_transactions projection"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [
+          "ACCOUNT_*",
+          "INV_*"
+        ],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "accounts.deposit": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.deposit",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "External cash in",
+        "requestFields": [
+          "operationId",
+          "accountId",
+          "amount",
+          "currency",
+          "businessDate",
+          "counterparty?"
+        ],
+        "validation": [],
+        "journalMapping": "Dr cash / Cr income or equity per policy",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "accounts.withdraw": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.withdraw",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "External cash out",
+        "requestFields": [
+          "operationId",
+          "accountId",
+          "amount",
+          "currency",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Dr expense/equity / Cr cash",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "income.create": {
       "owner": "docs/modules/income-expense.md",
       "capability": "income.create",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Record income event",
+        "requestFields": [
+          "operationId",
+          "amount",
+          "currency",
+          "categoryId?",
+          "accountId",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Dr cash / Cr income",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inc_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "expense.create": {
       "owner": "docs/modules/income-expense.md",
       "capability": "expense.create",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Record expense event",
+        "requestFields": [
+          "operationId",
+          "amount",
+          "currency",
+          "categoryId?",
+          "accountId",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Dr expense / Cr cash",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "exp_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "income.reverse": {
       "owner": "docs/modules/income-expense.md",
       "capability": "income.reverse",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Reverse prior income operation",
+        "requestFields": [
+          "operationId",
+          "originalOperationId"
+        ],
+        "validation": [],
+        "journalMapping": "inverse of original",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "inc_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "expense.reverse": {
       "owner": "docs/modules/income-expense.md",
       "capability": "expense.reverse",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Reverse prior expense operation",
+        "requestFields": [
+          "operationId",
+          "originalOperationId"
+        ],
+        "validation": [],
+        "journalMapping": "inverse of original",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "exp_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "cheque.register": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.register",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Register cheque instrument event",
+        "requestFields": [
+          "operationId",
+          "chequeNumber",
+          "amount",
+          "currency",
+          "dueDate",
+          "direction"
+        ],
+        "validation": [],
+        "journalMapping": "may create receivable/payable; not always cash",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "chq_*",
+          "fin_*?"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "cheque.deposit": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.deposit",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Deposit cheque toward clearing",
+        "requestFields": [
+          "operationId",
+          "chequeId",
+          "accountId",
+          "businessDate"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "chq_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "cheque.clear": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.clear",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Mark cheque cleared; cash effect if policy requires",
+        "requestFields": [
+          "operationId",
+          "chequeId",
+          "clearedDate"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "chq_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "cheque.bounce": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.bounce",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Bounce cheque; reverse pending cash if needed",
+        "requestFields": [
+          "operationId",
+          "chequeId",
+          "reason?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "chq_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "cheque.cancel": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.cancel",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Cancel cheque before clear",
+        "requestFields": [
+          "operationId",
+          "chequeId"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "chq_*",
+          "fin_*?"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "assets.register": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.register",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Register physical/non-investment asset",
+        "requestFields": [
+          "operationId?",
+          "name",
+          "category?",
+          "acquisitionCost?",
+          "currency?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "pa_*",
+          "fin_*?"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "assets.update": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.update",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Update asset metadata",
+        "requestFields": [
+          "assetId",
+          "name?",
+          "location?"
+        ],
+        "validation": [],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "assets.dispose": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.dispose",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Dispose asset with optional proceeds",
+        "requestFields": [
+          "operationId",
+          "assetId",
+          "proceeds?",
+          "currency?"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "pa_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "budget.set": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "budget.set",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Set budget period amounts (planning; not journal truth)",
+        "requestFields": [
+          "period",
+          "categoryId",
+          "amount",
+          "currency"
+        ],
+        "validation": [],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "bg_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "goal.create": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "goal.create",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Create savings/investment goal",
+        "requestFields": [
+          "name",
+          "targetAmount",
+          "currency",
+          "deadline?"
+        ],
+        "validation": [],
+        "journalMapping": "none",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "bg_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "bill.schedule": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "bill.schedule",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Schedule recurring bill reminder / obligation projection",
+        "requestFields": [
+          "name",
+          "amount",
+          "currency",
+          "dueRule"
+        ],
+        "validation": [],
+        "journalMapping": "none until pay",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "bg_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "tax.assess": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.assess",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Create tax obligation (assessment event)",
+        "requestFields": [
+          "operationId?",
+          "taxYear",
+          "amount",
+          "currency",
+          "kind"
+        ],
+        "validation": [],
+        "journalMapping": "Dr tax expense / Cr tax payable when posted",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "tax_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "tax.pay": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.pay",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Pay tax obligation — only path that can mark paid",
+        "requestFields": [
+          "operationId",
+          "taxRecordId",
+          "amount",
+          "currency",
+          "accountId",
+          "businessDate"
+        ],
+        "validation": [
+          "status paid only after successful payTax journal"
+        ],
+        "journalMapping": "Dr tax payable / Cr cash",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "tax_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     },
     "tax.adjust": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.adjust",
-      "status": "PARTIAL"
+      "status": "PARTIAL",
+      "card": {
+        "purpose": "Adjust assessment; not a silent paid flag",
+        "requestFields": [
+          "operationId",
+          "taxRecordId",
+          "deltaAmount",
+          "reason"
+        ],
+        "validation": [],
+        "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "tax_*",
+          "fin_*"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [],
+        "fixtureRefs": [],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": null,
+        "maturity": "baseline"
+      },
+      "maturity": "baseline"
     }
   },
   "consistency": {
     "rule": "status IMPLEMENTED = code path exists; not RELEASE-PROVEN / not FREEZE_PROVEN",
     "FREEZE_PROVEN": false,
     "requiredNext": [
-      "requestSchema",
-      "resultSchema",
-      "errorCodes",
-      "fixture"
+      "fixtureRefs for IMPLEMENTED",
+      "OpenAPI requestSchema files optional later"
+    ]
+  },
+  "matrix": {
+    "Accounts": [
+      "accounts.create",
+      "accounts.update",
+      "accounts.archive",
+      "accounts.transfer",
+      "accounts.deposit",
+      "accounts.withdraw"
+    ],
+    "Income": [
+      "income.create",
+      "income.reverse"
+    ],
+    "Expense": [
+      "expense.create",
+      "expense.reverse"
+    ],
+    "Cheque": [
+      "cheque.register",
+      "cheque.deposit",
+      "cheque.clear",
+      "cheque.bounce",
+      "cheque.cancel"
+    ],
+    "Loan": [
+      "loan.create",
+      "loan.recordPayment",
+      "loan.reversePayment",
+      "loan.generateSchedule",
+      "loan.previewSchedule"
+    ],
+    "Crypto": [
+      "crypto.buy",
+      "crypto.sell",
+      "crypto.transfer"
+    ],
+    "Stocks": [
+      "stocks.buy",
+      "stocks.sell",
+      "stocks.settle",
+      "stocks.dividend"
+    ],
+    "Funds": [
+      "funds.subscribe",
+      "funds.redeem",
+      "funds.distribute"
+    ],
+    "Metals": [
+      "metals.buy",
+      "metals.sell",
+      "metals.delivery"
+    ],
+    "Physical Assets": [
+      "assets.register",
+      "assets.update",
+      "assets.dispose"
+    ],
+    "Budget/Goals/Bills": [
+      "budget.set",
+      "goal.create",
+      "bill.schedule"
+    ],
+    "Tax": [
+      "tax.assess",
+      "tax.pay",
+      "tax.adjust"
     ]
   }
 }

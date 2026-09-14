@@ -32,6 +32,12 @@ for (const [feat, body] of Object.entries(features)) {
   }
 }
 
+for (const [id, cmd] of Object.entries(catalog.commands || {})) {
+  if (!cmd.card || !cmd.card.purpose) {
+    errors.push(`command ${id} missing card.purpose`);
+  }
+}
+
 if (errors.length) {
   console.error("command-catalog-check FAILED:");
   for (const e of errors) console.error(" -", e);

@@ -222,3 +222,49 @@ Legacy column `fin_operations.source` is **non-authoritative**; writers leave it
 
 ## Category hierarchy
 `cat_categories.parent_id` must not form a cycle (`assertNoCategoryCycle`).
+
+## 40. Pre-code accounting locks (single owner — never fork)
+
+### 8.1 Journal
+```
+Σ debit(amountInBase) = Σ credit(amountInBase)
+```
+Exact Decimal equality after conversion/rounding policy. Posted ops require ≥ 2 lines.
+
+### 8.2 FX
+```
+amountInBase = amount × exchangeRateToBase
+```
+`exchangeRateToBase` = base units per 1 transaction unit. Historical rates via `resolveStoredRate(asOf)` — never wall-clock latest.
+
+### 8.3 Base currency
+Book base from `db_meta.book_base_currency` (product default **IRR**).  
+Transaction currency must **never** silently become book base.
+
+### 8.4 Fees
+Every fee event must state:
+```
+economic meaning · cash effect · P&L/carrying effect · currency · amount|quantity · treatment
+```
+Core rejects missing treatment (`FEE_TREATMENT_REQUIRED`). Module defaults must be explicit and versioned.
+
+### 8.5 Cost basis
+WAC v1: deterministic, versioned, reversible, asOf-reproducible; quantity and carrying conservation tested.
+
+### 8.6 Reversal
+Never mutate posted historical amounts. Correct only by:
+```
+new operation + inverse journal + link to originalOperationId
+```
+
+### 8.7 Tax
+Tax cannot become paid by status mutation alone:
+```
+assessment → payable/obligation → tax.pay operation → journal → paid
+```
+
+### Relationship (accounting truth)
+```
+fin_operations → fin_journal_entries → fin_journal_lines → fin_accounts
+```
+Feature transactions link via `operationId`. Holdings are rebuildable projections — not unaudited cost SoT.

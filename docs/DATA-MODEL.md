@@ -115,3 +115,30 @@ Forbidden: accepted → not stored → not returned → not rejected.
 | `fin_journal_entries.post_state` | CACHE | No — integrity-scan only |
 | `fin_operations.source` | LEGACY | No — do not write |
 | `source_channel` / `source_type` / `source_reference` | RAW | Yes |
+
+## Relationship contracts (LOCKED)
+
+### Core accounting
+```
+fin_operations
+  └── fin_journal_entries
+        └── fin_journal_lines → fin_accounts
+```
+Only accounting truth for statements.
+
+### Feature event
+```
+feature transaction → operationId → fin_operations → journal
+```
+
+### Holding projection
+```
+ref_instruments → feature transactions → holding projection (rebuildable)
+```
+Holding is never unaudited cost SoT.
+
+### Import lineage
+```
+import_batch → raw_record → dedupe_key → normalized → operation → journal → provenance
+```
+Unknown source fields survive unless user chooses destructive transform.
