@@ -166,3 +166,16 @@ Forbidden: AUDIT → BUG DOC → FIX DOC → NEW MATRIX → NEW FINAL AUDIT.
 
 ## Vertical reference
 `modules/loan.md` is the practical 34-section template reference for other modules.
+
+## Forbidden restoration
+Never restore as normative files:
+```
+BUG-*.md · P0-*.md · GAP-*.md · AUDIT-*.md · VERDICT-*.md · MATRIX-*.md · FIX-*.md
+```
+History lives in Git. Capability proof lives in tests/fixtures. Live status in QUALITY-STATUS + registry.
+
+## Safe deletion checklist
+1 inventory · 2 classify · 3 code refs · 4 package scripts · 5 registry · 6 Git history · 7 replacement owner · 8 delete/rename · 9 docs validate · 10 schema/field gates · 11 tests
+
+Delete only if: no live reference + knowledge absorbed + no unique proof + no migration/packaging dependency.
+

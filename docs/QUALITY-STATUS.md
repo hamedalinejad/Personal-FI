@@ -48,3 +48,33 @@ Decimal/FX → Journal/invariants → Persistence → Loan→Crypto→Stocks→F
 ## 2026-09-14 — Final grammar lock (§8–13)
 Owner docs updated: FINANCIAL-CORE §20, API §10–12, OFFLINE §20, DATA-MODEL §20, modules loan/crypto/stocks/funds/metals/tax/accounts/cheque/income-expense/budget.
 Production remains **NO-GO** until browser offline + recovery golden matrix + freeze evidence.
+
+## FREEZE_PROVEN checklist
+```
+[ ] no dead live references
+[ ] no contradictory owner/registry status
+[ ] book base currency canonical
+[ ] cross-currency golden tests
+[ ] posted-only report boundary enforced
+[ ] fee capitalization balanced journal proof
+[ ] Iran calendar versioned/data-driven
+[ ] fund NAV ≠ transactionPrice contract
+[ ] metal purity identity
+[ ] delivery no-field-loss
+[ ] command field preservation machine-checked
+[ ] loan formulas explicit
+[ ] golden fixtures non-empty expected
+[ ] recovery matrix green
+[ ] standalone packs green
+[ ] browser adapter release proof (if shipping browser)
+[ ] command API schemas complete
+```
+Until all green: `FREEZE_PROVEN = false`. Production remains **NO-GO**.
+
+### Inventory vs coverage
+| Layer | Status |
+|-------|--------|
+| Schema inventory tooling | operational |
+| Command field coverage | PARTIAL |
+| Browser offline | OPEN |
+

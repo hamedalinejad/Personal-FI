@@ -31,3 +31,9 @@ Full golden suite PARTIAL until RELEASE_PROVEN.
 - **Unrealized P&L:** valuation(asOf) − cost basis; uses priceAsOf + fxAsOf context; never rewrites cost.
 - **Fees / FX gain:** separate attribution lines when reported.
 - Cash flows for TWR/MWR: explicit dated external flows only; formulas versioned in engineVersions.
+
+## Posted-only boundary (LOCKED)
+All standard statements (GL, TB, BS, IS, CF, account activity) read **posted** journal lines only via a shared reader.  
+Voided/reversal rows appear only in explicit audit/history modes.  
+Cash classification from `fin_accounts`; never from feature cash snapshot tables as Net Worth SoT.
+

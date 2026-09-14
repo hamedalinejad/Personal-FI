@@ -164,3 +164,14 @@ No in-place rewrite of posted amounts. Correction = **new** operation linked to 
 ### 20.7 Book base currency
 Book base is authoritative (`db_meta` / settings). Commands must not default base to transaction currency. Use `resolveBookBaseCurrency`.
 
+## 21. Fee capitalization journal rule
+If `feeTreatment = capitalize_inventory` (or equivalent), Fee Engine **must** emit balanced journal legs (e.g. Dr inventory / Cr cash or payable). Subledger cost change without journal legs is forbidden.
+
+## 22. Rounding policy table (v1)
+| Context | Rule |
+|---------|------|
+| Money storage | full decimal string; no silent float |
+| Loan schedule intermediate | Decimal; residual absorbed on final period |
+| Display | presentation only; does not rewrite stored values |
+| Journal balance | exact equality in base after conversion |
+

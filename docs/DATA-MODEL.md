@@ -78,3 +78,12 @@ That is a hard **no-field-loss** violation. Accept implies persist or explicit r
 ### Posted ledger deletion
 No `deletedAt` strategy may hide posted accounting history.
 
+## 21. Canonical book base currency
+Authority: book settings / `db_meta` (default IRR). Commands resolve via Core; never silent `baseCurrency = transactionCurrency`.
+
+## 22. Metals holding identity
+Scope key includes **purityRatio** when instrument policy requires purity segregation. Do not merge different purity lots without explicit policy.
+
+## 23. Legacy alias lifecycle
+Alias → normalize at API boundary → persist canonical only → document removal criterion after zero inbound use.
+

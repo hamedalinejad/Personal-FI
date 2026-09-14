@@ -92,3 +92,28 @@ Module files hold **feature-specific** behavior only. Global rules stay in globa
 ## Universal command contract (required fields)
 command ID · purpose · request fields · required/optional · types · units · currency · precision · normalization · defaults · identity · validation · journal mapping · fees · FX · cost basis · DB writes · transaction boundary · idempotency · reversal · result · errors · queries · reports · standalone · fixture · invariants · recovery  
 Detail per command lives in the owning `modules/<feature>.md` + API schemas when present.
+
+## Coding sequence (do not start UI first)
+```
+Phase 0  semantic freeze prep (owners, dead refs, field matrix, command schemas)
+Phase 1  numeric core (Decimal, precision, rounding, units, FX)
+Phase 2  accounting kernel (accounts, ops, journal, invariants, reversal, posted-only reports)
+Phase 3  persistence/recovery (SQLite atomicity, idempotency, crash, backup, single writer)
+Phase 4  reference vertical — Loan
+Phase 5  investment verticals — Crypto, Stocks, Funds, Metals
+Phase 6  remaining — Income/Expense, Cheque, Tax, Physical Assets, Budget/Goals/Bills
+Phase 7  browser/offline
+Phase 8  licensing/standalone proof
+Phase 9  UI
+```
+
+## Developer checklist (28 questions)
+Before coding a feature, answer from owner + module + schema + fixture only:
+owner · field kinds · identity · operationId · book base · tx currency · unit · precision · rounding · formula · FX asOf · fee roles · cost basis · P&L fees · journal legs · tables · transaction boundary · idempotency · reversal · asOf · standalone · license · errors · fixture · invariant · recovery · report impact · export survival.
+
+If any answer is missing → documentation not ready.
+
+## Scripts policy
+- `npm run gates` = release path
+- `schema:smoke` / `status:gen` = optional developer convenience; **not** normative authority
+
