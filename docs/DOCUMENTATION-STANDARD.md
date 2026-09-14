@@ -188,3 +188,7 @@ STANDARDIZE → CANONICALIZE → PROVE → FREEZE → CODE
 ```
 UI coding is last. Do not restore BUG/P0/AUDIT normative docs.
 
+## Snapshot
+Protected baseline tag: `personal-fi-pre-semantic-freeze-2026-09-14`.
+Minimal active tree = owner docs + modules + archive/AUDIT-HISTORY + docs/core machine files only.
+No new audit/P0/BUG/MATRIX Markdown authority files.

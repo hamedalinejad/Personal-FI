@@ -207,3 +207,36 @@ Keep concepts separate. Live production: **NO_GO** until RELEASE_PROVEN.
 ## §12–24 offline/standalone/UI/freeze (2026-09-14)
 Owner updates in OFFLINE-RELEASE · PRODUCT · ARCHITECTURE · DEVELOPMENT.
 Deleted: `scripts/generate-command-status-md.js` + `status:gen` (MD command matrix anti-pattern).
+
+## Maturity verdict (2026-09-14)
+| Area | Verdict |
+|------|---------|
+| Documentation architecture | GREEN |
+| Consolidation strategy | GREEN |
+| Six-route IA | GREEN |
+| Shared Core direction | GREEN |
+| Decimal / IRR-Toman | GREEN |
+| Operation / idempotency direction | GREEN / needs more proof |
+| Fee model | GOOD / keep module defaults explicit |
+| FX + journal invariants | Mostly enforced in Core — need golden depth |
+| Data identity constraints | Mostly enforced — keep integrity-audit |
+| Field preservation | PARTIAL |
+| Module command contracts | PARTIAL (cards exist; depth varies) |
+| Golden fixtures | PARTIAL |
+| Recovery proof | PARTIAL |
+| Browser offline | OPEN |
+| Standalone proof | PARTIAL |
+| Production | **NO-GO** |
+| UI coding | **WAIT** |
+
+## Next objective (not a new feature)
+```
+SEMANTIC FREEZE CLOSURE
+```
+Snapshot tag: `personal-fi-pre-semantic-freeze-2026-09-14`
+
+Already landed in prior commits (do not re-open as missing unless regression):
+command ID normalization · dead refs · catalog cards · FX/posted journal · fee defaults · stock fee fields · holding uniqueness · FX resolver · category cycle · offline/standalone docs.
+
+Still open for FREEZE_PROVEN:
+field-preservation machine coverage · non-empty goldens for all high-value families · executable recovery matrix · standalone packs · browser sql.js+IDB proof · request/result JSON schemas where still missing.

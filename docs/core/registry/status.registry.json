@@ -123,5 +123,7 @@
     "schema": [
       "FREEZE_PROVEN"
     ]
-  }
+  },
+  "snapshot_tag": "personal-fi-pre-semantic-freeze-2026-09-14",
+  "next_objective": "SEMANTIC_FREEZE_CLOSURE"
 }

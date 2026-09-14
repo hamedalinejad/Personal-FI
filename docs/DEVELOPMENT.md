@@ -223,3 +223,43 @@ Do not recreate removed consolidation files (old command-coverage MD, core micro
 | `status.registry.json` | implemented / proven / deferred / release / owners |
 | `command-catalog.json` | public commands, cards, capability, fixtures/tests |
 | `requirements-matrix.json` | requirement id, owner define path, status, evidence |
+
+## Implementation order (LOCKED)
+```
+Phase 0  Tag snapshot (personal-fi-pre-semantic-freeze-2026-09-14)
+Phase 1  Registry normalization
+Phase 2  Core math closure
+Phase 3  Schema integrity closure
+Phase 4  Field-preservation closure
+Phase 5  Module completion (real content, not placeholders)
+Phase 6  Golden proof (non-empty fixtures)
+Phase 7  Recovery proof (executable matrix)
+Phase 8  Standalone proof (one pack per edition)
+Phase 9  Browser proof (sql.js + IndexedDB + single-writer)
+Phase 10 Semantic freeze → FREEZE_PROVEN=true
+Phase 11 Accounting kernel coding (Core before UI)
+Phase 12 Feature coding (Loan reference first, then investments)
+Phase 13 UI (six routes + sheets/drawers only)
+```
+Do not skip phases. Do not start UI before Phase 10.
+
+## “Developer must not invent economics” (LOCKED)
+A command is not ready if the implementer still has to decide any of:
+```
+which dates matter · book base · FX · fee owner/treatment · cost-basis effect
+journal legs · what is stored/returned · reversal · exact error · rounding
+missing provider · crash · standalone behavior
+```
+Those answers live in: FINANCIAL-CORE + module owner + command-catalog card + schema + fixture.
+
+## Forbidden next actions
+```
+another FINAL-AUDIT / P0 register / BUG register / Markdown command matrix
+another architecture or accounting “master” document
+page-per-feature · second cash ledger · per-edition accounting kernel
+restoring deleted archive authority docs into active tree
+```
+
+## Philosophy (LOCKED)
+Complexity in Financial Core + proof · simplicity in UI · precision in accounting ·
+flexibility in features · independence in standalone · history in Git.
