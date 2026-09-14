@@ -49,7 +49,33 @@ export async function buyMetal(input, { dataDir } = {}) {
   const purity = toDecimal(p.purityRatio);
   if (purity.lte(0) || purity.gt(1)) throw new Error("VALIDATION_ERROR:purityRatio_range");
   const fine = grossMg.times(purity); // fineWeightMg
-  const metalCost = fine.times(toDecimal(unitPrice));
+
+  // Quote semantics (explicit — never silent pure vs gross confusion)
+  const quoteBasis = p.quoteBasis || "pure_metal"; // pure_metal | gross_weight | coin_market | bar
+  const priceUnit = p.priceUnit || "per_mg"; // per_mg | per_g
+  const pricePurityBasis = p.pricePurityBasis || (quoteBasis === "pure_metal" ? "fine" : "gross");
+  const allowedQuote = new Set(["pure_metal", "gross_weight", "coin_market", "bar"]);
+  const allowedUnit = new Set(["per_mg", "per_g"]);
+  const allowedPurityBasis = new Set(["fine", "gross"]);
+  if (!allowedQuote.has(quoteBasis)) throw new Error("VALIDATION_ERROR:quoteBasis");
+  if (!allowedUnit.has(priceUnit)) throw new Error("VALIDATION_ERROR:priceUnit");
+  if (!allowedPurityBasis.has(pricePurityBasis)) throw new Error("VALIDATION_ERROR:pricePurityBasis");
+  if (quoteBasis === "pure_metal" && pricePurityBasis !== "fine") {
+    throw new Error("VALIDATION_ERROR:quoteBasis_pricePurityBasis");
+  }
+  if (quoteBasis === "gross_weight" && pricePurityBasis !== "gross") {
+    throw new Error("VALIDATION_ERROR:quoteBasis_pricePurityBasis");
+  }
+  if ((quoteBasis === "coin_market" || quoteBasis === "bar") && !p.instrumentQuoteLocked) {
+    // coin/bar market quotes must not be auto-derived from pure metal without explicit lock
+    if (pricePurityBasis === "fine" && !p.allowFineDerivedCoinPrice) {
+      throw new Error("VALIDATION_ERROR:coin_bar_requires_explicit_policy");
+    }
+  }
+  let pricePerMg = toDecimal(unitPrice);
+  if (priceUnit === "per_g") pricePerMg = pricePerMg.div("1000");
+  const massForPrice = pricePurityBasis === "fine" ? fine : grossMg;
+  const metalCost = massForPrice.times(pricePerMg);
   const premium = toDecimal(p.premiumAmount ?? p.premium ?? "0");
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
@@ -163,6 +189,9 @@ export async function buyMetal(input, { dataDir } = {}) {
       holdingId,
       transactionId: txId,
       fineWeight: fine.toFixed(),
+      quoteBasis,
+      priceUnit,
+      pricePurityBasis,
       fineWeightMg: fine.toFixed(),
       quantityMg: grossMg.toFixed(),
       metalCost: metalCost.toFixed(),

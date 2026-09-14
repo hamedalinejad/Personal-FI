@@ -369,7 +369,8 @@ async function persistOperationJson(record, dir) {
   // shared validity gate with SQLite path
   if (!record.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!record.baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
-  const id = record.operationId || randomUUID();
+  if (!record.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
+  const id = record.operationId;
   const journalLines = record.journalLines || [];
   if (journalLines.length) assertJournalBalanced(journalLines);
   for (const line of journalLines) {

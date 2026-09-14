@@ -119,3 +119,12 @@ gross weight (quantityMg RAW) · purityRatio RAW · fineWeight DERIVED · option
 
 ### Holding identity (P0)
 `platform_id + instrument_id + purity_ratio` — incompatible purities never share one aggregate row without an explicit product policy.
+
+### Quote basis (required semantics)
+| quoteBasis | pricePurityBasis | meaning |
+|------------|------------------|---------|
+| pure_metal | fine | price × fineWeightMg |
+| gross_weight | gross | price × gross mg |
+| coin_market / bar | explicit policy | no silent pure-metal derivation |
+
+`priceUnit`: `per_mg` | `per_g`.

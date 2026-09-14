@@ -241,48 +241,23 @@ export async function settleStock(input, { dataDir } = {}) {
         systemRole: "cash",
       });
 
-      // Persist settlement event on stocks subledger when columns exist
-      try {
-        const cols = db.prepare(`PRAGMA table_info(inv_stocks_iran_transactions)`).all().map((c) => c.name);
-        const hasRelated = cols.includes("related_operation_id");
-        if (hasRelated) {
-          db.prepare(
-            `INSERT INTO inv_stocks_iran_transactions (
-              id, operation_id, brokerage_id, instrument_id, tx_type, trade_date, settlement_date,
-              quantity, price, currency, related_operation_id, created_at
-            ) VALUES (?, ?, ?, ?, 'settlement', ?, ?, '0', '0', ?, ?, ?)`,
-          ).run(
-            settleTxId,
-            operationId,
-            brokerageId,
-            tradeTx.instrument_id,
-            p.businessDate,
-            settlementDate,
-            currency,
-            p.originalTradeOperationId,
-            now,
-          );
-        } else {
-          db.prepare(
-            `INSERT INTO inv_stocks_iran_transactions (
-              id, operation_id, brokerage_id, instrument_id, tx_type, trade_date, settlement_date,
-              quantity, price, currency, created_at
-            ) VALUES (?, ?, ?, ?, 'settlement', ?, ?, '0', '0', ?, ?)`,
-          ).run(
-            settleTxId,
-            operationId,
-            brokerageId,
-            tradeTx.instrument_id,
-            p.businessDate,
-            settlementDate,
-            currency,
-            now,
-          );
-        }
-      } catch (e) {
-        // If settlement tx_type not in CHECK, skip subledger row (journal remains SoT)
-        if (!String(e.message || e).includes("CHECK")) throw e;
-      }
+      // Locked schema contract: related_operation_id + settlement tx_type always present
+      db.prepare(
+        `INSERT INTO inv_stocks_iran_transactions (
+          id, operation_id, brokerage_id, instrument_id, tx_type, trade_date, settlement_date,
+          quantity, price, currency, related_operation_id, created_at
+        ) VALUES (?, ?, ?, ?, 'settlement', ?, ?, '0', '0', ?, ?, ?)`,
+      ).run(
+        settleTxId,
+        operationId,
+        brokerageId,
+        tradeTx.instrument_id,
+        p.businessDate,
+        settlementDate,
+        currency,
+        p.originalTradeOperationId,
+        now,
+      );
     },
   });
 }
