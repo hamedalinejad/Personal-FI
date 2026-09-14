@@ -20,7 +20,6 @@
     "docs:consistency": "node scripts/docs-consistency.js",
     "lint:money-sql": "node scripts/lint-no-sql-sum-money.js",
     "status:check": "node scripts/status-registry-check.js",
-    "status:gen": "node scripts/generate-command-status-md.js",
     "requirements:check": "node scripts/requirements-matrix-check.js",
     "schema:inventory:soft": "node scripts/field-inventory-verify.js",
     "fixture:empty": "node scripts/fixture-empty-check.js",

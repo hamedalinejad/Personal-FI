@@ -151,3 +151,29 @@ License limits **capability**, never deletes history.
 ## Non-goals
 Not ERP · not broker OMS · not HFT · not cloud-first SaaS · not one cash ledger per feature · not a page per table.
 
+## Six routes (LOCKED) — Feature ≠ Page
+```
+/
+/money
+/transactions
+/investments
+/loans
+/more
+```
+No top-level route per table or per feature package. Sheets/drawers under the six routes only.
+
+## Standalone editions (LOCKED)
+```
+Loan-only · Crypto-only · Stocks-only · Funds-only · Metals-only · Full
+```
+Every edition shares: Decimal · FX · Fee · Journal · Recovery · Persistence ports.
+
+Licensing controls only: capability · UI availability · command availability.  
+**Never deletes data** on downgrade.
+
+### Standalone acceptance pattern (per edition)
+```
+boot → create entity → representative financial operation → statement
+  → export → backup → restore → rebuild → verify same result
+```
+Required for `STANDALONE_GREEN` per edition.

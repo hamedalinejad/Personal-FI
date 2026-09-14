@@ -191,3 +191,35 @@ costBasis, dbWrites, transactionBoundary, idempotency, reversal,
 result, errors, fixtureRefs, invariants
 ```
 Human module file remains **one file per module**; cards live in the catalog.
+
+## Freeze blockers A–H (live checklist — not a second requirements system)
+
+| Blocker | Theme | Status (2026-09-14) |
+|---------|--------|---------------------|
+| **A** Machine contracts | command naming, full catalog, dead refs, owners, verify refs | **Mostly green** — catalog 42+cards; dead refs cleaned; keep guarding |
+| **B** Core financial math | FX equation, posted journal, fee treatment, account currency, rounding | **Mostly green** — continue golden coverage |
+| **C** Data integrity | holding uniqueness, rate resolver, post_state cache rules | **Mostly green** — integrity-audit + indexes |
+| **D** No-field-loss | every supported command field map | **PARTIAL** — stocks/metals/crypto improved; full matrix open |
+| **E** Module contract depth | command-level detail in module files | **PARTIAL** — investment locks added; baseline modules thinner |
+| **F** Proof packs | non-empty golden fixtures | **PARTIAL** |
+| **G** Recovery executable | matrix → tests | **PARTIAL** |
+| **H** Standalone packs | one proof pack per edition | **PARTIAL** |
+
+`FREEZE_PROVEN` requires A–H green. Do not start UI until freeze policy says so.
+
+## Files that must not be deleted
+Owner docs (`PRODUCT`…`QUALITY-STATUS`), all `docs/modules/*`, machine proof under `docs/core/**`, fixtures/tests.  
+Do not recreate removed consolidation files (old command-coverage MD, core micro-docs); recover unique rules via Git → absorb into owners.
+
+## Delete policy
+- `scripts/generate-command-status-md.js` — **removed** (Markdown matrix forbidden; machine JSON only).
+- `durableMemoryAdapter` — **keep** until sql.js+IDB RELEASE_PROVEN.
+- `archivedZeroBalance` — **keep** (integrity tests depend on it).
+- `registry.index.json` — optional; keep if `scripts/registry-index.js` consumers exist.
+
+## Registry roles (no job overlap)
+| Registry | Answers |
+|----------|---------|
+| `status.registry.json` | implemented / proven / deferred / release / owners |
+| `command-catalog.json` | public commands, cards, capability, fixtures/tests |
+| `requirements-matrix.json` | requirement id, owner define path, status, evidence |

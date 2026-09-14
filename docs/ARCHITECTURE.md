@@ -138,3 +138,25 @@ UI → public-api only
 ```
 Forbidden: UI → repository · UI → SQL · UI → journal writer.
 
+## Command implementation pattern (LOCKED)
+No feature bypasses this flow:
+```
+UI / importer
+  → Feature Public API
+  → normalize
+  → validate
+  → resolve identity
+  → resolve book base
+  → resolve FX
+  → build fee events
+  → calculate domain effects
+  → build journal
+  → run Core invariants
+  → single atomic transaction
+  → persist operation + domain rows
+  → commit
+  → durable ACK
+  → canonical result envelope
+  → rebuild / projection refresh
+```
+Feature packages may contain `commands/ queries/ public-api/ domain/ tests/ fixtures/` without a new top-level route.

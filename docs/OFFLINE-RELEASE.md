@@ -124,3 +124,39 @@ crash before commit · crash after SQL · same operationId replay · same ID + c
 
 `loadOperation` must always overlay `journalLines` from relational tables when present.
 
+## Restore pipeline (LOCKED)
+```
+validate package (formatVersion, schemaVersion, checksums)
+  → stage to temp location
+  → integrity-check (schema + journal invariants scan)
+  → atomic replace of working DB
+  → re-open
+  → verify (sample ops + TB balance)
+```
+Never overwrite a working database before validation passes.
+Corrupt backup → reject; leave live DB untouched.
+
+## Executable recovery proof
+Each recovery-matrix row must have a **fixture or automated test result**, not prose alone, before `RECOVERY_GREEN`.
+
+| Scenario | Proof target |
+|----------|----------------|
+| crash before commit | acceptance/recovery test |
+| crash after SQL commit | acceptance/recovery test |
+| replay same operation | idempotency test |
+| same ID + changed economics | conflict test |
+| offline reopen | reopen test |
+| backup / restore | backup.test.js family |
+| corrupt backup | reject test |
+| browser reload | browser adapter proof |
+| multi-tab write | WRITER_REQUIRED test |
+| rebuild | rebuild determinism |
+| reversal | inverse journal test |
+
+## Browser target vs protocol
+| Layer | Role |
+|-------|------|
+| `sql.js + IndexedDB + single-writer` | **release target** |
+| `durableMemoryAdapter` | protocol/harness only — **not** browser RELEASE_PROVEN |
+
+Keep durable-memory until sql.js+IDB is proven; do not delete for file-count reduction.

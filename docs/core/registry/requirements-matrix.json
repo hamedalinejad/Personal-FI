@@ -8,8 +8,7 @@
       "status": "IMPLEMENTED",
       "define": [
         "docs/core/registry/status.registry.json",
-        "scripts/status-registry-check.js",
-        "scripts/generate-command-status-md.js"
+        "scripts/status-registry-check.js"
       ],
       "evidence": "status:check CI"
     },

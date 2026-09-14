@@ -195,3 +195,15 @@ Gate: `npm run command:catalog` requires `card.purpose` on every command.
 Owner modules updated: crypto, stocks, funds, metals, loan + REPORTING.
 Deferred lists explicit (crypto deposit/withdraw/swap/airdrop; stock CA family; TWR/MWR; loan borrower/variable rate).
 No new BUG/P0 markdown files.
+
+## Status dimensions (dashboard only — not a second requirements system)
+```
+SPEC_ONLY · SCAFFOLD · IMPLEMENTED · INTEGRATED
+UNPROVEN · GOLDEN_GREEN · RECOVERY_GREEN · STANDALONE_GREEN · RELEASE_PROVEN
+NO_GO · CONDITIONALLY_GO · GO
+```
+Keep concepts separate. Live production: **NO_GO** until RELEASE_PROVEN.
+
+## §12–24 offline/standalone/UI/freeze (2026-09-14)
+Owner updates in OFFLINE-RELEASE · PRODUCT · ARCHITECTURE · DEVELOPMENT.
+Deleted: `scripts/generate-command-status-md.js` + `status:gen` (MD command matrix anti-pattern).

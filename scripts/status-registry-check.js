@@ -43,30 +43,4 @@ for (const [feat, body] of Object.entries(reg.features || {})) {
   }
 }
 
-// Check FEATURE-COMMAND-STATUS.md does not claim opposite of registry for stocks.settle
-const statusMd = join(root, "docs/core/command-coverage/FEATURE-COMMAND-STATUS.md");
-if (existsSync(statusMd)) {
-  const text = readFileSync(statusMd, "utf8");
-  for (const [cmd, st] of Object.entries(commands)) {
-    if (st === "IMPLEMENTED") {
-      // if doc says settle incomplete as command — fail only if explicit NOT
-      const neg = new RegExp(`${cmd.replace(".", "\\.")}.*NOT.?IMPLEMENTED`, "i");
-      if (neg.test(text)) {
-        console.error(`conflict: ${cmd} IMPLEMENTED in registry but negated in FEATURE-COMMAND-STATUS`);
-        process.exit(1);
-      }
-    }
-  }
-}
-
-// OPEN-REQUIREMENTS should not say stocks.settle command missing if registry IMPLEMENTED
-const openReq = join(root, "docs/core/authority/OPEN-REQUIREMENTS-RELEASE.md");
-if (existsSync(openReq)) {
-  const t = readFileSync(openReq, "utf8");
-  if (/stocks\.settle.*not implemented/i.test(t) && commands["stocks.settle"] === "IMPLEMENTED") {
-    console.error("OPEN-REQUIREMENTS contradicts stocks.settle IMPLEMENTED");
-    process.exit(1);
-  }
-}
-
 console.log("status-registry-check: OK", Object.keys(commands).length, "commands");
