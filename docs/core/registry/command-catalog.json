@@ -1079,7 +1079,10 @@
           "metalPricePerMg",
           "premium?",
           "fee?",
-          "quoteBasis?"
+          "quoteBasis?",
+          "serial?",
+          "certificate?",
+          "location?"
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1134,7 +1137,9 @@
         "businessRules": [
           "fineWeight = grossMass × purityRatio",
           "quoteBasis required",
-          "purity required unless fixed_1 instrument"
+          "purity required unless fixed_1 instrument",
+          "serial/certificate/location: RAW optional provenance; not holding identity",
+          "coin: no auto fine-metal valuation unless quoteBasis metal_equivalent"
         ],
         "queries": [],
         "reports": [
@@ -1297,7 +1302,11 @@
           "feeAmount?",
           "feeCurrency?",
           "deliveryAddress?",
-          "invoiceRef?"
+          "invoiceRef?",
+          "serial?",
+          "certificate?",
+          "location?",
+          "quoteBasis?"
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1351,7 +1360,9 @@
         "identity": "operationId + canonical economic hash",
         "businessRules": [
           "PhysicalDeliveryInput: all accepted fields persisted or rejected",
-          "delivery fee separate"
+          "delivery fee separate",
+          "serial/certificate/location: RAW optional provenance; not holding identity",
+          "coin: no auto fine-metal valuation unless quoteBasis metal_equivalent"
         ],
         "queries": [],
         "reports": [

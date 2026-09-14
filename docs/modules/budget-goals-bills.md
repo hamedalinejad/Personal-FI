@@ -117,3 +117,7 @@ Planning only — no journal truth. Full edition. Does not block standalone loan
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Projection vs accounting (LOCKED)
+Budget/goals/bills are **planning/projection only**.  
+A projection **never** writes accounting truth until a financial command creates an operation/journal.
+

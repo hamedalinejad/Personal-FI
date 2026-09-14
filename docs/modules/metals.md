@@ -196,3 +196,12 @@ Proof path: `src/features/metals/tests/standalone.test.js`
 
 `trade fee ≠ delivery fee`.
 
+## Serial / certificate / location field policy (LOCKED direction)
+| Field | Kind | Identity? | After post | Export |
+|-------|------|-----------|------------|--------|
+| serial | RAW optional | no (provenance) | immutable if linked to posted delivery/buy | yes |
+| certificate | RAW optional | no | immutable when posted | yes |
+| location | RAW optional / updatable label | no | may update via non-financial command if policy allows | yes |
+
+Coins: valuation from **instrument unit price**, not auto fine-metal derivation, unless explicit analytical `quoteBasis=metal_equivalent`.
+

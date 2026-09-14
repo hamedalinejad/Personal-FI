@@ -117,3 +117,7 @@ Tax ships with **Full**. `tax.pay` is the only path to paid. Standalone investme
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Jurisdiction policy (LOCKED)
+Core tax engine is **generic** (assess → obligation → payTax → journal → paid).  
+Iran-specific rates/calendars/rules live in **versioned module/policy data**, not hardcoded Financial Core.
+

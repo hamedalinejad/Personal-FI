@@ -160,3 +160,19 @@ Each recovery-matrix row must have a **fixture or automated test result**, not p
 | `durableMemoryAdapter` | protocol/harness only — **not** browser RELEASE_PROVEN |
 
 Keep durable-memory until sql.js+IDB is proven; do not delete for file-count reduction.
+
+## Backup package fields (machine contract — no separate BACKUP-SPEC.md)
+```
+formatVersion · schemaVersion · database payload · metadata
+checksums · createdAt · engineVersions
+restore validation · atomic replace · integrity result
+```
+Flow: validate → stage temp → integrity scan → atomic replace → reopen → verify.  
+Corrupt backup must leave live DB untouched.
+
+## Recovery proof checklist
+crash before commit · after SQL commit · same-op replay · ID+changed economics · offline reopen · backup · restore · corrupt backup · browser reload · multi-tab write · rebuild · reversal.
+
+## Browser adapters
+`durableMemoryAdapter` = protocol harness until `sql.js + IndexedDB + single-writer` is RELEASE_PROVEN. **Do not delete** for file-count reduction.
+

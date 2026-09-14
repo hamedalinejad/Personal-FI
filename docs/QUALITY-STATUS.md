@@ -301,3 +301,8 @@ Inventory: regenerated + `inventory:check`. Regression = code + test, not new au
 | Stocks CA deferred + policy data path | LOCKED |
 | Funds distribution field list | PARTIAL contract listed |
 | Iran holiday package files | OPEN (path `data/policy/iran/`) |
+
+## Sections 18–26 closure (this pass)
+Metals serial/coin policy · income/cheque/tax/assets/budget depth markers · reporting TWR deferred · offline recovery/backup package fields · API catalog authority · STANDALONE_GREEN path · licensing control plane · forbidden extra MD authorities — locked in owners.  
+R-M27 command schemas · full recovery matrix · browser IndexedDB · license RELEASE — remain OPEN/PARTIAL as before.
+

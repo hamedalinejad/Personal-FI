@@ -190,3 +190,22 @@ Sheets/drawers under these routes only. No route per table or per feature packag
 ## Accounting stance
 Financial truth rules and **forbidden anti-patterns** live only in [FINANCIAL-CORE.md](./FINANCIAL-CORE.md).  
 Modules must not invent a second cash or cost ledger.
+
+## STANDALONE_GREEN meaning (LOCKED)
+Not merely `standalone.test.js` existence. Full path must pass:
+```
+boot → create entity → representative operation → statement
+→ export → backup → restore → rebuild → same result
+```
+
+## Licensing control plane (LOCKED)
+License gates **capabilities and UI only** — never journal semantics, never history deletion.  
+Downgrade: capability unavailable; historical data remains readable/exportable.  
+
+Before RELEASE of license enforcement define (in PRODUCT + machine registry, not new MD files):
+```
+edition ID · capabilities · entitlement · local validation
+offline grace (if any) · upgrade · downgrade · expiry behavior
+historical readability · backup compatibility
+```
+

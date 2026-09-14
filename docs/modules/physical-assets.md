@@ -114,3 +114,11 @@ Physical assets ship with **Full** / More. Metals-only uses metals module for bu
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Valuation model (LOCKED direction)
+Track separately where applicable:
+```
+acquisition cost · improvements · maintenance · insurance
+fair-value / manual valuation · impairment · disposal
+```
+Valuation snapshots are **never cash truth**. Cash only via journal operations.
+

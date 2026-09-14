@@ -66,3 +66,11 @@ Derived only — never a second ledger.
 | MWR / IRR | **DEFERRED** for v1 unless engineVersions ship a locked formula |
 
 Registry must keep TWR/MWR as DEFERRED until formulas + fixtures exist — do not imply completeness from report names alone.
+
+## Performance metrics scope (LOCKED)
+v1: realized P&L · unrealized P&L · FX attribution · fee attribution.  
+**TWR / MWR / IRR = DEFERRED** until formulas + fixtures locked.  
+Report name alone does not imply metric support.
+
+Standard statements consume **posted** journal only; voids/reversals in explicit audit/history views.
+

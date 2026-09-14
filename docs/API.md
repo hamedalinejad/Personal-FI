@@ -90,3 +90,8 @@ Errors use `errors[].code`; feature-specific codes in `details.featureCode` when
 UI may hide Accounts; kernel remains. Licensing disables capability — **never deletes history**.
 Required always: backup, restore, statement, export, reversal, asOf, rebuild.
 
+## Command contract authority (LOCKED)
+Per-command request/result economics live in `docs/core/registry/command-catalog.json` cards (OpenAPI-like offline domain contracts).  
+Shared JSON schemas only: api-envelope · operation-result · schedule-snapshot.  
+Future HTTP OpenAPI is a **projection** of the catalog — not a second business authority.
+

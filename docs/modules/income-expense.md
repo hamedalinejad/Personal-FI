@@ -118,3 +118,12 @@ Income/Expense ship with **Full** (and money surfaces). Not a separate licensed 
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Completion checklist (Full edition)
+Must specify before RELEASE for this module:
+- category ownership · payee/counterparty
+- recurring rule vs actual transaction
+- attachment/document lineage · tax linkage
+- source/provenance · reversal · import dedupe
+
+UI: sheets under `/money` and `/transactions` only — no extra routes.
+

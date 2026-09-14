@@ -120,3 +120,14 @@ Cheque ships with **Full**. No separate edition in v1. Journal legs via Core onl
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Transition accounting matrix (must be explicit)
+| Transition | Informational only? | Payable/receivable reclass? | Cash movement? | Reversal/correction? |
+|------------|---------------------|----------------------------|----------------|----------------------|
+| issued/received → deposited | often no | maybe | maybe | no |
+| → cleared | no | yes | yes (typical) | no |
+| → bounced | no | yes | maybe reverse prior | possible correction op |
+| → cancelled | depends | yes | no new cash if never cleared | correction if needed |
+| → returned | no | yes | policy-defined | possible |
+
+Each transition command card must mark which of the four columns apply. Pure status-only transitions that skip journal when cash actually moved are forbidden.
+
