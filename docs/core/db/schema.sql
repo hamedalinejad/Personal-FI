@@ -276,6 +276,9 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
   created_at      TEXT NOT NULL,
   updated_at      TEXT NOT NULL
 );
+-- Holding identity: instrument + venue + network (NULL network = offchain sentinel in index)
+CREATE UNIQUE INDEX IF NOT EXISTS uq_crypto_holdings_identity
+  ON inv_crypto_holdings(exchange_id, instrument_id, ifnull(network_id, ''));
 
 -- CRYPTO-002: Holding identity is explicit and includes venue
 -- - Exchange → Wallet transfer creates NEW holding identity (not same holding)
@@ -721,6 +724,10 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   quantity TEXT,
   price TEXT,
   fee_amount TEXT,
+  fee_commission TEXT,
+  fee_tax TEXT,
+  fee_other TEXT,
+  fee_treatments_json TEXT,
   currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   created_at TEXT NOT NULL
@@ -778,6 +785,8 @@ CREATE TABLE IF NOT EXISTS inv_fif_holdings (
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS uq_fif_holdings_scope
+  ON inv_fif_holdings(instrument_id, ifnull(account_id, ''), ifnull(brokerage_id, ''));
 
 CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   id TEXT PRIMARY KEY,
@@ -826,7 +835,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity_mg TEXT NOT NULL, -- SoT mass (gross weight, mg canonical)
   purity_code TEXT, -- e.g. 24k, 18k, 750, 999, emami, bahar
-  purity_ratio TEXT, -- decimal 0-1 for fine weight derivation: quantity_mg * purity_ratio
+  purity_ratio TEXT CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL) > 0 AND CAST(purity_ratio AS REAL) <= 1)), -- 0-1 exclusive of 0
   total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
   average_cost_per_mg TEXT, -- DERIVED: cost-basis engine rebuild only, -- derived / maintained by cost-basis engine
@@ -835,7 +844,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_metals_holdings_platform_instrument_purity
-  ON inv_metals_holdings(platform_id, instrument_id, purity_ratio);
+  ON inv_metals_holdings(platform_id, instrument_id, ifnull(purity_ratio, ''));
 
 CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   id TEXT PRIMARY KEY,

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 // createHash via crypto;
 import { DatabaseSync } from "node:sqlite";
-import { assertJournalBalanced } from "../domain/invariants/index.js";
+import { assertJournalBalanced, assertPostedHasJournal } from "../domain/invariants/index.js";
 import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
 import { ensureSchemaSync } from "../db/migration.js";
 
@@ -92,6 +92,7 @@ function persistOperationSqlite(record, dir) {
   if (!["draft", "posted", "voided", "failed"].includes(status)) {
     throw new Error(`OP_STATUS_INVALID:${status}`);
   }
+  assertPostedHasJournal(status, journalLines);
 
   const db = openDb(dir);
   const now = new Date().toISOString();
@@ -373,14 +374,15 @@ async function persistOperationJson(record, dir) {
   if (!record.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const id = record.operationId;
   const journalLines = record.journalLines || [];
+  const status = record.status || "posted";
+  assertPostedHasJournal(status, journalLines);
   if (journalLines.length) assertJournalBalanced(journalLines);
   for (const line of journalLines) {
     if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
-    if ((record.status || "posted") === "posted" && (line.amountInBase == null || line.amountInBase === "")) {
+    if (status === "posted" && (line.amountInBase == null || line.amountInBase === "")) {
       throw new Error("INV_JOURNAL_MISSING_AMOUNT_IN_BASE");
     }
   }
-  const status = record.status || "posted";
   const body = {
     operationId: id,
     commandHash: record.commandHash,

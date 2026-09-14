@@ -1,5 +1,5 @@
 {
-  "schemaHash": "e95a18e17621456333874df113efee1a6b60cf3137abfa876afa91b9468a6cf0",
+  "schemaHash": "d342a238caf54ff037e6da2856850ee255f40deaf4b086efb8d201682d9707b2",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -3970,6 +3970,16 @@
       ],
       "indexes": [
         {
+          "name": "uq_crypto_holdings_identity",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "exchange_id",
+            "instrument_id",
+            null
+          ]
+        },
+        {
           "name": "sqlite_autoindex_inv_crypto_holdings_1",
           "unique": true,
           "origin": "pk",
@@ -4606,6 +4616,16 @@
       ],
       "indexes": [
         {
+          "name": "uq_fif_holdings_scope",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "instrument_id",
+            null,
+            null
+          ]
+        },
+        {
           "name": "sqlite_autoindex_inv_fif_holdings_1",
           "unique": true,
           "origin": "pk",
@@ -4874,7 +4894,7 @@
           "columns": [
             "platform_id",
             "instrument_id",
-            "purity_ratio"
+            null
           ]
         },
         {
@@ -4886,7 +4906,9 @@
           ]
         }
       ],
-      "checks": []
+      "checks": [
+        "CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL)"
+      ]
     },
     "inv_metals_physical_deliveries": {
       "columns": [
@@ -5714,6 +5736,34 @@
         },
         {
           "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_commission",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_tax",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_other",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_treatments_json",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-13",
+  "updated": "2026-09-14",
   "rule": "Live define paths must resolve to current owners or machine files. Historical paths are not active.",
   "requirements": {
     "R-M01": {
@@ -274,8 +274,9 @@
     }
   },
   "related_contracts": {
-    "data_model_relationships": "docs/core/authority/DATA-MODEL-RELATIONSHIP-CONTRACT.md",
-    "field_preservation": "docs/core/authority/FIELD-PRESERVATION-PROTOCOL.md",
-    "accounting_calculation": "docs/core/authority/ACCOUNTING-CALCULATION-MASTER-RULES.md"
+    "data_model_relationships": "docs/DATA-MODEL.md",
+    "field_preservation": "docs/DATA-MODEL.md",
+    "accounting_calculation": "docs/FINANCIAL-CORE.md",
+    "command_catalog": "docs/core/registry/command-catalog.json"
   }
 }

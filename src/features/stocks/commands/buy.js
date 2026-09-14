@@ -47,9 +47,9 @@ export async function buyStock(input, { dataDir } = {}) {
 
   const feeEvents = buildFeeEvents(
     [
-      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "capitalized_cost", label: "commission", feeCurrency: currency },
-      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "capitalized_cost", label: "tax", feeCurrency: currency },
-      { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || "capitalized_cost", label: "otherFee", feeCurrency: currency },
+      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "capitalize_inventory", label: "commission", feeCurrency: currency },
+      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "capitalize_inventory", label: "tax", feeCurrency: currency },
+      { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || "capitalize_inventory", label: "otherFee", feeCurrency: currency },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );

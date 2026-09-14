@@ -29,7 +29,8 @@
     "stocks.sell": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.sell",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "notes": "Non-zero fees require explicit *Treatment; fee_commission/tax/other persisted"
     },
     "stocks.settle": {
       "owner": "docs/modules/stocks.md",
@@ -52,5 +53,15 @@
       "status": "IMPLEMENTED"
     }
   },
-  "notes": "requestSchema/resultSchema filled as FREEZE prep; not RELEASE-PROVEN"
+  "notes": "requestSchema/resultSchema filled as FREEZE prep; not RELEASE-PROVEN",
+  "consistency": {
+    "rule": "status IMPLEMENTED means code path exists; not RELEASE-PROVEN",
+    "FREEZE_PROVEN": false,
+    "requiredNext": [
+      "requestSchema",
+      "resultSchema",
+      "errorCodes",
+      "fixture"
+    ]
+  }
 }

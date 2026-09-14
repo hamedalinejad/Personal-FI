@@ -150,3 +150,13 @@ FREEZE_PROVEN = false
 PRODUCTION = NO-GO
 ```
 
+## Freeze blockers closed (2026-09-14 evening)
+| Finding | Fix |
+|---------|-----|
+| Dead related_contracts paths | → DATA-MODEL / FINANCIAL-CORE / command-catalog |
+| Journal FX equation | INV_JOURNAL_FX_MISMATCH in assertJournalBalanced |
+| Posted empty journal | OP_POSTED_REQUIRES_JOURNAL |
+| stocks.sell fee field loss | fee_commission/tax/other + treatments_json |
+| stocks.sell silent fee treatment | FEE_TREATMENT_REQUIRED when fee ≠ 0 |
+| Crypto/funds/metals holding uniqueness | SQL unique indexes with ifnull sentinel |
+| Metals purity range | CHECK 0 < purity ≤ 1 |

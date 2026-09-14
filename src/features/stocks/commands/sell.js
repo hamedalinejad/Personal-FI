@@ -71,6 +71,7 @@ export async function sellStock(input, { dataDir } = {}) {
   });
   const toBase = (a) => toDecimal(typeof a === "string" ? a : a.toFixed()).times(toDecimal(exchangeRateToBase)).toFixed();
 
+  // Module policy (stocks.md): sell fee default = expense when omitted
   const feeEvents = buildFeeEvents(
     [
       { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "expense", label: "commission", feeCurrency: currency },
@@ -240,8 +241,10 @@ export async function sellStock(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, holding_id, instrument_id, brokerage_id, tx_type,
-          trade_date, settlement_date, quantity, price, fee_amount, currency, account_id, created_at
-        ) VALUES (?, ?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          trade_date, settlement_date, quantity, price, fee_amount,
+          fee_commission, fee_tax, fee_other, fee_treatments_json,
+          currency, account_id, created_at
+        ) VALUES (?, ?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -252,7 +255,15 @@ export async function sellStock(input, { dataDir } = {}) {
         settlementDate,
         qty.toFixed(),
         price.toFixed(),
+        commission.plus(tax).plus(otherFee).toFixed(),
         commission.toFixed(),
+        tax.toFixed(),
+        otherFee.toFixed(),
+        JSON.stringify({
+          commission: p.commissionTreatment || null,
+          tax: p.taxTreatment || null,
+          otherFee: p.otherFeeTreatment || null,
+        }),
         currency,
         p.accountId || null,
         now,

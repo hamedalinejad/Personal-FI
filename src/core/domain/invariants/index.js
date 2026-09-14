@@ -30,6 +30,17 @@ export function assertJournalBalanced(lines) {
       assertFiniteMoney(base, "line.amountInBase");
       balAmount = toDecimal(base);
       if (balAmount.lt(0)) throw new Error("INV_JOURNAL_NEGATIVE_AMOUNT_IN_BASE");
+      // Prove amountInBase = amount × exchangeRateToBase when rate present
+      const fx = line.exchangeRateToBase ?? line.exchange_rate_to_base;
+      if (fx != null && fx !== "") {
+        assertFiniteMoney(String(fx), "line.exchangeRateToBase");
+        const expected = a.times(toDecimal(fx));
+        if (!expected.eq(balAmount)) {
+          throw new Error(
+            `INV_JOURNAL_FX_MISMATCH:${a.toFixed()}*${toDecimal(fx).toFixed()}!=${balAmount.toFixed()}`,
+          );
+        }
+      }
     } else {
       if (!line.currency) throw new Error("INV_JOURNAL_CURRENCY_REQUIRED");
       if (currency == null) currency = line.currency;
@@ -57,6 +68,15 @@ export function assertRatePositive(rate) {
 export function assertRateNonNegative(rate) {
   assertFiniteMoney(rate, "rate");
   if (toDecimal(rate).lt(0)) throw new Error("INV_RATE_NEGATIVE");
+}
+
+export function assertPostedHasJournal(status, journalLines) {
+  if (status === "posted") {
+    if (!Array.isArray(journalLines) || journalLines.length === 0) {
+      throw new Error("OP_POSTED_REQUIRES_JOURNAL");
+    }
+  }
+  return true;
 }
 
 export function assertImmutablePost(previousRow) {

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { runInvariantGate } from "../invariants/index.js";
+import { runInvariantGate, assertPostedHasJournal } from "../invariants/index.js";
 import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
 import { persistOperation, loadOperation } from "../../persistence/port.js";
 
@@ -266,6 +266,7 @@ export async function runAtomicFinancialOperation(command) {
       }
     }
 
+    assertPostedHasJournal(norm.status, norm.journalLines);
     runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates });
 
     const operationContext = Object.freeze({

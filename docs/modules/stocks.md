@@ -121,3 +121,10 @@ docs/core/db/schema.sql · registry · fixtures.
 ## Date fields (never collapse)
 `tradeDate` · `settlementDate` · `cashDate` · `marketDate` · `priceAsOf` · `fxAsOf`  
 Settlement uses versioned market calendar (Iran equity T+n). Corporate actions need explicit event semantics before production.
+
+## Fee treatment (LOCKED)
+- **Core** never invents treatment (`FEE_TREATMENT_REQUIRED` if missing at Fee Engine).
+- **Module defaults** (applied in command before Core):
+  - `stocks.buy`: omitted fee treatment → `capitalize_inventory`
+  - `stocks.sell`: omitted fee treatment → `expense`
+Sell persists `fee_commission`, `fee_tax`, `fee_other`, `fee_treatments_json` (no field loss).
