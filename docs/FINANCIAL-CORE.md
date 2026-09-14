@@ -347,3 +347,8 @@ Module default treatments are versioned in `command-catalog.json` `feeTaxonomy` 
 ## FX fail-closed (LOCKED)
 No rate → **no financial post**. Never convert missing FX to zero.  
 Multi-hop paths must store or deterministically reconstruct `conversionPath` + observation provenance when historical rebuild requires it.
+
+## Account classification vs operational cash kind
+`fin_accounts.account_kind` = accounting class only (asset/liability/equity/income/expense).  
+Operational kinds (bank, card, …) live on Accounts feature entities — see `modules/accounts.md`.  
+Archive never deletes posted history.

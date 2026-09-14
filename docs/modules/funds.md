@@ -171,3 +171,17 @@ Proof path: `src/features/funds/tests/standalone.test.js`
 
 Cost always uses **transactionPrice**, never silent NAV.
 
+## Distribution / reinvestment contract (PARTIAL → must complete before RELEASE)
+Command card / implementation must define:
+```
+ex-date · record-date · payment-date
+cash distribution · reinvestment distribution
+units created from reinvestment
+transaction price for reinvestment
+NAV observation (context only)
+income vs return-of-capital treatment
+tax treatment · fees
+```
+A boolean `reinvest?` alone is **not** a full economic contract.
+
+Pricing lock remains: **NAV ≠ transactionPrice ≠ liquidationPrice**.

@@ -142,3 +142,18 @@ Holding is never unaudited cost SoT.
 import_batch → raw_record → dedupe_key → normalized → operation → journal → provenance
 ```
 Unknown source fields survive unless user chooses destructive transform.
+
+## Holding identity scopes (LOCKED)
+| Module | Identity |
+|--------|----------|
+| Crypto | `instrumentId` + venue/exchange + network |
+| Stocks | `instrumentId` + brokerage/account scope |
+| Funds | `instrumentId` + account scope |
+| Metals | `instrumentId` + platform/account + purity when policy requires |
+
+**symbol / providerSymbol is a LABEL only** — never economic primary key.  
+Canonical identity = `ref_instruments.id` (+ scope above).
+
+## fin_operations.source (legacy)
+Column may remain for migration compatibility. **New writers must not populate `source`.**  
+Use `source_channel` · `source_type` · `source_reference` only. Removal only after migration rules confirm zero inbound use.

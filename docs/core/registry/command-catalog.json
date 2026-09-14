@@ -1042,7 +1042,9 @@
         ],
         "identity": "operationId + canonical economic hash",
         "businessRules": [
-          "cash vs reinvest explicit"
+          "ex-date, record-date, payment-date required for full release",
+          "cash vs reinvestment explicit; reinvest needs units + transactionPrice",
+          "NAV observation is context only — never silent cost"
         ],
         "queries": [],
         "reports": [
@@ -1403,14 +1405,16 @@
           "method",
           "startDate",
           "term",
-          "role"
+          "role",
+          "originationKind?"
         ],
         "validation": [
           "operationId required UUID for mutations that post",
           "businessDate required YYYY-MM-DD",
           "monetary fields must be decimal strings (no JS Number)",
           "book base from db_meta; never default baseCurrency to transaction currency",
-          "posted path requires balanced journal in base"
+          "posted path requires balanced journal in base",
+          "originationKind required when cash effect ambiguous"
         ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
@@ -1456,7 +1460,9 @@
         "identity": "operationId + canonical economic hash",
         "businessRules": [
           "rate is percentage-points (18=18%)",
-          "declining_balance = equal-principal"
+          "declining_balance = equal-principal",
+          "originationKind: disburse_now | record_outstanding (required for unambiguous cash)",
+          "disburse_now → Cr settlement cash; record_outstanding → no fabricated cash movement"
         ],
         "queries": [],
         "reports": [

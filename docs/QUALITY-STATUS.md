@@ -289,3 +289,15 @@ Inventory: regenerated + `inventory:check`. Regression = code + test, not new au
 | Fee taxonomy on catalog + module defaults | **documented** |
 | FX fail-closed contract | **FINANCIAL-CORE LOCKED** |
 | Field-preservation matrix | **PARTIAL** (R-M03) — expand rows, do not invent new MD matrices |
+
+## Domain contract closure (this pass)
+| Topic | Status |
+|-------|--------|
+| Holding identity scopes | LOCKED in DATA-MODEL |
+| Account class vs operational kind | LOCKED |
+| Loan policy matrix SUPPORTED/DEFERRED | LOCKED |
+| loan.create disburse_now vs record_outstanding | LOCKED |
+| Crypto transfer fields + swap deferred gate | LOCKED |
+| Stocks CA deferred + policy data path | LOCKED |
+| Funds distribution field list | PARTIAL contract listed |
+| Iran holiday package files | OPEN (path `data/policy/iran/`) |

@@ -186,3 +186,18 @@ Proof path: `src/features/crypto/tests/standalone.test.js`
 
 Never interpret monetary `feeAmount` as quantity. Version with capability `crypto`.
 
+## Transfer field preservation (LOCKED)
+Must persist (or reject if accepted at API):
+```
+fromVenue · fromNetwork · toVenue · toNetwork
+quantity · networkFee · feeFundingKind
+externalTxReference · provenance
+```
+
+## Swap (DEFERRED — do not implement casually)
+Before any `crypto.swap` command exists, lock:
+```
+asset out · asset in · prices · valuation currency
+fees · FX · cost basis transfer · realized P&L rule · economic_kind
+```
+No partial swap() without that contract.

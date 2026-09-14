@@ -202,3 +202,33 @@ Proof path: `src/features/loan/tests/standalone-boot.test.js`
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Policy completeness matrix (v1)
+| Policy | Status |
+|--------|--------|
+| equal-principal / declining_balance schedule | **SUPPORTED** |
+| flat / bullet / qarz as implemented in engine | **SUPPORTED** where fixtures green |
+| payment waterfall penalty→fee→interest→principal | **SUPPORTED** |
+| rate as percentage-points (18 = 18%) | **SUPPORTED** |
+| borrower role (as counterparty mode) | **DEFERRED** |
+| custom interval beyond engine | **DEFERRED** |
+| grace period + grace interest | **DEFERRED** |
+| penalty **accrual** engine | **DEFERRED** (allocation may accept outstanding penalty) |
+| complete fee tier taxonomy | **DEFERRED** / PARTIAL |
+| early payment + recalculation | **DEFERRED** |
+| overpayment policy | **DEFERRED** |
+| multi-currency loan FX | **DEFERRED** |
+| residual/closure criteria beyond residual principal row | **PARTIAL** |
+| mid-loan reschedule | **DEFERRED** |
+| variable rate | **DEFERRED** |
+| day-count actual/365, 30/360 | **DEFERRED** (v1 period_based/monthly only) |
+
+No ambiguous “maybe later” — only SUPPORTED / DEFERRED / REJECTED.
+
+## loan.create economic kinds (LOCKED)
+| Kind | Meaning | Journal sketch |
+|------|---------|----------------|
+| `disburse_now` | Cash actually leaves settlement now | Dr receivable · Cr settlement cash |
+| `record_outstanding` | Historical/already-outstanding receivable; **no new cash movement** | Dr receivable · Cr opening equity/loan liability (or explicit opening accounts) — **not** Cr settlement cash |
+
+Default for greenfield “new loan cash out” = `disburse_now`.  
+Recording an existing receivable without fabricating cash requires `record_outstanding` (or explicit opening-balance path). Command card must carry `originationKind`.

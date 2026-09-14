@@ -130,3 +130,13 @@ Standalone investment/loan editions **do not** require Accounts screens; they us
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Account kind distinction (LOCKED)
+| Field | Meaning | Values |
+|-------|---------|--------|
+| `fin_accounts.account_kind` | **Accounting class** | asset · liability · equity · income · expense |
+| `acc_accounts.account_kind` | **Operational cash kind** | cash · bank_account · card · wallet · brokerage_cash · crypto_exchange_cash · cash_equivalent · credit_account |
+
+Never collapse these into one semantic field.
+
+## Archive (LOCKED)
+Archive/close marks operational inactivity. **Posted journal history is immutable** and is never deleted because an account is archived. Reject archive when journal balance ≠ 0 (Decimal).

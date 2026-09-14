@@ -192,3 +192,15 @@ Proof path: `src/features/stocks/tests/standalone.test.js`
 
 Override only with explicit `treatment` on CanonicalFeeEvent. Same fee vocabulary on buy and sell.
 
+## Iran policy data (LOCKED approach)
+| Layer | Rule |
+|-------|------|
+| Weekend / T+n engine | Versioned in `settlementPolicy` (`iran-equity-T2-v1` legacy Fri/Sat; `v2` Thu/Fri weekend) |
+| Exchange holidays | **Machine policy package** (e.g. `iran-equity-calendar-YYYY-version.json`) — not hardcoded in Financial Core |
+| Operation | Must persist `settlement_policy_version` used |
+| Fee/tax percentages | Versioned **policy data** with effective dates — not frozen into Core |
+
+## Corporate actions (v1)
+All of the following are **DEFERRED** until command + fixture + rebuild exist:  
+bonus · split · reverse split · rights · rights exercise · rights sale · capital increase · merger · spin-off · symbol change · ISIN change · transfer.  
+Schema may reserve columns; reserved ≠ supported.
