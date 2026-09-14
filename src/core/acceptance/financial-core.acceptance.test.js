@@ -157,10 +157,9 @@ test("BUG-FINAL-005 fee engine TX vs BASE dimensions", () => {
     ],
     { transactionCurrency: "USD" },
   );
-  assert.equal(r.carryingDeltaTx.amount, "10");
-  assert.equal(r.carryingDeltaTx.currency, "USD");
+  assert.equal(r.carryingDeltaTx, "10");
   assert.equal(r.carryingDeltaBase, "420000");
-  assert.notEqual(r.carryingDeltaTx.amount, r.carryingDeltaBase);
+  assert.notEqual(r.carryingDeltaTx, r.carryingDeltaBase);
 });
 
 test("BUG-FINAL-006 fee-from-received rejects different instrument", () => {
@@ -168,7 +167,7 @@ test("BUG-FINAL-006 fee-from-received rejects different instrument", () => {
     () =>
       applySingleFee(
         {
-          feeAmount: "1",
+          feeQuantity: "1",
           feeInstrumentId: "usdt-trc20",
           treatment: "fee_from_received",
         },
@@ -181,6 +180,27 @@ test("BUG-FINAL-006 fee-from-received rejects different instrument", () => {
         },
       ),
     /FEE_UNIT_MISMATCH/,
+  );
+});
+
+test("reduce_received_quantity rejects money feeAmount without feeQuantity", () => {
+  assert.throws(
+    () =>
+      applySingleFee(
+        {
+          feeAmount: "10",
+          feeCurrency: "USDT",
+          treatment: "fee_from_received",
+          feeInstrumentId: "btc",
+        },
+        {
+          receivedInstrumentId: "btc",
+          transactionCurrency: "USDT",
+          baseCurrency: "USDT",
+          exchangeRateToBase: "1",
+        },
+      ),
+    /FEE_QUANTITY_REQUIRED/,
   );
 });
 

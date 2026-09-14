@@ -79,13 +79,34 @@ export function normalizeCommand(command) {
     if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
     if (!line.accountId && !line.account_id) throw new Error("JOURNAL_LINE_ACCOUNT_REQUIRED");
     if (!line.side || !line.amount) throw new Error("JOURNAL_LINE_INVALID");
+    let amountInBase =
+      line.amountInBase != null
+        ? canonicalDecimalString(line.amountInBase)
+        : line.amount_in_base != null
+          ? canonicalDecimalString(line.amount_in_base)
+          : undefined;
+    let exchangeRateToBase = line.exchangeRateToBase ?? line.exchange_rate_to_base;
+    let conversionPath = line.conversionPath ?? line.conversion_path;
+    // Canonicalize same-currency lines before hash (BUG-004)
+    if (line.currency === baseCurrency) {
+      if (amountInBase == null) {
+        amountInBase = canonicalDecimalString(line.amount);
+      }
+      if (exchangeRateToBase == null || exchangeRateToBase === "") {
+        exchangeRateToBase = "1";
+      }
+      // stable default so representation variants hash identically
+      if (conversionPath == null || conversionPath === "") {
+        conversionPath = "identity";
+      }
+    }
     return {
       accountId: line.accountId || line.account_id,
       side: line.side,
       amount: canonicalDecimalString(line.amount),
-      amountInBase: line.amountInBase != null ? canonicalDecimalString(line.amountInBase) : line.amount_in_base != null ? canonicalDecimalString(line.amount_in_base) : undefined,
-      exchangeRateToBase: line.exchangeRateToBase ?? line.exchange_rate_to_base,
-      conversionPath: line.conversionPath ?? line.conversion_path,
+      amountInBase,
+      exchangeRateToBase,
+      conversionPath,
       lineKind: line.lineKind ?? line.line_kind,
       reference: line.reference,
       currency: line.currency,

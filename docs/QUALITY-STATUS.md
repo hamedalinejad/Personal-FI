@@ -78,3 +78,10 @@ Until all green: `FREEZE_PROVEN = false`. Production remains **NO-GO**.
 | Command field coverage | PARTIAL |
 | Browser offline | OPEN |
 
+## Fee / hash freeze (2026-09-14)
+| ID | Status |
+|----|--------|
+| BUG-001 fee treatment enum unified | FIXED |
+| BUG-002 feeQuantity for reduce_received_quantity | FIXED |
+| BUG-003 no silent expense default in Core | FIXED |
+| BUG-004 same-currency journal filled before hash | FIXED |

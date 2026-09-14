@@ -43,9 +43,17 @@ CASH IS DERIVED FROM CORE JOURNAL TRUTH.
 Posted lines require `amount_in_base`; non-base requires `exchange_rate_to_base`.
 
 ## 7. Fee
-CanonicalFeeEvent: `feeAmount`, `feeCurrency`, `feeInstrumentId?`, `feeTreatment`, `feeFundingKind` (`cash|asset`).  
-Treatments: expense | capitalize_inventory | reduce_proceeds | equity_adjustment — **one** treatment per event.  
-Feature selects policy; Core Fee Engine applies.
+CanonicalFeeEvent:
+- money: `feeAmount`, `feeCurrency`, `feeExchangeRateToBase?`
+- quantity (only `reduce_received_quantity`): `feeQuantity`, `feeQuantityUnit?`, `feeInstrumentId`
+- `treatment` **required** in Core (`FEE_TREATMENT_REQUIRED` if missing)
+
+Canonical treatments only:
+```
+expense | capitalize_inventory | reduce_proceeds | reduce_received_quantity | embedded_in_gross_cash | equity_adjustment
+```
+API aliases (normalize only): `capitalized_cost` → capitalize_inventory · `fee_from_received` → reduce_received_quantity · `from_cash` → embedded_in_gross_cash.  
+Never subtract monetary `feeAmount` from asset quantity. One treatment per event. Feature selects policy; Core applies.
 
 ## 8. Cost basis
 WAC v1 unless module policy says otherwise. Cost pool currency must be consistent (transaction vs base) per module. Disposal reduces quantity and carrying.

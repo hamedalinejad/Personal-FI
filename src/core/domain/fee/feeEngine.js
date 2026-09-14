@@ -1,33 +1,75 @@
 /**
- * BUG-011 — Canonical Fee Engine (Core)
- * Features select policy; Core applies treatment → journal legs + carrying adjustment.
+ * Canonical Fee Engine (Core)
+ * Owner: docs/FINANCIAL-CORE.md
  *
- * Treatments (Fee Treatment Matrix):
- * - expense: P&L expense (does not increase asset carrying)
- * - capitalized_cost: added to asset carrying / inventory cost
- * - fee_from_received: reduces received quantity (asset side); cash cost unchanged
- * - from_cash: explicit cash out already in principal (no extra leg) — informational
+ * Canonical treatments (only these after normalize):
+ * - expense
+ * - capitalize_inventory
+ * - reduce_proceeds
+ * - reduce_received_quantity
+ * - embedded_in_gross_cash
+ * - equity_adjustment
+ *
+ * Legacy API aliases (normalize only, not stored in Core after normalize):
+ * - capitalized_cost → capitalize_inventory
+ * - fee_from_received → reduce_received_quantity
+ * - from_cash → embedded_in_gross_cash
  */
 
 import { toDecimal } from "../../money/canonicalDecimal.js";
 import { scopedAccountId } from "../../accounting/chartOfAccounts.js";
 
+export const CANONICAL_FEE_TREATMENTS = Object.freeze([
+  "expense",
+  "capitalize_inventory",
+  "reduce_proceeds",
+  "reduce_received_quantity",
+  "embedded_in_gross_cash",
+  "equity_adjustment",
+]);
+
+const TREATMENT_ALIASES = Object.freeze({
+  capitalized_cost: "capitalize_inventory",
+  fee_from_received: "reduce_received_quantity",
+  feeBurnQuantity: "reduce_received_quantity",
+  from_cash: "embedded_in_gross_cash",
+});
+
+/**
+ * Map legacy synonym → canonical. Throws if missing or unknown.
+ * @param {string|null|undefined} raw
+ * @param {{ allowMissing?: boolean }} [opts]
+ */
+export function normalizeFeeTreatment(raw, opts = {}) {
+  if (raw == null || raw === "") {
+    if (opts.allowMissing) return null;
+    throw new Error("FEE_TREATMENT_REQUIRED");
+  }
+  const key = String(raw);
+  const canonical = TREATMENT_ALIASES[key] || key;
+  if (!CANONICAL_FEE_TREATMENTS.includes(canonical)) {
+    throw new Error(`FEE_TREATMENT_INVALID:${raw}`);
+  }
+  return canonical;
+}
+
 /**
  * @typedef {object} CanonicalFeeEvent
- * @property {string} feeAmount - decimal string
+ * @property {string} [feeAmount] - monetary fee (decimal string)
+ * @property {string} [feeQuantity] - quantity fee for reduce_received_quantity
+ * @property {string} [feeQuantityUnit]
  * @property {string} feeCurrency
  * @property {string} [feeInstrumentId]
- * @property {string} treatment - expense | capitalized_cost | fee_from_received | from_cash
+ * @property {string} treatment - canonical only
  * @property {string} [feeExchangeRateToBase]
  * @property {string} baseCurrency
- * @property {string} transactionCurrency - principal/cost currency
- * @property {string} exchangeRateToBase - principal FX to base
- * @property {string} [expenseAccountId]
- * @property {string} [cashAccountId]
+ * @property {string} transactionCurrency
+ * @property {string} exchangeRateToBase
  */
 
 /**
  * Normalize feature fee inputs into CanonicalFeeEvent[].
+ * Treatment is required (no silent expense default).
  */
 export function buildFeeEvents(inputs = [], ctx = {}) {
   const {
@@ -36,24 +78,54 @@ export function buildFeeEvents(inputs = [], ctx = {}) {
     exchangeRateToBase = "1",
   } = ctx;
   return (inputs || [])
-    .filter((f) => f && f.feeAmount != null && f.feeAmount !== "" && !toDecimal(f.feeAmount).isZero())
-    .map((f) => ({
-      feeAmount: toDecimal(f.feeAmount).toFixed(),
-      feeCurrency: f.feeCurrency || transactionCurrency,
-      feeInstrumentId: f.feeInstrumentId || null,
-      treatment: f.treatment || f.feeTreatment || "expense",
-      feeExchangeRateToBase: f.feeExchangeRateToBase ?? null,
-      baseCurrency,
-      transactionCurrency,
-      exchangeRateToBase,
-      expenseAccountId: f.expenseAccountId || null,
-      cashAccountId: f.cashAccountId || null,
-      label: f.label || "fee",
-    }));
+    .filter((f) => {
+      if (!f) return false;
+      const hasMoney = f.feeAmount != null && f.feeAmount !== "" && !toDecimal(f.feeAmount).isZero();
+      const hasQty = f.feeQuantity != null && f.feeQuantity !== "" && !toDecimal(f.feeQuantity).isZero();
+      return hasMoney || hasQty;
+    })
+    .map((f) => {
+      const treatment = normalizeFeeTreatment(f.treatment ?? f.feeTreatment ?? f.feeRole);
+      const event = {
+        feeAmount:
+          f.feeAmount != null && f.feeAmount !== ""
+            ? toDecimal(f.feeAmount).toFixed()
+            : null,
+        feeQuantity:
+          f.feeQuantity != null && f.feeQuantity !== ""
+            ? toDecimal(f.feeQuantity).toFixed()
+            : null,
+        feeQuantityUnit: f.feeQuantityUnit || null,
+        feeCurrency: f.feeCurrency || transactionCurrency,
+        feeInstrumentId: f.feeInstrumentId || null,
+        treatment,
+        feeExchangeRateToBase: f.feeExchangeRateToBase ?? null,
+        baseCurrency,
+        transactionCurrency,
+        exchangeRateToBase,
+        expenseAccountId: f.expenseAccountId || null,
+        cashAccountId: f.cashAccountId || null,
+        inventoryAccountId: f.inventoryAccountId || null,
+        inventoryRole: f.inventoryRole || null,
+        label: f.label || "fee",
+      };
+      if (treatment === "reduce_received_quantity") {
+        // money amount must NOT be used as quantity
+        if (event.feeQuantity == null) {
+          throw new Error("FEE_QUANTITY_REQUIRED");
+        }
+        if (toDecimal(event.feeQuantity).isNegative()) {
+          throw new Error("FEE_QUANTITY_NEGATIVE");
+        }
+      } else if (event.feeAmount == null) {
+        throw new Error("FEE_AMOUNT_REQUIRED");
+      }
+      return event;
+    });
 }
 
 function feeAmountInBase(event) {
-  const amt = toDecimal(event.feeAmount);
+  const amt = toDecimal(event.feeAmount || "0");
   const feeCurrency = event.feeCurrency;
   if (feeCurrency === event.baseCurrency) return amt;
   if (feeCurrency === event.transactionCurrency) {
@@ -66,10 +138,18 @@ function feeAmountInBase(event) {
 }
 
 /**
- * Apply fee events: returns { carryingDeltaBase, quantityDelta, journalLines, derivedFeeBases }
- * quantityDelta is negative string for fee_from_received (caller applies to gross qty).
+ * Apply fee events: returns { carryingDeltaBase, carryingDeltaTx, quantityDelta, journalLines, derivedFeeBases }
  */
-export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receivedInstrumentId, receivedQuantityUnit, transactionCurrency } = {}) {
+export function applyFeeEvents(
+  events,
+  {
+    expenseAccountId,
+    cashAccountId,
+    receivedInstrumentId,
+    receivedQuantityUnit,
+    transactionCurrency,
+  } = {},
+) {
   let carryingDeltaBase = toDecimal("0");
   let carryingDeltaTx = toDecimal("0");
   let quantityDelta = toDecimal("0");
@@ -78,19 +158,21 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
   const txCcy = transactionCurrency || (events[0] && events[0].transactionCurrency) || null;
 
   for (const event of events) {
-    const inBase = feeAmountInBase(event);
+    const treatment = normalizeFeeTreatment(event.treatment);
+    const inBase =
+      treatment === "reduce_received_quantity" ? toDecimal("0") : feeAmountInBase(event);
     derivedFeeBases.push({
       label: event.label,
-      treatment: event.treatment,
+      treatment,
       feeAmount: event.feeAmount,
+      feeQuantity: event.feeQuantity,
       feeCurrency: event.feeCurrency,
       feeAmountBase: inBase.toFixed(),
       feeInstrumentId: event.feeInstrumentId,
     });
 
-    switch (event.treatment) {
-      case "capitalized_cost": {
-        // Model B: capitalized fee must move GL inventory and cash/payable — not subledger-only.
+    switch (treatment) {
+      case "capitalize_inventory": {
         carryingDeltaBase = carryingDeltaBase.plus(inBase);
         if (txCcy && event.feeCurrency === txCcy) {
           carryingDeltaTx = carryingDeltaTx.plus(toDecimal(event.feeAmount));
@@ -136,15 +218,25 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
         );
         break;
       }
-      case "expense": {
+      case "expense":
+      case "equity_adjustment": {
         const expId =
           event.expenseAccountId ||
           expenseAccountId ||
-          scopedAccountId("fee_expense", event.baseCurrency);
+          scopedAccountId(
+            treatment === "equity_adjustment" ? "fee_equity" : "fee_expense",
+            event.feeCurrency,
+          );
         const cashId =
           event.cashAccountId ||
           cashAccountId ||
           scopedAccountId("local_settlement_cash", event.feeCurrency);
+        const fx =
+          event.feeCurrency === event.baseCurrency
+            ? "1"
+            : event.feeCurrency === event.transactionCurrency
+              ? event.exchangeRateToBase
+              : event.feeExchangeRateToBase;
         journalLines.push(
           {
             accountId: expId,
@@ -152,12 +244,7 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
             amount: event.feeAmount,
             currency: event.feeCurrency,
             amountInBase: inBase.toFixed(),
-            exchangeRateToBase:
-              event.feeCurrency === event.baseCurrency
-                ? "1"
-                : event.feeCurrency === event.transactionCurrency
-                  ? event.exchangeRateToBase
-                  : event.feeExchangeRateToBase,
+            exchangeRateToBase: fx,
             lineKind: "fee",
           },
           {
@@ -166,68 +253,103 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
             amount: event.feeAmount,
             currency: event.feeCurrency,
             amountInBase: inBase.toFixed(),
-            exchangeRateToBase:
-              event.feeCurrency === event.baseCurrency
-                ? "1"
-                : event.feeCurrency === event.transactionCurrency
-                  ? event.exchangeRateToBase
-                  : event.feeExchangeRateToBase,
+            exchangeRateToBase: fx,
             lineKind: "fee",
           },
         );
         break;
       }
-      case "fee_from_received": {
-        // dimension context mandatory
+      case "reduce_proceeds": {
+        // reduces net cash proceeds (sell side); credit inventory/income handled by feature principal
+        const cashId =
+          event.cashAccountId ||
+          cashAccountId ||
+          scopedAccountId("local_settlement_cash", event.feeCurrency);
+        const expId =
+          event.expenseAccountId ||
+          expenseAccountId ||
+          scopedAccountId("fee_expense", event.feeCurrency);
+        const fx =
+          event.feeCurrency === event.baseCurrency
+            ? "1"
+            : event.feeCurrency === event.transactionCurrency
+              ? event.exchangeRateToBase
+              : event.feeExchangeRateToBase;
+        journalLines.push(
+          {
+            accountId: expId,
+            side: "debit",
+            amount: event.feeAmount,
+            currency: event.feeCurrency,
+            amountInBase: inBase.toFixed(),
+            exchangeRateToBase: fx,
+            lineKind: "fee",
+          },
+          {
+            accountId: cashId,
+            side: "credit",
+            amount: event.feeAmount,
+            currency: event.feeCurrency,
+            amountInBase: inBase.toFixed(),
+            exchangeRateToBase: fx,
+            lineKind: "fee",
+          },
+        );
+        break;
+      }
+      case "reduce_received_quantity": {
         if (!receivedInstrumentId) {
           throw new Error("FEE_FROM_RECEIVED_CONTEXT_REQUIRED");
         }
         if (event.feeInstrumentId && event.feeInstrumentId !== receivedInstrumentId) {
           throw new Error("FEE_UNIT_MISMATCH");
         }
-        // Explicit cash fee currency that is not the principal asset marker is invalid for quantity burn
-        if (
-          receivedQuantityUnit === "asset" &&
-          event.feeInstrumentId == null &&
-          event.feeCurrency &&
-          event.transactionCurrency &&
-          event.feeCurrency !== event.transactionCurrency &&
-          event.feeCurrency !== event.baseCurrency
-        ) {
+        if (event.feeQuantityUnit && receivedQuantityUnit && event.feeQuantityUnit !== receivedQuantityUnit) {
           throw new Error("FEE_UNIT_MISMATCH");
         }
-        quantityDelta = quantityDelta.minus(toDecimal(event.feeAmount));
+        if (event.feeQuantity == null) {
+          throw new Error("FEE_QUANTITY_REQUIRED");
+        }
+        quantityDelta = quantityDelta.minus(toDecimal(event.feeQuantity));
         break;
       }
-      case "from_cash":
-        // already embedded in principal cash out — no extra journal
+      case "embedded_in_gross_cash": {
+        // informational — cash already in principal legs
         break;
+      }
       default:
-        throw new Error(`FEE_TREATMENT_INVALID:${event.treatment}`);
+        throw new Error(`FEE_TREATMENT_INVALID:${treatment}`);
     }
   }
 
   return {
-    // no bare carryingDelta — callers must use dimensioned fields
-    carryingDeltaBase: carryingDeltaBase.toFixed(), // string BASE only (legacy internal)
-    carryingDeltaTx: { amount: carryingDeltaTx.toFixed(), currency: txCcy },
-    carryingDeltaBaseDim: { amount: carryingDeltaBase.toFixed(), currency: "BASE" },
-    quantityDelta: quantityDelta.isZero() ? "0" : quantityDelta.toFixed(),
+    carryingDeltaBase: carryingDeltaBase.toFixed(),
+    carryingDeltaTx: carryingDeltaTx.toFixed(),
+    // structured form for multi-currency callers
+    carryingDeltaTxDetail: { amount: carryingDeltaTx.toFixed(), currency: txCcy },
+    quantityDelta: quantityDelta.toFixed(),
     journalLines,
     derivedFeeBases,
   };
 }
 
-/**
- * Single-fee convenience for feature commands.
- */
-export function applySingleFee(feeInput, ctx = {}) {
-  const events = buildFeeEvents(feeInput ? [feeInput] : [], ctx);
+export function applySingleFee(feeInput, ctx) {
+  if (!feeInput) {
+    return {
+      carryingDeltaBase: "0",
+      carryingDeltaTx: "0",
+      carryingDeltaTxDetail: { amount: "0", currency: null },
+      quantityDelta: "0",
+      journalLines: [],
+      derivedFeeBases: [],
+    };
+  }
+  const events = buildFeeEvents([feeInput], ctx);
   return applyFeeEvents(events, {
     expenseAccountId: feeInput?.expenseAccountId || ctx.expenseAccountId,
     cashAccountId: feeInput?.cashAccountId || ctx.cashAccountId,
-    receivedInstrumentId: ctx.receivedInstrumentId || feeInput?.receivedInstrumentId,
-    receivedQuantityUnit: ctx.receivedQuantityUnit || feeInput?.receivedQuantityUnit || "asset",
+    receivedInstrumentId: ctx.receivedInstrumentId,
+    receivedQuantityUnit: ctx.receivedQuantityUnit,
     transactionCurrency: ctx.transactionCurrency,
   });
 }

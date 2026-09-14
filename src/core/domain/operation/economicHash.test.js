@@ -36,3 +36,29 @@ test("P0-01 computeCommandHash equals stable identity of normalizeCommand", () =
   const id = buildEconomicIdentity(norm);
   assert.equal(id.settlementDate, "2026-01-02");
 });
+
+
+test("BUG-004 same-currency representation yields same hash", () => {
+  const base = {
+    operationId: "op-1",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "posted",
+    type: "test.op",
+  };
+  const a = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "100", currency: "IRR" },
+    ],
+  });
+  const b = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100", currency: "IRR", amountInBase: "100", exchangeRateToBase: "1" },
+      { accountId: "a2", side: "credit", amount: "100", currency: "IRR", amountInBase: "100", exchangeRateToBase: "1" },
+    ],
+  });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});

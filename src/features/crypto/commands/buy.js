@@ -63,15 +63,19 @@ export async function buyCrypto(input, { dataDir } = {}) {
 
   // Fee Engine owns treatment; feature only selects policy
   // Model A: cost pool / total_invested is always in costCurrency (not base)
+  // Module default: fee_from_received when feeRole omitted (documented in modules/crypto.md)
   const feeTreatment = p.feeTreatment || p.feeRole || "fee_from_received";
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
+  const hasMoneyFee = p.feeAmount != null && p.feeAmount !== "";
+  const hasQtyFee = p.feeQuantity != null && p.feeQuantity !== "" && !toDecimal(p.feeQuantity).isZero();
   const feeResult = applySingleFee(
-    p.feeAmount != null && p.feeAmount !== ""
+    hasMoneyFee || (hasQtyFee && (feeTreatment === "fee_from_received" || feeTreatment === "feeBurnQuantity" || feeTreatment === "reduce_received_quantity"))
       ? {
-          feeAmount: p.feeAmount,
+          feeAmount: hasMoneyFee ? p.feeAmount : undefined,
+          feeQuantity: hasQtyFee ? p.feeQuantity : undefined,
           feeCurrency: p.feeCurrency || costCurrency,
-          feeInstrumentId: p.feeInstrumentId || null,
-          treatment: feeTreatment === "feeBurnQuantity" ? "fee_from_received" : feeTreatment,
+          feeInstrumentId: p.feeInstrumentId || p.instrumentId,
+          treatment: feeTreatment,
           inventoryAccountId: scopedAccountId("crypto_inventory", costCurrency),
           inventoryRole: "crypto_inventory",
           feeExchangeRateToBase: p.feeExchangeRateToBase,
