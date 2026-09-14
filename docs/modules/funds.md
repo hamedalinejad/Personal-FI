@@ -34,7 +34,7 @@ Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-fund.subscribe · redeem · distribute
+funds.subscribe · funds.redeem · funds.distribute
 
 ## 12. Queries
 List / get / statement-style reads as applicable.

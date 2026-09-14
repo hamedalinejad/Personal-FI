@@ -13,7 +13,7 @@ import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { openDb } from "../../../core/persistence/port.js";
 
 /**
- * fund.redeem — units out at transactionPrice (not NAV for cost release WAC).
+ * funds.redeem — units out at transactionPrice (not NAV for cost release WAC).
  * proceeds = units * transactionPrice (or explicit proceedsTotal).
  */
 export async function redeemFund(input, { dataDir } = {}) {
@@ -110,7 +110,7 @@ export async function redeemFund(input, { dataDir } = {}) {
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
-    type: "fund.redeem",
+    type: "funds.redeem",
     dataDir,
     businessDate: p.businessDate,
     baseCurrency: currency,

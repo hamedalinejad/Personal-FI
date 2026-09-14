@@ -6,7 +6,7 @@ export function capabilities() {
   return {
     edition: "fund-only",
     status: "PARTIAL",
-    implements: ["fund.subscribe", "fund.redeem", "fund.distribution"],
+    implements: ["funds.subscribe", "funds.redeem", "funds.distribute"],
   };
 }
 

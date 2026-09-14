@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { distributeFund } from "../public-api/index.js";
 import { closeAllDbs } from "../../../core/persistence/port.js";
 
-test("fund.distribution", async () => {
+test("funds.distribute", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-fd-"));
   const r = await distributeFund(
     {

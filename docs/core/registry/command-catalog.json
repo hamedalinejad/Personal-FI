@@ -1,6 +1,31 @@
 {
-  "schemaVersion": 1,
-  "description": "Machine-only public command catalog. Not a Markdown matrix.",
+  "schemaVersion": 2,
+  "description": "Machine-only canonical command IDs. One ID per semantic command. Plural feature prefix (funds not fund).",
+  "naming": {
+    "pattern": "<feature>.<verbOrVerbNoun>",
+    "featurePrefixes": [
+      "accounts",
+      "income",
+      "expense",
+      "cheque",
+      "loan",
+      "crypto",
+      "stocks",
+      "funds",
+      "metals",
+      "assets",
+      "budget",
+      "goal",
+      "bill",
+      "tax"
+    ],
+    "forbiddenAliases": {
+      "loan.payment": "loan.recordPayment",
+      "fund.subscribe": "funds.subscribe",
+      "fund.redeem": "funds.redeem",
+      "fund.distribution": "funds.distribute"
+    }
+  },
   "commands": {
     "crypto.buy": {
       "owner": "docs/modules/crypto.md",
@@ -8,13 +33,15 @@
       "status": "IMPLEMENTED",
       "tests": [
         "src/features/crypto/tests/buy.test.js"
-      ],
-      "fixture": null
+      ]
     },
     "crypto.sell": {
       "owner": "docs/modules/crypto.md",
       "capability": "crypto.sell",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "tests": [
+        "src/features/crypto/tests/sell.test.js"
+      ]
     },
     "crypto.transfer": {
       "owner": "docs/modules/crypto.md",
@@ -30,16 +57,32 @@
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.sell",
       "status": "IMPLEMENTED",
-      "notes": "Non-zero fees require explicit *Treatment; fee_commission/tax/other persisted"
+      "notes": "fee_commission/tax/other persisted"
     },
     "stocks.settle": {
       "owner": "docs/modules/stocks.md",
       "capability": "stocks.settle",
       "status": "IMPLEMENTED"
     },
+    "stocks.dividend": {
+      "owner": "docs/modules/stocks.md",
+      "capability": "stocks.dividend",
+      "status": "IMPLEMENTED"
+    },
     "funds.subscribe": {
       "owner": "docs/modules/funds.md",
       "capability": "funds.subscribe",
+      "status": "IMPLEMENTED",
+      "notes": "Never auto-copy NAV\u2192transactionPrice; aliases fund.* forbidden"
+    },
+    "funds.redeem": {
+      "owner": "docs/modules/funds.md",
+      "capability": "funds.redeem",
+      "status": "IMPLEMENTED"
+    },
+    "funds.distribute": {
+      "owner": "docs/modules/funds.md",
+      "capability": "funds.distribute",
       "status": "IMPLEMENTED"
     },
     "metals.buy": {
@@ -47,15 +90,165 @@
       "capability": "metals.buy",
       "status": "IMPLEMENTED"
     },
+    "metals.sell": {
+      "owner": "docs/modules/metals.md",
+      "capability": "metals.sell",
+      "status": "IMPLEMENTED"
+    },
+    "metals.delivery": {
+      "owner": "docs/modules/metals.md",
+      "capability": "metals.delivery",
+      "status": "IMPLEMENTED"
+    },
     "loan.create": {
       "owner": "docs/modules/loan.md",
       "capability": "loan.create",
       "status": "IMPLEMENTED"
+    },
+    "loan.recordPayment": {
+      "owner": "docs/modules/loan.md",
+      "capability": "loan.recordPayment",
+      "status": "IMPLEMENTED",
+      "notes": "Not loan.payment"
+    },
+    "loan.reversePayment": {
+      "owner": "docs/modules/loan.md",
+      "capability": "loan.reversePayment",
+      "status": "IMPLEMENTED"
+    },
+    "loan.generateSchedule": {
+      "owner": "docs/modules/loan.md",
+      "capability": "loan.generateSchedule",
+      "status": "IMPLEMENTED"
+    },
+    "loan.previewSchedule": {
+      "owner": "docs/modules/loan.md",
+      "capability": "loan.previewSchedule",
+      "status": "IMPLEMENTED"
+    },
+    "accounts.create": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.create",
+      "status": "PARTIAL"
+    },
+    "accounts.update": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.update",
+      "status": "PARTIAL"
+    },
+    "accounts.archive": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.archive",
+      "status": "PARTIAL"
+    },
+    "accounts.transfer": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.transfer",
+      "status": "PARTIAL"
+    },
+    "accounts.deposit": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.deposit",
+      "status": "PARTIAL"
+    },
+    "accounts.withdraw": {
+      "owner": "docs/modules/accounts.md",
+      "capability": "accounts.withdraw",
+      "status": "PARTIAL"
+    },
+    "income.create": {
+      "owner": "docs/modules/income-expense.md",
+      "capability": "income.create",
+      "status": "PARTIAL"
+    },
+    "expense.create": {
+      "owner": "docs/modules/income-expense.md",
+      "capability": "expense.create",
+      "status": "PARTIAL"
+    },
+    "income.reverse": {
+      "owner": "docs/modules/income-expense.md",
+      "capability": "income.reverse",
+      "status": "PARTIAL"
+    },
+    "expense.reverse": {
+      "owner": "docs/modules/income-expense.md",
+      "capability": "expense.reverse",
+      "status": "PARTIAL"
+    },
+    "cheque.register": {
+      "owner": "docs/modules/cheque.md",
+      "capability": "cheque.register",
+      "status": "PARTIAL"
+    },
+    "cheque.deposit": {
+      "owner": "docs/modules/cheque.md",
+      "capability": "cheque.deposit",
+      "status": "PARTIAL"
+    },
+    "cheque.clear": {
+      "owner": "docs/modules/cheque.md",
+      "capability": "cheque.clear",
+      "status": "PARTIAL"
+    },
+    "cheque.bounce": {
+      "owner": "docs/modules/cheque.md",
+      "capability": "cheque.bounce",
+      "status": "PARTIAL"
+    },
+    "cheque.cancel": {
+      "owner": "docs/modules/cheque.md",
+      "capability": "cheque.cancel",
+      "status": "PARTIAL"
+    },
+    "assets.register": {
+      "owner": "docs/modules/physical-assets.md",
+      "capability": "assets.register",
+      "status": "PARTIAL"
+    },
+    "assets.update": {
+      "owner": "docs/modules/physical-assets.md",
+      "capability": "assets.update",
+      "status": "PARTIAL"
+    },
+    "assets.dispose": {
+      "owner": "docs/modules/physical-assets.md",
+      "capability": "assets.dispose",
+      "status": "PARTIAL"
+    },
+    "budget.set": {
+      "owner": "docs/modules/budget-goals-bills.md",
+      "capability": "budget.set",
+      "status": "PARTIAL"
+    },
+    "goal.create": {
+      "owner": "docs/modules/budget-goals-bills.md",
+      "capability": "goal.create",
+      "status": "PARTIAL"
+    },
+    "bill.schedule": {
+      "owner": "docs/modules/budget-goals-bills.md",
+      "capability": "bill.schedule",
+      "status": "PARTIAL"
+    },
+    "tax.assess": {
+      "owner": "docs/modules/tax.md",
+      "capability": "tax.assess",
+      "status": "PARTIAL"
+    },
+    "tax.pay": {
+      "owner": "docs/modules/tax.md",
+      "capability": "tax.pay",
+      "status": "PARTIAL"
+    },
+    "tax.adjust": {
+      "owner": "docs/modules/tax.md",
+      "capability": "tax.adjust",
+      "status": "PARTIAL"
     }
   },
-  "notes": "requestSchema/resultSchema filled as FREEZE prep; not RELEASE-PROVEN",
   "consistency": {
-    "rule": "status IMPLEMENTED means code path exists; not RELEASE-PROVEN",
+    "rule": "status IMPLEMENTED = code path exists; not RELEASE-PROVEN / not FREEZE_PROVEN",
     "FREEZE_PROVEN": false,
     "requiredNext": [
       "requestSchema",

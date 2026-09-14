@@ -9,7 +9,7 @@ import {
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resolve.js";
 
-/** fund.distribution — cash distribution; quantity unchanged unless reinvest flag. */
+/** funds.distribute — cash distribution; quantity unchanged unless reinvest flag. */
 export async function distributeFund(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -52,7 +52,7 @@ export async function distributeFund(input, { dataDir } = {}) {
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
-    type: "fund.distribution",
+    type: "funds.distribute",
     dataDir,
     businessDate: p.businessDate,
     baseCurrency: currency,

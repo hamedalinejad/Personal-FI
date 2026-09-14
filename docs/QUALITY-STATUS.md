@@ -160,3 +160,8 @@ PRODUCTION = NO-GO
 | stocks.sell silent fee treatment | FEE_TREATMENT_REQUIRED when fee ≠ 0 |
 | Crypto/funds/metals holding uniqueness | SQL unique indexes with ifnull sentinel |
 | Metals purity range | CHECK 0 < purity ≤ 1 |
+
+## REVIEW-001 command naming (2026-09-14)
+Canonical IDs in `docs/core/registry/command-catalog.json` (42 entries).
+Forbidden aliases: `loan.payment`→`loan.recordPayment`, `fund.*`→`funds.*`.
+Gate: `npm run command:catalog`.

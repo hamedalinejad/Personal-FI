@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { subscribeFund, capabilities } from "../public-api/index.js";
 import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 
-test("fund.subscribe uses transactionPrice not NAV for cost", async () => {
+test("funds.subscribe uses transactionPrice not NAV for cost", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-fund-"));
   const r = await subscribeFund(
     {
@@ -35,7 +35,7 @@ test("fund.subscribe uses transactionPrice not NAV for cost", async () => {
 });
 
 test("fund capabilities", () => {
-  assert.ok(capabilities().implements.includes("fund.subscribe"));
+  assert.ok(capabilities().implements.includes("funds.subscribe"));
 });
 
 test("BUG-002 nav null with transactionPrice succeeds", async () => {
