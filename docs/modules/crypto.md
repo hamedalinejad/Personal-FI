@@ -120,3 +120,38 @@ Wallet / network / provider fields = provenance, not economic identity.
 ## Fee treatment (LOCKED)
 - Core: no silent treatment.
 - Module policy v1: buy quantity fee → `reduce_received_quantity`; sell fee → `expense`.
+
+## 9.1 Identity & transfer (LOCKED)
+
+Identity (never symbol alone):
+```
+instrumentId + venue/exchange + network
+```
+
+Holding scopes:
+| Scope | Meaning |
+|-------|---------|
+| exchange-offchain | CEX balance under exchange_id; network may be empty sentinel |
+| wallet on-chain | network_id required; address/wallet metadata as provenance |
+
+Transfer must preserve (no-field-loss):
+```
+fromVenue · fromNetwork · toVenue · toNetwork
+quantity · networkFee · feeFundingKind
+externalTxReference · provenance
+```
+
+Fee funding kinds: cash leg vs quantity burn/reduce_received — explicit treatment via Fee Engine.
+
+## 9.2 V1 deferred (do not implement accidentally)
+| Command / event | Status |
+|-----------------|--------|
+| deposit | DEFERRED |
+| withdrawal | DEFERRED |
+| swap / C2C economic | DEFERRED until economic_kind + valuation rule locked |
+| airdrop | DEFERRED |
+| opening balance (crypto) | DEFERRED |
+
+Supported v1 mutations only: `crypto.buy` · `crypto.sell` · `crypto.transfer`.
+
+Catalog cards: `docs/core/registry/command-catalog.json`.

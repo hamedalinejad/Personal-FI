@@ -114,3 +114,32 @@ Distribution vs reinvestment: explicit commands; cash vs units effects via journ
 - Explicit `transactionPrice`, or `pricingMode=nav` with nav, or `pricingMode=amount_based` with amount.
 - **Silent NAV → transactionPrice is forbidden** (`FUND_TRANSACTION_PRICE_REQUIRED`).
 
+## 9.3 Pricing triad (LOCKED)
+
+Never collapse:
+```
+NAV
+transactionPrice
+liquidationPrice
+```
+
+Pricing modes (explicit — no silent NAV→transactionPrice):
+| Mode | Rule |
+|------|------|
+| explicit transaction price | required for cost |
+| explicit nav mode | only when command says so |
+| amount-based | units derived from amount ÷ transactionPrice |
+
+NAV observation = **price observation** (`price_history` / asOf), never a transaction fact by itself.
+
+## 9.4 Still required before Funds “complete”
+| Topic | Status |
+|-------|--------|
+| redeem pricing contract | PARTIAL |
+| distribution dates (ex / record / payment) | PARTIAL / document in card |
+| reinvestment semantics | PARTIAL |
+| tax on distribution | PARTIAL |
+| management / brokerage / subscription / redemption fees | PARTIAL — Fee Engine treatments |
+| current NAV as observation only | LOCKED direction |
+
+Supported v1 mutations: `funds.subscribe` · `funds.redeem` · `funds.distribute`.

@@ -140,3 +140,44 @@ Final period conserves residual principal. Do not document as generic “amortiz
 borrower | lender · rate period · payment frequency · custom interval · grace · holiday policy · penalty · fee tiers · early payment · recalculation · FX · rounding · residual.
 
 Rate unit: percentage points (`12` = 12%).
+
+## 9.5 declining_balance math (LOCKED)
+
+Interpretation: **equal-principal** (not generic annuity).
+
+```
+rateFraction = annualRate / 100
+
+principalPart = P / n
+
+interest_i = openingBalance_i × periodRate
+
+payment_i = principalPart + interest_i
+```
+
+Final row must conserve principal (residual zero in Decimal policy).
+
+Payment allocation order (LOCKED):
+```
+penalty → fee → interest → principal
+```
+
+## 9.6 Remaining before Loan “complete”
+| Topic | v1 status |
+|-------|-----------|
+| role = lender | LOCKED |
+| role = borrower | DEFERRED |
+| custom interval | PARTIAL / DEFERRED if not in engine |
+| grace period + grace interest policy | DEFERRED |
+| penalty accrual engine | DEFERRED (allocation may still accept outstanding penalty) |
+| fee tiers full taxonomy | PARTIAL |
+| early payment / recalculation | PARTIAL |
+| overpayment | PARTIAL |
+| rounding residual distribution | must match engine + fixtures |
+| FX multi-currency loans | PARTIAL |
+| residual / closure criteria | PARTIAL |
+| reschedule mid-loan | DEFERRED |
+| variable rate | DEFERRED |
+| day-count actual/365, 30/360 | DEFERRED |
+
+Loan remains the **vertical reference** for module template quality — not automatically RELEASE-PROVEN for every policy row above.

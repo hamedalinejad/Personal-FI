@@ -190,3 +190,8 @@ Gate: `npm run command:catalog`.
 All public mutations in `command-catalog.json` now carry a `card` (purpose, fields, journal, fee, FX, cost basis, writes, idempotency, reversal, errors).
 Maturity still baseline/partial/strongest per module — card ≠ RELEASE-PROVEN.
 Gate: `npm run command:catalog` requires `card.purpose` on every command.
+
+## Investment / Loan / Reporting locks (2026-09-14)
+Owner modules updated: crypto, stocks, funds, metals, loan + REPORTING.
+Deferred lists explicit (crypto deposit/withdraw/swap/airdrop; stock CA family; TWR/MWR; loan borrower/variable rate).
+No new BUG/P0 markdown files.

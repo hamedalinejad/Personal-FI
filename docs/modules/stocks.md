@@ -128,3 +128,38 @@ Settlement uses versioned market calendar (Iran equity T+n). Corporate actions n
   - `stocks.buy`: omitted fee treatment → `capitalize_inventory`
   - `stocks.sell`: omitted fee treatment → `expense`
 Sell persists `fee_commission`, `fee_tax`, `fee_other`, `fee_treatments_json` (no field loss).
+
+## 9.2 Iranian stocks dates (LOCKED)
+
+Must remain separate fields (never collapse):
+```
+tradeDate
+settlementDate
+cashDate
+marketDate
+priceAsOf
+fxAsOf
+settlement_policy_version
+```
+
+Semantics:
+| Event | Effect |
+|-------|--------|
+| Trade | Position/quantity on **trade** semantics |
+| Settlement | Cash / payable / receivable on **settlement** semantics |
+| Cash date | Actual cash movement when different from settlement |
+
+Calendar:
+- Business days: **Sat–Wed**
+- Weekend: **Thu–Fri**
+- Policy is **data-driven / versioned** (`settlement_policy_version`); official holidays = versioned policy package, not hard-coded Core forever.
+- Legacy calendar versions retained for deterministic replay.
+
+## 9.3 Corporate actions — status
+Schema may reserve a wide family. **None** of the following are RELEASE-PROVEN / complete command+fixture+rebuild contracts in v1:
+
+bonus · split · reverse split · rights · rights exercise · rights sale · capital increase · merger · spin-off · symbol change · ISIN change · transfer
+
+Do **not** call Stocks module complete until each **supported** action has: command card · fixture · rebuild path.
+
+Supported v1 mutations: `stocks.buy` · `stocks.sell` · `stocks.settle` · `stocks.dividend` only.

@@ -1712,5 +1712,41 @@
       "tax.pay",
       "tax.adjust"
     ]
-  }
+  },
+  "deferred": {
+    "crypto": [
+      "crypto.deposit",
+      "crypto.withdrawal",
+      "crypto.swap",
+      "crypto.airdrop",
+      "crypto.openingBalance"
+    ],
+    "stocks.corporateActions": [
+      "bonus",
+      "split",
+      "reverse_split",
+      "rights",
+      "rights_exercise",
+      "rights_sale",
+      "capital_increase",
+      "merger",
+      "spin_off",
+      "symbol_change",
+      "isin_change",
+      "transfer"
+    ],
+    "loan": [
+      "borrower",
+      "variable_rate",
+      "grace",
+      "reschedule",
+      "day_count_actual_365",
+      "day_count_30_360"
+    ],
+    "reporting": [
+      "TWR",
+      "MWR"
+    ]
+  },
+  "note": "Deferred entries must not be implemented accidentally; not present as live command keys."
 }

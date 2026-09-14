@@ -37,3 +37,32 @@ All standard statements (GL, TB, BS, IS, CF, account activity) read **posted** j
 Voided/reversal rows appear only in explicit audit/history modes.  
 Cash classification from `fin_accounts`; never from feature cash snapshot tables as Net Worth SoT.
 
+## Report inventory (LOCKED)
+
+Derived only — never a second ledger.
+
+| Report | Source | v1 |
+|--------|--------|-----|
+| General Ledger | posted journal | required |
+| Trial Balance | posted journal | required |
+| Balance Sheet | posted journal + classification | required |
+| Income Statement | posted journal | required |
+| Cash Flow | posted journal + cash accounts | required |
+| Account Activity | posted journal filtered | required |
+| Net Worth | journal cash + valuations | required |
+| Investment P&L | disposals + valuation context | required |
+| Historical asOf | ledger cutoff + price/FX asOf | required |
+| Fees attribution | fee events / journal line_kind | required |
+| Allocation | classification | required |
+
+### Investment performance definitions (versioned)
+| Metric | Definition |
+|--------|------------|
+| Realized P&L | disposal: proceeds − cost released − allocated fees (base) |
+| Unrealized P&L | valuation(asOf) − carrying; uses priceAsOf + fxAsOf; never rewrites cost |
+| FX gain/loss | separate when multi-currency settlement/valuation |
+| Fee attribution | by treatment and period |
+| TWR | **DEFERRED** for v1 unless engineVersions ship a locked formula |
+| MWR / IRR | **DEFERRED** for v1 unless engineVersions ship a locked formula |
+
+Registry must keep TWR/MWR as DEFERRED until formulas + fixtures exist — do not imply completeness from report names alone.

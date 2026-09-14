@@ -139,3 +139,31 @@ Preserve: gross · purity · fine · price basis (quoteBasis) · premium · trad
 ## Fee treatment (LOCKED)
 - Core: `FEE_TREATMENT_REQUIRED` if treatment missing at Fee Engine.
 - Module policy v1: trade fee → `expense`; premium → `capitalize_inventory` (alias of capitalized_cost).
+
+## 9.4 Mass & quote (LOCKED)
+
+Preserve separately:
+```
+gross mass (quantityMg)
+purityRatio
+fine weight
+quoteBasis
+priceUnit
+premium
+trade fee
+delivery fee
+serial
+certificate
+location
+```
+
+Dimensional rule:
+```
+fineWeight = grossMass × purityRatio
+```
+
+Coins: do **not** invent pure-metal valuation from fine weight unless policy explicitly permits analytical metal-equivalent mode (user-opt-in). Instrument carries canonical unit/valuation basis for coins.
+
+Trade fee ≠ delivery fee. Delivery does not change acquisition cost unless policy capitalizes it.
+
+Supported v1: `metals.buy` · `metals.sell` · `metals.delivery`.
