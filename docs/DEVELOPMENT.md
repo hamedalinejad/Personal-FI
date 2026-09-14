@@ -303,3 +303,23 @@ On regression:
 4. QUALITY-STATUS line if useful
 
 Git retains history. No `BUG-*.md` / `P0-*.md` restoration.
+
+## Implementation phases (LOCKED order)
+| Phase | Focus |
+|-------|--------|
+| 0 | Documentation normalization (inventory, no dead refs, command cards, no duplicate authority) |
+| 1 | Numeric core proof (Decimal, units, IRR/Toman, FX) |
+| 2 | Accounting kernel (CoA, operation, journal, posted, reversal, opening, settlement) |
+| 3 | Persistence/recovery (atomic SQLite, idempotency, backup/restore, rebuild, single-writer) |
+| 4 | Loan reference vertical |
+| 5 | Investments (Crypto, Stocks, Funds, Metals) |
+| 6 | Income/Expense, Cheque, Tax, Physical Assets, Budget |
+| 7 | Browser sql.js + IndexedDB RELEASE_PROVEN |
+| 8 | Standalone editions one-by-one (full STANDALONE_GREEN path) |
+| 9 | Licensing (capability only; no data deletion) |
+| 10 | Semantic freeze |
+| 11 | UI — six routes only; sheets/drawers for the rest |
+
+## Safe deletion protocol
+1 filesystem inventory → 2 classify → 3–6 reference search (source, package, registry, tests) → 7 knowledge in owner → 8 no unique proof → 9 migration safe → 10 delete → 11 regenerate inventory/manifest → 12 gates.  
+Never delete by filename alone. Keep: schema, manifests, field matrices, fixtures, durableMemoryAdapter until browser proven.

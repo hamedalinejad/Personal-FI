@@ -211,3 +211,10 @@ Do not list deleted scripts (e.g. former `generate-command-status-md.js`).
 Do not add: `BUG-*.md` · `P0-*.md` · `FINAL-AUDIT.md` · `FINAL-VERDICT.md` · `GAP-*.md` · `FIX-*.md` · `COMMAND-MATRIX.md` · `FEATURE-MATRIX.md` · `ACCOUNTING-MASTER.md` · `ARCHITECTURE-MASTER.md` · `BACKUP-SPEC.md`.  
 Target human tree = README + owners + modules + archive/AUDIT-HISTORY only; `docs/core/**` machine-only.
 
+## Operating rule (LOCKED)
+```
+ONE CONCEPT → ONE HUMAN OWNER → ONE MACHINE REGISTRY WHERE NEEDED
+→ ONE EXECUTABLE PROOF → HISTORY IN GIT ONLY
+```
+Example good path: `modules/loan.md` + `command-catalog.json` + `fixtures/LOAN-*.json` + tests + QUALITY-STATUS.  
+Never recreate LOAN-P0 / LOAN-AUDIT / LOAN-MATRIX Markdown.

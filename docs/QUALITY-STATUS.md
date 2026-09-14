@@ -306,3 +306,13 @@ Inventory: regenerated + `inventory:check`. Regression = code + test, not new au
 Metals serial/coin policy · income/cheque/tax/assets/budget depth markers · reporting TWR deferred · offline recovery/backup package fields · API catalog authority · STANDALONE_GREEN path · licensing control plane · forbidden extra MD authorities — locked in owners.  
 R-M27 command schemas · full recovery matrix · browser IndexedDB · license RELEASE — remain OPEN/PARTIAL as before.
 
+## Deletion policy (current)
+| Candidate | Action |
+|-----------|--------|
+| `scripts/generate-command-status-md.js` | **DELETED** — do not restore |
+| `file-inventory.tsv` | **REGENERATE** only — never drop the concept |
+| `durableMemoryAdapter.js` | **KEEP** until sql.js+IDB RELEASE_PROVEN |
+| schema / manifest / field matrices / fixtures / tests | **KEEP** |
+
+## Requirements backlog location
+Live IDs R-M03…R-M30 statuses live in `docs/core/registry/requirements-matrix.json` only — not a new requirements Markdown file.

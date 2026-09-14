@@ -132,5 +132,6 @@
     "STANDALONE": "PARTIAL",
     "BROWSER": "OPEN",
     "FIELD_PRESERVATION": "PARTIAL→machine matrix from cards"
-  }
+  },
+  "production": "NO-GO"
 }

@@ -1,9 +1,8 @@
 {
   "version": 1,
-  "updated": "2026-09-14",
-  "rule": "Live define paths must resolve to current owners or machine files. Historical paths are not active.",
-  "requirements": {
-    "R-M01": {
+  "requirements": [
+    {
+      "id": "R-M01",
       "title": "Canonical status registry",
       "status": "IMPLEMENTED",
       "define": [
@@ -12,57 +11,72 @@
       ],
       "evidence": "status:check CI"
     },
-    "R-M02": {
+    {
+      "id": "R-M02",
       "title": "Schema freeze proof vocabulary",
       "status": "IMPLEMENTED",
       "define": [
-        "docs/core/registry/status.registry.json#schema_status",
+        "docs/core/registry/status.registry.json",
         "docs/QUALITY-STATUS.md"
       ],
       "note": "SPEC_LOCKED vs FREEZE_PROVEN vs RELEASE-PROVEN separated; FREEZE_PROVEN still false"
     },
-    "R-M03": {
+    {
+      "id": "R-M03",
       "title": "Full field preservation matrix",
       "status": "PARTIAL",
       "define": [
         "docs/core/field-inventory.checklist.tsv",
         "docs/DATA-MODEL.md"
       ],
-      "gap": "Not every command has complete schema→export mapping automated"
+      "gap": "Not every command has complete schema→export mapping automated",
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "field-preservation matrix command-by-command"
     },
-    "R-M04": {
+    {
+      "id": "R-M04",
       "title": "Journal cardinality contract",
       "status": "IMPLEMENTED",
       "define": [
         "docs/FINANCIAL-CORE.md"
       ]
     },
-    "R-M05": {
+    {
+      "id": "R-M05",
       "title": "Internal vs external identifier policy",
       "status": "PARTIAL",
       "define": [
         "docs/DATA-MODEL.md"
       ],
-      "gap": "Not all scalar columns named external_* in schema"
+      "gap": "Not all scalar columns named external_* in schema",
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "identity table + schema"
     },
-    "R-M06": {
+    {
+      "id": "R-M06",
       "title": "Money and unit canonicalization table",
       "status": "PARTIAL",
       "define": [
         "docs/FINANCIAL-CORE.md",
         "src/core/money/canonicalDecimal.js"
       ],
-      "gap": "Single consolidated unit table for weight/qty still narrative"
+      "gap": "Single consolidated unit table for weight/qty still narrative",
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "unit policy table"
     },
-    "R-M07": {
+    {
+      "id": "R-M07",
       "title": "FX historical valuation contract",
       "status": "PARTIAL",
       "define": [
         "docs/FINANCIAL-CORE.md"
       ],
-      "gap": "Full cross-rate path + stale override runtime incomplete"
+      "gap": "Full cross-rate path + stale override runtime incomplete",
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "FX path/stale/asOf goldens"
     },
-    "R-M08": {
+    {
+      "id": "R-M08",
       "title": "Crypto accounting completion",
       "status": "PARTIAL",
       "define": [
@@ -73,18 +87,24 @@
         "sell",
         "transfer"
       ],
-      "gap": "swap, deposit, withdraw, airdrop, opening balance commands"
+      "gap": "swap, deposit, withdraw, airdrop, opening balance commands",
+      "owner": "docs/modules/crypto.md",
+      "closure_note": "defer or implement lifecycle"
     },
-    "R-M09": {
+    {
+      "id": "R-M09",
       "title": "Crypto network fee policy",
       "status": "PARTIAL",
       "define": [
         "docs/FINANCIAL-CORE.md",
         "src/features/crypto/commands/transfer.js"
       ],
-      "note": "fee_from_received and transfer feeCarrying defined; not all fee roles productized"
+      "note": "fee_from_received and transfer feeCarrying defined; not all fee roles productized",
+      "owner": "docs/modules/crypto.md",
+      "closure_note": "network fee taxonomy in cards"
     },
-    "R-M10": {
+    {
+      "id": "R-M10",
       "title": "Stocks Iran settlement runtime",
       "status": "PARTIAL",
       "define": [
@@ -93,25 +113,34 @@
         "src/features/stocks/commands/settle.js",
         "docs/modules/stocks.md"
       ],
-      "gap": "Holiday calendar file not full TSE calendar"
+      "gap": "Holiday calendar file not full TSE calendar",
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "versioned holiday data"
     },
-    "R-M11": {
+    {
+      "id": "R-M11",
       "title": "Iran commission/tax/fee policy",
       "status": "PARTIAL",
       "define": [
         "src/features/stocks/commands/buy.js"
       ],
-      "note": "commission/tax/otherFee separate on buy; full policy table versioned incomplete"
+      "note": "commission/tax/otherFee separate on buy; full policy table versioned incomplete",
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "versioned commission/tax policy"
     },
-    "R-M12": {
+    {
+      "id": "R-M12",
       "title": "Corporate action master model",
       "status": "SPEC_LOCKED",
       "define": [
         "docs/modules/stocks.md"
       ],
-      "gap": "No runtime CA command suite"
+      "gap": "No runtime CA command suite",
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "CA deferred until command+fixture+rebuild"
     },
-    "R-M13": {
+    {
+      "id": "R-M13",
       "title": "Fund transaction-price/NAV contract",
       "status": "IMPLEMENTED",
       "define": [
@@ -119,50 +148,66 @@
         "src/features/funds/tests/"
       ]
     },
-    "R-M14": {
+    {
+      "id": "R-M14",
       "title": "Fund distribution/reinvest semantics",
       "status": "PARTIAL",
       "define": [
         "src/features/funds/commands/distribution.js"
       ],
-      "gap": "reinvest command, ex/record/payment dates full"
+      "gap": "reinvest command, ex/record/payment dates full",
+      "owner": "docs/modules/funds.md",
+      "closure_note": "distribution/reinvest contract"
     },
-    "R-M15": {
+    {
+      "id": "R-M15",
       "title": "Metals physical/financial split",
       "status": "PARTIAL",
       "define": [
         "src/features/metals/commands/buy.js",
         "src/features/metals/commands/delivery.js"
       ],
-      "gap": "serial/certificate optional fields not fully productized"
+      "gap": "serial/certificate optional fields not fully productized",
+      "owner": "docs/modules/metals.md",
+      "closure_note": "physical field-level contracts"
     },
-    "R-M16": {
+    {
+      "id": "R-M16",
       "title": "Loan complete fee taxonomy",
       "status": "PARTIAL",
       "define": [
-        "docs/core/db/schema.sql#ln_loan_fees",
+        "docs/core/db/schema.sql",
         "src/features/loan/ledger/feeRepository.js"
       ],
-      "gap": "All fee kinds not driven by product commands yet"
+      "gap": "All fee kinds not driven by product commands yet",
+      "owner": "docs/modules/loan.md",
+      "closure_note": "loan fee event catalog"
     },
-    "R-M17": {
+    {
+      "id": "R-M17",
       "title": "Loan schedule policy versioning",
       "status": "PARTIAL",
       "define": [
         "src/core/domain/loan/scheduleEngine.js"
       ],
-      "note": "engineVersions on operations; variable rate reset incomplete"
+      "note": "engineVersions on operations; variable rate reset incomplete",
+      "owner": "docs/modules/loan.md",
+      "closure_note": "schedule policy versioning"
     },
-    "R-M18": {
+    {
+      "id": "R-M18",
       "title": "Loan standalone report contract",
       "status": "PARTIAL",
       "define": [
         "src/features/loan/reports/statement.js",
         "src/features/loan/tests/standalone-boot.test.js"
       ],
-      "gap": "Statement enriched; full standalone golden pack pending"
+      "gap": "Statement enriched; full standalone golden pack pending",
+      "owner": "docs/modules/loan.md",
+      "closure_note": "standalone report pack"
     },
-    "R-M19": {
+    {
+      "id": "R-M19",
       "title": "Accounting financial statements",
       "status": "PARTIAL",
       "define": [
@@ -176,58 +221,79 @@
         "IS",
         "CF"
       ],
-      "gap": "RELEASE-PROVEN evidence pack"
+      "gap": "RELEASE-PROVEN evidence pack",
+      "owner": "docs/REPORTING.md",
+      "closure_note": "statement golden suite"
     },
-    "R-M20": {
+    {
+      "id": "R-M20",
       "title": "Investment performance model",
       "status": "PARTIAL",
       "define": [
         "src/core/accounting/reports/investment.js"
       ],
-      "gap": "TWR/MWR, full FX attribution"
+      "gap": "TWR/MWR, full FX attribution",
+      "owner": "docs/REPORTING.md",
+      "closure_note": "perf formulas or explicit defer"
     },
-    "R-M21": {
+    {
+      "id": "R-M21",
       "title": "Deterministic rebuild contract",
       "status": "PARTIAL",
       "define": [
         "docs/FINANCIAL-CORE.md"
       ],
-      "gap": "Executable rebuild API incomplete"
+      "gap": "Executable rebuild API incomplete",
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "rebuild API executable"
     },
-    "R-M22": {
+    {
+      "id": "R-M22",
       "title": "Import lineage runtime gate",
       "status": "SPEC_LOCKED",
       "define": [
         "docs/OFFLINE-RELEASE.md",
         "docs/FINANCIAL-CORE.md"
       ],
-      "gap": "Runtime gate not fully enforced"
+      "gap": "Runtime gate not fully enforced",
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "import lineage tests"
     },
-    "R-M23": {
+    {
+      "id": "R-M23",
       "title": "Backup format contract",
       "status": "PARTIAL",
       "define": [
         "docs/OFFLINE-RELEASE.md"
       ],
-      "gap": "Archive package format runtime incomplete"
+      "gap": "Archive package format runtime incomplete",
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "backup/restore executable"
     },
-    "R-M24": {
+    {
+      "id": "R-M24",
       "title": "Offline browser persistence",
       "status": "PARTIAL",
       "define": [
         "src/core/persistence/browser/durableMemoryAdapter.js"
       ],
-      "gap": "sql.js + IndexedDB production path"
+      "gap": "sql.js + IndexedDB production path",
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "sql.js+IDB E2E"
     },
-    "R-M25": {
+    {
+      "id": "R-M25",
       "title": "License entitlement model",
       "status": "SPEC_LOCKED",
       "define": [
         "docs/OFFLINE-RELEASE.md",
         "docs/FINANCIAL-CORE.md"
-      ]
+      ],
+      "owner": "docs/PRODUCT.md",
+      "closure_note": "license entitlement proof"
     },
-    "R-M26": {
+    {
+      "id": "R-M26",
       "title": "Minimal navigation IA",
       "status": "SPEC_LOCKED",
       "define": [
@@ -236,16 +302,20 @@
       ],
       "note": "Navigation IA is Product-owned; not Financial Core."
     },
-    "R-M27": {
+    {
+      "id": "R-M27",
       "title": "API registry coverage",
       "status": "PARTIAL",
       "define": [
         "docs/API.md",
         "docs/core/registry/status.registry.json"
       ],
-      "gap": "Per-command OpenAPI-like schema files not complete"
+      "gap": "Per-command OpenAPI-like schema files not complete",
+      "owner": "docs/API.md",
+      "closure_note": "complete command cards"
     },
-    "R-M28": {
+    {
+      "id": "R-M28",
       "title": "UI/domain separation gate",
       "status": "IMPLEMENTED",
       "define": [
@@ -253,7 +323,8 @@
         "scripts/lint-boundaries.js"
       ]
     },
-    "R-M29": {
+    {
+      "id": "R-M29",
       "title": "Automated schema/manifest/field consistency",
       "status": "PARTIAL",
       "define": [
@@ -261,9 +332,12 @@
         "scripts/field-inventory-verify.js",
         "scripts/schema-manifest-check.js"
       ],
-      "gap": "FREEZE_PROVEN still false"
+      "gap": "FREEZE_PROVEN still false",
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "schema/field consistency gate"
     },
-    "R-M30": {
+    {
+      "id": "R-M30",
       "title": "Golden fixture machine format",
       "status": "PARTIAL",
       "define": [
@@ -271,13 +345,10 @@
         "docs/core/registry/fixture-manifest.json",
         "scripts/fixture-manifest.js"
       ],
-      "gap": "Markdown fixtures still coexist; machine JSON is primary for /fixtures"
+      "gap": "Markdown fixtures still coexist; machine JSON is primary for /fixtures",
+      "owner": "docs/DEVELOPMENT.md",
+      "closure_note": "fixture machine format"
     }
-  },
-  "related_contracts": {
-    "data_model_relationships": "docs/DATA-MODEL.md",
-    "field_preservation": "docs/DATA-MODEL.md",
-    "accounting_calculation": "docs/FINANCIAL-CORE.md",
-    "command_catalog": "docs/core/registry/command-catalog.json"
-  }
+  ],
+  "description": "Live requirements matrix — statuses in JSON only; no parallel requirements Markdown"
 }

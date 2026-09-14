@@ -352,3 +352,7 @@ Multi-hop paths must store or deterministically reconstruct `conversionPath` + o
 `fin_accounts.account_kind` = accounting class only (asset/liability/equity/income/expense).  
 Operational kinds (bank, card, …) live on Accounts feature entities — see `modules/accounts.md`.  
 Archive never deletes posted history.
+
+## Unit policy (PARTIAL → complete for R-M06)
+Canonical dimensions: money (currency code) · quantity (instrument unit) · mass (`mg` for metals) · rate (percentage-points or fraction — explicit) · pure ratio (0–1).  
+Every field card must state unit; mixing money and quantity without treatment is forbidden.
