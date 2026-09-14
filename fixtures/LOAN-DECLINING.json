@@ -1,10 +1,10 @@
 {
-  "id": "LOAN-FLAT",
+  "id": "LOAN-DECLINING",
   "engineVersions": {
-    "loanSchedule": "1.0.0-period_based-flat"
+    "loanSchedule": "1.0.0-period_based-equal-principal"
   },
   "input": {
-    "method": "flat_rate",
+    "method": "declining_balance",
     "principal": "1200",
     "annualRate": "12",
     "periods": "12",
@@ -16,7 +16,7 @@
       "rowCount": 12,
       "finalBalance": "0.00",
       "totalPrincipal": "1200.00",
-      "totalInterest": "144.00"
+      "totalInterest": "78.00"
     }
   },
   "status": "ACTIVE",

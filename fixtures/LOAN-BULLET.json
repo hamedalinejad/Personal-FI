@@ -1,18 +1,24 @@
 {
   "id": "LOAN-BULLET",
-  "engineVersions": {},
-  "input": {},
-  "expected": {
-    "domain": {},
-    "journal": [],
-    "cash": {},
-    "holding": {},
-    "costBasis": {},
-    "realizedPnl": {},
-    "unrealizedPnl": {},
-    "attribution": {},
-    "wealthDelta": {}
+  "engineVersions": {
+    "loanSchedule": "1.0.0-period_based-bullet"
   },
-  "status": "DEFERRED",
-  "fixtureStatus": "DEFERRED"
+  "input": {
+    "method": "bullet",
+    "principal": "100000",
+    "annualRate": "12",
+    "periods": "12",
+    "startDate": "2026-01-01",
+    "dayCount": "period_based"
+  },
+  "expected": {
+    "domain": {
+      "rowCount": 12,
+      "finalBalance": "0.00",
+      "totalPrincipal": "100000.00",
+      "totalInterest": "12000.00"
+    }
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN"
 }

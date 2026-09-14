@@ -16,6 +16,13 @@ export async function backupDatabase(dataDir, destPath) {
 
 export async function restoreDatabase(backupPath, dataDir) {
   closeAllDbs();
+  const { readFile } = await import("node:fs/promises");
+  const buf = await readFile(backupPath);
+  // SQLite header: "SQLite format 3\0"
+  const header = buf.subarray(0, 16).toString("utf8");
+  if (!header.startsWith("SQLite format 3")) {
+    throw new Error("BACKUP_CORRUPT: not a SQLite database");
+  }
   await mkdir(dataDir, { recursive: true });
   const dest = join(dataDir, "personal-fi.sqlite");
   await copyFile(backupPath, dest);

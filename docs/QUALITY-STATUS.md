@@ -240,3 +240,19 @@ command ID normalization · dead refs · catalog cards · FX/posted journal · f
 
 Still open for FREEZE_PROVEN:
 field-preservation machine coverage · non-empty goldens for all high-value families · executable recovery matrix · standalone packs · browser sql.js+IDB proof · request/result JSON schemas where still missing.
+
+## Freeze closure progress (2026-09-14 late)
+| Blocker | Status |
+|---------|--------|
+| A Registry | GREEN |
+| B Core math | GREEN (invariants + tests) |
+| C Data identity | GREEN |
+| D Field preservation | PARTIAL — machine matrix from command cards (209 rows) |
+| E Module depth | PARTIAL |
+| F Goldens | IMPROVED — LOAN flat/qarz/bullet/declining, metal fineWeight, fund NAV, core |
+| G Recovery | IMPROVED — matrix test + BACKUP_CORRUPT |
+| H Standalone | PARTIAL (existing standalone tests) |
+| Browser | OPEN |
+
+`FREEZE_PROVEN` remains **false** until browser proof + remaining deferred fixtures + full standalone packs are green.
+`npm run freeze:check` = structural gate only.

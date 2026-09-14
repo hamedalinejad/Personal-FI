@@ -1,0 +1,20 @@
+{
+  "id": "METAL-FINEWEIGHT",
+  "engineVersions": {
+    "metals": "1.0.0"
+  },
+  "input": {
+    "grossMg": "1000",
+    "purityRatio": "0.75",
+    "metalPricePerMg": "10"
+  },
+  "expected": {
+    "domain": {
+      "fineWeight": "750",
+      "metalValue": "7500",
+      "formula": "fineWeight = grossMass × purityRatio"
+    }
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN"
+}

@@ -1,18 +1,25 @@
 {
   "id": "LOAN-QARZ",
-  "engineVersions": {},
-  "input": {},
-  "expected": {
-    "domain": {},
-    "journal": [],
-    "cash": {},
-    "holding": {},
-    "costBasis": {},
-    "realizedPnl": {},
-    "unrealizedPnl": {},
-    "attribution": {},
-    "wealthDelta": {}
+  "engineVersions": {
+    "loanSchedule": "1.0.0-period_based-qarz"
   },
-  "status": "DEFERRED",
-  "fixtureStatus": "DEFERRED"
+  "input": {
+    "method": "qarz_al_hasaneh",
+    "principal": "100000",
+    "feePercent": "4",
+    "periods": "12",
+    "startDate": "2026-01-01",
+    "dayCount": "period_based"
+  },
+  "expected": {
+    "domain": {
+      "rowCount": 12,
+      "finalBalance": "0.00",
+      "totalPrincipal": "99999.96",
+      "totalInterest": "0.00",
+      "totalFee": "3999.96"
+    }
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN"
 }

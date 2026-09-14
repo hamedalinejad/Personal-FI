@@ -1,18 +1,26 @@
 {
   "id": "FUND-NAV-VS-TX-PRICE",
-  "engineVersions": {},
-  "input": {},
-  "expected": {
-    "domain": {},
-    "journal": [],
-    "cash": {},
-    "holding": {},
-    "costBasis": {},
-    "realizedPnl": {},
-    "unrealizedPnl": {},
-    "attribution": {},
-    "wealthDelta": {}
+  "engineVersions": {
+    "funds": "1.0.0"
   },
-  "status": "DEFERRED",
-  "fixtureStatus": "DEFERRED"
+  "input": {
+    "command": "funds.subscribe",
+    "amount": "1000000",
+    "nav": "1000",
+    "transactionPrice": "1005",
+    "currency": "IRR"
+  },
+  "expected": {
+    "domain": {
+      "costUses": "transactionPrice",
+      "navMustNotBecomeTransactionPrice": true,
+      "units": "995.02487562"
+    },
+    "invariants": [
+      "NAV_NE_TRANSACTION_PRICE"
+    ]
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN",
+  "note": "units = amount / transactionPrice; NAV is observation only"
 }

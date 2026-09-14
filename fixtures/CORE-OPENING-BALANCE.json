@@ -1,18 +1,21 @@
 {
   "id": "CORE-OPENING-BALANCE",
-  "engineVersions": {},
-  "input": {},
-  "expected": {
-    "domain": {},
-    "journal": [],
-    "cash": {},
-    "holding": {},
-    "costBasis": {},
-    "realizedPnl": {},
-    "unrealizedPnl": {},
-    "attribution": {},
-    "wealthDelta": {}
+  "engineVersions": {
+    "accounting": "1.0.0"
   },
-  "status": "DEFERRED",
-  "fixtureStatus": "DEFERRED"
+  "input": {
+    "amount": "1000000",
+    "currency": "IRR",
+    "bookBase": "IRR"
+  },
+  "expected": {
+    "domain": {
+      "journalMinLines": 2,
+      "balanced": true,
+      "exchangeRateToBase": "1",
+      "amountInBase": "1000000"
+    }
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN"
 }

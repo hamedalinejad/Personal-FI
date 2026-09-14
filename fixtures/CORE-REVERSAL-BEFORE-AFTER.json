@@ -1,18 +1,24 @@
 {
   "id": "CORE-REVERSAL-BEFORE-AFTER",
-  "engineVersions": {},
-  "input": {},
-  "expected": {
-    "domain": {},
-    "journal": [],
-    "cash": {},
-    "holding": {},
-    "costBasis": {},
-    "realizedPnl": {},
-    "unrealizedPnl": {},
-    "attribution": {},
-    "wealthDelta": {}
+  "engineVersions": {
+    "accounting": "1.0.0"
   },
-  "status": "DEFERRED",
-  "fixtureStatus": "DEFERRED"
+  "input": {
+    "original": {
+      "amount": "100",
+      "currency": "IRR"
+    },
+    "reversal": {
+      "link": "originalOperationId"
+    }
+  },
+  "expected": {
+    "domain": {
+      "postedAmountsImmutable": true,
+      "reversalCreatesNewOperation": true,
+      "inverseJournal": true
+    }
+  },
+  "status": "ACTIVE",
+  "fixtureStatus": "GOLDEN"
 }

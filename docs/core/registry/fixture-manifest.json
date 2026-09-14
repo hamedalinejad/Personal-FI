@@ -1,97 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "files": [
-    {
-      "path": "fixtures/CORE-OPENING-BALANCE.json",
-      "hash": "ba8dee2c08056208"
-    },
-    {
-      "path": "fixtures/CORE-REVERSAL-BEFORE-AFTER.json",
-      "hash": "9c7f2dbd955d8126"
-    },
-    {
-      "path": "fixtures/CRITICAL-C2C-SWAP.json",
-      "hash": "3d398ec2b1faa983"
-    },
-    {
-      "path": "fixtures/CRITICAL-TOMAN-INPUT.json",
-      "hash": "832c47d230e8f9b8"
-    },
-    {
-      "path": "fixtures/CRITICAL-TRANSFER-FEE.json",
-      "hash": "3c157bf07c4f1ef8"
-    },
-    {
-      "path": "fixtures/CRYPTO-BRIDGE-FEE.json",
-      "hash": "c246f5618854ab7d"
-    },
-    {
-      "path": "fixtures/CRYPTO-BTC-USDT-IRR-PNL.json",
-      "hash": "e20930b362a7564c"
-    },
-    {
-      "path": "fixtures/CRYPTO-BUY-FEE-FROM-BASE.json",
-      "hash": "5f0df1091730074f"
-    },
-    {
-      "path": "fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json",
-      "hash": "13e3de5acc5e086d"
-    },
-    {
-      "path": "fixtures/CRYPTO-SELL-FEE.json",
-      "hash": "4ff40087fd06f6ce"
-    },
-    {
-      "path": "fixtures/FUND-DIVIDEND-REINVEST.json",
-      "hash": "16f05a573cc6732a"
-    },
-    {
-      "path": "fixtures/FUND-NAV-VS-TX-PRICE.json",
-      "hash": "ed8389d40a181ef3"
-    },
-    {
-      "path": "fixtures/LOAN-BULLET.json",
-      "hash": "bdbf1f99e2ff0299"
-    },
-    {
-      "path": "fixtures/LOAN-FLAT.json",
-      "hash": "ab6c16ab31e766f0"
-    },
-    {
-      "path": "fixtures/LOAN-QARZ.json",
-      "hash": "92b1a33497d58499"
-    },
-    {
-      "path": "fixtures/STANDALONE-CRYPTO.json",
-      "hash": "78961e052e0734d1"
-    },
-    {
-      "path": "fixtures/STANDALONE-FUND.json",
-      "hash": "08bc8eece39f1f84"
-    },
-    {
-      "path": "fixtures/STANDALONE-LOAN.json",
-      "hash": "a43f3842628dc25a"
-    },
-    {
-      "path": "fixtures/STANDALONE-METALS.json",
-      "hash": "d788304769aa8133"
-    },
-    {
-      "path": "fixtures/STANDALONE-STOCKS.json",
-      "hash": "26b49564e2eac350"
-    },
-    {
-      "path": "fixtures/STOCK-BUY-SELL-FEE.json",
-      "hash": "67f63111d57c2dd5"
-    },
-    {
-      "path": "fixtures/STOCK-CORPORATE-ACTION.json",
-      "hash": "443d840a529fb4e8"
-    },
-    {
-      "path": "fixtures/STOCK-T2-SETTLEMENT.json",
-      "hash": "b6c70bc1fe531edb"
-    }
+    "CORE-OPENING-BALANCE.json",
+    "CORE-REVERSAL-BEFORE-AFTER.json",
+    "CRITICAL-C2C-SWAP.json",
+    "CRITICAL-TOMAN-INPUT.json",
+    "CRITICAL-TRANSFER-FEE.json",
+    "CRYPTO-BRIDGE-FEE.json",
+    "CRYPTO-BTC-USDT-IRR-PNL.json",
+    "CRYPTO-BUY-FEE-FROM-BASE.json",
+    "CRYPTO-BUY-FEE-IN-QUOTE.json",
+    "CRYPTO-SELL-FEE.json",
+    "FUND-DIVIDEND-REINVEST.json",
+    "FUND-NAV-VS-TX-PRICE.json",
+    "LOAN-BULLET.json",
+    "LOAN-DECLINING.json",
+    "LOAN-FLAT.json",
+    "LOAN-QARZ.json",
+    "METAL-FINEWEIGHT.json",
+    "STANDALONE-CRYPTO.json",
+    "STANDALONE-FUND.json",
+    "STANDALONE-LOAN.json",
+    "STANDALONE-METALS.json",
+    "STANDALONE-STOCKS.json",
+    "STOCK-BUY-SELL-FEE.json",
+    "STOCK-CORPORATE-ACTION.json",
+    "STOCK-T2-SETTLEMENT.json"
   ]
 }
