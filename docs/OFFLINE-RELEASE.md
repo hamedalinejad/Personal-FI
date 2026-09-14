@@ -101,3 +101,26 @@ draft | posted | voided | failed
 ### 20.4 Recovery matrix (must be golden before release)
 crash before commit · crash after SQL · same operationId replay · same ID + changed economics · offline reopen · backup · restore · corrupt backup · browser reload · multi-tab write · rebuild · reversal
 
+## result_json vs relational truth (LOCKED)
+
+| Field | SoT | Replay source | In economic hash | Mismatch action |
+|-------|-----|---------------|------------------|-----------------|
+| operationId | fin_operations.id | row | yes | fatal if missing |
+| commandHash | fin_operations.command_hash | row | yes | conflict / reject |
+| status / durability | fin_operations columns | row | no | row wins |
+| businessDate / baseCurrency | fin_operations | row | yes | row wins |
+| journal lines | fin_journal_lines | relational SELECT | yes | always rebuild from rows |
+| domain feature rows | inv_*/ln_*/… | feature tables | module rule | tables win |
+| result_json | cache / transport snapshot | recomputed optional | no | never accounting SoT |
+| result_hash | control-plane on fin_operations | SHA of snapshot without result_hash | no | see below |
+
+### resultHashMismatch classification
+| Class | Meaning | Action |
+|-------|---------|--------|
+| stale_snapshot | relational truth newer than snapshot | soft flag `_resultHashMismatch`; load rows |
+| transport_difference | key order / omit null noise | soft flag; prefer rows |
+| corruption | unreadable JSON or impossible shape | fail load of snapshot; still prefer rows if present |
+| fatal_identity | operationId/commandHash row missing | reject |
+
+`loadOperation` must always overlay `journalLines` from relational tables when present.
+

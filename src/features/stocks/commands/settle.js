@@ -78,20 +78,8 @@ export async function settleStock(input, { dataDir } = {}) {
          AND t.related_operation_id = ?`,
     )
     .get(p.originalTradeOperationId);
-  // related_operation_id may not exist on schema — fallback query via payload in typed ops
-  let alreadySettled = !!priorSettle;
-  if (!alreadySettled) {
-    // Scan domainResult is forbidden; use settlement journal + operation type with source_reference
-    const byRef = db0
-      .prepare(
-        `SELECT id FROM fin_operations
-         WHERE operation_type = 'stocks.settle' AND status = 'posted'
-           AND source_reference = ?`,
-      )
-      .get(p.originalTradeOperationId);
-    alreadySettled = !!byRef;
-  }
-  if (alreadySettled) throw new Error("ALREADY_SETTLED");
+  // Locked schema: prior settlement only via related_operation_id (no source_reference fallback)
+  if (priorSettle) throw new Error("ALREADY_SETTLED");
 
   const currency = p.currency || tradeTx.currency;
   const brokerageId = p.brokerageId || tradeTx.brokerage_id;

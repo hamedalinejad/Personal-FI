@@ -9,13 +9,25 @@ import { persistOperation, loadOperation } from "../../persistence/port.js";
  * invariant: optional undefined fields are OMITTED (never serialized as null unless caller set null).
  * Arrays preserve index order; object keys sorted.
  */
-export function stableStringify(value) {
+/**
+ * Stable JSON for economic hash.
+ * Financial payloads must use decimal **strings** for money/qty/rate/price.
+ * Finite JS Number is forbidden in hashed economic identity (BUG-005).
+ * Allowed non-object scalars: string, boolean, null. Integers only when parent
+ * passes { allowIntegerKeys } context — default reject all numbers.
+ */
+export function stableStringify(value, opts = {}) {
   if (value === undefined) {
     return undefined; // signal omit to parent
   }
   if (value === null || typeof value !== "object") {
-    if (typeof value === "number" && !Number.isFinite(value)) {
-      throw new Error("HASH_NON_FINITE_NUMBER");
+    if (typeof value === "number") {
+      if (!Number.isFinite(value)) throw new Error("HASH_NON_FINITE_NUMBER");
+      // Allow only safe integers used as counts/line numbers when explicitly opted in
+      if (opts.allowIntegers && Number.isInteger(value) && Number.isSafeInteger(value)) {
+        return JSON.stringify(value);
+      }
+      throw new Error("HASH_NUMBER_FORBIDDEN");
     }
     return JSON.stringify(value);
   }
@@ -24,19 +36,27 @@ export function stableStringify(value) {
     for (const v of value) {
       if (v === undefined) throw new Error("HASH_ARRAY_UNDEFINED_FORBIDDEN");
     }
-    return `[${value.map((v) => stableStringify(v)).join(",")}]`;
+    return `[${value.map((v) => stableStringify(v, opts)).join(",")}]`;
   }
   const keys = Object.keys(value).sort();
   const parts = [];
   for (const k of keys) {
     if (value[k] === undefined) continue; // omit optional undefined
-    parts.push(`${JSON.stringify(k)}:${stableStringify(value[k])}`);
+    const childOpts = opts.integerKeys && opts.integerKeys.has(k) ? { ...opts, allowIntegers: true } : opts;
+    parts.push(`${JSON.stringify(k)}:${stableStringify(value[k], childOpts)}`);
   }
   return `{${parts.join(",")}}`;
 }
 
 function stableHash(obj) {
-  return createHash("sha256").update(stableStringify(obj)).digest("hex");
+  // line_number is structural index, not money — only safe integers allowed under these keys
+  return createHash("sha256")
+    .update(
+      stableStringify(obj, {
+        integerKeys: new Set(["line_number", "lineNumber"]),
+      }),
+    )
+    .digest("hex");
 }
 
 /** economic-identity — fields that participate in economic identity / commandHash */

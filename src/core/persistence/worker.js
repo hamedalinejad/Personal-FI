@@ -303,8 +303,9 @@ function loadOperationSync(db, operationId, replay = false) {
       const { result_hash: _rh, ...canonical } = snap;
       const recomputed = createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
       if (recomputed !== row.result_hash) {
-        // soft warn path: do not fail load of relational truth; surface flag
+        // soft: snapshot cache drift — relational journal remains SoT (BUG-006)
         snap._resultHashMismatch = true;
+        snap._resultHashMismatchClass = "stale_snapshot_or_transport";
       }
     }
     const lines = db

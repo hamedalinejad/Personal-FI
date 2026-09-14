@@ -62,3 +62,21 @@ test("BUG-004 same-currency representation yields same hash", () => {
   });
   assert.equal(computeCommandHash(a), computeCommandHash(b));
 });
+
+
+test("BUG-005 money Number in payload rejected by hash", () => {
+  assert.throws(
+    () =>
+      computeCommandHash(
+        normalizeCommand({
+          operationId: "op-num",
+          businessDate: "2026-01-01",
+          baseCurrency: "IRR",
+          status: "draft",
+          type: "test.op",
+          payload: { amount: 0.1 },
+        }),
+      ),
+    /HASH_NUMBER_FORBIDDEN/,
+  );
+});

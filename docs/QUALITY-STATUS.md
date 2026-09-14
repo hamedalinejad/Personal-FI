@@ -85,3 +85,13 @@ Until all green: `FREEZE_PROVEN = false`. Production remains **NO-GO**.
 | BUG-002 feeQuantity for reduce_received_quantity | FIXED |
 | BUG-003 no silent expense default in Core | FIXED |
 | BUG-004 same-currency journal filled before hash | FIXED |
+
+## BUG-005…009 / FINDING-010
+| ID | Status |
+|----|--------|
+| BUG-005 Number forbidden in economic hash | FIXED |
+| BUG-006 result_json vs journal SoT table | FIXED (docs + soft mismatch class) |
+| BUG-007 dead COMMAND-COVERAGE-MATRIX ref | FIXED → QUALITY-STATUS |
+| BUG-008 file-inventory regenerated | FIXED |
+| BUG-009 ticket vocabulary in feeEngine | already clean / verify |
+| FINDING-010 settle source_reference fallback | REMOVED |
