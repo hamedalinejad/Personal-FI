@@ -1,5 +1,6 @@
 -- Personal-FI canonical schema
--- Authority: SCHEMA-FREEZE-REQUIREMENTS.md + 01-schema-tables.md + identity/cash locks
+-- Authority: docs/DATA-MODEL.md + docs/FINANCIAL-CORE.md + docs/core/db/schema.manifest.json + registry
+-- Historical prose names live in Git only; not active authority.
 -- content: advanced (tables/columns/CHECKs present)
 -- freeze: FREEZE_PROVEN via field-inventory STRICT + schema load (RELEASE-PROVEN still open) (Gate B / OPEN-001 — drift scripts help; full freeze evidence pending)
 -- Money: TEXT decimal strings. IDs: TEXT UUID.
@@ -833,6 +834,9 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   updated_at TEXT NOT NULL
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_metals_holdings_platform_instrument_purity
+  ON inv_metals_holdings(platform_id, instrument_id, purity_ratio);
+
 CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   id TEXT PRIMARY KEY,
   operation_id TEXT NOT NULL REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1071,7 +1075,7 @@ CREATE TABLE IF NOT EXISTS rpt_snapshots (
   id TEXT PRIMARY KEY,
   report_kind TEXT NOT NULL CHECK (report_kind IN ('net_worth','cash_flow','income_statement','balance_sheet','investment_pnl','tax','allocation','fees','category_spending','custom')),
   as_of TEXT NOT NULL,
-  payload_json TEXT NOT NULL, -- schema per report_kind: see Essential-Reports.md (net_worth|cash_flow|pnl|balance_sheet|tax|allocation|fees)
+  payload_json TEXT NOT NULL, -- schema per report_kind: see docs/REPORTING.md (net_worth|cash_flow|pnl|balance_sheet|tax|allocation|fees)
   ledger_watermark TEXT, -- opaque hash/version string of ledger state
   price_as_of TEXT,
   fx_as_of TEXT,
@@ -1501,7 +1505,7 @@ CREATE TABLE IF NOT EXISTS ref_integrity_queue (
 -- Posted financial events ALWAYS require operation_id → fin_operations.
 -- Standalone edition = UI/package may ship without other feature UIs;
 -- local settlement still uses CashSettlementPort + journal when cash moves.
--- See Feature-Independence-Contract.md.
+-- See docs/ARCHITECTURE.md (module boundaries).
 -- ═══════════════════════════════════════════════════════════
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_import_external_ref ON import_dedupe_keys(source_provider, external_ref) WHERE external_ref IS NOT NULL;
@@ -1552,7 +1556,7 @@ CREATE INDEX IF NOT EXISTS idx_exp_reversed ON exp_transactions(reversed_expense
 --   realized_gain_loss only on sale/disposal
 --   reverse target must be posted / not already voided
 --   principal, cheque amount, journal line amount > 0
--- See Financial-Invariants.md + BUG-CODE regression suite.
+-- See docs/FINANCIAL-CORE.md + BUG-CODE regression suite.
 -- ═══════════════════════════════════════════════════════════
 
 

@@ -24,6 +24,11 @@ Live only. History in Git. **No new audit documents.**
 | P0-03 | Fund no silent NAV price | FIXED | subscribe FUND_TRANSACTION_PRICE_REQUIRED |
 | P0-04 | Capitalized fee has GL legs | FIXED | feeEngine journal |
 | P0-05 | Reports posted-only GL | FIXED | generalLedger status filter |
+| P0-06 | Settle uses book base + FX | FIXED | stocks/settle.js |
+| P0-07 | Sell fee vocab = buy | FIXED | stocks/sell.js |
+| P0-08 | Metals holding + purity key | FIXED | platform+instrument+purity_ratio |
+| P0-09 | Delivery field persist | FIXED | physical_deliveries full columns |
+| P1-01 | Schema live owner refs | FIXED | schema.sql header |
 | PROD | Production | **NO_GO** | — |
 
 ### Remaining before RELEASE_PROVEN

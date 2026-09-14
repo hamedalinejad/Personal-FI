@@ -7,6 +7,7 @@ import {
   ensureAccount,
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
+import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { assertPositive, assertNonNegative } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
@@ -33,9 +34,14 @@ export async function sellStock(input, { dataDir } = {}) {
   const currency = p.currency;
   const proceeds = qty.times(price);
   const commission = toDecimal(p.commission || "0");
+  const tax = toDecimal(p.tax || p.transactionTax || "0");
+  const otherFee = toDecimal(p.otherFee || p.otherFees || "0");
   assertNonNegative(p.commission || "0", "STOCK_COMMISSION_NEGATIVE");
-  const netProceeds = proceeds.minus(commission);
-  if (netProceeds.lt(0)) throw new Error("VALIDATION_ERROR:commission");
+  assertNonNegative(p.tax || p.transactionTax || "0", "STOCK_TAX_NEGATIVE");
+  assertNonNegative(p.otherFee || p.otherFees || "0", "STOCK_OTHER_FEE_NEGATIVE");
+  const totalFees = commission.plus(tax).plus(otherFee);
+  const netProceeds = proceeds.minus(totalFees);
+  if (netProceeds.lt(0)) throw new Error("VALIDATION_ERROR:fees_exceed_proceeds");
 
   const tradeDate = p.tradeDate;
   const settlementDate = p.settlementDate || null;
@@ -52,6 +58,40 @@ export async function sellStock(input, { dataDir } = {}) {
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("stock_inventory", currency);
   const pnlId = scopedAccountId("stock_realized_pnl", currency);
+
+  const baseCurrency = resolveBookBaseCurrency({
+    dataDir,
+    explicitBaseCurrency: p.baseCurrency || null,
+    transactionCurrency: currency,
+  });
+  const exchangeRateToBase = requireFxIfCrossCurrency({
+    transactionCurrency: currency,
+    baseCurrency,
+    exchangeRateToBase: p.exchangeRateToBase || null,
+  });
+  const toBase = (a) => toDecimal(typeof a === "string" ? a : a.toFixed()).times(toDecimal(exchangeRateToBase)).toFixed();
+
+  const feeEvents = buildFeeEvents(
+    [
+      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "expense", label: "commission", feeCurrency: currency },
+      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "expense", label: "tax", feeCurrency: currency },
+      { feeAmount: otherFee.toFixed(), treatment: p.otherFeeTreatment || "expense", label: "otherFee", feeCurrency: currency },
+    ].filter((f) => !toDecimal(f.feeAmount).isZero()),
+    { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
+  );
+  const feeResult = applyFeeEvents(
+    feeEvents.map((e) => ({
+      ...e,
+      baseCurrency,
+      transactionCurrency: currency,
+      exchangeRateToBase,
+    })),
+    {
+      expenseAccountId: scopedAccountId("stock_fee_expense", currency),
+      cashAccountId: receivableId,
+      transactionCurrency: currency,
+    },
+  );
 
   const db0 = openDb(dataDir);
   const holding = db0
@@ -76,8 +116,8 @@ export async function sellStock(input, { dataDir } = {}) {
       side: "debit",
       amount: netProceeds.toFixed(),
       currency,
-      amountInBase: netProceeds.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(netProceeds),
+      exchangeRateToBase,
       lineKind: "principal",
     },
     {
@@ -85,8 +125,8 @@ export async function sellStock(input, { dataDir } = {}) {
       side: "credit",
       amount: costReleased.toFixed(),
       currency,
-      amountInBase: costReleased.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(costReleased),
+      exchangeRateToBase,
       lineKind: "principal",
     },
   ];
@@ -96,35 +136,13 @@ export async function sellStock(input, { dataDir } = {}) {
       side: realized.gt(0) ? "credit" : "debit",
       amount: realized.abs().toFixed(),
       currency,
-      amountInBase: realized.abs().toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(realized.abs()),
+      exchangeRateToBase,
       lineKind: "principal",
     });
   }
-  // Commission expense if any
-  if (commission.gt(0)) {
-    const feeExp = scopedAccountId("stock_fee_expense", currency);
-    journalLines.push(
-      {
-        accountId: feeExp,
-        side: "debit",
-        amount: commission.toFixed(),
-        currency,
-        amountInBase: commission.toFixed(),
-        exchangeRateToBase: "1",
-        lineKind: "fee",
-      },
-      {
-        accountId: receivableId,
-        side: "credit",
-        amount: commission.toFixed(),
-        currency,
-        amountInBase: commission.toFixed(),
-        exchangeRateToBase: "1",
-        lineKind: "fee",
-      },
-    );
-  }
+  // Fees: same vocabulary as buy (commission / tax / otherFee)
+  journalLines.push(...feeResult.journalLines);
 
   if (settleSameOp) {
     journalLines.push(
@@ -133,8 +151,8 @@ export async function sellStock(input, { dataDir } = {}) {
         side: "debit",
         amount: netProceeds.toFixed(),
         currency,
-        amountInBase: netProceeds.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: toBase(netProceeds),
+        exchangeRateToBase,
         lineKind: "principal",
       },
       {
@@ -142,8 +160,8 @@ export async function sellStock(input, { dataDir } = {}) {
         side: "credit",
         amount: netProceeds.toFixed(),
         currency,
-        amountInBase: netProceeds.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: toBase(netProceeds),
+        exchangeRateToBase,
         lineKind: "principal",
       },
     );
@@ -152,14 +170,13 @@ export async function sellStock(input, { dataDir } = {}) {
   const txId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
-    
-    status: "posted",operationId,
+    status: "posted",
+    operationId,
     type: "stocks.sell",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency,
     payload: p,
     journalLines,
     domainResult: {
@@ -196,7 +213,7 @@ export async function sellStock(input, { dataDir } = {}) {
         currency,
         systemRole: "stock_realized_pnl",
       });
-      if (commission.gt(0)) {
+      if (totalFees.gt(0)) {
         ensureAccount(db, {
           id: scopedAccountId("stock_fee_expense", currency),
           name: `Stock fee expense (${currency})`,

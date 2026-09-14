@@ -116,3 +116,6 @@ docs/core/db/schema.sql · registry · fixtures.
 
 ### Physical fields
 gross weight (quantityMg RAW) · purityRatio RAW · fineWeight DERIVED · optional serial/certificate/location · delivery fee ≠ trade fee.
+
+### Holding identity (P0)
+`platform_id + instrument_id + purity_ratio` — incompatible purities never share one aggregate row without an explicit product policy.

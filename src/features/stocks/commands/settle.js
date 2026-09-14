@@ -131,7 +131,24 @@ export async function settleStock(input, { dataDir } = {}) {
   const amt = amount.toFixed();
   const now = new Date().toISOString();
 
-  // Buy: Dr payable / Cr cash. Sell: Dr cash / Cr receivable.
+  // Book base from trade op / book settings — never force txn currency as base
+  const baseCurrency = resolveBookBaseCurrency({
+    dataDir,
+    explicitBaseCurrency: p.baseCurrency || tradeOp.base_currency || null,
+    transactionCurrency: currency,
+  });
+  const exchangeRateToBase = requireFxIfCrossCurrency({
+    transactionCurrency: currency,
+    baseCurrency,
+    exchangeRateToBase:
+      p.exchangeRateToBase ||
+      p.settlementExchangeRateToBase ||
+      tradeOp.exchange_rate_to_base ||
+      null,
+  });
+  const amountInBase = toDecimal(amt).times(toDecimal(exchangeRateToBase)).toFixed();
+
+  // Buy: Dr payable / Cr cash. Sell: Dr cash / Cr receivable. (txn currency legs + base amounts)
   const journalLines =
     side === "buy"
       ? [
@@ -140,8 +157,8 @@ export async function settleStock(input, { dataDir } = {}) {
             side: "debit",
             amount: amt,
             currency,
-            amountInBase: amt,
-            exchangeRateToBase: "1",
+            amountInBase,
+            exchangeRateToBase,
             lineKind: "principal",
           },
           {
@@ -149,8 +166,8 @@ export async function settleStock(input, { dataDir } = {}) {
             side: "credit",
             amount: amt,
             currency,
-            amountInBase: amt,
-            exchangeRateToBase: "1",
+            amountInBase,
+            exchangeRateToBase,
             lineKind: "principal",
           },
         ]
@@ -160,8 +177,8 @@ export async function settleStock(input, { dataDir } = {}) {
             side: "debit",
             amount: amt,
             currency,
-            amountInBase: amt,
-            exchangeRateToBase: "1",
+            amountInBase,
+            exchangeRateToBase,
             lineKind: "principal",
           },
           {
@@ -169,20 +186,19 @@ export async function settleStock(input, { dataDir } = {}) {
             side: "credit",
             amount: amt,
             currency,
-            amountInBase: amt,
-            exchangeRateToBase: "1",
+            amountInBase,
+            exchangeRateToBase,
             lineKind: "principal",
           },
         ];
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     status: "posted",
     operationId,
     type: "stocks.settle",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency,
     sourceReference: p.originalTradeOperationId,
     sourceType: "settlement",
     sourceChannel: "api",

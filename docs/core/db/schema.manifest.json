@@ -1,5 +1,5 @@
 {
-  "schemaHash": "2544df9c58a594dea458e7e4cfc25120188ea1f7bd5c55df647e3a4f70da5168",
+  "schemaHash": "e95a18e17621456333874df113efee1a6b60cf3137abfa876afa91b9468a6cf0",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -4867,6 +4867,16 @@
         }
       ],
       "indexes": [
+        {
+          "name": "uq_metals_holdings_platform_instrument_purity",
+          "unique": true,
+          "origin": "c",
+          "columns": [
+            "platform_id",
+            "instrument_id",
+            "purity_ratio"
+          ]
+        },
         {
           "name": "sqlite_autoindex_inv_metals_holdings_1",
           "unique": true,

@@ -175,11 +175,32 @@ export async function deliverMetal(input, { dataDir } = {}) {
       // optional physical_deliveries table
       const cols = db.prepare(`PRAGMA table_info(inv_metals_physical_deliveries)`).all();
       if (cols.length) {
+        const feeAmt =
+          p.feeAmount != null && p.feeAmount !== ""
+            ? toDecimal(p.feeAmount).toFixed()
+            : fee.gt(0)
+              ? fee.toFixed()
+              : null;
+        const feeCcy = p.feeCurrency || currency;
         db.prepare(
           `INSERT INTO inv_metals_physical_deliveries (
-            id, operation_id, metals_holding_id, status, quantity_mg, created_at, updated_at
-          ) VALUES (?, ?, ?, 'delivered', ?, ?, ?)`,
-        ).run(delId, operationId, h2.id, qty.toFixed(), now, now);
+            id, operation_id, metals_holding_id, pa_asset_id, status, quantity_mg,
+            fee_amount, fee_currency, delivery_address, invoice_ref, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ).run(
+          delId,
+          operationId,
+          h2.id,
+          p.physicalAssetId || p.paAssetId || p.pa_asset_id || null,
+          p.deliveryStatus || "delivered",
+          qty.toFixed(),
+          feeAmt,
+          feeAmt != null ? feeCcy : null,
+          p.deliveryAddress || p.delivery_address || null,
+          p.invoiceRef || p.invoice_ref || null,
+          now,
+          now,
+        );
       }
     },
   });

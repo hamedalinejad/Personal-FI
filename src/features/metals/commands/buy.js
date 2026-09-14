@@ -208,9 +208,9 @@ export async function buyMetal(input, { dataDir } = {}) {
       // aggregate position (platform + instrument)
       let holding = db
         .prepare(
-          `SELECT * FROM inv_metals_holdings WHERE platform_id = ? AND instrument_id = ?`,
+          `SELECT * FROM inv_metals_holdings WHERE platform_id = ? AND instrument_id = ? AND purity_ratio = ?`,
         )
-        .get(p.platformId, p.instrumentId);
+        .get(p.platformId, p.instrumentId, p.purityRatio);
       if (holding) {
         const newQty = toDecimal(holding.quantity_mg).plus(grossMg);
         const newCost = toDecimal(holding.total_invested || "0").plus(carrying);
