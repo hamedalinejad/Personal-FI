@@ -118,3 +118,6 @@ docs/core/db/schema.sql · registry · fixtures.
 - Official holiday calendars must be data packages, not hard-coded Core constants beyond this deterministic weekend set.
 - Every equity trade must persist `settlement_policy_version` with the op.
 
+## Date fields (never collapse)
+`tradeDate` · `settlementDate` · `cashDate` · `marketDate` · `priceAsOf` · `fxAsOf`  
+Settlement uses versioned market calendar (Iran equity T+n). Corporate actions need explicit event semantics before production.

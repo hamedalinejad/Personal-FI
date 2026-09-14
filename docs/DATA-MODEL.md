@@ -55,3 +55,26 @@ Holdings rebuild from feature transactions + cost basis version.
 **Accounting SoT = journal lines + fin_accounts classification.**  
 `current_balance` is a cache; if present it must reconcile to journal or be ignored by statements.
 
+## 20. Field-preservation protocol (LOCKED)
+
+Every **input** field maps to:
+```
+Input → semantic owner → kind → normalized value
+  → persistence column OR explicit DERIVED|VIRTUAL|DEFERRED
+  → query projection → report/export → reversal → migration
+```
+
+Every **table** field records:
+```
+kind · owner · nullable · unit · currency · precision · formula · source · migration · export · reversal
+```
+
+### Forbidden
+```
+input accepted → not stored → not returned → not rejected
+```
+That is a hard **no-field-loss** violation. Accept implies persist or explicit reject.
+
+### Posted ledger deletion
+No `deletedAt` strategy may hide posted accounting history.
+

@@ -117,3 +117,50 @@ No live provider calls during historical reconstruction.
 - `resolveBookBaseCurrency` never defaults book base to transaction currency.
 - Cross-currency writes require `exchangeRateToBase`; `amountInBase = amount × rate`.
 
+## 20. Final calculation / ledger grammar (LOCKED)
+
+### 20.1 Monetary representation
+| Layer | Rule |
+|-------|------|
+| API | decimal **string** |
+| DB | TEXT decimal |
+| Arithmetic | Decimal.js only |
+| Forbidden | JavaScript `Number` for money/quantity/rate/price |
+
+### 20.2 Base conversion
+```
+exchangeRateToBase = base units per 1 transaction-currency unit
+amountInBase = amount × exchangeRateToBase
+```
+- Base currency line: `exchangeRateToBase = 1`, `amountInBase = amount`.
+- Non-base posted line: rate **mandatory**.
+- Historical path: rate carries as-of / source / context when reproducibility matters.
+
+### 20.3 Journal balance
+Posted operation:
+```
+Σ debit(amountInBase) = Σ credit(amountInBase)
+```
+Exact Decimal equality after policy rounding. No ad-hoc tolerance unless explicitly specified with mathematical justification.
+
+### 20.4 Accounting SoT
+```
+fin_accounts + fin_journal_entries + fin_journal_lines
+```
+Feature cash balances are **projections only**.
+
+### 20.5 Operation identity
+```
+operationId + canonical economic hash
+```
+| Case | Result |
+|------|--------|
+| Same ID + same economics | idempotent replay |
+| Same ID + different economics | conflict |
+
+### 20.6 Reversal
+No in-place rewrite of posted amounts. Correction = **new** operation linked to original + inverse journal legs.
+
+### 20.7 Book base currency
+Book base is authoritative (`db_meta` / settings). Commands must not default base to transaction currency. Use `resolveBookBaseCurrency`.
+

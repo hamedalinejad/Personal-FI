@@ -44,3 +44,7 @@ Live only. History in Git. **No new audit documents.**
 
 ### Implementation sequence (locked)
 Decimal/FX → Journal/invariants → Persistence → Loan→Crypto→Stocks→Funds→Metals → Planning/Tax/Reports → Browser → License → UI
+
+## 2026-09-14 — Final grammar lock (§8–13)
+Owner docs updated: FINANCIAL-CORE §20, API §10–12, OFFLINE §20, DATA-MODEL §20, modules loan/crypto/stocks/funds/metals/tax/accounts/cheque/income-expense/budget.
+Production remains **NO-GO** until browser offline + recovery golden matrix + freeze evidence.

@@ -71,3 +71,33 @@ Unknown provider fields survive unless user chooses destructive transform.
 - License gates **capability only** — never deletes financial history.
 - Wallet addresses / bank identifiers are sensitive fields; do not log in plain telemetry.
 - Detailed key-management is a DEFERRED product package; schema may hold encryption metadata without implying a full KMS.
+
+## 20. Offline architecture — final rules
+
+### 20.1 Node
+```
+Node → SQLite
+```
+Primary production path for desktop.
+
+### 20.2 Browser (release requirement)
+```
+sql.js + IndexedDB + single-writer coordination
+```
+Durable-memory scaffold is **not** RELEASE-PROVEN for browser production.
+
+### 20.3 Two state machines (never mixed)
+**Durability (transport):**
+```
+pending → sql_committed → persisted
+pending → persist_failed
+```
+**Business status:**
+```
+draft | posted | voided | failed
+```
+`swapped` / `durable` are **not** public durability or business states (legacy transport markers only).
+
+### 20.4 Recovery matrix (must be golden before release)
+crash before commit · crash after SQL · same operationId replay · same ID + changed economics · offline reopen · backup · restore · corrupt backup · browser reload · multi-tab write · rebuild · reversal
+

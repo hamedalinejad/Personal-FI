@@ -122,4 +122,21 @@ Canonical: `fixtures/LOAN-FLAT.json` · `fixtures/LOAN-BULLET.json` · `fixtures
 ### Algorithms (v1) — implementation: `scheduleEngine.js`
 - **Rate:** rateFraction = annualRate / 100  
 - **Flat:** totalInterest = P × rateFraction × (n / periodsPerYear); residual last row  
-- **Declining / Qarz / Bullet:** see engine; conservation assert Σ principal = P  
+- **Declining / Qarz / Bullet:** see engine; conservation assert Σ principal = P
+
+## V1 schedule conventions (LOCKED)
+
+Methods: `declining_balance` · `flat_rate` · `qarz_al_hasaneh` · `bullet`.
+
+### declining_balance = equal-principal (NOT annuity)
+```
+principalPart = P / n
+interest_i = openingBalance_i × periodRate
+payment_i = principalPart + interest_i
+```
+Final period conserves residual principal. Do not document as generic “amortizing annuity”.
+
+### Explicit v1 must define (module + fixtures)
+borrower | lender · rate period · payment frequency · custom interval · grace · holiday policy · penalty · fee tiers · early payment · recalculation · FX · rounding · residual.
+
+Rate unit: percentage points (`12` = 12%).

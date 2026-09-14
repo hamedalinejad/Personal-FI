@@ -115,3 +115,7 @@ Accounting/chart tests in src/core/accounting
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+## Operational account kinds → fin_accounts
+cash · bank_account · card · wallet · broker_cash · crypto_exchange_cash · cash_equivalent · credit_account  
+Balances derived from journal. **No parallel cash ledger.**

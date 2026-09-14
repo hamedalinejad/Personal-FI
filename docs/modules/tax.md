@@ -104,3 +104,6 @@ src/core/tax · acceptance tax/provenance-tax
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+## Tax vs fee (LOCKED)
+Tax is separate from fee. Status `paid` is allowed only after a successful **payTax** operation with journal legs — never a free status mutation.

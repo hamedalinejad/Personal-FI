@@ -104,3 +104,6 @@ src/features/<name>/tests + acceptance as applicable.
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+## Role
+Planning projections and links only — **never** an alternate cash ledger.

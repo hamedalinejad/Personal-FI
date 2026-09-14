@@ -110,3 +110,10 @@ src/features/crypto/tests · recovery-roundtrip
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+## V1 command boundary (LOCKED)
+**Implemented:** `crypto.buy` · `crypto.sell` · `crypto.transfer`  
+**Deferred:** deposit · withdrawal · swap · airdrop · opening_balance  
+
+Holding identity: `instrument + venue/exchange + network`.  
+Wallet / network / provider fields = provenance, not economic identity.

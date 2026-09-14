@@ -128,3 +128,11 @@ gross weight (quantityMg RAW) · purityRatio RAW · fineWeight DERIVED · option
 | coin_market / bar | explicit policy | no silent pure-metal derivation |
 
 `priceUnit`: `per_mg` | `per_g`.
+
+## Mass / purity (LOCKED)
+```
+quantityMg (canonical gross mass)
+purityRatio
+fineWeight = quantityMg × purityRatio
+```
+Preserve: gross · purity · fine · price basis (quoteBasis) · premium · trade fee · delivery fee · serial/certificate/location when supplied.

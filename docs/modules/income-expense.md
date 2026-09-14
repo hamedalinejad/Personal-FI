@@ -104,3 +104,7 @@ src/features/<name>/tests + acceptance as applicable.
 
 ## 34. Machine-file references
 docs/core/db/schema.sql · registry · fixtures.
+
+## Fields
+category · counterparty? · account · currency · FX · attachment · recurrence · source · reversal  
+Journal is the financial truth.
