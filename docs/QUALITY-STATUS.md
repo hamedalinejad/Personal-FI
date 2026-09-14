@@ -273,3 +273,11 @@ Standalone editions are a **product requirement**, not an afterthought — see P
 | BUG-CURRENT-003 command cards incomplete | **CLOSED** | All 42 cards: validation, errors, fixtureRefs, recoveryCases, businessRules, result shape |
 | BUG-CURRENT-004 duplicate owner prose | **CLOSED** | DoD xref; schema ticket IDs stripped; single PRODUCT standalone/routes |
 | BUG-CURRENT-005 schema ticket vocabulary | **CLOSED** | Active schema comments are semantic-only |
+
+## Historical issues (do not re-open as docs)
+Fee vocabulary · feeQuantity · silent fee default · amountInBase-before-hash · Number in hash ·
+dead command-coverage ref · book-base default · NAV as tx price · capitalized fee GL ·
+posted-only reports · stock sell fees · holding uniqueness · FX resolver · category cycles ·
+settle probing · operationId silent gen · metals purity/delivery · command aliases → **FIXED**.
+
+Inventory: regenerated + `inventory:check`. Regression = code + test, not new audit Markdown.

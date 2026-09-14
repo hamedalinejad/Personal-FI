@@ -186,3 +186,7 @@ boot → create entity → representative operation → statement
 / · /money · /transactions · /investments · /loans · /more
 ```
 Sheets/drawers under these routes only. No route per table or per feature package.
+
+## Accounting stance
+Financial truth rules and **forbidden anti-patterns** live only in [FINANCIAL-CORE.md](./FINANCIAL-CORE.md).  
+Modules must not invent a second cash or cost ledger.

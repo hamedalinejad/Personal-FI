@@ -285,3 +285,39 @@ assessment → payable/obligation → tax.pay operation → journal → paid
 fin_operations → fin_journal_entries → fin_journal_lines → fin_accounts
 ```
 Feature transactions link via `operationId`. Holdings are rebuildable projections — not unaudited cost SoT.
+
+## Core relationship (LOCKED)
+```
+fin_operations
+    ↓
+fin_journal_entries
+    ↓
+fin_journal_lines
+    ↓
+fin_accounts
+```
+Feature event → `operationId` → `fin_operations` → journal.  
+Holding/cost tables are **rebuildable projections**, not unaudited cost SoT.
+
+```
+instrument → feature transactions → cost basis / rebuild → holding projection
+```
+
+## Anti-patterns (FORBIDDEN — LOCKED)
+A programmer or AI must **not** implement any of the following:
+
+| Forbidden | Correct |
+|-----------|---------|
+| Feature-specific cash ledger as accounting truth | Journal + `fin_accounts` only |
+| Holding table as unaudited cost-basis SoT | Rebuild from feature transactions + WAC policy |
+| Tax “paid” via status mutation only | `tax.pay` → journal → paid derived |
+| In-place edit of posted amounts | New operation + inverse journal + link |
+| Current price rewriting historical acquisition cost | Valuation uses asOf price context only |
+| “Latest” provider call during historical rebuild | Pinned price/FX asOf + engineVersions |
+| Toman as ledger currency | Ledger = IRR; Toman = presentation |
+| NAV silently used as transaction price | Explicit `transactionPrice`; NAV is valuation context |
+| Merge different purities into one holding without policy | Identity includes purity (or explicit lot policy) |
+| Broker/exchange symbol as unique economic identity | `ref_instruments.id` + venue/network/account scope |
+
+These are not suggestions; violating them breaks Financial Core invariants.
+

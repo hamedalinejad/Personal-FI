@@ -289,3 +289,17 @@ Forbidden: describing HEAD as “no code yet” while `src/` engines exist.
 (validation, errors, fixtures, recovery, journal/fee/FX notes).  
 Do **not** invent economics from source when the card is SPEC_LOCKED or richer.
 Human module files own feature narrative; they do not replace the catalog card.
+
+## Historical P0/BUG regressions (LOCKED process)
+Issues already fixed (fee vocabulary, feeQuantity, silent fee default, hash/canonicalization,
+book base, NAV≠tx price, capitalized fee GL legs, posted-only reports, stock sell fees,
+holding uniqueness, settle schema probing, metals purity/delivery, command aliases, etc.)
+must **not** be re-opened as new Markdown bug documents.
+
+On regression:
+1. failing test / new golden
+2. code fix
+3. owner-doc update **only if** the contract changed
+4. QUALITY-STATUS line if useful
+
+Git retains history. No `BUG-*.md` / `P0-*.md` restoration.
