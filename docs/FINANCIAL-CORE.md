@@ -183,3 +183,25 @@ If `feeTreatment = capitalize_inventory` (or equivalent), Fee Engine **must** em
 | Display | presentation only; does not rewrite stored values |
 | Journal balance | exact equality in base after conversion |
 
+## 30. Hard accounting rules (LOCKED — never dilute)
+
+| Rule | Statement |
+|------|-----------|
+| A | Posted journal: Σ debit(amountInBase) = Σ credit(amountInBase) exact Decimal |
+| B | Non-base posted line: amountInBase + exchangeRateToBase required |
+| C | No IEEE float for money/qty/rate/price |
+| D | Posted amounts immutable; correction = new op + inverse legs + link |
+| E | Cash derives from journal only |
+| F | Feature cash cache never SoT |
+| G | Historical rebuild never calls “latest” provider |
+| H | No silent zero-fill of financial values |
+| I | Book base from db_meta/settings — never default to transaction currency |
+
+### SoT split
+- **Accounting:** fin_accounts + fin_journal_entries + fin_journal_lines  
+- **Operation:** operationId · commandHash · status · durability_state (independent axes)  
+- **FX:** amountInBase = amount × exchangeRateToBase  
+- **Fees:** every event states economic meaning + cash effect + carrying/P&L effect  
+- **Cost basis WAC v1:** deterministic, reversible, asOf-reproducible  
+- **Dates never collapsed:** businessDate · tradeDate · settlementDate · cashDate · eventAt · marketDate · priceAsOf · fxAsOf  
+

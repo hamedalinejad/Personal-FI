@@ -179,3 +179,5 @@ History lives in Git. Capability proof lives in tests/fixtures. Live status in Q
 
 Delete only if: no live reference + knowledge absorbed + no unique proof + no migration/packaging dependency.
 
+## Machine command coverage
+Use `docs/core/registry/command-catalog.json` only — never a Markdown coverage matrix under docs/core/.

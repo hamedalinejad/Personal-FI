@@ -95,3 +95,29 @@ Until all green: `FREEZE_PROVEN = false`. Production remains **NO-GO**.
 | BUG-008 file-inventory regenerated | FIXED |
 | BUG-009 ticket vocabulary in feeEngine | already clean / verify |
 | FINDING-010 settle source_reference fallback | REMOVED |
+
+## Module status snapshot
+| Module | Doc | Runtime | Remaining |
+|--------|-----|---------|-----------|
+| Accounts | good | partial/core | command depth |
+| Income/Expense | baseline | partial | field/command depth |
+| Cheque | baseline | partial | lifecycle proof |
+| Loan | strongest | implemented | policy breadth |
+| Crypto | good | partial | deferred lifecycle |
+| Stocks | good | partial | corporate actions |
+| Funds | good | partial | edge cases |
+| Metals | good | partial | pricing proof |
+| Physical Assets | baseline | partial | valuation semantics |
+| Budget/Goals/Bills | baseline | planning | forecast linkage |
+| Tax | baseline | partial | policy depth |
+
+## Explicitly deferred (do not fake in v1)
+- Crypto: deposit, withdrawal, swap, airdrop, opening_balance  
+- Stocks: bonus, split, reverse split, rights, merger, spinoff, symbol change  
+- Loan: variable rate, reschedule, alternate day-count, full penalty/grace matrix  
+- Browser: sql.js+IndexedDB RELEASE-PROVEN  
+
+## Target human tree (compact)
+11 global owners + 11 modules + archive/AUDIT-HISTORY.md + machine `docs/core/*` only.  
+No `docs/core/authority/` human trees. Command coverage → `command-catalog.json` (machine-only) when expanded.
+

@@ -87,3 +87,24 @@ Scope key includes **purityRatio** when instrument policy requires purity segreg
 ## 23. Legacy alias lifecycle
 Alias → normalize at API boundary → persist canonical only → document removal criterion after zero inbound use.
 
+## 30. Iran & asset field preservation (LOCKED)
+
+### IRR / Toman
+Ledger currency = **IRR**. Toman = presentation only. UI conversion must not rewrite stored truth.
+
+### Stocks Iran — keep distinct
+tradeDate · settlementDate · cashDate · marketDate · priceAsOf · fxAsOf · settlement_policy_version
+
+### Funds — never collapse
+NAV ≠ transactionPrice ≠ liquidationPrice
+
+### Metals — preserve all
+gross weight · purityRatio · fine weight · quoteBasis · priceUnit · premium · trade fee · delivery fee · serial · certificate · location
+
+### Crypto identity
+instrument + venue + network (symbol alone is not identity)
+
+### Field completeness
+Every field: kind · owner · schema column · nullable · unit · currency · precision · formula · source · migration · export · reversal  
+Forbidden: accepted → not stored → not returned → not rejected.
+

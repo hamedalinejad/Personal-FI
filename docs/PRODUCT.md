@@ -130,3 +130,24 @@ Disabled modules: commands return capability error; data remains.
 
 ## 20. Backup product requirement
 User-accessible backup/restore from Settings; restore replaces DB file via persistence port; post-restore integrity check.
+
+## IA — six routes (LOCKED)
+```
+/              HOME — dashboard, net worth, cash, recent
+/money         accounts, transfers, income/expense, cheques
+/transactions  unified activity, filters, journal detail
+/investments   crypto, stocks, funds, metals, portfolio
+/loans         loans, schedule, payments
+/more          tax, assets, budget/goals/bills, documents, settings, backup
+```
+Create/Edit = drawer / sheet / modal / short wizard — **not** a new top-level page.
+
+## Standalone editions (LOCKED)
+Loan-only · Crypto-only · Stocks-only · Funds-only · Metals-only · Full  
+All consume the same Financial Core (journal / FX / fee / decimal / recovery).  
+No edition owns independent cash truth, journal, or formula set.  
+License limits **capability**, never deletes history.
+
+## Non-goals
+Not ERP · not broker OMS · not HFT · not cloud-first SaaS · not one cash ledger per feature · not a page per table.
+

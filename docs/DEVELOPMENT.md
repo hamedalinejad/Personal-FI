@@ -117,3 +117,24 @@ If any answer is missing → documentation not ready.
 - `npm run gates` = release path
 - `schema:smoke` / `status:gen` = optional developer convenience; **not** normative authority
 
+## Forbidden document families
+Never create normative:
+```
+BUG-*.md · P0-*.md · GAP-*.md · AUDIT-*.md · VERDICT-*.md · MATRIX-*.md · FIX-*.md
+```
+History → Git · proof → tests/fixtures · contract → Owner · status → QUALITY/registry.
+
+## Naming
+- Source: `features/<x>/commands/<verb>.js`
+- Tests: capability names (`field-preservation`, `fee-capitalization`) — not gateH/P0/BUG IDs
+- Fixtures: business capability (`LOAN-FLAT.json`, `FUND-NAV-VS-TX-PRICE.json`)
+
+## Definition of Done — 28 questions per command
+owner · field kinds · identity · operationId · book base · tx currency · unit · precision · rounding · formula · FX asOf · fee role · cost basis · P&L fees · journal legs · tables · txn boundary · idempotency · reversal · asOf · standalone · license · errors · fixture · invariant · recovery · report impact · export survival  
+If any undefined → **DOCUMENTATION NOT READY**.
+
+## Change workflow
+```
+Feature/Bug → Owner check → Code → Test → Fixture → QUALITY-STATUS → Commit
+```
+

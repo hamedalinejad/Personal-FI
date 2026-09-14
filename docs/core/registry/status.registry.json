@@ -59,7 +59,8 @@
     "investment_reporting": "PARTIAL",
     "iran_settlement_policy": "PARTIAL",
     "tax_events_runtime": "PARTIAL",
-    "command_coverage_matrix": "docs/QUALITY-STATUS.md"
+    "command_coverage_matrix": "docs/QUALITY-STATUS.md",
+    "command_catalog": "docs/core/registry/command-catalog.json"
   },
   "gates": {
     "phase0_docs": "SPEC_LOCKED",

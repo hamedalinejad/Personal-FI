@@ -113,3 +113,17 @@ same ledger + engineVersions + asOf/context → same outputs; no live provider c
 
 ## 17. License gate placement
 Capability check at public-api boundary; never in journal writer as data delete path.
+
+## Standalone editions share one Core
+```
+Financial Core (Journal / FX / Fee / Decimal / Recovery)
+        │
+        ├── Loan-only
+        ├── Crypto-only
+        ├── Stocks-only
+        ├── Funds-only
+        ├── Metals-only
+        └── Full
+```
+Feature API + Core only. No parallel accounting kernels.
+

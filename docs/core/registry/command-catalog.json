@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "description": "Machine-only public command catalog. Not a Markdown matrix.",
+  "commands": {
+    "crypto.buy": {
+      "owner": "docs/modules/crypto.md",
+      "capability": "crypto.buy",
+      "status": "IMPLEMENTED",
+      "tests": [
+        "src/features/crypto/tests/buy.test.js"
+      ],
+      "fixture": null
+    },
+    "crypto.sell": {
+      "owner": "docs/modules/crypto.md",
+      "capability": "crypto.sell",
+      "status": "IMPLEMENTED"
+    },
+    "crypto.transfer": {
+      "owner": "docs/modules/crypto.md",
+      "capability": "crypto.transfer",
+      "status": "IMPLEMENTED"
+    },
+    "stocks.buy": {
+      "owner": "docs/modules/stocks.md",
+      "capability": "stocks.buy",
+      "status": "IMPLEMENTED"
+    },
+    "stocks.sell": {
+      "owner": "docs/modules/stocks.md",
+      "capability": "stocks.sell",
+      "status": "IMPLEMENTED"
+    },
+    "stocks.settle": {
+      "owner": "docs/modules/stocks.md",
+      "capability": "stocks.settle",
+      "status": "IMPLEMENTED"
+    },
+    "funds.subscribe": {
+      "owner": "docs/modules/funds.md",
+      "capability": "funds.subscribe",
+      "status": "IMPLEMENTED"
+    },
+    "metals.buy": {
+      "owner": "docs/modules/metals.md",
+      "capability": "metals.buy",
+      "status": "IMPLEMENTED"
+    },
+    "loan.create": {
+      "owner": "docs/modules/loan.md",
+      "capability": "loan.create",
+      "status": "IMPLEMENTED"
+    }
+  },
+  "notes": "requestSchema/resultSchema filled as FREEZE prep; not RELEASE-PROVEN"
+}
