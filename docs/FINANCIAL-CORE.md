@@ -4,6 +4,23 @@
 
 Absorbs: Accounting-Core, Accounting-Calculation-Invariants, Financial-Invariants, Canonical-Financial-Operation, Canonical-Cash-Model, Fee-Treatment-Matrix, Cost-Basis-Engine, Money-Decimal-Policy, Precision-Policy, Unit-Policy, JSON-Policy, Date-Semantics-Matrix, Rebuild-API-Contract, Reconciliation-Order, Opening-Balance, Reversal specs, Journal contracts.
 
+## Formula index (quick reference)
+| Topic | Rule |
+|-------|------|
+| Money | API/DB decimal **strings**; arithmetic Decimal.js; never JS Number |
+| FX | `amountInBase = amount × exchangeRateToBase` |
+| Book base | `db_meta.book_base_currency` default **IRR** |
+| Journal | `Σ debit(base) = Σ credit(base)`; posted ≥ 2 lines |
+| Fee | treatment required (or explicit module default); Fee Engine only |
+| Cost basis | WAC v1; disposal releases quantity + carrying |
+| Reversal | new operation + inverse journal + link; no in-place edit |
+| Tax paid | only after `tax.pay` + journal |
+| Metals | `fineWeight = grossMass × purityRatio` |
+| Loan declining | equal-principal; `rateFraction = annualRate/100` |
+| Loan pay waterfall | penalty → fee → interest → principal |
+| Toman | display only; ledger = IRR |
+
+
 ## 1. Money & Decimal
 - All money, quantity, rate, price: **decimal strings** in API and DB.
 - Arithmetic: Decimal library only — never IEEE float for financial truth.

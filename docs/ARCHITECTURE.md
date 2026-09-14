@@ -160,3 +160,33 @@ UI / importer
   → rebuild / projection refresh
 ```
 Feature packages may contain `commands/ queries/ public-api/ domain/ tests/ fixtures/` without a new top-level route.
+
+## Modular packages (LOCKED)
+```
+src/features/<feature>/
+  public-api/     ← only entry for UI and other packages
+  commands/
+  queries/
+  domain/
+  tests/
+  fixtures/
+```
+
+```
+                    ┌─────────────────────────┐
+                    │     Financial Core        │
+                    │ Decimal FX Fee Journal    │
+                    └───────────┬─────────────┘
+          ┌─────────┬───────────┼───────────┬─────────┐
+       Loan      Crypto      Stocks      Funds    Metals
+       only       only        only        only     only
+          └─────────┴───────────┴───────────┴─────────┘
+                         Full edition
+                    (Accounts + all modules)
+```
+
+Dependency rule:
+- Feature → Core ✅  
+- Feature → Feature internals ❌  
+- UI → Feature public-api ✅  
+- UI → SQL / journal writer ❌  

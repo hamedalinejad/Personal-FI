@@ -70,7 +70,8 @@ Sheets/drawers for create/edit. **No** top-level `/accounting` page.
 Minimal navigation · context-heavy sheets · decimal-safe inputs · Jalali **display** allowed; storage dates ISO · Toman is **display unit** only (ledger currency IRR).
 
 ## 10. Standalone behavior
-Standalone edition boots **without** Accounts UI and **without** importing other feature internals. Uses `CashSettlementPort` + local settlement accounts. Journal remains SoT. Export/report/backup required for RELEASE_PROVEN of that edition.
+See **Standalone editions (LOCKED)** below.
+
 
 ## 11. Offline philosophy
 Node: SQLite file. Browser: persistence port → sql.js + IndexedDB (see OFFLINE-RELEASE.md). Durable ACK after publish. Single-writer multi-tab.
@@ -143,37 +144,43 @@ User-accessible backup/restore from Settings; restore replaces DB file via persi
 Create/Edit = drawer / sheet / modal / short wizard — **not** a new top-level page.
 
 ## Standalone editions (LOCKED)
-Loan-only · Crypto-only · Stocks-only · Funds-only · Metals-only · Full  
-All consume the same Financial Core (journal / FX / fee / decimal / recovery).  
-No edition owns independent cash truth, journal, or formula set.  
-License limits **capability**, never deletes history.
 
-## Non-goals
-Not ERP · not broker OMS · not HFT · not cloud-first SaaS · not one cash ledger per feature · not a page per table.
-
-## Six routes (LOCKED) — Feature ≠ Page
-```
-/
-/money
-/transactions
-/investments
-/loans
-/more
-```
-No top-level route per table or per feature package. Sheets/drawers under the six routes only.
-
-## Standalone editions (LOCKED)
+Editions:
 ```
 Loan-only · Crypto-only · Stocks-only · Funds-only · Metals-only · Full
 ```
-Every edition shares: Decimal · FX · Fee · Journal · Recovery · Persistence ports.
 
-Licensing controls only: capability · UI availability · command availability.  
-**Never deletes data** on downgrade.
-
-### Standalone acceptance pattern (per edition)
+### Shared kernel (always present, even if UI hidden)
 ```
-boot → create entity → representative financial operation → statement
+Decimal · FX · Fee Engine · Journal · Operation engine · Recovery · Persistence port
+```
+No edition ships a second accounting kernel or cash ledger.
+
+### Licensing
+Controls only: capability · command availability · UI surfaces.  
+**Never deletes history** on downgrade.
+
+### Edition matrix — what the user can do without Accounts UI
+
+| Edition | Boot | Core journal | Local settlement | Representative ops | Statements | Backup/restore |
+|---------|------|--------------|------------------|--------------------|------------|----------------|
+| Loan-only | yes | yes (hidden) | yes | create, pay, reverse, schedule | loan statement + TB subset | yes |
+| Crypto-only | yes | yes (hidden) | yes | buy, sell, transfer | holdings + P&L + TB subset | yes |
+| Stocks-only | yes | yes (hidden) | yes | buy, sell, settle, dividend | positions + TB subset | yes |
+| Funds-only | yes | yes (hidden) | yes | subscribe, redeem, distribute | holdings + TB subset | yes |
+| Metals-only | yes | yes (hidden) | yes | buy, sell, delivery | holdings + TB subset | yes |
+| Full | yes | yes | full Accounts UI | all | full REPORTING set | yes |
+
+**Rule:** Standalone never imports another feature’s internals. Settlement uses `CashSettlementPort` + `ensureLocalSettlementAccounts` only.
+
+### Acceptance pattern (STANDALONE_GREEN)
+```
+boot → create entity → representative operation → statement
   → export → backup → restore → rebuild → verify same result
 ```
-Required for `STANDALONE_GREEN` per edition.
+
+## Six routes (LOCKED) — Feature ≠ Page
+```
+/ · /money · /transactions · /investments · /loans · /more
+```
+Sheets/drawers under these routes only. No route per table or per feature package.

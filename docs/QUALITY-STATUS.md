@@ -256,3 +256,7 @@ field-preservation machine coverage · non-empty goldens for all high-value fami
 
 `FREEZE_PROVEN` remains **false** until browser proof + remaining deferred fixtures + full standalone packs are green.
 `npm run freeze:check` = structural gate only.
+
+## Modular product stance
+Documentation is intentionaly **small and modular**: owner docs + one file per feature + machine registries.  
+Standalone editions are a **product requirement**, not an afterthought — see PRODUCT.md edition matrix.

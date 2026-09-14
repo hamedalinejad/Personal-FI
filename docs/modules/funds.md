@@ -84,8 +84,6 @@ asOf queries rebuild from ledger; no live price required for history.
 ## 27. Reports
 Module statements + REPORTING from journal.
 
-## 28. Standalone edition behavior
-Standalone edition uses local settlement + Core; no second cash ledger.
 
 ## 29. Licensing / capabilities
 Capability/license gates UI and commands only.
@@ -143,3 +141,25 @@ NAV observation = **price observation** (`price_history` / asOf), never a transa
 | current NAV as observation only | LOCKED direction |
 
 Supported v1 mutations: `funds.subscribe` · `funds.redeem` · `funds.distribute`.
+## 28. Standalone edition behavior (LOCKED)
+**Funds-only** (fixed-income / mutual) without Accounts UI.
+
+| Requirement | Rule |
+|-------------|------|
+| Pricing | NAV ≠ transactionPrice ≠ liquidationPrice |
+| Commands | `funds.subscribe` · `funds.redeem` · `funds.distribute` |
+| Cost | always transactionPrice (never silent NAV) |
+| Reports | units · cost · TB subset |
+| Forbidden | cross-feature internal imports |
+
+Proof path: `src/features/funds/tests/standalone.test.js`
+
+
+## 35. Implementer checklist (this module)
+1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
+2. Read this module + `command-catalog.json` cards for each command.
+3. Implement only `public-api` exports; UI calls public-api only.
+4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
+5. Standalone: no imports from other `features/*` internals.
+6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
+

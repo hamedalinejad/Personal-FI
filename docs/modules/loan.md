@@ -98,8 +98,6 @@ Statement/query may filter by asOf; rebuild schedule from snapshot + engine vers
 ## 27. Reports
 Loan statement (module) · GL/TB via REPORTING from journal
 
-## 28. Standalone edition behavior
-Loan-only edition uses local settlement adapter + Core accounts; no Accounts UI required.
 
 ## 29. Licensing / capabilities
 Commands gated by capability; historical rows remain readable on downgrade.
@@ -181,3 +179,26 @@ penalty → fee → interest → principal
 | day-count actual/365, 30/360 | DEFERRED |
 
 Loan remains the **vertical reference** for module template quality — not automatically RELEASE-PROVEN for every policy row above.
+## 28. Standalone edition behavior (LOCKED)
+**Loan-only** boots without Accounts UI and without other feature packages.
+
+| Requirement | Rule |
+|-------------|------|
+| Core | Journal + operation engine always available |
+| Settlement | `CashSettlementPort` + local settlement accounts |
+| Commands | `loan.create` · `loan.recordPayment` · `loan.reversePayment` · schedule generate/preview |
+| Reports | Loan schedule/statement · trial balance subset · export |
+| Forbidden | Import `features/stocks/**` or any other feature internals |
+| License | capability `loan` only |
+
+Proof path: `src/features/loan/tests/standalone-boot.test.js`
+
+
+## 35. Implementer checklist (this module)
+1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
+2. Read this module + `command-catalog.json` cards for each command.
+3. Implement only `public-api` exports; UI calls public-api only.
+4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
+5. Standalone: no imports from other `features/*` internals.
+6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
+

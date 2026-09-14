@@ -263,3 +263,11 @@ restoring deleted archive authority docs into active tree
 ## Philosophy (LOCKED)
 Complexity in Financial Core + proof · simplicity in UI · precision in accounting ·
 flexibility in features · independence in standalone · history in Git.
+
+## Building one standalone edition
+1. Implement Core paths used by the feature (operation, journal, fee, FX, persistence).
+2. Implement `src/features/<feature>/public-api` only surface.
+3. Wire local settlement (`CashSettlementPort`) — no Accounts UI dependency.
+4. Add statement/query needed for that edition.
+5. Golden + recovery + standalone tests green before STANDALONE_GREEN.
+6. Do not copy Core formulas into the feature package.

@@ -192,3 +192,12 @@ UI coding is last. Do not restore BUG/P0/AUDIT normative docs.
 Protected baseline tag: `personal-fi-pre-semantic-freeze-2026-09-14`.
 Minimal active tree = owner docs + modules + archive/AUDIT-HISTORY + docs/core machine files only.
 No new audit/P0/BUG/MATRIX Markdown authority files.
+
+## Active human docs only
+```
+docs/*.md (owners listed in README)
+docs/modules/*.md
+docs/archive/AUDIT-HISTORY.md
+docs/core/**   (machine only)
+```
+Merge new rules into the owner file. Do not add parallel markdown authorities.

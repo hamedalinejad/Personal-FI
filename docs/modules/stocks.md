@@ -90,8 +90,6 @@ asOf queries rebuild from ledger; no live price required for history.
 ## 27. Reports
 Module statements + REPORTING from journal.
 
-## 28. Standalone edition behavior
-Standalone edition uses local settlement + Core; no second cash ledger.
 
 ## 29. Licensing / capabilities
 Capability/license gates UI and commands only.
@@ -163,3 +161,26 @@ bonus · split · reverse split · rights · rights exercise · rights sale · c
 Do **not** call Stocks module complete until each **supported** action has: command card · fixture · rebuild path.
 
 Supported v1 mutations: `stocks.buy` · `stocks.sell` · `stocks.settle` · `stocks.dividend` only.
+## 28. Standalone edition behavior (LOCKED)
+**Stocks-only** (Iran equity) without full Accounts navigation.
+
+| Requirement | Rule |
+|-------------|------|
+| Dates | tradeDate ≠ settlementDate ≠ cashDate |
+| Commands | `stocks.buy` · `stocks.sell` · `stocks.settle` · `stocks.dividend` |
+| Settlement | T+n payable/receivable then settle |
+| Reports | positions · dividends · TB subset |
+| CA family | deferred until command+fixture+rebuild exist |
+| Forbidden | cross-feature internal imports |
+
+Proof path: `src/features/stocks/tests/standalone.test.js`
+
+
+## 35. Implementer checklist (this module)
+1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
+2. Read this module + `command-catalog.json` cards for each command.
+3. Implement only `public-api` exports; UI calls public-api only.
+4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
+5. Standalone: no imports from other `features/*` internals.
+6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
+

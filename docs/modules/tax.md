@@ -84,8 +84,6 @@ asOf queries rebuild from ledger; no live price required for history.
 ## 27. Reports
 Module statements + REPORTING from journal.
 
-## 28. Standalone edition behavior
-Standalone edition uses local settlement + Core; no second cash ledger.
 
 ## 29. Licensing / capabilities
 Capability/license gates UI and commands only.
@@ -107,3 +105,15 @@ docs/core/db/schema.sql · registry · fixtures.
 
 ## Tax vs fee (LOCKED)
 Tax is separate from fee. Status `paid` is allowed only after a successful **payTax** operation with journal legs — never a free status mutation.
+## 28. Standalone edition behavior
+Tax ships with **Full**. `tax.pay` is the only path to paid. Standalone investment editions may omit Tax UI.
+
+
+## 35. Implementer checklist (this module)
+1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
+2. Read this module + `command-catalog.json` cards for each command.
+3. Implement only `public-api` exports; UI calls public-api only.
+4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
+5. Standalone: no imports from other `features/*` internals.
+6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
+

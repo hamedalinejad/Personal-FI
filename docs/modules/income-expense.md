@@ -84,8 +84,6 @@ asOf queries rebuild from ledger; no live price required for history.
 ## 27. Reports
 P&L via REPORTING; category activity queries
 
-## 28. Standalone edition behavior
-Standalone edition uses local settlement + Core; no second cash ledger.
 
 ## 29. Licensing / capabilities
 Capability/license gates UI and commands only.
@@ -108,3 +106,15 @@ docs/core/db/schema.sql · registry · fixtures.
 ## Fields
 category · counterparty? · account · currency · FX · attachment · recurrence · source · reversal  
 Journal is the financial truth.
+## 28. Standalone edition behavior
+Income/Expense ship with **Full** (and money surfaces). Not a separate licensed vertical in v1; always uses Core journal.
+
+
+## 35. Implementer checklist (this module)
+1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
+2. Read this module + `command-catalog.json` cards for each command.
+3. Implement only `public-api` exports; UI calls public-api only.
+4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
+5. Standalone: no imports from other `features/*` internals.
+6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
+
