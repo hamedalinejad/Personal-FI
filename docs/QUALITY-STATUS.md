@@ -281,3 +281,11 @@ posted-only reports · stock sell fees · holding uniqueness · FX resolver · c
 settle probing · operationId silent gen · metals purity/delivery · command aliases → **FIXED**.
 
 Inventory: regenerated + `inventory:check`. Regression = code + test, not new audit Markdown.
+
+## Operation / Fee / FX / Field matrix (this pass)
+| Topic | Status |
+|-------|--------|
+| Economic hash line-order + decimal format proofs | **tests added** |
+| Fee taxonomy on catalog + module defaults | **documented** |
+| FX fail-closed contract | **FINANCIAL-CORE LOCKED** |
+| Field-preservation matrix | **PARTIAL** (R-M03) — expand rows, do not invent new MD matrices |

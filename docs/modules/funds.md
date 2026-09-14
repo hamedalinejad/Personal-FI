@@ -163,3 +163,11 @@ Proof path: `src/features/funds/tests/standalone.test.js`
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Fee defaults (v1 — LOCKED)
+| Context | Default treatment |
+|---------|-------------------|
+| Subscribe fee | `capitalize_inventory` |
+| Redeem fee | `expense` |
+
+Cost always uses **transactionPrice**, never silent NAV.
+

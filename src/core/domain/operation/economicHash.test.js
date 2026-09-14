@@ -80,3 +80,81 @@ test("BUG-005 money Number in payload rejected by hash", () => {
     /HASH_NUMBER_FORBIDDEN/,
   );
 });
+
+test("equivalent decimal formatting → same hash", () => {
+  const base = {
+    operationId: "op-dec",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "posted",
+    type: "test.op",
+  };
+  const a = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "100", currency: "IRR" },
+    ],
+  });
+  const b = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100.0", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "100.00", currency: "IRR" },
+    ],
+  });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("reordered journal lines → same economic hash", () => {
+  const base = {
+    operationId: "op-order",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "posted",
+    type: "test.op",
+  };
+  const a = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "50", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "50", currency: "IRR" },
+    ],
+  });
+  const b = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a2", side: "credit", amount: "50", currency: "IRR" },
+      { accountId: "a1", side: "debit", amount: "50", currency: "IRR" },
+    ],
+  });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("payload key order does not change hash", () => {
+  const base = {
+    operationId: "op-keys",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "draft",
+    type: "test.op",
+    journalLines: [],
+  };
+  const a = normalizeCommand({ ...base, payload: { a: "1", b: "2" } });
+  const b = normalizeCommand({ ...base, payload: { b: "2", a: "1" } });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("omitted settlementDate and null settlementDate same identity", () => {
+  const base = {
+    operationId: "op-null",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "draft",
+    type: "test.op",
+    journalLines: [],
+  };
+  const a = normalizeCommand({ ...base });
+  const b = normalizeCommand({ ...base, settlementDate: null });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});

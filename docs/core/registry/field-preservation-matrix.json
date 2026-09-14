@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Machine field-preservation map from command cards (DOC-001/D)",
+  "description": "Machine field-preservation map (R-M03 PARTIAL). Rows expand with command cards; not full closure until every public request field maps to schema/derived/deferred.",
   "rows": [
     {
       "commandId": "accounts.archive",
@@ -2719,5 +2719,6 @@
       "migrated": true,
       "owner": "docs/modules/tax.md"
     }
-  ]
+  ],
+  "status": "PARTIAL"
 }

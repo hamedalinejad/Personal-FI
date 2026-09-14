@@ -112,7 +112,32 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "quantity_network_or_exchange",
+              "treatment": "reduce_received_quantity",
+              "quantityField": "feeQuantity",
+              "moneyField": null
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -197,7 +222,32 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "trade_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount",
+              "quantityField": null
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -279,7 +329,32 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "network_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount",
+              "quantityField": "feeQuantity"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -366,7 +441,41 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "commission",
+              "treatment": "capitalize_inventory",
+              "moneyField": "commission"
+            },
+            {
+              "feeType": "tax",
+              "treatment": "capitalize_inventory",
+              "moneyField": "tax"
+            },
+            {
+              "feeType": "otherFee",
+              "treatment": "capitalize_inventory",
+              "moneyField": "otherFee"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -451,7 +560,41 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "commission",
+              "treatment": "expense",
+              "moneyField": "commission"
+            },
+            {
+              "feeType": "tax",
+              "treatment": "expense",
+              "moneyField": "tax"
+            },
+            {
+              "feeType": "otherFee",
+              "treatment": "expense",
+              "moneyField": "otherFee"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -530,7 +673,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -610,7 +758,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -694,7 +847,31 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "subscription_fee",
+              "treatment": "capitalize_inventory",
+              "moneyField": "feeAmount"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -774,7 +951,31 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "redemption_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -853,7 +1054,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -938,7 +1144,36 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "premium",
+              "treatment": "capitalize_inventory",
+              "moneyField": "premiumAmount"
+            },
+            {
+              "feeType": "trade_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -1019,7 +1254,31 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "trade_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -1102,7 +1361,32 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "inputFields": [
+            "feeAmount",
+            "feeQuantity",
+            "feeCurrency",
+            "feeInstrumentId",
+            "treatment"
+          ],
+          "quantityVersusMoney": "reduce_received_quantity requires feeQuantity; never use feeAmount as quantity",
+          "cashLeg": "via Fee Engine + journal",
+          "inventoryImpact": "capitalize_inventory increases carrying; reduce_received_quantity decreases qty",
+          "pnlImpact": "expense hits P&L; capitalize does not expense at acquisition",
+          "fxSource": "feeExchangeRateToBase or operation FX context",
+          "defaultTreatments": [
+            {
+              "feeType": "delivery_fee",
+              "treatment": "expense",
+              "moneyField": "feeAmount",
+              "note": "never auto-capitalize into metal cost unless policy says so"
+            }
+          ],
+          "allowedOverrides": "explicit treatment in request only if module allows",
+          "reversalBehavior": "inverse journal + domain reversal of fee effects",
+          "version": "v1"
+        }
       },
       "maturity": "partial"
     },
@@ -1184,7 +1468,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "strongest"
     },
@@ -1264,7 +1553,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "strongest"
     },
@@ -1340,7 +1634,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "strongest"
     },
@@ -1416,7 +1715,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "strongest"
     },
@@ -1491,7 +1795,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "strongest"
     },
@@ -1556,7 +1865,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1624,7 +1938,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1685,7 +2004,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1756,7 +2080,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1833,7 +2162,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1909,7 +2243,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -1987,7 +2326,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2065,7 +2409,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2139,7 +2488,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2213,7 +2567,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2289,7 +2648,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2363,7 +2727,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2436,7 +2805,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2509,7 +2883,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2581,7 +2960,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2656,7 +3040,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2726,7 +3115,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2800,7 +3194,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2873,7 +3272,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -2946,7 +3350,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -3019,7 +3428,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -3096,7 +3510,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -3173,7 +3592,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     },
@@ -3247,7 +3671,12 @@
           "crash after SQL commit → reconcile durability_state",
           "same operationId + same economic hash → idempotent replay",
           "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ]
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        }
       },
       "maturity": "baseline"
     }

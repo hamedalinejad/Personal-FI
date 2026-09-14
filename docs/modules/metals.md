@@ -187,3 +187,12 @@ Proof path: `src/features/metals/tests/standalone.test.js`
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Fee defaults (v1 — LOCKED)
+| Context | Default treatment |
+|---------|-------------------|
+| Premium / making | `capitalize_inventory` |
+| Trade fee | `expense` |
+| Delivery fee | `expense` (separate from acquisition cost unless policy capitalizes) |
+
+`trade fee ≠ delivery fee`.
+

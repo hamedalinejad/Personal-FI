@@ -321,3 +321,29 @@ A programmer or AI must **not** implement any of the following:
 
 These are not suggestions; violating them breaks Financial Core invariants.
 
+## Economic hash proof cases (LOCKED)
+Core hashes **canonical economic meaning** after `normalizeCommand` (and feature payload canonicalization at the public-api boundary).
+
+Required proofs (see `economicHash.test.js` / idempotency tests):
+1. equivalent decimal formatting → same hash  
+2. same ID + same economics → replay  
+3. same ID + changed economics → conflict  
+4. reordered object keys → same hash  
+5. omitted optional fields consistent with null where contract says null ≡ omit  
+6. journal line order does not change economic hash (identity sorts lines; `line_number` excluded)  
+7. structural integers (`line_number`) are not money  
+
+Feature commands must canonicalize their payload **before** Core hash; Core also canonicalizes same-currency journal lines and decimal strings.
+
+## Fee taxonomy (LOCKED)
+Canonical treatments only (aliases normalized at boundary):
+```
+expense | capitalize_inventory | reduce_received_quantity
+| embedded_in_gross_cash | equity_adjustment
+```
+`reduce_received_quantity` → **quantity field only**.  
+Module default treatments are versioned in `command-catalog.json` `feeTaxonomy` + module Fee defaults tables.
+
+## FX fail-closed (LOCKED)
+No rate → **no financial post**. Never convert missing FX to zero.  
+Multi-hop paths must store or deterministically reconstruct `conversionPath` + observation provenance when historical rebuild requires it.

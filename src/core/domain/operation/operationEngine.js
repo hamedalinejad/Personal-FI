@@ -61,10 +61,28 @@ function stableHash(obj) {
 
 /** economic-identity — fields that participate in economic identity / commandHash */
 export function buildEconomicIdentity(norm) {
+  // Deterministic line order for hash; line_number is structural and excluded from economics
+  const lines = (norm.journalLines || []).map((l) => ({
+    accountId: l.accountId,
+    side: l.side,
+    amount: l.amount,
+    amountInBase: l.amountInBase ?? null,
+    exchangeRateToBase: l.exchangeRateToBase ?? null,
+    conversionPath: l.conversionPath ?? null,
+    currency: l.currency,
+    lineKind: l.lineKind ?? null,
+    reference: l.reference ?? null,
+    memo: l.memo ?? null,
+  }));
+  lines.sort((a, b) => {
+    const ka = `${a.accountId}|${a.side}|${a.currency}|${a.amount}|${a.lineKind || ""}`;
+    const kb = `${b.accountId}|${b.side}|${b.currency}|${b.amount}|${b.lineKind || ""}`;
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
+  });
   return {
     operationType: norm.type,
-    payload: norm.payload,
-    journalLines: norm.journalLines,
+    payload: norm.payload ?? null,
+    journalLines: lines,
     businessDate: norm.businessDate,
     baseCurrency: norm.baseCurrency,
     settlementDate: norm.settlementDate ?? null,

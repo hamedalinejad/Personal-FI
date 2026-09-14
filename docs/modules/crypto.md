@@ -176,3 +176,13 @@ Proof path: `src/features/crypto/tests/standalone.test.js`
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Fee defaults (v1 — LOCKED)
+| Context | Default treatment | Field |
+|---------|-------------------|--------|
+| Buy quantity fee | `reduce_received_quantity` | `feeQuantity` (required) |
+| Buy money fee | `expense` unless explicit | `feeAmount` |
+| Sell fee | `expense` | `feeAmount` |
+| Transfer network fee | `expense` | money and/or quantity |
+
+Never interpret monetary `feeAmount` as quantity. Version with capability `crypto`.
+

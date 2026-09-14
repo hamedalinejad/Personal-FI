@@ -184,3 +184,11 @@ Proof path: `src/features/stocks/tests/standalone.test.js`
 5. Standalone: no imports from other `features/*` internals.
 6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
+## Fee defaults (v1 — LOCKED)
+| Context | Default treatment |
+|---------|-------------------|
+| Buy commission / tax / otherFee | `capitalize_inventory` |
+| Sell commission / tax / otherFee | `expense` |
+
+Override only with explicit `treatment` on CanonicalFeeEvent. Same fee vocabulary on buy and sell.
+
