@@ -260,3 +260,9 @@ field-preservation machine coverage · non-empty goldens for all high-value fami
 ## Modular product stance
 Documentation is intentionaly **small and modular**: owner docs + one file per feature + machine registries.  
 Standalone editions are a **product requirement**, not an afterthought — see PRODUCT.md edition matrix.
+
+## Inventory integrity
+| ID | Status | Note |
+|----|--------|------|
+| BUG-CURRENT-001 file-inventory stale | **CLOSED** | Regenerated from filesystem; `npm run inventory:check` hard-fails on missing paths |
+| BUG-CURRENT-002 phase vocabulary | **CLOSED** | Scaffold ≠ docs-only; see DEVELOPMENT.md |

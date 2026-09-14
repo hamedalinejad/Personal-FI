@@ -4,6 +4,8 @@
 
 Sole product authority. Absorbs PRODUCT/FA, Project-Blueprint product sections, Pages-IA navigation rules.
 
+
+**Repo state:** reference implementation scaffold under specification authority — production **NO-GO** until RELEASE_PROVEN.
 ## 1. Vision
 Build an **offline-first** personal finance application for individuals: accurate double-entry accounting, Iran-aware market rules, and **licensable feature editions** (loan-only, crypto-only, etc.) on the same Financial Core.
 

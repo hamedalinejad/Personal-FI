@@ -201,3 +201,8 @@ docs/archive/AUDIT-HISTORY.md
 docs/core/**   (machine only)
 ```
 Merge new rules into the owner file. Do not add parallel markdown authorities.
+
+## File inventory
+`docs/core/file-inventory.tsv` is generated from the live tree.  
+`npm run inventory:check` must pass: every inventory path exists.  
+Do not list deleted scripts (e.g. former `generate-command-status-md.js`).

@@ -1,5 +1,7 @@
 # Documentation index
 
+**Project state:** Specification-locked **reference implementation scaffold** — executable Core/feature code, tests, and gates exist; **not** a release-proven product. Future work extends this scaffold; do **not** reimplement the kernel from zero.
+
 **One concept → one owner.** History lives in Git. Proof lives in tests/fixtures. Status lives in QUALITY-STATUS + registries.
 
 ## Structure

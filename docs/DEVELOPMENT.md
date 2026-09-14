@@ -271,3 +271,16 @@ flexibility in features · independence in standalone · history in Git.
 4. Add statement/query needed for that edition.
 5. Golden + recovery + standalone tests green before STANDALONE_GREEN.
 6. Do not copy Core formulas into the feature package.
+
+## Project phase vocabulary (LOCKED)
+| Term | Meaning |
+|------|---------|
+| **Specification authority** | Owner Markdown + machine registries/schema |
+| **Reference implementation scaffold** | Existing `src/**`, fixtures, tests, gates — intentional, incomplete |
+| **Not documentation-only** | Do not treat the repo as prose-only or delete working engines to “start coding” |
+| **Production coding** | Harden scaffold toward RELEASE_PROVEN — not greenfield rewrite |
+| **FREEZE_PROVEN** | Semantic contracts closed + goldens/recovery/standalone (and browser if shipping) |
+| **RELEASE_PROVEN / GO** | Full evidence matrix green |
+
+Forbidden: describing HEAD as “no code yet” while `src/` engines exist.
+
