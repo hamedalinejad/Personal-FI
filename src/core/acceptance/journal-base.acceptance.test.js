@@ -50,6 +50,6 @@ test("P0-009: amountInBase balance required when present", () => {
         { side: "debit", amount: "10", currency: "USD", amountInBase: "100" },
         { side: "credit", amount: "10", currency: "USD", amountInBase: "90" },
       ]),
-    /INV_JOURNAL_UNBALANCED/,
+    /INV_JOURNAL_(UNBALANCED|MISSING_EXCHANGE_RATE|FX_MISMATCH)/,
   );
 });

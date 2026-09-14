@@ -15,6 +15,10 @@ import { computeEquitySettlementDate, SETTLEMENT_POLICY_VERSION } from "../../..
 /**
  * stocks.buy — persists inv_stocks_iran_transactions; fee treatment explicit.
  */
+
+/** Module policy v1 (docs/modules/stocks.md) — not a Core silent default */
+const MODULE_DEFAULT_FEE_TREATMENT = "capitalize_inventory";
+
 export async function buyStock(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -47,9 +51,9 @@ export async function buyStock(input, { dataDir } = {}) {
 
   const feeEvents = buildFeeEvents(
     [
-      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "capitalize_inventory", label: "commission", feeCurrency: currency },
-      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "capitalize_inventory", label: "tax", feeCurrency: currency },
-      { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || "capitalize_inventory", label: "otherFee", feeCurrency: currency },
+      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "commission", feeCurrency: currency },
+      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "tax", feeCurrency: currency },
+      { feeAmount: other.toFixed(), treatment: p.otherFeeTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "otherFee", feeCurrency: currency },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
@@ -280,8 +284,10 @@ export async function buyStock(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, holding_id, instrument_id, brokerage_id, tx_type,
-          trade_date, settlement_date, quantity, price, fee_amount, currency, account_id, created_at
-        ) VALUES (?, ?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          trade_date, settlement_date, quantity, price, fee_amount,
+          fee_commission, fee_tax, fee_other, fee_treatments_json,
+          currency, account_id, created_at
+        ) VALUES (?, ?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -293,6 +299,14 @@ export async function buyStock(input, { dataDir } = {}) {
         qty.toFixed(),
         price.toFixed(),
         feeAmount.toFixed(),
+        commission.toFixed(),
+        tax.toFixed(),
+        other.toFixed(),
+        JSON.stringify({
+          commission: p.commissionTreatment || MODULE_DEFAULT_FEE_TREATMENT,
+          tax: p.taxTreatment || MODULE_DEFAULT_FEE_TREATMENT,
+          otherFee: p.otherFeeTreatment || MODULE_DEFAULT_FEE_TREATMENT,
+        }),
         currency,
         p.accountId || null,
         now,

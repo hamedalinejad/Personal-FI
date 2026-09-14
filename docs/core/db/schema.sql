@@ -278,7 +278,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
 );
 -- Holding identity: instrument + venue + network (NULL network = offchain sentinel in index)
 CREATE UNIQUE INDEX IF NOT EXISTS uq_crypto_holdings_identity
-  ON inv_crypto_holdings(exchange_id, instrument_id, ifnull(network_id, ''));
+  ON inv_crypto_holdings(ifnull(exchange_id, ''), instrument_id, ifnull(network_id, ''));
 
 -- CRYPTO-002: Holding identity is explicit and includes venue
 -- - Exchange → Wallet transfer creates NEW holding identity (not same holding)
@@ -844,7 +844,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_metals_holdings_platform_instrument_purity
-  ON inv_metals_holdings(platform_id, instrument_id, ifnull(purity_ratio, ''));
+  ON inv_metals_holdings(ifnull(platform_id, ''), instrument_id, ifnull(purity_ratio, ''));
 
 CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   id TEXT PRIMARY KEY,

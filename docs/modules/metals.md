@@ -136,3 +136,6 @@ purityRatio
 fineWeight = quantityMg × purityRatio
 ```
 Preserve: gross · purity · fine · price basis (quoteBasis) · premium · trade fee · delivery fee · serial/certificate/location when supplied.
+## Fee treatment (LOCKED)
+- Core: `FEE_TREATMENT_REQUIRED` if treatment missing at Fee Engine.
+- Module policy v1: trade fee → `expense`; premium → `capitalize_inventory` (alias of capitalized_cost).

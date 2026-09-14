@@ -15,6 +15,10 @@ import { applySingleFee } from "../../../core/domain/fee/feeEngine.js";
  * crypto.buy — all master mutations inside the financial transaction.
  * Multi-currency: amountInBase = cost × exchangeRateToBase when costCurrency !== base.
  */
+
+/** Module policy v1: quantity fee reduces received; money fee must set treatment explicitly when present */
+const MODULE_DEFAULT_FEE_TREATMENT = "reduce_received_quantity";
+
 export async function buyCrypto(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -64,7 +68,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
   // Fee Engine owns treatment; feature only selects policy
   // Model A: cost pool / total_invested is always in costCurrency (not base)
   // Module default: fee_from_received when feeRole omitted (documented in modules/crypto.md)
-  const feeTreatment = p.feeTreatment || p.feeRole || "fee_from_received";
+  const feeTreatment = p.feeTreatment || p.feeRole || MODULE_DEFAULT_FEE_TREATMENT;
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
   const hasMoneyFee = p.feeAmount != null && p.feeAmount !== "";
   const hasQtyFee = p.feeQuantity != null && p.feeQuantity !== "" && !toDecimal(p.feeQuantity).isZero();

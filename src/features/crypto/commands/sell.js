@@ -18,6 +18,10 @@ import { openDb } from "../../../core/persistence/port.js";
  * Journal: Dr Cash (proceeds) / Cr Inventory (costReleased) / Cr or Dr PnL
  * Fee via Fee Engine.
  */
+
+/** Module policy v1 (docs/modules/crypto.md) */
+const MODULE_DEFAULT_FEE_TREATMENT = "expense";
+
 export async function sellCrypto(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -76,7 +80,7 @@ export async function sellCrypto(input, { dataDir } = {}) {
   const invId = scopedAccountId("crypto_inventory", costCurrency);
   const pnlId = scopedAccountId("crypto_realized_pnl", proceedsCurrency);
 
-  const feeTreatment = p.feeTreatment || "expense";
+  const feeTreatment = p.feeTreatment || MODULE_DEFAULT_FEE_TREATMENT;
   const feeResult = applySingleFee(
     p.feeAmount != null && p.feeAmount !== ""
       ? {

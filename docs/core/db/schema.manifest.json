@@ -1,5 +1,5 @@
 {
-  "schemaHash": "d342a238caf54ff037e6da2856850ee255f40deaf4b086efb8d201682d9707b2",
+  "schemaHash": "ba7f52f2b850535383eec2e88f31fe011d22ecf3ce7b643e2a4bda87072ac3fd",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -3974,7 +3974,7 @@
           "unique": true,
           "origin": "c",
           "columns": [
-            "exchange_id",
+            null,
             "instrument_id",
             null
           ]
@@ -4892,7 +4892,7 @@
           "unique": true,
           "origin": "c",
           "columns": [
-            "platform_id",
+            null,
             "instrument_id",
             null
           ]

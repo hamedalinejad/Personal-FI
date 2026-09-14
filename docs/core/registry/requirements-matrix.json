@@ -232,8 +232,10 @@
       "title": "Minimal navigation IA",
       "status": "SPEC_LOCKED",
       "define": [
-        "docs/FINANCIAL-CORE.md"
-      ]
+        "docs/PRODUCT.md",
+        "docs/DOCUMENTATION-STANDARD.md"
+      ],
+      "note": "Navigation IA is Product-owned; not Financial Core."
     },
     "R-M27": {
       "title": "API registry coverage",

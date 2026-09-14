@@ -165,3 +165,14 @@ PRODUCTION = NO-GO
 Canonical IDs in `docs/core/registry/command-catalog.json` (42 entries).
 Forbidden aliases: `loan.payment`→`loan.recordPayment`, `fund.*`→`funds.*`.
 Gate: `npm run command:catalog`.
+
+## REVIEW-002…010 (2026-09-14)
+| ID | Status |
+|----|--------|
+| 002 requirements dead refs | OK — 0 missing live paths; checker walks define/evidence/related_contracts |
+| 003 R-M26 navigation | OK — PRODUCT.md (+ DOCUMENTATION-STANDARD) |
+| 004 FX equation | OK — amountInBase must equal amount×rate |
+| 005 posted empty journal | OK — posted requires ≥2 journal lines |
+| 006 stocks fee fields | OK — fee_commission/tax/other + treatments_json on buy+sell |
+| 007 silent expense | OK — MODULE_DEFAULT_FEE_TREATMENT per module |
+| 008–010 holding uniqueness | OK — ifnull sentinels on crypto/funds/metals |

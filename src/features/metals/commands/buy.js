@@ -15,6 +15,11 @@ import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngi
 /**
  * metals.buy — persists inv_metals_transactions; metal / premium / fee separated.
  */
+
+/** Module policy v1 (docs/modules/metals.md): trade fee expense; premium capitalized via alias */
+const MODULE_DEFAULT_FEE_TREATMENT = "expense";
+const MODULE_DEFAULT_PREMIUM_TREATMENT = "capitalize_inventory";
+
 export async function buyMetal(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -105,8 +110,8 @@ export async function buyMetal(input, { dataDir } = {}) {
 
   const feeEvents = buildFeeEvents(
     [
-      { feeAmount: premium.toFixed(), treatment: p.premiumTreatment || "capitalized_cost", label: "premium", feeCurrency: currency },
-      { feeAmount: fee.toFixed(), treatment: p.feeTreatment || "expense", label: "fee", feeCurrency, feeExchangeRateToBase: p.feeExchangeRateToBase },
+      { feeAmount: premium.toFixed(), treatment: p.premiumTreatment || MODULE_DEFAULT_PREMIUM_TREATMENT, label: "premium", feeCurrency: currency },
+      { feeAmount: fee.toFixed(), treatment: p.feeTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "fee", feeCurrency, feeExchangeRateToBase: p.feeExchangeRateToBase },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );

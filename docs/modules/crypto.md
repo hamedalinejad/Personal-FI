@@ -117,3 +117,6 @@ docs/core/db/schema.sql · registry · fixtures.
 
 Holding identity: `instrument + venue/exchange + network`.  
 Wallet / network / provider fields = provenance, not economic identity.
+## Fee treatment (LOCKED)
+- Core: no silent treatment.
+- Module policy v1: buy quantity fee → `reduce_received_quantity`; sell fee → `expense`.

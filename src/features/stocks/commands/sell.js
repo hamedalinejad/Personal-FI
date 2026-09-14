@@ -18,6 +18,10 @@ import { openDb } from "../../../core/persistence/port.js";
  * V1: proceeds create broker receivable (T+n mirror of buy payable) unless settleSameDay.
  * Position decreases on tradeDate.
  */
+
+/** Module policy v1 (docs/modules/stocks.md) — not a Core silent default */
+const MODULE_DEFAULT_FEE_TREATMENT = "expense";
+
 export async function sellStock(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
@@ -74,9 +78,9 @@ export async function sellStock(input, { dataDir } = {}) {
   // Module policy (stocks.md): sell fee default = expense when omitted
   const feeEvents = buildFeeEvents(
     [
-      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || "expense", label: "commission", feeCurrency: currency },
-      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || "expense", label: "tax", feeCurrency: currency },
-      { feeAmount: otherFee.toFixed(), treatment: p.otherFeeTreatment || "expense", label: "otherFee", feeCurrency: currency },
+      { feeAmount: commission.toFixed(), treatment: p.commissionTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "commission", feeCurrency: currency },
+      { feeAmount: tax.toFixed(), treatment: p.taxTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "tax", feeCurrency: currency },
+      { feeAmount: otherFee.toFixed(), treatment: p.otherFeeTreatment || MODULE_DEFAULT_FEE_TREATMENT, label: "otherFee", feeCurrency: currency },
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
