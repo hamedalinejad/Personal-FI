@@ -112,3 +112,8 @@ rebuild(asOf, engineVersions, sourceLedger) → projections
 Same ledger + same engineVersions + same asOf/context ⇒ same output.  
 No live provider calls during historical reconstruction.
 
+## Book base currency (P0)
+- Canonical book base from `db_meta.book_base_currency` (product default **IRR**).
+- `resolveBookBaseCurrency` never defaults book base to transaction currency.
+- Cross-currency writes require `exchangeRateToBase`; `amountInBase = amount × rate`.
+

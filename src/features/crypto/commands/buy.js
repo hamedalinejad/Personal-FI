@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -35,8 +36,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
     if (p[k] == null || p[k] === "") throw new Error(`VALIDATION_ERROR:${k}`);
   }
 
-  const baseCurrency = p.currency;
   const costCurrency = p.costCurrency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: costCurrency || p.currency });
   const gross = toDecimal(p.grossQuantity);
   const fee = toDecimal(p.feeQuantity || "0");
   const net = toDecimal(p.netQuantity);
@@ -71,6 +72,8 @@ export async function buyCrypto(input, { dataDir } = {}) {
           feeCurrency: p.feeCurrency || costCurrency,
           feeInstrumentId: p.feeInstrumentId || null,
           treatment: feeTreatment === "feeBurnQuantity" ? "fee_from_received" : feeTreatment,
+          inventoryAccountId: scopedAccountId("crypto_inventory", costCurrency),
+          inventoryRole: "crypto_inventory",
           feeExchangeRateToBase: p.feeExchangeRateToBase,
         }
       : null,

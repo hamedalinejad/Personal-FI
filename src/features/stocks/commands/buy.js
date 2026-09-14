@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -32,7 +33,7 @@ export async function buyStock(input, { dataDir } = {}) {
   const other = toDecimal(p.otherFee || "0");
   const gross = qty.times(price);
   const currency = p.currency;
-  const baseCurrency = p.baseCurrency || currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   // require explicit FX when currencies differ
   let exchangeRateToBase = p.exchangeRateToBase || p.exchange_rate_to_base || null;
   if (baseCurrency !== currency) {
@@ -62,11 +63,14 @@ export async function buyStock(input, { dataDir } = {}) {
   // Fee expense credits payable (not cash) until settlement
   // expense account currency must match fee journal line currency (tx currency)
   const feeExpenseId = scopedAccountId("stock_fee_expense", currency);
-  const feeResult = applyFeeEvents(feeEvents, {
-    expenseAccountId: feeExpenseId,
-    cashAccountId: payableId,
-    transactionCurrency: currency,
-  });
+  const feeResult = applyFeeEvents(
+    feeEvents.map((e) => ({ ...e, inventoryAccountId: invId, baseCurrency, transactionCurrency: currency, exchangeRateToBase })),
+    {
+      expenseAccountId: feeExpenseId,
+      cashAccountId: payableId,
+      transactionCurrency: currency,
+    },
+  );
   // Dimensional: never add base-currency fee total into TX carrying
   const feeCarryTx = toDecimal(feeResult.carryingDeltaTx?.amount || "0");
   const carrying = gross.plus(feeCarryTx);
@@ -110,9 +114,9 @@ export async function buyStock(input, { dataDir } = {}) {
     {
       accountId: invId,
       side: "debit",
-      amount: carrying.toFixed(),
+      amount: gross.toFixed(),
       currency,
-      amountInBase: carryingBase.toFixed(),
+      amountInBase: grossBase.toFixed(),
       exchangeRateToBase: exchangeRateToBase,
       lineKind: "principal",
     },

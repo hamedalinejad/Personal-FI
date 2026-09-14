@@ -5,11 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyCrypto } from "../public-api/index.js";
+import { setBookBaseCurrency } from "../../../core/accounting/bookSettings.js";
 import { openDb, closeAllDbs } from "../../../core/persistence/port.js";
 import { backupDatabase, restoreDatabase } from "../../../core/persistence/browser/sqlJsIndexedDbAdapter.js";
 
 test("crypto recovery: buy → backup → restore → holding survives", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-cr-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   await buyCrypto(
     {
       operationId: randomUUID(),

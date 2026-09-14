@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
@@ -136,6 +137,7 @@ export async function recordPayment(
   const txId = randomUUID();
   const now = new Date().toISOString();
 
+    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,

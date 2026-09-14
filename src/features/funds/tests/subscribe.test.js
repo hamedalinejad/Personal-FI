@@ -83,3 +83,26 @@ test("BUG-004 amount mismatch rejects", async () => {
   );
   closeAllDbs();
 });
+
+test("P0-03 nav alone without transactionPrice rejects", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-fnav-"));
+  await assert.rejects(
+    () =>
+      subscribeFund(
+        {
+          operationId: randomUUID(),
+          payload: {
+            instrumentId: "f1",
+            quantity: "10",
+            nav: "100",
+            transactionPrice: null,
+            currency: "IRR",
+            businessDate: "2026-01-01",
+          },
+        },
+        { dataDir },
+      ),
+    /FUND_TRANSACTION_PRICE_REQUIRED/,
+  );
+  closeAllDbs();
+});

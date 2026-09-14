@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -33,7 +34,7 @@ export async function sellCrypto(input, { dataDir } = {}) {
   const feeAmt = p.feeAmount != null && p.feeAmount !== "" ? toDecimal(p.feeAmount) : null;
   if (feeAmt && feeAmt.isNegative()) throw new Error("CRYPTO_FEE_NEGATIVE");
   const proceedsCurrency = p.proceedsCurrency || p.costCurrency;
-  const baseCurrency = p.currency || p.baseCurrency || proceedsCurrency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: proceedsCurrency || p.currency });
   if (!proceedsCurrency) throw new Error("VALIDATION_ERROR:proceedsCurrency");
 
   let exchangeRateToBase =

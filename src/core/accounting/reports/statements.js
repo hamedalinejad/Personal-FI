@@ -29,6 +29,7 @@ export function generalLedger(dataDir, { accountId = null, fromDate = null, toDa
     sql += ` AND je.business_date <= ?`;
     params.push(toDate);
   }
+  sql += ` AND fo.status = 'posted'`;
   sql += ` ORDER BY je.business_date, je.created_at, jl.line_number`;
   return db.prepare(sql).all(...params);
 }

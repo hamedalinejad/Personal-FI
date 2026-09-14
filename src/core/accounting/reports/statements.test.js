@@ -1,5 +1,7 @@
+import { openDb } from "../../persistence/port.js";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { setBookBaseCurrency } from "../bookSettings.js";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,6 +12,7 @@ import { trialBalance, generalLedger } from "./statements.js";
 
 test("R-007 trial balance balances after crypto.buy", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-tb-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   await buyCrypto(
     {
       operationId: randomUUID(),
@@ -42,6 +45,7 @@ import { investmentHoldings } from "./investment.js";
 
 test("BS/IS/CF run after crypto.buy", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-bs-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   await buyCrypto(
     {
       operationId: randomUUID(),

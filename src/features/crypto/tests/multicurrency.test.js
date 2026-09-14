@@ -5,10 +5,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyCrypto } from "../public-api/index.js";
+import { setBookBaseCurrency } from "../../../core/accounting/bookSettings.js";
 import { closeAllDbs, openDb } from "../../../core/persistence/port.js";
 
 test("crypto multi-currency: inventory account currency matches costCurrency", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-mc-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   await buyCrypto(
     {
       operationId: randomUUID(),

@@ -5,11 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyCrypto, capabilities } from "../public-api/index.js";
+import { setBookBaseCurrency } from "../../../core/accounting/bookSettings.js";
 import { openDb, closeAllDbs } from "../../../core/persistence/worker.js";
 
 test("P0-MOD-001 crypto-only standalone buy without Accounts UI", async () => {
   assert.ok(capabilities().edition === "crypto-only" || capabilities().implements);
   const dataDir = mkdtempSync(join(tmpdir(), "pf-csa-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   const r = await buyCrypto(
     {
       operationId: randomUUID(),

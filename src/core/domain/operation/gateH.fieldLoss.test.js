@@ -1,3 +1,4 @@
+import { setBookBaseCurrency } from "../../accounting/bookSettings.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
@@ -9,6 +10,7 @@ import { loadOperation, closeAllDbs, openDb } from "../../persistence/port.js";
 
 test("Gate H: crypto.buy payload fields survive persist→load", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-h-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   const opId = randomUUID();
   const payload = {
     instrumentId: "eth-h",

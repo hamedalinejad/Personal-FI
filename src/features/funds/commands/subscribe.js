@@ -5,6 +5,7 @@ import {
   ensureFeatureInventoryAccount,
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { assertPositive } from "../../../core/domain/validation/positiveMoney.js";
 import { fundCashJournalLines } from "../domain/cashPath.js";
@@ -29,40 +30,47 @@ export async function subscribeFund(input, { dataDir } = {}) {
   if (p.transactionPrice != null && p.transactionPrice !== "") {
     txPrice = toDecimal(p.transactionPrice);
   } else if (p.pricingMode === "nav" && nav != null) {
+    // Explicit opt-in only — never silent NAV→transactionPrice
     txPrice = nav;
   } else if (p.pricingMode === "amount_based" && p.amount != null && p.amount !== "") {
-    txPrice = toDecimal(p.amount).div(qty);
-  } else if (nav != null) {
-    // allowed fallback only when transactionPrice omitted and nav present
-    txPrice = nav;
+    // amount_based derives unit price later from amount/qty
+    txPrice = null;
   } else {
-    throw new Error("VALIDATION_ERROR:transactionPrice_or_nav");
+    throw new Error("FUND_TRANSACTION_PRICE_REQUIRED");
   }
-  assertPositive(txPrice.toFixed(), "FUND_PRICE_NONPOSITIVE");
   if (nav != null) assertPositive(nav.toFixed(), "FUND_NAV_NONPOSITIVE");
 
   let amount;
-  if (p.amount != null && p.amount !== "") {
+  if (p.pricingMode === "amount_based" && p.amount != null && p.amount !== "") {
     amount = toDecimal(p.amount);
-    const expected = qty.times(txPrice);
-    if (!amount.eq(expected)) {
-      throw new Error(`AMOUNT_PRICE_MISMATCH:expected=${expected.toFixed()},got=${amount.toFixed()}`);
-    }
+    assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
+    txPrice = amount.div(qty); // derived unit price, not NAV
   } else {
-    amount = qty.times(txPrice);
+    if (txPrice == null) throw new Error("FUND_TRANSACTION_PRICE_REQUIRED");
+    assertPositive(txPrice.toFixed(), "FUND_PRICE_NONPOSITIVE");
+    if (p.amount != null && p.amount !== "") {
+      amount = toDecimal(p.amount);
+      const expected = qty.times(txPrice);
+      if (!amount.eq(expected)) {
+        throw new Error(`AMOUNT_PRICE_MISMATCH:expected=${expected.toFixed()},got=${amount.toFixed()}`);
+      }
+    } else {
+      amount = qty.times(txPrice);
+    }
+    assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
   }
-  assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
 
   // transaction vs base currency
   const transactionCurrency = p.transactionCurrency || p.currency;
   if (!transactionCurrency) throw new Error("VALIDATION_ERROR:transactionCurrency");
-  const baseCurrency = p.baseCurrency || transactionCurrency;
-  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
-  if (transactionCurrency === baseCurrency) {
-    exchangeRateToBase = toDecimal("1");
-  } else if (exchangeRateToBase == null) {
-    throw new Error("VALIDATION_ERROR:exchangeRateToBase");
-  }
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency });
+  const exchangeRateToBase = toDecimal(
+    requireFxIfCrossCurrency({
+      transactionCurrency,
+      baseCurrency,
+      exchangeRateToBase: p.exchangeRateToBase,
+    }),
+  );
   const amountInBase = amount.times(exchangeRateToBase);
   const currency = transactionCurrency; // journal line currency = transaction currency
   const accountId = p.accountId || null;

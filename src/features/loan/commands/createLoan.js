@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { generateSchedule } from "../domain/scheduleFacade.js";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
@@ -55,7 +56,7 @@ export async function createLoan(
   }
 
   const currency = p.currency;
-  const baseCurrency = operationBaseCurrency || p.baseCurrency || currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: operationBaseCurrency || p.baseCurrency || null, transactionCurrency: currency });
   if (currency !== baseCurrency) {
     throw new Error("LOAN_MULTI_CURRENCY_DEFERRED");
   }

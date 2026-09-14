@@ -109,3 +109,8 @@ docs/core/db/schema.sql · registry · fixtures.
 ### Price fields
 NAV · transactionPrice · liquidationPrice are distinct. **NAV must never** auto-fill transaction or liquidation price.
 Distribution vs reinvestment: explicit commands; cash vs units effects via journal.
+
+### Pricing modes (P0)
+- Explicit `transactionPrice`, or `pricingMode=nav` with nav, or `pricingMode=amount_based` with amount.
+- **Silent NAV → transactionPrice is forbidden** (`FUND_TRANSACTION_PRICE_REQUIRED`).
+

@@ -89,13 +89,53 @@ export function applyFeeEvents(events, { expenseAccountId, cashAccountId, receiv
     });
 
     switch (event.treatment) {
-      case "capitalized_cost":
-        // Dimension-safe: base always accumulates fee-in-base; TX only if same currency
+      case "capitalized_cost": {
+        // Model B: capitalized fee must move GL inventory and cash/payable — not subledger-only.
         carryingDeltaBase = carryingDeltaBase.plus(inBase);
         if (txCcy && event.feeCurrency === txCcy) {
           carryingDeltaTx = carryingDeltaTx.plus(toDecimal(event.feeAmount));
         }
+        const invId =
+          event.inventoryAccountId ||
+          event.assetAccountId ||
+          scopedAccountId(
+            event.inventoryRole || "crypto_inventory",
+            event.feeCurrency === (event.transactionCurrency || txCcy)
+              ? event.transactionCurrency || txCcy || event.feeCurrency
+              : event.feeCurrency,
+          );
+        const cashId =
+          event.cashAccountId ||
+          cashAccountId ||
+          scopedAccountId("local_settlement_cash", event.feeCurrency);
+        const fx =
+          event.feeCurrency === event.baseCurrency
+            ? "1"
+            : event.feeCurrency === event.transactionCurrency
+              ? event.exchangeRateToBase
+              : event.feeExchangeRateToBase;
+        journalLines.push(
+          {
+            accountId: invId,
+            side: "debit",
+            amount: event.feeAmount,
+            currency: event.feeCurrency,
+            amountInBase: inBase.toFixed(),
+            exchangeRateToBase: fx,
+            lineKind: "fee",
+          },
+          {
+            accountId: cashId,
+            side: "credit",
+            amount: event.feeAmount,
+            currency: event.feeCurrency,
+            amountInBase: inBase.toFixed(),
+            exchangeRateToBase: fx,
+            lineKind: "fee",
+          },
+        );
         break;
+      }
       case "expense": {
         const expId =
           event.expenseAccountId ||

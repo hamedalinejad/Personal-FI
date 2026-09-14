@@ -5,10 +5,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { buyCrypto } from "../../../features/crypto/public-api/index.js";
+import { setBookBaseCurrency } from "../../accounting/bookSettings.js";
 import { closeAllDbs, openDb } from "../../persistence/port.js";
 
 test("Recovery: same operationId + same command is idempotent replay", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-rec-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   const opId = randomUUID();
   const payload = {
     instrumentId: "btc-rec",
@@ -37,6 +39,7 @@ test("Recovery: same operationId + same command is idempotent replay", async () 
 
 test("Recovery: same operationId + different command conflicts", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-rec2-"));
+  setBookBaseCurrency(openDb(dataDir), "USDT");
   const opId = randomUUID();
   const base = {
     instrumentId: "btc-c",

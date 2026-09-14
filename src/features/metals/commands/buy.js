@@ -1,3 +1,4 @@
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -52,7 +53,7 @@ export async function buyMetal(input, { dataDir } = {}) {
   const premium = toDecimal(p.premiumAmount ?? p.premium ?? "0");
   const fee = toDecimal(p.feeAmount ?? p.fee ?? "0");
   const currency = p.currency;
-  const baseCurrency = p.baseCurrency || currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   let exchangeRateToBase = "1";
   if (baseCurrency !== currency) {
     if (!p.exchangeRateToBase) throw new Error("FX_RATE_REQUIRED");
@@ -83,11 +84,20 @@ export async function buyMetal(input, { dataDir } = {}) {
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
-  const feeResult = applyFeeEvents(feeEvents, {
-    expenseAccountId: scopedAccountId("metal_fee_expense", feeCurrency),
-    cashAccountId: cashId,
-    transactionCurrency: currency,
-  });
+  const feeResult = applyFeeEvents(
+    feeEvents.map((e) => ({
+      ...e,
+      inventoryAccountId: invId,
+      baseCurrency,
+      transactionCurrency: currency,
+      exchangeRateToBase,
+    })),
+    {
+      expenseAccountId: scopedAccountId("metal_fee_expense", feeCurrency),
+      cashAccountId: cashId,
+      transactionCurrency: currency,
+    },
+  );
   // Dimensional carrying — never add BASE fee amounts into TX currency
   // Premium is a capitalized_cost fee event — already inside carryingDeltaTx/Base; do not add twice
   const feeCarryTx = toDecimal(feeResult.carryingDeltaTx?.amount || "0");
@@ -109,9 +119,9 @@ export async function buyMetal(input, { dataDir } = {}) {
     {
       accountId: invId,
       side: "debit",
-      amount: carrying.toFixed(),
+      amount: metalCost.toFixed(),
       currency,
-      amountInBase: carryingBase.toFixed(),
+      amountInBase: metalCostBase.toFixed(),
       exchangeRateToBase,
       lineKind: "principal",
     },
