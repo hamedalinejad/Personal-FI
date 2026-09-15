@@ -182,3 +182,11 @@ input accepted → silently discarded → not returned → not exported → not 
 | Funds | instrument · units · transactionPrice · NAV · liquidationPrice · distribution dates · reinvest semantics |
 | Metals | gross · purity · fine · quoteBasis · price unit · premium · trade fee · delivery fee · serial · certificate · location |
 | Loans | principal · role · rate · rate unit · method · frequency · periods · day-count · fee/penalty · allocation · schedule version · residual · FX |
+
+## Import lineage FKs (LOCKED)
+```
+import_raw_records.batch_id → import_batches.id (RESTRICT)
+import_dedupe_keys.raw_record_id → import_raw_records.id
+source_document_id → docs_documents.id (SET NULL) when internal document
+```
+String IDs without FK are forbidden when the target table is in-schema.

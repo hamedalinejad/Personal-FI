@@ -201,3 +201,30 @@ asset out · asset in · prices · valuation currency
 fees · FX · cost basis transfer · realized P&L rule · economic_kind
 ```
 No partial swap() without that contract.
+
+## economic_kind (LOCKED) — separate from tx_type
+Canonical economic classification only:
+```
+acquisition · disposal · transfer_internal · swap_economic · fee · income · adjustment
+```
+Operational `tx_type` remains separate (`buy`, `sell`, `transfer_in`, `transfer_out`, …).
+
+### Migration map (do not blind-rename)
+| Old value | New value | Rule |
+|-----------|-----------|------|
+| transfer | transfer_internal | only if internal scope transfer |
+| internal_transfer | transfer_internal | same |
+| economic_swap / swap | swap_economic | only when economic swap semantics present |
+| bridge | transfer_internal or deferred external move | classify by evidence |
+
+## Transfer persistence map (LOCKED)
+| API field | Table.column | Kind |
+|-----------|--------------|------|
+| fromVenue / fromNetwork | from holding `exchange_id`/`network_id` + tx scope | RAW |
+| toVenue / toNetwork | to holding scope | RAW |
+| quantity | inv_crypto_transactions.gross_quantity / net_quantity | RAW |
+| networkFee | fee_quantity and/or fee amount fields | RAW |
+| feeFundingKind | fee_funding_kind | RAW |
+| externalTxReference | provenance / source_reference on operation | RAW |
+| provenance | fin_operations provenance + optional address ids | RAW |
+| economic_kind | inv_crypto_transactions.economic_kind | RAW status |

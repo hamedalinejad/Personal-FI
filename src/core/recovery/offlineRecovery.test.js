@@ -134,6 +134,9 @@ test("P0-OFFLINE-002 import unknown field preservation roundtrip", async () => {
     nested: { a: 1 },
   };
   db.prepare(
+    `INSERT INTO import_batches (id, source_provider, source_type, status, created_at) VALUES (?, 'test-provider', 'csv', 'completed', ?)`,
+  ).run(batchId, now);
+  db.prepare(
     `INSERT INTO import_raw_records (
       id, batch_id, source_provider, source_type, raw_record_hash, unknown_fields_json, payload_json, normalization_status, imported_at
     ) VALUES (?, ?, 'test-provider', 'csv', ?, ?, ?, 'raw', ?)`,

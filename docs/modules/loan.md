@@ -232,3 +232,9 @@ No ambiguous “maybe later” — only SUPPORTED / DEFERRED / REJECTED.
 
 Default for greenfield “new loan cash out” = `disburse_now`.  
 Recording an existing receivable without fabricating cash requires `record_outstanding` (or explicit opening-balance path). Command card must carry `originationKind`.
+
+## installment_frequency (schema aligned)
+```
+monthly · weekly · quarterly · annual · custom
+```
+Engine + schema both support `annual`.

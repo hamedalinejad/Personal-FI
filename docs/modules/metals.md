@@ -205,3 +205,11 @@ Proof path: `src/features/metals/tests/standalone.test.js`
 
 Coins: valuation from **instrument unit price**, not auto fine-metal derivation, unless explicit analytical `quoteBasis=metal_equivalent`.
 
+## purity_ratio post rule (LOCKED — Option A)
+At financial post:
+```
+if instrument.purityPolicy == fixed_1 → persist purity_ratio = "1"
+else purity_ratio required (Decimal domain validation)
+```
+NULL purity is allowed only on non-posted drafts. Holding identity must not use NULL as a merge bucket.  
+SQLite CHECK = structural sanity only; Decimal domain = financial truth.

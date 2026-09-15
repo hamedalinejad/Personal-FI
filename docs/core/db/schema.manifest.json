@@ -1,5 +1,5 @@
 {
-  "schemaHash": "fcfc803610819a20802f3ecc6129573cb45b08b1b0292e0f43175680183c7424",
+  "schemaHash": "02ad2b21fee2f829ee3d1c61ce42d5791b3ef7bdcf6a7c1946fddaa6bde43482",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -3223,7 +3223,22 @@
           "pk": 0
         }
       ],
-      "foreignKeys": [],
+      "foreignKeys": [
+        {
+          "table": "docs_documents",
+          "from": "source_document_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        },
+        {
+          "table": "import_batches",
+          "from": "batch_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        }
+      ],
       "indexes": [
         {
           "name": "idx_import_raw_hash",
@@ -4182,7 +4197,7 @@
       ],
       "checks": [
         "CHECK ( fee_funding_kind IS NULL OR (fee_funding_kind = 'cash' AND fee_currency IS NOT NULL AND fee_instrument_id IS NULL)",
-        "CHECK (economic_kind IS NULL OR economic_kind IN ( 'acquisition','disposal','transfer','internal_transfer','bridge','economic_swap','fee','income','adjustment','swap' )",
+        "CHECK (economic_kind IS NULL OR economic_kind IN ( 'acquisition','disposal','transfer_internal','swap_economic','fee','income','adjustment' )",
         "CHECK (fee_funding_kind IS NULL OR fee_funding_kind IN ('cash','asset')",
         "CHECK (tx_type IN ('buy','sell','transfer_in','transfer_out','deposit','withdraw','fee','adjustment','swap')"
       ]
@@ -6574,6 +6589,13 @@
           "on_delete": "RESTRICT"
         },
         {
+          "table": "acc_transactions",
+          "from": "account_transaction_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        },
+        {
           "table": "acc_accounts",
           "from": "account_id",
           "to": "id",
@@ -6605,7 +6627,7 @@
         "CHECK (grace_interest_policy IS NULL OR grace_interest_policy IN ('interest_only','payment_holiday')",
         "CHECK (grace_mode IS NULL OR grace_mode IN ('none','periods','date_range')",
         "CHECK (grace_period_unit IS NULL OR grace_period_unit IN ('installment')",
-        "CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','custom')",
+        "CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','annual','custom')",
         "CHECK (interest_rate_period IS NULL OR interest_rate_period IN ('annual','monthly')",
         "CHECK (interest_type IS NULL OR interest_type IN ('none','fixed','variable')",
         "CHECK (irregular_first_period IN (0, 1)",
@@ -7777,7 +7799,7 @@
         "CHECK (is_degraded IN (0, 1)",
         "CHECK (is_manual IN (0, 1)",
         "CHECK (is_stale IN (0, 1)",
-        "CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')"
+        "CHECK (quote_type IN ('last','close','nav','liquidation','manual','imported','bid','ask')"
       ]
     },
     "price_sources": {

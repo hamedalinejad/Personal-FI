@@ -100,7 +100,7 @@ Local intent → journal → positions/holdings rebuild → external broker stat
 - **Stocks T+n:** trade posts inventory vs payable; settle posts payable vs cash.  
 - **Tax:** paid only after payTax operation.  
 - **Metals:** purity RAW; fineWeight DERIVED; delivery fee ≠ trade fee by default.  
-- **Crypto economic_kind:** acquisition|disposal|transfer_internal|swap_economic|fee.  
+- **Crypto economic_kind:** acquisition|disposal|transfer_internal|swap_economic|fee|income|adjustment (not tx_type).  
 - **Funds:** NAV ≠ transactionPrice ≠ liquidationPrice.  
 
 ## 16. Loan math (v1)

@@ -354,3 +354,14 @@ No new audit/P0 Markdown.
 | P0-01 fee taxonomy single enum + reduce_proceeds semantics | CLOSED |
 | P0-02 loan schedule conservation exact (no 0.01 tolerance) | CLOSED |
 | P0-03 stocks date/policy columns on schema + writers | CLOSED |
+
+## P0-04 / P1 schema closure
+| ID | Status |
+|----|--------|
+| P0-04 crypto economic_kind canonical | CLOSED |
+| P1-01 loan frequency annual in schema | CLOSED |
+| P1-02 crypto transfer persistence map | CLOSED (module + matrix) |
+| P1-03 import batch FK | CLOSED |
+| P1-04 ln_loans.account_transaction_id FK | CLOSED |
+| P1-05 funds liquidation via price_history quote_type | CLOSED (contract) |
+| P1-06 metals purity post rule Option A | CLOSED (contract + schema comment) |

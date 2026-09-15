@@ -185,3 +185,14 @@ tax treatment · fees
 A boolean `reinvest?` alone is **not** a full economic contract.
 
 Pricing lock remains: **NAV ≠ transactionPrice ≠ liquidationPrice**.
+
+## liquidationPrice observation (LOCKED)
+Canonical store for market/liquidity observations is **price_history** with `quote_type` including `liquidation` (extend enum when implemented).
+
+| Concept | Store |
+|---------|--------|
+| NAV | price_history quote_type=`nav` and/or tx.nav as snapshot of observation used |
+| transactionPrice | inv_fif_transactions.transaction_price (economic price of the op) |
+| liquidationPrice | price_history quote_type=`liquidation` (or explicit command input required by card) |
+
+Never copy NAV → transactionPrice or liquidationPrice silently.

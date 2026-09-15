@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS price_history (
   price           TEXT NOT NULL,
   currency        TEXT NOT NULL,
  quote_basis TEXT, -- per_unit|per_coin|per_mg|nav|... 
- quote_type TEXT NOT NULL DEFAULT 'last' CHECK (quote_type IN ('last','close','nav','manual','imported','bid','ask')), -- NOT NULL
+ quote_type TEXT NOT NULL DEFAULT 'last' CHECK (quote_type IN ('last','close','nav','liquidation','manual','imported','bid','ask')), -- NOT NULL
  is_manual INTEGER NOT NULL DEFAULT 0 CHECK (is_manual IN (0, 1)), -- 
  is_stale INTEGER NOT NULL DEFAULT 0 CHECK (is_stale IN (0, 1)), -- 
  is_degraded INTEGER NOT NULL DEFAULT 0 CHECK (is_degraded IN (0, 1)), -- DEGRADED mode
@@ -347,8 +347,9 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   from_address_id TEXT, -- soft FK → inv_crypto_wallet_addresses.id (table defined later; CRYPTO-003)
   to_address_id   TEXT, -- soft FK → inv_crypto_wallet_addresses.id
   -- CRYPTO-002 / MATH-008
+  -- economic_kind = economic meaning (canonical). Operational event type is tx_type separately.
   economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN (
-    'acquisition','disposal','transfer','internal_transfer','bridge','economic_swap','fee','income','adjustment','swap'
+    'acquisition','disposal','transfer_internal','swap_economic','fee','income','adjustment'
   )),
   created_at      TEXT NOT NULL,
   CHECK (
@@ -418,13 +419,13 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   payment_holiday_calendar_id TEXT, -- لینک به تقویم 
   -- account (RAW):
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- فقط حالت Integrated 
-  account_transaction_id TEXT, -- لینک cash leg 
+  account_transaction_id TEXT REFERENCES acc_transactions(id) ON DELETE SET NULL ON UPDATE CASCADE, -- cash-leg FK when linked
   -- calculation (RAW):
   calculation_method TEXT NOT NULL CHECK (calculation_method IN ('declining_balance','flat_rate','bullet','qarz_al_hasaneh')),
   interest_type TEXT CHECK (interest_type IS NULL OR interest_type IN ('none','fixed','variable')), -- 
   interest_rate TEXT, -- درصد کامل 
   interest_rate_period TEXT CHECK (interest_rate_period IS NULL OR interest_rate_period IN ('annual','monthly')), -- 
-  installment_frequency TEXT CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','custom')), -- 
+  installment_frequency TEXT CHECK (installment_frequency IS NULL OR installment_frequency IN ('monthly','weekly','quarterly','annual','custom')), -- 
   custom_interval_days INTEGER, -- اجباری اگر frequency=custom 
   total_installments INTEGER,
   -- grace (RAW):
@@ -540,7 +541,7 @@ CREATE TABLE IF NOT EXISTS import_batches (
 
 CREATE TABLE IF NOT EXISTS import_raw_records (
   id                    TEXT PRIMARY KEY,
- batch_id TEXT NOT NULL, -- import batch 
+  batch_id TEXT NOT NULL REFERENCES import_batches(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- import batch FK
   source_provider       TEXT NOT NULL, -- provider name (e.g., 'mellat', 'tsetmc', 'coinbase')
   source_schema_version TEXT, -- schema version of source data
   -- source_type: type of source data format (not interface channel)
@@ -552,7 +553,7 @@ CREATE TABLE IF NOT EXISTS import_raw_records (
   -- This is the BUSINESS provenance format, NOT the interface channel
  source_type TEXT, -- csv|json|api|manual|broker_export 
  source_reference TEXT, -- file name / URL / batch label 
- source_document_id TEXT, -- link to docs_documents 
+  source_document_id TEXT REFERENCES docs_documents(id) ON DELETE SET NULL ON UPDATE CASCADE, -- optional document FK
  raw_record_hash TEXT NOT NULL, -- never destroy source identity 
   unknown_fields_json   TEXT,
  payload_json TEXT NOT NULL, -- original raw amount/date/time preserved (236)
@@ -840,7 +841,8 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity_mg TEXT NOT NULL, -- SoT mass (gross weight, mg canonical)
   purity_code TEXT, -- e.g. 24k, 18k, 750, 999, emami, bahar
-  purity_ratio TEXT CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL) > 0 AND CAST(purity_ratio AS REAL) <= 1)), -- 0-1 exclusive of 0
+  -- Domain posting requires non-null purity_ratio (fixed_1 instruments persist "1"). NULL only for non-posted drafts. SQLite CHECK is structural only; Decimal domain is financial truth.
+  purity_ratio TEXT CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL) > 0 AND CAST(purity_ratio AS REAL) <= 1)),
   total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
   average_cost_per_mg TEXT, -- DERIVED: cost-basis engine rebuild only, -- derived / maintained by cost-basis engine

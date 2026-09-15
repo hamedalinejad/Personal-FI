@@ -3110,6 +3110,20 @@
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
       "protected": true
+    },
+    {
+      "commandId": "crypto.transfer",
+      "field": "economic_kind",
+      "required": false,
+      "accepted": true,
+      "stored": "inv_crypto_transactions.economic_kind",
+      "derived": false,
+      "returned": true,
+      "exported": true,
+      "reversed": true,
+      "migrated": true,
+      "owner": "docs/modules/crypto.md",
+      "protected": true
     }
   ],
   "status": "PARTIAL"

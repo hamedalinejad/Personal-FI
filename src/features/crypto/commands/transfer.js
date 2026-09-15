@@ -257,7 +257,7 @@ export async function transferCrypto(input, { dataDir } = {}) {
         feeCurrency,
         feeInstrumentId,
         feeFundingKind,
-        "transfer",
+        "transfer_internal",
         now,
       );
       db.prepare(ins).run(
@@ -273,7 +273,7 @@ export async function transferCrypto(input, { dataDir } = {}) {
         null,
         null,
         null,
-        "transfer",
+        "transfer_internal",
         now,
       );
     },
