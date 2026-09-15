@@ -1,55 +1,38 @@
 # QUALITY-STATUS
 
-**Live status only.** History lives in Git. Do not add audit/BUG Markdown files.
+**Live only.** No BUG/AUDIT Markdown files.
 
-## Production
+## Production gates
 | Gate | Value |
 |------|-------|
 | FREEZE_PROVEN | **false** |
 | RELEASE_PROVEN | **false** |
 | PRODUCTION | **NO-GO** |
 | UI | **WAIT** |
-| Coding allowed | **Core + Loan scaffold hardening** (see DEVELOPMENT) |
+| Coding | **Core + Loan + feature public-apis** |
 
-## Architecture (locked)
-| Item | Status |
+## Closed (do not reopen as docs)
+Owner tree · six routes · journal SoT · Decimal · book base · fee enum · loan conservation · stocks dates/policy columns · crypto economic_kind · import/loan FKs · dual-mode publicRegistry · standalone packs · full-edition shared journal · command catalog 42 cards · field matrix ≥230 rows · recovery matrix named + core scenarios · Iran calendar **structure** v1 · browser **protocol** harness
+
+## Explicitly open / deferred (blocks only claimed scope)
+| Item | Blocks |
 |------|--------|
-| Owner docs (11 global + 11 modules) | GREEN — do not expand |
-| Six routes / Feature ≠ Page | GREEN |
-| Journal = cash/accounting SoT | GREEN |
-| Decimal strings + no float money | GREEN |
-| Book base ≠ transaction currency | GREEN |
-| Fee treatment required + single enum | GREEN |
-| Loan schedule exact conservation | GREEN |
-| Stocks date/policy columns | GREEN |
-| Crypto economic_kind canonical | GREEN |
-| Import/loan FKs | GREEN |
+| Browser real-tab E2E | Browser RELEASE only |
+| Official Iran holiday **dates** filled | Equity holiday-aware settlement RELEASE |
+| TWR/MWR formulas | Performance reports claiming TWR/MWR |
+| Empty `fixtureRefs` goldens for accounts/cheque/tax/budget | Those commands' GOLDEN_GREEN |
+| Full recovery crash-injection in-process | RECOVERY_GREEN organizational claim |
+| Corporate actions / crypto deposit-swap | Until un-deferred with command+fixture |
 
-## Open before FREEZE_PROVEN
-| Area | Status |
-|------|--------|
-| Field-preservation full matrix | PARTIAL |
-| Full golden families | PARTIAL |
-| Recovery matrix complete | PARTIAL |
-| Standalone full path packs | IMPROVING (edition packs + capabilities) |
-| Iran official policy data (not SAMPLE) | OPEN |
-| FX multi-hop production goldens | PARTIAL |
-| Browser sql.js + IndexedDB E2E | OPEN |
-| TWR/MWR formulas | DEFERRED |
-| Command cards every mutation complete | PARTIAL |
+## Dual mode (product)
+| Mode | Accounts UI | Integration |
+|------|-------------|-------------|
+| loan-only / fund-only / metals-only / … | Not required | Single public-api |
+| full | Optional surface | `src/api/publicRegistry` · shared journal |
 
-## Evidence locations
+## Evidence
 ```
-docs/FINANCIAL-CORE.md · docs/modules/*.md
-docs/core/db/schema.sql · docs/core/registry/*
-fixtures/* · src/**/*.test.js
-npm test · npm run gates
+npm test · npm run gates · src/api/publicRegistry.js
+standalone-edition-packs · full-edition-integration
+docs/core/registry/* · data/policy/iran/*
 ```
-
-## Standalone evidence
-`src/core/acceptance/standalone-edition-packs.acceptance.test.js` + feature `*standalone*.test.js`
-
-## Dual-mode evidence
-- Standalone packs: `standalone-edition-packs.acceptance.test.js`
-- Full composition: `full-edition-integration.acceptance.test.js` + `src/api/publicRegistry.js`
-- Boundary: `npm run lint` (lint-boundaries)

@@ -176,3 +176,11 @@ crash before commit · after SQL commit · same-op replay · ID+changed economic
 ## Browser adapters
 `durableMemoryAdapter` = protocol harness until `sql.js + IndexedDB + single-writer` is RELEASE_PROVEN. **Do not delete** for file-count reduction.
 
+## Browser proof levels (LOCKED)
+| Level | Meaning | Status |
+|-------|---------|--------|
+| Protocol harness | `durableMemoryAdapter` + `sqlJsIndexedDbAdapter` API shape, backup/restore unit tests | PROVEN in Node harness |
+| Release E2E | Real browser tab: sql.js + IndexedDB + single-writer + reload + crash | **OPEN** — required only if shipping browser |
+| Node SQLite | Primary path | PROVEN (scaffold) |
+
+Shipping Node-first is allowed while browser E2E remains OPEN. Browser edition cannot claim RELEASE_PROVEN until level 2 is green.

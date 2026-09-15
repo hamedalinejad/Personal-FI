@@ -1,0 +1,15 @@
+{
+  "policyVersion": "iran-equity-calendar-v1",
+  "market": "TSE",
+  "timezone": "Asia/Tehran",
+  "weekend": ["Thursday", "Friday"],
+  "businessDays": ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday"],
+  "settlementDefault": "T+2",
+  "holidays": [],
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": null,
+  "sourceMetadata": {
+    "status": "STRUCTURE_LOCKED_DATA_PENDING",
+    "note": "Weekend and T+n structure locked. Official holiday dates must be filled from verified source before RELEASE_PROVEN. Empty holidays[] means only weekend rules apply."
+  }
+}

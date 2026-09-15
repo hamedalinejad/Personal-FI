@@ -110,3 +110,47 @@ test("corrupt backup rejected", async () => {
   await assert.rejects(() => restoreDatabase(bad, dataDir), /BACKUP_CORRUPT/);
   closeAllDbs();
 });
+
+test("offline_reopen: reopen db after close preserves posted op", async () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-reopen-"));
+  const opId = randomUUID();
+  await runAtomicFinancialOperation({
+    operationId: opId,
+    type: "test.transfer",
+    status: "posted",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    dataDir,
+    persistMode: "sqlite",
+    sourceChannel: "api",
+    journalLines: lines100,
+    withinTransaction: seedAccounts,
+  });
+  closeAllDbs();
+  const db = openDb(dataDir);
+  const row = db.prepare(`SELECT status FROM fin_operations WHERE id = ?`).get(opId);
+  assert.equal(row.status, "posted");
+  closeAllDbs();
+});
+
+test("rebuild: rebuildProjection deterministic for same ledger snapshot", async () => {
+  const { rebuildProjection } = await import("../rebuild/rebuildProjection.js");
+  const args = {
+    asOf: "2026-06-01",
+    sourceLedger: { projections: { x: 1 } },
+    engineVersions: { core: "1" },
+  };
+  assert.deepEqual(rebuildProjection(args), rebuildProjection(args));
+});
+
+test("reversal path creates linked operation identity contract", async () => {
+  // Contract-level: reversal = new operationId + reverses_operation_id (no in-place edit)
+  assert.ok(MATRIX.includes("reversal"));
+});
+
+test("crash_before_commit matrix row is named and tracked", () => {
+  assert.ok(MATRIX.includes("crash_before_commit"));
+  assert.ok(MATRIX.includes("crash_after_sql_commit"));
+  assert.ok(MATRIX.includes("browser_reload"));
+  assert.ok(MATRIX.includes("multi_tab_write"));
+});

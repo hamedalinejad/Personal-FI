@@ -1854,7 +1854,9 @@
         "errors": [
           "ACCOUNT_*"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:accounts.create"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -1927,7 +1929,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:accounts.update"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -1991,7 +1995,9 @@
         "errors": [
           "ACCOUNT_NONZERO_BALANCE"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:accounts.archive"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -2637,7 +2643,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:cheque.register"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -2716,7 +2724,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:cheque.deposit"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -2794,7 +2804,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:cheque.clear"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -2872,7 +2884,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:cheque.bounce"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -2949,7 +2963,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:cheque.cancel"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3029,7 +3045,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:assets.register"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3104,7 +3122,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:assets.update"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3183,7 +3203,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:assets.dispose"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3261,7 +3283,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:budget.set"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3339,7 +3363,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:goal.create"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3417,7 +3443,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:bill.schedule"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3497,7 +3525,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:tax.assess"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
@@ -3660,7 +3690,9 @@
           "WRITER_REQUIRED",
           "CAPABILITY_DENIED"
         ],
-        "fixtureRefs": [],
+        "fixtureRefs": [
+          "DEFERRED:no-golden-yet:tax.adjust"
+        ],
         "invariants": [
           "posted ⇒ ≥2 journal lines",
           "Σ debit(base)=Σ credit(base)"
