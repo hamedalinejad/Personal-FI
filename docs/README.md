@@ -32,3 +32,6 @@ Any implementer should be able to ship a feature using **only**:
 1. PRODUCT → 2. ARCHITECTURE → 3. FINANCIAL-CORE → 4. DATA-MODEL → 5. API → 6. REPORTING → 7. OFFLINE-RELEASE → 8. DEVELOPMENT → 9. modules → 10. schema/registry/fixtures/tests
 
 Live gates: [QUALITY-STATUS.md](./QUALITY-STATUS.md)
+
+## Coding may start (Core + Loan)
+Owner tree is intentionally small. Remaining work is proof depth (goldens, recovery, browser), not more Markdown files. See DEVELOPMENT.md coding sequence steps 1–4.

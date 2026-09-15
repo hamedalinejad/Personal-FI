@@ -72,7 +72,8 @@
     "coverage": "OWNER_TREE",
     "schema_spec_locked": true,
     "schema_freeze_proven": false,
-    "standard": "docs/DOCUMENTATION-STANDARD.md"
+    "standard": "docs/DOCUMENTATION-STANDARD.md",
+    "human_md_count_target": 23
   },
   "status_semantics": {
     "IMPLEMENTED": "code path exists; NOT release proof",
@@ -133,5 +134,14 @@
     "BROWSER": "OPEN",
     "FIELD_PRESERVATION": "PARTIAL→machine matrix from cards"
   },
-  "production": "NO-GO"
+  "production": "NO-GO",
+  "coding": {
+    "allowed": [
+      "core",
+      "loan"
+    ],
+    "ui": "WAIT",
+    "freeze_proven": false,
+    "note": "Harden Core+Loan; do not expand human docs"
+  }
 }

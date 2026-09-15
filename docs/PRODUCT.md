@@ -209,3 +209,6 @@ tax obligation ≠ paid · posted ≠ draft
 ```
 Simplify via UI: smart defaults, guided sheets, progressive disclosure, unified activity — **not** by collapsing Core distinctions.
 
+## Coding readiness (LOCKED)
+Human doc surface is fixed: **11 global owners + 11 modules + archive + machine core**.  
+Do not add pages or feature routes. Implementation order: Core → Loan → Investments → UI last.

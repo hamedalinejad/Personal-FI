@@ -218,3 +218,6 @@ ONE CONCEPT → ONE HUMAN OWNER → ONE MACHINE REGISTRY WHERE NEEDED
 ```
 Example good path: `modules/loan.md` + `command-catalog.json` + `fixtures/LOAN-*.json` + tests + QUALITY-STATUS.  
 Never recreate LOAN-P0 / LOAN-AUDIT / LOAN-MATRIX Markdown.
+
+## Maximum human Markdown set (LOCKED)
+Only the files listed under the target tree in this document. Adding a new top-level `docs/*.md` requires an explicit product decision to replace or absorb an existing owner — never "another audit."
