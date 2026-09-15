@@ -260,7 +260,7 @@ export function applyFeeEvents(
         break;
       }
       case "reduce_proceeds": {
-        // reduces net cash proceeds (sell side); credit inventory/income handled by feature principal
+        // Sell-side: netProceeds reduced in domain; journal legs match expense (Dr fee_expense Cr cash). Not a second silent economics family.
         const cashId =
           event.cashAccountId ||
           cashAccountId ||

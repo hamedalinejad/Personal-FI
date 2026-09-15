@@ -347,3 +347,10 @@ Ready for production coding only when all are green. Current honest state:
 
 Next path: CLEAN → complete cards/matrix/policies → executable fixtures → FREEZE → Core → verticals → UI last.  
 No new audit/P0 Markdown.
+
+## P0 closure (this commit)
+| ID | Status |
+|----|--------|
+| P0-01 fee taxonomy single enum + reduce_proceeds semantics | CLOSED |
+| P0-02 loan schedule conservation exact (no 0.01 tolerance) | CLOSED |
+| P0-03 stocks date/policy columns on schema + writers | CLOSED |

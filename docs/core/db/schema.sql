@@ -719,8 +719,13 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
     )
   ),
   related_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- settle→trade link
-  trade_date TEXT NOT NULL, -- exchange trade date (T+0); distinct from market_date (quote/session date)
-  settlement_date TEXT, -- cash/settlement date (T+2 for Iranian market)
+  trade_date TEXT NOT NULL, -- exchange trade date (T+0)
+  settlement_date TEXT, -- T+n settlement date
+  cash_date TEXT, -- actual cash movement date when known; NULL if unknown
+  market_date TEXT, -- market session / quote date; never silently substitute trade_date
+  price_as_of TEXT, -- when market price observation used
+  fx_as_of TEXT, -- when FX used
+  settlement_policy_version TEXT, -- required for trades using settlement engine
   quantity TEXT,
   price TEXT,
   fee_amount TEXT,

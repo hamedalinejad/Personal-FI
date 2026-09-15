@@ -153,6 +153,7 @@ src/core/domain/instrument/resolve.js	E	impl	keep
 src/core/domain/instrument/resolve.test.js	D	test	keep
 src/core/domain/invariants/index.js	E	impl	keep
 src/core/domain/loan/rate-normalize.test.js	D	test	keep
+src/core/domain/loan/scheduleConservation.test.js	D	test	keep
 src/core/domain/loan/scheduleEngine.js	E	impl	keep
 src/core/domain/loan/scheduleEngine.test.js	D	test	keep
 src/core/domain/metals/fineWeight.js	E	impl	keep

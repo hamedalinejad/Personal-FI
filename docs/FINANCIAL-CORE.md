@@ -335,14 +335,29 @@ Required proofs (see `economicHash.test.js` / idempotency tests):
 
 Feature commands must canonicalize their payload **before** Core hash; Core also canonicalizes same-currency journal lines and decimal strings.
 
-## Fee taxonomy (LOCKED)
-Canonical treatments only (aliases normalized at boundary):
+## Fee taxonomy (LOCKED) — single enum
+Canonical set (must match `CANONICAL_FEE_TREATMENTS` in feeEngine.js):
 ```
-expense | capitalize_inventory | reduce_received_quantity
-| embedded_in_gross_cash | equity_adjustment
+expense
+capitalize_inventory
+reduce_proceeds
+reduce_received_quantity
+embedded_in_gross_cash
+equity_adjustment
 ```
-`reduce_received_quantity` → **quantity field only**.  
-Module default treatments are versioned in `command-catalog.json` `feeTaxonomy` + module Fee defaults tables.
+No other list in this document may omit members of this set.
+
+| Treatment | Economics (v1) |
+|-----------|----------------|
+| expense | Dr fee_expense · Cr cash/payable — period cost |
+| capitalize_inventory | increases carrying / inventory cost |
+| reduce_proceeds | **sell-side presentation**: net proceeds = gross − fee; journal still Dr fee_expense · Cr cash (same legs as expense) so P&L sees the fee; domain `netProceeds` is reduced. Distinct **name** for feature result semantics, not a second silent journal family |
+| reduce_received_quantity | **quantity only** (`feeQuantity`); never treat `feeAmount` as quantity |
+| embedded_in_gross_cash | fee embedded in gross cash movement |
+| equity_adjustment | equity/capital adjustment path |
+
+Aliases normalize at boundary; never become permanent internal vocabulary.  
+Module defaults live in command-catalog `feeTaxonomy` + module Fee defaults tables.
 
 ## FX fail-closed (LOCKED)
 No rate → **no financial post**. Never convert missing FX to zero.  

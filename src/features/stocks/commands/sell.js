@@ -245,10 +245,11 @@ export async function sellStock(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, holding_id, instrument_id, brokerage_id, tx_type,
-          trade_date, settlement_date, quantity, price, fee_amount,
+          trade_date, settlement_date, cash_date, market_date, price_as_of, fx_as_of,
+          settlement_policy_version, quantity, price, fee_amount,
           fee_commission, fee_tax, fee_other, fee_treatments_json,
           currency, account_id, created_at
-        ) VALUES (?, ?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, 'sell', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -257,6 +258,11 @@ export async function sellStock(input, { dataDir } = {}) {
         p.brokerageId,
         tradeDate,
         settlementDate,
+        p.cashDate || null,
+        p.marketDate || tradeDate,
+        p.priceAsOf || tradeDate,
+        p.fxAsOf || null,
+        p.settlementPolicyVersion || null,
         qty.toFixed(),
         price.toFixed(),
         commission.plus(tax).plus(otherFee).toFixed(),

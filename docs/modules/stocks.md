@@ -204,3 +204,11 @@ Override only with explicit `treatment` on CanonicalFeeEvent. Same fee vocabular
 All of the following are **DEFERRED** until command + fixture + rebuild exist:  
 bonus · split · reverse split · rights · rights exercise · rights sale · capital increase · merger · spin-off · symbol change · ISIN change · transfer.  
 Schema may reserve columns; reserved ≠ supported.
+
+## Transaction date/context columns (LOCKED)
+`inv_stocks_iran_transactions` persists:
+```
+trade_date · settlement_date · cash_date · market_date
+price_as_of · fx_as_of · settlement_policy_version
+```
+Do not substitute trade_date for market_date. `settlement_policy_version` required when settlement engine is used.

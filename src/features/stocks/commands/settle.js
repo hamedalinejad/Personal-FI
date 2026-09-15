@@ -233,8 +233,9 @@ export async function settleStock(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, brokerage_id, instrument_id, tx_type, trade_date, settlement_date,
+          cash_date, market_date, price_as_of, fx_as_of, settlement_policy_version,
           quantity, price, currency, related_operation_id, created_at
-        ) VALUES (?, ?, ?, ?, 'settlement', ?, ?, '0', '0', ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, 'settlement', ?, ?, ?, ?, ?, ?, ?, '0', '0', ?, ?, ?)`,
       ).run(
         settleTxId,
         operationId,
@@ -242,6 +243,11 @@ export async function settleStock(input, { dataDir } = {}) {
         tradeTx.instrument_id,
         p.businessDate,
         settlementDate,
+        p.cashDate || settlementDate || p.businessDate,
+        p.marketDate || p.businessDate,
+        p.priceAsOf || null,
+        p.fxAsOf || null,
+        p.settlementPolicyVersion || tradeTx.settlement_policy_version || null,
         currency,
         p.originalTradeOperationId,
         now,

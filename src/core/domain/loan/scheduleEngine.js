@@ -1,5 +1,9 @@
 
-/** P0 residual: Σ principal == original P; Σ interest == totalInterest (within 1e-8 via Decimal) */
+/**
+ * Schedule conservation — exact at stored money scale (2 dp).
+ * Engine must absorb residual into the final eligible row before this assert.
+ * One-cent silent mismatch is forbidden.
+ */
 export function assertScheduleConservation(rows, { principal, totalInterest = null }) {
   let sp = toDecimal("0");
   let si = toDecimal("0");
@@ -7,13 +11,21 @@ export function assertScheduleConservation(rows, { principal, totalInterest = nu
     sp = sp.plus(toDecimal(r.principal));
     si = si.plus(toDecimal(r.interest || "0"));
   }
-  // Final installment absorbs rounding residual to preserve principal conservation. residual-corrects so Σ principal == P exactly at display scale (2 dp).
-  // Internal pre-round allocation uses full Decimal; conservation proved at money2str scale.
-  const pDiff = sp.minus(toDecimal(principal)).abs();
-  if (pDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_PRINCIPAL_MISMATCH");
+  const pExpected = toDecimal(principal).toDecimalPlaces(2);
+  const pActual = sp.toDecimalPlaces(2);
+  if (!pActual.equals(pExpected)) {
+    throw new Error(
+      `LOAN_SCHEDULE_PRINCIPAL_MISMATCH expected=${pExpected.toFixed(2)} actual=${pActual.toFixed(2)}`,
+    );
+  }
   if (totalInterest != null) {
-    const iDiff = si.minus(toDecimal(totalInterest)).abs();
-    if (iDiff.gt("0.01")) throw new Error("LOAN_SCHEDULE_INTEREST_MISMATCH");
+    const iExpected = toDecimal(totalInterest).toDecimalPlaces(2);
+    const iActual = si.toDecimalPlaces(2);
+    if (!iActual.equals(iExpected)) {
+      throw new Error(
+        `LOAN_SCHEDULE_INTEREST_MISMATCH expected=${iExpected.toFixed(2)} actual=${iActual.toFixed(2)}`,
+      );
+    }
   }
   return true;
 }

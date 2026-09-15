@@ -1,5 +1,5 @@
 {
-  "schemaHash": "136e9aa7d886e8f8a6dd5b25fb5738072b196d0a700ab5f754fca3e2933116dc",
+  "schemaHash": "fcfc803610819a20802f3ecc6129573cb45b08b1b0292e0f43175680183c7424",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -5734,6 +5734,41 @@
         },
         {
           "name": "settlement_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "cash_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "market_date",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fx_as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "settlement_policy_version",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,

@@ -114,8 +114,9 @@ export async function stockDividend(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, holding_id, instrument_id, brokerage_id, tx_type,
-          trade_date, settlement_date, quantity, price, fee_amount, currency, account_id, created_at
-        ) VALUES (?, ?, NULL, ?, ?, 'dividend', ?, ?, '0', '0', ?, ?, ?, ?)`,
+          trade_date, settlement_date, cash_date, market_date, price_as_of, fx_as_of,
+          settlement_policy_version, quantity, price, fee_amount, currency, account_id, created_at
+        ) VALUES (?, ?, NULL, ?, ?, 'dividend', ?, ?, ?, ?, ?, ?, ?, '0', '0', ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -123,6 +124,11 @@ export async function stockDividend(input, { dataDir } = {}) {
         p.brokerageId || null,
         p.businessDate,
         p.businessDate,
+        p.cashDate || p.businessDate,
+        p.marketDate || p.businessDate,
+        p.priceAsOf || null,
+        p.fxAsOf || null,
+        p.settlementPolicyVersion || null,
         tax.toFixed(),
         currency,
         p.accountId || null,
