@@ -141,6 +141,7 @@ src/core/domain/costBasis/engine.js	E	impl	keep
 src/core/domain/costBasis/engine.test.js	D	test	keep
 src/core/domain/fee/feeEngine.js	E	impl	keep
 src/core/domain/fee/feeEngine.test.js	D	test	keep
+src/core/domain/fee/reduceProceeds.test.js	D	test	keep
 src/core/domain/funds/engine.js	E	impl	keep
 src/core/domain/funds/engine.test.js	D	test	keep
 src/core/domain/fx/amountInBase.test.js	D	test	keep

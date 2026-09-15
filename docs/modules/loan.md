@@ -228,7 +228,7 @@ No ambiguous “maybe later” — only SUPPORTED / DEFERRED / REJECTED.
 | Kind | Meaning | Journal sketch |
 |------|---------|----------------|
 | `disburse_now` | Cash actually leaves settlement now | Dr receivable · Cr settlement cash |
-| `record_outstanding` | Historical/already-outstanding receivable; **no new cash movement** | Dr receivable · Cr opening equity/loan liability (or explicit opening accounts) — **not** Cr settlement cash |
+| `record_outstanding` | Historical/already-outstanding receivable; **no new cash movement** | **v1 lender-only canonical:** Dr Loan Receivable · Cr Opening Balance Equity — **not** Cr settlement cash. Alternate source accounts only via explicit config path, not developer choice. |
 
 Default for greenfield “new loan cash out” = `disburse_now`.  
 Recording an existing receivable without fabricating cash requires `record_outstanding` (or explicit opening-balance path). Command card must carry `originationKind`.

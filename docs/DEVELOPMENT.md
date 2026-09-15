@@ -93,19 +93,22 @@ Module files hold **feature-specific** behavior only. Global rules stay in globa
 command ID · purpose · request fields · required/optional · types · units · currency · precision · normalization · defaults · identity · validation · journal mapping · fees · FX · cost basis · DB writes · transaction boundary · idempotency · reversal · result · errors · queries · reports · standalone · fixture · invariants · recovery  
 Detail per command lives in the owning `modules/<feature>.md` + API schemas when present.
 
-## Coding sequence (do not start UI first)
+## Coding sequence (LOCKED — single plan only)
 ```
-Phase 0  semantic freeze prep (owners, dead refs, field matrix, command schemas)
-Phase 1  numeric core (Decimal, precision, rounding, units, FX)
-Phase 2  accounting kernel (accounts, ops, journal, invariants, reversal, posted-only reports)
-Phase 3  persistence/recovery (SQLite atomicity, idempotency, crash, backup, single writer)
-Phase 4  reference vertical — Loan
-Phase 5  investment verticals — Crypto, Stocks, Funds, Metals
-Phase 6  remaining — Income/Expense, Cheque, Tax, Physical Assets, Budget/Goals/Bills
-Phase 7  browser/offline
-Phase 8  licensing/standalone proof
-Phase 9  UI
+0  Documentation normalization (owners, dead refs, field matrix, command schemas)
+1  Numeric core (Decimal, precision, rounding, units, FX)
+2  Accounting kernel (accounts, ops, journal, invariants, reversal, posted-only reports)
+3  Persistence / recovery (SQLite atomicity, idempotency, crash, backup, single writer)
+4  Loan reference vertical
+5  Investments (Crypto, Stocks, Funds, Metals)
+6  Remaining modules (Income/Expense, Cheque, Tax, Physical Assets, Budget/Goals/Bills)
+7  Browser offline (sql.js + IndexedDB + single-writer)
+8  Standalone proof packs
+9  Licensing (capability only; never delete history)
+10 Semantic freeze (FREEZE_PROVEN=true only when gates green)
+11 UI (six routes only; sheets/drawers)
 ```
+Do not start UI before step 10. Do not invent parallel phase lists.
 
 ## Developer checklist (28 questions)
 Before coding a feature, answer from owner + module + schema + fixture only:
@@ -224,24 +227,9 @@ Do not recreate removed consolidation files (old command-coverage MD, core micro
 | `command-catalog.json` | public commands, cards, capability, fixtures/tests |
 | `requirements-matrix.json` | requirement id, owner define path, status, evidence |
 
-## Implementation order (LOCKED)
-```
-Phase 0  Tag snapshot (personal-fi-pre-semantic-freeze-2026-09-14)
-Phase 1  Registry normalization
-Phase 2  Core math closure
-Phase 3  Schema integrity closure
-Phase 4  Field-preservation closure
-Phase 5  Module completion (real content, not placeholders)
-Phase 6  Golden proof (non-empty fixtures)
-Phase 7  Recovery proof (executable matrix)
-Phase 8  Standalone proof (one pack per edition)
-Phase 9  Browser proof (sql.js + IndexedDB + single-writer)
-Phase 10 Semantic freeze → FREEZE_PROVEN=true
-Phase 11 Accounting kernel coding (Core before UI)
-Phase 12 Feature coding (Loan reference first, then investments)
-Phase 13 UI (six routes + sheets/drawers only)
-```
-Do not skip phases. Do not start UI before Phase 10.
+## Implementation order
+See **Coding sequence (LOCKED)** above — one list only.  
+Baseline tag remains `personal-fi-pre-semantic-freeze-2026-09-14` (history; not a second plan).
 
 ## “Developer must not invent economics” (LOCKED)
 A command is not ready if the implementer still has to decide any of:

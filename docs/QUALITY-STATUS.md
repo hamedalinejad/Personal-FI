@@ -384,3 +384,31 @@ No new audit/P0 Markdown.
 - DATA-MODEL: fieldKind vs fieldDisposition
 - FINANCIAL-CORE: structure index; no competing policies
 - Deleted stale `src/README.md` (removed roadmap/P0 pointers)
+
+## Audit handoff compliance map (2026-09-16 document — applied in-repo)
+
+| Audit ID | Status in HEAD |
+|----------|----------------|
+| P0-01 fee taxonomy single enum + reduce_proceeds semantics | CLOSED in FINANCIAL-CORE + feeEngine |
+| P0-02 loan exact conservation (no 0.01 tolerance) | CLOSED in scheduleEngine |
+| P0-03 stocks cash_date/market_date/price_as_of/fx_as_of/settlement_policy_version | CLOSED in schema + writers |
+| P0-04 crypto economic_kind canonical | CLOSED in schema + transfer writers |
+| P1-01 annual frequency schema | CLOSED |
+| P1-02 crypto transfer persistence map | CLOSED (module + matrix) |
+| P1-03 import batch FK | CLOSED |
+| P1-04 loan account_transaction_id FK | CLOSED |
+| P1-05 funds liquidation quote_type | CLOSED (contract + price_history enum) |
+| P1-06 metals purity post rule Option A | CLOSED (contract) |
+| P1-07 FX cross-rate tests expanded | PARTIAL (still not freeze-green full family) |
+| P1-08 field-preservation matrix | PARTIAL |
+| P1-09/10 Iran policy samples | SAMPLE_ONLY (not production) |
+| P1-11 goldens | PARTIAL |
+| P1-12 standalone full path | PARTIAL |
+| Browser IndexedDB | OPEN — durableMemory kept |
+| src/README.md delete | DONE |
+| PRODUCT/DEVELOPMENT/DATA-MODEL consolidation | DONE |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |
+| UI | WAIT |
+
+Do not reopen fixed items as BUG-*.md. Regressions → test + code + owner if contract changes.
