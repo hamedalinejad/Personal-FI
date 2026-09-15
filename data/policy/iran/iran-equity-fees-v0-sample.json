@@ -1,0 +1,19 @@
+{
+  "policyVersion": "iran-equity-fees-v0-sample",
+  "market": "TSE",
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": null,
+  "items": [
+    {
+      "scope": "equity_default",
+      "commissionBasis": "notional",
+      "commissionRate": null,
+      "taxBasis": "notional",
+      "taxRate": null,
+      "otherFeeRules": [],
+      "roundingRule": "money_2dp_half_up",
+      "note": "SAMPLE — rates intentionally null until policy data locked"
+    }
+  ],
+  "sourceMetadata": { "status": "SAMPLE_ONLY" }
+}

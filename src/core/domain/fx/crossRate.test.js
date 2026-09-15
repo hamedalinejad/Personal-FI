@@ -51,3 +51,64 @@ test("MISSING_RATE not zero", () => {
     /MISSING_RATE/,
   );
 });
+
+test("identity path same currency", () => {
+  const r = convertAmount({ amount: "10", from: "IRR", to: "IRR", rates: {} });
+  assert.equal(r.amount, "10");
+  assert.deepEqual(r.path, ["IRR"]);
+});
+
+test("inverse rate via reciprocal edge", () => {
+  const r = convertAmount({
+    amount: "90",
+    from: "EUR",
+    to: "USD",
+    rates: { "USD/EUR": "0.9" },
+  });
+  assert.equal(r.conversionPath[0].inverted, true);
+  // reciprocal of 0.9 is repeating; must be near 100, never 0 / missing
+  assert.ok(r.amount.startsWith("99.999") || r.amount.startsWith("100"));
+});
+
+test("two-hop pins conversionPath hops with rates", () => {
+  const r = convertAmount({
+    amount: "1",
+    from: "A",
+    to: "C",
+    rates: {
+      "A/B": { rate: "2", asOf: "2026-01-01", source: "test" },
+      "B/C": { rate: "3", asOf: "2026-01-01", source: "test" },
+    },
+  });
+  assert.equal(r.amount, "6");
+  assert.equal(r.conversionPath.length, 2);
+  assert.equal(r.conversionPath[0].rate, "2");
+  assert.equal(r.conversionPath[1].rate, "3");
+  assert.ok(r.contextHash);
+});
+
+test("historical asOf rejects observation after asOf", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "EUR",
+        asOf: "2025-01-01",
+        rates: { "USD/EUR": { rate: "0.9", asOf: "2026-01-01", source: "future" } },
+      }),
+    /MISSING_RATE/,
+  );
+});
+
+test("deterministic contextHash stable", () => {
+  const args = {
+    amount: "1",
+    from: "USD",
+    to: "EUR",
+    rates: { "USD/EUR": "0.85" },
+  };
+  const a = convertAmount(args);
+  const b = convertAmount(args);
+  assert.equal(a.contextHash, b.contextHash);
+});

@@ -1,6 +1,8 @@
 path	class	role	action
 README.md	E	impl	keep
 data/policy/iran/README.md	E	impl	keep
+data/policy/iran/iran-equity-calendar-v0-sample.json	E	impl	keep
+data/policy/iran/iran-equity-fees-v0-sample.json	E	impl	keep
 docs/API.md	A	docs	keep
 docs/ARCHITECTURE.md	A	docs	keep
 docs/DATA-MODEL.md	A	docs	keep
@@ -211,6 +213,8 @@ src/core/price/mappingResolver.js	E	impl	keep
 src/core/price/mappingResolver.test.js	D	test	keep
 src/core/rebuild/ordering.js	E	impl	keep
 src/core/rebuild/ordering.test.js	D	test	keep
+src/core/rebuild/rebuildProjection.js	E	impl	keep
+src/core/rebuild/rebuildProjection.test.js	D	test	keep
 src/core/recovery/backup.js	E	impl	keep
 src/core/recovery/backup.test.js	D	test	keep
 src/core/recovery/offlineRecovery.test.js	D	test	keep

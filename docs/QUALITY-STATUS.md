@@ -365,3 +365,15 @@ No new audit/P0 Markdown.
 | P1-04 ln_loans.account_transaction_id FK | CLOSED |
 | P1-05 funds liquidation via price_history quote_type | CLOSED (contract) |
 | P1-06 metals purity post rule Option A | CLOSED (contract + schema comment) |
+
+## P1 proof progress (this commit)
+| ID | Status |
+|----|--------|
+| P1-07 FX cross-rate / inverse / asOf / stale | tests expanded; still not full freeze family |
+| P1-09 Iran holiday package | SAMPLE machine file under data/policy/iran (not production) |
+| P1-10 Iran fee policy package | SAMPLE machine file (rates null until locked) |
+| P1-11 golden families | still PARTIAL |
+| P1-12 standalone full path | still PARTIAL |
+| Browser IndexedDB | still OPEN — durableMemory kept |
+| R-M20 TWR/MWR | DEFERRED explicit in REPORTING |
+| R-M21 rebuildProjection | scaffold + deterministic test |

@@ -1,0 +1,15 @@
+{
+  "policyVersion": "iran-equity-calendar-v0-sample",
+  "market": "TSE",
+  "timezone": "Asia/Tehran",
+  "weekend": ["Thursday", "Friday"],
+  "holidays": [
+    { "date": "2026-03-20", "name": "sample-nowruz", "source": "placeholder-not-official" }
+  ],
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": null,
+  "sourceMetadata": {
+    "status": "SAMPLE_ONLY",
+    "note": "Replace with official verified holiday list before RELEASE_PROVEN. Not for production settlement."
+  }
+}

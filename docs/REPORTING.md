@@ -74,3 +74,11 @@ Report name alone does not imply metric support.
 
 Standard statements consume **posted** journal only; voids/reversals in explicit audit/history views.
 
+## TWR / MWR contract status (DEFERRED until formulas locked)
+Before implementing investment performance algorithms, lock in this document:
+```
+TWR formula · MWR/IRR formula · cash-flow timing · valuation timestamps
+FX conversion point · fees treatment · deposits/withdrawals · income/distributions
+unrealized valuation · asOf
+```
+Until locked: do not ship ambiguous return metrics. v1 remains realized/unrealized P&L + fee/FX attribution only.

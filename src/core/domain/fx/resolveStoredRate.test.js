@@ -38,3 +38,29 @@ test("FX resolver: priority then as_of <= requested", () => {
   assert.equal(r1.rate, "400000");
   closeAllDbs();
 });
+
+test("FX resolver: stale rejected unless allowStale", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-fx-stale-"));
+  const db = openDb(dataDir);
+  const now = new Date().toISOString();
+  db.prepare(
+    `INSERT OR IGNORE INTO cur_currencies (code, name, minor_units, is_active) VALUES ('USD','US Dollar',2,1),('EUR','Euro',2,1)`,
+  ).run();
+  db.prepare(
+    `INSERT INTO cur_exchange_rates (id, from_currency, to_currency, rate, as_of, source, source_priority, is_manual, is_stale, created_at)
+     VALUES ('s1','USD','EUR','0.9','2026-01-01T00:00:00.000Z','manual',50,1,1,?)`,
+  ).run(now);
+  assert.throws(
+    () => resolveStoredRate(db, { fromCurrency: "USD", toCurrency: "EUR", asOf: "2026-01-02T00:00:00.000Z", allowStale: false }),
+    /FX_RATE_STALE/,
+  );
+  const ok = resolveStoredRate(db, {
+    fromCurrency: "USD",
+    toCurrency: "EUR",
+    asOf: "2026-01-02T00:00:00.000Z",
+    allowStale: true,
+  });
+  assert.equal(ok.rate, "0.9");
+  assert.equal(ok.isStale, true);
+  closeAllDbs();
+});

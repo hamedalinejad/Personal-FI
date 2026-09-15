@@ -73,7 +73,7 @@
       ],
       "gap": "Full cross-rate path + stale override runtime incomplete",
       "owner": "docs/FINANCIAL-CORE.md",
-      "closure_note": "FX path/stale/asOf goldens"
+      "closure_note": "crossRate+resolveStoredRate tests expanded; multi-hop path+stale; freeze still needs full golden family"
     },
     {
       "id": "R-M08",
@@ -115,7 +115,7 @@
       ],
       "gap": "Holiday calendar file not full TSE calendar",
       "owner": "docs/modules/stocks.md",
-      "closure_note": "versioned holiday data"
+      "closure_note": "sample iran-equity-calendar-v0-sample.json present; official data OPEN"
     },
     {
       "id": "R-M11",
@@ -126,7 +126,7 @@
       ],
       "note": "commission/tax/otherFee separate on buy; full policy table versioned incomplete",
       "owner": "docs/modules/stocks.md",
-      "closure_note": "versioned commission/tax policy"
+      "closure_note": "sample iran-equity-fees-v0-sample.json present; rates null until locked"
     },
     {
       "id": "R-M12",
@@ -245,7 +245,7 @@
       ],
       "gap": "Executable rebuild API incomplete",
       "owner": "docs/FINANCIAL-CORE.md",
-      "closure_note": "rebuild API executable"
+      "closure_note": "rebuildProjection scaffold executable; full ledger replay OPEN"
     },
     {
       "id": "R-M22",
