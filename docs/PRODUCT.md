@@ -226,3 +226,15 @@ Same Financial Core (journal, Decimal, FX, Fee, Operation, Recovery)
 They **never** must open Accounts UI.  
 They **never** get a second cash ledger.  
 License disables capability only — history stays readable/exportable.
+
+## Full edition composition (LOCKED)
+When the user enables **Full**, all licensed features share one database and one journal.  
+Integration path is **only**:
+
+```
+src/api/publicRegistry.js
+  or features/<name>/public-api
+```
+
+Not UI-to-SQL, not feature-to-feature internals.  
+Standalone and Full are the same code paths; edition only changes **which public APIs are exposed**.

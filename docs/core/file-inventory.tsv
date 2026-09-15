@@ -95,9 +95,12 @@ scripts/schema-manifest.js	E	impl	keep
 scripts/schema-sync-pipeline.js	E	impl	keep
 scripts/source-vocab-check.js	E	impl	keep
 scripts/status-registry-check.js	E	impl	keep
+src/api/publicRegistry.js	E	impl	keep
+src/api/publicRegistry.test.js	D	test	keep
 src/core/acceptance/domain-feature.acceptance.test.js	D	test	keep
 src/core/acceptance/fee-fx.acceptance.test.js	D	test	keep
 src/core/acceptance/financial-core.acceptance.test.js	D	test	keep
+src/core/acceptance/full-edition-integration.acceptance.test.js	D	test	keep
 src/core/acceptance/golden-fixtures.acceptance.test.js	D	test	keep
 src/core/acceptance/journal-base.acceptance.test.js	D	test	keep
 src/core/acceptance/journal.acceptance.test.js	D	test	keep

@@ -48,3 +48,8 @@ npm test · npm run gates
 
 ## Standalone evidence
 `src/core/acceptance/standalone-edition-packs.acceptance.test.js` + feature `*standalone*.test.js`
+
+## Dual-mode evidence
+- Standalone packs: `standalone-edition-packs.acceptance.test.js`
+- Full composition: `full-edition-integration.acceptance.test.js` + `src/api/publicRegistry.js`
+- Boundary: `npm run lint` (lint-boundaries)

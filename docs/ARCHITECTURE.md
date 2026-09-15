@@ -189,4 +189,25 @@ Dependency rule:
 - Feature → Core ✅  
 - Feature → Feature internals ❌  
 - UI → Feature public-api ✅  
-- UI → SQL / journal writer ❌  
+- UI → SQL / journal writer ❌
+
+## Dual mode: Standalone vs Full (LOCKED)
+
+### Standalone (loan-only / fund-only / metals-only / …)
+```
+Host → one features/<x>/public-api
+     → Financial Core (journal, Decimal, FX, Fee, Operation)
+     → local settlement adapter
+     → feature reports only
+```
+`requiresAccountsUi = false`. User never opens Accounts screens.
+
+### Full edition
+```
+Host → src/api/publicRegistry (or multiple public-apis)
+     → same Financial Core
+     → shared fin_operations + fin_journal_*
+     → Accounts UI optional surface for chart/cash navigation
+```
+Features **compose through public APIs only**. No feature→feature internal imports.  
+One book, one journal, many feature packages.

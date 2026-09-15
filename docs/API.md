@@ -95,3 +95,13 @@ Per-command request/result economics live in `docs/core/registry/command-catalog
 Shared JSON schemas only: api-envelope · operation-result · schedule-snapshot.  
 Future HTTP OpenAPI is a **projection** of the catalog — not a second business authority.
 
+## Composition registry (scaffold)
+Machine entry for hosts:
+
+```
+src/api/publicRegistry.js
+  EDITIONS · publicApis · apisForEdition(editionId) · listEditionCapabilities()
+```
+
+Standalone hosts call `apisForEdition("loan-only")` (etc.).  
+Full hosts call `apisForEdition("full")` and route UI sheets to the returned packages.
