@@ -7,7 +7,13 @@ export function capabilities() {
   return {
     edition: "stocks-only",
     status: "PARTIAL",
-    implements: ["stocks.buy", "stocks.sell", "stocks.settle", "stocks.dividend"],
+    implements: ['stocks.buy', 'stocks.sell', 'stocks.settle', 'stocks.dividend'],
+    requiresAccountsUi: false,
+    cashAdapter: "local",
+    sharedCore: true,
+    commands: ["stocks.buy", "stocks.sell", "stocks.settle", "stocks.dividend"],
+    reports: ["positions", "tb_subset"],
+    licenseCapability: "stocks",
   };
 }
 

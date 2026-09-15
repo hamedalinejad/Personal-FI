@@ -6,7 +6,13 @@ export function capabilities() {
   return {
     edition: "crypto-only",
     status: "PARTIAL",
-    implements: ["crypto.buy", "crypto.sell", "crypto.transfer"],
+    implements: ['crypto.buy', 'crypto.sell', 'crypto.transfer'],
+    requiresAccountsUi: false,
+    cashAdapter: "local",
+    sharedCore: true,
+    commands: ["crypto.buy", "crypto.sell", "crypto.transfer"],
+    reports: ["holdings", "pnl_subset"],
+    licenseCapability: "crypto",
   };
 }
 

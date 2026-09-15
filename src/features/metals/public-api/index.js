@@ -6,7 +6,13 @@ export function capabilities() {
   return {
     edition: "metals-only",
     status: "PARTIAL",
-    implements: ["metals.buy", "metals.sell", "metals.delivery"],
+    implements: ['metals.buy', 'metals.sell', 'metals.delivery'],
+    requiresAccountsUi: false,
+    cashAdapter: "local",
+    sharedCore: true,
+    commands: ["metals.buy", "metals.sell", "metals.delivery"],
+    reports: ["holdings", "tb_subset"],
+    licenseCapability: "metals",
   };
 }
 

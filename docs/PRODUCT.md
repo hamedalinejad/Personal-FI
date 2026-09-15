@@ -212,3 +212,17 @@ Simplify via UI: smart defaults, guided sheets, progressive disclosure, unified 
 ## Coding readiness (LOCKED)
 Human doc surface is fixed: **11 global owners + 11 modules + archive + machine core**.  
 Do not add pages or feature routes. Implementation order: Core → Loan → Investments → UI last.
+
+## Standalone product promise (LOCKED)
+A user may run **only** Loan, **only** Funds (fixed-income), **only** Metals/gold, **only** Crypto, or **only** Stocks:
+
+```
+Same Financial Core (journal, Decimal, FX, Fee, Operation, Recovery)
++ one feature public-api
++ local settlement adapter
++ feature statements/reports subset
+```
+
+They **never** must open Accounts UI.  
+They **never** get a second cash ledger.  
+License disables capability only — history stays readable/exportable.

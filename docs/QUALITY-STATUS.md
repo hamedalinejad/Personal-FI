@@ -31,7 +31,7 @@
 | Field-preservation full matrix | PARTIAL |
 | Full golden families | PARTIAL |
 | Recovery matrix complete | PARTIAL |
-| Standalone full path packs | PARTIAL |
+| Standalone full path packs | IMPROVING (edition packs + capabilities) |
 | Iran official policy data (not SAMPLE) | OPEN |
 | FX multi-hop production goldens | PARTIAL |
 | Browser sql.js + IndexedDB E2E | OPEN |
@@ -45,3 +45,6 @@ docs/core/db/schema.sql · docs/core/registry/*
 fixtures/* · src/**/*.test.js
 npm test · npm run gates
 ```
+
+## Standalone evidence
+`src/core/acceptance/standalone-edition-packs.acceptance.test.js` + feature `*standalone*.test.js`

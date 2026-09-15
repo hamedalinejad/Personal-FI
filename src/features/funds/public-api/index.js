@@ -6,7 +6,13 @@ export function capabilities() {
   return {
     edition: "fund-only",
     status: "PARTIAL",
-    implements: ["funds.subscribe", "funds.redeem", "funds.distribute"],
+    implements: ['funds.subscribe', 'funds.redeem', 'funds.distribute'],
+    requiresAccountsUi: false,
+    cashAdapter: "local",
+    sharedCore: true,
+    commands: ["funds.subscribe", "funds.redeem", "funds.distribute"],
+    reports: ["holdings", "tb_subset"],
+    licenseCapability: "funds",
   };
 }
 

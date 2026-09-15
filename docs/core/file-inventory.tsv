@@ -109,6 +109,7 @@ src/core/acceptance/operation.acceptance.test.js	D	test	keep
 src/core/acceptance/provenance-tax.acceptance.test.js	D	test	keep
 src/core/acceptance/recovery-matrix.acceptance.test.js	D	test	keep
 src/core/acceptance/reporting.acceptance.test.js	D	test	keep
+src/core/acceptance/standalone-edition-packs.acceptance.test.js	D	test	keep
 src/core/acceptance/standalone.acceptance.test.js	D	test	keep
 src/core/acceptance/tax.acceptance.test.js	D	test	keep
 src/core/accounting/bookSettings.js	E	impl	keep
