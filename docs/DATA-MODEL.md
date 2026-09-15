@@ -157,3 +157,28 @@ Canonical identity = `ref_instruments.id` (+ scope above).
 ## fin_operations.source (legacy)
 Column may remain for migration compatibility. **New writers must not populate `source`.**  
 Use `source_channel` · `source_type` · `source_reference` only. Removal only after migration rules confirm zero inbound use.
+
+## No-field-loss final acceptance (LOCKED)
+A field may only be:
+1. persisted **RAW**
+2. **DERIVED** with documented formula
+3. **SNAPSHOT** with owner/version
+4. explicitly **DEFERRED**
+5. explicitly **REJECTED**
+
+There is **no** sixth state (“we forgot it”).
+
+Forbidden (release-blocking):
+```
+input accepted → silently discarded → not returned → not exported → not reversible
+```
+
+## Protected economic fields (extra matrix coverage)
+| Domain | Fields |
+|--------|--------|
+| Money/accounting | currency · amount · amountInBase · exchange rate · FX as-of/source · account · line kind · businessDate · settlementDate · eventAt · provenance |
+| Crypto | instrument · venue · network · quantity · price · feeAmount · feeQuantity · feeFundingKind · from/to scope · external ref |
+| Stocks | instrument · brokerage · qty · price · trade/settlement/cash dates · commission · tax · other fees · policy version |
+| Funds | instrument · units · transactionPrice · NAV · liquidationPrice · distribution dates · reinvest semantics |
+| Metals | gross · purity · fine · quoteBasis · price unit · premium · trade fee · delivery fee · serial · certificate · location |
+| Loans | principal · role · rate · rate unit · method · frequency · periods · day-count · fee/penalty · allocation · schedule version · residual · FX |

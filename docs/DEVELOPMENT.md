@@ -323,3 +323,39 @@ Git retains history. No `BUG-*.md` / `P0-*.md` restoration.
 ## Safe deletion protocol
 1 filesystem inventory → 2 classify → 3–6 reference search (source, package, registry, tests) → 7 knowledge in owner → 8 no unique proof → 9 migration safe → 10 delete → 11 regenerate inventory/manifest → 12 gates.  
 Never delete by filename alone. Keep: schema, manifests, field matrices, fixtures, durableMemoryAdapter until browser proven.
+
+## Developer handoff contract (LOCKED)
+Implement any command using **only**:
+```
+Product scope → Module spec → Command card → Field-preservation matrix
+→ Schema → Fixture → Tests
+```
+The developer must **not** invent: which dates matter, book base, FX requirement, fee treatment, cost-basis effect, journal legs, which fields are stored, reversal, error codes, rounding, historical provider behavior, backup behavior, or standalone behavior.  
+If any of those remain implicit, the command is **not documentation-complete**.
+
+## Per-command checklist (LOCKED)
+Every mutation card + matrix must cover:
+
+**Identity** — command ID · feature · entity · operationId · economic hash inputs  
+
+**Inputs** — every field · required/optional · type · unit · currency · precision · range · null semantics  
+
+**Normalization** — decimal · dates · identifiers · aliases · enums  
+
+**Validation** — business · accounting · cross-field · identity  
+
+**Financial** — book base · tx currency · FX · rate as-of · fees · treatment · cost basis · P&L · tax · rounding  
+
+**Journal** — debit/credit · line kinds · amountInBase · accounts · balance proof  
+
+**Persistence** — tables/columns · relationships · transaction boundary  
+
+**Reliability** — idempotency · conflict · retry · crash  
+
+**Reversal** — inverse · originalOperationId · rebuild  
+
+**Read side** — result · list/detail · statement · reports · asOf  
+
+**Product** — standalone · license · UI sheet placement  
+
+**Proof** — fixture · golden · recovery · field-preservation test  

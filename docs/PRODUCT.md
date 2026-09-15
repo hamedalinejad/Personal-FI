@@ -209,3 +209,25 @@ offline grace (if any) · upgrade · downgrade · expiry behavior
 historical readability · backup compatibility
 ```
 
+## What not to simplify (LOCKED)
+Keep economically necessary distinctions:
+```
+tradeDate ≠ settlementDate · NAV ≠ transactionPrice · IRR ≠ Toman display
+feeAmount ≠ feeQuantity · book base ≠ transaction currency
+business status ≠ durability · instrument id ≠ symbol
+holding ≠ accounting SoT · premium ≠ fee · delivery fee ≠ trade fee
+tax obligation ≠ paid · posted ≠ draft
+```
+Simplify via UI: smart defaults, guided sheets, progressive disclosure, unified activity — **not** by collapsing Core distinctions.
+
+## Minimal UI (LOCKED) — six routes only
+| Route | Surfaces |
+|-------|----------|
+| `/` | net worth · cash · investments · loans · activity · warnings |
+| `/money` | accounts · transfers · income · expense · cheques |
+| `/transactions` | unified events · filters · operation/journal · reversal |
+| `/investments` | crypto · stocks · funds · metals · portfolio (tabs/sheets) |
+| `/loans` | loans · schedule · payments · statement |
+| `/more` | tax · assets · budget/goals/bills · documents · settings · backup · security · license |
+
+No route per entity, table, report, or feature package.

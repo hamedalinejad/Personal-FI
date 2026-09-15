@@ -316,3 +316,34 @@ R-M27 command schemas · full recovery matrix · browser IndexedDB · license RE
 
 ## Requirements backlog location
 Live IDs R-M03…R-M30 statuses live in `docs/core/registry/requirements-matrix.json` only — not a new requirements Markdown file.
+
+## Documentation ready checklist
+Ready for production coding only when all are green. Current honest state:
+
+| Criterion | State |
+|-----------|--------|
+| one owner per concept | ✓ |
+| no dead references | ✓ |
+| no ticket IDs as domain vocabulary | ✓ |
+| canonical command IDs + structured cards | ✓ structure / depth ongoing |
+| field preservation complete | PARTIAL (matrix 209+) |
+| Decimal/units/book base/FX/journal/fee/cost/reversal contracts | mostly LOCKED; FX/proof depth YELLOW |
+| module deferred boundaries explicit | ✓ |
+| Iran holiday packages versioned | OPEN |
+| investment/loan/report goldens | PARTIAL |
+| recovery / standalone / browser / license proof | PARTIAL / OPEN |
+| FREEZE_PROVEN | **false** |
+| PRODUCTION | **NO-GO** |
+| UI coding | **WAIT** |
+
+## Area verdict (keep architecture; prove gaps)
+| Area | Verdict |
+|------|---------|
+| Documentation architecture / consolidation / six routes / shared Core | GREEN — keep |
+| Accounting SoT / Decimal / fee direction / operation direction | GREEN direction — prove |
+| FX / field matrix / command depth / verticals / reporting / offline / license | YELLOW |
+| Browser offline | OPEN |
+| Production / UI | NO-GO / WAIT |
+
+Next path: CLEAN → complete cards/matrix/policies → executable fixtures → FREEZE → Core → verticals → UI last.  
+No new audit/P0 Markdown.
