@@ -377,3 +377,10 @@ No new audit/P0 Markdown.
 | Browser IndexedDB | still OPEN — durableMemory kept |
 | R-M20 TWR/MWR | DEFERRED explicit in REPORTING |
 | R-M21 rebuildProjection | scaffold + deterministic test |
+
+## Owner-doc consolidation
+- PRODUCT: single six-route IA section
+- DEVELOPMENT: single coding sequence (0–11)
+- DATA-MODEL: fieldKind vs fieldDisposition
+- FINANCIAL-CORE: structure index; no competing policies
+- Deleted stale `src/README.md` (removed roadmap/P0 pointers)

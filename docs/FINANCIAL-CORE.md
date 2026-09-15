@@ -2,6 +2,12 @@
 
 **Status:** CURRENT
 
+## Document structure (single flow)
+1. Scope / SoT · 2. Money & units · 3. Currency/FX · 4. Operation & idempotency · 5. Journal · 6. Fees · 7. Cost basis · 8. Dates · 9. Opening/reversal · 10. Rebuild · 11. Domain locks · 12. Hard invariants · 13. Anti-patterns · 14. Proof requirements  
+
+The **Formula index** is the quick reference. Later numbered sections expand the same rules — they do not introduce competing policies.
+
+
 Absorbs: Accounting-Core, Accounting-Calculation-Invariants, Financial-Invariants, Canonical-Financial-Operation, Canonical-Cash-Model, Fee-Treatment-Matrix, Cost-Basis-Engine, Money-Decimal-Policy, Precision-Policy, Unit-Policy, JSON-Policy, Date-Semantics-Matrix, Rebuild-API-Contract, Reconciliation-Order, Opening-Balance, Reversal specs, Journal contracts.
 
 ## Formula index (quick reference)
@@ -110,7 +116,7 @@ rateFraction = annualRate/100. Methods: declining, flat, qarz, bullet. dayCount 
 schema.sql · fixtures · tests · scheduleEngine · operationEngine · worker.
 
 
-## Money / unit table (global)
+## Money / unit table (extends §1 — not a second policy)
 | Type | API/DB | Arithmetic | Notes |
 |------|--------|------------|-------|
 | money | decimal string | Decimal | currency required |
@@ -124,7 +130,7 @@ schema.sql · fixtures · tests · scheduleEngine · operationEngine · worker.
 
 No IEEE float in domain logic.
 
-## FX
+## FX (extends §10)
 `exchangeRateToBase` = base units per 1 transaction-currency unit.  
 `amountInBase = amount × exchangeRateToBase`.  
 Historical rebuild uses **stored** rates, never “latest now”. Missing rate → fail-closed.

@@ -4,6 +4,30 @@
 
 Absorbs: Data-Dictionary, Field-Level-SoT, Field-Level-Data-Ownership-Matrix, Data-Preservation, Raw-vs-Derived, Canonical-Ownership-Matrix, Relationship matrices, Migration-Data-Preservation, Storage-API field mapping (prose).
 
+## fieldKind vs fieldDisposition (LOCKED)
+
+**fieldKind** — semantic nature of the data:
+```
+RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX | REFERENCE | STATUS
+```
+
+**fieldDisposition** — what happens at the API boundary for an accepted field:
+```
+PERSISTED   — stored as RAW (or REFERENCE) column
+DERIVED     — computed by formula; not independently stored as SoT
+SNAPSHOT    — versioned rebuildable cache
+DEFERRED    — accepted concept reserved; not implemented this release
+REJECTED    — must error; must not silently drop
+```
+
+Example:
+```
+fieldKind = RAW, fieldDisposition = PERSISTED
+fieldKind = RAW, fieldDisposition = DEFERRED
+fieldKind = DERIVED, fieldDisposition = DERIVED
+```
+
+There is never: accepted → silently discarded.
 ## 1. Field Kind (locked)
 `RAW | DERIVED | SNAPSHOT | EXTERNAL_REPORTED | LABEL | SYSTEM_INDEX | REFERENCE | STATUS`
 

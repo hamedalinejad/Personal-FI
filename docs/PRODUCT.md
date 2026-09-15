@@ -134,16 +134,18 @@ Disabled modules: commands return capability error; data remains.
 ## 20. Backup product requirement
 User-accessible backup/restore from Settings; restore replaces DB file via persistence port; post-restore integrity check.
 
-## IA — six routes (LOCKED)
-```
-/              HOME — dashboard, net worth, cash, recent
-/money         accounts, transfers, income/expense, cheques
-/transactions  unified activity, filters, journal detail
-/investments   crypto, stocks, funds, metals, portfolio
-/loans         loans, schedule, payments
-/more          tax, assets, budget/goals/bills, documents, settings, backup
-```
-Create/Edit = drawer / sheet / modal / short wizard — **not** a new top-level page.
+## IA — six routes only (LOCKED) · Feature ≠ Page
+| Route | Surfaces |
+|-------|----------|
+| `/` | dashboard · net worth · cash · activity · warnings |
+| `/money` | accounts · transfers · income · expense · cheques |
+| `/transactions` | unified activity · filters · journal detail · reversal |
+| `/investments` | crypto · stocks · funds · metals · portfolio (tabs/sheets) |
+| `/loans` | loans · schedule · payments · statement |
+| `/more` | tax · assets · budget/goals/bills · documents · settings · backup · security · license |
+
+Create/Edit = drawer / sheet / modal / short wizard — **not** a new top-level page.  
+No route per entity, table, report, or feature package.
 
 ## Standalone editions (LOCKED)
 
@@ -181,22 +183,9 @@ boot → create entity → representative operation → statement
   → export → backup → restore → rebuild → verify same result
 ```
 
-## Six routes (LOCKED) — Feature ≠ Page
-```
-/ · /money · /transactions · /investments · /loans · /more
-```
-Sheets/drawers under these routes only. No route per table or per feature package.
-
 ## Accounting stance
 Financial truth rules and **forbidden anti-patterns** live only in [FINANCIAL-CORE.md](./FINANCIAL-CORE.md).  
 Modules must not invent a second cash or cost ledger.
-
-## STANDALONE_GREEN meaning (LOCKED)
-Not merely `standalone.test.js` existence. Full path must pass:
-```
-boot → create entity → representative operation → statement
-→ export → backup → restore → rebuild → same result
-```
 
 ## Licensing control plane (LOCKED)
 License gates **capabilities and UI only** — never journal semantics, never history deletion.  
@@ -220,14 +209,3 @@ tax obligation ≠ paid · posted ≠ draft
 ```
 Simplify via UI: smart defaults, guided sheets, progressive disclosure, unified activity — **not** by collapsing Core distinctions.
 
-## Minimal UI (LOCKED) — six routes only
-| Route | Surfaces |
-|-------|----------|
-| `/` | net worth · cash · investments · loans · activity · warnings |
-| `/money` | accounts · transfers · income · expense · cheques |
-| `/transactions` | unified events · filters · operation/journal · reversal |
-| `/investments` | crypto · stocks · funds · metals · portfolio (tabs/sheets) |
-| `/loans` | loans · schedule · payments · statement |
-| `/more` | tax · assets · budget/goals/bills · documents · settings · backup · security · license |
-
-No route per entity, table, report, or feature package.
