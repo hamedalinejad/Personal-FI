@@ -102,9 +102,9 @@ export async function sellStock(input, { dataDir } = {}) {
   const db0 = openDb(dataDir);
   const holding = db0
     .prepare(
-      `SELECT * FROM inv_stocks_iran_holdings WHERE instrument_id = ? AND brokerage_id = ?`,
+      `SELECT * FROM inv_stocks_iran_holdings WHERE instrument_id = ? AND brokerage_id = ? AND ifnull(account_id,'') = ifnull(?, '')`,
     )
-    .get(p.instrumentId, p.brokerageId);
+    .get(p.instrumentId, p.brokerageId, p.accountId || null);
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
 
   const disposal = applyDisposal(
@@ -231,9 +231,9 @@ export async function sellStock(input, { dataDir } = {}) {
 
       const h2 = db
         .prepare(
-          `SELECT * FROM inv_stocks_iran_holdings WHERE instrument_id = ? AND brokerage_id = ?`,
+          `SELECT * FROM inv_stocks_iran_holdings WHERE instrument_id = ? AND brokerage_id = ? AND ifnull(account_id,'') = ifnull(?, '')`,
         )
-        .get(p.instrumentId, p.brokerageId);
+        .get(p.instrumentId, p.brokerageId, p.accountId || null);
       if (!h2) throw new Error("HOLDING_NOT_FOUND");
       const d2 = applyDisposal(
         { quantity: h2.quantity, totalInvested: h2.total_invested },

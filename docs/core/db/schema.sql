@@ -673,6 +673,8 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_instruments (
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
   id TEXT PRIMARY KEY,
   brokerage_id TEXT NOT NULL REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- P0-09: portfolio/account scope under same brokerage (NULL = default single-account-per-brokerage)
+  account_id TEXT,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- RAW fields (persisted from trade documents, not derived):
   isin TEXT, -- ISIN رسمی وقتی شناخته شده 
@@ -687,9 +689,13 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
  total_fees_paid_base TEXT, -- total fees in base currency (DERIVED;)
   cost_currency TEXT NOT NULL,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL,
-  UNIQUE (brokerage_id, instrument_id)
+  updated_at TEXT NOT NULL
+  -- uniqueness via index uq_stocks_holdings_scope (brokerage + account + instrument)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_stocks_holdings_scope
+  ON inv_stocks_iran_holdings(brokerage_id, ifnull(account_id, ''), instrument_id);
+
 
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   id TEXT PRIMARY KEY,

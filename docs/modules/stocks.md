@@ -212,3 +212,7 @@ trade_date · settlement_date · cash_date · market_date
 price_as_of · fx_as_of · settlement_policy_version
 ```
 Do not substitute trade_date for market_date. `settlement_policy_version` required when settlement engine is used.
+
+
+## Holding identity (LOCKED)
+`brokerage_id + account_id? + instrument_id` — never merge portfolios at same broker.

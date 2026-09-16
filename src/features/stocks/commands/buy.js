@@ -252,9 +252,9 @@ export async function buyStock(input, { dataDir } = {}) {
 
       let holding = db
         .prepare(
-          `SELECT * FROM inv_stocks_iran_holdings WHERE brokerage_id = ? AND instrument_id = ?`,
+          `SELECT * FROM inv_stocks_iran_holdings WHERE brokerage_id = ? AND instrument_id = ? AND ifnull(account_id,'') = ifnull(?, '')`,
         )
-        .get(p.brokerageId, p.instrumentId);
+        .get(p.brokerageId, p.instrumentId, p.accountId || null);
 
       if (holding) {
         const newQty = toDecimal(holding.quantity).plus(qty);
@@ -265,11 +265,12 @@ export async function buyStock(input, { dataDir } = {}) {
       } else {
         db.prepare(
           `INSERT INTO inv_stocks_iran_holdings (
-            id, brokerage_id, instrument_id, quantity, total_invested, cost_currency, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            id, brokerage_id, account_id, instrument_id, quantity, total_invested, cost_currency, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         ).run(
           holdingId,
           p.brokerageId,
+          p.accountId || null,
           p.instrumentId,
           qty.toFixed(),
           carrying.toFixed(),

@@ -37,15 +37,56 @@
       "card": {
         "purpose": "Buy crypto; quantity fee may reduce received",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "quantity",
-          "price",
-          "currency",
-          "feeAmount?",
-          "feeQuantity?",
-          "networkId?",
-          "exchangeId?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeQuantity",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "networkId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -59,8 +100,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC increase",
         "dbWrites": [
-          "inv_crypto_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_crypto_holdings",
+          "inv_crypto_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -152,12 +196,41 @@
       "card": {
         "purpose": "Sell crypto; fee expense by module policy v1",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "quantity",
-          "price",
-          "currency",
-          "feeAmount?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -171,8 +244,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC disposal + realized PnL",
         "dbWrites": [
-          "inv_crypto_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_crypto_holdings",
+          "inv_crypto_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -260,12 +336,41 @@
       "card": {
         "purpose": "Internal transfer / network move; not a taxable disposal unless policy says so",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "quantity",
-          "fromScope",
-          "toScope",
-          "networkFee?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "fromScope",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toScope",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "networkFee",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -279,8 +384,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "carrying moves with quantity",
         "dbWrites": [
-          "inv_crypto_*",
-          "fin_*?"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_crypto_holdings",
+          "inv_crypto_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -368,17 +476,66 @@
       "card": {
         "purpose": "Buy equity; T+n settlement dates distinct",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "brokerageId",
-          "quantity",
-          "price",
-          "currency",
-          "tradeDate",
-          "settlementDate",
-          "commission?",
-          "tax?",
-          "otherFee?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "brokerageId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tradeDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "settlementDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "commission",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tax",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "otherFee",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -392,8 +549,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC increase",
         "dbWrites": [
-          "inv_stocks_iran_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_stocks_iran_holdings",
+          "inv_stocks_iran_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -491,15 +651,56 @@
       "card": {
         "purpose": "Sell equity; fee fields persisted",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "brokerageId",
-          "quantity",
-          "price",
-          "currency",
-          "commission?",
-          "tax?",
-          "otherFee?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "brokerageId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "commission",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tax",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "otherFee",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -513,8 +714,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC disposal + realized PnL",
         "dbWrites": [
-          "inv_stocks_iran_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_stocks_iran_holdings",
+          "inv_stocks_iran_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -610,10 +814,31 @@
       "card": {
         "purpose": "Settle broker payable/receivable; settlement-date FX",
         "requestFields": [
-          "operationId",
-          "relatedOperationId",
-          "settlementDate",
-          "currency"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "relatedOperationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "settlementDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -627,8 +852,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a settlement cash",
         "dbWrites": [
-          "fin_*",
-          "settlement markers"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_stocks_iran_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -695,12 +922,41 @@
       "card": {
         "purpose": "Cash dividend income",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "amount",
-          "currency",
-          "exDate?",
-          "payDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exDate",
+            "required": false,
+            "type": "date"
+          },
+          {
+            "name": "payDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -714,8 +970,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inv_stocks_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_stocks_iran_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -782,13 +1040,46 @@
       "card": {
         "purpose": "Subscribe fund units; transactionPrice required; NAV ≠ price",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "amount",
-          "transactionPrice",
-          "nav?",
-          "currency",
-          "accountId?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "transactionPrice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "nav",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -802,8 +1093,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "units from amount/transactionPrice",
         "dbWrites": [
-          "inv_fif_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_fif_holdings",
+          "inv_fif_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -890,12 +1184,41 @@
       "card": {
         "purpose": "Redeem fund units",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "units",
-          "transactionPrice",
-          "currency",
-          "accountId?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "units",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "transactionPrice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -909,8 +1232,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC disposal",
         "dbWrites": [
-          "inv_fif_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_fif_holdings",
+          "inv_fif_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -995,11 +1321,36 @@
       "card": {
         "purpose": "Fund distribution / income",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "amount",
-          "currency",
-          "reinvest?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reinvest",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1013,8 +1364,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inv_fif_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_fif_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1082,17 +1435,66 @@
       "card": {
         "purpose": "Buy metal; purity identity; premium vs trade fee",
         "requestFields": [
-          "operationId",
-          "instrumentId",
-          "quantityMg",
-          "purityRatio",
-          "metalPricePerMg",
-          "premium?",
-          "fee?",
-          "quoteBasis?",
-          "serial?",
-          "certificate?",
-          "location?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantityMg",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "purityRatio",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "metalPricePerMg",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "premium",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fee",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "quoteBasis",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "serial",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "certificate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1106,8 +1508,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "metal + capitalized premium/fees",
         "dbWrites": [
-          "inv_metals_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_metals_holdings",
+          "inv_metals_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1202,12 +1607,41 @@
       "card": {
         "purpose": "Sell metal position",
         "requestFields": [
-          "operationId",
-          "holdingId",
-          "quantityMg",
-          "price",
-          "currency",
-          "fee?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "holdingId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantityMg",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fee",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1221,8 +1655,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "WAC disposal",
         "dbWrites": [
-          "inv_metals_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_metals_holdings",
+          "inv_metals_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1308,17 +1745,66 @@
       "card": {
         "purpose": "Physical delivery; delivery fee ≠ trade fee; no silent cost capitalize",
         "requestFields": [
-          "operationId",
-          "holdingId",
-          "quantityMg",
-          "feeAmount?",
-          "feeCurrency?",
-          "deliveryAddress?",
-          "invoiceRef?",
-          "serial?",
-          "certificate?",
-          "location?",
-          "quoteBasis?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "holdingId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantityMg",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeCurrency",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "deliveryAddress",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "invoiceRef",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "serial",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "certificate",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "quoteBasis",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1332,9 +1818,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "carrying moves to physical asset unless policy capitalizes delivery fee",
         "dbWrites": [
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
           "inv_metals_physical_deliveries",
-          "inv_metals_*",
-          "fin_*"
+          "inv_metals_holdings"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1423,14 +1911,51 @@
       "card": {
         "purpose": "Create loan + schedule snapshot",
         "requestFields": [
-          "operationId",
-          "principal",
-          "rate",
-          "method",
-          "startDate",
-          "term",
-          "role",
-          "originationKind?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "principal",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "rate",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "method",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "term",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "originationKind",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1445,8 +1970,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "ln_*",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "ln_loans",
+          "ln_schedules"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1516,10 +2044,26 @@
       "card": {
         "purpose": "Allocate payment to principal/interest/fee/penalty",
         "requestFields": [
-          "operationId",
-          "loanId",
-          "amount",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "loanId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1533,8 +2077,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "ln_transactions",
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "ln_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1601,8 +2147,21 @@
       "card": {
         "purpose": "Reverse a loan payment operation",
         "requestFields": [
-          "operationId",
-          "originalOperationId"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "originalOperationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1616,8 +2175,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "ln_*",
-          "fin_*"
+          "ln_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1683,9 +2244,31 @@
       "card": {
         "purpose": "Persist schedule snapshot (may be non-posting)",
         "requestFields": [
-          "loanId",
-          "engineVersion",
-          "calendarVersion"
+          {
+            "name": "loanId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "engineVersion",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "calendarVersion",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1700,7 +2283,7 @@
         "costBasis": "n/a",
         "dbWrites": [
           "fin_operations",
-          "fin_journal_*"
+          "fin_journal_"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "loanId + schedule schema version",
@@ -1768,10 +2351,36 @@
       "card": {
         "purpose": "Preview schedule without persist",
         "requestFields": [
-          "principal",
-          "rate",
-          "method",
-          "term"
+          {
+            "name": "principal",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "rate",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "method",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "term",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -1786,7 +2395,7 @@
         "costBasis": "n/a",
         "dbWrites": [
           "fin_operations",
-          "fin_journal_*"
+          "fin_journal_"
         ],
         "transactionBoundary": "none (read/compute)",
         "idempotency": "n/a pure function",
@@ -1852,11 +2461,31 @@
       "card": {
         "purpose": "Create cash/bank/card account projection + optional opening balance path",
         "requestFields": [
-          "operationId?",
-          "name",
-          "accountKind",
-          "currency",
-          "openingBalance?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountKind",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "openingBalance",
+            "required": false,
+            "type": "string"
+          }
         ],
         "validation": [
           "currency required",
@@ -1869,7 +2498,9 @@
         "dbWrites": [
           "acc_accounts",
           "fin_accounts?",
-          "fin_* if opening"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -1925,9 +2556,26 @@
       "card": {
         "purpose": "Update non-financial metadata of an account",
         "requestFields": [
-          "accountId",
-          "name?",
-          "status?"
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "cannot rewrite posted journal via update"
@@ -2001,7 +2649,16 @@
       "card": {
         "purpose": "Archive account only if journal balance is zero",
         "requestFields": [
-          "accountId"
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "balance must be 0 in Decimal"
@@ -2070,12 +2727,36 @@
       "card": {
         "purpose": "Transfer between two cash accounts",
         "requestFields": [
-          "operationId",
-          "fromAccountId",
-          "toAccountId",
-          "amount",
-          "currency",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fromAccountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toAccountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2089,7 +2770,9 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "fin_*",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
           "acc_transactions projection"
         ],
         "transactionBoundary": "single SQLite transaction",
@@ -2147,12 +2830,36 @@
       "card": {
         "purpose": "External cash in",
         "requestFields": [
-          "operationId",
-          "accountId",
-          "amount",
-          "currency",
-          "businessDate",
-          "counterparty?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "counterparty",
+            "required": false,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2166,7 +2873,9 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2230,11 +2939,31 @@
       "card": {
         "purpose": "External cash out",
         "requestFields": [
-          "operationId",
-          "accountId",
-          "amount",
-          "currency",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2248,7 +2977,9 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "fin_*"
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2312,12 +3043,36 @@
       "card": {
         "purpose": "Record income event",
         "requestFields": [
-          "operationId",
-          "amount",
-          "currency",
-          "categoryId?",
-          "accountId",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2331,8 +3086,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inc_*",
-          "fin_*"
+          "inc_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2396,12 +3153,36 @@
       "card": {
         "purpose": "Record expense event",
         "requestFields": [
-          "operationId",
-          "amount",
-          "currency",
-          "categoryId?",
-          "accountId",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2415,8 +3196,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "exp_*",
-          "fin_*"
+          "exp_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2480,8 +3263,21 @@
       "card": {
         "purpose": "Reverse prior income operation",
         "requestFields": [
-          "operationId",
-          "originalOperationId"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "originalOperationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2495,8 +3291,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inc_*",
-          "fin_*"
+          "inc_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2560,8 +3358,21 @@
       "card": {
         "purpose": "Reverse prior expense operation",
         "requestFields": [
-          "operationId",
-          "originalOperationId"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "originalOperationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2575,8 +3386,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "exp_*",
-          "fin_*"
+          "exp_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2640,12 +3453,41 @@
       "card": {
         "purpose": "Register cheque instrument event",
         "requestFields": [
-          "operationId",
-          "chequeNumber",
-          "amount",
-          "currency",
-          "dueDate",
-          "direction"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chequeNumber",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dueDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "direction",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2659,8 +3501,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_*",
-          "fin_*?"
+          "chq_",
+          "fin_?"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2724,10 +3566,26 @@
       "card": {
         "purpose": "Deposit cheque toward clearing",
         "requestFields": [
-          "operationId",
-          "chequeId",
-          "accountId",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chequeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2741,8 +3599,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_*",
-          "fin_*"
+          "chq_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2806,9 +3666,26 @@
       "card": {
         "purpose": "Mark cheque cleared; cash effect if policy requires",
         "requestFields": [
-          "operationId",
-          "chequeId",
-          "clearedDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chequeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "clearedDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2822,8 +3699,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_*",
-          "fin_*"
+          "chq_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2887,9 +3766,26 @@
       "card": {
         "purpose": "Bounce cheque; reverse pending cash if needed",
         "requestFields": [
-          "operationId",
-          "chequeId",
-          "reason?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chequeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reason",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2903,8 +3799,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_*",
-          "fin_*"
+          "chq_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2968,8 +3866,21 @@
       "card": {
         "purpose": "Cancel cheque before clear",
         "requestFields": [
-          "operationId",
-          "chequeId"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "chequeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -2983,8 +3894,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_*",
-          "fin_*?"
+          "chq_",
+          "fin_?"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3048,11 +3959,36 @@
       "card": {
         "purpose": "Register physical/non-investment asset",
         "requestFields": [
-          "operationId?",
-          "name",
-          "category?",
-          "acquisitionCost?",
-          "currency?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "acquisitionCost",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3066,8 +4002,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "pa_*",
-          "fin_*?"
+          "pa_",
+          "fin_?"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3131,9 +4067,31 @@
       "card": {
         "purpose": "Update asset metadata",
         "requestFields": [
-          "assetId",
-          "name?",
-          "location?"
+          {
+            "name": "assetId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "location",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3148,7 +4106,7 @@
         "costBasis": "n/a",
         "dbWrites": [
           "fin_operations",
-          "fin_journal_*"
+          "fin_journal_"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3212,10 +4170,31 @@
       "card": {
         "purpose": "Dispose asset with optional proceeds",
         "requestFields": [
-          "operationId",
-          "assetId",
-          "proceeds?",
-          "currency?"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "assetId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "proceeds",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3229,8 +4208,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "pa_*",
-          "fin_*"
+          "pa_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3294,10 +4275,36 @@
       "card": {
         "purpose": "Set budget period amounts (planning; not journal truth)",
         "requestFields": [
-          "period",
-          "categoryId",
-          "amount",
-          "currency"
+          {
+            "name": "period",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoryId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3311,7 +4318,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_*"
+          "bg_"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3375,10 +4382,36 @@
       "card": {
         "purpose": "Create savings/investment goal",
         "requestFields": [
-          "name",
-          "targetAmount",
-          "currency",
-          "deadline?"
+          {
+            "name": "name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "targetAmount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "deadline",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3392,7 +4425,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_*"
+          "bg_"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3456,10 +4489,36 @@
       "card": {
         "purpose": "Schedule recurring bill reminder / obligation projection",
         "requestFields": [
-          "name",
-          "amount",
-          "currency",
-          "dueRule"
+          {
+            "name": "name",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dueRule",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3473,7 +4532,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_*"
+          "bg_"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3537,11 +4596,36 @@
       "card": {
         "purpose": "Create tax obligation (assessment event)",
         "requestFields": [
-          "operationId?",
-          "taxYear",
-          "amount",
-          "currency",
-          "kind"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "taxYear",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "kind",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3555,8 +4639,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_*",
-          "fin_*"
+          "tax_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3622,12 +4708,36 @@
       "card": {
         "purpose": "Pay tax obligation — only path that can mark paid",
         "requestFields": [
-          "operationId",
-          "taxRecordId",
-          "amount",
-          "currency",
-          "accountId",
-          "businessDate"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "taxRecordId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "status paid only after successful payTax journal"
@@ -3637,8 +4747,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_*",
-          "fin_*"
+          "tax_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3705,10 +4817,31 @@
       "card": {
         "purpose": "Adjust assessment; not a silent paid flag",
         "requestFields": [
-          "operationId",
-          "taxRecordId",
-          "deltaAmount",
-          "reason"
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "taxRecordId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "deltaAmount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "reason",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
         ],
         "validation": [
           "operationId required UUID for mutations that post",
@@ -3722,8 +4855,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_*",
-          "fin_*"
+          "tax_",
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",

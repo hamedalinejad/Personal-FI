@@ -42,6 +42,24 @@ BUG-*.md · P0-*.md · GAP-*.md · AUDIT-*.md · FIX-*.md · MATRIX-*.md · VERD
 Defect → test → code → owner update only if contract changed → QUALITY-STATUS → commit.
 
 ## Developer must not invent economics
+### Final handoff order (LOCKED)
+```
+1 DOCUMENTATION-STANDARD
+2 PRODUCT
+3 ARCHITECTURE
+4 FINANCIAL-CORE
+5 DATA-MODEL
+6 API
+7 REPORTING
+8 OFFLINE-RELEASE
+9 DEVELOPMENT
+10 modules/<feature>
+11 command-catalog.json
+12 field-preservation-matrix.json
+13 schema.sql
+14 fixture
+15 test
+```
 Read in order:
 ```
 DOCUMENTATION-STANDARD → PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-MODEL
