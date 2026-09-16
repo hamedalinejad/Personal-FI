@@ -119,23 +119,31 @@ export function scheduleDeclining({ principal, annualRate, periods, startDate, d
   const P = assertPositive(principal);
   const r = periodRateFromAnnual(annualRate, frequency);
   const n = parsePeriodCount(periods);
-  const principalPart = P.div(n);
-  let bal = P;
+  const principalPartExact = P.div(n);
+  let principalAllocated = toDecimal("0");
+  let balExact = P;
   const rows = [];
   for (let i = 1; i <= n; i++) {
-    const interest = bal.times(r);
-    let pPart = principalPart;
-    if (i === n) pPart = bal;
-    const payment = pPart.plus(interest);
-    bal = bal.minus(pPart);
+    const interestExact = balExact.times(r);
+    let pStr;
+    if (i === n) {
+      pStr = money2str(P.minus(principalAllocated));
+    } else {
+      pStr = money2str(principalPartExact);
+    }
+    const iStr = money2str(interestExact);
+    principalAllocated = principalAllocated.plus(toDecimal(pStr));
+    balExact = P.minus(principalAllocated);
+    const payStr = money2str(toDecimal(pStr).plus(toDecimal(iStr)));
     rows.push({
       period: i,
-      payment: money2str(payment),
-      principal: money2str(pPart),
-      interest: money2str(interest),
-      balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
+      payment: payStr,
+      principal: pStr,
+      interest: iStr,
+      balance: money2str(balExact.gt(0) ? balExact : toDecimal("0")),
     });
   }
+  assertScheduleConservation(rows, { principal: P.toFixed() });
   return { method: "declining_balance", startDate, dayCount: dayCountNorm, rows };
 }
 
@@ -192,23 +200,34 @@ export function scheduleQarz({ principal, periods, feePercent = "0", feePercentP
   const n = parsePeriodCount(periods);
   // feePercent is percentage-points (2 = 2% of principal), not a raw fraction.
   const feeTotal = P.times(normalizeRatePercentage(feePercent));
-  const pPart = P.div(n);
-  const feePart = feeTotal.div(n);
-  let bal = P;
+  const pPartExact = P.div(n);
+  const feePartExact = feeTotal.div(n);
+  let principalAllocated = toDecimal("0");
+  let feeAllocated = toDecimal("0");
   const rows = [];
   for (let i = 1; i <= n; i++) {
-    let p = pPart;
-    if (i === n) p = bal;
-    bal = bal.minus(p);
+    let pStr;
+    let fStr;
+    if (i === n) {
+      pStr = money2str(P.minus(principalAllocated));
+      fStr = money2str(feeTotal.minus(feeAllocated));
+    } else {
+      pStr = money2str(pPartExact);
+      fStr = money2str(feePartExact);
+    }
+    principalAllocated = principalAllocated.plus(toDecimal(pStr));
+    feeAllocated = feeAllocated.plus(toDecimal(fStr));
+    const balStr = money2str(P.minus(principalAllocated));
     rows.push({
       period: i,
-      payment: money2str(p.plus(feePart)),
-      principal: money2str(p),
+      payment: money2str(toDecimal(pStr).plus(toDecimal(fStr))),
+      principal: pStr,
       interest: "0.00",
-      fee: money2str(feePart),
-      balance: money2str(bal.gt(0) ? bal : toDecimal("0")),
+      fee: fStr,
+      balance: balStr,
     });
   }
+  assertScheduleConservation(rows, { principal: P.toFixed() });
   return { method: "qarz_al_hasaneh", startDate, dayCount: dayCountNorm, rows };
 }
 
@@ -242,6 +261,7 @@ export function scheduleBullet({ principal, annualRate, periods, startDate, dayC
       });
     }
   }
+  assertScheduleConservation(rows, { principal: P.toFixed() });
   return { method: "bullet", startDate, dayCount: dayCountNorm, rows };
 }
 

@@ -14,6 +14,14 @@
 ## Closed since last audit
 | Finding | Status |
 |---------|--------|
+| P0-02 Loan schedule exact conservation | **CLOSED** — residual absorb + exact assert; 1¢ mismatch fails |
+| P0-03 Stocks date/policy columns | **CLOSED** — schema + writers + test |
+| P0-04 Crypto economic_kind canonical | **CLOSED** — schema CHECK + writers |
+| P1-01 Loan annual frequency | **CLOSED** — schema + engine + test |
+| P1-02 Crypto transfer map | **CLOSED** — module + field matrix |
+| P1-03 Import batch FK | **CLOSED** |
+| P1-04 ln_loans.account_transaction_id FK | **CLOSED** |
+| P1-05 Funds liquidationPrice | **CLOSED** — price_history quote_type=liquidation |
 | P0-01 Fee taxonomy / `reduce_proceeds` | **CLOSED** — single enum in FINANCIAL-CORE + feeEngine; journal legs documented; golden tests |
 
 ## What “complete for coding” means

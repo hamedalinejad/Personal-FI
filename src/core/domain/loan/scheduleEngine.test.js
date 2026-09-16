@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildSchedule } from "./scheduleEngine.js";
+import { buildSchedule, assertScheduleConservation } from "./scheduleEngine.js";
 
 test("BUG-006 declining", () => {
   const s = buildSchedule("declining_balance", {
@@ -64,4 +64,59 @@ test("startDate required", () => {
       periods: "12",
     }),
   );
+});
+
+
+test("P0-02 one-cent principal mismatch fails conservation", () => {
+  assert.throws(
+    () =>
+      assertScheduleConservation(
+        [
+          { principal: "50.00", interest: "0" },
+          { principal: "49.99", interest: "0" },
+        ],
+        { principal: "100.00" },
+      ),
+    /LOAN_SCHEDULE_PRINCIPAL_MISMATCH/,
+  );
+});
+
+test("P0-02 exact conservation passes after residual absorb", () => {
+  assertScheduleConservation(
+    [
+      { principal: "33.33", interest: "0" },
+      { principal: "33.33", interest: "0" },
+      { principal: "33.34", interest: "0" },
+    ],
+    { principal: "100.00" },
+  );
+});
+
+test("P1-01 annual frequency declining conserves principal", () => {
+  const s = buildSchedule("declining_balance", {
+    principal: "1200.00",
+    annualRate: "12",
+    periods: "3",
+    startDate: "2026-01-01",
+    frequency: "annual",
+  });
+  assert.equal(s.rows.length, 3);
+  assert.ok(s.rows[2].balance === "0.00" || s.rows[2].balance === "0");
+  let sum = 0;
+  for (const r of s.rows) sum += Number(r.principal);
+  // still use string equality via conservation already inside engine
+  assert.equal(s.rows.reduce((a, r) => a + parseFloat(r.principal), 0).toFixed(2), "1200.00");
+});
+
+test("declining monthly residual conservation exact", () => {
+  const s = buildSchedule("declining_balance", {
+    principal: "1000.00",
+    annualRate: "18",
+    periods: "12",
+    startDate: "2026-01-01",
+    frequency: "monthly",
+  });
+  let sp = 0;
+  for (const r of s.rows) sp += parseFloat(r.principal);
+  assert.equal(sp.toFixed(2), "1000.00");
 });

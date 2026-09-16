@@ -15,9 +15,9 @@
     "domain": {
       "rowCount": 12,
       "finalBalance": "0.00",
-      "totalPrincipal": "99999.96",
+      "totalPrincipal": "100000.00",
       "totalInterest": "0.00",
-      "totalFee": "3999.96"
+      "totalFee": "4000.00"
     }
   },
   "status": "ACTIVE",

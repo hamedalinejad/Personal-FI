@@ -83,7 +83,7 @@ export async function buyStock(input, { dataDir } = {}) {
   const totalDue = gross.plus(commission).plus(tax).plus(other);
   const tradeDate = p.tradeDate;
   let settlementDate = p.settlementDate || null;
-  let settlementPolicyVersion = p.settlementPolicyVersion || null;
+  let settlementPolicyVersion = p.settlementPolicyVersion || SETTLEMENT_POLICY_VERSION;
   if (!settlementDate && p.autoSettlementDate !== false) {
     const computed = computeEquitySettlementDate(tradeDate, {
       tPlus: p.tPlus != null ? Number(p.tPlus) : 2,

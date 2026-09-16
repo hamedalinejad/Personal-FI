@@ -8,6 +8,7 @@ import {
   scopedAccountId,
 } from "../../../core/accounting/chartOfAccounts.js";
 import { buildFeeEvents, applyFeeEvents } from "../../../core/domain/fee/feeEngine.js";
+import { SETTLEMENT_POLICY_VERSION } from "../../../core/iran/settlementPolicy.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { assertPositive, assertNonNegative } from "../../../core/domain/validation/positiveMoney.js";
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
@@ -262,7 +263,7 @@ export async function sellStock(input, { dataDir } = {}) {
         p.marketDate || tradeDate,
         p.priceAsOf || tradeDate,
         p.fxAsOf || null,
-        p.settlementPolicyVersion || null,
+        p.settlementPolicyVersion || SETTLEMENT_POLICY_VERSION,
         qty.toFixed(),
         price.toFixed(),
         commission.plus(tax).plus(otherFee).toFixed(),

@@ -1,3 +1,4 @@
+import { SETTLEMENT_POLICY_VERSION } from "../../../core/iran/settlementPolicy.js";
 import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
@@ -128,7 +129,7 @@ export async function stockDividend(input, { dataDir } = {}) {
         p.marketDate || p.businessDate,
         p.priceAsOf || null,
         p.fxAsOf || null,
-        p.settlementPolicyVersion || null,
+        p.settlementPolicyVersion || SETTLEMENT_POLICY_VERSION,
         tax.toFixed(),
         currency,
         p.accountId || null,
