@@ -1,0 +1,22 @@
+{
+  "policyVersion": "iran-equity-fees-v1",
+  "market": "TSE",
+  "effectiveFrom": "2026-01-01",
+  "effectiveTo": null,
+  "items": [
+    {
+      "scope": "equity_default",
+      "commissionBasis": "notional",
+      "commissionRate": null,
+      "taxBasis": "notional",
+      "taxRate": null,
+      "otherFeeRules": [],
+      "roundingRule": "money_2dp_half_up",
+      "application": "Caller/module MUST pass explicit fee amounts on trade commands; this package does not invent rates. When rates are non-null, engine may compute feeAmount = notional × rate with Decimal."
+    }
+  ],
+  "sourceMetadata": {
+    "status": "STRUCTURE_LOCKED_RATES_FROM_CALLER_OR_UPDATE",
+    "note": "Official broker commission tables change; product accepts explicit feeAmount on commands. Non-null rates here are optional accelerators only."
+  }
+}

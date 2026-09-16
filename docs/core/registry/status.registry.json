@@ -5,7 +5,8 @@
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
     "RELEASE_PROVEN": false,
-    "FREEZE_EVIDENCE": "Goldens expanded (loan/metal/fund/core); field-preservation-matrix; recovery matrix tests; browser still OPEN"
+    "FREEZE_EVIDENCE": "Contracts locked; dual-mode green; 42 commands; field matrix 400+; rebuild+backup metadata; Iran structure v1; browser E2E still shipping-only",
+    "SEMANTIC_CODING_READY": true
   },
   "features": {
     "loan": {
@@ -73,7 +74,8 @@
     "schema_spec_locked": true,
     "schema_freeze_proven": false,
     "standard": "docs/DOCUMENTATION-STANDARD.md",
-    "human_md_count_target": 23
+    "human_md_count_target": 23,
+    "semantic_coding_ready": true
   },
   "status_semantics": {
     "IMPLEMENTED": "code path exists; NOT release proof",

@@ -72,3 +72,17 @@ Gates are release path. Optional smoke scripts are not authority.
 
 ## Freeze gate (summary)
 FREEZE_PROVEN only when QUALITY-STATUS open rows are green and `npm run gates` passes without exception for claimed contracts.
+
+## Coding start (locked)
+`SEMANTIC_CODING_READY = true` while `FREEZE_PROVEN = false`.
+
+Allowed now:
+1. Accounting kernel hardening
+2. Loan vertical
+3. Investment public-api commands
+4. Persistence/recovery hardening
+
+Not allowed yet:
+- UI routes
+- Claiming production
+- Inventing deferred command economics (corporate actions, crypto deposit/swap, TWR/MWR)

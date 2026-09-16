@@ -154,3 +154,31 @@ test("crash_before_commit matrix row is named and tracked", () => {
   assert.ok(MATRIX.includes("browser_reload"));
   assert.ok(MATRIX.includes("multi_tab_write"));
 });
+
+test("crash_after_sql_commit: operation readable after reopen", async () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-crash-after-"));
+  const opId = randomUUID();
+  await runAtomicFinancialOperation({
+    operationId: opId,
+    type: "test.transfer",
+    status: "posted",
+    businessDate: "2026-02-01",
+    baseCurrency: "IRR",
+    dataDir,
+    persistMode: "sqlite",
+    sourceChannel: "api",
+    journalLines: lines100,
+    withinTransaction: seedAccounts,
+  });
+  // simulate process death: close handles, reopen
+  closeAllDbs();
+  const db = openDb(dataDir);
+  const row = db.prepare(`SELECT status FROM fin_operations WHERE id = ?`).get(opId);
+  assert.equal(row.status, "posted");
+  closeAllDbs();
+});
+
+test("multi_tab_write contract name is tracked (Node single-writer)", () => {
+  assert.ok(MATRIX.includes("multi_tab_write"));
+  // Browser multi-tab proven only at shipping E2E; Node uses single process writer.
+});

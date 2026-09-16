@@ -857,3 +857,13 @@ tax_records	period_start	RAW	Tax	no	tax_records	canonical	yes
 tax_records	period_end	RAW	Tax	no	tax_records	canonical	yes
 fin_journal_lines	source_channel	RAW	Core	No	fin_operations	preserve	yes
 inv_stocks_iran_transactions	related_operation_id	RAW	Stocks	No	fin_operations	preserve	yes
+inv_stocks_iran_transactions	cash_date	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	market_date	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	price_as_of	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fx_as_of	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	settlement_policy_version	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fee_commission	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fee_tax	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fee_other	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	fee_treatments_json	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+cur_exchange_rates	is_stale	RAW	Core	yes	cur_exchange_rates	canonical	yes

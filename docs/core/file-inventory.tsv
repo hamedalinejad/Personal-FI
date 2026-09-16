@@ -4,6 +4,7 @@ data/policy/iran/README.md	E	impl	keep
 data/policy/iran/iran-equity-calendar-v0-sample.json	E	impl	keep
 data/policy/iran/iran-equity-calendar-v1.json	E	impl	keep
 data/policy/iran/iran-equity-fees-v0-sample.json	E	impl	keep
+data/policy/iran/iran-equity-fees-v1.json	E	impl	keep
 docs/API.md	A	docs	keep
 docs/ARCHITECTURE.md	A	docs	keep
 docs/DATA-MODEL.md	A	docs	keep
