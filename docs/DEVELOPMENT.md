@@ -25,7 +25,7 @@ Do not delete `src/**` fixtures or tests.
 10 Semantic freeze (FREEZE_PROVEN)
 11 UI — six routes only
 ```
-**Start coding at steps 1–4 now.** UI stays at step 11. FREEZE_PROVEN stays false until open items in QUALITY-STATUS are green.
+**Scaffold maintenance at steps 1–4 is allowed.** UI stays at step 11. Production feature coding waits for FREEZE_PROVEN. FREEZE_PROVEN stays false until open items in QUALITY-STATUS are green.
 
 ## Status vocabulary (only these)
 ```

@@ -48,6 +48,20 @@ List / get / statement-style reads as applicable.
 ## 13. API contract
 API.md envelope; decimal strings; operationId on mutations.
 
+
+## Transition matrix (LOCKED)
+
+| From | To | Status | Journal | operationId |
+|------|-----|--------|---------|-------------|
+| (new) | issued/received | SUPPORTED | forbidden | optional |
+| issued/received | deposited | SUPPORTED | forbidden | optional |
+| deposited | cleared | SUPPORTED | Dr Cash Cr Receivable | required |
+| deposited | bounced | SUPPORTED | bounce journal | required |
+| * | cancelled | SUPPORTED | none if never cleared | required if prior financial |
+| cleared | rewrite | REJECTED | use reversal op only | required |
+
+No maybe/depends in implementation contracts.
+
 ## 14. State machine
 issued/received → deposited → cleared | bounced | cancelled | returned
 

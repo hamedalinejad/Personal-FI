@@ -182,7 +182,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -325,7 +327,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -465,7 +469,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -639,7 +645,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -803,7 +811,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -911,7 +921,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1028,7 +1040,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1173,7 +1187,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1310,7 +1326,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1424,7 +1442,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1596,7 +1616,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1734,7 +1756,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -1900,7 +1924,9 @@
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "partial"
     },
@@ -2032,7 +2058,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "strongest"
     },
@@ -2136,7 +2164,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "strongest"
     },
@@ -2233,7 +2263,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "strongest"
     },
@@ -2340,7 +2372,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "optional"
       },
       "maturity": "strongest"
     },
@@ -2450,7 +2484,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "optional"
       },
       "maturity": "strongest"
     },
@@ -2545,7 +2581,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -2638,7 +2676,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -2716,7 +2756,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -2819,7 +2861,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -2928,7 +2972,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3032,7 +3078,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3142,7 +3190,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3252,7 +3302,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3347,7 +3399,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3442,7 +3496,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3555,7 +3611,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -3655,7 +3713,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -3755,7 +3815,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3855,7 +3917,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -3948,7 +4012,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4056,7 +4122,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4159,7 +4227,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4264,7 +4334,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "master_data",
+        "journal": "optional"
       },
       "maturity": "baseline"
     },
@@ -4371,7 +4443,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "planning",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4478,7 +4552,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "planning",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4585,7 +4661,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "planning",
+        "journal": "forbidden"
       },
       "maturity": "baseline"
     },
@@ -4697,7 +4775,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -4806,7 +4886,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     },
@@ -4911,7 +4993,9 @@
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
         },
-        "license": "capability-gated; never deletes history"
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "required"
       },
       "maturity": "baseline"
     }

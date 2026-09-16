@@ -214,3 +214,7 @@ import_dedupe_keys.raw_record_id → import_raw_records.id
 source_document_id → docs_documents.id (SET NULL) when internal document
 ```
 String IDs without FK are forbidden when the target table is in-schema.
+
+
+## Attachments (LOCKED)
+Use document_id → docs_documents + relative storage key + checksum. Do not use absolute OS paths as identity. Backup includes bytes or explicit DEFERRED reject.

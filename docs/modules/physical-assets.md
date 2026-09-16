@@ -34,7 +34,14 @@ Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-asset.register · update · dispose (as implemented)
+| Command | effectClass | Journal |
+|---------|-------------|---------|
+| assets.register | master_data | forbidden |
+| assets.update | master_data | forbidden |
+| assets.acquire | financial | required (DEFERRED until card+fixture) |
+| assets.dispose | financial | required (DEFERRED until card+fixture) |
+
+v1 ships register/update as master_data only.
 
 ## 12. Queries
 List / get / statement-style reads as applicable.
@@ -61,7 +68,7 @@ Fees via Fee Engine / FINANCIAL-CORE treatments.
 No silent tax; tax module owns obligations when linked.
 
 ## 20. Accounting / journal mapping
-Purchase/disposal may post journal when treated as financial events; otherwise metadata-only
+assets.register = metadata only. Financial purchase/disposal only via assets.acquire / assets.dispose.
 
 ## 21. Cost basis / valuation
 Valuation EXTERNAL_REPORTED / SNAPSHOT — not transaction cost rewrite

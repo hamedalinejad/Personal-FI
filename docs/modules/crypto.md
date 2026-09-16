@@ -228,3 +228,7 @@ Operational `tx_type` remains separate (`buy`, `sell`, `transfer_in`, `transfer_
 | externalTxReference | provenance / source_reference on operation | RAW |
 | provenance | fin_operations provenance + optional address ids | RAW |
 | economic_kind | inv_crypto_transactions.economic_kind | RAW status |
+
+
+## Venue identity (LOCKED)
+`exchange_id` is venue/container identity. type in {cex,dex,wallet,other}. API alias venueId maps to exchange_id.

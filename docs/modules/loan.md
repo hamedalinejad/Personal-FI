@@ -43,6 +43,17 @@ Create loan · Record payment · Reverse payment
 | remaining balance | DERIVED | rebuild from ledger |
 
 ## 10. Identity
+
+## Identity: role vs direction (LOCKED)
+
+| Field | Status | Rule |
+|-------|--------|------|
+| `role` | **CANONICAL** | `borrower` \| `lender` — v1 writers use this only |
+| `direction` | **LEGACY** | `borrowed` \| `lent` — migration alias only; new writers leave NULL |
+| Agreement | if both present: borrowed↔borrower, lent↔lender | conflict → reject |
+
+v1: `role = lender` only; `borrower` DEFERRED.
+
 `loanId` · `operationId` per mutation · schedule snapshot id/version
 
 ## 11. Commands
@@ -238,3 +249,8 @@ Recording an existing receivable without fabricating cash requires `record_outst
 monthly · weekly · quarterly · annual · custom
 ```
 Engine + schema both support `annual`.
+
+
+### Field kinds (LOCKED)
+- `fixed_installment_amount` → RAW (user-entered)
+- `calculated_installment` → SNAPSHOT (engine result at schedule generation)

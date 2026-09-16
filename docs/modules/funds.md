@@ -196,3 +196,13 @@ Canonical store for market/liquidity observations is **price_history** with `quo
 | liquidationPrice | price_history quote_type=`liquidation` (or explicit command input required by card) |
 
 Never copy NAV → transactionPrice or liquidationPrice silently.
+
+
+## Price observations (LOCKED)
+| Concept | Storage |
+|---------|---------|
+| NAV | price_history.quote_type = nav |
+| liquidationPrice | price_history.quote_type = liquidation |
+| transactionPrice | inv_fif_transactions.transaction_price only |
+
+Never auto-copy between these three.

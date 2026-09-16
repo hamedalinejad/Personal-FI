@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-09-16T20:17:53.818Z",
+  "registryVersion": "1",
+  "note": "generatedAt removed for deterministic machine proof",
   "core": true,
   "features": [
     {

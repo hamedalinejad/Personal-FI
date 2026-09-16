@@ -391,3 +391,8 @@ rebuildProjection({
 }) → { projections, rebuildVersion, ... }
 ```
 No live providers. Same inputs → same outputs. Full event replay remains vertical work before FREEZE_PROVEN.
+
+
+## Operation base_currency snapshot (LOCKED)
+`fin_operations.base_currency` is the immutable book-base resolved at normalize time from db_meta.book_base_currency (default IRR).
+Invariant: operation.base_currency is the currency used for every posted amountInBase on that operation. Later settings changes never rewrite posted ops.

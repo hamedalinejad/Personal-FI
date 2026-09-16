@@ -33,5 +33,11 @@ Any implementer should be able to ship a feature using **only**:
 
 Live gates: [QUALITY-STATUS.md](./QUALITY-STATUS.md)
 
-## Coding may start (Core + Loan)
+## Implementation phase (precise)
+
+Reference **scaffold maintenance** is allowed on Core + Loan paths.
+
+**Production feature coding** begins only after semantic freeze gates are green (`FREEZE_PROVEN=true`).
+
+Until then: `SEMANTIC_CODING_READY=true`, `FREEZE_PROVEN=false`, `PRODUCTION=NO-GO`, UI=WAIT.
 Owner tree is intentionally small. Remaining work is proof depth (goldens, recovery, browser), not more Markdown files. See DEVELOPMENT.md coding sequence steps 1–4.

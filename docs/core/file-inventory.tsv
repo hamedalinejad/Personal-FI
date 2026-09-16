@@ -202,6 +202,7 @@ src/core/import/lineage.test.js	D	test	keep
 src/core/integrity/accAccountCurrencyScan.js	E	impl	keep
 src/core/integrity/archivedZeroBalance.js	E	impl	keep
 src/core/integrity/integrity.test.js	D	test	keep
+src/core/integrity/loanRoleDirection.js	E	impl	keep
 src/core/integrity/postedJournalCurrencyScan.js	E	impl	keep
 src/core/iran/settlementPolicy.js	E	impl	keep
 src/core/iran/settlementPolicy.test.js	D	test	keep

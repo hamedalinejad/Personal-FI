@@ -32,7 +32,36 @@ export function recordTaxEvent(dataDir, {
   const now = new Date().toISOString();
   const cols = db.prepare(`PRAGMA table_info(tax_events)`).all().map((c) => c.name);
   const hasPeriod = cols.includes("tax_year");
-  if (hasPeriod) {
+  const hasSource = cols.includes("source_operation_id");
+  if (hasPeriod && hasSource) {
+    db.prepare(
+      `INSERT INTO tax_events (
+        id, operation_id, source_operation_id, tax_kind, amount, currency, period_key,
+        jurisdiction, rule_version, basis_amount, is_deductible, is_manual_adjustment,
+        adjustment_reason, status, tax_year, calendar_system, period_start, period_end,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'posted', ?, ?, ?, ?, ?, ?)`,
+    ).run(
+      id,
+      operationId,
+      operationId,
+      taxKind,
+      taxAmount,
+      currency,
+      period,
+      jurisdiction,
+      policyVersion,
+      baseAmount,
+      isManualAdjustment ? 1 : 0,
+      adjustmentReason,
+      period,
+      "gregorian",
+      businessDate || null,
+      businessDate || null,
+      now,
+      now,
+    );
+  } else if (hasPeriod) {
     db.prepare(
       `INSERT INTO tax_events (
         id, operation_id, tax_kind, amount, currency, period_key,
@@ -88,7 +117,9 @@ export function recordTaxEvent(dataDir, {
 export function listTaxEvents(dataDir, { operationId = null } = {}) {
   const db = openDb(dataDir);
   if (operationId) {
-    return db.prepare(`SELECT * FROM tax_events WHERE operation_id = ? ORDER BY created_at`).all(operationId);
+    return db.prepare(
+      `SELECT * FROM tax_events WHERE operation_id = ? OR source_operation_id = ? ORDER BY created_at`
+    ).all(operationId, operationId);
   }
   return db.prepare(`SELECT * FROM tax_events ORDER BY period_key, created_at`).all();
 }

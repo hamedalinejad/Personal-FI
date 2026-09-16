@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS fin_accounts (
   reconciliation_status TEXT CHECK (reconciliation_status IS NULL OR reconciliation_status IN ('unreconciled','matched','partial','stale')),
   external_ref_json TEXT
 );
--- ACCOUNTING-001: code is ledger-facing identifier; unique when present (single-user local book scope)
+-- code is ledger-facing identifier; unique when present (single-user local book scope)
 CREATE UNIQUE INDEX IF NOT EXISTS uq_fin_accounts_code ON fin_accounts(code) WHERE code IS NOT NULL;
 
 
@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS fin_operations (
   voided_at TEXT,
   corrects_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   result_json TEXT, -- idempotent replay snapshot ONLY; not accounting SoT
-  result_schema_version TEXT, -- PRES-002
-  result_hash TEXT, -- PRES-002 sha256 of canonical result payload
+  result_schema_version TEXT,
+  result_hash TEXT, -- sha256 of canonical result payload
   CHECK (status != 'posted' OR command_hash IS NOT NULL)
 );
 
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS fin_journal_lines (
   line_kind       TEXT CHECK (line_kind IS NULL OR line_kind IN ('principal','interest','fee','tax','fx','fx_gain','fx_loss','adjustment','other')),
   memo            TEXT,
   reference TEXT,
-  -- : source_channel = interface; source_type = business provenance (see SOURCE-VOCABULARY.md)
+  -- : source_channel = interface; source_type = business provenance (see docs/DATA-MODEL.md (source vocabulary))
   source_channel TEXT CHECK (source_channel IS NULL OR source_channel IN ('ui','api','import','migration','system','reconciliation')),
   source_type TEXT, -- business provenance (manual|bank_statement|broker_statement|…) — NOT channel
   -- sourceReference: external reference for audit trail (file name, URL, batch label)
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_holdings (
 CREATE UNIQUE INDEX IF NOT EXISTS uq_crypto_holdings_identity
   ON inv_crypto_holdings(ifnull(exchange_id, ''), instrument_id, ifnull(network_id, ''));
 
--- CRYPTO-002: Holding identity is explicit and includes venue
+-- Holding identity is explicit and includes venue
 -- - Exchange → Wallet transfer creates NEW holding identity (not same holding)
 -- - Same asset moved from Exchange A to Wallet B = two holdings: (A, null, asset) and (B, network, asset)
 -- - Transfer provenance is recorded in inv_crypto_transactions via transfer_in/out pairs with same operation_id
@@ -291,7 +291,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_price_history_null_source
 -- prefer source_id = canonical 'manual' / 'import' rows in price_sources;
 -- NULL source_id only for true ad-hoc; is_manual=1 required when source is manual.
 
--- ─── Price Provider Mapping (STOCK-004) ─────────────────────
+-- ─── Price Provider Mapping () ─────────────────────
 -- Preserves symbol-change history and prevents provider identity from leaking into core instrument identity.
 CREATE TABLE IF NOT EXISTS instrument_price_mappings (
   id              TEXT PRIMARY KEY,
@@ -312,7 +312,7 @@ CREATE INDEX IF NOT EXISTS idx_ipm_active ON instrument_price_mappings(instrumen
 -- ─── Crypto holdings (projection of ledger events) ───────────
 
 -- ─── Crypto Transactions ─────────────────────────────────────
--- Field Mapping (CRYPTO-001,):
+-- Field Mapping (,):
 -- | feature field                 | SQL column                   | kind     | constraints                                    |
 -- |-------------------------------|------------------------------|----------|------------------------------------------------|
 -- | id                            | id                           | RAW      | PK                                             |
@@ -339,15 +339,14 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   gross_quantity  TEXT,
   fee_quantity    TEXT,
   net_quantity    TEXT NOT NULL,
-  -- CRYPTO-001: exactly one funding source when fee present
+  -- exactly one funding source when fee present
   fee_funding_kind  TEXT CHECK (fee_funding_kind IS NULL OR fee_funding_kind IN ('cash','asset')),
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- CRYPTO-003: optional address audit FKs
   from_address_id TEXT, -- soft FK → inv_crypto_wallet_addresses.id (table defined later; CRYPTO-003)
   to_address_id   TEXT, -- soft FK → inv_crypto_wallet_addresses.id
-  -- CRYPTO-002 / MATH-008
-  -- economic_kind = economic meaning (canonical). Operational event type is tx_type separately.
+  -- / -- economic_kind = economic meaning (canonical). Operational event type is tx_type separately.
   economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN (
     'acquisition','disposal','transfer_internal','swap_economic','fee','income','adjustment'
   )),
@@ -380,7 +379,7 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
 -- | interestRatePeriod            | interest_rate_period         | RAW      | -                                                | enum map            |
 -- | installmentFrequency          | installment_frequency        | RAW      | -                                                | enum map            |
 -- | customIntervalDays            | custom_interval_days         | RAW      | -                                                | int                 |
--- | calculatedInstallment         | calculated_installment       | RAW      | from schedule engine                             | computed            |
+-- | calculatedInstallment         | calculated_installment       | SNAPSHOT | schedule engine result at generation time        | versioned snapshot  |
 -- | fixedInstallmentAmount        | fixed_installment_amount     | RAW      | user-entered or computed                         | preserve            |
 -- | recalculateOnEarlyPayment     | recalculate_on_early_payment | RAW      | boolean → int                                    | cast                |
 -- | penaltyRate                   | penalty_rate                 | RAW      | % (6 for 6%)                                     | preserve            |
@@ -400,9 +399,11 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   -- identity and metadata (RAW):
   name TEXT, -- نام وام 
   loan_type TEXT CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')), -- 
-  direction TEXT CHECK (direction IS NULL OR direction IN ('borrowed','lent')), -- 
+  direction TEXT CHECK (direction IS NULL OR direction IN ('borrowed','lent')), -- LEGACY alias only; new writers use role; migration maps borrowed→borrower, lent→lender
+  -- CANONICAL: role; if both set must agree (borrowed↔borrower, lent↔lender)
+  -- 
   party_id TEXT REFERENCES ref_parties(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  role TEXT NOT NULL CHECK (role IN ('borrower','lender')), -- LOAN-001: map borrowed→borrower, lent→lender
+  role TEXT NOT NULL CHECK (role IN ('borrower','lender')), -- map borrowed→borrower, lent→lender
   -- amounts and currency (RAW):
   principal TEXT NOT NULL, -- مبلغ اصلی
   currency TEXT NOT NULL,
@@ -436,7 +437,7 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   grace_end_date TEXT, -- وقتی graceMode=date_range 
   grace_interest_policy TEXT CHECK (grace_interest_policy IS NULL OR grace_interest_policy IN ('interest_only','payment_holiday')), -- 
   -- installment (RAW):
-  calculated_installment TEXT, -- محاسبه‌شده برای Declining/Bullet 
+  calculated_installment TEXT, -- SNAPSHOT: schedule-engine result at generation (not user RAW input)
   fixed_installment_amount TEXT, -- ثابت برای Flat Rate/Qarz 
   -- early payment (RAW):
   recalculate_on_early_payment INTEGER NOT NULL DEFAULT 0 CHECK (recalculate_on_early_payment IN (0, 1)), -- فقط declining_balance 
@@ -590,7 +591,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_import_provider_tx
 
 
 -- ═══════════════════════════════════════════════════════════
--- expansion + …050 column/table gaps (2026-09-04)
+-- 
 -- Domain still validates decimal; SQLite stores TEXT
 -- ═══════════════════════════════════════════════════════════
 
@@ -673,7 +674,7 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_instruments (
 CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings (
   id TEXT PRIMARY KEY,
   brokerage_id TEXT NOT NULL REFERENCES inv_stocks_iran_brokerages(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- P0-09: portfolio/account scope under same brokerage (NULL = default single-account-per-brokerage)
+  -- 09: portfolio/account scope under same brokerage (NULL = default single-account-per-brokerage)
   account_id TEXT,
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- RAW fields (persisted from trade documents, not derived):
@@ -789,9 +790,9 @@ CREATE TABLE IF NOT EXISTS inv_fif_holdings (
   current_nav TEXT, -- آخرین NAV (فقط برای ارزش‌گذاری و Unrealized P&L؛ هرگز با transactionPrice قاطی نشود) 
   last_subscription_price TEXT, -- آخرین قیمت صدور دیده‌شده (nullable) 
   last_redemption_price TEXT, -- آخرین قیمت ابطال دیده‌شده (nullable) 
-  -- FUND-002: external_reported_profit is deferred to v2
+  -- external_reported_profit is deferred to v2
   -- Never overwrite calculated return with provider-reported return
-  external_reported_profit TEXT, -- nullable; v2 observation model (see FUND-002)
+  external_reported_profit TEXT, -- nullable; v2 observation model (see )
   cost_currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- nullable — برای issuance_redemption 
   created_at TEXT NOT NULL,
@@ -826,9 +827,9 @@ CREATE TABLE IF NOT EXISTS inv_fif_transactions (
   amount TEXT,
   currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  -- FUND-002: operationRole for multi-leg operations (reinvest, dividend+acquisition)
+  -- operationRole for multi-leg operations (reinvest, dividend+acquisition)
   operation_role TEXT CHECK (operation_role IS NULL OR operation_role IN ('dividend_income','reinvest_purchase','standalone')),
-  -- FUND-002: external_reported_profit is deferred to v2
+  -- external_reported_profit is deferred to v2
   -- Never overwrite calculated return with provider-reported return
   external_reported_profit TEXT, -- nullable; v2 observation model
   created_at TEXT NOT NULL
@@ -1020,9 +1021,12 @@ CREATE TABLE IF NOT EXISTS br_occurrences (
 
 CREATE TABLE IF NOT EXISTS tax_events (
   id TEXT PRIMARY KEY,
-  -- operation_id: NULLABLE only for draft events or manual adjustments
-  -- Investment/realized ops that create tax MUST have operation_id → fin_operations
- operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- source investment/realized op 
+  -- source_operation_id: investment/realized op that created the obligation (nullable for pure manual)
+  -- payment_operation_id: set only by tax.pay path; paid state is DERIVED from posted payments
+  source_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  payment_operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- legacy alias column kept for migration readers; new writers use source_operation_id only
+  operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE, -- LEGACY = source_operation_id
   tax_kind TEXT NOT NULL, -- capital_gain|income|withholding|adjustment|...
   amount TEXT NOT NULL, -- tax amount (decimal string)
   currency TEXT NOT NULL,
@@ -1036,14 +1040,14 @@ CREATE TABLE IF NOT EXISTS tax_events (
  adjustment_reason TEXT, -- required when manual 
  document_id TEXT, -- link to docs_documents evidence 
   status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')),
-  -- TAX-002 period semantics (do not infer bounds from bare year)
+  -- period semantics (do not infer bounds from bare year)
   tax_year TEXT,
   calendar_system TEXT CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')),
   period_start TEXT,
   period_end TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)
+  CHECK (source_operation_id IS NOT NULL OR operation_id IS NOT NULL OR is_manual_adjustment = 1)
 );
 
 CREATE TABLE IF NOT EXISTS cur_currencies (
@@ -1558,6 +1562,8 @@ CREATE INDEX IF NOT EXISTS idx_ln_tx_op ON ln_transactions(operation_id);
 CREATE INDEX IF NOT EXISTS idx_ln_tx_loan ON ln_transactions(loan_id);
 CREATE INDEX IF NOT EXISTS idx_chk_op ON chk_cheques(operation_id);
 CREATE INDEX IF NOT EXISTS idx_tax_op ON tax_events(operation_id);
+CREATE INDEX IF NOT EXISTS idx_tax_source_op ON tax_events(source_operation_id);
+CREATE INDEX IF NOT EXISTS idx_tax_payment_op ON tax_events(payment_operation_id);
 CREATE INDEX IF NOT EXISTS idx_fg_goal ON fg_contributions(goal_id);
 CREATE INDEX IF NOT EXISTS idx_fg_op ON fg_contributions(operation_id);
 CREATE INDEX IF NOT EXISTS idx_br_item ON br_occurrences(item_id);

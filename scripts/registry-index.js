@@ -22,7 +22,9 @@ if (existsSync(fr)) {
 }
 
 const registry = {
-  generatedAt: new Date().toISOString(),
+  // deterministic: no wall-clock — use registryVersion + source tree identity
+  registryVersion: "1",
+  note: "generatedAt removed for deterministic machine proof",
   core: existsSync(join(root, "src/core")),
   features,
   scripts: {

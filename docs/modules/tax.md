@@ -121,3 +121,14 @@ Tax ships with **Full**. `tax.pay` is the only path to paid. Standalone investme
 Core tax engine is **generic** (assess → obligation → payTax → journal → paid).  
 Iran-specific rates/calendars/rules live in **versioned module/policy data**, not hardcoded Financial Core.
 
+
+
+## Obligation vs payment (LOCKED)
+| Field | Meaning |
+|-------|---------|
+| tax_events.source_operation_id | source obligation op |
+| tax_events.payment_operation_id | tax.pay only |
+| tax_records.payment_operation_id | payTax path |
+| paid | DERIVED from posted payments |
+
+operation_id on tax_events is LEGACY alias of source_operation_id.
