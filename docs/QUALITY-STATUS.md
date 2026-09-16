@@ -12,6 +12,12 @@
 | UI | WAIT |
 
 ## Closed since last audit
+| Standalone 5 editions path | **IMPROVED** — backup/restore/rebuild equality packs |
+| Browser offline E2E | **OPEN** (protocol harness only; durableMemoryAdapter kept) |
+| TWR/MWR | **DEFERRED** locked in REPORTING |
+| rebuildProjection | **IMPLEMENTED** deterministic inputHash |
+| Command catalog full card keys | **IMPROVED** |
+
 | P1-06 Metals purity_ratio NOT NULL | **CLOSED** Option A |
 | P1-07 FX cross-rate + stale | **CLOSED** |
 | P1-08 Field-preservation gate | **CLOSED** |

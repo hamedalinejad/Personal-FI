@@ -134,7 +134,10 @@ Disabled modules: commands return capability error; data remains.
 ## 20. Backup product requirement
 User-accessible backup/restore from Settings; restore replaces DB file via persistence port; post-restore integrity check.
 
-## IA — six routes only (LOCKED) · Feature ≠ Page
+## IA — six routes only (LOCKED)
+
+**Canonical IA section:** this section only. Other mentions of routes are summaries, not competing rules.
+ · Feature ≠ Page
 | Route | Surfaces |
 |-------|----------|
 | `/` | dashboard · net worth · cash · activity · warnings |

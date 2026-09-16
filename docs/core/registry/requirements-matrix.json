@@ -237,7 +237,7 @@
       ],
       "owner": "docs/REPORTING.md",
       "closure_note": "perf formulas or explicit defer",
-      "evidence": "REPORTING realized/unrealized; TWR/MWR deferred"
+      "evidence": "REPORTING.md TWR/MWR deferred lock; v1 statements posted-only"
     },
     {
       "id": "R-M21",
@@ -248,7 +248,7 @@
       ],
       "owner": "docs/FINANCIAL-CORE.md",
       "closure_note": "rebuildProjection scaffold executable; full ledger replay OPEN",
-      "evidence": "rebuildProjection inputHash deterministic"
+      "evidence": "rebuildProjection inputHash; standalone packs"
     },
     {
       "id": "R-M22",
@@ -282,7 +282,7 @@
       ],
       "owner": "docs/OFFLINE-RELEASE.md",
       "closure_note": "sql.js+IDB E2E",
-      "evidence": "browser protocol proven; real-tab E2E shipping-only gate"
+      "evidence": "OFFLINE-RELEASE protocol vs release E2E levels"
     },
     {
       "id": "R-M25",
@@ -317,7 +317,7 @@
       ],
       "owner": "docs/API.md",
       "closure_note": "complete command cards",
-      "evidence": "command-catalog 42 cards"
+      "evidence": "command-catalog 42 cards with full key set"
     },
     {
       "id": "R-M28",
@@ -355,5 +355,5 @@
       "evidence": "fixtures non-empty + fixture:empty gate"
     }
   ],
-  "description": "Live requirements matrix \u2014 statuses in JSON only; no parallel requirements Markdown"
+  "description": "Live requirements matrix — statuses in JSON only; no parallel requirements Markdown"
 }

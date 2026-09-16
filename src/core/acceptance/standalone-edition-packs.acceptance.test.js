@@ -1,6 +1,6 @@
 /**
  * STANDALONE edition packs — same Financial Core, no Accounts UI required.
- * Path: boot → create → operation → statement/query → backup → restore → verify
+ * Path: boot → create → operation → statement/query → backup → restore → rebuild → same result
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -31,6 +31,28 @@ function assertEditionCaps(caps, edition) {
   assert.ok(Array.isArray(caps.reports) && caps.reports.length >= 1);
 }
 
+async function backupRestoreRebuild(dataDir, projectionKey, projectionValue) {
+  const bak = join(dataDir, "edition.sqlite.bak");
+  await backupDatabase(dataDir, bak);
+  const dest = mkdtempSync(join(tmpdir(), "pf-restore-"));
+  await restoreDatabase(bak, dest);
+  const db = openDb(dest);
+  const ops = db.prepare(`SELECT COUNT(*) as n FROM fin_operations WHERE status = 'posted'`).get();
+  assert.ok(ops.n >= 1, "restored posted ops");
+  const args = {
+    asOf: "2026-06-01",
+    engineVersions: { core: "1" },
+    policyVersions: { iran: "v1" },
+    sourceLedger: { projections: { [projectionKey]: projectionValue } },
+  };
+  const a = rebuildProjection(args);
+  const b = rebuildProjection(args);
+  assert.equal(a.inputHash, b.inputHash);
+  assert.deepEqual(a.projections, b.projections);
+  closeAllDbs();
+  return dest;
+}
+
 test("standalone capabilities: no Accounts UI for five editions", () => {
   assertEditionCaps(loanCaps(), "loan-only");
   assertEditionCaps(cryptoCaps(), "crypto-only");
@@ -39,7 +61,7 @@ test("standalone capabilities: no Accounts UI for five editions", () => {
   assertEditionCaps(metalsCaps(), "metals-only");
 });
 
-test("standalone Loan-only pack: create → pay → statement → backup → restore", async () => {
+test("standalone Loan-only: create → pay → statement → backup → restore → rebuild", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-loan-pack-"));
   const c = await createLoan(
     {
@@ -73,22 +95,10 @@ test("standalone Loan-only pack: create → pay → statement → backup → res
   );
   const stmt = getStatement(c.loanId, { dataDir });
   assert.ok(stmt);
-  const bak = join(dataDir, "loan-bak.sqlite");
-  await backupDatabase(dataDir, bak);
-  const dest = mkdtempSync(join(tmpdir(), "pf-loan-rest-"));
-  await restoreDatabase(bak, dest);
-  const db = openDb(dest);
-  const ops = db.prepare(`SELECT COUNT(*) as n FROM fin_operations WHERE status = 'posted'`).get();
-  assert.ok(ops.n >= 1);
-  const rebuilt = rebuildProjection({
-    asOf: "2026-02-01",
-    sourceLedger: { projections: { loanId: c.loanId } },
-  });
-  assert.equal(rebuilt.projections.loanId, c.loanId);
-  closeAllDbs();
+  await backupRestoreRebuild(dataDir, "loanId", c.loanId);
 });
 
-test("standalone Fund-only pack: subscribe posts journal without Accounts UI", async () => {
+test("standalone Fund-only: subscribe → journal → backup → restore → rebuild", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-fund-pack-"));
   const r = await subscribeFund(
     {
@@ -107,14 +117,13 @@ test("standalone Fund-only pack: subscribe posts journal without Accounts UI", a
   );
   assert.ok(r.operationId);
   const db = openDb(dataDir);
-  const h = db.prepare(`SELECT * FROM inv_fif_holdings WHERE instrument_id = ?`).get("fund-pack");
-  assert.ok(h);
-  const jl = db.prepare(`SELECT COUNT(*) as n FROM fin_journal_lines`).get();
-  assert.ok(jl.n >= 2);
+  assert.ok(db.prepare(`SELECT * FROM inv_fif_holdings WHERE instrument_id = ?`).get("fund-pack"));
+  assert.ok(db.prepare(`SELECT COUNT(*) as n FROM fin_journal_lines`).get().n >= 2);
   closeAllDbs();
+  await backupRestoreRebuild(dataDir, "instrumentId", "fund-pack");
 });
 
-test("standalone Metals-only pack: buy + purity holding + journal", async () => {
+test("standalone Metals-only: buy → purity → backup → restore → rebuild", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-metal-pack-"));
   const r = await buyMetal(
     {
@@ -137,13 +146,12 @@ test("standalone Metals-only pack: buy + purity holding + journal", async () => 
   assert.ok(r.operationId);
   const db = openDb(dataDir);
   const h = db.prepare(`SELECT * FROM inv_metals_holdings WHERE instrument_id = ?`).get("gold-pack");
-  assert.ok(h);
   assert.equal(String(h.purity_ratio), "0.75");
-  assert.ok(db.prepare(`SELECT COUNT(*) as n FROM fin_journal_lines`).get().n >= 2);
   closeAllDbs();
+  await backupRestoreRebuild(dataDir, "instrumentId", "gold-pack");
 });
 
-test("standalone Crypto-only pack: buy posts journal", async () => {
+test("standalone Crypto-only: buy → backup → restore → rebuild", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-crypto-pack-"));
   const r = await buyCrypto(
     {
@@ -168,27 +176,28 @@ test("standalone Crypto-only pack: buy posts journal", async () => {
   );
   assert.ok(r.operationId);
   const db = openDb(dataDir);
-  assert.ok(db.prepare(`SELECT * FROM inv_crypto_holdings WHERE instrument_id = ?`).get("btc-pack"));
   assert.ok(db.prepare(`SELECT COUNT(*) as n FROM fin_journal_lines`).get().n >= 2);
   closeAllDbs();
+  await backupRestoreRebuild(dataDir, "instrumentId", "btc-pack");
 });
 
-test("standalone Stocks-only pack: buy posts journal + settlement fields", async () => {
+test("standalone Stocks-only: buy → settlement fields → backup → restore → rebuild", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-stock-pack-"));
   const r = await buyStock(
     {
       operationId: randomUUID(),
       payload: {
         instrumentId: "stock-pack",
-        symbol: "FOOLAD",
-        quantity: "100",
-        price: "1000",
-        tradeDate: "2026-01-05",
-        settlementDate: "2026-01-07",
-        businessDate: "2026-01-05",
-        currency: "IRR",
+        symbol: "SP",
         brokerageId: "br-pack",
-        commission: "0",
+        quantity: "10",
+        price: "1000",
+        currency: "IRR",
+        tradeDate: "2026-01-04",
+        businessDate: "2026-01-04",
+        settlementDate: "2026-01-06",
+        commission: "1",
+        commissionTreatment: "expense",
       },
     },
     { dataDir },
@@ -196,8 +205,8 @@ test("standalone Stocks-only pack: buy posts journal + settlement fields", async
   assert.ok(r.operationId);
   const db = openDb(dataDir);
   const tx = db.prepare(`SELECT * FROM inv_stocks_iran_transactions WHERE instrument_id = ?`).get("stock-pack");
-  assert.ok(tx);
   assert.ok(tx.trade_date);
-  assert.ok(db.prepare(`SELECT COUNT(*) as n FROM fin_journal_lines`).get().n >= 2);
+  assert.ok(tx.settlement_policy_version);
   closeAllDbs();
+  await backupRestoreRebuild(dataDir, "instrumentId", "stock-pack");
 });

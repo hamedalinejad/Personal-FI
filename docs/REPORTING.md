@@ -82,3 +82,24 @@ FX conversion point · fees treatment · deposits/withdrawals · income/distribu
 unrealized valuation · asOf
 ```
 Until locked: do not ship ambiguous return metrics. v1 remains realized/unrealized P&L + fee/FX attribution only.
+
+## TWR / MWR / IRR — DECISION LOCK (v1)
+
+**Status: DEFERRED** — do not implement an investment-return algorithm until formulas below are un-deferred with fixtures.
+
+| Topic | v1 rule |
+|-------|---------|
+| TWR | DEFERRED — formula + cash-flow timing + fixtures required before coding |
+| MWR / IRR | DEFERRED — same |
+| Cash-flow timing | Must be defined with each formula (trade vs settle vs cash date) |
+| Valuation timestamps | `priceAsOf` + `fxAsOf` required; never “latest now” |
+| FX conversion point | Book base via pinned rate context only |
+| Fees | Follow Fee taxonomy; attribution deferred with TWR/MWR |
+| Deposits/withdrawals | External flows only when formula defines inclusion |
+| Income/distributions | Separate from price return until formula locks |
+| Unrealized | Valuation snapshot; not journal rewrite |
+| asOf | Required parameter on historical reports |
+
+**Allowed v1 reporting:** GL, Trial Balance, BS, IS, CF (posted-only), account activity, holdings cost, realized P&L from disposal operations when domain defines it.
+
+**Forbidden:** inventing TWR/MWR “for completeness” without this section being un-deferred + golden fixtures.

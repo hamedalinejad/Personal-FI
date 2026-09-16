@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "description": "Machine-only canonical command IDs + command cards. One ID per semantic mutation. DOC-001 complete for catalog surface.",
+  "description": "Machine SoT for public command economics. OpenAPI may be generated later — do not maintain a second business OpenAPI by hand.",
   "naming": {
     "pattern": "<feature>.<verbOrVerbNoun>",
     "featurePrefixes": [
@@ -137,7 +137,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -247,7 +248,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -354,7 +356,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -475,7 +478,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -594,7 +598,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -678,7 +683,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -763,7 +769,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -871,7 +878,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -975,7 +983,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -1061,7 +1070,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -1180,7 +1190,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -1285,7 +1296,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -1399,7 +1411,8 @@
           "allowedOverrides": "explicit treatment in request only if module allows",
           "reversalBehavior": "inverse journal + domain reversal of fee effects",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "partial"
     },
@@ -1490,7 +1503,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "strongest"
     },
@@ -1575,7 +1589,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "strongest"
     },
@@ -1656,7 +1671,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "strongest"
     },
@@ -1682,7 +1698,10 @@
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
-        "dbWrites": [],
+        "dbWrites": [
+          "fin_operations",
+          "fin_journal_*"
+        ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "loanId + schedule schema version",
         "reversal": "n/a generate",
@@ -1737,7 +1756,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "strongest"
     },
@@ -1764,7 +1784,10 @@
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
-        "dbWrites": [],
+        "dbWrites": [
+          "fin_operations",
+          "fin_journal_*"
+        ],
         "transactionBoundary": "none (read/compute)",
         "idempotency": "n/a pure function",
         "reversal": "n/a",
@@ -1817,7 +1840,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "strongest"
     },
@@ -1889,7 +1913,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -1964,7 +1989,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2032,7 +2058,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2108,7 +2135,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2190,7 +2218,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2271,7 +2300,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2354,7 +2384,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2437,7 +2468,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2516,7 +2548,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2595,7 +2628,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2678,7 +2712,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2759,7 +2794,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2839,7 +2875,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2919,7 +2956,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -2998,7 +3036,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3080,7 +3119,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3106,7 +3146,10 @@
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
-        "dbWrites": [],
+        "dbWrites": [
+          "fin_operations",
+          "fin_journal_*"
+        ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
         "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
@@ -3157,7 +3200,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3238,7 +3282,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3318,7 +3363,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3398,7 +3444,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3478,7 +3525,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3562,7 +3610,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3644,7 +3693,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     },
@@ -3725,7 +3775,8 @@
           "defaultTreatments": [],
           "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
           "version": "v1"
-        }
+        },
+        "license": "capability-gated; never deletes history"
       },
       "maturity": "baseline"
     }
