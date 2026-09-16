@@ -221,3 +221,15 @@ Never recreate LOAN-P0 / LOAN-AUDIT / LOAN-MATRIX Markdown.
 
 ## Maximum human Markdown set (LOCKED)
 Only the files listed under the target tree in this document. Adding a new top-level `docs/*.md` requires an explicit product decision to replace or absorb an existing owner — never "another audit."
+
+
+## Anti-ambiguity (LOCKED)
+Implementation contracts (command cards, schema, formulas, field-preservation, gates) **must not** use:
+```
+maybe · usually · typically · as applicable · policy-defined · depends · or equivalent · module_or_core · etc.
+```
+Use only:
+```
+SUPPORTED | DEFERRED | REJECTED | REQUIRED | OPTIONAL
+| PERSISTED | DERIVED | SNAPSHOT | NOT-PERSISTED
+```

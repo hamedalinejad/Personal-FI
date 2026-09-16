@@ -6,6 +6,14 @@
 ## 1. Purpose
 Iran equity trades with tradeDate vs settlementDate separation.
 
+## Shared contracts
+Money / FX / journal / fee / reversal / rebuild → [FINANCIAL-CORE.md](../FINANCIAL-CORE.md)  
+API envelope / idempotency shape → [API.md](../API.md)  
+Layers / public-api → [ARCHITECTURE.md](../ARCHITECTURE.md)  
+Offline / backup / recovery → [OFFLINE-RELEASE.md](../OFFLINE-RELEASE.md)  
+Process / freeze → [DEVELOPMENT.md](../DEVELOPMENT.md)  
+Command cards → `docs/core/registry/command-catalog.json`
+
 ## 2. Scope
 Personal offline edition; Core journal is cash/accounting truth.
 
@@ -16,7 +24,6 @@ Personal offline edition; Core journal is cash/accounting truth.
 | settle | T+n payable/receivable |
 | dividend | income journal |
 | dates | trade ≠ settlement ≠ cash |
-
 
 ## 4. Unsupported / Deferred behavior
 T+0 cash as if settled when settlement future · corporate actions full set until specified
@@ -45,23 +52,11 @@ stocks.buy · sell · settle · dividend
 ## 12. Queries
 List / get / statement-style reads as applicable.
 
-## 13. API contract
-API.md envelope; decimal strings; operationId on mutations.
-
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
 Reject missing required fields; no silent financial defaults.
-
-## 16. Money / quantity semantics
-Decimal strings for money/qty; units explicit.
-
-## 17. FX behavior
-Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
-
-## 18. Fee behavior
-Fees via Fee Engine / FINANCIAL-CORE treatments.
 
 ## 19. Tax behavior
 No silent tax; tax module owns obligations when linked.
@@ -72,27 +67,8 @@ Trade: inventory vs payable; Settle: payable vs cash (FINANCIAL-CORE settlement)
 ## 21. Cost basis / valuation
 WAC on disposal; valuation asOf
 
-## 22. Persistence impact
-SQLite + feature tables inside atomic operation txn.
-
-## 23. Transaction boundary
-runAtomicFinancialOperation boundary.
-
-## 24. Idempotency
-operationId idempotency.
-
-## 25. Reversal / correction
-Reversal operation; no in-place rewrite of posted amounts.
-
-## 26. Historical / asOf behavior
-asOf queries rebuild from ledger; no live price required for history.
-
 ## 27. Reports
 Module statements + REPORTING from journal.
-
-
-## 29. Licensing / capabilities
-Capability/license gates UI and commands only.
 
 ## 30. Edge cases
 Missing rate/price → reject or mark missing; never zero-fill.
@@ -105,16 +81,6 @@ STANDALONE-STOCKS · stock-related fixtures
 
 ## 33. Tests / proof
 src/features/stocks/tests
-
-## 34. Machine-file references
-docs/core/db/schema.sql · registry · fixtures.
-
-
-### Settlement calendar (versioned)
-- Current default: `iran-equity-T2-v2` — business days **Sat–Wed**; weekend **Thu–Fri** (TSE-oriented package).
-- Legacy `iran-equity-T2-v1` (Fri–Sat skip) retained only for replay of ops that stored that version.
-- Official holiday calendars must be data packages, not hard-coded Core constants beyond this deterministic weekend set.
-- Every equity trade must persist `settlement_policy_version` with the op.
 
 ## Date fields (never collapse)
 `tradeDate` · `settlementDate` · `cashDate` · `marketDate` · `priceAsOf` · `fxAsOf`  
@@ -175,15 +141,6 @@ Supported v1 mutations: `stocks.buy` · `stocks.sell` · `stocks.settle` · `sto
 
 Proof path: `src/features/stocks/tests/standalone.test.js`
 
-
-## 35. Implementer checklist (this module)
-1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
-2. Read this module + `command-catalog.json` cards for each command.
-3. Implement only `public-api` exports; UI calls public-api only.
-4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
-5. Standalone: no imports from other `features/*` internals.
-6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
-
 ## Fee defaults (v1 — LOCKED)
 | Context | Default treatment |
 |---------|-------------------|
@@ -212,7 +169,6 @@ trade_date · settlement_date · cash_date · market_date
 price_as_of · fx_as_of · settlement_policy_version
 ```
 Do not substitute trade_date for market_date. `settlement_policy_version` required when settlement engine is used.
-
 
 ## Holding identity (LOCKED)
 `brokerage_id + account_id? + instrument_id` — never merge portfolios at same broker.

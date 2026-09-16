@@ -6,6 +6,14 @@
 ## 1. Purpose
 Crypto holdings and trades with venue/network scope; cash via CashSettlementPort.
 
+## Shared contracts
+Money / FX / journal / fee / reversal / rebuild → [FINANCIAL-CORE.md](../FINANCIAL-CORE.md)  
+API envelope / idempotency shape → [API.md](../API.md)  
+Layers / public-api → [ARCHITECTURE.md](../ARCHITECTURE.md)  
+Offline / backup / recovery → [OFFLINE-RELEASE.md](../OFFLINE-RELEASE.md)  
+Process / freeze → [DEVELOPMENT.md](../DEVELOPMENT.md)  
+Command cards → `docs/core/registry/command-catalog.json`
+
 ## 2. Scope
 Personal offline edition; Core journal is cash/accounting truth.
 
@@ -16,7 +24,6 @@ Personal offline edition; Core journal is cash/accounting truth.
 | fee | cash or asset (feeFundingKind) |
 | identity | instrumentId + venue/network |
 | holding | rebuildable from transactions |
-
 
 ## 4. Unsupported / Deferred behavior
 Ghost exchange cash ledgers · provider symbol as instrument identity · full C2C without economic_kind
@@ -45,23 +52,11 @@ crypto.buy · sell · transfer (scope per public-api)
 ## 12. Queries
 List / get / statement-style reads as applicable.
 
-## 13. API contract
-API.md envelope; decimal strings; operationId on mutations.
-
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
 Reject missing required fields; no silent financial defaults.
-
-## 16. Money / quantity semantics
-Quantity decimal; fee qty separate from gross/net
-
-## 17. FX behavior
-Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
-
-## 18. Fee behavior
-Fee Engine; fee_from_received vs cash fee
 
 ## 19. Tax behavior
 No silent tax; tax module owns obligations when linked.
@@ -72,27 +67,8 @@ All statement effects via Core journal.
 ## 21. Cost basis / valuation
 WAC/cost in costCurrency; valuation via price_history asOf
 
-## 22. Persistence impact
-SQLite + feature tables inside atomic operation txn.
-
-## 23. Transaction boundary
-runAtomicFinancialOperation boundary.
-
-## 24. Idempotency
-operationId idempotency.
-
-## 25. Reversal / correction
-Reversal operation; no in-place rewrite of posted amounts.
-
-## 26. Historical / asOf behavior
-asOf queries rebuild from ledger; no live price required for history.
-
 ## 27. Reports
 Module statements + REPORTING from journal.
-
-
-## 29. Licensing / capabilities
-Capability/license gates UI and commands only.
 
 ## 30. Edge cases
 Missing rate/price → reject or mark missing; never zero-fill.
@@ -105,9 +81,6 @@ fixtures/CRYPTO-* · STANDALONE-CRYPTO.json
 
 ## 33. Tests / proof
 src/features/crypto/tests · recovery-roundtrip
-
-## 34. Machine-file references
-docs/core/db/schema.sql · registry · fixtures.
 
 ## V1 command boundary (LOCKED)
 **Implemented:** `crypto.buy` · `crypto.sell` · `crypto.transfer`  
@@ -167,15 +140,6 @@ Catalog cards: `docs/core/registry/command-catalog.json`.
 
 Proof path: `src/features/crypto/tests/standalone.test.js`
 
-
-## 35. Implementer checklist (this module)
-1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
-2. Read this module + `command-catalog.json` cards for each command.
-3. Implement only `public-api` exports; UI calls public-api only.
-4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
-5. Standalone: no imports from other `features/*` internals.
-6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
-
 ## Fee defaults (v1 — LOCKED)
 | Context | Default treatment | Field |
 |---------|-------------------|--------|
@@ -228,7 +192,6 @@ Operational `tx_type` remains separate (`buy`, `sell`, `transfer_in`, `transfer_
 | externalTxReference | provenance / source_reference on operation | RAW |
 | provenance | fin_operations provenance + optional address ids | RAW |
 | economic_kind | inv_crypto_transactions.economic_kind | RAW status |
-
 
 ## Venue identity (LOCKED)
 `exchange_id` is venue/container identity. type in {cex,dex,wallet,other}. API alias venueId maps to exchange_id.

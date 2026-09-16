@@ -6,6 +6,14 @@
 ## 1. Purpose
 Operational cash/bank/card accounts as projections over Core journal — not a second cash truth.
 
+## Shared contracts
+Money / FX / journal / fee / reversal / rebuild → [FINANCIAL-CORE.md](../FINANCIAL-CORE.md)  
+API envelope / idempotency shape → [API.md](../API.md)  
+Layers / public-api → [ARCHITECTURE.md](../ARCHITECTURE.md)  
+Offline / backup / recovery → [OFFLINE-RELEASE.md](../OFFLINE-RELEASE.md)  
+Process / freeze → [DEVELOPMENT.md](../DEVELOPMENT.md)  
+Command cards → `docs/core/registry/command-catalog.json`
+
 ## 2. Scope
 Personal offline edition; Core journal is cash/accounting truth.
 
@@ -16,7 +24,6 @@ Personal offline edition; Core journal is cash/accounting truth.
 | cashAccountKind (acc) | cash/bank/card/... operational kinds |
 | balance | **DERIVED from journal** |
 | transfer/deposit/withdraw | Core operations |
-
 
 ## 4. Unsupported / Deferred behavior
 Parallel cash ledgers · treating acc balance as SoT · silent currency default
@@ -40,7 +47,6 @@ Create / edit / detail sheets as product IA defines.
 | balance | DERIVED |
 | fin_account mapping | REFERENCE |
 
-
 ## 10. Identity
 Feature entity ids + operationId on mutations.
 
@@ -50,23 +56,11 @@ account.create · update · archive · transfer · deposit · withdraw (as imple
 ## 12. Queries
 List / get / statement-style reads as applicable.
 
-## 13. API contract
-API.md envelope; decimal strings; operationId on mutations.
-
 ## 14. State machine
 active → archived (archive only if journal balance zero)
 
 ## 15. Validation
 Reject missing required fields; no silent financial defaults.
-
-## 16. Money / quantity semantics
-Decimal strings for money/qty; units explicit.
-
-## 17. FX behavior
-Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
-
-## 18. Fee behavior
-Fees via Fee Engine / FINANCIAL-CORE treatments.
 
 ## 19. Tax behavior
 No silent tax; tax module owns obligations when linked.
@@ -77,27 +71,8 @@ Transfers: balanced journal legs in settlement accounts; no domain cash table as
 ## 21. Cost basis / valuation
 Per feature cost/valuation rules; snapshots not SoT.
 
-## 22. Persistence impact
-SQLite + feature tables inside atomic operation txn.
-
-## 23. Transaction boundary
-runAtomicFinancialOperation boundary.
-
-## 24. Idempotency
-operationId idempotency.
-
-## 25. Reversal / correction
-Reversal operation; no in-place rewrite of posted amounts.
-
-## 26. Historical / asOf behavior
-asOf queries rebuild from ledger; no live price required for history.
-
 ## 27. Reports
 Module statements + REPORTING from journal.
-
-
-## 29. Licensing / capabilities
-Capability/license gates UI and commands only.
 
 ## 30. Edge cases
 Missing rate/price → reject or mark missing; never zero-fill.
@@ -111,24 +86,12 @@ Feature tests under accounts when present; Core journal fixtures
 ## 33. Tests / proof
 Accounting/chart tests in src/core/accounting
 
-## 34. Machine-file references
-docs/core/db/schema.sql · registry · fixtures.
-
 ## Operational account kinds → fin_accounts
 cash · bank_account · card · wallet · broker_cash · crypto_exchange_cash · cash_equivalent · credit_account  
 Balances derived from journal. **No parallel cash ledger.**
 ## 28. Standalone edition behavior
 Accounts UI is part of **Full** edition (and `/money` route).  
 Standalone investment/loan editions **do not** require Accounts screens; they use local settlement accounts created by Core helpers.
-
-
-## 35. Implementer checklist (this module)
-1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
-2. Read this module + `command-catalog.json` cards for each command.
-3. Implement only `public-api` exports; UI calls public-api only.
-4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
-5. Standalone: no imports from other `features/*` internals.
-6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
 
 ## Account kind distinction (LOCKED)
 | Field | Meaning | Values |
@@ -140,3 +103,12 @@ Never collapse these into one semantic field.
 
 ## Archive (LOCKED)
 Archive/close marks operational inactivity. **Posted journal history is immutable** and is never deleted because an account is archived. Reject archive when journal balance ≠ 0 (Decimal).
+
+## Accounts ↔ ledger mapping (LOCKED)
+| Layer | Table | Role |
+|-------|-------|------|
+| Operational | acc_accounts | user bank/card/wallet kinds |
+| Ledger | fin_accounts | accounting class asset/liability/… |
+| Link | acc_accounts.fin_account_id (when activated) | settlement posts through journal |
+
+Every **activated** operational account used for settlement must resolve a fin_account_id. Cash balance on acc_* is SNAPSHOT only.

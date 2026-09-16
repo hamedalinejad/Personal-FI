@@ -13,7 +13,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.create",
@@ -26,7 +27,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.create",
@@ -39,7 +41,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.create",
@@ -52,7 +55,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.create",
@@ -65,7 +69,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.create",
@@ -78,7 +83,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -91,7 +97,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -104,7 +111,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -117,7 +125,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -130,7 +139,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -143,7 +153,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.deposit",
@@ -156,7 +167,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -169,7 +181,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -182,7 +195,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -195,7 +209,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -208,7 +223,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -221,7 +237,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.transfer",
@@ -234,7 +251,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.update",
@@ -247,7 +265,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.update",
@@ -260,7 +279,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.update",
@@ -273,7 +293,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.withdraw",
@@ -286,7 +307,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.withdraw",
@@ -299,7 +321,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.withdraw",
@@ -312,7 +335,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.withdraw",
@@ -325,7 +349,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "accounts.withdraw",
@@ -338,7 +363,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/accounts.md"
+      "owner": "docs/modules/accounts.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.dispose",
@@ -351,7 +377,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.dispose",
@@ -364,7 +391,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.dispose",
@@ -377,7 +405,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.dispose",
@@ -390,7 +419,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.register",
@@ -403,7 +433,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.register",
@@ -416,7 +447,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.register",
@@ -429,7 +461,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.register",
@@ -442,7 +475,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.register",
@@ -455,7 +489,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.update",
@@ -468,7 +503,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.update",
@@ -481,7 +517,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "assets.update",
@@ -494,7 +531,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/physical-assets.md"
+      "owner": "docs/modules/physical-assets.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "bill.schedule",
@@ -507,7 +545,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "bill.schedule",
@@ -520,7 +559,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "bill.schedule",
@@ -533,7 +573,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "bill.schedule",
@@ -546,7 +587,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "budget.set",
@@ -559,7 +601,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "budget.set",
@@ -572,7 +615,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "budget.set",
@@ -585,7 +629,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "budget.set",
@@ -598,7 +643,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.bounce",
@@ -611,7 +657,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.bounce",
@@ -624,7 +671,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.bounce",
@@ -637,7 +685,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.cancel",
@@ -650,7 +699,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.cancel",
@@ -663,7 +713,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.clear",
@@ -676,7 +727,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.clear",
@@ -689,7 +741,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.clear",
@@ -702,7 +755,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.deposit",
@@ -715,7 +769,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.deposit",
@@ -728,7 +783,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.deposit",
@@ -741,7 +797,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.deposit",
@@ -754,7 +811,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -767,7 +825,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -780,7 +839,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -793,7 +853,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -806,7 +867,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -819,7 +881,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "cheque.register",
@@ -832,7 +895,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/cheque.md"
+      "owner": "docs/modules/cheque.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -845,7 +909,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -858,7 +923,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -871,7 +937,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -884,7 +951,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -897,7 +965,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -910,7 +979,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -923,7 +993,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -936,7 +1007,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.buy",
@@ -949,7 +1021,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -962,7 +1035,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -975,7 +1049,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -988,7 +1063,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -1001,7 +1077,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -1014,7 +1091,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.sell",
@@ -1027,7 +1105,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1040,7 +1119,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1053,7 +1133,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1066,7 +1147,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1079,7 +1161,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1092,7 +1175,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -1105,7 +1189,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/crypto.md"
+      "owner": "docs/modules/crypto.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1118,7 +1203,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1131,7 +1217,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1144,7 +1231,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1157,7 +1245,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1170,7 +1259,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.create",
@@ -1183,7 +1273,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.reverse",
@@ -1196,7 +1287,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "expense.reverse",
@@ -1209,7 +1301,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.distribute",
@@ -1222,7 +1315,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.distribute",
@@ -1235,7 +1329,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.distribute",
@@ -1248,7 +1343,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.distribute",
@@ -1261,7 +1357,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.distribute",
@@ -1274,7 +1371,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1287,7 +1385,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1300,7 +1399,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1313,7 +1413,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1326,7 +1427,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1339,7 +1441,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.redeem",
@@ -1352,7 +1455,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1365,7 +1469,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1378,7 +1483,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1391,7 +1497,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1404,7 +1511,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1417,7 +1525,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1430,7 +1539,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -1443,7 +1553,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/funds.md"
+      "owner": "docs/modules/funds.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "goal.create",
@@ -1456,7 +1567,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "goal.create",
@@ -1469,7 +1581,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "goal.create",
@@ -1482,7 +1595,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "goal.create",
@@ -1495,7 +1609,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/budget-goals-bills.md"
+      "owner": "docs/modules/budget-goals-bills.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1508,7 +1623,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1521,7 +1637,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1534,7 +1651,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1547,7 +1665,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1560,7 +1679,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.create",
@@ -1573,7 +1693,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.reverse",
@@ -1586,7 +1707,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "income.reverse",
@@ -1599,7 +1721,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/income-expense.md"
+      "owner": "docs/modules/income-expense.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1612,7 +1735,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1625,7 +1749,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1638,7 +1763,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1651,7 +1777,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1664,7 +1791,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1677,7 +1805,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -1690,7 +1819,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -1703,7 +1833,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -1716,7 +1847,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -1729,7 +1861,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -1742,7 +1875,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -1755,7 +1889,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -1768,7 +1903,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -1781,7 +1917,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -1794,7 +1931,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -1807,7 +1945,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -1820,7 +1959,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -1833,7 +1973,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.reversePayment",
@@ -1846,7 +1987,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.reversePayment",
@@ -1859,7 +2001,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/loan.md"
+      "owner": "docs/modules/loan.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1872,7 +2015,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1885,7 +2029,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1898,7 +2043,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1911,7 +2057,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1924,7 +2071,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1937,7 +2085,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1950,7 +2099,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -1963,7 +2113,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -1976,7 +2127,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -1989,7 +2141,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -2002,7 +2155,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -2015,7 +2169,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -2028,7 +2183,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -2041,7 +2197,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.delivery",
@@ -2054,7 +2211,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2067,7 +2225,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2080,7 +2239,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2093,7 +2253,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2106,7 +2267,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2119,7 +2281,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.sell",
@@ -2132,7 +2295,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/metals.md"
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2145,7 +2309,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2158,7 +2323,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2171,7 +2337,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2184,7 +2351,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2197,7 +2365,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2210,7 +2379,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2223,7 +2393,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2236,7 +2407,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2249,7 +2421,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2262,7 +2435,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2275,7 +2449,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2288,7 +2463,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2301,7 +2477,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2314,7 +2491,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2327,7 +2505,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2340,7 +2519,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.dividend",
@@ -2353,7 +2533,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2366,7 +2547,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2379,7 +2561,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2392,7 +2575,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2405,7 +2589,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2418,7 +2603,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2431,7 +2617,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2444,7 +2631,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2457,7 +2645,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.sell",
@@ -2470,7 +2659,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -2483,7 +2673,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -2496,7 +2687,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -2509,7 +2701,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -2522,7 +2715,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/stocks.md"
+      "owner": "docs/modules/stocks.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.adjust",
@@ -2535,7 +2729,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.adjust",
@@ -2548,7 +2743,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.adjust",
@@ -2561,7 +2757,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.adjust",
@@ -2574,7 +2771,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.assess",
@@ -2587,7 +2785,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.assess",
@@ -2600,7 +2799,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.assess",
@@ -2613,7 +2813,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.assess",
@@ -2626,7 +2827,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.assess",
@@ -2639,7 +2841,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2652,7 +2855,8 @@
       "exported": true,
       "reversed": false,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2665,7 +2869,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2678,7 +2883,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2691,7 +2897,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2704,7 +2911,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "tax.pay",
@@ -2717,7 +2925,8 @@
       "exported": true,
       "reversed": true,
       "migrated": true,
-      "owner": "docs/modules/tax.md"
+      "owner": "docs/modules/tax.md",
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2731,7 +2940,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.buy",
@@ -2745,7 +2955,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2759,7 +2970,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2773,7 +2985,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2787,7 +3000,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2801,7 +3015,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2815,7 +3030,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2829,7 +3045,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -2843,7 +3060,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2857,7 +3075,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2871,7 +3090,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2885,7 +3105,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2899,7 +3120,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2913,7 +3135,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "metals.buy",
@@ -2927,7 +3150,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -2941,7 +3165,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "funds.subscribe",
@@ -2955,7 +3180,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -2969,7 +3195,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -2983,7 +3210,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -2997,7 +3225,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.create",
@@ -3011,7 +3240,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -3025,7 +3255,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -3039,7 +3270,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -3053,7 +3285,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "stocks.settle",
@@ -3067,7 +3300,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -3081,7 +3315,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -3095,7 +3330,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "loan.recordPayment",
@@ -3109,7 +3345,8 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED"
     },
     {
       "commandId": "crypto.transfer",
@@ -3123,7 +3360,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "inv_crypto_transactions",
+        "column": "economic_kind"
+      }
     },
     {
       "commandId": "accounts.create",
@@ -3137,7 +3379,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "accounts.update",
@@ -3151,7 +3398,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "accounts.update",
@@ -3165,7 +3417,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "accounts.update",
@@ -3179,7 +3436,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_journal_lines",
+        "column": "currency"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -3193,7 +3455,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -3207,7 +3474,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -3221,7 +3493,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_journal_lines",
+        "column": "currency"
+      }
     },
     {
       "commandId": "tax.adjust",
@@ -3235,7 +3512,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_journal_lines",
+        "column": "amount"
+      }
     },
     {
       "commandId": "crypto.buy",
@@ -3249,7 +3531,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "crypto.buy",
@@ -3263,7 +3550,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "crypto.buy",
@@ -3277,7 +3569,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "crypto.buy",
@@ -3291,7 +3588,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "crypto.sell",
@@ -3305,7 +3607,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "crypto.sell",
@@ -3319,7 +3626,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "crypto.sell",
@@ -3333,7 +3645,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "crypto.sell",
@@ -3347,7 +3664,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "crypto.transfer",
@@ -3361,7 +3683,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "crypto.transfer",
@@ -3375,7 +3702,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "crypto.transfer",
@@ -3389,7 +3721,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "crypto.transfer",
@@ -3403,7 +3740,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "stocks.buy",
@@ -3417,7 +3759,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "stocks.buy",
@@ -3431,7 +3778,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "stocks.buy",
@@ -3445,7 +3797,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "stocks.buy",
@@ -3459,7 +3816,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "stocks.sell",
@@ -3473,7 +3835,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "stocks.sell",
@@ -3487,7 +3854,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "stocks.sell",
@@ -3501,7 +3873,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "stocks.sell",
@@ -3515,7 +3892,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "stocks.settle",
@@ -3529,7 +3911,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "stocks.settle",
@@ -3543,7 +3930,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "stocks.settle",
@@ -3557,7 +3949,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "stocks.dividend",
@@ -3571,7 +3968,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "stocks.dividend",
@@ -3585,7 +3987,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "stocks.dividend",
@@ -3599,7 +4006,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "stocks.dividend",
@@ -3613,7 +4025,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "funds.subscribe",
@@ -3627,7 +4044,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "funds.subscribe",
@@ -3641,7 +4063,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "funds.subscribe",
@@ -3655,7 +4082,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "funds.subscribe",
@@ -3669,7 +4101,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "funds.redeem",
@@ -3683,7 +4120,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "funds.redeem",
@@ -3697,7 +4139,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "funds.redeem",
@@ -3711,7 +4158,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "funds.redeem",
@@ -3725,7 +4177,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "funds.distribute",
@@ -3739,7 +4196,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "funds.distribute",
@@ -3753,7 +4215,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "funds.distribute",
@@ -3767,7 +4234,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "funds.distribute",
@@ -3781,7 +4253,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "metals.buy",
@@ -3795,7 +4272,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "metals.buy",
@@ -3809,7 +4291,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "metals.buy",
@@ -3823,7 +4310,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "metals.buy",
@@ -3837,7 +4329,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "metals.sell",
@@ -3851,7 +4348,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "metals.sell",
@@ -3865,7 +4367,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "metals.sell",
@@ -3879,7 +4386,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "metals.sell",
@@ -3893,7 +4405,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3907,7 +4424,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3921,7 +4443,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3935,7 +4462,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3949,7 +4481,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3963,7 +4500,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "domain:metals",
+        "column": "delivery"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3977,7 +4519,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "domain:metals",
+        "column": "delivery"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -3991,7 +4538,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "domain:metals",
+        "column": "delivery"
+      }
     },
     {
       "commandId": "metals.delivery",
@@ -4005,7 +4557,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "domain:metals",
+        "column": "delivery"
+      }
     },
     {
       "commandId": "loan.create",
@@ -4019,7 +4576,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "loan.create",
@@ -4033,7 +4595,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "loan.create",
@@ -4047,7 +4614,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "loan.create",
@@ -4061,7 +4633,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "loan.recordPayment",
@@ -4075,7 +4652,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "loan.recordPayment",
@@ -4089,7 +4671,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "loan.recordPayment",
@@ -4103,7 +4690,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "loan.reversePayment",
@@ -4117,7 +4709,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "loan.reversePayment",
@@ -4131,7 +4728,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "loan.reversePayment",
@@ -4145,7 +4747,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "loan.reversePayment",
@@ -4159,7 +4766,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "loan.generateSchedule",
@@ -4173,7 +4785,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "loan.generateSchedule",
@@ -4187,7 +4804,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "loan.generateSchedule",
@@ -4201,7 +4823,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "loan.generateSchedule",
@@ -4215,7 +4842,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "loan.generateSchedule",
@@ -4229,7 +4861,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "loan.previewSchedule",
@@ -4243,7 +4880,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "loan.previewSchedule",
@@ -4257,7 +4899,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "loan.previewSchedule",
@@ -4271,7 +4918,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "loan.previewSchedule",
@@ -4285,7 +4937,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "loan.previewSchedule",
@@ -4299,7 +4956,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "accounts.create",
@@ -4313,7 +4975,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.create",
@@ -4327,7 +4994,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.create",
@@ -4341,7 +5013,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "accounts.update",
@@ -4355,7 +5032,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.update",
@@ -4369,7 +5051,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -4383,7 +5070,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -4397,7 +5089,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.archive",
@@ -4411,7 +5108,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "accounts.transfer",
@@ -4425,7 +5127,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.transfer",
@@ -4439,7 +5146,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.transfer",
@@ -4453,7 +5165,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "accounts.deposit",
@@ -4467,7 +5184,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.deposit",
@@ -4481,7 +5203,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.deposit",
@@ -4495,7 +5222,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "accounts.withdraw",
@@ -4509,7 +5241,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "accounts.withdraw",
@@ -4523,7 +5260,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "accounts.withdraw",
@@ -4537,7 +5279,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "income.create",
@@ -4551,7 +5298,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "income.create",
@@ -4565,7 +5317,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "income.create",
@@ -4579,7 +5336,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "expense.create",
@@ -4593,7 +5355,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "expense.create",
@@ -4607,7 +5374,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "expense.create",
@@ -4621,7 +5393,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "income.reverse",
@@ -4635,7 +5412,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "income.reverse",
@@ -4649,7 +5431,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "income.reverse",
@@ -4663,7 +5450,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "income.reverse",
@@ -4677,7 +5469,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "expense.reverse",
@@ -4691,7 +5488,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "expense.reverse",
@@ -4705,7 +5507,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "expense.reverse",
@@ -4719,7 +5526,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "expense.reverse",
@@ -4733,7 +5545,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "cheque.register",
@@ -4747,7 +5564,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "cheque.register",
@@ -4761,7 +5583,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "cheque.register",
@@ -4775,7 +5602,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "cheque.register",
@@ -4789,7 +5621,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "cheque.deposit",
@@ -4803,7 +5640,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "cheque.deposit",
@@ -4817,7 +5659,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "cheque.deposit",
@@ -4831,7 +5678,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "cheque.clear",
@@ -4845,7 +5697,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "cheque.clear",
@@ -4859,7 +5716,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "cheque.clear",
@@ -4873,7 +5735,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "cheque.clear",
@@ -4887,7 +5754,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "cheque.bounce",
@@ -4901,7 +5773,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "cheque.bounce",
@@ -4915,7 +5792,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "cheque.bounce",
@@ -4929,7 +5811,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "cheque.bounce",
@@ -4943,7 +5830,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "cheque.cancel",
@@ -4957,7 +5849,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "cheque.cancel",
@@ -4971,7 +5868,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "cheque.cancel",
@@ -4985,7 +5887,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "cheque.cancel",
@@ -4999,7 +5906,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/cheque.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "assets.register",
@@ -5013,7 +5925,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "assets.register",
@@ -5027,7 +5944,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "assets.register",
@@ -5041,7 +5963,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "assets.register",
@@ -5055,7 +5982,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "assets.update",
@@ -5069,7 +6001,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "assets.update",
@@ -5083,7 +6020,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "assets.update",
@@ -5097,7 +6039,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "assets.update",
@@ -5111,7 +6058,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "assets.update",
@@ -5125,7 +6077,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "assets.dispose",
@@ -5139,7 +6096,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "assets.dispose",
@@ -5153,7 +6115,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "assets.dispose",
@@ -5167,7 +6134,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "assets.dispose",
@@ -5181,7 +6153,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "budget.set",
@@ -5195,7 +6172,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "budget.set",
@@ -5209,7 +6191,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "budget.set",
@@ -5223,7 +6210,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "budget.set",
@@ -5237,7 +6229,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "budget.set",
@@ -5251,7 +6248,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "goal.create",
@@ -5265,7 +6267,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "goal.create",
@@ -5279,7 +6286,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "goal.create",
@@ -5293,7 +6305,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "goal.create",
@@ -5307,7 +6324,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "goal.create",
@@ -5321,7 +6343,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "bill.schedule",
@@ -5335,7 +6362,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "id"
+      }
     },
     {
       "commandId": "bill.schedule",
@@ -5349,7 +6381,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "bill.schedule",
@@ -5363,7 +6400,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "bill.schedule",
@@ -5377,7 +6419,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "bill.schedule",
@@ -5391,7 +6438,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "tax.assess",
@@ -5405,7 +6457,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "tax.assess",
@@ -5419,7 +6476,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "tax.assess",
@@ -5433,7 +6495,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "tax.assess",
@@ -5447,7 +6514,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "tax.pay",
@@ -5461,7 +6533,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "tax.pay",
@@ -5475,7 +6552,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "tax.pay",
@@ -5489,7 +6571,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "tax.adjust",
@@ -5503,7 +6590,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "business_date"
+      }
     },
     {
       "commandId": "tax.adjust",
@@ -5517,7 +6609,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "base_currency"
+      }
     },
     {
       "commandId": "tax.adjust",
@@ -5531,7 +6628,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "command_hash"
+      }
     },
     {
       "commandId": "tax.adjust",
@@ -5545,7 +6647,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "fin_operations",
+        "column": "status"
+      }
     },
     {
       "commandId": "funds.redeem",
@@ -5559,8 +6666,41 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "protected": true
+      "protected": true,
+      "disposition": "PERSISTED",
+      "persistence": {
+        "table": "price_history",
+        "column": "quote_type=liquidation"
+      }
     }
   ],
-  "status": "PARTIAL"
+  "status": "PARTIAL",
+  "schemaVersion": "2",
+  "rowSchema": {
+    "commandId": "string",
+    "field": "string",
+    "input": {
+      "type": "string",
+      "required": "boolean"
+    },
+    "canonicalField": "string?",
+    "kind": "RAW|DERIVED|SNAPSHOT|EXTERNAL_REPORTED|LABEL|SYSTEM_INDEX|REFERENCE|STATUS",
+    "owner": "string",
+    "persistence": {
+      "table": "string?",
+      "column": "string?"
+    },
+    "unit": "string?",
+    "currency": "string?",
+    "formula": "string|null",
+    "resultPath": "string?",
+    "exportPath": "string?",
+    "reversal": "string?",
+    "migration": "string?",
+    "disposition": "PERSISTED|DERIVED|SNAPSHOT|DEFERRED|REJECTED|NOT-PERSISTED"
+  },
+  "meta": {
+    "upgradedPersistenceHints": 175,
+    "note": "exact persistence required for freeze; no module_or_core"
+  }
 }

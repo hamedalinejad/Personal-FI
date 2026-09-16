@@ -6,6 +6,14 @@
 ## 1. Purpose
 Planning layer: budgets, goals, recurring bills — **not** cash truth.
 
+## Shared contracts
+Money / FX / journal / fee / reversal / rebuild → [FINANCIAL-CORE.md](../FINANCIAL-CORE.md)  
+API envelope / idempotency shape → [API.md](../API.md)  
+Layers / public-api → [ARCHITECTURE.md](../ARCHITECTURE.md)  
+Offline / backup / recovery → [OFFLINE-RELEASE.md](../OFFLINE-RELEASE.md)  
+Process / freeze → [DEVELOPMENT.md](../DEVELOPMENT.md)  
+Command cards → `docs/core/registry/command-catalog.json`
+
 ## 2. Scope
 Personal offline edition; Core journal is cash/accounting truth.
 
@@ -39,23 +47,11 @@ budget.set · goal.create · bill.schedule (as implemented)
 ## 12. Queries
 List / get / statement-style reads as applicable.
 
-## 13. API contract
-API.md envelope; decimal strings; operationId on mutations.
-
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.
 
 ## 15. Validation
 Reject missing required fields; no silent financial defaults.
-
-## 16. Money / quantity semantics
-Decimal strings for money/qty; units explicit.
-
-## 17. FX behavior
-Non-base currency requires locked exchangeRateToBase (FINANCIAL-CORE).
-
-## 18. Fee behavior
-Fees via Fee Engine / FINANCIAL-CORE treatments.
 
 ## 19. Tax behavior
 No silent tax; tax module owns obligations when linked.
@@ -66,27 +62,8 @@ No automatic journal from plans; actual spend uses income-expense or feature ops
 ## 21. Cost basis / valuation
 Per feature cost/valuation rules; snapshots not SoT.
 
-## 22. Persistence impact
-SQLite + feature tables inside atomic operation txn.
-
-## 23. Transaction boundary
-runAtomicFinancialOperation boundary.
-
-## 24. Idempotency
-operationId idempotency.
-
-## 25. Reversal / correction
-Reversal operation; no in-place rewrite of posted amounts.
-
-## 26. Historical / asOf behavior
-asOf queries rebuild from ledger; no live price required for history.
-
 ## 27. Reports
 Plan vs actual reports are analytical; SoT remains journal for actuals
-
-
-## 29. Licensing / capabilities
-Capability/license gates UI and commands only.
 
 ## 30. Edge cases
 Missing rate/price → reject or mark missing; never zero-fill.
@@ -100,24 +77,15 @@ fixtures/ and feature tests.
 ## 33. Tests / proof
 src/features/<name>/tests + acceptance as applicable.
 
-## 34. Machine-file references
-docs/core/db/schema.sql · registry · fixtures.
-
 ## Role
 Planning projections and links only — **never** an alternate cash ledger.
 ## 28. Standalone edition behavior
 Planning only — no journal truth. Full edition. Does not block standalone loan/investment editions.
 
-
-## 35. Implementer checklist (this module)
-1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
-2. Read this module + `command-catalog.json` cards for each command.
-3. Implement only `public-api` exports; UI calls public-api only.
-4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
-5. Standalone: no imports from other `features/*` internals.
-6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
-
 ## Projection vs accounting (LOCKED)
 Budget/goals/bills are **planning/projection only**.  
 A projection **never** writes accounting truth until a financial command creates an operation/journal.
 
+
+## Planning vs cash (LOCKED)
+Budget/goal/bill amounts are **planning projections**. They do not move journal cash. Earmark is LABEL/plan, not a second cash ledger. Forecast formulas DEFERRED until explicit contract + fixture.

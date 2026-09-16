@@ -6,6 +6,14 @@
 ## 1. Purpose
 Record lender receivables, schedules, payments, and journal effects offline-first.
 
+## Shared contracts
+Money / FX / journal / fee / reversal / rebuild → [FINANCIAL-CORE.md](../FINANCIAL-CORE.md)  
+API envelope / idempotency shape → [API.md](../API.md)  
+Layers / public-api → [ARCHITECTURE.md](../ARCHITECTURE.md)  
+Offline / backup / recovery → [OFFLINE-RELEASE.md](../OFFLINE-RELEASE.md)  
+Process / freeze → [DEVELOPMENT.md](../DEVELOPMENT.md)  
+Command cards → `docs/core/registry/command-catalog.json`
+
 ## 2. Scope
 Personal lending books; fixed-rate v1 schedules; Core journal as cash/accounting truth.
 
@@ -62,23 +70,11 @@ v1: `role = lender` only; `borrower` DEFERRED.
 ## 12. Queries
 `listLoans` · `getLoan` · `getStatement`
 
-## 13. API contract
-Envelope: API.md. Money/qty: decimal strings. `operationId` required on mutations.
-
 ## 14. State machine
 Loan: active → (payments) → closed. Operations: draft/pending durability vs posted/voided financial status (FINANCIAL-CORE).
 
 ## 15. Validation
 Positive principal · integer periods · supported method/frequency/dayCount · reject variable rate · purity N/A
-
-## 16. Money / quantity semantics
-Decimal strings only. Rate = percentage points via `normalizeRatePercentage`.
-
-## 17. FX behavior
-If transaction currency ≠ base: require locked `exchangeRateToBase` on post (FINANCIAL-CORE).
-
-## 18. Fee behavior
-Optional fee tiers; payment may allocate fee component. Generic fee engine semantics in FINANCIAL-CORE.
 
 ## 19. Tax behavior
 None by default; no silent tax posting.
@@ -91,27 +87,8 @@ All via Core operation + journal — no parallel cash ledger.
 ## 21. Cost basis / valuation
 N/A for pure loan receivable (not investment inventory).
 
-## 22. Persistence impact
-SQLite control plane: loan rows + operations + journal in one transaction.
-
-## 23. Transaction boundary
-`runAtomicFinancialOperation` — domain writes inside same txn as journal.
-
-## 24. Idempotency
-Same `operationId` + economic identity → replay, not double post.
-
-## 25. Reversal / correction
-`loan.reversePayment` → reversing operation linked to original; no in-place amount rewrite.
-
-## 26. Historical / asOf behavior
-Statement/query may filter by asOf; rebuild schedule from snapshot + engine version.
-
 ## 27. Reports
 Loan statement (module) · GL/TB via REPORTING from journal
-
-
-## 29. Licensing / capabilities
-Commands gated by capability; historical rows remain readable on downgrade.
 
 ## 30. Edge cases
 Overpayment policy explicit · last installment residual conservation · empty fixture not release proof
@@ -124,14 +101,6 @@ Canonical: `fixtures/LOAN-FLAT.json` · `fixtures/LOAN-BULLET.json` · `fixtures
 
 ## 33. Tests / proof
 `src/features/loan/tests/*` · `src/core/acceptance/loan*.js` · recovery roundtrip · golden schedule (Decimal assertions)
-
-## 34. Machine-file references
-`docs/core/db/schema.sql` (ln_*) · `docs/core/json-schemas/schedule-snapshot.schema.json` · registry status · `fixtures/LOAN-*`
-
-### Algorithms (v1) — implementation: `scheduleEngine.js`
-- **Rate:** rateFraction = annualRate / 100  
-- **Flat:** totalInterest = P × rateFraction × (n / periodsPerYear); residual last row  
-- **Declining / Qarz / Bullet:** see engine; conservation assert Σ principal = P
 
 ## V1 schedule conventions (LOCKED)
 
@@ -204,15 +173,6 @@ Loan remains the **vertical reference** for module template quality — not auto
 
 Proof path: `src/features/loan/tests/standalone-boot.test.js`
 
-
-## 35. Implementer checklist (this module)
-1. Read FINANCIAL-CORE (money, FX, journal, fee, reversal).
-2. Read this module + `command-catalog.json` cards for each command.
-3. Implement only `public-api` exports; UI calls public-api only.
-4. Every mutation: normalize → validate → book base → FX → fees → domain → journal → invariants → one transaction.
-5. Standalone: no imports from other `features/*` internals.
-6. Prove with fixture/test before claiming GOLDEN/STANDALONE_GREEN.
-
 ## Policy completeness matrix (v1)
 | Policy | Status |
 |--------|--------|
@@ -249,7 +209,6 @@ Recording an existing receivable without fabricating cash requires `record_outst
 monthly · weekly · quarterly · annual · custom
 ```
 Engine + schema both support `annual`.
-
 
 ### Field kinds (LOCKED)
 - `fixed_installment_amount` → RAW (user-entered)
