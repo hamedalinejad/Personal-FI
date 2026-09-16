@@ -112,3 +112,50 @@ test("deterministic contextHash stable", () => {
   const b = convertAmount(args);
   assert.equal(a.contextHash, b.contextHash);
 });
+
+test("stale rate rejected by default", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "10",
+        from: "USD",
+        to: "IRR",
+        rates: { "USD/IRR": { rate: "42000", asOf: "2026-01-01", source: "manual", isStale: true } },
+      }),
+    /FX_RATE_STALE/,
+  );
+});
+
+test("stale rate allowed when allowStale=true", () => {
+  const r = convertAmount({
+    amount: "10",
+    from: "USD",
+    to: "IRR",
+    rates: { "USD/IRR": { rate: "42000", asOf: "2026-01-01", source: "manual", isStale: true } },
+    allowStale: true,
+  });
+  assert.equal(r.amount, "420000");
+  assert.equal(r.conversionPath[0].isStale, true);
+  assert.equal(r.conversionPath[0].source, "manual");
+});
+
+test("no path fails closed", () => {
+  assert.throws(
+    () => convertAmount({ amount: "1", from: "EUR", to: "JPY", rates: { "USD/IRR": "42000" } }),
+    /MISSING_RATE/,
+  );
+});
+
+test("historical asOf rejects observation after asOf", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "IRR",
+        asOf: "2025-01-01",
+        rates: { "USD/IRR": { rate: "42000", asOf: "2026-01-01", source: "x" } },
+      }),
+    /MISSING_RATE/,
+  );
+});

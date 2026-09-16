@@ -841,8 +841,8 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
   instrument_id TEXT NOT NULL REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   quantity_mg TEXT NOT NULL, -- SoT mass (gross weight, mg canonical)
   purity_code TEXT, -- e.g. 24k, 18k, 750, 999, emami, bahar
-  -- Domain posting requires non-null purity_ratio (fixed_1 instruments persist "1"). NULL only for non-posted drafts. SQLite CHECK is structural only; Decimal domain is financial truth.
-  purity_ratio TEXT CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL) > 0 AND CAST(purity_ratio AS REAL) <= 1)),
+  -- P1-06 Option A: purity_ratio NOT NULL. fixed_1 instruments persist "1" at post. Domain Decimal is financial truth; SQLite CHECK is structural sanity only.
+  purity_ratio TEXT NOT NULL CHECK (CAST(purity_ratio AS REAL) > 0 AND CAST(purity_ratio AS REAL) <= 1),
   total_invested TEXT NOT NULL, -- DERIVED carrying; rebuild on tx/reversal by cost-basis engine
   cost_currency TEXT NOT NULL,
   average_cost_per_mg TEXT, -- DERIVED: cost-basis engine rebuild only, -- derived / maintained by cost-basis engine
@@ -851,7 +851,7 @@ CREATE TABLE IF NOT EXISTS inv_metals_holdings (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_metals_holdings_platform_instrument_purity
-  ON inv_metals_holdings(ifnull(platform_id, ''), instrument_id, ifnull(purity_ratio, ''));
+  ON inv_metals_holdings(ifnull(platform_id, ''), instrument_id, purity_ratio);
 
 CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   id TEXT PRIMARY KEY,

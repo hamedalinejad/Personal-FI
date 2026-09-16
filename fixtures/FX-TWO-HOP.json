@@ -1,0 +1,12 @@
+{
+  "id": "FX-TWO-HOP",
+  "input": {
+    "amount": "2",
+    "from": "EUR",
+    "to": "IRR",
+    "rates": { "EUR/USD": "2", "USD/IRR": "3" }
+  },
+  "expected": {
+    "domain": { "amount": "12", "hops": 2 }
+  }
+}

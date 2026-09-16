@@ -31,7 +31,7 @@
       ],
       "owner": "docs/DATA-MODEL.md",
       "closure_note": "field-preservation matrix command-by-command",
-      "evidence": "field-preservation-matrix.json 400+ rows; field:preservation gate"
+      "evidence": "field-preservation-matrix + field-preservation-check.js"
     },
     {
       "id": "R-M04",
@@ -73,7 +73,7 @@
       ],
       "owner": "docs/FINANCIAL-CORE.md",
       "closure_note": "crossRate+resolveStoredRate tests expanded; multi-hop path+stale; freeze still needs full golden family",
-      "evidence": "crossRate.js multi-hop + goldens; conversionPath pinned"
+      "evidence": "crossRate.js multi-hop + stale reject/allow + goldens"
     },
     {
       "id": "R-M08",
@@ -128,7 +128,7 @@
       "note": "commission/tax/otherFee separate on buy; full policy table versioned incomplete",
       "owner": "docs/modules/stocks.md",
       "closure_note": "sample iran-equity-fees-v0-sample.json present; rates null until locked",
-      "evidence": "iran-equity-fees-v1 structure; rates from caller"
+      "evidence": "iran-equity-fees-v1 structure; explicit feeAmount on trades"
     },
     {
       "id": "R-M12",
@@ -355,5 +355,5 @@
       "evidence": "fixtures non-empty + fixture:empty gate"
     }
   ],
-  "description": "Live requirements matrix — statuses in JSON only; no parallel requirements Markdown"
+  "description": "Live requirements matrix \u2014 statuses in JSON only; no parallel requirements Markdown"
 }

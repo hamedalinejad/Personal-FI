@@ -43,6 +43,8 @@ docs/modules/metals.md	A	docs	keep
 docs/modules/physical-assets.md	A	docs	keep
 docs/modules/stocks.md	A	docs	keep
 docs/modules/tax.md	A	docs	keep
+fixtures/CORE-JOURNAL-MULTI-CURRENCY.json	D	test	keep
+fixtures/CORE-JOURNAL-SAME-CURRENCY.json	D	test	keep
 fixtures/CORE-OPENING-BALANCE.json	D	test	keep
 fixtures/CORE-REVERSAL-BEFORE-AFTER.json	D	test	keep
 fixtures/CRITICAL-C2C-SWAP.json	D	test	keep
@@ -55,11 +57,14 @@ fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json	D	test	keep
 fixtures/CRYPTO-SELL-FEE.json	D	test	keep
 fixtures/FUND-DIVIDEND-REINVEST.json	D	test	keep
 fixtures/FUND-NAV-VS-TX-PRICE.json	D	test	keep
+fixtures/FX-TWO-HOP.json	D	test	keep
+fixtures/LOAN-ANNUAL-FREQUENCY.json	D	test	keep
 fixtures/LOAN-BULLET.json	D	test	keep
 fixtures/LOAN-DECLINING.json	D	test	keep
 fixtures/LOAN-FLAT.json	D	test	keep
 fixtures/LOAN-QARZ.json	D	test	keep
 fixtures/METAL-FINEWEIGHT.json	D	test	keep
+fixtures/METAL-PURITY-18K.json	D	test	keep
 fixtures/STANDALONE-CRYPTO.json	D	test	keep
 fixtures/STANDALONE-FUND.json	D	test	keep
 fixtures/STANDALONE-LOAN.json	D	test	keep
@@ -78,6 +83,7 @@ scripts/docs-consistency.js	E	impl	keep
 scripts/docs-validator.js	E	impl	keep
 scripts/feature-field-diff.js	E	impl	keep
 scripts/field-inventory-verify.js	E	impl	keep
+scripts/field-preservation-check.js	E	impl	keep
 scripts/file-inventory-check.js	E	impl	keep
 scripts/fixture-empty-check.js	E	impl	keep
 scripts/fixture-manifest.js	E	impl	keep

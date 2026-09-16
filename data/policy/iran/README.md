@@ -1,13 +1,14 @@
-# Iran equity policy packages (machine data)
+# Iran policy packages (machine-only)
 
-Holiday calendars and fee tables live here as versioned JSON, e.g.:
-`iran-equity-calendar-1404-v1.json`
+## Files
+| File | Role |
+|------|------|
+| `iran-equity-calendar-v1.json` | Weekend + T+n structure + holiday seed |
+| `iran-equity-fees-v1.json` | Fee structure; rates null → caller supplies explicit feeAmount |
+| `*-v0-sample.json` | Historical samples; do not use as production authority |
 
-Financial Core must **not** hard-code annual holidays.
-Operations persist `settlement_policy_version` / policy package id used.
-
-## Current samples
-- `iran-equity-calendar-v0-sample.json` — structure only; **not** official holidays
-- `iran-equity-fees-v0-sample.json` — structure only; rates null
-
-Replace samples with verified packages before RELEASE_PROVEN. Operations must persist `policyVersion` used.
+## Rules
+- Core code must **not** hard-code holiday dates or commission rates.
+- Trades persist `settlement_policy_version` (and fee amounts as explicit inputs).
+- Official TSE bulletin may replace holiday seed before RELEASE_PROVEN for holiday-aware settlement.
+- Weekend-only mode remains valid if `holidays[]` is empty or ignored.

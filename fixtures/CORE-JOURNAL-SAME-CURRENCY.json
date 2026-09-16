@@ -1,0 +1,12 @@
+{
+  "id": "CORE-JOURNAL-SAME-CURRENCY",
+  "input": {
+    "lines": [
+      { "side": "debit", "amount": "100.00", "currency": "IRR", "amountInBase": "100.00", "exchangeRateToBase": "1" },
+      { "side": "credit", "amount": "100.00", "currency": "IRR", "amountInBase": "100.00", "exchangeRateToBase": "1" }
+    ]
+  },
+  "expected": {
+    "domain": { "balanced": true, "debitBase": "100.00", "creditBase": "100.00" }
+  }
+}

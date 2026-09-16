@@ -6,6 +6,7 @@ import { assertPositive } from "../../money/decimalMath.js";
 /**
  * FX: string rates only, MISSING_RATE never 0.
  * Multi-hop: BFS fewest hops, then lexical path.
+ * Stale observations rejected unless allowStale=true.
  */
 function normalizeRate(entry) {
   if (entry == null) return null;
@@ -23,7 +24,7 @@ function normalizeRate(entry) {
 }
 
 function buildGraph(rates) {
-  const edges = new Map(); // from -> [{to, rate, asOf, source, inverted}]
+  const edges = new Map();
   function add(from, to, meta) {
     if (!edges.has(from)) edges.set(from, []);
     edges.get(from).push({ to, ...meta });
@@ -33,15 +34,21 @@ function buildGraph(rates) {
     if (!n) continue;
     const [a, b] = pair.split("/");
     if (!a || !b) continue;
-    add(a, b, { rate: n.rate, asOf: n.asOf, source: n.source, inverted: false });
+    add(a, b, {
+      rate: n.rate,
+      asOf: n.asOf,
+      source: n.source,
+      isStale: n.isStale,
+      inverted: false,
+    });
     add(b, a, {
       rate: toDecimal("1").div(toDecimal(n.rate)).toFixed(),
       asOf: n.asOf,
       source: n.source,
+      isStale: n.isStale,
       inverted: true,
     });
   }
-  // stable order
   for (const [, list] of edges) list.sort((x, y) => x.to.localeCompare(y.to));
   return edges;
 }
@@ -58,7 +65,15 @@ function findPath(edges, from, to) {
       const path = [...cur.path, e.to];
       const hops = [
         ...cur.hops,
-        { from: cur.node, to: e.to, rate: e.rate, asOf: e.asOf, inverted: e.inverted },
+        {
+          from: cur.node,
+          to: e.to,
+          rate: e.rate,
+          asOf: e.asOf,
+          source: e.source,
+          isStale: e.isStale,
+          inverted: e.inverted,
+        },
       ];
       if (e.to === to) return { path, hops };
       seen.add(e.to);
@@ -68,7 +83,16 @@ function findPath(edges, from, to) {
   return null;
 }
 
-export function convertAmount({ amount, from, to, rates, asOf }) {
+/**
+ * @param {object} args
+ * @param {string} args.amount
+ * @param {string} args.from
+ * @param {string} args.to
+ * @param {object} args.rates map "USD/IRR" -> string | {rate, asOf, source, isStale}
+ * @param {string|null} [args.asOf] historical cutoff YYYY-MM-DD
+ * @param {boolean} [args.allowStale=false]
+ */
+export function convertAmount({ amount, from, to, rates, asOf = null, allowStale = false }) {
   assertPositive(amount);
   if (typeof amount !== "string") throw new Error("FX_AMOUNT_NOT_STRING");
   if (from === to) {
@@ -77,16 +101,18 @@ export function convertAmount({ amount, from, to, rates, asOf }) {
       path: [from],
       conversionPath: [],
       asOf: asOf || null,
-      contextHash: hashContext({ amount, from, to, path: [from], asOf }),
+      contextHash: hashContext({ amount, from, to, path: [from], asOf, allowStale }),
     };
   }
-  const edges = buildGraph(rates);
+  const edges = buildGraph(rates || {});
   const found = findPath(edges, from, to);
   if (!found) throw new Error("MISSING_RATE");
   let out = toDecimal(amount);
   for (const h of found.hops) {
+    if (h.isStale && !allowStale) {
+      throw new Error("FX_RATE_STALE");
+    }
     if (asOf && h.asOf && h.asOf > asOf) {
-      // observation after asOf not allowed for historical
       throw new Error("MISSING_RATE");
     }
     out = out.times(toDecimal(h.rate));
@@ -96,6 +122,7 @@ export function convertAmount({ amount, from, to, rates, asOf }) {
     path: found.path,
     conversionPath: found.hops,
     asOf: asOf || null,
+    allowStale: !!allowStale,
     contextHash: hashContext({
       amount,
       from,
@@ -103,6 +130,7 @@ export function convertAmount({ amount, from, to, rates, asOf }) {
       path: found.path,
       hops: found.hops,
       asOf,
+      allowStale,
     }),
   };
 }

@@ -12,6 +12,13 @@
 | UI | WAIT |
 
 ## Closed since last audit
+| P1-06 Metals purity_ratio NOT NULL | **CLOSED** Option A |
+| P1-07 FX cross-rate + stale | **CLOSED** |
+| P1-08 Field-preservation gate | **CLOSED** |
+| P1-09 Iran calendar package | **CLOSED** structure v1 |
+| P1-10 Iran fees package | **CLOSED** structure v1 (rates from caller) |
+| P1-11 Golden families expanded | **IMPROVED** — full freeze list still grows with features |
+
 | Finding | Status |
 |---------|--------|
 | P0-02 Loan schedule exact conservation | **CLOSED** — residual absorb + exact assert; 1¢ mismatch fails |

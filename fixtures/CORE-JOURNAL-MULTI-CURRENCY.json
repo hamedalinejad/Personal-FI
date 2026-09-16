@@ -1,0 +1,13 @@
+{
+  "id": "CORE-JOURNAL-MULTI-CURRENCY",
+  "input": {
+    "bookBase": "IRR",
+    "lines": [
+      { "side": "debit", "amount": "1", "currency": "USD", "exchangeRateToBase": "42000", "amountInBase": "42000" },
+      { "side": "credit", "amount": "42000", "currency": "IRR", "exchangeRateToBase": "1", "amountInBase": "42000" }
+    ]
+  },
+  "expected": {
+    "domain": { "balanced": true, "debitBase": "42000", "creditBase": "42000" }
+  }
+}

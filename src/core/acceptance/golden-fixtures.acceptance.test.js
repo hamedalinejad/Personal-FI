@@ -74,3 +74,55 @@ test("GOLDEN fixtures marked ACTIVE are non-empty expected", () => {
     assert.ok(keys.length > 0, name);
   }
 });
+
+test("GOLDEN LOAN-ANNUAL-FREQUENCY conserves principal", () => {
+  const fx = load("LOAN-ANNUAL-FREQUENCY");
+  const s = buildSchedule(fx.input.method, fx.input);
+  assert.equal(s.rows.length, fx.expected.domain.rowCount);
+  assert.equal(sumField(s.rows, "principal").toFixed(2), fx.expected.domain.totalPrincipal);
+  assert.equal(String(s.rows.at(-1).balance), fx.expected.domain.finalBalance);
+});
+
+test("GOLDEN METAL-PURITY-18K fine weight", () => {
+  const fx = load("METAL-PURITY-18K");
+  const fine = toDecimal(fx.input.grossMg).times(fx.input.purityRatio);
+  assert.equal(fine.toFixed(0), fx.expected.domain.fineWeight);
+});
+
+test("GOLDEN FX-TWO-HOP", async () => {
+  const { convertAmount } = await import("../domain/fx/crossRate.js");
+  const fx = load("FX-TWO-HOP");
+  const r = convertAmount({
+    amount: fx.input.amount,
+    from: fx.input.from,
+    to: fx.input.to,
+    rates: fx.input.rates,
+  });
+  assert.equal(r.amount, fx.expected.domain.amount);
+  assert.equal(r.conversionPath.length, fx.expected.domain.hops);
+});
+
+test("GOLDEN CORE-JOURNAL-SAME-CURRENCY balances", () => {
+  const fx = load("CORE-JOURNAL-SAME-CURRENCY");
+  let d = toDecimal("0");
+  let c = toDecimal("0");
+  for (const ln of fx.input.lines) {
+    if (ln.side === "debit") d = d.plus(ln.amountInBase);
+    else c = c.plus(ln.amountInBase);
+  }
+  assert.equal(d.toFixed(2), fx.expected.domain.debitBase);
+  assert.equal(c.toFixed(2), fx.expected.domain.creditBase);
+  assert.equal(d.equals(c), fx.expected.domain.balanced);
+});
+
+test("GOLDEN CORE-JOURNAL-MULTI-CURRENCY balances in base", () => {
+  const fx = load("CORE-JOURNAL-MULTI-CURRENCY");
+  let d = toDecimal("0");
+  let c = toDecimal("0");
+  for (const ln of fx.input.lines) {
+    if (ln.side === "debit") d = d.plus(ln.amountInBase);
+    else c = c.plus(ln.amountInBase);
+  }
+  assert.equal(d.toFixed(0), fx.expected.domain.debitBase);
+  assert.equal(c.toFixed(0), fx.expected.domain.creditBase);
+});

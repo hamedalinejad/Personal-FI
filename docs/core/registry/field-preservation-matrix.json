@@ -5546,6 +5546,20 @@
       "migrated": true,
       "owner": "docs/modules/tax.md",
       "protected": true
+    },
+    {
+      "commandId": "funds.redeem",
+      "field": "liquidationPrice",
+      "required": false,
+      "accepted": true,
+      "stored": "price_history.quote_type=liquidation",
+      "derived": false,
+      "returned": true,
+      "exported": true,
+      "reversed": true,
+      "migrated": true,
+      "owner": "docs/modules/funds.md",
+      "protected": true
     }
   ],
   "status": "PARTIAL"

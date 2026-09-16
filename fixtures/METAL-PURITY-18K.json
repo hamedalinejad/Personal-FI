@@ -1,0 +1,7 @@
+{
+  "id": "METAL-PURITY-18K",
+  "input": { "grossMg": "1000", "purityRatio": "0.750" },
+  "expected": {
+    "domain": { "fineWeight": "750", "purityRatio": "0.750" }
+  }
+}

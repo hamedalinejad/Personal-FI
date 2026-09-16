@@ -1,0 +1,14 @@
+{
+  "id": "LOAN-ANNUAL-FREQUENCY",
+  "input": {
+    "method": "declining_balance",
+    "principal": "1200.00",
+    "annualRate": "12",
+    "periods": "3",
+    "frequency": "annual",
+    "startDate": "2026-01-01"
+  },
+  "expected": {
+    "domain": { "rowCount": 3, "totalPrincipal": "1200.00", "finalBalance": "0.00" }
+  }
+}
