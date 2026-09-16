@@ -1,62 +1,39 @@
 # QUALITY-STATUS
 
-**Live only.** History = Git. No BUG/AUDIT Markdown.
+**Live only.** History = Git. Never add BUG/P0/AUDIT Markdown authority files.
 
 ## Gates
 | Gate | Value |
 |------|-------|
-| **SEMANTIC_CODING_READY** | **true** |
-| FREEZE_PROVEN | false (shipping freeze still needs browser E2E if browser ships + official TSE holiday bulletin) |
-| RELEASE_PROVEN | false |
-| PRODUCTION | NO-GO |
-| UI | WAIT |
+| SEMANTIC_CODING_READY | **true** |
+| FREEZE_PROVEN | **false** |
+| RELEASE_PROVEN | **false** |
+| PRODUCTION | **NO-GO** |
+| UI | **WAIT** |
 
-## Closed since last audit
-| Standalone 5 editions path | **IMPROVED** — backup/restore/rebuild equality packs |
-| Browser offline E2E | **OPEN** (protocol harness only; durableMemoryAdapter kept) |
-| TWR/MWR | **DEFERRED** locked in REPORTING |
-| rebuildProjection | **IMPLEMENTED** deterministic inputHash |
-| Command catalog full card keys | **IMPROVED** |
+## Closed (do not reopen as bug docs)
+Fee taxonomy · fee qty vs money · silent fee default · economic hash · book base · NAV≠txPrice · capitalized fee legs · posted-only reports · stocks dates/policy · crypto economic_kind · loan residual conservation · annual frequency · import/loan FKs · metals purity NOT NULL · FX multi-hop+stale · field-preservation gate · Iran policy structure · standalone 5 packs · rebuildProjection · backup format · command catalog 42 · dual-mode publicRegistry
 
-| P1-06 Metals purity_ratio NOT NULL | **CLOSED** Option A |
-| P1-07 FX cross-rate + stale | **CLOSED** |
-| P1-08 Field-preservation gate | **CLOSED** |
-| P1-09 Iran calendar package | **CLOSED** structure v1 |
-| P1-10 Iran fees package | **CLOSED** structure v1 (rates from caller) |
-| P1-11 Golden families expanded | **IMPROVED** — full freeze list still grows with features |
+## Explicit DEFERRED / OPEN
+| Item | Status | Blocks |
+|------|--------|--------|
+| TWR / MWR / IRR / FX attribution in performance | DEFERRED | performance-report claims |
+| Browser sql.js+IDB real-tab E2E | OPEN | browser RELEASE only |
+| Official TSE holiday bulletin rates | seed only | holiday-aware settlement RELEASE |
+| Corporate actions / crypto deposit-swap | DEFERRED | those commands |
+| License enforcement runtime | SPEC_LOCKED machine contract | paid-edition RELEASE |
 
-| Finding | Status |
-|---------|--------|
-| P0-02 Loan schedule exact conservation | **CLOSED** — residual absorb + exact assert; 1¢ mismatch fails |
-| P0-03 Stocks date/policy columns | **CLOSED** — schema + writers + test |
-| P0-04 Crypto economic_kind canonical | **CLOSED** — schema CHECK + writers |
-| P1-01 Loan annual frequency | **CLOSED** — schema + engine + test |
-| P1-02 Crypto transfer map | **CLOSED** — module + field matrix |
-| P1-03 Import batch FK | **CLOSED** |
-| P1-04 ln_loans.account_transaction_id FK | **CLOSED** |
-| P1-05 Funds liquidationPrice | **CLOSED** — price_history quote_type=liquidation |
-| P0-01 Fee taxonomy / `reduce_proceeds` | **CLOSED** — single enum in FINANCIAL-CORE + feeEngine; journal legs documented; golden tests |
+## Standalone
+```
+Loan | Crypto | Stocks | Funds | Metals
+→ public-api only · requiresAccountsUi=false · sharedCore=true
+→ boot→create→op→backup→restore→rebuild
+```
+Full edition: `src/api/publicRegistry` + one journal.
 
-## What “complete for coding” means
-All owner docs, dual-mode (standalone + full API composition), Financial Core invariants, 42 command cards, field-preservation matrix, fixtures for investment/loan/core families, recovery core scenarios, rebuild + backup metadata, Iran **structure** policies — are locked.
+## Keep forever
+Owner docs (11+11) · `docs/core/**` machine · `src/**` scaffold · `fixtures/**` · `scripts/**`  
+Do **not** restore: `generate-command-status-md.js`, `field-inventory-live-check.js`, BUG/P0/AUDIT as authority.
 
-You may implement Core → Loan → investments → remaining modules against this tree without inventing economics.
-
-## Still not production / not freeze-shipping
-| Item | Why |
-|------|-----|
-| Real browser tab sql.js+IDB E2E | Needs browser environment |
-| Official TSE holiday **bulletin** replace seed dates | External data source |
-| Official broker fee **rate tables** | Explicit feeAmount on commands is the v1 path |
-| TWR/MWR | Explicitly DEFERRED |
-| Corporate actions / crypto deposit-swap | Explicitly DEFERRED |
-| Accounts/cheque/tax/budget full goldens | Commands catalogued; implementation scaffold next |
-
-## Dual mode (locked product rule)
-| Edition | Accounts UI | How |
-|---------|-------------|-----|
-| loan-only, funds-only, metals-only, crypto-only, stocks-only | **Not required** | Feature `public-api` only |
-| full | Optional | `src/api/publicRegistry` · **one shared journal** |
-
-## Proof
-`npm test` · `npm run gates` · `docs/core/registry/*` · `data/policy/iran/*`
+## Evidence
+`npm test` · `npm run gates` · `docs/core/registry/*` · `docs/core/RELEASE-EVIDENCE.json`

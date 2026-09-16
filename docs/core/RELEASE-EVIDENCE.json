@@ -1,25 +1,62 @@
 {
-  "generatedAt": "2026-09-16T20:17:55.415Z",
-  "schemaHash": "6690f8761ca1261e",
-  "gatesScript": "npm test && npm run command:catalog && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity && npm run lint:source-vocab && npm run integrity:audit && npm run freeze:check && npm run inventory:check",
-  "status": {
-    "production": "NO-GO",
-    "loanVerticalCoding": "ALLOWED_UNDER_CODING_GATE",
-    "browserSqlJs": "OPEN",
-    "fullReports": "PARTIAL",
-    "standaloneAll": "PARTIAL"
+  "generatedAt": "2026-09-16T23:00:00.000Z",
+  "production": "NO-GO",
+  "FREEZE_PROVEN": false,
+  "RELEASE_PROVEN": false,
+  "SEMANTIC_CODING_READY": true,
+  "authority": {
+    "human": [
+      "docs/DOCUMENTATION-STANDARD.md",
+      "docs/PRODUCT.md",
+      "docs/ARCHITECTURE.md",
+      "docs/FINANCIAL-CORE.md",
+      "docs/DATA-MODEL.md",
+      "docs/API.md",
+      "docs/REPORTING.md",
+      "docs/OFFLINE-RELEASE.md",
+      "docs/DEVELOPMENT.md",
+      "docs/QUALITY-STATUS.md",
+      "docs/modules/"
+    ],
+    "machine": [
+      "docs/core/db/schema.sql",
+      "docs/core/registry/command-catalog.json",
+      "docs/core/registry/field-preservation-matrix.json",
+      "docs/core/registry/requirements-matrix.json",
+      "docs/core/registry/status.registry.json",
+      "docs/core/registry/license-editions.json",
+      "docs/core/registry/fixture-manifest.json"
+    ]
+  },
+  "proof": {
+    "standaloneEditions": ["loan-only", "crypto-only", "stocks-only", "funds-only", "metals-only"],
+    "standalonePath": "boot→create→op→backup→restore→rebuild",
+    "recoveryMatrix": "src/core/acceptance/recovery-matrix.acceptance.test.js",
+    "backupFormat": "src/core/recovery/backup.js formatVersion+checksum",
+    "browser": {
+      "protocolHarness": "PROVEN",
+      "sqlJsIndexedDbE2E": "OPEN"
+    },
+    "reporting": {
+      "postedStatements": "IMPLEMENTED scaffold",
+      "TWR": "DEFERRED",
+      "MWR": "DEFERRED",
+      "FX_attribution": "DEFERRED with TWR/MWR"
+    }
   },
   "requiredGreenForRelease": [
     "npm run gates",
-    "Golden families claimed",
-    "Recovery matrix COVERED",
-    "Standalone editions claimed",
-    "Browser adapter RELEASE-PROVEN if shipping browser",
-    "REQ-001 deferred commands explicit"
+    "golden families for claimed commands",
+    "recovery matrix executable",
+    "standalone five editions",
+    "browser E2E if shipping browser",
+    "license enforcement if shipping paid editions"
   ],
-  "docs": {
-    "reqStatus": "docs/core/REQ-001-032-STATUS.md",
-    "audit613": "docs/core/AUDIT-BATCH-6-13-STATUS.md",
-    "authority": "docs/core/DOC-AUTHORITY-CHAIN.md"
-  }
+  "doNotRestore": [
+    "scripts/generate-command-status-md.js",
+    "scripts/field-inventory-live-check.js",
+    "BUG-*.md",
+    "P0-*.md",
+    "AUDIT-*.md as authority"
+  ]
 }

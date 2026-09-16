@@ -353,6 +353,82 @@
       "owner": "docs/DEVELOPMENT.md",
       "closure_note": "fixture machine format",
       "evidence": "fixtures non-empty + fixture:empty gate"
+    },
+    {
+      "id": "R-REPORT-01",
+      "title": "TWR formula",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md"
+      ],
+      "evidence": "Explicitly deferred until formula+fixtures locked"
+    },
+    {
+      "id": "R-REPORT-02",
+      "title": "MWR/IRR formula",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md"
+      ],
+      "evidence": "Explicitly deferred"
+    },
+    {
+      "id": "R-REPORT-03",
+      "title": "FX attribution in performance reports",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md",
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "evidence": "Deferred with TWR/MWR"
+    },
+    {
+      "id": "R-REPORT-04",
+      "title": "Distribution and fee treatment in performance reports",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md",
+        "docs/modules/funds.md"
+      ],
+      "evidence": "Deferred with performance model"
+    },
+    {
+      "id": "R-OFFLINE-01",
+      "title": "Executable recovery matrix",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/OFFLINE-RELEASE.md",
+        "src/core/acceptance/recovery-matrix.acceptance.test.js"
+      ],
+      "evidence": "Named scenarios + executable tests"
+    },
+    {
+      "id": "R-OFFLINE-02",
+      "title": "Backup package complete",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/core/recovery/backup.js"
+      ],
+      "evidence": "formatVersion + checksum sidecar"
+    },
+    {
+      "id": "R-OFFLINE-03",
+      "title": "Browser sql.js + IndexedDB + single-writer E2E",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/OFFLINE-RELEASE.md"
+      ],
+      "evidence": "Protocol harness proven; real-tab E2E OPEN for shipping"
+    },
+    {
+      "id": "R-LICENSE-01",
+      "title": "License edition machine contract",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/PRODUCT.md",
+        "docs/core/registry/license-editions.json"
+      ],
+      "evidence": "Capability-only gate; never delete data"
     }
   ],
   "description": "Live requirements matrix — statuses in JSON only; no parallel requirements Markdown"

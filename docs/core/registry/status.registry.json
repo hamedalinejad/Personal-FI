@@ -5,8 +5,8 @@
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
     "RELEASE_PROVEN": false,
-    "FREEZE_EVIDENCE": "Contracts locked; dual-mode green; 42 commands; field matrix 400+; rebuild+backup metadata; Iran structure v1; browser E2E still shipping-only",
-    "SEMANTIC_CODING_READY": true
+    "SEMANTIC_CODING_READY": true,
+    "FREEZE_EVIDENCE": "Owner tree locked; dual-mode; 42 commands; field matrix; recovery+standalone packs; license-editions.json; TWR deferred; browser E2E open"
   },
   "features": {
     "loan": {
@@ -145,5 +145,19 @@
     "ui": "WAIT",
     "freeze_proven": false,
     "note": "Harden Core+Loan; do not expand human docs"
+  },
+  "license": {
+    "status": "SPEC_LOCKED",
+    "registry": "docs/core/registry/license-editions.json"
+  },
+  "standalone": {
+    "status": "IMPLEMENTED_PROOF_PACKS",
+    "editions": [
+      "loan-only",
+      "crypto-only",
+      "stocks-only",
+      "funds-only",
+      "metals-only"
+    ]
   }
 }

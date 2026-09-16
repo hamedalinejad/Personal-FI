@@ -30,6 +30,7 @@ docs/core/registry.index.json	B	machine	keep
 docs/core/registry/command-catalog.json	B	machine	keep
 docs/core/registry/field-preservation-matrix.json	B	machine	keep
 docs/core/registry/fixture-manifest.json	B	machine	keep
+docs/core/registry/license-editions.json	B	machine	keep
 docs/core/registry/requirements-matrix.json	B	machine	keep
 docs/core/registry/status.registry.json	B	machine	keep
 docs/modules/accounts.md	A	docs	keep
