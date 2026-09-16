@@ -11,6 +11,11 @@
 | PRODUCTION | NO-GO |
 | UI | WAIT |
 
+## Closed since last audit
+| Finding | Status |
+|---------|--------|
+| P0-01 Fee taxonomy / `reduce_proceeds` | **CLOSED** — single enum in FINANCIAL-CORE + feeEngine; journal legs documented; golden tests |
+
 ## What “complete for coding” means
 All owner docs, dual-mode (standalone + full API composition), Financial Core invariants, 42 command cards, field-preservation matrix, fixtures for investment/loan/core families, recovery core scenarios, rebuild + backup metadata, Iran **structure** policies — are locked.
 

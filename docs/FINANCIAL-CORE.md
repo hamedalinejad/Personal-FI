@@ -342,6 +342,11 @@ Required proofs (see `economicHash.test.js` / idempotency tests):
 Feature commands must canonicalize their payload **before** Core hash; Core also canonicalizes same-currency journal lines and decimal strings.
 
 ## Fee taxonomy (LOCKED) — single enum
+
+### Fee enum authority (anti-drift)
+There is **exactly one** canonical fee treatment set in this document (section «Fee taxonomy (LOCKED)») and in `CANONICAL_FEE_TREATMENTS` (`feeEngine.js`).  
+Any shorter list elsewhere is an error. `reduce_proceeds` is **required** for sell-side fee presentation: domain `netProceeds = grossProceeds − feeAmount`; journal legs match `expense` by design so fee hits P&L once.
+
 Canonical set (must match `CANONICAL_FEE_TREATMENTS` in feeEngine.js):
 ```
 expense
