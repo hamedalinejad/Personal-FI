@@ -1,4 +1,4 @@
-import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency, resolveBaseAmountSync } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -78,6 +78,12 @@ export async function transferCrypto(input, { dataDir } = {}) {
   const invId = scopedAccountId("crypto_inventory", costCurrency);
   const feeExp = scopedAccountId("crypto_transfer_fee", costCurrency);
   const clearing = scopedAccountId("crypto_transfer_clearing", costCurrency);
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: costCurrency || p.currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? p.exchangeRateToBase : null;
+  if (costCurrency === baseCurrency) exchangeRateToBase = "1";
+  else if (exchangeRateToBase == null || exchangeRateToBase === "") throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  const toBase = (amt) => resolveBaseAmountSync(amt, costCurrency, baseCurrency, exchangeRateToBase).amountInBase;
+  const rateStr = resolveBaseAmountSync("1", costCurrency, baseCurrency, exchangeRateToBase).exchangeRateToBase;
   const journalLines = [];
   const feeCarry = toDecimal(result.transfer.feeCarrying);
   const destCarry = toDecimal(result.transfer.destinationCarrying);
@@ -89,8 +95,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
         side: "debit",
         amount: feeCarry.toFixed(),
         currency: costCurrency,
-        amountInBase: feeCarry.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: toBase(feeCarry),
+        exchangeRateToBase: rateStr,
         lineKind: "fee",
       },
       {
@@ -98,8 +104,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
         side: "credit",
         amount: feeCarry.toFixed(),
         currency: costCurrency,
-        amountInBase: feeCarry.toFixed(),
-        exchangeRateToBase: "1",
+        amountInBase: toBase(feeCarry),
+        exchangeRateToBase: rateStr,
         lineKind: "fee",
       },
     );
@@ -112,8 +118,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
       side: "credit",
       amount: destCarry.toFixed(),
       currency: costCurrency,
-      amountInBase: destCarry.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(destCarry),
+      exchangeRateToBase: rateStr,
       lineKind: "principal",
     },
     {
@@ -121,8 +127,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
       side: "debit",
       amount: destCarry.toFixed(),
       currency: costCurrency,
-      amountInBase: destCarry.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(destCarry),
+      exchangeRateToBase: rateStr,
       lineKind: "principal",
     },
     {
@@ -130,8 +136,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
       side: "credit",
       amount: destCarry.toFixed(),
       currency: costCurrency,
-      amountInBase: destCarry.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(destCarry),
+      exchangeRateToBase: rateStr,
       lineKind: "principal",
     },
     {
@@ -139,8 +145,8 @@ export async function transferCrypto(input, { dataDir } = {}) {
       side: "debit",
       amount: destCarry.toFixed(),
       currency: costCurrency,
-      amountInBase: destCarry.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(destCarry),
+      exchangeRateToBase: rateStr,
       lineKind: "principal",
     },
   );
@@ -149,8 +155,6 @@ export async function transferCrypto(input, { dataDir } = {}) {
   const txIn = randomUUID();
   const toHoldingId = toH?.id || randomUUID();
   const now = new Date().toISOString();
-  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: costCurrency || p.currency });
-
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,

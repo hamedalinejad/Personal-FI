@@ -50,6 +50,13 @@ Unambiguous contracts · complete command cards · exact field mapping · schema
 ## Standalone
 Loan · Crypto · Stocks · Funds · Metals → one public-api · shared Core · requiresAccountsUi=false
 
+## Closure V3 (2026-09-18)
+- field-preservation: schema column gate (PERSISTED → real table.column)
+- amountInBase via resolveBaseAmountSync (funds/stocks/metals/crypto.transfer)
+- metals: cost_currency must match transaction currency
+- command catalog aligned: crypto.buy/sell/transfer, loan.create
+- inventory: removed stale venue_kind
+
 ## Evidence
 `npm test` (328) · schema drift GREEN · field-inventory 875 strict · command-catalog 42 · matrix 412  
 `npm run gates` · registries · fixtures

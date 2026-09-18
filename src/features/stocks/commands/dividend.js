@@ -1,5 +1,5 @@
 import { SETTLEMENT_POLICY_VERSION } from "../../../core/iran/settlementPolicy.js";
-import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency, resolveBaseAmountSync } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -31,7 +31,7 @@ export async function stockDividend(input, { dataDir } = {}) {
   let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
   if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
   else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
-  const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(exchangeRateToBase).toFixed();
+  const toBase = (amt) => resolveBaseAmountSync(amt, currency, baseCurrency, exchangeRateToBase).amountInBase;
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const incId = scopedAccountId("stock_dividend_income", currency);
@@ -45,7 +45,7 @@ export async function stockDividend(input, { dataDir } = {}) {
       side: "debit",
       amount: net.toFixed(),
       currency,
-      amountInBase: net.toFixed(),
+      amountInBase: toBase(net),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
@@ -54,7 +54,7 @@ export async function stockDividend(input, { dataDir } = {}) {
       side: "credit",
       amount: amount.toFixed(),
       currency,
-      amountInBase: amount.toFixed(),
+      amountInBase: toBase(amount),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
@@ -66,7 +66,7 @@ export async function stockDividend(input, { dataDir } = {}) {
       side: "debit",
       amount: tax.toFixed(),
       currency,
-      amountInBase: tax.toFixed(),
+      amountInBase: toBase(tax),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "fee",
     });

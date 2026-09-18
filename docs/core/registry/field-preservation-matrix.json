@@ -19,7 +19,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "acc_accounts",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.accounts.archive.accountId",
@@ -44,7 +45,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.accounts.create.operationId",
@@ -69,7 +71,8 @@
       "kind": "LABEL",
       "persistence": {
         "table": "acc_accounts",
-        "column": "name"
+        "column": "name",
+        "mode": "COLUMN"
       },
       "resultPath": "result.name",
       "exportPath": "export.accounts.create.name",
@@ -94,7 +97,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "acc_accounts",
-        "column": "account_kind"
+        "column": "account_kind",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountKind",
       "exportPath": "export.accounts.create.accountKind",
@@ -119,7 +123,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "acc_accounts",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.accounts.create.currency",
@@ -170,7 +175,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.accounts.deposit.operationId",
@@ -195,7 +201,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "acc_accounts",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.accounts.deposit.accountId",
@@ -219,8 +226,9 @@
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "amount"
+        "table": "acc_transactions",
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.accounts.deposit.amount",
@@ -247,7 +255,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "acc_accounts",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.accounts.deposit.currency",
@@ -272,7 +281,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.accounts.deposit.businessDate",
@@ -292,12 +302,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/accounts.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "counterparty",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "counterparty"
+        "mode": "DERIVED"
       },
       "resultPath": "result.counterparty",
       "exportPath": "export.accounts.deposit.counterparty",
@@ -322,7 +331,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.accounts.transfer.operationId",
@@ -346,8 +356,10 @@
       "canonicalField": "fromAccountId",
       "kind": "RAW",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "from_account_id"
+        "table": "acc_transactions",
+        "column": "account_id",
+        "mode": "PROJECTION",
+        "selector": "from_account_id"
       },
       "resultPath": "result.fromAccountId",
       "exportPath": "export.accounts.transfer.fromAccountId",
@@ -371,8 +383,10 @@
       "canonicalField": "toAccountId",
       "kind": "RAW",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "to_account_id"
+        "table": "acc_transactions",
+        "column": "account_id",
+        "mode": "PROJECTION",
+        "selector": "to_account_id"
       },
       "resultPath": "result.toAccountId",
       "exportPath": "export.accounts.transfer.toAccountId",
@@ -396,8 +410,9 @@
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "amount"
+        "table": "acc_transactions",
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.accounts.transfer.amount",
@@ -424,7 +439,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "acc_accounts",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.accounts.transfer.currency",
@@ -449,7 +465,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.accounts.transfer.businessDate",
@@ -474,7 +491,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "acc_accounts",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.accounts.update.accountId",
@@ -499,7 +517,8 @@
       "kind": "LABEL",
       "persistence": {
         "table": "acc_accounts",
-        "column": "name"
+        "column": "name",
+        "mode": "COLUMN"
       },
       "resultPath": "result.name",
       "exportPath": "export.accounts.update.name",
@@ -524,7 +543,8 @@
       "kind": "STATUS",
       "persistence": {
         "table": "acc_accounts",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "resultPath": "result.status",
       "exportPath": "export.accounts.update.status",
@@ -549,7 +569,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.accounts.withdraw.operationId",
@@ -574,7 +595,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "acc_accounts",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.accounts.withdraw.accountId",
@@ -598,8 +620,9 @@
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "acc_accounts",
-        "column": "amount"
+        "table": "acc_transactions",
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.accounts.withdraw.amount",
@@ -626,7 +649,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "acc_accounts",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.accounts.withdraw.currency",
@@ -651,7 +675,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.accounts.withdraw.businessDate",
@@ -676,7 +701,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.assets.dispose.operationId",
@@ -701,7 +727,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "asset_id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.assetId",
       "exportPath": "export.assets.dispose.assetId",
@@ -721,12 +748,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/physical-assets.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "proceeds",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "pa_assets",
-        "column": "proceeds"
+        "mode": "DERIVED"
       },
       "resultPath": "result.proceeds",
       "exportPath": "export.assets.dispose.proceeds",
@@ -751,7 +777,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.assets.dispose.currency",
@@ -776,7 +803,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.assets.register.operationId",
@@ -801,7 +829,8 @@
       "kind": "LABEL",
       "persistence": {
         "table": "pa_assets",
-        "column": "name"
+        "column": "name",
+        "mode": "COLUMN"
       },
       "resultPath": "result.name",
       "exportPath": "export.assets.register.name",
@@ -826,7 +855,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "category"
+        "column": "asset_kind",
+        "mode": "COLUMN"
       },
       "resultPath": "result.category",
       "exportPath": "export.assets.register.category",
@@ -851,7 +881,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "acquisition_cost"
+        "column": "acquisition_cost",
+        "mode": "COLUMN"
       },
       "resultPath": "result.acquisitionCost",
       "exportPath": "export.assets.register.acquisitionCost",
@@ -876,7 +907,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.assets.register.currency",
@@ -901,7 +933,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "asset_id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.assetId",
       "exportPath": "export.assets.update.assetId",
@@ -926,7 +959,8 @@
       "kind": "LABEL",
       "persistence": {
         "table": "pa_assets",
-        "column": "name"
+        "column": "name",
+        "mode": "COLUMN"
       },
       "resultPath": "result.name",
       "exportPath": "export.assets.update.name",
@@ -951,7 +985,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "pa_assets",
-        "column": "location"
+        "column": "location",
+        "mode": "COLUMN"
       },
       "resultPath": "result.location",
       "exportPath": "export.assets.update.location",
@@ -971,12 +1006,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DEFERRED",
       "canonicalField": "name",
       "kind": "LABEL",
       "persistence": {
-        "table": "bill_bills",
-        "column": "name"
+        "mode": "DEFERRED"
       },
       "resultPath": "result.name",
       "exportPath": "export.bill.schedule.name",
@@ -996,12 +1030,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DEFERRED",
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "bill_bills",
-        "column": "amount"
+        "mode": "DEFERRED"
       },
       "resultPath": "result.amount",
       "exportPath": "export.bill.schedule.amount",
@@ -1023,12 +1056,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DEFERRED",
       "canonicalField": "currency",
       "kind": "RAW",
       "persistence": {
-        "table": "bill_bills",
-        "column": "currency"
+        "mode": "DEFERRED"
       },
       "resultPath": "result.currency",
       "exportPath": "export.bill.schedule.currency",
@@ -1048,12 +1080,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DEFERRED",
       "canonicalField": "dueRule",
       "kind": "RAW",
       "persistence": {
-        "table": "bill_bills",
-        "column": "due_rule"
+        "mode": "DEFERRED"
       },
       "resultPath": "result.dueRule",
       "exportPath": "export.bill.schedule.dueRule",
@@ -1077,8 +1108,9 @@
       "canonicalField": "period",
       "kind": "RAW",
       "persistence": {
-        "table": "bdg_budgets",
-        "column": "period"
+        "table": "bg_budgets",
+        "column": "period_key",
+        "mode": "COLUMN"
       },
       "resultPath": "result.period",
       "exportPath": "export.budget.set.period",
@@ -1098,12 +1130,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "categoryId",
       "kind": "RAW",
       "persistence": {
-        "table": "bdg_budgets",
-        "column": "category_id"
+        "mode": "DERIVED",
+        "note": "was bg_budgets.category_id"
       },
       "resultPath": "result.categoryId",
       "exportPath": "export.budget.set.categoryId",
@@ -1127,8 +1159,9 @@
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "bdg_budgets",
-        "column": "amount"
+        "table": "bg_budgets",
+        "column": "total_income",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.budget.set.amount",
@@ -1154,8 +1187,9 @@
       "canonicalField": "currency",
       "kind": "RAW",
       "persistence": {
-        "table": "bdg_budgets",
-        "column": "currency"
+        "table": "bg_budgets",
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.budget.set.currency",
@@ -1180,7 +1214,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.cheque.bounce.operationId",
@@ -1204,8 +1239,9 @@
       "canonicalField": "chequeId",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cheque_id"
+        "table": "chk_cheques",
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.chequeId",
       "exportPath": "export.cheque.bounce.chequeId",
@@ -1229,8 +1265,9 @@
       "canonicalField": "reason",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "reason"
+        "table": "chk_cheques",
+        "column": "bounced_reason",
+        "mode": "COLUMN"
       },
       "resultPath": "result.reason",
       "exportPath": "export.cheque.bounce.reason",
@@ -1255,7 +1292,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.cheque.cancel.operationId",
@@ -1279,8 +1317,9 @@
       "canonicalField": "chequeId",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cheque_id"
+        "table": "chk_cheques",
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.chequeId",
       "exportPath": "export.cheque.cancel.chequeId",
@@ -1305,7 +1344,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.cheque.clear.operationId",
@@ -1329,8 +1369,9 @@
       "canonicalField": "chequeId",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cheque_id"
+        "table": "chk_cheques",
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.chequeId",
       "exportPath": "export.cheque.clear.chequeId",
@@ -1354,8 +1395,9 @@
       "canonicalField": "clearedDate",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cleared_date"
+        "table": "chk_cheques",
+        "column": "cleared_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.clearedDate",
       "exportPath": "export.cheque.clear.clearedDate",
@@ -1380,7 +1422,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.cheque.deposit.operationId",
@@ -1404,8 +1447,9 @@
       "canonicalField": "chequeId",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cheque_id"
+        "table": "chk_cheques",
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.chequeId",
       "exportPath": "export.cheque.deposit.chequeId",
@@ -1429,8 +1473,9 @@
       "canonicalField": "accountId",
       "kind": "REFERENCE",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "id"
+        "table": "chk_cheques",
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.cheque.deposit.accountId",
@@ -1455,7 +1500,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.cheque.deposit.businessDate",
@@ -1480,7 +1526,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.cheque.register.operationId",
@@ -1504,8 +1551,9 @@
       "canonicalField": "chequeNumber",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "cheque_number"
+        "table": "chk_cheques",
+        "column": "cheque_number",
+        "mode": "COLUMN"
       },
       "resultPath": "result.chequeNumber",
       "exportPath": "export.cheque.register.chequeNumber",
@@ -1529,8 +1577,9 @@
       "canonicalField": "amount",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "amount"
+        "table": "chk_cheques",
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.cheque.register.amount",
@@ -1556,8 +1605,9 @@
       "canonicalField": "currency",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "currency"
+        "table": "chk_cheques",
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.cheque.register.currency",
@@ -1581,8 +1631,9 @@
       "canonicalField": "dueDate",
       "kind": "RAW",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "due_date"
+        "table": "chk_cheques",
+        "column": "due_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.dueDate",
       "exportPath": "export.cheque.register.dueDate",
@@ -1606,8 +1657,9 @@
       "canonicalField": "direction",
       "kind": "STATUS",
       "persistence": {
-        "table": "chq_cheques",
-        "column": "direction"
+        "table": "chk_cheques",
+        "column": "direction",
+        "mode": "COLUMN"
       },
       "resultPath": "result.direction",
       "exportPath": "export.cheque.register.direction",
@@ -1632,7 +1684,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.crypto.buy.operationId",
@@ -1657,7 +1710,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.crypto.buy.instrumentId",
@@ -1682,7 +1736,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "quantity"
+        "column": "gross_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantity",
       "exportPath": "export.crypto.buy.quantity",
@@ -1703,12 +1758,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "price",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "price"
+        "mode": "DERIVED"
       },
       "resultPath": "result.price",
       "exportPath": "export.crypto.buy.price",
@@ -1730,12 +1784,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "currency",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "currency"
+        "mode": "DERIVED"
       },
       "resultPath": "result.currency",
       "exportPath": "export.crypto.buy.currency",
@@ -1760,7 +1813,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "fee_amount"
+        "column": "fee_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeAmount",
       "exportPath": "export.crypto.buy.feeAmount",
@@ -1787,7 +1841,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "fee_quantity"
+        "column": "fee_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeQuantity",
       "exportPath": "export.crypto.buy.feeQuantity",
@@ -1809,12 +1864,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "networkId",
-      "kind": "REFERENCE",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "network_id"
+        "mode": "DERIVED"
       },
       "resultPath": "result.networkId",
       "exportPath": "export.crypto.buy.networkId",
@@ -1834,12 +1888,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "exchangeId",
       "kind": "REFERENCE",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "exchange_id"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.exchange_id"
       },
       "resultPath": "result.exchangeId",
       "exportPath": "export.crypto.buy.exchangeId",
@@ -1864,7 +1918,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.crypto.sell.operationId",
@@ -1889,7 +1944,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.crypto.sell.instrumentId",
@@ -1914,7 +1970,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "quantity"
+        "column": "gross_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantity",
       "exportPath": "export.crypto.sell.quantity",
@@ -1935,12 +1992,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "price",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "price"
+        "mode": "DERIVED"
       },
       "resultPath": "result.price",
       "exportPath": "export.crypto.sell.price",
@@ -1962,12 +2018,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "currency",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "currency"
+        "mode": "DERIVED"
       },
       "resultPath": "result.currency",
       "exportPath": "export.crypto.sell.currency",
@@ -1992,7 +2047,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "fee_amount"
+        "column": "fee_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeAmount",
       "exportPath": "export.crypto.sell.feeAmount",
@@ -2019,7 +2075,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.crypto.transfer.operationId",
@@ -2044,7 +2101,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.crypto.transfer.instrumentId",
@@ -2069,7 +2127,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "quantity"
+        "column": "gross_quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantity",
       "exportPath": "export.crypto.transfer.quantity",
@@ -2090,12 +2149,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "fromScope",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "from_scope"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.from_scope"
       },
       "resultPath": "result.fromScope",
       "exportPath": "export.crypto.transfer.fromScope",
@@ -2115,12 +2174,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "toScope",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "to_scope"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.to_scope"
       },
       "resultPath": "result.toScope",
       "exportPath": "export.crypto.transfer.toScope",
@@ -2140,12 +2199,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/crypto.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "networkFee",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "network_fee"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.network_fee"
       },
       "resultPath": "result.networkFee",
       "exportPath": "export.crypto.transfer.networkFee",
@@ -2172,7 +2231,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.expense.create.operationId",
@@ -2197,7 +2257,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "exp_transactions",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.expense.create.amount",
@@ -2224,7 +2285,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "exp_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.expense.create.currency",
@@ -2249,7 +2311,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "exp_transactions",
-        "column": "category_id"
+        "column": "category_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.categoryId",
       "exportPath": "export.expense.create.categoryId",
@@ -2274,7 +2337,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "exp_transactions",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.expense.create.accountId",
@@ -2299,7 +2363,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.expense.create.businessDate",
@@ -2324,7 +2389,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.expense.reverse.operationId",
@@ -2344,12 +2410,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "originalOperationId",
       "kind": "RAW",
       "persistence": {
-        "table": "exp_transactions",
-        "column": "original_operation_id"
+        "mode": "DERIVED",
+        "note": "was exp_transactions.original_operation_id"
       },
       "resultPath": "result.originalOperationId",
       "exportPath": "export.expense.reverse.originalOperationId",
@@ -2374,7 +2440,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.funds.distribute.operationId",
@@ -2399,7 +2466,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.funds.distribute.instrumentId",
@@ -2424,7 +2492,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.funds.distribute.amount",
@@ -2451,7 +2520,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.funds.distribute.currency",
@@ -2471,12 +2541,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/funds.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "reinvest",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_fif_transactions",
-        "column": "reinvest"
+        "mode": "DERIVED",
+        "note": "was inv_fif_transactions.reinvest"
       },
       "resultPath": "result.reinvest",
       "exportPath": "export.funds.distribute.reinvest",
@@ -2501,7 +2571,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.funds.redeem.operationId",
@@ -2526,7 +2597,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.funds.redeem.instrumentId",
@@ -2551,7 +2623,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "units"
+        "column": "quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.units",
       "exportPath": "export.funds.redeem.units",
@@ -2576,7 +2649,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "transaction_price"
+        "column": "transaction_price",
+        "mode": "COLUMN"
       },
       "resultPath": "result.transactionPrice",
       "exportPath": "export.funds.redeem.transactionPrice",
@@ -2603,7 +2677,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.funds.redeem.currency",
@@ -2628,7 +2703,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "account_id"
+        "column": "account_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.funds.redeem.accountId",
@@ -2653,7 +2729,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.funds.subscribe.operationId",
@@ -2678,7 +2755,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.funds.subscribe.instrumentId",
@@ -2703,7 +2781,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.funds.subscribe.amount",
@@ -2730,7 +2809,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "transaction_price"
+        "column": "transaction_price",
+        "mode": "COLUMN"
       },
       "resultPath": "result.transactionPrice",
       "exportPath": "export.funds.subscribe.transactionPrice",
@@ -2757,7 +2837,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "nav"
+        "column": "nav",
+        "mode": "COLUMN"
       },
       "resultPath": "result.nav",
       "exportPath": "export.funds.subscribe.nav",
@@ -2784,7 +2865,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.funds.subscribe.currency",
@@ -2809,7 +2891,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "account_id"
+        "column": "account_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.funds.subscribe.accountId",
@@ -2833,8 +2916,9 @@
       "canonicalField": "name",
       "kind": "LABEL",
       "persistence": {
-        "table": "goal_goals",
-        "column": "name"
+        "table": "fg_goals",
+        "column": "name",
+        "mode": "COLUMN"
       },
       "resultPath": "result.name",
       "exportPath": "export.goal.create.name",
@@ -2858,8 +2942,9 @@
       "canonicalField": "targetAmount",
       "kind": "RAW",
       "persistence": {
-        "table": "goal_goals",
-        "column": "target_amount"
+        "table": "fg_goals",
+        "column": "target_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.targetAmount",
       "exportPath": "export.goal.create.targetAmount",
@@ -2885,8 +2970,9 @@
       "canonicalField": "currency",
       "kind": "RAW",
       "persistence": {
-        "table": "goal_goals",
-        "column": "currency"
+        "table": "fg_goals",
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.goal.create.currency",
@@ -2906,12 +2992,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/budget-goals-bills.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "deadline",
       "kind": "RAW",
       "persistence": {
-        "table": "goal_goals",
-        "column": "deadline"
+        "mode": "DERIVED",
+        "note": "was fg_goals.deadline"
       },
       "resultPath": "result.deadline",
       "exportPath": "export.goal.create.deadline",
@@ -2936,7 +3022,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.income.create.operationId",
@@ -2961,7 +3048,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inc_transactions",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.income.create.amount",
@@ -2988,7 +3076,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inc_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.income.create.currency",
@@ -3013,7 +3102,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inc_transactions",
-        "column": "category_id"
+        "column": "category_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.categoryId",
       "exportPath": "export.income.create.categoryId",
@@ -3038,7 +3128,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inc_transactions",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.income.create.accountId",
@@ -3063,7 +3154,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.income.create.businessDate",
@@ -3088,7 +3180,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.income.reverse.operationId",
@@ -3108,12 +3201,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/income-expense.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "originalOperationId",
       "kind": "RAW",
       "persistence": {
-        "table": "inc_transactions",
-        "column": "original_operation_id"
+        "mode": "DERIVED",
+        "note": "was inc_transactions.original_operation_id"
       },
       "resultPath": "result.originalOperationId",
       "exportPath": "export.income.reverse.originalOperationId",
@@ -3138,7 +3231,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.loan.create.operationId",
@@ -3163,7 +3257,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_loans",
-        "column": "principal"
+        "column": "principal",
+        "mode": "COLUMN"
       },
       "resultPath": "result.principal",
       "exportPath": "export.loan.create.principal",
@@ -3189,8 +3284,9 @@
       "canonicalField": "rate",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "rate"
+        "table": "ln_loans",
+        "column": "interest_rate",
+        "mode": "COLUMN"
       },
       "resultPath": "result.rate",
       "exportPath": "export.loan.create.rate",
@@ -3214,8 +3310,9 @@
       "canonicalField": "method",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "method"
+        "table": "ln_loans",
+        "column": "calculation_method",
+        "mode": "COLUMN"
       },
       "resultPath": "result.method",
       "exportPath": "export.loan.create.method",
@@ -3239,8 +3336,9 @@
       "canonicalField": "startDate",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "start_date"
+        "table": "ln_loans",
+        "column": "start_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.startDate",
       "exportPath": "export.loan.create.startDate",
@@ -3264,8 +3362,9 @@
       "canonicalField": "term",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "term"
+        "table": "ln_loans",
+        "column": "total_installments",
+        "mode": "COLUMN"
       },
       "resultPath": "result.term",
       "exportPath": "export.loan.create.term",
@@ -3290,7 +3389,8 @@
       "kind": "STATUS",
       "persistence": {
         "table": "ln_loans",
-        "column": "role"
+        "column": "role",
+        "mode": "COLUMN"
       },
       "resultPath": "result.role",
       "exportPath": "export.loan.create.role",
@@ -3315,7 +3415,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "loan_id"
+        "column": "loan_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.loanId",
       "exportPath": "export.loan.generateSchedule.loanId",
@@ -3335,12 +3436,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "engineVersion",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "engine_version"
+        "mode": "DERIVED",
+        "note": "was ln_transactions.engine_version"
       },
       "resultPath": "result.engineVersion",
       "exportPath": "export.loan.generateSchedule.engineVersion",
@@ -3360,12 +3461,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "calendarVersion",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "calendar_version"
+        "mode": "DERIVED",
+        "note": "was ln_transactions.calendar_version"
       },
       "resultPath": "result.calendarVersion",
       "exportPath": "export.loan.generateSchedule.calendarVersion",
@@ -3390,7 +3491,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_loans",
-        "column": "principal"
+        "column": "principal",
+        "mode": "COLUMN"
       },
       "resultPath": "result.principal",
       "exportPath": "export.loan.previewSchedule.principal",
@@ -3416,8 +3518,9 @@
       "canonicalField": "rate",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "rate"
+        "table": "ln_loans",
+        "column": "interest_rate",
+        "mode": "COLUMN"
       },
       "resultPath": "result.rate",
       "exportPath": "export.loan.previewSchedule.rate",
@@ -3441,8 +3544,9 @@
       "canonicalField": "method",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "method"
+        "table": "ln_loans",
+        "column": "calculation_method",
+        "mode": "COLUMN"
       },
       "resultPath": "result.method",
       "exportPath": "export.loan.previewSchedule.method",
@@ -3466,8 +3570,9 @@
       "canonicalField": "term",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "term"
+        "table": "ln_loans",
+        "column": "total_installments",
+        "mode": "COLUMN"
       },
       "resultPath": "result.term",
       "exportPath": "export.loan.previewSchedule.term",
@@ -3492,7 +3597,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.loan.recordPayment.operationId",
@@ -3517,7 +3623,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "loan_id"
+        "column": "loan_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.loanId",
       "exportPath": "export.loan.recordPayment.loanId",
@@ -3542,7 +3649,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.loan.recordPayment.amount",
@@ -3569,7 +3677,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.loan.recordPayment.businessDate",
@@ -3594,7 +3703,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.loan.reversePayment.operationId",
@@ -3614,12 +3724,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/loan.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "originalOperationId",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "original_operation_id"
+        "mode": "DERIVED",
+        "note": "was ln_transactions.original_operation_id"
       },
       "resultPath": "result.originalOperationId",
       "exportPath": "export.loan.reversePayment.originalOperationId",
@@ -3644,7 +3754,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.metals.buy.operationId",
@@ -3669,7 +3780,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.metals.buy.instrumentId",
@@ -3694,7 +3806,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "quantity_mg"
+        "column": "quantity_mg",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantityMg",
       "exportPath": "export.metals.buy.quantityMg",
@@ -3720,7 +3833,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_holdings",
-        "column": "purity_ratio"
+        "column": "purity_ratio",
+        "mode": "COLUMN"
       },
       "resultPath": "result.purityRatio",
       "exportPath": "export.metals.buy.purityRatio",
@@ -3745,7 +3859,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "metal_price_per_mg"
+        "column": "metal_price_per_mg",
+        "mode": "COLUMN"
       },
       "resultPath": "result.metalPricePerMg",
       "exportPath": "export.metals.buy.metalPricePerMg",
@@ -3767,12 +3882,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "premium",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "premium"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.premium"
       },
       "resultPath": "result.premium",
       "exportPath": "export.metals.buy.premium",
@@ -3797,7 +3912,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "fee"
+        "column": "fee_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.fee",
       "exportPath": "export.metals.buy.fee",
@@ -3824,7 +3940,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "quote_basis"
+        "column": "quote_basis",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quoteBasis",
       "exportPath": "export.metals.buy.quoteBasis",
@@ -3849,7 +3966,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.metals.delivery.operationId",
@@ -3874,7 +3992,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "holding_id"
+        "column": "holding_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.holdingId",
       "exportPath": "export.metals.delivery.holdingId",
@@ -3899,7 +4018,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "quantity_mg"
+        "column": "quantity_mg",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantityMg",
       "exportPath": "export.metals.delivery.quantityMg",
@@ -3925,7 +4045,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "fee_amount"
+        "column": "fee_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeAmount",
       "exportPath": "export.metals.delivery.feeAmount",
@@ -3952,7 +4073,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "fee_currency"
+        "column": "fee_currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeCurrency",
       "exportPath": "export.metals.delivery.feeCurrency",
@@ -3974,12 +4096,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "deliveryAddress",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "delivery_address"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.delivery_address"
       },
       "resultPath": "result.deliveryAddress",
       "exportPath": "export.metals.delivery.deliveryAddress",
@@ -3999,12 +4121,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "invoiceRef",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "invoice_ref"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.invoice_ref"
       },
       "resultPath": "result.invoiceRef",
       "exportPath": "export.metals.delivery.invoiceRef",
@@ -4029,7 +4151,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.metals.sell.operationId",
@@ -4054,7 +4177,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "holding_id"
+        "column": "holding_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.holdingId",
       "exportPath": "export.metals.sell.holdingId",
@@ -4079,7 +4203,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "quantity_mg"
+        "column": "quantity_mg",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantityMg",
       "exportPath": "export.metals.sell.quantityMg",
@@ -4100,12 +4225,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/metals.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "price",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "price"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.price"
       },
       "resultPath": "result.price",
       "exportPath": "export.metals.sell.price",
@@ -4132,7 +4257,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.metals.sell.currency",
@@ -4157,7 +4283,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "fee"
+        "column": "fee_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.fee",
       "exportPath": "export.metals.sell.fee",
@@ -4184,7 +4311,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.stocks.buy.operationId",
@@ -4209,7 +4337,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.stocks.buy.instrumentId",
@@ -4234,7 +4363,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "brokerage_id"
+        "column": "brokerage_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.brokerageId",
       "exportPath": "export.stocks.buy.brokerageId",
@@ -4259,7 +4389,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "quantity"
+        "column": "quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantity",
       "exportPath": "export.stocks.buy.quantity",
@@ -4285,7 +4416,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "price"
+        "column": "price",
+        "mode": "COLUMN"
       },
       "resultPath": "result.price",
       "exportPath": "export.stocks.buy.price",
@@ -4312,7 +4444,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.stocks.buy.currency",
@@ -4337,7 +4470,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "trade_date"
+        "column": "trade_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.tradeDate",
       "exportPath": "export.stocks.buy.tradeDate",
@@ -4362,7 +4496,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "settlement_date"
+        "column": "settlement_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.settlementDate",
       "exportPath": "export.stocks.buy.settlementDate",
@@ -4387,7 +4522,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "commission"
+        "column": "fee_commission",
+        "mode": "COLUMN"
       },
       "resultPath": "result.commission",
       "exportPath": "export.stocks.buy.commission",
@@ -4412,7 +4548,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "tax"
+        "column": "fee_tax",
+        "mode": "COLUMN"
       },
       "resultPath": "result.tax",
       "exportPath": "export.stocks.buy.tax",
@@ -4437,7 +4574,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "other_fee"
+        "column": "fee_other",
+        "mode": "COLUMN"
       },
       "resultPath": "result.otherFee",
       "exportPath": "export.stocks.buy.otherFee",
@@ -4464,7 +4602,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.stocks.dividend.operationId",
@@ -4489,7 +4628,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.stocks.dividend.instrumentId",
@@ -4509,12 +4649,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "amount",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "amount"
+        "mode": "DERIVED"
       },
       "resultPath": "result.amount",
       "exportPath": "export.stocks.dividend.amount",
@@ -4541,7 +4680,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.stocks.dividend.currency",
@@ -4561,12 +4701,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "exDate",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "ex_date"
+        "mode": "DERIVED",
+        "note": "was inv_stocks_iran_transactions.ex_date"
       },
       "resultPath": "result.exDate",
       "exportPath": "export.stocks.dividend.exDate",
@@ -4586,12 +4726,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "payDate",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "pay_date"
+        "mode": "DERIVED",
+        "note": "was inv_stocks_iran_transactions.pay_date"
       },
       "resultPath": "result.payDate",
       "exportPath": "export.stocks.dividend.payDate",
@@ -4616,7 +4756,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.stocks.sell.operationId",
@@ -4641,7 +4782,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "instrument_id"
+        "column": "instrument_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.instrumentId",
       "exportPath": "export.stocks.sell.instrumentId",
@@ -4666,7 +4808,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "brokerage_id"
+        "column": "brokerage_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.brokerageId",
       "exportPath": "export.stocks.sell.brokerageId",
@@ -4691,7 +4834,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "quantity"
+        "column": "quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.quantity",
       "exportPath": "export.stocks.sell.quantity",
@@ -4717,7 +4861,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "price"
+        "column": "price",
+        "mode": "COLUMN"
       },
       "resultPath": "result.price",
       "exportPath": "export.stocks.sell.price",
@@ -4744,7 +4889,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.stocks.sell.currency",
@@ -4769,7 +4915,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "commission"
+        "column": "fee_commission",
+        "mode": "COLUMN"
       },
       "resultPath": "result.commission",
       "exportPath": "export.stocks.sell.commission",
@@ -4794,7 +4941,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "tax"
+        "column": "fee_tax",
+        "mode": "COLUMN"
       },
       "resultPath": "result.tax",
       "exportPath": "export.stocks.sell.tax",
@@ -4819,7 +4967,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "other_fee"
+        "column": "fee_other",
+        "mode": "COLUMN"
       },
       "resultPath": "result.otherFee",
       "exportPath": "export.stocks.sell.otherFee",
@@ -4846,7 +4995,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.stocks.settle.operationId",
@@ -4871,7 +5021,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "related_operation_id"
+        "column": "related_operation_id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.relatedOperationId",
       "exportPath": "export.stocks.settle.relatedOperationId",
@@ -4896,7 +5047,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "settlement_date"
+        "column": "settlement_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.settlementDate",
       "exportPath": "export.stocks.settle.settlementDate",
@@ -4921,7 +5073,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.stocks.settle.currency",
@@ -4946,7 +5099,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.tax.adjust.operationId",
@@ -4966,12 +5120,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "taxRecordId",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "tax_events",
-        "column": "tax_record_id"
+        "mode": "DERIVED"
       },
       "resultPath": "result.taxRecordId",
       "exportPath": "export.tax.adjust.taxRecordId",
@@ -4991,12 +5144,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "deltaAmount",
       "kind": "RAW",
       "persistence": {
-        "table": "tax_events",
-        "column": "delta_amount"
+        "mode": "DERIVED",
+        "note": "was tax_events.delta_amount"
       },
       "resultPath": "result.deltaAmount",
       "exportPath": "export.tax.adjust.deltaAmount",
@@ -5018,12 +5171,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "reason",
       "kind": "RAW",
       "persistence": {
-        "table": "tax_events",
-        "column": "reason"
+        "mode": "DERIVED",
+        "note": "was tax_events.reason"
       },
       "resultPath": "result.reason",
       "exportPath": "export.tax.adjust.reason",
@@ -5048,7 +5201,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.tax.assess.operationId",
@@ -5073,7 +5227,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "tax_events",
-        "column": "tax_year"
+        "column": "tax_year",
+        "mode": "COLUMN"
       },
       "resultPath": "result.taxYear",
       "exportPath": "export.tax.assess.taxYear",
@@ -5098,7 +5253,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "tax_events",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.tax.assess.amount",
@@ -5125,7 +5281,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "tax_events",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.tax.assess.currency",
@@ -5145,12 +5302,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "kind",
       "kind": "RAW",
       "persistence": {
-        "table": "tax_events",
-        "column": "kind"
+        "mode": "DERIVED",
+        "note": "was tax_events.kind"
       },
       "resultPath": "result.kind",
       "exportPath": "export.tax.assess.kind",
@@ -5175,7 +5332,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.operationId",
       "exportPath": "export.tax.pay.operationId",
@@ -5195,12 +5353,11 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/tax.md",
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "taxRecordId",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "tax_events",
-        "column": "tax_record_id"
+        "mode": "DERIVED"
       },
       "resultPath": "result.taxRecordId",
       "exportPath": "export.tax.pay.taxRecordId",
@@ -5225,7 +5382,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "tax_events",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.amount",
       "exportPath": "export.tax.pay.amount",
@@ -5252,7 +5410,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "tax_events",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.tax.pay.currency",
@@ -5277,7 +5436,8 @@
       "kind": "REFERENCE",
       "persistence": {
         "table": "tax_events",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "resultPath": "result.accountId",
       "exportPath": "export.tax.pay.accountId",
@@ -5302,7 +5462,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.tax.pay.businessDate",
@@ -5328,7 +5489,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "cash_date"
+        "column": "cash_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.cashDate",
       "exportPath": "export.stocks.buy.cashDate",
@@ -5354,7 +5516,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_stocks_iran_transactions",
-        "column": "settlement_policy_version"
+        "column": "settlement_policy_version",
+        "mode": "COLUMN"
       },
       "resultPath": "result.settlement_policy_version",
       "exportPath": "export.stocks.buy.settlement_policy_version",
@@ -5375,12 +5538,11 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "fromVenue",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "from_venue"
+        "mode": "DERIVED"
       },
       "resultPath": "result.fromVenue",
       "exportPath": "export.crypto.transfer.fromVenue",
@@ -5401,12 +5563,12 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "fromNetwork",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "from_network"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.from_network"
       },
       "resultPath": "result.fromNetwork",
       "exportPath": "export.crypto.transfer.fromNetwork",
@@ -5427,12 +5589,11 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "toVenue",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "to_venue"
+        "mode": "DERIVED"
       },
       "resultPath": "result.toVenue",
       "exportPath": "export.crypto.transfer.toVenue",
@@ -5453,12 +5614,12 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "toNetwork",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "to_network"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.to_network"
       },
       "resultPath": "result.toNetwork",
       "exportPath": "export.crypto.transfer.toNetwork",
@@ -5484,7 +5645,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "fee_funding_kind"
+        "column": "fee_funding_kind",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeFundingKind",
       "exportPath": "export.crypto.transfer.feeFundingKind",
@@ -5507,12 +5669,12 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "externalTxReference",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "external_tx_reference"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.external_tx_reference"
       },
       "resultPath": "result.externalTxReference",
       "exportPath": "export.crypto.transfer.externalTxReference",
@@ -5533,12 +5695,12 @@
       "migrated": true,
       "owner": "docs/modules/crypto.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "provenance",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_crypto_transactions",
-        "column": "provenance"
+        "mode": "DERIVED",
+        "note": "was inv_crypto_transactions.provenance"
       },
       "resultPath": "result.provenance",
       "exportPath": "export.crypto.transfer.provenance",
@@ -5559,12 +5721,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "fineWeight",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "fine_weight"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.fine_weight"
       },
       "resultPath": "result.fineWeight",
       "exportPath": "export.metals.buy.fineWeight",
@@ -5591,7 +5753,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "premium_amount"
+        "column": "premium_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.premiumAmount",
       "exportPath": "export.metals.buy.premiumAmount",
@@ -5619,7 +5782,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_metals_transactions",
-        "column": "fee_amount"
+        "column": "fee_amount",
+        "mode": "COLUMN"
       },
       "resultPath": "result.feeAmount",
       "exportPath": "export.metals.buy.feeAmount",
@@ -5642,12 +5806,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "serial",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "serial"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.serial"
       },
       "resultPath": "result.serial",
       "exportPath": "export.metals.buy.serial",
@@ -5668,12 +5832,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "certificate",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "certificate"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.certificate"
       },
       "resultPath": "result.certificate",
       "exportPath": "export.metals.buy.certificate",
@@ -5694,12 +5858,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "location",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_metals_transactions",
-        "column": "location"
+        "mode": "DERIVED",
+        "note": "was inv_metals_transactions.location"
       },
       "resultPath": "result.location",
       "exportPath": "export.metals.buy.location",
@@ -5725,7 +5889,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "inv_fif_transactions",
-        "column": "units"
+        "column": "quantity",
+        "mode": "COLUMN"
       },
       "resultPath": "result.units",
       "exportPath": "export.funds.subscribe.units",
@@ -5746,12 +5911,12 @@
       "migrated": true,
       "owner": "docs/modules/funds.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "feeAmount",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_fif_transactions",
-        "column": "fee_amount"
+        "mode": "DERIVED",
+        "note": "was inv_fif_transactions.fee_amount"
       },
       "resultPath": "result.feeAmount",
       "exportPath": "export.funds.subscribe.feeAmount",
@@ -5779,7 +5944,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_loans",
-        "column": "interest_rate"
+        "column": "interest_rate",
+        "mode": "COLUMN"
       },
       "resultPath": "result.annualRate",
       "exportPath": "export.loan.create.annualRate",
@@ -5804,8 +5970,9 @@
       "canonicalField": "periods",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "periods"
+        "table": "ln_loans",
+        "column": "total_installments",
+        "mode": "COLUMN"
       },
       "resultPath": "result.periods",
       "exportPath": "export.loan.create.periods",
@@ -5826,12 +5993,12 @@
       "migrated": true,
       "owner": "docs/modules/loan.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "originationKind",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "origination_kind"
+        "mode": "DERIVED",
+        "note": "was ln_transactions.origination_kind"
       },
       "resultPath": "result.originationKind",
       "exportPath": "export.loan.create.originationKind",
@@ -5857,7 +6024,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.loan.create.currency",
@@ -5878,12 +6046,11 @@
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "amount",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "amount"
+        "mode": "DERIVED"
       },
       "resultPath": "result.amount",
       "exportPath": "export.stocks.settle.amount",
@@ -5906,12 +6073,12 @@
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "amountInBase",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "amount_in_base"
+        "mode": "DERIVED",
+        "note": "was inv_stocks_iran_transactions.amount_in_base"
       },
       "resultPath": "result.amountInBase",
       "exportPath": "export.stocks.settle.amountInBase",
@@ -5934,12 +6101,12 @@
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "exchangeRateToBase",
       "kind": "RAW",
       "persistence": {
-        "table": "inv_stocks_iran_transactions",
-        "column": "exchange_rate_to_base"
+        "mode": "DERIVED",
+        "note": "was inv_stocks_iran_transactions.exchange_rate_to_base"
       },
       "resultPath": "result.exchangeRateToBase",
       "exportPath": "export.stocks.settle.exchangeRateToBase",
@@ -5965,7 +6132,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "resultPath": "result.businessDate",
       "exportPath": "export.stocks.settle.businessDate",
@@ -5991,7 +6159,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "resultPath": "result.currency",
       "exportPath": "export.loan.recordPayment.currency",
@@ -6012,12 +6181,12 @@
       "migrated": true,
       "owner": "docs/FINANCIAL-CORE.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "canonicalField": "amountInBase",
       "kind": "RAW",
       "persistence": {
-        "table": "ln_transactions",
-        "column": "amount_in_base"
+        "mode": "DERIVED",
+        "note": "was ln_transactions.amount_in_base"
       },
       "resultPath": "result.amountInBase",
       "exportPath": "export.loan.recordPayment.amountInBase",
@@ -6045,7 +6214,8 @@
       "kind": "RAW",
       "persistence": {
         "table": "ln_transactions",
-        "column": "exchange_rate_to_base"
+        "column": "exchange_rate_to_base",
+        "mode": "COLUMN"
       },
       "resultPath": "result.exchangeRateToBase",
       "exportPath": "export.loan.recordPayment.exchangeRateToBase",
@@ -6069,7 +6239,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "inv_crypto_transactions",
-        "column": "economic_kind"
+        "column": "economic_kind",
+        "mode": "COLUMN"
       },
       "canonicalField": "economic_kind",
       "kind": "RAW",
@@ -6095,7 +6266,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6121,7 +6293,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -6147,7 +6320,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6173,7 +6347,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_journal_lines",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "currency",
       "kind": "RAW",
@@ -6199,7 +6374,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -6225,7 +6401,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6251,7 +6428,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_journal_lines",
-        "column": "currency"
+        "column": "currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "currency",
       "kind": "RAW",
@@ -6277,7 +6455,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_journal_lines",
-        "column": "amount"
+        "column": "amount",
+        "mode": "COLUMN"
       },
       "canonicalField": "amount",
       "kind": "RAW",
@@ -6305,7 +6484,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6331,7 +6511,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6357,7 +6538,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6383,7 +6565,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6409,7 +6592,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6435,7 +6619,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6461,7 +6646,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6487,7 +6673,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6513,7 +6700,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6539,7 +6727,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6565,7 +6754,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6591,7 +6781,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6617,7 +6808,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6643,7 +6835,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6669,7 +6862,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6695,7 +6889,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6721,7 +6916,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6747,7 +6943,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6773,7 +6970,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6799,7 +6997,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6825,7 +7024,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6851,7 +7051,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6877,7 +7078,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -6903,7 +7105,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -6929,7 +7132,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -6955,7 +7159,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -6981,7 +7186,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7007,7 +7213,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7033,7 +7240,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7059,7 +7267,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7085,7 +7294,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7111,7 +7321,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7137,7 +7348,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7163,7 +7375,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7189,7 +7402,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7215,7 +7429,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7241,7 +7456,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7267,7 +7483,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7293,7 +7510,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7319,7 +7537,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7345,7 +7564,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7371,7 +7591,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7397,7 +7618,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7423,7 +7645,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7449,7 +7672,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7475,7 +7699,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7501,7 +7726,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7527,7 +7753,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7553,7 +7780,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7579,7 +7807,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7605,7 +7834,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7628,13 +7858,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "persistence": {
-        "table": "domain:metals",
-        "column": "delivery"
+        "mode": "DERIVED"
       },
       "canonicalField": "serial",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "resultPath": "result.serial",
       "exportPath": "export.metals.delivery.serial",
       "reversal": "inverse operation; original field retained on original op",
@@ -7654,13 +7883,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "persistence": {
-        "table": "domain:metals",
-        "column": "delivery"
+        "mode": "DERIVED"
       },
       "canonicalField": "certificate",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "resultPath": "result.certificate",
       "exportPath": "export.metals.delivery.certificate",
       "reversal": "inverse operation; original field retained on original op",
@@ -7680,13 +7908,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "persistence": {
-        "table": "domain:metals",
-        "column": "delivery"
+        "mode": "DERIVED"
       },
       "canonicalField": "location",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "resultPath": "result.location",
       "exportPath": "export.metals.delivery.location",
       "reversal": "inverse operation; original field retained on original op",
@@ -7706,13 +7933,12 @@
       "migrated": true,
       "owner": "docs/modules/metals.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "persistence": {
-        "table": "domain:metals",
-        "column": "delivery"
+        "mode": "DERIVED"
       },
       "canonicalField": "quoteBasis",
-      "kind": "RAW",
+      "kind": "DERIVED",
       "resultPath": "result.quoteBasis",
       "exportPath": "export.metals.delivery.quoteBasis",
       "reversal": "inverse operation; original field retained on original op",
@@ -7735,7 +7961,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7761,7 +7988,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7787,7 +8015,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7813,7 +8042,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7839,7 +8069,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7865,7 +8096,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7891,7 +8123,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -7917,7 +8150,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -7943,7 +8177,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -7969,7 +8204,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -7995,7 +8231,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8021,7 +8258,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -8047,7 +8285,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -8073,7 +8312,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8099,7 +8339,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8125,7 +8366,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8151,7 +8393,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -8177,7 +8420,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -8203,7 +8447,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8229,7 +8474,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8255,7 +8501,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8281,7 +8528,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8307,7 +8555,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8333,7 +8582,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8359,7 +8609,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8385,7 +8636,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8411,7 +8663,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8437,7 +8690,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8463,7 +8717,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8489,7 +8744,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8515,7 +8771,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8541,7 +8798,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8567,7 +8825,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8593,7 +8852,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8619,7 +8879,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8645,7 +8906,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8671,7 +8933,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8697,7 +8960,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8723,7 +8987,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8749,7 +9014,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8775,7 +9041,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8801,7 +9068,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8827,7 +9095,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8853,7 +9122,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8879,7 +9149,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -8905,7 +9176,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -8931,7 +9203,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -8957,7 +9230,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -8983,7 +9257,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9009,7 +9284,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9035,7 +9311,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9061,7 +9338,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9087,7 +9365,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9113,7 +9392,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9139,7 +9419,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9165,7 +9446,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9191,7 +9473,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9217,7 +9500,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9243,7 +9527,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9269,7 +9554,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9295,7 +9581,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9321,7 +9608,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9347,7 +9635,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9373,7 +9662,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9399,7 +9689,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9425,7 +9716,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9451,7 +9743,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9477,7 +9770,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9503,7 +9797,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9529,7 +9824,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9555,7 +9851,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9581,7 +9878,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9607,7 +9905,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9633,7 +9932,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9659,7 +9959,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9685,7 +9986,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -9711,7 +10013,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9737,7 +10040,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9763,7 +10067,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9789,7 +10094,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9815,7 +10121,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9841,7 +10148,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9867,7 +10175,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -9893,7 +10202,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -9919,7 +10229,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -9945,7 +10256,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -9971,7 +10283,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -9997,7 +10310,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10023,7 +10337,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10049,7 +10364,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -10075,7 +10391,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -10101,7 +10418,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -10127,7 +10445,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10153,7 +10472,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10179,7 +10499,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "id"
+        "column": "id",
+        "mode": "COLUMN"
       },
       "canonicalField": "operationId",
       "kind": "REFERENCE",
@@ -10205,7 +10526,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -10231,7 +10553,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -10257,7 +10580,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10283,7 +10607,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10309,7 +10634,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -10335,7 +10661,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -10361,7 +10688,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10387,7 +10715,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10413,7 +10742,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -10439,7 +10769,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10465,7 +10796,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10491,7 +10823,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "business_date"
+        "column": "business_date",
+        "mode": "COLUMN"
       },
       "canonicalField": "businessDate",
       "kind": "RAW",
@@ -10517,7 +10850,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "base_currency"
+        "column": "base_currency",
+        "mode": "COLUMN"
       },
       "canonicalField": "baseCurrency",
       "kind": "RAW",
@@ -10543,7 +10877,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "command_hash"
+        "column": "command_hash",
+        "mode": "COLUMN"
       },
       "canonicalField": "commandHash",
       "kind": "SYSTEM_INDEX",
@@ -10569,7 +10904,8 @@
       "disposition": "PERSISTED",
       "persistence": {
         "table": "fin_operations",
-        "column": "status"
+        "column": "status",
+        "mode": "COLUMN"
       },
       "canonicalField": "status",
       "kind": "STATUS",
@@ -10592,10 +10928,10 @@
       "migrated": true,
       "owner": "docs/modules/funds.md",
       "protected": true,
-      "disposition": "PERSISTED",
+      "disposition": "DERIVED",
       "persistence": {
-        "table": "price_history",
-        "column": "quote_type=liquidation"
+        "mode": "DERIVED",
+        "note": "was price_history.quote_type=liquidation"
       },
       "canonicalField": "liquidationPrice",
       "kind": "RAW",

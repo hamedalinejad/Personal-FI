@@ -1,4 +1,4 @@
-import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency, resolveBaseAmountSync } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -28,7 +28,7 @@ export async function distributeFund(input, { dataDir } = {}) {
   let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
   if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
   else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
-  const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(exchangeRateToBase).toFixed();
+  const toBase = (amt) => resolveBaseAmountSync(amt, currency, baseCurrency, exchangeRateToBase).amountInBase;
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const incId = scopedAccountId("fund_distribution_income", currency);
@@ -39,7 +39,7 @@ export async function distributeFund(input, { dataDir } = {}) {
       side: "debit",
       amount: amount.toFixed(),
       currency,
-      amountInBase: amount.toFixed(),
+      amountInBase: toBase(amount),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
@@ -48,7 +48,7 @@ export async function distributeFund(input, { dataDir } = {}) {
       side: "credit",
       amount: amount.toFixed(),
       currency,
-      amountInBase: amount.toFixed(),
+      amountInBase: toBase(amount),
       exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },

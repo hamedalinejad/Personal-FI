@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { openDb } from "../persistence/port.js";
 
 /** Product default for local-first Iran book when db_meta not yet set. */
@@ -80,4 +81,35 @@ export function requireFxIfCrossCurrency({
     throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   }
   return String(exchangeRateToBase);
+}
+
+
+/**
+ * Canonical journal base amount for a line.
+ * amountInBase = amount × exchangeRateToBase (rate is base units per 1 transaction unit).
+ * Same-currency → rate must be 1.
+ */
+
+
+/**
+ * Canonical amountInBase for journal lines.
+ * amountInBase = amount × exchangeRateToBase (base units per 1 transaction unit).
+ * Same currency forces rate = 1.
+ */
+export function resolveBaseAmountSync(amount, transactionCurrency, bookBaseCurrency, exchangeRateToBase) {
+  if (transactionCurrency == null || bookBaseCurrency == null) {
+    throw new Error("VALIDATION_ERROR:currency");
+  }
+  const amt = new Decimal(amount?.toFixed ? amount.toFixed() : String(amount));
+  if (transactionCurrency === bookBaseCurrency) {
+    return { amountInBase: amt.toFixed(), exchangeRateToBase: "1" };
+  }
+  if (exchangeRateToBase == null || exchangeRateToBase === "") {
+    throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  }
+  const rate = new Decimal(String(exchangeRateToBase));
+  return {
+    amountInBase: amt.times(rate).toFixed(),
+    exchangeRateToBase: rate.toFixed(),
+  };
 }

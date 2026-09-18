@@ -125,6 +125,7 @@ src/core/acceptance/reporting.acceptance.test.js	D	test	keep
 src/core/acceptance/standalone-edition-packs.acceptance.test.js	D	test	keep
 src/core/acceptance/standalone.acceptance.test.js	D	test	keep
 src/core/acceptance/tax.acceptance.test.js	D	test	keep
+src/core/accounting/bookSettings.baseAmount.test.js	D	test	keep
 src/core/accounting/bookSettings.js	E	impl	keep
 src/core/accounting/bookSettings.test.js	D	test	keep
 src/core/accounting/chartOfAccounts.js	E	impl	keep

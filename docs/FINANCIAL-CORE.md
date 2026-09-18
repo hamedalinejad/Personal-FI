@@ -25,7 +25,8 @@ No feature parallel cash ledger. UI never builds journal lines.
 | Book base | `db_meta.book_base_currency` (default IRR) — never transaction currency |
 | Snapshot | `fin_operations.base_currency` = immutable base resolved at **normalize**; later settings changes never rewrite posted ops |
 | Book base mutation | Mutable only **before first posted** operation; after that `BOOK_BASE_LOCKED` (migration/new-book required). UI display currency ≠ book base |
-| Equation | `amountInBase = amount × exchangeRateToBase` (basePerTxnUnit) |
+| Equation | `amountInBase = amount × exchangeRateToBase  
+Helper: `resolveBaseAmountSync` (Core) — features must not hard-code `amountInBase = amount` when currencies differ.` (basePerTxnUnit) |
 | Base line | rate = 1, amountInBase = amount |
 | Non-base posted | rate + amountInBase + conversionPath (when multi-hop) **required** |
 | Fail-closed | Missing/stale rate without explicit override → **no financial post**; never zero-fill |

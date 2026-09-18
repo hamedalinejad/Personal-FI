@@ -1,4 +1,4 @@
-import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency, resolveBaseAmountSync } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -62,6 +62,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
   else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   else exchangeRateToBase = toDecimal(exchangeRateToBase);
   const exchangeRateToBaseStr = exchangeRateToBase.toFixed();
+  const toBase = (amt) => resolveBaseAmountSync(amt, currency, baseCurrency, exchangeRateToBase).amountInBase;
 
 
   const fee = toDecimal(p.deliveryFee || "0");
@@ -72,6 +73,9 @@ export async function deliverMetal(input, { dataDir } = {}) {
   const db0 = openDb(dataDir);
   const holding = resolveMetalsHolding(db0, p);
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
+  if (holding.cost_currency && holding.cost_currency !== currency) {
+    throw new Error(`COST_CURRENCY_MISMATCH:${holding.cost_currency}!=${currency}`);
+  }
 
   // delivery is transfer of carrying, not disposal at 0
   const unit = toDecimal(holding.total_invested).div(toDecimal(holding.quantity_mg));
@@ -91,7 +95,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
       side: "debit",
       amount: carrying.toFixed(),
       currency,
-      amountInBase: carrying.toFixed(),
+      amountInBase: toBase(carrying),
       exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
@@ -100,7 +104,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
       side: "credit",
       amount: carrying.toFixed(),
       currency,
-      amountInBase: carrying.toFixed(),
+      amountInBase: toBase(carrying),
       exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
@@ -112,7 +116,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
         side: "debit",
         amount: fee.toFixed(),
         currency,
-        amountInBase: fee.toFixed(),
+        amountInBase: toBase(fee),
         exchangeRateToBase: exchangeRateToBaseStr,
         lineKind: "fee",
       },
@@ -121,7 +125,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
         side: "credit",
         amount: fee.toFixed(),
         currency,
-        amountInBase: fee.toFixed(),
+        amountInBase: toBase(fee),
         exchangeRateToBase: exchangeRateToBaseStr,
         lineKind: "fee",
       },

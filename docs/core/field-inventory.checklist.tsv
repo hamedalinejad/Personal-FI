@@ -356,7 +356,6 @@ inv_crypto_exchanges	name	RAW	Crypto	yes	inv_crypto_exchanges	canonical	yes
 inv_crypto_exchanges	type	STATUS	Crypto	no	inv_crypto_exchanges	canonical	yes
 inv_crypto_exchanges	updated_at	SYSTEM_INDEX	Crypto	no	inv_crypto_exchanges	canonical	yes
 inv_crypto_exchanges	url	RAW	Crypto	no	inv_crypto_exchanges	canonical	yes
-inv_crypto_exchanges	venue_kind	RAW	Crypto	yes	inv_crypto_exchanges	canonical	yes
 inv_crypto_holdings	cost_currency	RAW	Crypto	yes	inv_crypto_holdings	canonical	yes
 inv_crypto_holdings	created_at	SYSTEM_INDEX	Crypto	yes	inv_crypto_holdings	canonical	yes
 inv_crypto_holdings	exchange_id	RAW	Crypto	yes	inv_crypto_holdings	canonical	yes

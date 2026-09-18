@@ -165,3 +165,11 @@ SQLite CHECK = structural sanity only; Decimal domain = financial truth.
 
 ## Queries (v1)
 This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).
+
+
+## Carrying currency (v1 LOCKED)
+```
+holding.cost_currency MUST equal transaction currency
+```
+Mismatch → `COST_CURRENCY_MISMATCH` reject.  
+Multi-currency carrying / FX attribution on metals inventory = **DEFERRED**.

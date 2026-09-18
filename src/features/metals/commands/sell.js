@@ -1,4 +1,4 @@
-import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core/accounting/bookSettings.js";
+import { resolveBookBaseCurrency, requireFxIfCrossCurrency, resolveBaseAmountSync } from "../../../core/accounting/bookSettings.js";
 import { randomUUID } from "node:crypto";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
 import {
@@ -63,7 +63,8 @@ export async function sellMetal(input, { dataDir } = {}) {
   else exchangeRateToBase = toDecimal(exchangeRateToBase);
   const exchangeRateToBaseStr = exchangeRateToBase.toFixed();
 
-  const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(exchangeRateToBase).toFixed();
+  const toBase = (amt) => resolveBaseAmountSync(amt, currency, baseCurrency, exchangeRateToBase).amountInBase;
+
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const invId = scopedAccountId("metal_inventory", currency);
@@ -72,6 +73,9 @@ export async function sellMetal(input, { dataDir } = {}) {
   const db0 = openDb(dataDir);
   const holding = resolveMetalsHolding(db0, p);
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
+  if (holding.cost_currency && holding.cost_currency !== currency) {
+    throw new Error(`COST_CURRENCY_MISMATCH:${holding.cost_currency}!=${currency}`);
+  }
 
   const disposal = applyDisposal(
     { quantity: holding.quantity_mg, totalInvested: holding.total_invested },
@@ -87,7 +91,7 @@ export async function sellMetal(input, { dataDir } = {}) {
       side: "debit",
       amount: proceeds.toFixed(),
       currency,
-      amountInBase: proceeds.toFixed(),
+      amountInBase: toBase(proceeds),
       exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
@@ -96,7 +100,7 @@ export async function sellMetal(input, { dataDir } = {}) {
       side: "credit",
       amount: costReleased.toFixed(),
       currency,
-      amountInBase: costReleased.toFixed(),
+      amountInBase: toBase(costReleased),
       exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
@@ -107,7 +111,7 @@ export async function sellMetal(input, { dataDir } = {}) {
       side: realized.gt(0) ? "credit" : "debit",
       amount: realized.abs().toFixed(),
       currency,
-      amountInBase: realized.abs().toFixed(),
+      amountInBase: toBase(realized.abs()),
       exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     });

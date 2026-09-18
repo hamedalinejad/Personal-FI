@@ -182,3 +182,8 @@ It does **not** create `tax_events` obligation lineage in v1. Full tax-owner int
 
 ## Queries (v1)
 This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).
+
+
+## Dividend withholding (v1 LOCKED)
+withholdingTax is a **transaction-only netting adjustment** (gross − tax = cash).
+Journal posts an expense leg on the dividend operation; it does **not** create tax_events or pay Tax-module obligations.

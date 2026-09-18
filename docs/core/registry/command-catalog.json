@@ -48,29 +48,52 @@
             "type": "string"
           },
           {
-            "name": "quantity",
+            "name": "grossQuantity",
             "required": true,
             "type": "decimal_string"
           },
           {
-            "name": "price",
-            "required": true,
-            "type": "decimal_string"
-          },
-          {
-            "name": "currency",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "feeAmount",
+            "name": "netQuantity",
             "required": false,
-            "type": "decimal_string"
+            "type": "decimal_string",
+            "note": "derived if omitted"
           },
           {
             "name": "feeQuantity",
             "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "price",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "costTotal",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "costCurrency",
+            "required": true,
             "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": "string",
+            "aliasOf": "costCurrency"
+          },
+          {
+            "name": "exchangeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "venueId",
+            "required": false,
+            "type": "string",
+            "aliasOf": "exchangeId"
           },
           {
             "name": "networkId",
@@ -78,14 +101,29 @@
             "type": "string"
           },
           {
-            "name": "exchangeId",
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeCurrency",
             "required": false,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "feeTreatment",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
@@ -184,7 +222,8 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "aliases": {}
       },
       "maturity": "partial"
     },
@@ -214,14 +253,36 @@
             "type": "decimal_string"
           },
           {
-            "name": "price",
+            "name": "proceedsTotal",
             "required": true,
             "type": "decimal_string"
           },
           {
-            "name": "currency",
+            "name": "proceedsCurrency",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": "string",
+            "aliasOf": "proceedsCurrency"
+          },
+          {
+            "name": "exchangeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "venueId",
+            "required": false,
+            "type": "string",
+            "aliasOf": "exchangeId"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
           },
           {
             "name": "feeAmount",
@@ -229,9 +290,14 @@
             "type": "decimal_string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "feeTreatment",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
@@ -329,7 +395,8 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "aliases": {}
       },
       "maturity": "partial"
     },
@@ -351,22 +418,42 @@
             "type": "string"
           },
           {
-            "name": "quantity",
+            "name": "fromExchangeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toExchangeId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "grossQuantity",
             "required": true,
             "type": "decimal_string"
           },
           {
-            "name": "fromScope",
-            "required": true,
+            "name": "netQuantity",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeQuantity",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "networkId",
+            "required": false,
             "type": "string"
           },
           {
-            "name": "toScope",
-            "required": true,
+            "name": "feeFundingKind",
+            "required": false,
             "type": "string"
           },
           {
-            "name": "networkFee",
+            "name": "feeInstrumentId",
             "required": false,
             "type": "string"
           },
@@ -374,6 +461,16 @@
             "name": "businessDate",
             "required": true,
             "type": "date"
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
@@ -471,7 +568,8 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "aliases": {}
       },
       "maturity": "partial"
     },
@@ -1943,14 +2041,25 @@
             "type": "string"
           },
           {
-            "name": "principal",
+            "name": "currency",
             "required": true,
             "type": "string"
           },
           {
-            "name": "rate",
+            "name": "principal",
             "required": true,
-            "type": "string"
+            "type": "decimal_string"
+          },
+          {
+            "name": "annualRate",
+            "required": true,
+            "type": "decimal_string",
+            "note": "percentage points; 18 = 18%"
+          },
+          {
+            "name": "periods",
+            "required": true,
+            "type": "integer"
           },
           {
             "name": "method",
@@ -1963,17 +2072,18 @@
             "type": "date"
           },
           {
-            "name": "term",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "role",
             "required": true,
+            "type": "string",
+            "note": "v1 lender only"
+          },
+          {
+            "name": "dayCount",
+            "required": false,
             "type": "string"
           },
           {
-            "name": "originationKind",
+            "name": "installmentFrequency",
             "required": false,
             "type": "string"
           },
@@ -1981,6 +2091,16 @@
             "name": "businessDate",
             "required": true,
             "type": "date"
+          },
+          {
+            "name": "name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "economicMode",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
@@ -2060,7 +2180,8 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "aliases": {}
       },
       "maturity": "strongest"
     },
