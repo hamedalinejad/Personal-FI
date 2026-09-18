@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-13-proof-pack",
+  "updated": "2026-09-18",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
@@ -15,7 +15,8 @@
         "loan.create": "IMPLEMENTED",
         "loan.recordPayment": "IMPLEMENTED",
         "loan.reversePayment": "IMPLEMENTED"
-      }
+      },
+      "commands_note": "Summary only — authoritative status in command-catalog.json"
     },
     "crypto": {
       "surface": "PARTIAL",
@@ -23,7 +24,8 @@
         "crypto.buy": "IMPLEMENTED",
         "crypto.sell": "IMPLEMENTED",
         "crypto.transfer": "IMPLEMENTED"
-      }
+      },
+      "commands_note": "Summary only — authoritative status in command-catalog.json"
     },
     "funds": {
       "surface": "PARTIAL",
@@ -31,7 +33,8 @@
         "funds.subscribe": "IMPLEMENTED",
         "funds.redeem": "IMPLEMENTED",
         "funds.distribute": "IMPLEMENTED"
-      }
+      },
+      "commands_note": "Summary only — authoritative status in command-catalog.json"
     },
     "stocks": {
       "surface": "PARTIAL",
@@ -40,7 +43,8 @@
         "stocks.sell": "IMPLEMENTED",
         "stocks.settle": "IMPLEMENTED",
         "stocks.dividend": "IMPLEMENTED"
-      }
+      },
+      "commands_note": "Summary only — authoritative status in command-catalog.json"
     },
     "metals": {
       "surface": "PARTIAL",
@@ -48,7 +52,8 @@
         "metals.buy": "IMPLEMENTED",
         "metals.sell": "IMPLEMENTED",
         "metals.delivery": "IMPLEMENTED"
-      }
+      },
+      "commands_note": "Summary only — authoritative status in command-catalog.json"
     }
   },
   "release": {
@@ -83,7 +88,11 @@
     "GOLDEN-GREEN": "golden fixtures pass for claimed surface",
     "RECOVERY-GREEN": "recovery matrix green",
     "RELEASE-PROVEN": "golden+recovery+standalone+CI for claimed edition",
-    "NOTE": "IMPLEMENTED never implies Golden/Recovery/Standalone proven"
+    "NOTE": "IMPLEMENTED never implies Golden/Recovery/Standalone proven",
+    "command_status_authority": "docs/core/registry/command-catalog.json",
+    "feature_surface_authority": "docs/core/registry/status.registry.json#features",
+    "requirement_authority": "docs/core/registry/requirements-matrix.json",
+    "note": "Per-command status lives only in command-catalog. features.*.commands maps are summary mirrors; catalog wins on conflict."
   },
   "authority_owners": {
     "API": "docs/API.md",

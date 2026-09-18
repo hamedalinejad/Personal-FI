@@ -218,3 +218,17 @@ String IDs without FK are forbidden when the target table is in-schema.
 
 ## Attachments (LOCKED)
 Use document_id → docs_documents + relative storage key + checksum. Do not use absolute OS paths as identity. Backup includes bytes or explicit DEFERRED reject.
+
+
+## Field-preservation machine contract (LOCKED)
+Matrix: `docs/core/registry/field-preservation-matrix.json`  
+Gate: `scripts/field-preservation-check.js`
+
+| disposition | Required |
+|-------------|----------|
+| PERSISTED | persistence.table + persistence.column exact |
+| DERIVED | formula and/or resultPath |
+| SNAPSHOT | persisted location + version |
+| DEFERRED / REJECTED | reason + owner |
+
+Forbidden storage language: `module_or_core`, `feature ledger via operationId`, wildcards.

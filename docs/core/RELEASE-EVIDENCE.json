@@ -1,5 +1,7 @@
 {
-  "generatedAt": "2026-09-16T23:00:00.000Z",
+  "registryVersion": "1",
+  "schemaHash": "3c9aadcc5cf39b14",
+  "gatesScript": "npm test && npm run command:catalog && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity && npm run lint:source-vocab && npm run integrity:audit && npm run freeze:check && npm run field:preservation && npm run inventory:check",
   "production": "NO-GO",
   "FREEZE_PROVEN": false,
   "RELEASE_PROVEN": false,
@@ -28,35 +30,40 @@
       "docs/core/registry/fixture-manifest.json"
     ]
   },
+  "commandAuthority": {
+    "perCommandStatus": "docs/core/registry/command-catalog.json",
+    "featureEditionRelease": "docs/core/registry/status.registry.json",
+    "note": "Do not duplicate per-command status in status.registry"
+  },
+  "counts": {
+    "publicCommands": 42,
+    "requirements": 38
+  },
   "proof": {
-    "standaloneEditions": ["loan-only", "crypto-only", "stocks-only", "funds-only", "metals-only"],
-    "standalonePath": "boot→create→op→backup→restore→rebuild",
-    "recoveryMatrix": "src/core/acceptance/recovery-matrix.acceptance.test.js",
-    "backupFormat": "src/core/recovery/backup.js formatVersion+checksum",
-    "browser": {
-      "protocolHarness": "PROVEN",
-      "sqlJsIndexedDbE2E": "OPEN"
-    },
-    "reporting": {
-      "postedStatements": "IMPLEMENTED scaffold",
-      "TWR": "DEFERRED",
-      "MWR": "DEFERRED",
-      "FX_attribution": "DEFERRED with TWR/MWR"
-    }
+    "GOLDEN": "PARTIAL→improved",
+    "RECOVERY": "PARTIAL→matrix tests + corrupt reject",
+    "STANDALONE": "PARTIAL",
+    "BROWSER": "OPEN",
+    "FIELD_PRESERVATION": "PARTIAL→machine matrix from cards"
+  },
+  "release": {
+    "production": "NO-GO",
+    "golden_family": "PARTIAL",
+    "recovery_suite": "PARTIAL",
+    "browser_offline_adapter": "DURABLE_MEMORY_PROTOCOL",
+    "full_accounting_statements": "PARTIAL",
+    "investment_reporting": "PARTIAL",
+    "iran_settlement_policy": "PARTIAL",
+    "tax_events_runtime": "PARTIAL",
+    "command_coverage_matrix": "docs/QUALITY-STATUS.md",
+    "command_catalog": "docs/core/registry/command-catalog.json"
   },
   "requiredGreenForRelease": [
     "npm run gates",
+    "field-preservation exact persistence for PERSISTED rows",
     "golden families for claimed commands",
     "recovery matrix executable",
-    "standalone five editions",
-    "browser E2E if shipping browser",
-    "license enforcement if shipping paid editions"
-  ],
-  "doNotRestore": [
-    "scripts/generate-command-status-md.js",
-    "scripts/field-inventory-live-check.js",
-    "BUG-*.md",
-    "P0-*.md",
-    "AUDIT-*.md as authority"
+    "standalone editions claimed",
+    "browser adapter RELEASE-PROVEN if shipping browser"
   ]
 }
