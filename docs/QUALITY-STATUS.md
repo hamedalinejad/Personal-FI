@@ -51,4 +51,5 @@ Unambiguous contracts · complete command cards · exact field mapping · schema
 Loan · Crypto · Stocks · Funds · Metals → one public-api · shared Core · requiresAccountsUi=false
 
 ## Evidence
-`npm test` · `npm run gates` · registries · fixtures
+`npm test` (328) · schema drift GREEN · field-inventory 875 strict · command-catalog 42 · matrix 412  
+`npm run gates` · registries · fixtures

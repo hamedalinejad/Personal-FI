@@ -1,13 +1,13 @@
 # Schema Sync Report
 
-Generated: 2026-09-16T20:17:55.242Z
+Generated: 2026-09-18T08:01:23.568Z
 
 | Check | Result |
 |-------|--------|
 | Tables | 86 |
-| Columns | 867 |
-| Inventory rows | 868 |
-| Manifest hash | `02ad2b21fee2f829` |
+| Columns | 874 |
+| Inventory rows | 875 |
+| Manifest hash | `dd4c567a82dcc89e` |
 | Missing inventory | 0 |
 | Extra inventory | 1 |
 

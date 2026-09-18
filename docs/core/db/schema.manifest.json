@@ -1,5 +1,5 @@
 {
-  "schemaHash": "02ad2b21fee2f829ee3d1c61ce42d5791b3ef7bdcf6a7c1946fddaa6bde43482",
+  "schemaHash": "dd4c567a82dcc89e83d195e19238295dcc63863df43fb35facccf50d3c76f195",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -4864,7 +4864,7 @@
         {
           "name": "purity_ratio",
           "type": "TEXT",
-          "notnull": false,
+          "notnull": true,
           "dflt": null,
           "pk": 0
         },
@@ -4928,7 +4928,7 @@
           "columns": [
             null,
             "instrument_id",
-            null
+            "purity_ratio"
           ]
         },
         {
@@ -4941,7 +4941,7 @@
         }
       ],
       "checks": [
-        "CHECK (purity_ratio IS NULL OR (CAST(purity_ratio AS REAL)"
+        "CHECK (CAST(purity_ratio AS REAL)"
       ]
     },
     "inv_metals_physical_deliveries": {
@@ -5180,6 +5180,13 @@
           "pk": 0
         },
         {
+          "name": "purity_ratio",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "metal_price_per_mg",
           "type": "TEXT",
           "notnull": false,
@@ -5223,6 +5230,27 @@
         },
         {
           "name": "exchange_rate_to_base",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "quote_basis",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_unit",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_purity_basis",
           "type": "TEXT",
           "notnull": false,
           "dflt": null,
@@ -5469,6 +5497,13 @@
           "pk": 0
         },
         {
+          "name": "account_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "instrument_id",
           "type": "TEXT",
           "notnull": true,
@@ -5585,11 +5620,12 @@
       ],
       "indexes": [
         {
-          "name": "sqlite_autoindex_inv_stocks_iran_holdings_2",
+          "name": "uq_stocks_holdings_scope",
           "unique": true,
-          "origin": "u",
+          "origin": "c",
           "columns": [
             "brokerage_id",
+            null,
             "instrument_id"
           ]
         },
@@ -8769,6 +8805,20 @@
           "pk": 1
         },
         {
+          "name": "source_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "payment_operation_id",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "operation_id",
           "type": "TEXT",
           "notnull": false,
@@ -8911,14 +8961,51 @@
       ],
       "foreignKeys": [
         {
+          "table": "docs_documents",
+          "from": "document_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "SET NULL"
+        },
+        {
           "table": "fin_operations",
           "from": "operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
+          "table": "fin_operations",
+          "from": "payment_operation_id",
+          "to": "id",
+          "on_update": "CASCADE",
+          "on_delete": "RESTRICT"
+        },
+        {
+          "table": "fin_operations",
+          "from": "source_operation_id",
           "to": "id",
           "on_update": "CASCADE",
           "on_delete": "RESTRICT"
         }
       ],
       "indexes": [
+        {
+          "name": "idx_tax_payment_op",
+          "unique": false,
+          "origin": "c",
+          "columns": [
+            "payment_operation_id"
+          ]
+        },
+        {
+          "name": "idx_tax_source_op",
+          "unique": false,
+          "origin": "c",
+          "columns": [
+            "source_operation_id"
+          ]
+        },
         {
           "name": "idx_tax_op",
           "unique": false,
@@ -8940,7 +9027,7 @@
         "CHECK (calendar_system IS NULL OR calendar_system IN ('jalali','gregorian')",
         "CHECK (is_deductible IN (0, 1)",
         "CHECK (is_manual_adjustment IN (0, 1)",
-        "CHECK (operation_id IS NOT NULL OR is_manual_adjustment = 1)",
+        "CHECK (source_operation_id IS NOT NULL OR operation_id IS NOT NULL OR is_manual_adjustment = 1)",
         "CHECK (status IN ('draft','posted','amended','void')"
       ]
     },

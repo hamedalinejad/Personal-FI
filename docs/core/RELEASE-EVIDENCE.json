@@ -1,6 +1,6 @@
 {
   "registryVersion": "1",
-  "schemaHash": "3c9aadcc5cf39b14",
+  "schemaHash": "ec8e025a353a018e",
   "gatesScript": "npm test && npm run command:catalog && npm run dep:graph && npm run docs:validate && npm run status:check && npm run requirements:check && npm run docs:consistency && npm run lint && npm run lint:money-sql && npm run schema:drift && npm run schema:inventory && npm run schema:manifest:check && npm run registry:index && npm run bench:smoke && npm run fixture:empty && npm run lint:money-number && npm run schema:sync && npm run release:evidence && npm run lint:query-purity && npm run lint:source-vocab && npm run integrity:audit && npm run freeze:check && npm run field:preservation && npm run inventory:check",
   "production": "NO-GO",
   "FREEZE_PROVEN": false,

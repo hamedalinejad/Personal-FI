@@ -867,3 +867,10 @@ inv_stocks_iran_transactions	fee_tax	RAW	Stocks	yes	inv_stocks_iran_transactions
 inv_stocks_iran_transactions	fee_other	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
 inv_stocks_iran_transactions	fee_treatments_json	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
 cur_exchange_rates	is_stale	RAW	Core	yes	cur_exchange_rates	canonical	yes
+inv_metals_transactions	quote_basis	RAW	Metals	no	inv_metals_transactions	canonical	yes
+inv_metals_transactions	price_unit	RAW	Metals	no	inv_metals_transactions	canonical	yes
+inv_metals_transactions	price_purity_basis	RAW	Metals	no	inv_metals_transactions	canonical	yes
+tax_events	source_operation_id	REFERENCE	Tax	no	tax_events	canonical	yes
+tax_events	payment_operation_id	REFERENCE	Tax	no	tax_events	canonical	yes
+inv_stocks_iran_holdings	account_id	RAW	Investments	no	inv_stocks_iran_holdings	canonical	yes
+inv_metals_transactions	purity_ratio	RAW	Investments	no	inv_metals_transactions	canonical	yes

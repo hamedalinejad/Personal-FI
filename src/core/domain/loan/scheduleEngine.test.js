@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import Decimal from "decimal.js";
 import { buildSchedule, assertScheduleConservation } from "./scheduleEngine.js";
 
 test("BUG-006 declining", () => {
@@ -21,7 +22,7 @@ test("BUG-006 qarz", () => {
     feePercent: "0.04",
   });
   assert.ok(s.rows[0].interest === "0" || s.rows[0].interest === "0.00");
-  assert.ok(Number(s.rows[0].fee) > 0);
+  assert.ok(new Decimal(s.rows[0].fee).gt(0));
 });
 
 test("P0-CODE-010 rejects fractional periods", () => {
@@ -102,10 +103,8 @@ test("P1-01 annual frequency declining conserves principal", () => {
   });
   assert.equal(s.rows.length, 3);
   assert.ok(s.rows[2].balance === "0.00" || s.rows[2].balance === "0");
-  let sum = 0;
-  for (const r of s.rows) sum += Number(r.principal);
-  // still use string equality via conservation already inside engine
-  assert.equal(s.rows.reduce((a, r) => a + parseFloat(r.principal), 0).toFixed(2), "1200.00");
+  const sum = s.rows.reduce((a, r) => a.plus(new Decimal(r.principal)), new Decimal(0));
+  assert.equal(sum.toFixed(2), "1200.00");
 });
 
 test("declining monthly residual conservation exact", () => {
@@ -116,7 +115,6 @@ test("declining monthly residual conservation exact", () => {
     startDate: "2026-01-01",
     frequency: "monthly",
   });
-  let sp = 0;
-  for (const r of s.rows) sp += parseFloat(r.principal);
+  const sp = s.rows.reduce((a, r) => a.plus(new Decimal(r.principal)), new Decimal(0));
   assert.equal(sp.toFixed(2), "1000.00");
 });
