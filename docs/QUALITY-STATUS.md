@@ -25,3 +25,10 @@ Machine authorities: command-catalog · field-preservation-matrix · schema.sql 
 - BUG-016 dividend withholdingTax → fee_tax column
 
 Iran fee policy data, browser sql.js E2E, TWR/MWR remain deferred (not v1 blockers for coding start).
+
+## Matrix canonicalization (2026-09-18)
+
+- Aligned 47 stale `stored` vs `persistence.table.column` registry rows to real schema.
+- Promoted incorrectly DEFERRED fields that are accepted/implemented to PERSISTED (or DERIVED for pure schedule calc).
+- `funds.distribution.reinvest` remains REJECTED with reason.
+- Gate: field-preservation-check OK (492 rows, 882 schema cols).
