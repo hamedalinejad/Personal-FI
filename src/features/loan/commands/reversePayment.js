@@ -85,7 +85,7 @@ export async function reversePayment(
     if (!fromJl) throw new Error("FX_RATE_REQUIRED");
     exchangeRateToBase = toDecimal(fromJl.exchangeRateToBase);
   }
-  if (exchangeRateToBase == null) exchangeRateToBase = toDecimal("1");
+  if (exchangeRateToBase == null) throw new Error("FX_RATE_REQUIRED");
 
   const journalLines = lines.map((l, i) => ({
     accountId: l.accountId,

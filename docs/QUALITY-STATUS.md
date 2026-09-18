@@ -4,22 +4,23 @@
 
 - Production: **NO-GO**
 - SEMANTIC_CODING_READY: see `docs/core/registry/status.registry.json`
-- FREEZE_PROVEN: false until freeze-proof blockers green
+- FREEZE_PROVEN: false until remaining freeze-proof blockers green
 - RELEASE_PROVEN: false
 
 Machine authorities: command-catalog · field-preservation-matrix · schema.sql · status.registry
 
-Do not hardcode inventory/matrix row counts here. Counts live in RELEASE-EVIDENCE.json when generated.
+## Closure 2026-09-18 (coding-readiness P0)
 
-## Closure pass (2026-09-18)
+Closed in code (no new audit docs):
 
-Applied from external File-Level Closure plan (not repo authority):
+- P0-03 loan frequency passed to engine + snapshot + installment_frequency column
+- P0-04/05 originationKind + canonical loan columns + snapshot frequency
+- P0-06 stocks.sell gross proceeds (no double fee reduction) + golden
+- P0-07 crypto capitalize_inventory cost pool + golden
+- P0-01 field-preservation catalog parity gate
+- P0-02 schema column set prefers schema.manifest.json
+- P0-08 catalog dbWrites rewritten to exact tables
+- P0-09 journal FORBIDDEN+posting contradictions → OPTIONAL
+- reversePayment no silent FX=1
 
-- `command:contract` gate added
-- Crypto transaction persistence: price, price_as_of, amount, currency, fee_amount
-- Crypto v1 `currency === costCurrency`
-- Loan `originationKind` (disburse_now | record_outstanding)
-- Catalog aligned for metals.sell, loan schedule calc commands, funds.distribution
-- Module docs: removed vague “as applicable” wording
-- Module handoff acceptance tests for five verticals
-- feature-field-diff emits stdout only (no Markdown under docs/core)
+Counts: generated in RELEASE-EVIDENCE.json / gate logs — do not hardcode here.

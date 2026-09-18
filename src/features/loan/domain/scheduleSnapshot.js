@@ -42,8 +42,10 @@ export function buildScheduleSnapshot({
   rateFractional,
   currency,
   engineVersion,
+  frequency,
 }) {
   const rows = schedule.rows || schedule.installments;
+  const freq = frequency || schedule.frequency || "monthly";
   return wrapScheduleSnapshot({
     rows,
     engineVersion,
@@ -54,6 +56,7 @@ export function buildScheduleSnapshot({
       currency,
       rateInput: rateInput != null ? String(rateInput) : null,
       rateFractional: rateFractional != null ? String(rateFractional) : null,
+      frequency: freq,
     },
   });
 }

@@ -9,7 +9,7 @@ import {
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { assertPositive, assertNonNegative } from "../../../core/domain/validation/positiveMoney.js";
 import { resolveOrCreateInstrument, resolveOrCreateNamedMaster } from "../../../core/domain/instrument/resolve.js";
-import { applySingleFee } from "../../../core/domain/fee/feeEngine.js";
+import { applySingleFee, normalizeFeeTreatment } from "../../../core/domain/fee/feeEngine.js";
 
 /**
  * crypto.buy — all master mutations inside the financial transaction.
@@ -73,7 +73,10 @@ export async function buyCrypto(input, { dataDir } = {}) {
   // Fee Engine owns treatment; feature only selects policy
   // Model A: cost pool / total_invested is always in costCurrency (not base)
   // Module default: fee_from_received when feeRole omitted (documented in modules/crypto.md)
-  const feeTreatment = p.feeTreatment || p.feeRole || MODULE_DEFAULT_FEE_TREATMENT;
+  // Normalize once: capitalize_inventory is canonical; capitalized_cost is legacy alias
+  const feeTreatment = normalizeFeeTreatment(
+    p.feeTreatment || p.feeRole || MODULE_DEFAULT_FEE_TREATMENT,
+  );
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
   const hasMoneyFee = p.feeAmount != null && p.feeAmount !== "";
   const hasQtyFee = p.feeQuantity != null && p.feeQuantity !== "" && !toDecimal(p.feeQuantity).isZero();
@@ -101,7 +104,7 @@ export async function buyCrypto(input, { dataDir } = {}) {
   );
   // Capitalized fee in cost-currency units for the cost pool
   let carryingInCostCurrency = cost;
-  if (feeTreatment === "capitalized_cost" && p.feeAmount != null && p.feeAmount !== "") {
+  if (feeTreatment === "capitalize_inventory" && p.feeAmount != null && p.feeAmount !== "") {
     const feeAmt = toDecimal(p.feeAmount);
     const feeCurrency = p.feeCurrency || costCurrency;
     if (feeCurrency === costCurrency) {

@@ -2215,11 +2215,11 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
+          "ln_loans",
+          "ln_schedule_snapshots",
           "fin_operations",
           "fin_journal_entries",
-          "fin_journal_lines",
-          "ln_loans",
-          "ln_schedules"
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2341,10 +2341,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
+          "ln_transactions",
           "fin_operations",
           "fin_journal_entries",
-          "fin_journal_lines",
-          "ln_transactions"
+          "fin_journal_lines"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2441,7 +2441,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "ln_",
+          "ln_transactions",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -2564,10 +2564,7 @@
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
-        "dbWrites": [
-          "ln_loans",
-          "ln_schedules"
-        ],
+        "dbWrites": [],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "loanId + schedule schema version",
         "reversal": "n/a generate",
@@ -2625,9 +2622,11 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "FORBIDDEN"
+        "journal": "OPTIONAL",
+        "journalCondition": "none unless policy posts"
       },
-      "maturity": "strongest"
+      "maturity": "strongest",
+      "journal": "OPTIONAL"
     },
     "loan.previewSchedule": {
       "owner": "docs/modules/loan.md",
@@ -3066,7 +3065,7 @@
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines",
-          "acc_transactions projection"
+          "acc_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3385,10 +3384,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inc_",
           "fin_operations",
           "fin_journal_entries",
-          "fin_journal_lines"
+          "fin_journal_lines",
+          "acc_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3497,10 +3496,10 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "exp_",
           "fin_operations",
           "fin_journal_entries",
-          "fin_journal_lines"
+          "fin_journal_lines",
+          "acc_transactions"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3594,7 +3593,6 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "inc_",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3691,7 +3689,6 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "exp_",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3808,7 +3805,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_cheques"
+          "chk_cheques"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3907,6 +3904,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
+          "chk_cheques",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3964,9 +3962,11 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "FORBIDDEN"
+        "journal": "OPTIONAL",
+        "journalCondition": "Core journal via runAtomicFinancialOperation when monetary"
       },
-      "maturity": "baseline"
+      "maturity": "baseline",
+      "journal": "OPTIONAL"
     },
     "cheque.clear": {
       "owner": "docs/modules/cheque.md",
@@ -4205,7 +4205,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_cheques"
+          "chk_cheques",
+          "fin_operations"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4260,9 +4261,11 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "FORBIDDEN"
+        "journal": "OPTIONAL",
+        "journalCondition": "Core journal via runAtomicFinancialOperation when monetary"
       },
-      "maturity": "baseline"
+      "maturity": "baseline",
+      "journal": "OPTIONAL"
     },
     "assets.register": {
       "owner": "docs/modules/physical-assets.md",
@@ -4369,9 +4372,11 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "FORBIDDEN"
+        "journal": "OPTIONAL",
+        "journalCondition": "Core journal via runAtomicFinancialOperation when monetary"
       },
-      "maturity": "baseline"
+      "maturity": "baseline",
+      "journal": "OPTIONAL"
     },
     "assets.update": {
       "owner": "docs/modules/physical-assets.md",
@@ -4418,8 +4423,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "fin_operations",
-          "fin_journal_"
+          "pa_assets"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4635,7 +4639,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_"
+          "bg_budgets",
+          "bg_envelopes"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4744,7 +4749,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_"
+          "fg_goals"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4853,7 +4858,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "bg_"
+          "br_items",
+          "br_occurrences"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4962,10 +4968,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_",
-          "fin_operations",
-          "fin_journal_entries",
-          "fin_journal_lines"
+          "tax_events",
+          "tax_records"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -5072,7 +5076,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_",
+          "tax_events",
+          "tax_records",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -5182,10 +5187,9 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "tax_",
-          "fin_operations",
-          "fin_journal_entries",
-          "fin_journal_lines"
+          "tax_events",
+          "tax_records",
+          "fin_operations"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",

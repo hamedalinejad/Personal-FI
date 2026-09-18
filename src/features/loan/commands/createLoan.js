@@ -82,6 +82,7 @@ export async function createLoan(
     startDate: p.startDate,
     dayCount: p.dayCount,
     feePercent: p.feePercent,
+    frequency: freq === "yearly" ? "annual" : freq,
   });
 
   const snapshot = buildScheduleSnapshot({
@@ -90,6 +91,7 @@ export async function createLoan(
     rateFractional,
     currency,
     engineVersion,
+    frequency: freq === "yearly" ? "annual" : freq,
   });
 
   const loanId = p.loanId || randomUUID();
@@ -170,9 +172,10 @@ export async function createLoan(
       db.prepare(
         `INSERT INTO ln_loans (
           id, role, calculation_method, principal, currency, interest_rate, status, created_at,
-          start_date, operation_id, total_installments, day_count, schedule_engine_version, notes,
-          origination_kind
-        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          start_date, disbursement_date, operation_id, total_installments,
+          day_count, day_count_convention, installment_frequency,
+          schedule_engine_version, notes, origination_kind, name
+        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         loanId,
         role,
@@ -182,12 +185,16 @@ export async function createLoan(
         p.annualRate,
         now,
         p.startDate,
+        p.startDate,
         operationId,
         parsePeriods(p.periods),
         p.dayCount,
+        p.dayCount,
+        freq === "yearly" ? "annual" : freq,
         engineVersion,
         p.notes || null,
         originationKind,
+        p.name || null,
       );
       db.prepare(
         `INSERT INTO ln_schedule_snapshots (id, loan_id, version, snapshot_json, effective_from, operation_id)

@@ -107,22 +107,23 @@ export async function sellStock(input, { dataDir } = {}) {
     .get(p.instrumentId, p.brokerageId, p.accountId || null);
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
 
+  // P0-06: disposal and trade legs use GROSS proceeds; fee engine posts fee once against receivable.
   const disposal = applyDisposal(
     { quantity: holding.quantity, totalInvested: holding.total_invested },
-    { quantity: qty.toFixed(), proceeds: netProceeds.toFixed() },
+    { quantity: qty.toFixed(), proceeds: proceeds.toFixed() },
   );
 
   const costReleased = toDecimal(disposal.costReleased);
   const realized = toDecimal(disposal.realizedPnl);
 
-  // Trade: Dr Receivable (net proceeds) / Cr Inventory (cost) / Cr|Dr PnL
+  // Trade: Dr Receivable (GROSS proceeds) / Cr Inventory / Cr|Dr PnL; fees reduce receivable once via fee engine
   const journalLines = [
     {
       accountId: receivableId,
       side: "debit",
-      amount: netProceeds.toFixed(),
+      amount: proceeds.toFixed(),
       currency,
-      amountInBase: toBase(netProceeds),
+      amountInBase: toBase(proceeds),
       exchangeRateToBase,
       lineKind: "principal",
     },
