@@ -53,13 +53,6 @@ export async function buyCrypto(input, { dataDir } = {}) {
   if (!gross.gt(0)) throw new Error("CRYPTO_QTY_NONPOSITIVE:gross");
   if (!net.gt(0)) throw new Error("CRYPTO_QTY_NONPOSITIVE:net");
   if (fee.isNegative()) throw new Error("CRYPTO_FEE_NEGATIVE");
-  if (p.feeRole === "fee_from_received" || p.feeRole === "feeBurnQuantity") {
-    if (!gross.minus(fee).eq(net)) throw new Error("INV_QTY_CONSERVATION");
-    // fee quantity must be same asset as received
-    if (p.feeInstrumentId && p.feeInstrumentId !== p.instrumentId) {
-      throw new Error("FEE_UNIT_MISMATCH");
-    }
-  }
 
   const cost = toDecimal(p.costTotal);
   let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
@@ -77,10 +70,29 @@ export async function buyCrypto(input, { dataDir } = {}) {
   const feeTreatment = normalizeFeeTreatment(
     p.feeTreatment || p.feeRole || MODULE_DEFAULT_FEE_TREATMENT,
   );
+  // BUG-002: canonical reduce_received_quantity (and legacy aliases after normalize)
+  if (
+    feeTreatment === "reduce_received_quantity" ||
+    feeTreatment === "fee_from_received" ||
+    feeTreatment === "feeBurnQuantity"
+  ) {
+    if (!gross.minus(fee).eq(net)) throw new Error("INV_QTY_CONSERVATION");
+    if (p.feeInstrumentId && p.feeInstrumentId !== p.instrumentId) {
+      throw new Error("FEE_UNIT_MISMATCH");
+    }
+  }
+
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", costCurrency);
   const hasMoneyFee = p.feeAmount != null && p.feeAmount !== "";
   const hasQtyFee = p.feeQuantity != null && p.feeQuantity !== "" && !toDecimal(p.feeQuantity).isZero();
-  const feeResult = applySingleFee(
+    // BUG-003 v1 rule A: monetary fee currency must match transaction/cost currency
+  if (p.feeAmount != null && p.feeAmount !== "" && !toDecimal(p.feeAmount).isZero()) {
+    const feeCur = p.feeCurrency || costCurrency;
+    if (feeCur !== costCurrency) {
+      throw new Error("CRYPTO_FEE_CURRENCY_MISMATCH:v1_feeCurrency_must_eq_costCurrency");
+    }
+  }
+const feeResult = applySingleFee(
     hasMoneyFee || (hasQtyFee && (feeTreatment === "fee_from_received" || feeTreatment === "feeBurnQuantity" || feeTreatment === "reduce_received_quantity"))
       ? {
           feeAmount: hasMoneyFee ? p.feeAmount : undefined,

@@ -122,9 +122,9 @@ export async function stockDividend(input, { dataDir } = {}) {
         `INSERT INTO inv_stocks_iran_transactions (
           id, operation_id, holding_id, instrument_id, brokerage_id, tx_type,
           trade_date, settlement_date, cash_date, market_date, price_as_of, fx_as_of,
-          settlement_policy_version, quantity, price, fee_amount, currency, account_id,
+          settlement_policy_version, quantity, price, fee_amount, fee_tax, currency, account_id,
           ex_date, pay_date, created_at
-        ) VALUES (?, ?, NULL, ?, ?, 'dividend', ?, ?, ?, ?, ?, ?, ?, '0', '0', ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, NULL, ?, ?, 'dividend', ?, ?, ?, ?, ?, ?, ?, '0', '0', '0', ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,

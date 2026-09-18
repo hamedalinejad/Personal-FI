@@ -5278,7 +5278,10 @@
           {
             "name": "reinvest",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "accepted": false,
+            "disposition": "REJECTED",
+            "note": "REJECTED in v1 — distribution posts income only; REINVEST_DEFERRED at runtime"
           },
           {
             "name": "businessDate",
@@ -5362,7 +5365,10 @@
         "effectClass": "financial",
         "journal": "REQUIRED"
       },
-      "maturity": "partial"
+      "maturity": "partial",
+      "rejectedFields": [
+        "reinvest"
+      ]
     }
   },
   "consistency": {

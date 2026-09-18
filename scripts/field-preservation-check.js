@@ -40,11 +40,22 @@ try {
     fs.readFileSync(path.join(root, "docs/core/db/schema.manifest.json"), "utf8"),
   );
   const mcols = new Set();
-  for (const t of manifest.tables || []) {
-    const tname = t.name || t.table;
-    for (const col of t.columns || []) {
-      const cname = typeof col === "string" ? col : col.name;
-      if (tname && cname) mcols.add(`${tname}.${cname}`);
+  // tables is object map { tableName: { columns: [...] } }
+  const tables = manifest.tables || {};
+  if (Array.isArray(tables)) {
+    for (const t of tables) {
+      const tname = t.name || t.table;
+      for (const col of t.columns || []) {
+        const cname = typeof col === "string" ? col : col.name;
+        if (tname && cname) mcols.add(`${tname}.${cname}`);
+      }
+    }
+  } else {
+    for (const [tname, t] of Object.entries(tables)) {
+      for (const col of t.columns || []) {
+        const cname = typeof col === "string" ? col : col.name;
+        if (tname && cname) mcols.add(`${tname}.${cname}`);
+      }
     }
   }
   if (mcols.size >= schemaCols.size) schemaCols = mcols;
@@ -106,6 +117,24 @@ for (const row of allRows) {
           failed = true;
         }
       }
+    }
+  }
+
+  if (disp === "DEFERRED" || disp === "REJECTED") {
+    if (!row.reason && !row.note) {
+      console.error("FAIL DEFERRED/REJECTED missing reason:", row.commandId, row.field);
+      failed = true;
+    }
+    if (!row.owner) {
+      console.error("FAIL DEFERRED/REJECTED missing owner:", row.commandId, row.field);
+      failed = true;
+    }
+  }
+  if (disp === "PERSISTED" && pers.table && pers.column) {
+    const expected = `${pers.table}.${pers.column}`;
+    if (row.stored && row.stored !== expected && pers.mode !== "JSON_PATH" && pers.mode !== "ALIAS") {
+      console.error("FAIL stored != persistence:", row.commandId, row.field, row.stored, "!=", expected);
+      failed = true;
     }
   }
   if (!row.kind) {

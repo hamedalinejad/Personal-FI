@@ -10,11 +10,6 @@ const root = process.cwd();
 const featuresRoot = join(root, "src/features");
 const coreRoot = join(root, "src/core");
 
-const ILLEGAL = [
-  /from\s+["'][^"']*features\/[^"']+\/(internal|ledger|domain)\//,
-  /from\s+["'][^"']*\/ui\//,
-  /from\s+["']@\/features\/(?!loan)/, // placeholder: expand when more packages
-];
 
 function walk(dir, acc = []) {
   if (!existsSync(dir)) return acc;

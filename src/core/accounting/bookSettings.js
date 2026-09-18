@@ -83,7 +83,11 @@ export function requireFxIfCrossCurrency({
   if (exchangeRateToBase == null || exchangeRateToBase === "") {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   }
-  return String(exchangeRateToBase);
+  const rate = new Decimal(String(exchangeRateToBase));
+  if (!rate.isFinite() || rate.lte(0)) {
+    throw new Error("VALIDATION_ERROR:exchangeRateToBase_nonpositive");
+  }
+  return rate.toFixed();
 }
 
 

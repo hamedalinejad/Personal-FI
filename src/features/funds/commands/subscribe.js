@@ -44,7 +44,12 @@ export async function subscribeFund(input, { dataDir } = {}) {
   if (p.pricingMode === "amount_based" && p.amount != null && p.amount !== "") {
     amount = toDecimal(p.amount);
     assertPositive(amount.toFixed(), "FUND_AMOUNT_NONPOSITIVE");
-    txPrice = amount.div(qty); // derived unit price, not NAV
+    const derived = amount.div(qty);
+    // BUG-004: if caller also supplied transactionPrice, it must match derived unit price
+    if (txPrice != null && !txPrice.eq(derived)) {
+      throw new Error(`AMOUNT_PRICE_MISMATCH:expected=${derived.toFixed()},got=${txPrice.toFixed()}`);
+    }
+    txPrice = derived; // derived unit price, not NAV
   } else {
     if (txPrice == null) throw new Error("FUND_TRANSACTION_PRICE_REQUIRED");
     assertPositive(txPrice.toFixed(), "FUND_PRICE_NONPOSITIVE");

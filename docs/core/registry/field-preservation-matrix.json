@@ -215,7 +215,7 @@
       "field": "amount",
       "required": true,
       "accepted": true,
-      "stored": "acc_accounts.amount",
+      "stored": "acc_transactions.amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -345,7 +345,7 @@
       "field": "fromAccountId",
       "required": true,
       "accepted": true,
-      "stored": "acc_accounts.from_account_id",
+      "stored": "acc_transactions.account_id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -372,7 +372,7 @@
       "field": "toAccountId",
       "required": true,
       "accepted": true,
-      "stored": "acc_accounts.to_account_id",
+      "stored": "acc_transactions.account_id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -399,7 +399,7 @@
       "field": "amount",
       "required": true,
       "accepted": true,
-      "stored": "acc_accounts.amount",
+      "stored": "acc_transactions.amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -609,7 +609,7 @@
       "field": "amount",
       "required": true,
       "accepted": true,
-      "stored": "acc_accounts.amount",
+      "stored": "acc_transactions.amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -715,7 +715,7 @@
       "field": "assetId",
       "required": true,
       "accepted": true,
-      "stored": "pa_assets.asset_id",
+      "stored": "pa_assets.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -843,7 +843,7 @@
       "field": "category",
       "required": false,
       "accepted": true,
-      "stored": "pa_assets.category",
+      "stored": "pa_assets.asset_kind",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -921,7 +921,7 @@
       "field": "assetId",
       "required": true,
       "accepted": true,
-      "stored": "pa_assets.asset_id",
+      "stored": "pa_assets.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1016,7 +1016,8 @@
       "exportPath": "export.bill.schedule.name",
       "reversal": "inverse operation; original field retained on original op",
       "migration": "direct",
-      "nullable": false
+      "nullable": false,
+      "reason": "v1 deferred/rejected pending explicit persistence model"
     },
     {
       "commandId": "bill.schedule",
@@ -1042,7 +1043,8 @@
       "migration": "direct",
       "nullable": false,
       "unit": "money",
-      "currency": "transactionCurrency"
+      "currency": "transactionCurrency",
+      "reason": "v1 deferred/rejected pending explicit persistence model"
     },
     {
       "commandId": "bill.schedule",
@@ -1066,7 +1068,8 @@
       "exportPath": "export.bill.schedule.currency",
       "reversal": "inverse operation; original field retained on original op",
       "migration": "direct",
-      "nullable": false
+      "nullable": false,
+      "reason": "v1 deferred/rejected pending explicit persistence model"
     },
     {
       "commandId": "bill.schedule",
@@ -1090,14 +1093,15 @@
       "exportPath": "export.bill.schedule.dueRule",
       "reversal": "inverse operation; original field retained on original op",
       "migration": "direct",
-      "nullable": false
+      "nullable": false,
+      "reason": "v1 deferred/rejected pending explicit persistence model"
     },
     {
       "commandId": "budget.set",
       "field": "period",
       "required": true,
       "accepted": true,
-      "stored": "bdg_budgets.period",
+      "stored": "bg_budgets.period_key",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1148,7 +1152,7 @@
       "field": "amount",
       "required": true,
       "accepted": true,
-      "stored": "bdg_budgets.amount",
+      "stored": "bg_budgets.total_income",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1176,7 +1180,7 @@
       "field": "currency",
       "required": true,
       "accepted": true,
-      "stored": "bdg_budgets.currency",
+      "stored": "bg_budgets.currency",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1228,7 +1232,7 @@
       "field": "chequeId",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cheque_id",
+      "stored": "chk_cheques.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1254,7 +1258,7 @@
       "field": "reason",
       "required": false,
       "accepted": true,
-      "stored": "chq_cheques.reason",
+      "stored": "chk_cheques.bounced_reason",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1306,7 +1310,7 @@
       "field": "chequeId",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cheque_id",
+      "stored": "chk_cheques.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1358,7 +1362,7 @@
       "field": "chequeId",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cheque_id",
+      "stored": "chk_cheques.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1384,7 +1388,7 @@
       "field": "clearedDate",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cleared_date",
+      "stored": "chk_cheques.cleared_date",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1436,7 +1440,7 @@
       "field": "chequeId",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cheque_id",
+      "stored": "chk_cheques.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1462,7 +1466,7 @@
       "field": "accountId",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.id",
+      "stored": "chk_cheques.id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1540,7 +1544,7 @@
       "field": "chequeNumber",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.cheque_number",
+      "stored": "chk_cheques.cheque_number",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1566,7 +1570,7 @@
       "field": "amount",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.amount",
+      "stored": "chk_cheques.amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1594,7 +1598,7 @@
       "field": "currency",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.currency",
+      "stored": "chk_cheques.currency",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1620,7 +1624,7 @@
       "field": "dueDate",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.due_date",
+      "stored": "chk_cheques.due_date",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1646,7 +1650,7 @@
       "field": "direction",
       "required": true,
       "accepted": true,
-      "stored": "chq_cheques.direction",
+      "stored": "chk_cheques.direction",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1776,7 +1780,7 @@
       "field": "quantity",
       "required": true,
       "accepted": true,
-      "stored": "inv_crypto_transactions.quantity",
+      "stored": "inv_crypto_transactions.gross_quantity",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1853,7 +1857,7 @@
       "field": "feeAmount",
       "required": false,
       "accepted": true,
-      "stored": "inv_crypto_transactions.fee_amount",
+      "stored": "inv_crypto_transactions.fee_quantity",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -1933,7 +1937,7 @@
       "field": "quantity",
       "required": true,
       "accepted": true,
-      "stored": "inv_crypto_transactions.quantity",
+      "stored": "inv_crypto_transactions.gross_quantity",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -2429,7 +2433,7 @@
       "field": "units",
       "required": true,
       "accepted": true,
-      "stored": "inv_fif_transactions.units",
+      "stored": "inv_fif_transactions.quantity",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -2723,7 +2727,7 @@
       "field": "name",
       "required": true,
       "accepted": true,
-      "stored": "goal_goals.name",
+      "stored": "fg_goals.name",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -2749,7 +2753,7 @@
       "field": "targetAmount",
       "required": true,
       "accepted": true,
-      "stored": "goal_goals.target_amount",
+      "stored": "fg_goals.target_amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -2777,7 +2781,7 @@
       "field": "currency",
       "required": true,
       "accepted": true,
-      "stored": "goal_goals.currency",
+      "stored": "fg_goals.currency",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3091,7 +3095,7 @@
       "field": "rate",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.rate",
+      "stored": "ln_loans.interest_rate",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3117,7 +3121,7 @@
       "field": "method",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.method",
+      "stored": "ln_loans.calculation_method",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3143,7 +3147,7 @@
       "field": "startDate",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.start_date",
+      "stored": "ln_loans.start_date",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3169,7 +3173,7 @@
       "field": "term",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.term",
+      "stored": "ln_loans.total_installments",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3325,7 +3329,7 @@
       "field": "rate",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.rate",
+      "stored": "ln_loans.interest_rate",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3351,7 +3355,7 @@
       "field": "method",
       "required": false,
       "accepted": true,
-      "stored": "ln_transactions.method",
+      "stored": "ln_loans.calculation_method",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3377,7 +3381,7 @@
       "field": "term",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.term",
+      "stored": "ln_loans.total_installments",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -3718,7 +3722,7 @@
       "field": "fee",
       "required": false,
       "accepted": true,
-      "stored": "inv_metals_transactions.fee",
+      "stored": "inv_metals_transactions.fee_amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4089,7 +4093,7 @@
       "field": "fee",
       "required": false,
       "accepted": true,
-      "stored": "inv_metals_transactions.fee",
+      "stored": "inv_metals_transactions.fee_amount",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4328,7 +4332,7 @@
       "field": "commission",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.commission",
+      "stored": "inv_stocks_iran_transactions.fee_commission",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4354,7 +4358,7 @@
       "field": "tax",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.tax",
+      "stored": "inv_stocks_iran_transactions.fee_tax",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4380,7 +4384,7 @@
       "field": "otherFee",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.other_fee",
+      "stored": "inv_stocks_iran_transactions.fee_other",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4723,7 +4727,7 @@
       "field": "commission",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.commission",
+      "stored": "inv_stocks_iran_transactions.fee_commission",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4749,7 +4753,7 @@
       "field": "tax",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.tax",
+      "stored": "inv_stocks_iran_transactions.fee_tax",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -4775,7 +4779,7 @@
       "field": "otherFee",
       "required": false,
       "accepted": true,
-      "stored": "inv_stocks_iran_transactions.other_fee",
+      "stored": "inv_stocks_iran_transactions.fee_other",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -5697,7 +5701,7 @@
       "field": "units",
       "required": true,
       "accepted": true,
-      "stored": "inv_fif_transactions.units",
+      "stored": "inv_fif_transactions.quantity",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -5779,7 +5783,7 @@
       "field": "periods",
       "required": true,
       "accepted": true,
-      "stored": "ln_transactions.periods",
+      "stored": "ln_loans.total_installments",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -10770,7 +10774,7 @@
       "canonicalField": "platformId",
       "required": true,
       "accepted": true,
-      "stored": true,
+      "stored": "inv_metals_holdings.platform_id",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -10796,7 +10800,7 @@
       "canonicalField": "currency",
       "required": true,
       "accepted": true,
-      "stored": true,
+      "stored": "inv_metals_transactions.currency",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -11346,7 +11350,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.sell",
@@ -11366,7 +11371,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.sell",
@@ -11386,7 +11392,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.sell",
@@ -11406,7 +11413,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.sell",
@@ -11426,7 +11434,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.sell",
@@ -11446,7 +11455,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11466,7 +11476,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11486,7 +11497,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11506,7 +11518,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11526,7 +11539,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11546,7 +11560,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11566,7 +11581,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11586,7 +11602,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11606,7 +11623,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "crypto.transfer",
@@ -11626,7 +11644,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "stocks.settle",
@@ -11646,27 +11665,33 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "stocks.dividend",
       "field": "withholdingTax",
       "required": false,
       "accepted": true,
-      "stored": null,
+      "stored": "inv_stocks_iran_transactions.fee_tax",
       "derived": false,
       "returned": true,
       "exported": true,
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "DEFERRED",
+      "disposition": "PERSISTED",
       "canonicalField": "withholdingTax",
       "kind": "RAW",
-      "persistence": null,
+      "persistence": {
+        "table": "inv_stocks_iran_transactions",
+        "column": "fee_tax",
+        "mode": "COLUMN"
+      },
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "v1 maps withholdingTax → fee_tax column",
+      "reason": null
     },
     {
       "commandId": "stocks.dividend",
@@ -11686,7 +11711,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "stocks.dividend",
@@ -11706,7 +11732,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "stocks.dividend",
@@ -11726,7 +11753,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "stocks.dividend",
@@ -11746,7 +11774,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11766,7 +11795,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11786,7 +11816,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11806,7 +11837,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11826,7 +11858,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11846,7 +11879,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11866,7 +11900,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.subscribe",
@@ -11886,7 +11921,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.redeem",
@@ -11906,7 +11942,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.redeem",
@@ -11926,7 +11963,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -11946,7 +11984,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -11966,7 +12005,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -11986,7 +12026,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12006,7 +12047,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12026,7 +12068,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12046,7 +12089,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12066,7 +12110,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12086,7 +12131,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12106,7 +12152,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.buy",
@@ -12126,7 +12173,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12146,7 +12194,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12166,7 +12215,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12186,7 +12236,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12206,7 +12257,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12226,7 +12278,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12246,7 +12299,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "metals.sell",
@@ -12266,7 +12320,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.create",
@@ -12286,7 +12341,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.create",
@@ -12306,7 +12362,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.create",
@@ -12326,7 +12383,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.recordPayment",
@@ -12346,7 +12404,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12366,7 +12425,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12386,7 +12446,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12406,7 +12467,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12426,7 +12488,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12446,7 +12509,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12466,7 +12530,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12486,7 +12551,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.generateSchedule",
@@ -12506,7 +12572,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -12526,7 +12593,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -12546,7 +12614,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -12566,7 +12635,8 @@
       "persistence": null,
       "nullable": false,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -12586,7 +12656,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "loan.previewSchedule",
@@ -12606,7 +12677,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     },
     {
       "commandId": "funds.distribution",
@@ -12626,7 +12698,8 @@
       "persistence": null,
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "auto-seeded for catalog parity; refine persistence target in closure",
+      "reason": "auto-seeded for catalog parity; refine persistence target in closure"
     }
   ],
   "status": "PARTIAL",

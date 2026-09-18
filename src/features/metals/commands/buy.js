@@ -118,7 +118,14 @@ export async function buyMetal(input, { dataDir } = {}) {
     ].filter((f) => !toDecimal(f.feeAmount).isZero()),
     { baseCurrency, transactionCurrency: currency, exchangeRateToBase },
   );
-  const feeResult = applyFeeEvents(
+    // BUG-003 v1: fee currency must match transaction currency
+  if (p.feeAmount != null && p.feeAmount !== "" && !toDecimal(p.feeAmount).isZero()) {
+    const feeCur = p.feeCurrency || currency;
+    if (feeCur !== currency) {
+      throw new Error("METALS_FEE_CURRENCY_MISMATCH:v1_feeCurrency_must_eq_transactionCurrency");
+    }
+  }
+const feeResult = applyFeeEvents(
     feeEvents.map((e) => ({
       ...e,
       inventoryAccountId: invId,

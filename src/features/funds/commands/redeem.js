@@ -45,10 +45,20 @@ export async function redeemFund(input, { dataDir } = {}) {
   }
   const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(toDecimal(exchangeRateToBase.toFixed ? exchangeRateToBase.toFixed() : String(exchangeRateToBase))).toFixed();
 
-  const proceeds =
-    p.proceedsTotal != null
-      ? toDecimal(p.proceedsTotal)
-      : units.times(toDecimal(p.transactionPrice));
+  // BUG-001: if both supplied, they must agree (units × transactionPrice)
+  let proceeds;
+  if (p.proceedsTotal != null && p.proceedsTotal !== "" && p.transactionPrice != null && p.transactionPrice !== "") {
+    const derived = units.times(toDecimal(p.transactionPrice));
+    proceeds = toDecimal(p.proceedsTotal);
+    if (!proceeds.eq(derived)) {
+      throw new Error("AMOUNT_PRICE_MISMATCH");
+    }
+  } else if (p.proceedsTotal != null && p.proceedsTotal !== "") {
+    proceeds = toDecimal(p.proceedsTotal);
+  } else {
+    proceeds = units.times(toDecimal(p.transactionPrice));
+  }
+  assertPositive(proceeds.toFixed(), "FUND_PROCEEDS_NONPOSITIVE");
   assertPositive(proceeds.toFixed(), "FUND_PROCEEDS_NONPOSITIVE");
 
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);

@@ -4,23 +4,24 @@
 
 - Production: **NO-GO**
 - SEMANTIC_CODING_READY: see `docs/core/registry/status.registry.json`
-- FREEZE_PROVEN: false until remaining freeze-proof blockers green
+- FREEZE_PROVEN: false
 - RELEASE_PROVEN: false
 
 Machine authorities: command-catalog · field-preservation-matrix · schema.sql · status.registry
 
-## Closure 2026-09-18 (coding-readiness P0)
+## Closure 2026-09-18 (final audit bugs)
 
-Closed in code (no new audit docs):
+- BUG-001 funds.redeem AMOUNT_PRICE_MISMATCH when price and proceeds disagree
+- BUG-002 crypto reduce_received_quantity quantity conservation
+- BUG-003 v1 feeCurrency must equal transaction/cost currency (crypto/metals)
+- BUG-004 funds.subscribe amount_based does not silently override conflicting price
+- BUG-007 field-preservation consumes object-shaped schema.manifest.tables
+- BUG-008/009 DEFERRED reason+owner; stored == persistence.table.column
+- BUG-011 funds.distribution.reinvest REJECTED in catalog
+- BUG-012 file-inventory updated for new tests/scripts
+- BUG-013 release-evidence requirements count uses Object.keys
+- BUG-014 requireFxIfCrossCurrency rejects non-positive FX
+- BUG-015 removed dead ILLEGAL regex
+- BUG-016 dividend withholdingTax → fee_tax column
 
-- P0-03 loan frequency passed to engine + snapshot + installment_frequency column
-- P0-04/05 originationKind + canonical loan columns + snapshot frequency
-- P0-06 stocks.sell gross proceeds (no double fee reduction) + golden
-- P0-07 crypto capitalize_inventory cost pool + golden
-- P0-01 field-preservation catalog parity gate
-- P0-02 schema column set prefers schema.manifest.json
-- P0-08 catalog dbWrites rewritten to exact tables
-- P0-09 journal FORBIDDEN+posting contradictions → OPTIONAL
-- reversePayment no silent FX=1
-
-Counts: generated in RELEASE-EVIDENCE.json / gate logs — do not hardcode here.
+Iran fee policy data, browser sql.js E2E, TWR/MWR remain deferred (not v1 blockers for coding start).

@@ -323,3 +323,10 @@ src/features/stocks/tests/sell.test.js	D	test	keep
 src/features/stocks/tests/settle.test.js	D	test	keep
 src/features/stocks/tests/standalone.test.js	D	test	keep
 src/features/stocks/tests/stocks-field-preservation.test.js	D	test	keep
+scripts/command-contract-check.js	script
+src/core/acceptance/module-handoff.acceptance.test.js	test
+src/features/crypto/tests/capitalize-fee.test.js	test
+src/features/loan/tests/frequency-command.test.js	test
+src/features/stocks/tests/sell-fee.test.js	test
+src/features/funds/tests/redeem-price-mismatch.test.js	test
+src/features/crypto/tests/qty-conservation.test.js	test

@@ -56,7 +56,7 @@ const evidence = {
   },
   counts: {
     publicCommands: Object.keys(catalog.commands || {}).length,
-    requirements: (requirements.requirements || []).length,
+    requirements: Object.keys(requirements.requirements || {}).length,
   },
   proof: status.proof || {},
   release: status.release || {},
