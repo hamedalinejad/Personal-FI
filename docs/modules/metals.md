@@ -173,3 +173,10 @@ holding.cost_currency MUST equal transaction currency
 ```
 Mismatch → `COST_CURRENCY_MISMATCH` reject.  
 Multi-currency carrying / FX attribution on metals inventory = **DEFERRED**.
+
+
+## metals.buy required inputs (LOCKED)
+- `platformId`, `currency`, `instrumentId`, `businessDate`
+- mass: `quantityMg` (alias `grossWeight`; optional `inputMassUnit` mg|g)
+- price: `metalPricePerMg` (alias `metalPrice`)
+- purity: `purityRatio` unless `purityPolicy=fixed_1`

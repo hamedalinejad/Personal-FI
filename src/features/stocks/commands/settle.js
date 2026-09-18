@@ -45,6 +45,11 @@ export async function settleStock(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
   const p = input.payload || input;
+  // alias: relatedOperationId → originalTradeOperationId
+  if (!p.originalTradeOperationId && p.relatedOperationId) {
+    p.originalTradeOperationId = p.relatedOperationId;
+  }
+
 
   if (!p.originalTradeOperationId) throw new Error("VALIDATION_ERROR:originalTradeOperationId");
   if (!p.businessDate) throw new Error("VALIDATION_ERROR:businessDate");

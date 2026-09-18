@@ -187,3 +187,9 @@ This package exposes **commands** via public-api. List/detail/holdings reads use
 ## Dividend withholding (v1 LOCKED)
 withholdingTax is a **transaction-only netting adjustment** (gross − tax = cash).
 Journal posts an expense leg on the dividend operation; it does **not** create tax_events or pay Tax-module obligations.
+
+
+## Settlement / dividend input (LOCKED)
+- `stocks.settle` canonical relation field: **`originalTradeOperationId`** (alias: `relatedOperationId`).
+- `stocks.dividend`: required = instrumentId, amount, currency, businessDate. **`payDate` optional** in v1.
+- Dividend `withholdingTax` = transaction-only netting (not tax_events).

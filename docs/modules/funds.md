@@ -172,3 +172,13 @@ Full reinvest economics (ex/record/payment dates, units, transaction price, RoC)
 
 ## Queries (v1)
 This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).
+
+
+## Subscribe / redeem pricing (LOCKED)
+**Subscribe:** `quantity` (alias `units`) required. Price modes:
+- explicit `transactionPrice`
+- `pricingMode=nav` + `nav` (never silent NAV)
+- `pricingMode=amount_based` + `amount` (unit price = amount/qty)
+Currency: `transactionCurrency` or `currency`.
+
+**Redeem:** `units` + `currency` required; **`transactionPrice` OR `proceedsTotal`** (one required).

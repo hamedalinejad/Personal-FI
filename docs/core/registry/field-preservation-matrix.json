@@ -4717,7 +4717,7 @@
     {
       "commandId": "stocks.dividend",
       "field": "payDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "inv_stocks_iran_transactions.pay_date",
       "derived": false,
@@ -4731,7 +4731,7 @@
       "kind": "RAW",
       "persistence": {
         "mode": "DERIVED",
-        "note": "was inv_stocks_iran_transactions.pay_date"
+        "note": "optional; not required for v1 posting"
       },
       "resultPath": "result.payDate",
       "exportPath": "export.stocks.dividend.payDate",
@@ -5006,7 +5006,7 @@
     },
     {
       "commandId": "stocks.settle",
-      "field": "relatedOperationId",
+      "field": "originalTradeOperationId",
       "required": true,
       "accepted": true,
       "stored": "inv_stocks_iran_transactions.related_operation_id",
@@ -5017,12 +5017,13 @@
       "migrated": true,
       "owner": "docs/modules/stocks.md",
       "disposition": "PERSISTED",
-      "canonicalField": "relatedOperationId",
+      "canonicalField": "originalTradeOperationId",
       "kind": "RAW",
       "persistence": {
+        "mode": "COLUMN",
         "table": "inv_stocks_iran_transactions",
         "column": "related_operation_id",
-        "mode": "COLUMN"
+        "note": "API originalTradeOperationId → DB related_operation_id"
       },
       "resultPath": "result.relatedOperationId",
       "exportPath": "export.stocks.settle.relatedOperationId",
@@ -10942,6 +10943,110 @@
       "nullable": true,
       "unit": "money",
       "currency": "transactionCurrency"
+    },
+    {
+      "commandId": "metals.buy",
+      "field": "platformId",
+      "canonicalField": "platformId",
+      "required": true,
+      "accepted": true,
+      "stored": true,
+      "derived": false,
+      "returned": true,
+      "exported": true,
+      "reversed": false,
+      "migrated": true,
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED",
+      "kind": "RAW",
+      "persistence": {
+        "mode": "COLUMN",
+        "table": "inv_metals_holdings",
+        "column": "platform_id"
+      },
+      "resultPath": "platformId",
+      "exportPath": "platformId",
+      "reversal": "n/a",
+      "migration": "keep",
+      "nullable": false
+    },
+    {
+      "commandId": "metals.buy",
+      "field": "currency",
+      "canonicalField": "currency",
+      "required": true,
+      "accepted": true,
+      "stored": true,
+      "derived": false,
+      "returned": true,
+      "exported": true,
+      "reversed": false,
+      "migrated": true,
+      "owner": "docs/modules/metals.md",
+      "disposition": "PERSISTED",
+      "kind": "RAW",
+      "persistence": {
+        "mode": "COLUMN",
+        "table": "inv_metals_transactions",
+        "column": "currency"
+      },
+      "resultPath": "currency",
+      "exportPath": "currency",
+      "reversal": "n/a",
+      "migration": "keep",
+      "nullable": false
+    },
+    {
+      "commandId": "funds.redeem",
+      "field": "proceedsTotal",
+      "canonicalField": "proceedsTotal",
+      "required": false,
+      "accepted": true,
+      "stored": false,
+      "derived": true,
+      "returned": true,
+      "exported": true,
+      "reversed": true,
+      "migrated": true,
+      "owner": "docs/modules/funds.md",
+      "disposition": "DERIVED",
+      "kind": "DERIVED",
+      "persistence": {
+        "mode": "DERIVED",
+        "note": "may derive from units*transactionPrice"
+      },
+      "resultPath": "proceedsTotal",
+      "exportPath": "proceedsTotal",
+      "reversal": "inverse",
+      "migration": "keep",
+      "nullable": true,
+      "formula": "units * transactionPrice when proceedsTotal omitted"
+    },
+    {
+      "commandId": "stocks.settle",
+      "field": "relatedOperationId",
+      "canonicalField": "originalTradeOperationId",
+      "required": false,
+      "accepted": true,
+      "stored": false,
+      "derived": true,
+      "returned": false,
+      "exported": false,
+      "reversed": false,
+      "migrated": true,
+      "owner": "docs/modules/stocks.md",
+      "disposition": "DERIVED",
+      "kind": "DERIVED",
+      "persistence": {
+        "mode": "DERIVED",
+        "note": "alias → originalTradeOperationId"
+      },
+      "resultPath": null,
+      "exportPath": null,
+      "reversal": "n/a",
+      "migration": "alias only",
+      "nullable": true,
+      "formula": "alias of originalTradeOperationId"
     }
   ],
   "status": "PARTIAL",

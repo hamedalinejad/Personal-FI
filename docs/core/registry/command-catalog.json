@@ -937,24 +937,44 @@
             "type": "string"
           },
           {
-            "name": "relatedOperationId",
+            "name": "originalTradeOperationId",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "note": "operationId of the buy/sell trade being settled"
+          },
+          {
+            "name": "relatedOperationId",
+            "required": false,
+            "type": "string",
+            "aliasOf": "originalTradeOperationId",
+            "note": "legacy alias — normalize to originalTradeOperationId"
           },
           {
             "name": "settlementDate",
-            "required": true,
-            "type": "date"
+            "required": false,
+            "type": "date",
+            "note": "defaults from trade settlement_date when omitted"
           },
           {
             "name": "currency",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "string",
+            "note": "defaults from original trade currency"
           },
           {
             "name": "businessDate",
             "required": true,
             "type": "date"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "cashAccountId",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
@@ -1054,12 +1074,18 @@
           {
             "name": "amount",
             "required": true,
-            "type": "decimal_string"
+            "type": "decimal_string",
+            "note": "gross dividend"
           },
           {
             "name": "currency",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
           },
           {
             "name": "exDate",
@@ -1068,13 +1094,35 @@
           },
           {
             "name": "payDate",
-            "required": true,
-            "type": "date"
+            "required": false,
+            "type": "date",
+            "note": "optional; not required for journal posting in v1"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "withholdingTax",
+            "required": false,
+            "type": "decimal_string",
+            "note": "transaction-only netting; not tax_events"
+          },
+          {
+            "name": "brokerageId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "accountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "cashAccountId",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
@@ -1172,24 +1220,55 @@
             "type": "string"
           },
           {
-            "name": "amount",
+            "name": "quantity",
             "required": true,
-            "type": "decimal_string"
+            "type": "decimal_string",
+            "note": "units alias accepted"
+          },
+          {
+            "name": "units",
+            "required": false,
+            "type": "decimal_string",
+            "aliasOf": "quantity"
           },
           {
             "name": "transactionPrice",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "decimal_string",
+            "note": "required unless pricingMode is nav or amount_based"
+          },
+          {
+            "name": "pricingMode",
+            "required": false,
+            "type": "string",
+            "note": "null|nav|amount_based — never silent NAV→price"
+          },
+          {
+            "name": "amount",
+            "required": false,
+            "type": "decimal_string",
+            "note": "required when pricingMode=amount_based; else optional consistency check"
           },
           {
             "name": "nav",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "transactionCurrency",
             "required": false,
             "type": "string"
           },
           {
             "name": "currency",
+            "required": false,
+            "type": "string",
+            "aliasOf": "transactionCurrency"
+          },
+          {
+            "name": "businessDate",
             "required": true,
-            "type": "string"
+            "type": "date"
           },
           {
             "name": "accountId",
@@ -1197,17 +1276,31 @@
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
+            "name": "cashAccountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "settlementDate",
+            "required": false,
             "type": "date"
+          },
+          {
+            "name": "quoteType",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
-          "operationId required UUID for mutations that post",
-          "businessDate required YYYY-MM-DD",
-          "monetary fields must be decimal strings (no JS Number)",
-          "book base from db_meta; never default baseCurrency to transaction currency",
-          "posted path requires balanced journal in base"
+          "quantity|units required positive",
+          "transactionCurrency or currency required",
+          "pricing: transactionPrice OR (pricingMode=nav + nav) OR (pricingMode=amount_based + amount)",
+          "never silent NAV as transactionPrice without pricingMode=nav"
         ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
@@ -1320,12 +1413,19 @@
           {
             "name": "units",
             "required": true,
-            "type": "string"
+            "type": "decimal_string"
           },
           {
             "name": "transactionPrice",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "decimal_string",
+            "note": "one of transactionPrice or proceedsTotal required"
+          },
+          {
+            "name": "proceedsTotal",
+            "required": false,
+            "type": "decimal_string",
+            "note": "one of transactionPrice or proceedsTotal required"
           },
           {
             "name": "currency",
@@ -1333,22 +1433,30 @@
             "type": "string"
           },
           {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
             "name": "accountId",
             "required": false,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "cashAccountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
-          "operationId required UUID for mutations that post",
-          "businessDate required YYYY-MM-DD",
-          "monetary fields must be decimal strings (no JS Number)",
-          "book base from db_meta; never default baseCurrency to transaction currency",
-          "posted path requires balanced journal in base"
+          "units required positive",
+          "transactionPrice OR proceedsTotal required",
+          "currency must match holding cost_currency (v1)"
         ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "none unless fees present",
@@ -1573,27 +1681,62 @@
             "type": "string"
           },
           {
-            "name": "quantityMg",
+            "name": "platformId",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          },
+          {
+            "name": "quantityMg",
+            "required": true,
+            "type": "decimal_string",
+            "note": "gross mass in mg; grossWeight alias"
+          },
+          {
+            "name": "grossWeight",
+            "required": false,
+            "type": "decimal_string",
+            "aliasOf": "quantityMg"
+          },
+          {
+            "name": "inputMassUnit",
+            "required": false,
+            "type": "string",
+            "note": "mg|g"
           },
           {
             "name": "purityRatio",
-            "required": true,
-            "type": "string"
+            "required": false,
+            "type": "decimal_string",
+            "note": "required unless purityPolicy=fixed_1"
           },
           {
-            "name": "metalPricePerMg",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "premium",
+            "name": "purityPolicy",
             "required": false,
             "type": "string"
           },
           {
-            "name": "fee",
+            "name": "metalPricePerMg",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "metalPrice",
+            "required": false,
+            "type": "decimal_string",
+            "aliasOf": "metalPricePerMg"
+          },
+          {
+            "name": "priceUnit",
             "required": false,
             "type": "string"
           },
@@ -1603,32 +1746,62 @@
             "type": "string"
           },
           {
-            "name": "serial",
+            "name": "pricePurityBasis",
             "required": false,
             "type": "string"
           },
           {
-            "name": "certificate",
+            "name": "premiumAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeCurrency",
             "required": false,
             "type": "string"
           },
           {
-            "name": "location",
+            "name": "feeTreatment",
             "required": false,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "baseCurrency",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cashAccountId",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "platformName",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "purityCode",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
-          "operationId required UUID for mutations that post",
-          "businessDate required YYYY-MM-DD",
-          "monetary fields must be decimal strings (no JS Number)",
-          "book base from db_meta; never default baseCurrency to transaction currency",
-          "posted path requires balanced journal in base"
+          "platformId, currency, instrumentId, businessDate required",
+          "quantityMg or grossWeight required",
+          "metalPricePerMg or metalPrice required",
+          "purityRatio required unless purityPolicy=fixed_1",
+          "quoteBasis/priceUnit/pricePurityBasis validated when present"
         ],
         "journalMapping": "Core journal via runAtomicFinancialOperation when monetary",
         "feeMapping": "trade fee expense; premium capitalize_inventory",
