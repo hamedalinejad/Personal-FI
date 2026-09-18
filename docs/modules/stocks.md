@@ -50,7 +50,7 @@ Feature entity ids + operationId on mutations.
 stocks.buy · sell · settle · dividend
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.

@@ -32,7 +32,7 @@
       "commands": {
         "funds.subscribe": "IMPLEMENTED",
         "funds.redeem": "IMPLEMENTED",
-        "funds.distribute": "IMPLEMENTED"
+        "funds.distribution": "IMPLEMENTED"
       },
       "commands_note": "Summary only — authoritative status in command-catalog.json"
     },

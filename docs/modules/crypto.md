@@ -50,7 +50,7 @@ Feature entity ids + operationId on mutations.
 crypto.buy · sell · transfer (scope per public-api)
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.
@@ -205,3 +205,10 @@ This package exposes **commands** via public-api. List/detail/holdings reads use
 Canonical domain/API field: **`venueId`**.  
 Persistence column remains `exchange_id` → `inv_crypto_exchanges.id` where `type ∈ {cex,dex,wallet,other}`.  
 No schema rename required in v1.
+
+## Handoff Contract — v1 currency lock
+
+- Public `currency` MUST equal `costCurrency` on `crypto.buy`.
+- Multi-currency means: transaction/cost currency vs book base via explicit FX — not a separate cash currency leg in v1.
+- `feeAmount` persists on `inv_crypto_transactions.fee_amount`; `feeQuantity` on `fee_quantity` (never conflated).
+- `price`, `priceAsOf`, `amount`, `currency` persist on the transaction row.

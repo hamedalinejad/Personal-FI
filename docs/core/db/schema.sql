@@ -339,6 +339,12 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   gross_quantity  TEXT,
   fee_quantity    TEXT,
   net_quantity    TEXT NOT NULL,
+  -- economic observation inputs (no-field-loss; distinct from fee_quantity)
+  price           TEXT, -- unit price at trade (decimal string)
+  price_as_of     TEXT, -- observation date/time for price
+  amount          TEXT, -- costTotal (buy) or proceedsTotal (sell) in transaction currency
+  currency        TEXT, -- transaction/cost/proceeds currency for amount
+  fee_amount      TEXT, -- monetary fee amount (distinct from fee_quantity asset burn)
   -- exactly one funding source when fee present
   fee_funding_kind  TEXT CHECK (fee_funding_kind IS NULL OR fee_funding_kind IN ('cash','asset')),
   fee_currency    TEXT,
@@ -453,6 +459,8 @@ CREATE TABLE IF NOT EXISTS ln_loans (
   start_date TEXT, -- alias for disbursement_date
   maturity_date TEXT, -- alias for end_date
   operation_id TEXT REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  -- v1 origination path (RAW): disburse_now posts cash+receivable; record_outstanding posts receivable only
+  origination_kind TEXT CHECK (origination_kind IS NULL OR origination_kind IN ('disburse_now','record_outstanding')),
   -- legacy:
   day_count TEXT DEFAULT 'period_based', -- deprecated, use day_count_convention
   schedule_engine_version TEXT,

@@ -55,5 +55,6 @@ for (const [domain, prefs] of Object.entries(prefixes)) {
   }
 }
 db.close();
-writeFileSync(join(root, "docs/core/db/FEATURE-FIELD-DIFF.md"), md);
-console.log("feature-field-diff: wrote FEATURE-FIELD-DIFF.md");
+// Machine boundary: do not write Markdown under docs/core. Emit stdout only.
+process.stdout.write(md);
+console.error("feature-field-diff: emitted to stdout (no Markdown write)");

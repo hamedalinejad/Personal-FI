@@ -51,10 +51,10 @@ Create / edit / detail sheets as product IA defines.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-account.create · update · archive · transfer · deposit · withdraw (as implemented)
+account.create · update · archive · transfer · deposit · withdraw
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 active → archived (archive only if journal balance zero)

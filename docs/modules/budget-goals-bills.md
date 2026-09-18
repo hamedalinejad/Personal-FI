@@ -42,10 +42,10 @@ Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-budget.set · goal.create · bill.schedule (as implemented)
+budget.set · goal.create · bill.schedule
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.
@@ -75,7 +75,7 @@ VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 fixtures/ and feature tests.
 
 ## 33. Tests / proof
-src/features/<name>/tests + acceptance as applicable.
+Tests: feature package tests under src/features/<module>/tests and Core acceptance where applicable to the edition.
 
 ## Role
 Planning projections and links only — **never** an alternate cash ledger.

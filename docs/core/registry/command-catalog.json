@@ -71,7 +71,7 @@
             "name": "currency",
             "required": true,
             "type": "string",
-            "note": "must match costCurrency for v1 journal scope"
+            "note": "v1 MUST equal costCurrency; book-base FX is separate"
           },
           {
             "name": "price",
@@ -1547,122 +1547,6 @@
       },
       "maturity": "partial"
     },
-    "funds.distribute": {
-      "owner": "docs/modules/funds.md",
-      "capability": "funds.distribute",
-      "status": "IMPLEMENTED",
-      "card": {
-        "purpose": "Fund distribution / income",
-        "requestFields": [
-          {
-            "name": "operationId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "instrumentId",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "amount",
-            "required": true,
-            "type": "decimal_string"
-          },
-          {
-            "name": "currency",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "reinvest",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
-          }
-        ],
-        "validation": [
-          "operationId required UUID for mutations that post",
-          "businessDate required YYYY-MM-DD",
-          "monetary fields must be decimal strings (no JS Number)",
-          "book base from db_meta; never default baseCurrency to transaction currency",
-          "posted path requires balanced journal in base"
-        ],
-        "journalMapping": "income vs return of capital per policy",
-        "feeMapping": "none unless fees present",
-        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
-        "costBasis": "n/a",
-        "dbWrites": [
-          "fin_operations",
-          "fin_journal_entries",
-          "fin_journal_lines",
-          "inv_fif_transactions"
-        ],
-        "transactionBoundary": "single SQLite transaction",
-        "idempotency": "operationId + canonical economic hash",
-        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
-        "result": "operationId + domainResult",
-        "errors": [
-          "VALIDATION_ERROR",
-          "FEE_TREATMENT_REQUIRED",
-          "FEE_QUANTITY_REQUIRED",
-          "MISSING_EXCHANGE_RATE",
-          "UNBALANCED_JOURNAL",
-          "POSTED_EMPTY_JOURNAL",
-          "IDEMPOTENCY_CONFLICT",
-          "WRITER_REQUIRED",
-          "CAPABILITY_DENIED"
-        ],
-        "fixtureRefs": [
-          "fixtures/FUND-DIVIDEND-REINVEST.json"
-        ],
-        "invariants": [
-          "posted ⇒ ≥2 journal lines",
-          "Σ debit(base)=Σ credit(base)"
-        ],
-        "standalone": "uses shared Financial Core; capability-gated",
-        "licenseCapability": "funds.distribute",
-        "maturity": "partial",
-        "requiredness": {
-          "operationId": "required",
-          "businessDate": "required"
-        },
-        "normalization": [
-          "decimal-string money/qty/rate/price",
-          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
-        ],
-        "identity": "operationId + canonical economic hash",
-        "businessRules": [
-          "ex-date, record-date, payment-date required for full release",
-          "cash vs reinvestment explicit; reinvest needs units + transactionPrice",
-          "NAV observation is context only — never silent cost"
-        ],
-        "queries": [],
-        "reports": [
-          "trial_balance_subset",
-          "account_activity"
-        ],
-        "recoveryCases": [
-          "crash before commit → no durable effect",
-          "crash after SQL commit → reconcile durability_state",
-          "same operationId + same economic hash → idempotent replay",
-          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
-        ],
-        "feeTaxonomy": {
-          "defaultTreatments": [],
-          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
-          "version": "v1"
-        },
-        "license": "capability-gated; never deletes history",
-        "effectClass": "financial",
-        "journal": "REQUIRED"
-      },
-      "maturity": "partial"
-    },
     "metals.buy": {
       "owner": "docs/modules/metals.md",
       "capability": "metals.buy",
@@ -1907,7 +1791,7 @@
       "capability": "metals.sell",
       "status": "IMPLEMENTED",
       "card": {
-        "purpose": "Sell metal position",
+        "purpose": "Sell metal holding by proceedsTotal (price is not a v1 input)",
         "requestFields": [
           {
             "name": "operationId",
@@ -1915,17 +1799,22 @@
             "type": "string"
           },
           {
-            "name": "holdingId",
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "platformId",
             "required": true,
             "type": "string"
           },
           {
             "name": "quantityMg",
             "required": true,
-            "type": "string"
+            "type": "decimal_string"
           },
           {
-            "name": "price",
+            "name": "proceedsTotal",
             "required": true,
             "type": "decimal_string"
           },
@@ -1935,14 +1824,34 @@
             "type": "string"
           },
           {
-            "name": "fee",
+            "name": "businessDate",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "holdingId",
             "required": false,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "purityRatio",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeAmount",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "feeCurrency",
+            "required": false,
+            "type": "string"
           }
         ],
         "validation": [
@@ -2282,7 +2191,15 @@
           {
             "name": "economicMode",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "aliasOf": "originationKind",
+            "note": "legacy alias of originationKind"
+          },
+          {
+            "name": "originationKind",
+            "required": false,
+            "type": "string",
+            "note": "disburse_now (default) | record_outstanding; economicMode is legacy alias"
           }
         ],
         "validation": [
@@ -2394,6 +2311,22 @@
             "name": "businessDate",
             "required": true,
             "type": "date"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "paymentDate",
+            "required": false,
+            "type": "string",
+            "note": "defaults to businessDate"
+          },
+          {
+            "name": "exchangeRateToBase",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
@@ -2577,31 +2510,46 @@
       "capability": "loan.generateSchedule",
       "status": "IMPLEMENTED",
       "card": {
-        "purpose": "Persist schedule snapshot (may be non-posting)",
+        "purpose": "Pure schedule calculation (not a posted financial mutation)",
         "requestFields": [
           {
-            "name": "loanId",
+            "name": "principal",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "annualRate",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "periods",
             "required": true,
             "type": "string"
           },
           {
-            "name": "engineVersion",
+            "name": "method",
             "required": true,
             "type": "string"
           },
           {
-            "name": "calendarVersion",
+            "name": "startDate",
             "required": true,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
+            "name": "dayCount",
+            "required": false,
+            "type": "string"
           },
           {
-            "name": "operationId",
-            "required": true,
+            "name": "feePercent",
+            "required": false,
+            "type": "decimal_string"
+          },
+          {
+            "name": "installmentFrequency",
+            "required": false,
             "type": "string"
           }
         ],
@@ -2686,37 +2634,43 @@
       "capability": "loan.previewSchedule",
       "status": "IMPLEMENTED",
       "card": {
-        "purpose": "Preview schedule without persist",
+        "purpose": "Preview schedule without persistence",
         "requestFields": [
           {
             "name": "principal",
             "required": true,
-            "type": "string"
+            "type": "decimal_string"
           },
           {
-            "name": "rate",
+            "name": "annualRate",
+            "required": false,
+            "type": "decimal_string",
+            "note": "defaults 0"
+          },
+          {
+            "name": "periods",
             "required": true,
             "type": "string"
           },
           {
             "name": "method",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
             "required": true,
             "type": "string"
           },
           {
-            "name": "term",
-            "required": true,
+            "name": "dayCount",
+            "required": false,
             "type": "string"
           },
           {
-            "name": "businessDate",
-            "required": true,
-            "type": "date"
-          },
-          {
-            "name": "operationId",
-            "required": true,
-            "type": "string"
+            "name": "feePercent",
+            "required": false,
+            "type": "decimal_string"
           }
         ],
         "validation": [
@@ -5289,6 +5243,122 @@
         "journal": "REQUIRED"
       },
       "maturity": "baseline"
+    },
+    "funds.distribution": {
+      "owner": "docs/modules/funds.md",
+      "capability": "funds.distribution",
+      "status": "IMPLEMENTED",
+      "card": {
+        "purpose": "Fund distribution / income",
+        "requestFields": [
+          {
+            "name": "operationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "instrumentId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reinvest",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "businessDate",
+            "required": true,
+            "type": "date"
+          }
+        ],
+        "validation": [
+          "operationId required UUID for mutations that post",
+          "businessDate required YYYY-MM-DD",
+          "monetary fields must be decimal strings (no JS Number)",
+          "book base from db_meta; never default baseCurrency to transaction currency",
+          "posted path requires balanced journal in base"
+        ],
+        "journalMapping": "income vs return of capital per policy",
+        "feeMapping": "none unless fees present",
+        "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
+        "costBasis": "n/a",
+        "dbWrites": [
+          "fin_operations",
+          "fin_journal_entries",
+          "fin_journal_lines",
+          "inv_fif_transactions"
+        ],
+        "transactionBoundary": "single SQLite transaction",
+        "idempotency": "operationId + canonical economic hash",
+        "reversal": "new inverse operation linked to original; no in-place rewrite of posted amounts",
+        "result": "operationId + domainResult",
+        "errors": [
+          "VALIDATION_ERROR",
+          "FEE_TREATMENT_REQUIRED",
+          "FEE_QUANTITY_REQUIRED",
+          "MISSING_EXCHANGE_RATE",
+          "UNBALANCED_JOURNAL",
+          "POSTED_EMPTY_JOURNAL",
+          "IDEMPOTENCY_CONFLICT",
+          "WRITER_REQUIRED",
+          "CAPABILITY_DENIED"
+        ],
+        "fixtureRefs": [
+          "fixtures/FUND-DIVIDEND-REINVEST.json"
+        ],
+        "invariants": [
+          "posted ⇒ ≥2 journal lines",
+          "Σ debit(base)=Σ credit(base)"
+        ],
+        "standalone": "uses shared Financial Core; capability-gated",
+        "licenseCapability": "funds.distribute",
+        "maturity": "partial",
+        "requiredness": {
+          "operationId": "required",
+          "businessDate": "required"
+        },
+        "normalization": [
+          "decimal-string money/qty/rate/price",
+          "canonicalize same-currency amountInBase=amount, exchangeRateToBase=1 before hash"
+        ],
+        "identity": "operationId + canonical economic hash",
+        "businessRules": [
+          "ex-date, record-date, payment-date required for full release",
+          "cash vs reinvestment explicit; reinvest needs units + transactionPrice",
+          "NAV observation is context only — never silent cost"
+        ],
+        "queries": [],
+        "reports": [
+          "trial_balance_subset",
+          "account_activity"
+        ],
+        "recoveryCases": [
+          "crash before commit → no durable effect",
+          "crash after SQL commit → reconcile durability_state",
+          "same operationId + same economic hash → idempotent replay",
+          "same operationId + different hash → IDEMPOTENCY_CONFLICT"
+        ],
+        "feeTaxonomy": {
+          "defaultTreatments": [],
+          "note": "no default fee; explicit CanonicalFeeEvent only if fees present",
+          "version": "v1"
+        },
+        "license": "capability-gated; never deletes history",
+        "effectClass": "financial",
+        "journal": "REQUIRED"
+      },
+      "maturity": "partial"
     }
   },
   "consistency": {

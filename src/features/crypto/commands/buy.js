@@ -42,7 +42,11 @@ export async function buyCrypto(input, { dataDir } = {}) {
   }
 
   const costCurrency = p.costCurrency;
-  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: costCurrency || p.currency });
+  // v1 lock: public currency must equal costCurrency (book base may differ via FX)
+  if (p.currency !== costCurrency) {
+    throw new Error("CRYPTO_CURRENCY_COST_MISMATCH:v1_requires_currency_eq_costCurrency");
+  }
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: costCurrency });
   const gross = toDecimal(p.grossQuantity);
   const fee = toDecimal(p.feeQuantity || "0");
   const net = toDecimal(p.netQuantity);
@@ -241,8 +245,9 @@ export async function buyCrypto(input, { dataDir } = {}) {
         `INSERT INTO inv_crypto_transactions (
           id, operation_id, holding_id, instrument_id,
           tx_type, business_date, gross_quantity, fee_quantity, net_quantity,
+          price, price_as_of, amount, currency, fee_amount,
           fee_funding_kind, fee_currency, fee_instrument_id, economic_kind, created_at
-        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -252,8 +257,13 @@ export async function buyCrypto(input, { dataDir } = {}) {
         gross.toFixed(),
         fee.toFixed(),
         net.toFixed(),
-        p.feeFundingKind || p.fee_funding_kind || (p.feeInstrumentId || p.fee_instrument_id ? "asset" : (p.feeCurrency || p.fee_currency ? "cash" : null)),
-        p.feeCurrency || costCurrency,
+        p.price,
+        p.priceAsOf,
+        cost.toFixed(),
+        costCurrency,
+        p.feeAmount != null && p.feeAmount !== "" ? String(p.feeAmount) : null,
+        p.feeFundingKind || p.fee_funding_kind || (p.feeInstrumentId || p.fee_instrument_id ? "asset" : (p.feeCurrency || p.fee_currency || (p.feeAmount && p.feeAmount !== "0") ? "cash" : null)),
+        p.feeCurrency || ((p.feeAmount && p.feeAmount !== "0") ? costCurrency : null),
         p.feeInstrumentId || null,
         "acquisition",
         now,

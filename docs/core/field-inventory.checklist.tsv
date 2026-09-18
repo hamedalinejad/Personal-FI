@@ -376,6 +376,11 @@ inv_crypto_transactions	holding_id	RAW	Crypto	yes	inv_crypto_transactions	canoni
 inv_crypto_transactions	id	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	instrument_id	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	net_quantity	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	price	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	price_as_of	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	amount	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	currency	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
+inv_crypto_transactions	fee_amount	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	operation_id	RAW	Crypto	no	inv_crypto_transactions	canonical	yes
 inv_crypto_transactions	tx_type	RAW	Crypto	yes	inv_crypto_transactions	canonical	yes
 inv_crypto_wallet_addresses	account_index	RAW	Crypto	no	inv_crypto_wallet_addresses	canonical	yes
@@ -583,6 +588,7 @@ ln_loans	loan_type	STATUS	Loan	no	ln_loans	canonical	yes
 ln_loans	maturity_date	RAW	Loan	yes	ln_loans	canonical	yes
 ln_loans	name	RAW	Loan	no	ln_loans	canonical	yes
 ln_loans	notes	RAW	Loan	yes	ln_loans	canonical	yes
+ln_loans	origination_kind	RAW	Loan	no	ln_loans	canonical	yes
 ln_loans	operation_id	RAW	Loan	no	ln_loans	canonical	yes
 ln_loans	party_id	RAW	Loan	yes	ln_loans	canonical	yes
 ln_loans	payment_holiday_calendar_id	REFERENCE	Loan	no	ln_loans	canonical	yes

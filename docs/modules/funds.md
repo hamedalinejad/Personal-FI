@@ -18,7 +18,7 @@ Command cards → `docs/core/registry/command-catalog.json`
 Personal offline edition; Core journal is cash/accounting truth.
 
 ## 3. Supported v1 behavior
-subscribe · redeem · distribution (as implemented) · units + amount consistency
+subscribe · redeem · distribution · units + amount consistency
 
 ## 4. Unsupported / Deferred behavior
 NAV as transaction price · silent fee path without Fee Engine when claimed integrated
@@ -45,7 +45,7 @@ Feature entity ids + operationId on mutations.
 funds.subscribe · funds.redeem · funds.distribute
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.

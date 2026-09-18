@@ -47,10 +47,10 @@ Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-cheque.register · deposit · clear · bounce · cancel (as implemented)
+cheque.register · deposit · clear · bounce · cancel
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## Transition matrix (LOCKED)
 
@@ -93,7 +93,7 @@ VALIDATION_ERROR:* · OP_OPERATION_ID_REQUIRED · domain-specific codes.
 fixtures/ and feature tests.
 
 ## 33. Tests / proof
-src/features/<name>/tests + acceptance as applicable.
+Tests: feature package tests under src/features/<module>/tests and Core acceptance where applicable to the edition.
 
 ## 28. Standalone edition behavior
 Cheque ships with **Full**. No separate edition in v1. Journal legs via Core only.

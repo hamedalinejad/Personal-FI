@@ -1,5 +1,5 @@
 {
-  "schemaHash": "f74b3f2d7d7c6b9bd8e21af8e7e0dedaaa09c158ea85688434c01a7ce1b42054",
+  "schemaHash": "247b8f6499d02c814ba2379f1065c7038121d0ea898da915031fed9c28cd571c",
   "tables": {
     "acc_accounts": {
       "columns": [
@@ -4090,6 +4090,41 @@
           "pk": 0
         },
         {
+          "name": "price",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "price_as_of",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
+          "name": "fee_amount",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "fee_funding_kind",
           "type": "TEXT",
           "notnull": false,
@@ -6609,6 +6644,13 @@
           "pk": 0
         },
         {
+          "name": "origination_kind",
+          "type": "TEXT",
+          "notnull": false,
+          "dflt": null,
+          "pk": 0
+        },
+        {
           "name": "day_count",
           "type": "TEXT",
           "notnull": false,
@@ -6682,6 +6724,7 @@
         "CHECK (interest_type IS NULL OR interest_type IN ('none','fixed','variable')",
         "CHECK (irregular_first_period IN (0, 1)",
         "CHECK (loan_type IS NULL OR loan_type IN ('bank_installment','qarz_al_hasaneh','facility','friendly_loan','credit_card','mortgage','leasing','bond','other')",
+        "CHECK (origination_kind IS NULL OR origination_kind IN ('disburse_now','record_outstanding')",
         "CHECK (penalty_basis IS NULL OR penalty_basis IN ('overdue_installment','remaining_balance')",
         "CHECK (recalculate_on_early_payment IN (0, 1)",
         "CHECK (role IN ('borrower','lender')",

@@ -42,10 +42,10 @@ Feature RAW fields owned here; journal owned by FINANCIAL-CORE.
 Feature entity ids + operationId on mutations.
 
 ## 11. Commands
-tax.assess · pay · adjust (as implemented)
+tax.assess · pay · adjust
 
 ## 12. Queries
-List / get / statement-style reads as applicable.
+Queries: module-local reads where listed below; otherwise Core/Reporting readers only.
 
 ## 14. State machine
 Posted vs voided via Core operation lifecycle.

@@ -2,7 +2,7 @@ import { resolveBookBaseCurrency, requireFxIfCrossCurrency } from "../../../core
 import { randomUUID } from "node:crypto";
 import { generateSchedule } from "../domain/scheduleFacade.js";
 import { runAtomicFinancialOperation } from "../../../core/domain/operation/operationEngine.js";
-import { bootstrapLoanEditionAccounts, scopedAccountId } from "../../../core/accounting/chartOfAccounts.js";
+import { bootstrapLoanEditionAccounts, scopedAccountId, ensureLocalSettlementAccounts } from "../../../core/accounting/chartOfAccounts.js";
 import { localSettlementAdapter } from "../adapters/localSettlementAdapter.js";
 import { buildScheduleSnapshot } from "../domain/scheduleSnapshot.js";
 import { normalizeLoanRole } from "../domain/role.js";
@@ -50,6 +50,11 @@ export async function createLoan(
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!p.dayCount) throw new Error("LOAN_DAY_COUNT_REQUIRED");
   if (p.dayCount !== "period_based") throw new Error("LOAN_DAY_COUNT_UNSUPPORTED");
+  // economicMode is legacy alias → originationKind
+  const originationKind = p.originationKind || p.economicMode || "disburse_now";
+  if (!["disburse_now", "record_outstanding"].includes(originationKind)) {
+    throw new Error("LOAN_ORIGINATION_KIND_UNSUPPORTED");
+  }
   const freq = p.installmentFrequency || p.frequency || "monthly";
   if (!["monthly", "weekly", "quarterly", "annual", "yearly"].includes(freq)) {
     throw new Error("LOAN_FREQUENCY_UNSUPPORTED");
@@ -88,19 +93,47 @@ export async function createLoan(
   });
 
   const loanId = p.loanId || randomUUID();
-  const settlement = localSettlementAdapter.settle({
-    finAccountId: cashAccountId,
-    counterAccountId: receivableAccountId,
-    amount: p.principal,
-    currency,
-    side: "credit",
-    operationId,
-    memo: "loan_disbursement",
-  });
-  for (const line of settlement.journalLines) {
-    line.lineKind = "principal";
-    line.amountInBase = line.amount;
-    line.exchangeRateToBase = "1";
+  let journalLines;
+  if (originationKind === "disburse_now") {
+    const settlement = localSettlementAdapter.settle({
+      finAccountId: cashAccountId,
+      counterAccountId: receivableAccountId,
+      amount: p.principal,
+      currency,
+      side: "credit",
+      operationId,
+      memo: "loan_disbursement",
+    });
+    journalLines = settlement.journalLines;
+    for (const line of journalLines) {
+      line.lineKind = "principal";
+      line.amountInBase = line.amount;
+      line.exchangeRateToBase = "1";
+    }
+  } else {
+    // record_outstanding: receivable only — DO NOT fabricate cash movement
+    // Opening equity/liability offset via opening_balance equity account
+    const openingEquityId = scopedAccountId("opening_balances_equity", currency);
+    journalLines = [
+      {
+        accountId: receivableAccountId,
+        side: "debit",
+        amount: p.principal,
+        currency,
+        amountInBase: p.principal,
+        exchangeRateToBase: "1",
+        lineKind: "principal",
+      },
+      {
+        accountId: openingEquityId,
+        side: "credit",
+        amount: p.principal,
+        currency,
+        amountInBase: p.principal,
+        exchangeRateToBase: "1",
+        lineKind: "opening",
+      },
+    ];
   }
 
   const snapshotId = randomUUID();
@@ -114,7 +147,7 @@ export async function createLoan(
     businessDate: p.businessDate,
     baseCurrency,
     payload: { ...p, loanId },
-    journalLines: settlement.journalLines,
+    journalLines,
     domainResult: {
       schedule: snapshot,
       loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: p.method },
@@ -122,11 +155,24 @@ export async function createLoan(
     engineVersions: { loanSchedule: engineVersion, money: "1.0.0" },
     withinTransaction(db) {
       bootstrapLoanEditionAccounts(dataDir, currency);
+      if (originationKind === "record_outstanding") {
+        ensureLocalSettlementAccounts(db, currency);
+        // opening equity for outstanding-only path
+        const eqId = scopedAccountId("opening_balances_equity", currency);
+        const existing = db.prepare("SELECT id FROM fin_accounts WHERE id = ?").get(eqId);
+        if (!existing) {
+          db.prepare(
+            `INSERT INTO fin_accounts (id, code, name, account_kind, currency, status, is_archived, created_at)
+             VALUES (?, ?, ?, 'equity', ?, 'active', 0, ?)`
+          ).run(eqId, eqId, `Opening balances (${currency})`, currency, now);
+        }
+      }
       db.prepare(
         `INSERT INTO ln_loans (
           id, role, calculation_method, principal, currency, interest_rate, status, created_at,
-          start_date, operation_id, total_installments, day_count, schedule_engine_version, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)`,
+          start_date, operation_id, total_installments, day_count, schedule_engine_version, notes,
+          origination_kind
+        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         loanId,
         role,
@@ -141,6 +187,7 @@ export async function createLoan(
         p.dayCount,
         engineVersion,
         p.notes || null,
+        originationKind,
       );
       db.prepare(
         `INSERT INTO ln_schedule_snapshots (id, loan_id, version, snapshot_json, effective_from, operation_id)
