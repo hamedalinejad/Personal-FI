@@ -330,3 +330,5 @@ src/features/loan/tests/frequency-command.test.js	test
 src/features/stocks/tests/sell-fee.test.js	test
 src/features/funds/tests/redeem-price-mismatch.test.js	test
 src/features/crypto/tests/qty-conservation.test.js	test
+src/core/acceptance/bug-f-semantic.acceptance.test.js	E	test	keep
+scripts/command-constraints-check.js	E	script	keep

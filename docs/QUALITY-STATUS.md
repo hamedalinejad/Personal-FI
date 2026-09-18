@@ -32,3 +32,10 @@ Iran fee policy data, browser sql.js E2E, TWR/MWR remain deferred (not v1 blocke
 - Promoted incorrectly DEFERRED fields that are accepted/implemented to PERSISTED (or DERIVED for pure schedule calc).
 - `funds.distribution.reinvest` remains REJECTED with reason.
 - Gate: field-preservation-check OK (492 rows, 882 schema cols).
+
+## Phase 0 — Conditional constraints (2026-09-18)
+
+- Machine `constraints[]` on funds.redeem, funds.subscribe, metals.buy, loan.create, crypto.buy
+- `scripts/command-constraints-check.js` + `npm run command:constraints` in gates
+- File inventory includes acceptance test previously missing
+- field-preservation gate remains GREEN

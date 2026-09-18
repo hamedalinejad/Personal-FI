@@ -232,9 +232,53 @@
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
         "journal": "REQUIRED",
-        "aliases": {}
+        "aliases": {},
+        "constraints": [
+          {
+            "id": "crypto_currency_eq_cost",
+            "type": "fieldEquals",
+            "left": "currency",
+            "right": "costCurrency",
+            "error": "CRYPTO_CURRENCY_COST_MISMATCH"
+          },
+          {
+            "id": "crypto_qty_conservation",
+            "type": "when",
+            "when": {
+              "field": "feeTreatment",
+              "in": [
+                "reduce_received_quantity",
+                "fee_from_received"
+              ]
+            },
+            "rule": "netQuantity == grossQuantity - feeQuantity",
+            "error": "CRYPTO_QTY_CONSERVATION"
+          }
+        ]
       },
-      "maturity": "partial"
+      "maturity": "partial",
+      "constraints": [
+        {
+          "id": "crypto_currency_eq_cost",
+          "type": "fieldEquals",
+          "left": "currency",
+          "right": "costCurrency",
+          "error": "CRYPTO_CURRENCY_COST_MISMATCH"
+        },
+        {
+          "id": "crypto_qty_conservation",
+          "type": "when",
+          "when": {
+            "field": "feeTreatment",
+            "in": [
+              "reduce_received_quantity",
+              "fee_from_received"
+            ]
+          },
+          "rule": "netQuantity == grossQuantity - feeQuantity",
+          "error": "CRYPTO_QTY_CONSERVATION"
+        }
+      ]
     },
     "crypto.sell": {
       "owner": "docs/modules/crypto.md",
@@ -1389,9 +1433,79 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "constraints": [
+          {
+            "id": "subscribe_qty_or_units",
+            "type": "atLeastOneOf",
+            "fields": [
+              "quantity",
+              "units"
+            ],
+            "error": "FUNDS_SUBSCRIBE_QTY_REQUIRED"
+          },
+          {
+            "id": "subscribe_pricing_modes",
+            "type": "pricingMode",
+            "modes": {
+              "transaction_price": {
+                "required": [
+                  "transactionPrice"
+                ]
+              },
+              "nav": {
+                "required": [
+                  "nav"
+                ],
+                "note": "explicit pricingMode=nav required to derive tx price from NAV"
+              },
+              "amount_based": {
+                "required": [
+                  "amount"
+                ],
+                "derived": "transactionPrice = amount / quantity"
+              }
+            },
+            "error": "FUNDS_PRICING_INCOMPLETE"
+          }
+        ]
       },
-      "maturity": "partial"
+      "maturity": "partial",
+      "constraints": [
+        {
+          "id": "subscribe_qty_or_units",
+          "type": "atLeastOneOf",
+          "fields": [
+            "quantity",
+            "units"
+          ],
+          "error": "FUNDS_SUBSCRIBE_QTY_REQUIRED"
+        },
+        {
+          "id": "subscribe_pricing_modes",
+          "type": "pricingMode",
+          "modes": {
+            "transaction_price": {
+              "required": [
+                "transactionPrice"
+              ]
+            },
+            "nav": {
+              "required": [
+                "nav"
+              ],
+              "note": "explicit pricingMode=nav required to derive tx price from NAV"
+            },
+            "amount_based": {
+              "required": [
+                "amount"
+              ],
+              "derived": "transactionPrice = amount / quantity"
+            }
+          },
+          "error": "FUNDS_PRICING_INCOMPLETE"
+        }
+      ]
     },
     "funds.redeem": {
       "owner": "docs/modules/funds.md",
@@ -1543,9 +1657,67 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "constraints": [
+          {
+            "id": "redeem_price_xor_proceeds",
+            "type": "atLeastOneOf",
+            "fields": [
+              "transactionPrice",
+              "proceedsTotal"
+            ],
+            "error": "FUNDS_REDEEM_PRICE_OR_PROCEEDS_REQUIRED"
+          },
+          {
+            "id": "redeem_price_proceeds_agree",
+            "type": "whenBothPresent",
+            "fields": [
+              "transactionPrice",
+              "proceedsTotal"
+            ],
+            "rule": "proceedsTotal == units * transactionPrice",
+            "error": "AMOUNT_PRICE_MISMATCH"
+          },
+          {
+            "id": "redeem_units_positive",
+            "type": "positiveDecimal",
+            "fields": [
+              "units"
+            ],
+            "error": "UNITS_NOT_POSITIVE"
+          }
+        ]
       },
-      "maturity": "partial"
+      "maturity": "partial",
+      "constraints": [
+        {
+          "id": "redeem_price_xor_proceeds",
+          "type": "atLeastOneOf",
+          "fields": [
+            "transactionPrice",
+            "proceedsTotal"
+          ],
+          "error": "FUNDS_REDEEM_PRICE_OR_PROCEEDS_REQUIRED"
+        },
+        {
+          "id": "redeem_price_proceeds_agree",
+          "type": "whenBothPresent",
+          "fields": [
+            "transactionPrice",
+            "proceedsTotal"
+          ],
+          "rule": "proceedsTotal == units * transactionPrice",
+          "error": "AMOUNT_PRICE_MISMATCH"
+        },
+        {
+          "id": "redeem_units_positive",
+          "type": "positiveDecimal",
+          "fields": [
+            "units"
+          ],
+          "error": "UNITS_NOT_POSITIVE"
+        }
+      ]
     },
     "metals.buy": {
       "owner": "docs/modules/metals.md",
@@ -1782,9 +1954,69 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "REQUIRED"
+        "journal": "REQUIRED",
+        "constraints": [
+          {
+            "id": "metals_mass",
+            "type": "atLeastOneOf",
+            "fields": [
+              "quantityMg",
+              "grossWeight"
+            ],
+            "error": "METALS_MASS_REQUIRED"
+          },
+          {
+            "id": "metals_price",
+            "type": "atLeastOneOf",
+            "fields": [
+              "metalPricePerMg",
+              "metalPrice"
+            ],
+            "error": "METALS_PRICE_REQUIRED"
+          },
+          {
+            "id": "metals_purity",
+            "type": "requiredUnless",
+            "field": "purityRatio",
+            "unless": {
+              "field": "purityPolicy",
+              "equals": "fixed_1"
+            },
+            "error": "PURITY_RATIO_REQUIRED"
+          }
+        ]
       },
-      "maturity": "partial"
+      "maturity": "partial",
+      "constraints": [
+        {
+          "id": "metals_mass",
+          "type": "atLeastOneOf",
+          "fields": [
+            "quantityMg",
+            "grossWeight"
+          ],
+          "error": "METALS_MASS_REQUIRED"
+        },
+        {
+          "id": "metals_price",
+          "type": "atLeastOneOf",
+          "fields": [
+            "metalPricePerMg",
+            "metalPrice"
+          ],
+          "error": "METALS_PRICE_REQUIRED"
+        },
+        {
+          "id": "metals_purity",
+          "type": "requiredUnless",
+          "field": "purityRatio",
+          "unless": {
+            "field": "purityPolicy",
+            "equals": "fixed_1"
+          },
+          "error": "PURITY_RATIO_REQUIRED"
+        }
+      ]
     },
     "metals.sell": {
       "owner": "docs/modules/metals.md",
@@ -2280,9 +2512,87 @@
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
         "journal": "REQUIRED",
-        "aliases": {}
+        "aliases": {},
+        "constraints": [
+          {
+            "id": "loan_origination_kind",
+            "type": "enum",
+            "field": "originationKind",
+            "values": [
+              "disburse_now",
+              "record_outstanding"
+            ],
+            "required": true,
+            "error": "LOAN_ORIGINATION_KIND_REQUIRED"
+          },
+          {
+            "id": "loan_method",
+            "type": "enum",
+            "field": "method",
+            "values": [
+              "declining_balance",
+              "flat",
+              "qarz",
+              "bullet"
+            ],
+            "required": true,
+            "error": "LOAN_METHOD_INVALID"
+          },
+          {
+            "id": "loan_frequency",
+            "type": "enum",
+            "field": "installmentFrequency",
+            "values": [
+              "monthly",
+              "weekly",
+              "quarterly",
+              "annual"
+            ],
+            "required": false,
+            "error": "LOAN_FREQUENCY_INVALID"
+          }
+        ]
       },
-      "maturity": "strongest"
+      "maturity": "strongest",
+      "constraints": [
+        {
+          "id": "loan_origination_kind",
+          "type": "enum",
+          "field": "originationKind",
+          "values": [
+            "disburse_now",
+            "record_outstanding"
+          ],
+          "required": true,
+          "error": "LOAN_ORIGINATION_KIND_REQUIRED"
+        },
+        {
+          "id": "loan_method",
+          "type": "enum",
+          "field": "method",
+          "values": [
+            "declining_balance",
+            "flat",
+            "qarz",
+            "bullet"
+          ],
+          "required": true,
+          "error": "LOAN_METHOD_INVALID"
+        },
+        {
+          "id": "loan_frequency",
+          "type": "enum",
+          "field": "installmentFrequency",
+          "values": [
+            "monthly",
+            "weekly",
+            "quarterly",
+            "annual"
+          ],
+          "required": false,
+          "error": "LOAN_FREQUENCY_INVALID"
+        }
+      ]
     },
     "loan.recordPayment": {
       "owner": "docs/modules/loan.md",
@@ -5482,5 +5792,20 @@
       "MWR"
     ]
   },
-  "note": "Deferred entries must not be implemented accidentally; not present as live command keys."
+  "note": "Deferred entries must not be implemented accidentally; not present as live command keys.",
+  "constraintSchema": {
+    "version": 1,
+    "types": [
+      "atLeastOneOf",
+      "exactlyOneOf",
+      "whenBothPresent",
+      "positiveDecimal",
+      "pricingMode",
+      "requiredUnless",
+      "enum",
+      "fieldEquals",
+      "when"
+    ],
+    "note": "Machine-readable conditional constraints. Enforced by scripts/command-constraints-check.js and runtime validators."
+  }
 }
