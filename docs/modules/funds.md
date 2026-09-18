@@ -168,3 +168,7 @@ Never auto-copy between these three.
 **Cash distribution only.**  
 `reinvest` field: **REJECTED** at API boundary in v1 (do not accept).  
 Full reinvest economics (ex/record/payment dates, units, transaction price, RoC) = **DEFERRED** until complete contract + golden.
+
+
+## Queries (v1)
+This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).

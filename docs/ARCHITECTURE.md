@@ -225,3 +225,14 @@ Standalone editions expose **one** vertical public-api only.
 
 Edition ID for funds standalone: **`funds-only`** (not fund-only).  
 `full.requiresAccountsUi = true`; standalone verticals = `false`.
+
+
+## Feature query surface (v1 LOCKED)
+
+| Package | Queries |
+|---------|---------|
+| loan | getLoan, listLoans, getSchedule, getStatement (package queries) |
+| crypto / funds / stocks / metals | **commands only** in v1 (`queries = {}`) |
+
+Holdings, statements, and portfolio reads for investment packages are provided by **shared Reporting / Core readers**, not by undocumented internal imports.  
+UI must not import feature internals for reads.

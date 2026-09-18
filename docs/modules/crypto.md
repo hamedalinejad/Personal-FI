@@ -195,3 +195,13 @@ Operational `tx_type` remains separate (`buy`, `sell`, `transfer_in`, `transfer_
 
 ## Venue identity (LOCKED)
 `exchange_id` is venue/container identity. type in {cex,dex,wallet,other}. API alias venueId maps to exchange_id.
+
+
+## Queries (v1)
+This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).
+
+
+## API field: venueId (LOCKED)
+Canonical domain/API field: **`venueId`**.  
+Persistence column remains `exchange_id` → `inv_crypto_exchanges.id` where `type ∈ {cex,dex,wallet,other}`.  
+No schema rename required in v1.

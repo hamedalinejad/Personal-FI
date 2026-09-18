@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * P0-SCHEMA-001: schema.sql → manifest → inventory must stay synchronized.
+ * schema.sql → manifest → inventory must stay synchronized.
  * 1) Regenerate manifest hash from schema
  * 2) Verify checked-in manifest matches
  * 3) Verify field-inventory covers every CREATE column

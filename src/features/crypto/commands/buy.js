@@ -22,7 +22,8 @@ const MODULE_DEFAULT_FEE_TREATMENT = "reduce_received_quantity";
 export async function buyCrypto(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
-  const p = input.payload || input;
+  const p = input.payload || input
+  if (p.venueId && !p.exchangeId) p.exchangeId = p.venueId;
 
   for (const k of [
     "instrumentId",

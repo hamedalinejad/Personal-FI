@@ -1,9 +1,10 @@
 
 /**
- * Schedule conservation — exact at stored money scale (2 dp).
+ * Schedule conservation — exact at stored money scale.
+ * Loan v1 contractual precision = 2 decimal places (fixed), independent of cur_currencies.minor_units.
  * Engine must absorb residual into the final eligible row before this assert.
- * One-cent silent mismatch is forbidden.
  */
+
 export function assertScheduleConservation(rows, { principal, totalInterest = null }) {
   let sp = toDecimal("0");
   let si = toDecimal("0");
@@ -41,6 +42,7 @@ import { assertPositive, assertNonNegative } from "../../money/decimalMath.js";
 function money2(d) {
   // accept Decimal instance or decimal string
   const x = d && typeof d === "object" && typeof d.toFixed === "function" ? d : toDecimal(d);
+  // LOAN_V1_SCALE = 2 (contractual; not derived from cur_currencies in v1)
   return x.toDecimalPlaces(2).toFixed(2);
 }
 

@@ -128,4 +128,9 @@ Feature cash ledger as truth · holding as unaudited cost SoT · UI journal · l
 Goldens for journal/FX/fee/loan/investments; recovery matrix; standalone packs. See QUALITY-STATUS + fixtures.
 
 ## 14. Rounding (v1)
-Store at policy precision; residual absorption only on **final eligible** schedule/allocation row; conservation asserts **exact** equality of stored sums vs original principal (and interest where required).
+| Context | Rule |
+|---------|------|
+| General | Prefer `cur_currencies.minor_units` when currency policy is fully wired |
+| **Loan v1** | **Fixed 2 decimal places** contractual scale (not read from minor_units yet) |
+| Residual | Absorb only on **final eligible** schedule/allocation row |
+| Conservation | Exact equality of stored sums vs original principal (and interest where required) |

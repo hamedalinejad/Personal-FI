@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * P0-B01/B16 — single command lifecycle status; fail on conflicts with hand docs.
+ * /B16 — single command lifecycle status; fail on conflicts with hand docs.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";

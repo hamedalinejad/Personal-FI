@@ -1,6 +1,17 @@
 # QUALITY-STATUS
 
-**Live only.** History = Git / `docs/archive/AUDIT-HISTORY.md`.
+**Live dashboard only.** History = Git. No BUG/P0 Markdown authority.
+
+## Vocabulary (LOCKED)
+| Axis | Values |
+|------|--------|
+| Contract | LOCKED · DEFERRED · REJECTED |
+| Implementation | NOT_IMPLEMENTED · PARTIAL · IMPLEMENTED |
+| Proof | UNPROVEN · PARTIAL · GREEN |
+| Release | FREEZE_PROVEN · RELEASE_PROVEN · NO-GO |
+
+`SEMANTIC_CODING_READY` = contracts usable for scaffold (derived; not a second status system).  
+`integrity:audit` without dataDir = **SKIPPED** (not GREEN release proof).
 
 ## Gates
 | Gate | Value |
@@ -11,36 +22,33 @@
 | PRODUCTION | **NO-GO** |
 | UI | **WAIT** |
 
-## Semantic freeze blockers (must be green for FREEZE_PROVEN)
-Contracts unambiguous · command registry complete · exact field mapping · schema consistent · owners consistent · deferred scope explicit · gate scripts trustworthy
+## Semantic freeze blockers
+Unambiguous contracts · complete command cards · exact field mapping · schema consistency · single authority · deferred scope explicit · trustworthy gates  
 
-Does **not** require: browser E2E, TWR/MWR, full holiday bulletin, license runtime, full golden families (those are **release**).
+**Not** freeze blockers: browser E2E, TWR/MWR, full holiday bulletin, license runtime, full golden families.
 
-## Release blockers (must be green for RELEASE_PROVEN)
-| Item | Status |
-|------|--------|
-| Golden families for claimed commands | PARTIAL |
-| Recovery matrix executable | PARTIAL |
-| Standalone edition packs | PARTIAL |
-| Browser sql.js + IndexedDB E2E | OPEN (if shipping browser) |
-| License runtime enforcement | SPEC_LOCKED machine only |
-| TWR/MWR/FX attribution | DEFERRED |
-| Official holiday bulletin completeness | seed only |
+## Release blockers
+| Item | Proof |
+|------|-------|
+| Goldens | PARTIAL |
+| Recovery matrix | PARTIAL |
+| Standalone packs | PARTIAL |
+| Browser sql.js+IDB | OPEN if shipping |
+| License runtime | SPEC_LOCKED machine |
+| Official holiday package | seed only |
+| integrity:audit on fixture DB | require GREEN not SKIPPED |
 
-## Authority separation
-| Question | Authority |
-|----------|-----------|
+## Authority
+| Question | Owner |
+|----------|-------|
 | Per-command status | command-catalog.json |
 | Feature/edition/release | status.registry.json |
 | Requirement trace | requirements-matrix.json |
 | Live dashboard | this file |
-| Release evidence | generated RELEASE-EVIDENCE.json |
-
-## Closed (do not reopen)
-C0 authority split · field-preservation exact rows · release-evidence current paths · book-base FX path · metals holdingId/purity · fund redeem currency match · loan reversal currency · reduce_proceeds reporting rule · catalog no wildcards · journal REQUIRED\|FORBIDDEN
+| Evidence | generated RELEASE-EVIDENCE.json |
 
 ## Standalone
-Loan | Crypto | Stocks | Funds | Metals → public-api only · shared Core journal
+Loan · Crypto · Stocks · Funds · Metals → one public-api · shared Core · requiresAccountsUi=false
 
 ## Evidence
-`npm test` · `npm run gates` · `docs/core/registry/*`
+`npm test` · `npm run gates` · registries · fixtures

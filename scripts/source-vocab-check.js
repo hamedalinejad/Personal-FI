@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * BUG-FINAL-040 — fail if journal/ops schema confuses channel enum with type.
+ * fail if journal/ops schema confuses channel enum with type.
  */
 import fs from "fs";
 import path from "path";

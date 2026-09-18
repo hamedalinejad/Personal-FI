@@ -161,3 +161,7 @@ else purity_ratio required (Decimal domain validation)
 ```
 NULL purity is allowed only on non-posted drafts. Holding identity must not use NULL as a merge bucket.  
 SQLite CHECK = structural sanity only; Decimal domain = financial truth.
+
+
+## Queries (v1)
+This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).

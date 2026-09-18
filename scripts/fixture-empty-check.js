@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * P0-TEST-001 — reject claimed financial fixtures with empty expected.
+ * reject claimed financial fixtures with empty expected.
  * A fixture is "claimed" if input is non-empty OR id suggests a financial op.
  * Empty expected.domain/journal when input has method/operation is FAIL.
  */

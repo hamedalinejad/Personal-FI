@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** REQ-028 soft: fail if feature query modules contain mutating SQL keywords */
+/** soft: fail if feature query modules contain mutating SQL keywords */
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";

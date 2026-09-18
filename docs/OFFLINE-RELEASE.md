@@ -184,3 +184,13 @@ crash before commit · after SQL commit · same-op replay · ID+changed economic
 | Node SQLite | Primary path | PROVEN (scaffold) |
 
 Shipping Node-first is allowed while browser E2E remains OPEN. Browser edition cannot claim RELEASE_PROVEN until level 2 is green.
+
+
+## integrity:audit outcomes (LOCKED)
+| Result | Meaning |
+|--------|---------|
+| SKIPPED | no dataDir / no DB — CI without fixture; **not** release proof |
+| GREEN | real SQLite checked, no findings |
+| FAIL | findings present |
+
+Release proof must run `node scripts/integrity-audit.js <fixtureDataDir>` and require GREEN.

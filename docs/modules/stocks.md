@@ -178,3 +178,7 @@ Do not substitute trade_date for market_date. `settlement_policy_version` requir
 
 `withholdingTax` on `stocks.dividend` is a **transaction-only withholding adjustment** (journal to stock_withholding_tax expense/payable style account).  
 It does **not** create `tax_events` obligation lineage in v1. Full tax-owner integration = DEFERRED.
+
+
+## Queries (v1)
+This package exposes **commands** via public-api. List/detail/holdings reads use **Core/Reporting readers**, not package-local query exports (`queries = {}` is intentional).

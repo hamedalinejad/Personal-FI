@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 /**
- * GAP-034 partial — SQL consistency checks on a given dataDir SQLite.
+ * SQL consistency checks on a given dataDir SQLite.
  * Usage: node scripts/integrity-audit.js [dataDir]
- * Exit 0 if clean or no DB; 1 on findings.
+ *
+ * Outcomes:
+ *   SKIPPED — no dataDir / no sqlite (not a release proof)
+ *   GREEN   — fixture DB checked, no findings
+ *   FAIL    — findings present (exit 1)
+ *
+ * Release proof must invoke with a real fixture dataDir and require GREEN.
  */
 import { existsSync } from "fs";
 import { join } from "path";
@@ -10,18 +16,17 @@ import { DatabaseSync } from "node:sqlite";
 
 const dir = process.argv[2];
 if (!dir) {
-  console.log("integrity-audit: no dataDir — skip (OK for CI without DB)");
+  console.log("integrity-audit: SKIPPED (no dataDir — not release proof)");
   process.exit(0);
 }
 const dbPath = join(dir, "personal-fi.sqlite");
 if (!existsSync(dbPath)) {
-  console.log("integrity-audit: no sqlite at", dbPath);
+  console.log("integrity-audit: SKIPPED (no sqlite at", dbPath, "— not release proof)");
   process.exit(0);
 }
 const db = new DatabaseSync(dbPath);
 const findings = [];
 
-// Orphan journal lines without entry
 try {
   const n = db.prepare(`
     SELECT COUNT(*) as c FROM fin_journal_lines jl
@@ -32,7 +37,6 @@ try {
   findings.push(`skip_orphan:${e.message}`);
 }
 
-// Posted ops missing amount_in_base on lines
 try {
   const n = db.prepare(`
     SELECT COUNT(*) as c FROM fin_journal_lines jl
@@ -45,8 +49,6 @@ try {
   findings.push(`skip_base:${e.message}`);
 }
 
-// post_state is CACHE only — authoritative status is fin_operations.status
-// Reports must JOIN fo.status, never filter solely on post_state.
 try {
   const n = db.prepare(`
     SELECT COUNT(*) as c FROM fin_journal_entries je
@@ -63,20 +65,6 @@ try {
   findings.push(`skip_drift:${e.message}`);
 }
 
-// Empty journal entry attached to posted op
-try {
-  const n = db.prepare(`
-    SELECT COUNT(*) as c FROM fin_journal_entries je
-    JOIN fin_operations o ON o.id = je.operation_id
-    LEFT JOIN fin_journal_lines jl ON jl.entry_id = je.id
-    WHERE o.status = 'posted'
-    GROUP BY je.id
-    HAVING COUNT(jl.id) < 2
-  `).get()?.c ?? 0;
-  // rewrite as subquery
-} catch (e) {
-  /* replaced below */
-}
 try {
   const n = db.prepare(`
     SELECT COUNT(*) as c FROM (
@@ -97,4 +85,4 @@ if (findings.length) {
   console.error("integrity-audit FAIL:", findings.join(", "));
   process.exit(1);
 }
-console.log("integrity-audit: OK");
+console.log("integrity-audit: GREEN (fixture DB checked)");
