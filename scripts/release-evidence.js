@@ -23,8 +23,8 @@ const evidence = {
   gatesScript: pkg.scripts.gates,
   production: status.release?.production || status.production || "NO-GO",
   FREEZE_PROVEN: status.schema_status?.FREEZE_PROVEN === true ? true : false,
-  RELEASE_PROVEN: status.release?.RELEASE_PROVEN === true ? false : false,
-  SEMANTIC_CODING_READY: true,
+  RELEASE_PROVEN: status.release?.RELEASE_PROVEN === true,
+  SEMANTIC_CODING_READY: status.schema_status?.SEMANTIC_CODING_READY === true,
   authority: {
     human: [
       "docs/DOCUMENTATION-STANDARD.md",

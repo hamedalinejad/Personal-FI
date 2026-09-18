@@ -48,10 +48,14 @@ function money2(d) {
 
 /** P0-CODE-010 — strict positive integer period count (string decimal, integer only). */
 export function parsePeriodCount(periods) {
-  const d = toDecimal(periods);
-  if (!d.isInteger()) throw new Error("LOAN_PERIODS_NOT_INTEGER");
-  if (d.lte(0)) throw new Error("LOAN_PERIODS");
-  return d.toNumber(); // safe: integer period count only, not money
+  if (periods == null || periods === "") throw new Error("LOAN_PERIODS");
+  const s = String(periods).trim();
+  if (!/^[0-9]+$/.test(s)) throw new Error("LOAN_PERIODS_NOT_INTEGER");
+  const n = Number(s);
+  // BUG-F10: structural count must be safe positive integer
+  if (!Number.isSafeInteger(n) || n <= 0) throw new Error("LOAN_PERIODS_NOT_SAFE_INTEGER");
+  if (n > 1200) throw new Error("LOAN_PERIODS_EXCEEDS_MAX");
+  return n;
 }
 
 function money2str(d) {
@@ -159,7 +163,14 @@ export function scheduleFlat({ principal, annualRate, periods, startDate, dayCou
   // annual flat = P * annualFraction * termYears
   // termYears from period count / periods-per-year (monthly → /12)
   const rateFrac = normalizeRatePercentage(annualRate);
-  const periodsPerYear = frequency === "monthly" ? 12 : frequency === "quarterly" ? 4 : frequency === "weekly" ? 52 : 1;
+  // BUG-F09: unknown frequency must not silently become annual
+  let freq = frequency || "monthly";
+  if (freq === "yearly") freq = "annual";
+  if (!["monthly", "weekly", "quarterly", "annual"].includes(freq)) {
+    throw new Error(`LOAN_FREQUENCY_UNSUPPORTED:${freq}`);
+  }
+  const periodsPerYear =
+    freq === "monthly" ? 12 : freq === "quarterly" ? 4 : freq === "weekly" ? 52 : 1;
   const termYears = toDecimal(String(n)).div(String(periodsPerYear));
   const totalInterest = P.times(rateFrac).times(termYears);
   const pPartExact = P.div(n);

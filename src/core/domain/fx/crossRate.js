@@ -11,19 +11,28 @@ import { assertPositive } from "../../money/decimalMath.js";
 function normalizeRate(entry) {
   if (entry == null) return null;
   if (typeof entry === "number") throw new Error("FX_RATE_NOT_STRING");
+  let rate;
+  let asOf = null;
+  let source = "map";
+  let isStale = false;
   if (typeof entry === "string") {
-    return { rate: entry, asOf: null, source: "map", isStale: false };
+    rate = entry;
+  } else if (typeof entry === "object") {
+    if (typeof entry.rate !== "string") throw new Error("FX_RATE_NOT_STRING");
+    rate = entry.rate;
+    asOf = entry.asOf || null;
+    source = entry.source || "unknown";
+    isStale = !!entry.isStale;
+  } else {
+    throw new Error("FX_RATE_NOT_STRING");
   }
-  if (typeof entry.rate !== "string") throw new Error("FX_RATE_NOT_STRING");
-  return {
-    rate: entry.rate,
-    asOf: entry.asOf || null,
-    source: entry.source || "unknown",
-    isStale: !!entry.isStale,
-  };
+  // BUG-F08: rate must be positive decimal string before graph use
+  const d = toDecimal(rate);
+  if (!d.gt(0)) throw new Error("FX_RATE_NONPOSITIVE");
+  return { rate: d.toFixed(), asOf, source, isStale };
 }
 
-function buildGraph(rates) {
+function buildGraph(rates, { asOf = null, allowStale = false } = {}) {
   const edges = new Map();
   function add(from, to, meta) {
     if (!edges.has(from)) edges.set(from, []);
@@ -112,8 +121,10 @@ export function convertAmount({ amount, from, to, rates, asOf = null, allowStale
     if (h.isStale && !allowStale) {
       throw new Error("FX_RATE_STALE");
     }
-    if (asOf && h.asOf && h.asOf > asOf) {
-      throw new Error("MISSING_RATE");
+    // BUG-F08: historical conversion requires dated observations
+    if (asOf) {
+      if (!h.asOf) throw new Error("FX_HISTORICAL_ASOF_REQUIRED");
+      if (h.asOf > asOf) throw new Error("FX_OBSERVATION_AFTER_CUTOFF");
     }
     out = out.times(toDecimal(h.rate));
   }

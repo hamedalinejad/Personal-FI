@@ -1,17 +1,21 @@
 #!/usr/bin/env node
 /**
- * /B16 — single command lifecycle status; fail on conflicts with hand docs.
+ * status.registry.json — feature/edition/release summaries only.
+ * BUG-F17: per-command lifecycle status authority = command-catalog.json
  */
-import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, existsSync } from "fs";
 
-const root = process.cwd();
-const regPath = join(root, "docs/core/registry/status.registry.json");
+const regPath = "docs/core/registry/status.registry.json";
+const catPath = "docs/core/registry/command-catalog.json";
 if (!existsSync(regPath)) {
-  console.error("status.registry.json missing");
+  console.error("missing status.registry.json");
   process.exit(1);
 }
 const reg = JSON.parse(readFileSync(regPath, "utf8"));
+const catalog = existsSync(catPath)
+  ? JSON.parse(readFileSync(catPath, "utf8"))
+  : { commands: {} };
+
 const allowed = new Set([
   "SPEC_LOCKED",
   "IMPLEMENTED",
@@ -25,22 +29,30 @@ const allowed = new Set([
   "FORBIDDEN_UNTIL_PHASE_ORDER",
 ]);
 
-const commands = {};
+// Per-command blocks in status.registry are non-authoritative if present —
+// require parity with catalog when both list a command
+const catalogCmds = catalog.commands || {};
+let regCmdCount = 0;
 for (const [feat, body] of Object.entries(reg.features || {})) {
   for (const [cmd, st] of Object.entries(body.commands || {})) {
-    if (commands[cmd]) {
-      console.error(`duplicate command key: ${cmd}`);
+    regCmdCount++;
+    if (!allowed.has(st)) {
+      console.error(`invalid command status ${cmd}=${st}`);
       process.exit(1);
     }
-    commands[cmd] = st;
-    if (!allowed.has(st) && st !== "IMPLEMENTED") {
-      // allow IMPLEMENTED
-    }
-    if (!["SPEC_LOCKED", "IMPLEMENTED", "PARTIAL", "BLOCKED", "DEFERRED"].includes(st)) {
-      console.error(`invalid command status ${cmd}=${st}`);
+    if (catalogCmds[cmd] && catalogCmds[cmd].status && catalogCmds[cmd].status !== st) {
+      console.error(
+        `command status drift: ${cmd} registry=${st} catalog=${catalogCmds[cmd].status}`,
+      );
       process.exit(1);
     }
   }
 }
 
-console.log("status-registry-check: OK", Object.keys(commands).length, "commands");
+console.log(
+  "status-registry-check: OK catalogCommands=",
+  Object.keys(catalogCmds).length,
+  "registryFeatureCommands=",
+  regCmdCount,
+  "(catalog is sole lifecycle authority)",
+);

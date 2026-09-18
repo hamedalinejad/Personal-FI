@@ -137,7 +137,11 @@ test("rebuild: rebuildProjection deterministic for same ledger snapshot", async 
   const { rebuildProjection } = await import("../rebuild/rebuildProjection.js");
   const args = {
     asOf: "2026-06-01",
-    sourceLedger: { projections: { x: 1 } },
+    sourceLedger: {
+      operations: [
+        { operationId: "op-x", status: "posted", businessDate: "2026-01-01", type: "test" },
+      ],
+    },
     engineVersions: { core: "1" },
   };
   assert.deepEqual(rebuildProjection(args), rebuildProjection(args));

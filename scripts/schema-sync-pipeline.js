@@ -17,16 +17,18 @@ const root = process.cwd();
 const schemaPath = join(root, "docs/core/db/schema.sql");
 const manifestPath = join(root, "docs/core/db/schema.manifest.json");
 const invPath = join(root, "docs/core/field-inventory.checklist.tsv");
-const reportPath = join(root, "(stdout only; no markdown artifact)");
 
 if (!existsSync(schemaPath)) {
   console.error("MISSING schema.sql");
   process.exit(1);
 }
 
-// Run official generators/checkers
+// BUG-F15: gates must not mutate artifacts. Generate only when SCHEMA_SYNC_WRITE=1.
+const writeMode = process.env.SCHEMA_SYNC_WRITE === "1";
 try {
-  execSync("node scripts/schema-manifest.js", { stdio: "inherit" });
+  if (writeMode) {
+    execSync("node scripts/schema-manifest.js", { stdio: "inherit" });
+  }
   execSync("node scripts/schema-manifest-check.js", { stdio: "inherit" });
   execSync("STRICT_INVENTORY=1 node scripts/field-inventory-verify.js", {
     stdio: "inherit",

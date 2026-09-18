@@ -39,4 +39,4 @@ for (const id of ["LOAN-FLAT", "LOAN-DECLINING", "METAL-FINEWEIGHT", "FUND-NAV-V
 }
 
 if (failed) process.exit(1);
-console.log("freeze-check: structural OK (FREEZE_PROVEN still requires full proof packs)");
+console.log("freeze-structure-check: OK (not freeze-proof; FREEZE_PROVEN requires all blockers green)");

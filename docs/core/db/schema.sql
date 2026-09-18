@@ -743,6 +743,8 @@ CREATE TABLE IF NOT EXISTS inv_stocks_iran_transactions (
   fee_treatments_json TEXT,
   currency TEXT NOT NULL,
   account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ex_date TEXT,
+  pay_date TEXT,
   created_at TEXT NOT NULL
 );
 

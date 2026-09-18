@@ -4701,12 +4701,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "DERIVED",
+      "disposition": "PERSISTED",
       "canonicalField": "exDate",
       "kind": "RAW",
       "persistence": {
-        "mode": "DERIVED",
-        "note": "was inv_stocks_iran_transactions.ex_date"
+        "mode": "PERSISTED",
+        "column": "inv_stocks_iran_transactions.ex_date"
       },
       "resultPath": "result.exDate",
       "exportPath": "export.stocks.dividend.exDate",
@@ -4726,12 +4726,12 @@
       "reversed": true,
       "migrated": true,
       "owner": "docs/modules/stocks.md",
-      "disposition": "DERIVED",
+      "disposition": "PERSISTED",
       "canonicalField": "payDate",
       "kind": "RAW",
       "persistence": {
-        "mode": "DERIVED",
-        "note": "optional; not required for v1 posting"
+        "mode": "PERSISTED",
+        "column": "inv_stocks_iran_transactions.pay_date"
       },
       "resultPath": "result.payDate",
       "exportPath": "export.stocks.dividend.payDate",
@@ -5023,7 +5023,7 @@
         "mode": "COLUMN",
         "table": "inv_stocks_iran_transactions",
         "column": "related_operation_id",
-        "note": "API originalTradeOperationId → DB related_operation_id"
+        "note": "API originalTradeOperationId \u2192 DB related_operation_id"
       },
       "resultPath": "result.relatedOperationId",
       "exportPath": "export.stocks.settle.relatedOperationId",
@@ -11039,7 +11039,7 @@
       "kind": "DERIVED",
       "persistence": {
         "mode": "DERIVED",
-        "note": "alias → originalTradeOperationId"
+        "note": "alias \u2192 originalTradeOperationId"
       },
       "resultPath": null,
       "exportPath": null,

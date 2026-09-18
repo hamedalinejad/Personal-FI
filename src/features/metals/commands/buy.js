@@ -90,7 +90,10 @@ export async function buyMetal(input, { dataDir } = {}) {
     if (!p.exchangeRateToBase) throw new Error("FX_RATE_REQUIRED");
     exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
   } else if (p.exchangeRateToBase != null && p.exchangeRateToBase !== "") {
-    exchangeRateToBase = toDecimal(p.exchangeRateToBase).toFixed();
+    // BUG-F03: same-currency must not accept non-identity FX
+    const supplied = toDecimal(p.exchangeRateToBase);
+    if (!supplied.eq(1)) throw new Error("FX_SAME_CURRENCY_RATE_MUST_BE_1");
+    exchangeRateToBase = "1";
   }
 
   const feeCurrency = p.feeCurrency || currency;

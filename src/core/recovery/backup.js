@@ -2,7 +2,7 @@
  * Backup/restore with machine metadata package (R-M23).
  * v1 Node: SQLite file + sidecar JSON metadata.
  */
-import { copyFile, mkdir, access, writeFile, readFile } from "node:fs/promises";
+import { copyFile, mkdir, access, writeFile, readFile, rename } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { closeAllDbs } from "../persistence/worker.js";
@@ -64,7 +64,8 @@ export async function restoreDatabase(backupPath, dataDir, opts = {}) {
   await mkdir(dataDir, { recursive: true });
   const dest = join(dataDir, "personal-fi.sqlite");
   const stage = dest + ".restoring";
+  // BUG-F06: stage then atomic rename — never second copyFile as "atomic"
   await copyFile(backupPath, stage);
-  await copyFile(stage, dest);
-  return { ok: true, path: dest };
+  await rename(stage, dest);
+  return { ok: true, path: dest, atomicReplace: true };
 }

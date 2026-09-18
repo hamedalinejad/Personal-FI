@@ -131,8 +131,22 @@ export async function subscribeFund(input, { dataDir } = {}) {
         asOf: p.priceAsOf || p.navAsOf || p.businessDate,
         fetchedAt: p.priceFetchedAt || null,
         marketDate: p.marketDate || p.businessDate,
-        quoteType: p.quoteType || (p.transactionPrice != null ? "transaction_price" : "nav"),
-        valuationMode: p.valuationMode || "transaction_price_preferred",
+        quoteType:
+          p.quoteType ||
+          (p.pricingMode === "amount_based"
+            ? "amount_based"
+            : p.pricingMode === "nav"
+              ? "nav"
+              : p.transactionPrice != null
+                ? "transaction_price"
+                : "nav"),
+        valuationMode:
+          p.valuationMode ||
+          (p.pricingMode === "amount_based"
+            ? "amount_based"
+            : p.pricingMode === "nav"
+              ? "nav"
+              : "transaction_price_preferred"),
       },
     },
     engineVersions: { funds: "1.1.0", money: "1.0.0" },

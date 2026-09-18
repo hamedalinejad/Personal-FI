@@ -9,10 +9,11 @@ export function assertFiniteMoney(value, field = "amount") {
  * Balance in base currency when amountInBase present on any line;
  * otherwise all lines must share one currency and balance on amount.
  */
-export function assertJournalBalanced(lines) {
+export function assertJournalBalanced(lines, opts = {}) {
   if (!Array.isArray(lines) || lines.length < 2) {
     throw new Error("INV_JOURNAL_MIN_LINES");
   }
+  const baseCurrency = opts.baseCurrency || null;
   const anyBase = lines.some((l) => l.amountInBase != null || l.amount_in_base != null);
   let debit = toDecimal("0");
   let credit = toDecimal("0");
@@ -46,6 +47,15 @@ export function assertJournalBalanced(lines) {
         throw new Error(
           `INV_JOURNAL_FX_MISMATCH:${a.toFixed()}*${toDecimal(fx).toFixed()}!=${balAmount.toFixed()}`,
         );
+      }
+      // BUG-F02: same-currency lines must use identity FX
+      if (baseCurrency && line.currency && line.currency === baseCurrency) {
+        if (!toDecimal(fx).eq(1)) {
+          throw new Error(`INV_JOURNAL_SAME_CURRENCY_FX_NOT_1:${fx}`);
+        }
+        if (!a.eq(balAmount)) {
+          throw new Error("INV_JOURNAL_SAME_CURRENCY_BASE_NEQ_AMOUNT");
+        }
       }
     } else {
       if (!line.currency) throw new Error("INV_JOURNAL_CURRENCY_REQUIRED");
@@ -111,8 +121,8 @@ export function assertQuantityConservation({ gross, fee, net, role }) {
   return true;
 }
 
-export function runInvariantGate({ journalLines, rates } = {}) {
-  if (journalLines) assertJournalBalanced(journalLines);
+export function runInvariantGate({ journalLines, rates, baseCurrency } = {}) {
+  if (journalLines) assertJournalBalanced(journalLines, { baseCurrency });
   if (rates) {
     for (const r of rates) {
       if (r != null) assertRateNonNegative(typeof r === "string" ? r : r.rate);

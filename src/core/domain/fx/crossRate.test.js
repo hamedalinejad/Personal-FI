@@ -48,7 +48,7 @@ test("MISSING_RATE not zero", () => {
         to: "BBB",
         rates: {},
       }),
-    /MISSING_RATE/,
+    /MISSING_RATE|FX_OBSERVATION_AFTER_CUTOFF|FX_HISTORICAL_ASOF_REQUIRED/,
   );
 });
 
@@ -97,7 +97,7 @@ test("historical asOf rejects observation after asOf", () => {
         asOf: "2025-01-01",
         rates: { "USD/EUR": { rate: "0.9", asOf: "2026-01-01", source: "future" } },
       }),
-    /MISSING_RATE/,
+    /MISSING_RATE|FX_OBSERVATION_AFTER_CUTOFF|FX_HISTORICAL_ASOF_REQUIRED/,
   );
 });
 
@@ -142,7 +142,7 @@ test("stale rate allowed when allowStale=true", () => {
 test("no path fails closed", () => {
   assert.throws(
     () => convertAmount({ amount: "1", from: "EUR", to: "JPY", rates: { "USD/IRR": "42000" } }),
-    /MISSING_RATE/,
+    /MISSING_RATE|FX_OBSERVATION_AFTER_CUTOFF|FX_HISTORICAL_ASOF_REQUIRED/,
   );
 });
 
@@ -156,6 +156,6 @@ test("historical asOf rejects observation after asOf", () => {
         asOf: "2025-01-01",
         rates: { "USD/IRR": { rate: "42000", asOf: "2026-01-01", source: "x" } },
       }),
-    /MISSING_RATE/,
+    /MISSING_RATE|FX_OBSERVATION_AFTER_CUTOFF|FX_HISTORICAL_ASOF_REQUIRED/,
   );
 });

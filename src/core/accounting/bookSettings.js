@@ -7,12 +7,15 @@ export const DEFAULT_BOOK_BASE_CURRENCY = "IRR";
 /** Book-level reporting base currency. */
 export function getBookBaseCurrency(dataDir, fallback = DEFAULT_BOOK_BASE_CURRENCY) {
   if (!dataDir) return fallback;
+  // BUG-F01: do not swallow openDb/I/O/schema errors as currency defaults
+  const db = openDb(dataDir);
   try {
-    const db = openDb(dataDir);
     const row = db.prepare(`SELECT value FROM db_meta WHERE key = 'book_base_currency'`).get();
     return row?.value || fallback;
-  } catch {
-    return fallback;
+  } catch (e) {
+    const msg = String(e?.message || e);
+    if (/no such table/i.test(msg)) return fallback;
+    throw e;
   }
 }
 

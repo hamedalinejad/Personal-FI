@@ -873,3 +873,7 @@ tax_events	source_operation_id	REFERENCE	Tax	no	tax_events	canonical	yes
 tax_events	payment_operation_id	REFERENCE	Tax	no	tax_events	canonical	yes
 inv_stocks_iran_holdings	account_id	RAW	Investments	no	inv_stocks_iran_holdings	canonical	yes
 inv_metals_transactions	purity_ratio	RAW	Investments	no	inv_metals_transactions	canonical	yes
+
+
+inv_stocks_iran_transactions	ex_date	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes
+inv_stocks_iran_transactions	pay_date	RAW	Stocks	yes	inv_stocks_iran_transactions	canonical	yes

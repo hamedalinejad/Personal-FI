@@ -192,12 +192,12 @@ function persistOperationSqlite(record, dir) {
       if (status === "posted" && lineCur !== baseCurrency) {
         const fx = line.exchangeRateToBase ?? line.exchange_rate_to_base;
         if (fx == null) throw new Error("INV_JOURNAL_MISSING_EXCHANGE_RATE");
-        if (line.conversionPath == null && line.conversion_path == null) {
-          line.conversionPath = "direct";
-        }
+        // BUG-F04: never invent conversionPath="direct" from absence.
+        // Missing path stays null; commands should supply real hops when known.
+
       }
     }
-    if (journalLines.length) assertJournalBalanced(journalLines);
+    if (journalLines.length) assertJournalBalanced(journalLines, { baseCurrency: record.baseCurrency });
 
     const entryId = randomUUID();
     const postState = status === "posted" ? "posted" : status === "voided" ? "void" : "draft";
@@ -368,20 +368,26 @@ function loadOperationSync(db, operationId, replay = false) {
 }
 
 async function persistOperationJson(record, dir) {
-  // shared validity gate with SQLite path
+  // BUG-F05: same semantic gate as SQLite — no weaker JSON path
   if (!record.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!record.baseCurrency) throw new Error("OP_BASE_CURRENCY_REQUIRED");
   if (!record.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const id = record.operationId;
   const journalLines = record.journalLines || [];
-  const status = record.status || "posted";
+  if (journalLines.length && (record.status == null || record.status === "")) {
+    throw new Error("OP_STATUS_REQUIRED_FOR_JOURNAL");
+  }
+  const status = record.status || "draft";
   assertPostedHasJournal(status, journalLines);
-  if (journalLines.length) assertJournalBalanced(journalLines);
+  if (journalLines.length) {
+    assertJournalBalanced(journalLines, { baseCurrency: record.baseCurrency });
+  }
   for (const line of journalLines) {
     if (!line.currency) throw new Error("JOURNAL_LINE_CURRENCY_REQUIRED");
     if (status === "posted" && (line.amountInBase == null || line.amountInBase === "")) {
       throw new Error("INV_JOURNAL_MISSING_AMOUNT_IN_BASE");
     }
+    // conversionPath optional until all commands supply hops; never invent "direct"
   }
   const body = {
     operationId: id,

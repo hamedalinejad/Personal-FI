@@ -43,7 +43,17 @@ async function backupRestoreRebuild(dataDir, projectionKey, projectionValue) {
     asOf: "2026-06-01",
     engineVersions: { core: "1" },
     policyVersions: { iran: "v1" },
-    sourceLedger: { projections: { [projectionKey]: projectionValue } },
+    sourceLedger: {
+      operations: [
+        {
+          operationId: "op-pack",
+          status: "posted",
+          businessDate: "2026-01-01",
+          type: "test",
+          domainResult: { holdingId: projectionKey, quantity: String(projectionValue) },
+        },
+      ],
+    },
   };
   const a = rebuildProjection(args);
   const b = rebuildProjection(args);

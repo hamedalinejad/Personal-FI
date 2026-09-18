@@ -50,8 +50,15 @@ export async function reversePayment(
   currency = origTx.currency || p.currency;
   const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
-  if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
-  else if (exchangeRateToBase == null) exchangeRateToBase = toDecimal("1");
+  if (currency === baseCurrency) {
+    if (exchangeRateToBase != null && !exchangeRateToBase.eq(1)) {
+      throw new Error("FX_SAME_CURRENCY_RATE_MUST_BE_1");
+    }
+    exchangeRateToBase = toDecimal("1");
+  } else if (exchangeRateToBase == null) {
+    // BUG-F11: never silent FX=1 for cross-currency; reuse original journal after load
+    // Temporary null — filled from original journal lines below
+  }
 
 
 
@@ -73,13 +80,20 @@ export async function reversePayment(
     )
     .all(p.originalOperationId);
 
+  if (currency !== baseCurrency && exchangeRateToBase == null) {
+    const fromJl = lines.find((l) => l.exchangeRateToBase != null && l.exchangeRateToBase !== "");
+    if (!fromJl) throw new Error("FX_RATE_REQUIRED");
+    exchangeRateToBase = toDecimal(fromJl.exchangeRateToBase);
+  }
+  if (exchangeRateToBase == null) exchangeRateToBase = toDecimal("1");
+
   const journalLines = lines.map((l, i) => ({
     accountId: l.accountId,
     side: l.side === "debit" ? "credit" : "debit",
     amount: l.amount,
     currency: l.currency || currency,
     amountInBase: l.amountInBase || l.amount,
-    exchangeRateToBase: l.exchangeRateToBase || "1",
+    exchangeRateToBase: l.exchangeRateToBase || exchangeRateToBase.toFixed(),
     conversionPath: l.conversionPath || null,
     lineKind: l.lineKind || null,
     line_number: i + 1,
