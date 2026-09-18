@@ -21,6 +21,12 @@ export async function distributeFund(input, { dataDir } = {}) {
   const amount = toDecimal(p.amount);
   if (!amount.gt(0)) throw new Error("VALIDATION_ERROR:amount");
   const currency = p.currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
+  else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(exchangeRateToBase).toFixed();
+
   const cashId = p.cashAccountId || scopedAccountId("local_settlement_cash", currency);
   const incId = scopedAccountId("fund_distribution_income", currency);
 
@@ -31,7 +37,7 @@ export async function distributeFund(input, { dataDir } = {}) {
       amount: amount.toFixed(),
       currency,
       amountInBase: amount.toFixed(),
-      exchangeRateToBase: "1",
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
     {
@@ -40,7 +46,7 @@ export async function distributeFund(input, { dataDir } = {}) {
       amount: amount.toFixed(),
       currency,
       amountInBase: amount.toFixed(),
-      exchangeRateToBase: "1",
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
   ];
@@ -48,14 +54,13 @@ export async function distributeFund(input, { dataDir } = {}) {
   const txId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
     type: "funds.distribute",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency: baseCurrency,
     payload: p,
     journalLines,
     domainResult: { transactionId: txId, amount: amount.toFixed() },

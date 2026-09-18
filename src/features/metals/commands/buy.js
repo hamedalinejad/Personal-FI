@@ -275,9 +275,9 @@ export async function buyMetal(input, { dataDir } = {}) {
       db.prepare(
         `INSERT INTO inv_metals_transactions (
           id, operation_id, holding_id, instrument_id, tx_type, business_date,
-          quantity_mg, metal_price_per_mg, premium_amount, fee_amount, fee_currency,
-          amount, currency, exchange_rate_to_base, created_at
-        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          quantity_mg, purity_ratio, metal_price_per_mg, premium_amount, fee_amount, fee_currency,
+          amount, currency, exchange_rate_to_base, quote_basis, price_unit, price_purity_basis, created_at
+        ) VALUES (?, ?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).run(
         txId,
         operationId,
@@ -285,6 +285,7 @@ export async function buyMetal(input, { dataDir } = {}) {
         p.instrumentId,
         p.businessDate,
         grossMg.toFixed(),
+        String(p.purityRatio),
         String(unitPrice),
         premium.toFixed(),
         fee.toFixed(),
@@ -292,6 +293,9 @@ export async function buyMetal(input, { dataDir } = {}) {
         cashPrincipal.toFixed(),
         currency,
         exchangeRateToBase,
+        quoteBasis,
+        priceUnit,
+        pricePurityBasis,
         now,
       );
     },

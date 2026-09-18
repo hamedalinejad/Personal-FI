@@ -34,6 +34,17 @@ export async function redeemFund(input, { dataDir } = {}) {
     assertPositive(p.transactionPrice, "FUND_PRICE_NONPOSITIVE");
   }
   const currency = p.currency;
+  // C0-FIN-03: redemption currency must match holding cost currency (no invented conversion)
+  // C0-FIN-01: book base + FX
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (currency === baseCurrency) {
+    exchangeRateToBase = toDecimal("1");
+  } else if (exchangeRateToBase == null) {
+    throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  }
+  const toBase = (amt) => toDecimal(amt?.toFixed ? amt.toFixed() : String(amt)).times(toDecimal(exchangeRateToBase.toFixed ? exchangeRateToBase.toFixed() : String(exchangeRateToBase))).toFixed();
+
   const proceeds =
     p.proceedsTotal != null
       ? toDecimal(p.proceedsTotal)
@@ -62,6 +73,9 @@ export async function redeemFund(input, { dataDir } = {}) {
     holding = rows[0];
   }
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
+  if (holding.cost_currency && holding.cost_currency !== currency) {
+    throw new Error("HOLDING_CURRENCY_MISMATCH");
+  }
 
   const disposal = applyDisposal(
     { quantity: holding.quantity, totalInvested: holding.total_invested },
@@ -77,8 +91,8 @@ export async function redeemFund(input, { dataDir } = {}) {
       side: "debit",
       amount: proceeds.toFixed(),
       currency,
-      amountInBase: proceeds.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(proceeds),
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
     {
@@ -86,8 +100,8 @@ export async function redeemFund(input, { dataDir } = {}) {
       side: "credit",
       amount: costReleased.toFixed(),
       currency,
-      amountInBase: costReleased.toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(costReleased),
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     },
   ];
@@ -97,8 +111,8 @@ export async function redeemFund(input, { dataDir } = {}) {
       side: realized.gt(0) ? "credit" : "debit",
       amount: realized.abs().toFixed(),
       currency,
-      amountInBase: realized.abs().toFixed(),
-      exchangeRateToBase: "1",
+      amountInBase: toBase(realized.abs()),
+      exchangeRateToBase: exchangeRateToBase.toFixed(),
       lineKind: "principal",
     });
   }
@@ -106,14 +120,13 @@ export async function redeemFund(input, { dataDir } = {}) {
   const txId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
     type: "funds.redeem",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency: baseCurrency,
     payload: p,
     journalLines,
     domainResult: {

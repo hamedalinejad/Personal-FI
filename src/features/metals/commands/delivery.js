@@ -12,6 +12,33 @@ import { assertPositive } from "../../../core/domain/validation/positiveMoney.js
 import { applyDisposal } from "../../../core/domain/costBasis/engine.js";
 import { openDb } from "../../../core/persistence/port.js";
 
+function resolveMetalsHolding(db, p) {
+  if (p.holdingId) {
+    const h = db.prepare(`SELECT * FROM inv_metals_holdings WHERE id = ?`).get(p.holdingId);
+    if (!h) throw new Error("HOLDING_NOT_FOUND");
+    return h;
+  }
+  if (p.purityRatio != null && p.purityRatio !== "") {
+    const rows = db
+      .prepare(
+        `SELECT * FROM inv_metals_holdings WHERE instrument_id = ? AND ifnull(platform_id,'') = ifnull(?, '') AND purity_ratio = ?`,
+      )
+      .all(p.instrumentId, p.platformId, String(p.purityRatio));
+    if (!rows.length) throw new Error("HOLDING_NOT_FOUND");
+    if (rows.length > 1) throw new Error("HOLDING_AMBIGUOUS");
+    return rows[0];
+  }
+  const rows = db
+    .prepare(
+      `SELECT * FROM inv_metals_holdings WHERE instrument_id = ? AND ifnull(platform_id,'') = ifnull(?, '')`,
+    )
+    .all(p.instrumentId, p.platformId);
+  if (!rows.length) throw new Error("HOLDING_NOT_FOUND");
+  if (rows.length > 1) throw new Error("HOLDING_AMBIGUOUS:purityRatio_or_holdingId_required");
+  return rows[0];
+}
+
+
 /**
  * metals.delivery — physical delivery out of platform holding.
  * Carrying cost moves to physical asset inventory (same currency).
@@ -29,15 +56,21 @@ export async function deliverMetal(input, { dataDir } = {}) {
   const qty = toDecimal(p.quantityMg);
   assertPositive(p.quantityMg, "METAL_DELIVERY_QTY_NONPOSITIVE");
   const currency = p.currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
+  else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  else exchangeRateToBase = toDecimal(exchangeRateToBase);
+  const exchangeRateToBaseStr = exchangeRateToBase.toFixed();
+
+
   const fee = toDecimal(p.deliveryFee || "0");
   if (p.feeCurrency && p.feeCurrency !== currency && fee.gt(0)) {
     throw new Error("DELIVERY_FEE_CURRENCY_MISMATCH");
   }
 
   const db0 = openDb(dataDir);
-  const holding = db0
-    .prepare(`SELECT * FROM inv_metals_holdings WHERE instrument_id=? AND platform_id=?`)
-    .get(p.instrumentId, p.platformId);
+  const holding = resolveMetalsHolding(db0, p);
   if (!holding) throw new Error("HOLDING_NOT_FOUND");
 
   // delivery is transfer of carrying, not disposal at 0
@@ -59,7 +92,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
       amount: carrying.toFixed(),
       currency,
       amountInBase: carrying.toFixed(),
-      exchangeRateToBase: "1",
+      exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
     {
@@ -68,7 +101,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
       amount: carrying.toFixed(),
       currency,
       amountInBase: carrying.toFixed(),
-      exchangeRateToBase: "1",
+      exchangeRateToBase: exchangeRateToBaseStr,
       lineKind: "principal",
     },
   ];
@@ -80,7 +113,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
         amount: fee.toFixed(),
         currency,
         amountInBase: fee.toFixed(),
-        exchangeRateToBase: "1",
+        exchangeRateToBase: exchangeRateToBaseStr,
         lineKind: "fee",
       },
       {
@@ -89,7 +122,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
         amount: fee.toFixed(),
         currency,
         amountInBase: fee.toFixed(),
-        exchangeRateToBase: "1",
+        exchangeRateToBase: exchangeRateToBaseStr,
         lineKind: "fee",
       },
     );
@@ -99,14 +132,13 @@ export async function deliverMetal(input, { dataDir } = {}) {
   const delId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
     type: "metals.delivery",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency: baseCurrency,
     payload: p,
     journalLines,
     domainResult: {
@@ -141,9 +173,7 @@ export async function deliverMetal(input, { dataDir } = {}) {
         });
       }
 
-      const h2 = db
-        .prepare(`SELECT * FROM inv_metals_holdings WHERE instrument_id=? AND platform_id=?`)
-        .get(p.instrumentId, p.platformId);
+      const h2 = resolveMetalsHolding(db, p);
       if (!h2) throw new Error("HOLDING_NOT_FOUND");
       const u2 = toDecimal(h2.total_invested).div(toDecimal(h2.quantity_mg));
       const c2 = qty.times(u2);

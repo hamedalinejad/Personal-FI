@@ -344,8 +344,8 @@ CREATE TABLE IF NOT EXISTS inv_crypto_transactions (
   fee_currency    TEXT,
   fee_instrument_id TEXT REFERENCES ref_instruments(id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- CRYPTO-003: optional address audit FKs
-  from_address_id TEXT, -- soft FK → inv_crypto_wallet_addresses.id (table defined later; CRYPTO-003)
-  to_address_id   TEXT, -- soft FK → inv_crypto_wallet_addresses.id
+  from_address_id TEXT, -- must reference inv_crypto_wallet_addresses.id (enforced in domain; table order)
+  to_address_id   TEXT, -- must reference inv_crypto_wallet_addresses.id (enforced in domain)
   -- / -- economic_kind = economic meaning (canonical). Operational event type is tx_type separately.
   economic_kind TEXT CHECK (economic_kind IS NULL OR economic_kind IN (
     'acquisition','disposal','transfer_internal','swap_economic','fee','income','adjustment'
@@ -868,14 +868,18 @@ CREATE TABLE IF NOT EXISTS inv_metals_transactions (
   tx_type TEXT NOT NULL CHECK (tx_type IN ('buy','sell','deposit_cash','withdraw_cash','physical_delivery','adjustment')), -- buy|sell|deposit_cash|withdraw_cash|physical_delivery|adjustment
   business_date TEXT NOT NULL,
   quantity_mg TEXT NOT NULL, -- gross weight moved; for partial sell <= holding.quantity_mg
+  purity_ratio TEXT, -- RAW purity used for this tx (holding identity)
   metal_price_per_mg TEXT, -- pure metal unit price (ex-premium)
- premium_amount TEXT, -- fabrication / maker / premium separate from metal price 
+  premium_amount TEXT, -- fabrication / maker / premium separate from metal price
   fee_amount TEXT, -- brokerage/dealer fee
   fee_currency TEXT,
   amount TEXT, -- total consideration (metal + premium ± fees as signed by policy)
   currency TEXT NOT NULL,
   exchange_rate_to_base TEXT,
- is_partial INTEGER NOT NULL DEFAULT 0 CHECK (is_partial IN (0, 1)), -- partial sales
+  quote_basis TEXT, -- pure_metal | gross_weight | coin_market | bar
+  price_unit TEXT, -- per_mg | per_g
+  price_purity_basis TEXT, -- fine | gross
+  is_partial INTEGER NOT NULL DEFAULT 0 CHECK (is_partial IN (0, 1)), -- partial sales
   created_at TEXT NOT NULL
 );
 
@@ -1038,7 +1042,7 @@ CREATE TABLE IF NOT EXISTS tax_events (
  is_deductible INTEGER NOT NULL DEFAULT 0 CHECK (is_deductible IN (0, 1)), -- fee/expense deductible flag 
   is_manual_adjustment INTEGER NOT NULL DEFAULT 0 CHECK (is_manual_adjustment IN (0, 1)),
  adjustment_reason TEXT, -- required when manual 
- document_id TEXT, -- link to docs_documents evidence 
+ document_id TEXT REFERENCES docs_documents(id) ON DELETE SET NULL ON UPDATE CASCADE, -- evidence document 
   status TEXT NOT NULL CHECK (status IN ('draft','posted','amended','void')),
   -- period semantics (do not infer bounds from bare year)
   tax_year TEXT,

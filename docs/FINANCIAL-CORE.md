@@ -69,7 +69,7 @@ expense | capitalize_inventory | reduce_proceeds
 |-----------|-----------|
 | expense | Dr fee_expense · Cr cash/payable |
 | capitalize_inventory | increases inventory/carrying |
-| reduce_proceeds | sell-side: netProceeds = gross − fee; journal legs same as expense for P&L visibility |
+| reduce_proceeds | **classification only for result.netProceeds** (= gross − fee). Journal still posts fee **once** as expense (Dr fee_expense Cr cash). Realized P&L = **gross proceeds − cost released − allocated fee** — never subtract fee again from already-net proceeds |
 | reduce_received_quantity | **quantity** (`feeQuantity`) only — never feeAmount as qty |
 | embedded_in_gross_cash | fee inside gross cash move |
 | equity_adjustment | equity/capital path |

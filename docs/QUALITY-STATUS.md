@@ -1,6 +1,6 @@
 # QUALITY-STATUS
 
-**Live only.** History = Git / `docs/archive/AUDIT-HISTORY.md`. Never add BUG/P0/AUDIT Markdown authority files.
+**Live only.** History = Git / `docs/archive/AUDIT-HISTORY.md`.
 
 ## Gates
 | Gate | Value |
@@ -11,29 +11,36 @@
 | PRODUCTION | **NO-GO** |
 | UI | **WAIT** |
 
-## Blockers (must green before FREEZE_PROVEN)
+## Semantic freeze blockers (must be green for FREEZE_PROVEN)
+Contracts unambiguous · command registry complete · exact field mapping · schema consistent · owners consistent · deferred scope explicit · gate scripts trustworthy
+
+Does **not** require: browser E2E, TWR/MWR, full holiday bulletin, license runtime, full golden families (those are **release**).
+
+## Release blockers (must be green for RELEASE_PROVEN)
 | Item | Status |
 |------|--------|
-| Browser sql.js + IndexedDB E2E | OPEN |
-| TWR/MWR/FX attribution formulas | DEFERRED |
-| Full golden families for every claimed command | PARTIAL |
-| Official holiday bulletin completeness | seed only |
+| Golden families for claimed commands | PARTIAL |
+| Recovery matrix executable | PARTIAL |
+| Standalone edition packs | PARTIAL |
+| Browser sql.js + IndexedDB E2E | OPEN (if shipping browser) |
 | License runtime enforcement | SPEC_LOCKED machine only |
+| TWR/MWR/FX attribution | DEFERRED |
+| Official holiday bulletin completeness | seed only |
 
-## Authority separation (C0)
+## Authority separation
 | Question | Authority |
 |----------|-----------|
 | Per-command status | command-catalog.json |
 | Feature/edition/release | status.registry.json |
-| Requirement trace | requirements-matrix.json (contract/implementation/proof) |
-| Live dashboard | QUALITY-STATUS.md |
+| Requirement trace | requirements-matrix.json |
+| Live dashboard | this file |
 | Release evidence | generated RELEASE-EVIDENCE.json |
 
 ## Closed (do not reopen)
-C0 command/status separation · field-preservation exact rows · release-evidence current paths · Fee taxonomy · loan exact conservation · stocks policy dates · crypto economic_kind · holdings uniqueness · book base · FX fail-closed · field-preservation gate · RELEASE-EVIDENCE live owners · loan role canonical · tax source vs payment ops · command effectClass · stocks account scope
+C0 authority split · field-preservation exact rows · release-evidence current paths · book-base FX path · metals holdingId/purity · fund redeem currency match · loan reversal currency · reduce_proceeds reporting rule · catalog no wildcards · journal REQUIRED\|FORBIDDEN
 
 ## Standalone
-Loan | Crypto | Stocks | Funds | Metals → public-api only · requiresAccountsUi=false · shared Core journal
+Loan | Crypto | Stocks | Funds | Metals → public-api only · shared Core journal
 
 ## Evidence
-`npm test` · `npm run gates` · `docs/core/registry/*` · `docs/core/RELEASE-EVIDENCE.json`
+`npm test` · `npm run gates` · `docs/core/registry/*`

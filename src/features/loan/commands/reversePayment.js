@@ -28,7 +28,7 @@ export async function reversePayment(
   if (!p.originalOperationId) throw new Error("VALIDATION_ERROR");
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
-  const currency = p.currency;
+  let currency = p.currency;
 
   // bootstrap only inside transaction
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
@@ -44,6 +44,16 @@ export async function reversePayment(
     .prepare(`SELECT * FROM ln_transactions WHERE operation_id = ? AND tx_type = 'payment'`)
     .get(p.originalOperationId);
   if (!origTx) throw new Error("LOAN_TX_NOT_FOUND");
+  if (p.currency && origTx.currency && p.currency !== origTx.currency) {
+    throw new Error("REVERSAL_CURRENCY_MISMATCH");
+  }
+  currency = origTx.currency || p.currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
+  else if (exchangeRateToBase == null) exchangeRateToBase = toDecimal("1");
+
+
 
   const already = db
     .prepare(`SELECT id FROM ln_transactions WHERE reverses_transaction_id = ?`)
@@ -78,14 +88,13 @@ export async function reversePayment(
   const txId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
     type: "loan.reversePayment",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency: baseCurrency,
     payload: p,
     journalLines,
     domainResult: {

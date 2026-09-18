@@ -96,6 +96,12 @@ export async function recordPayment(
   if (!p.currency) throw new Error("LOAN_CURRENCY_REQUIRED");
 
   const currency = p.currency;
+  const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
+  let exchangeRateToBase = p.exchangeRateToBase != null ? toDecimal(p.exchangeRateToBase) : null;
+  if (currency === baseCurrency) exchangeRateToBase = toDecimal("1");
+  else if (exchangeRateToBase == null) throw new Error("VALIDATION_ERROR:exchangeRateToBase");
+  const toBase = (amt) => toDecimal(amt).times(exchangeRateToBase).toFixed();
+
   if (!cashAccountId) cashAccountId = scopedAccountId("local_settlement_cash", currency);
   if (!receivableAccountId) receivableAccountId = scopedAccountId("loan_receivable", currency);
   if (!interestIncomeId) interestIncomeId = scopedAccountId("loan_interest_income", currency);
@@ -130,21 +136,20 @@ export async function recordPayment(
     penaltyIncomeId,
   });
   for (const line of journalLines) {
-    line.amountInBase = line.amount;
-    line.exchangeRateToBase = "1";
+    line.amountInBase = toDecimal(line.amount).times(exchangeRateToBase).toFixed();
+    line.exchangeRateToBase = exchangeRateToBase.toFixed();
   }
 
   const txId = randomUUID();
   const now = new Date().toISOString();
 
-    const baseCurrency = resolveBookBaseCurrency({ dataDir, explicitBaseCurrency: p.baseCurrency || null, transactionCurrency: currency });
   return runAtomicFinancialOperation({
     
     status: "posted",operationId,
     type: "loan.recordPayment",
     dataDir,
     businessDate: p.businessDate,
-    baseCurrency: currency,
+    baseCurrency: baseCurrency,
     payload: p,
     journalLines,
     domainResult: { loanId: p.loanId, allocation, lnTransactionId: txId },

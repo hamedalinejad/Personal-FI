@@ -184,7 +184,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -329,7 +329,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -471,7 +471,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -647,7 +647,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -813,7 +813,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -923,7 +923,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1042,7 +1042,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1189,7 +1189,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1328,7 +1328,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1444,7 +1444,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1618,7 +1618,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1758,7 +1758,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -1926,7 +1926,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "partial"
     },
@@ -2060,7 +2060,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "strongest"
     },
@@ -2166,7 +2166,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "strongest"
     },
@@ -2265,7 +2265,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "strongest"
     },
@@ -2314,8 +2314,8 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "fin_operations",
-          "fin_journal_"
+          "ln_loans",
+          "ln_schedules"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "loanId + schedule schema version",
@@ -2374,7 +2374,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "optional"
+        "journal": "FORBIDDEN"
       },
       "maturity": "strongest"
     },
@@ -2427,10 +2427,7 @@
         "feeMapping": "none unless fees present",
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
-        "dbWrites": [
-          "fin_operations",
-          "fin_journal_"
-        ],
+        "dbWrites": [],
         "transactionBoundary": "none (read/compute)",
         "idempotency": "n/a pure function",
         "reversal": "n/a",
@@ -2485,8 +2482,8 @@
           "version": "v1"
         },
         "license": "capability-gated; never deletes history",
-        "effectClass": "master_data",
-        "journal": "optional"
+        "effectClass": "analytical",
+        "journal": "FORBIDDEN"
       },
       "maturity": "strongest"
     },
@@ -2533,10 +2530,8 @@
         "costBasis": "n/a",
         "dbWrites": [
           "acc_accounts",
-          "fin_accounts?",
-          "fin_operations",
-          "fin_journal_entries",
-          "fin_journal_lines"
+          "fin_accounts",
+          "fin_operations"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2583,7 +2578,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -2678,7 +2673,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -2708,8 +2703,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "acc_accounts.is_archived",
-          "fin_accounts?"
+          "acc_accounts"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -2758,7 +2752,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -2863,7 +2857,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -2974,7 +2968,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3080,7 +3074,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3192,7 +3186,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3304,7 +3298,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3401,7 +3395,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3498,7 +3492,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3557,8 +3551,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_",
-          "fin_?"
+          "chq_cheques"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -3613,7 +3606,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -3657,7 +3650,6 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3715,7 +3707,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -3759,7 +3751,6 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3817,7 +3808,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3861,7 +3852,6 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -3919,7 +3909,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -3958,8 +3948,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "chq_",
-          "fin_?"
+          "chq_cheques"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4014,7 +4003,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4068,8 +4057,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "pa_",
-          "fin_?"
+          "pa_assets"
         ],
         "transactionBoundary": "single SQLite transaction",
         "idempotency": "operationId + canonical economic hash",
@@ -4124,7 +4112,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4229,7 +4217,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "master_data",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4278,7 +4266,7 @@
         "fx": "book base from db_meta; amountInBase = amount × exchangeRateToBase",
         "costBasis": "n/a",
         "dbWrites": [
-          "pa_",
+          "pa_assets",
           "fin_operations",
           "fin_journal_entries",
           "fin_journal_lines"
@@ -4335,8 +4323,8 @@
           "version": "v1"
         },
         "license": "capability-gated; never deletes history",
-        "effectClass": "master_data",
-        "journal": "optional"
+        "effectClass": "financial",
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -4445,7 +4433,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "planning",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4554,7 +4542,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "planning",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4663,7 +4651,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "planning",
-        "journal": "forbidden"
+        "journal": "FORBIDDEN"
       },
       "maturity": "baseline"
     },
@@ -4777,7 +4765,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -4888,7 +4876,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     },
@@ -4995,7 +4983,7 @@
         },
         "license": "capability-gated; never deletes history",
         "effectClass": "financial",
-        "journal": "required"
+        "journal": "REQUIRED"
       },
       "maturity": "baseline"
     }
