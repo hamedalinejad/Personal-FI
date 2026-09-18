@@ -9,11 +9,14 @@ import {
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resolve.js";
 
-/** funds.distribute — cash distribution; quantity unchanged unless reinvest flag. */
+/** funds.distribute — cash distribution only (v1). reinvest = DEFERRED/REJECTED. */
 export async function distributeFund(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;
-  const p = input.payload || input;
+  const p = input.payload || input
+  if (p.reinvest != null && p.reinvest !== false && p.reinvest !== 0 && p.reinvest !== "0") {
+    throw new Error("REINVEST_DEFERRED");
+  };
 
   for (const k of ["instrumentId", "amount", "currency", "businessDate"]) {
     if (p[k] == null || p[k] === "") throw new Error(`VALIDATION_ERROR:${k}`);

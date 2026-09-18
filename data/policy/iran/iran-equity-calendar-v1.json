@@ -2,24 +2,75 @@
   "policyVersion": "iran-equity-calendar-v1",
   "market": "TSE",
   "timezone": "Asia/Tehran",
-  "weekend": ["Thursday", "Friday"],
-  "businessDays": ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday"],
+  "weekend": [
+    "Thursday",
+    "Friday"
+  ],
+  "businessDays": [
+    "Saturday",
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday"
+  ],
   "settlementDefault": "T+2",
   "holidays": [
-    { "date": "2026-03-20", "name": "Nowruz", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-03-21", "name": "Nowruz", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-03-22", "name": "Nowruz", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-03-23", "name": "Nowruz", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-04-01", "name": "Islamic_Republic_Day", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-04-02", "name": "Nature_Day", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-06-04", "name": "Khordad_15", "kind": "national", "source": "civil_calendar_estimate" },
-    { "date": "2026-02-11", "name": "Revolution_Day", "kind": "national", "source": "civil_calendar_estimate" }
+    {
+      "date": "2026-03-20",
+      "name": "Nowruz",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-03-21",
+      "name": "Nowruz",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-03-22",
+      "name": "Nowruz",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-03-23",
+      "name": "Nowruz",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-04-01",
+      "name": "Islamic_Republic_Day",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-04-02",
+      "name": "Nature_Day",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-06-04",
+      "name": "Khordad_15",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    },
+    {
+      "date": "2026-02-11",
+      "name": "Revolution_Day",
+      "kind": "national",
+      "source": "civil_calendar_estimate"
+    }
   ],
   "effectiveFrom": "2026-01-01",
   "effectiveTo": null,
   "sourceMetadata": {
     "status": "STRUCTURE_LOCKED_WITH_CIVIL_HOLIDAY_SEED",
-    "note": "Weekend Sat–Wed business locked. Holiday list is a seed for engine testing; replace with official TSE holiday bulletin before claiming RELEASE_PROVEN for holiday-aware settlement. Lunar/religious movable holidays must be supplied by verified policy package updates.",
-    "weekendOnlyMode": "Always valid: if holidays[] ignored, T+n still uses weekend rules only"
-  }
+    "note": "Weekend Sat\u2013Wed business locked. Holiday list is a seed for engine testing; replace with official TSE holiday bulletin before claiming RELEASE_PROVEN for holiday-aware settlement. Lunar/religious movable holidays must be supplied by verified policy package updates.",
+    "weekendOnlyMode": "Always valid: if holidays[] ignored, T+n still uses weekend rules only",
+    "settlementPolicyId": "iran-equity-settlement-v2"
+  },
+  "usedBySettlementPolicy": "iran-equity-settlement-v2"
 }

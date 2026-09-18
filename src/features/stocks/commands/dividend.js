@@ -14,6 +14,7 @@ import { resolveOrCreateInstrument } from "../../../core/domain/instrument/resol
  * stocks.dividend — cash dividend; does not change quantity.
  * Dr Cash (or receivable) / Cr Dividend income
  */
+/** v1: withholdingTax is transaction-only adjustment — does not create tax_events. */
 export async function stockDividend(input, { dataDir } = {}) {
   if (!input?.operationId) throw new Error("OP_OPERATION_ID_REQUIRED");
   const operationId = input.operationId;

@@ -55,8 +55,8 @@ DOCUMENTATION-STANDARD → PRODUCT → ARCHITECTURE → FINANCIAL-CORE → DATA-
 Machine SoT: `docs/core/registry/command-catalog.json`  
 Each mutation: requestFields · effectClass · journal · validation · errors · dbWrites · fixtures · recovery.
 
-## Module template (content, not boilerplate)
-Scope · supported/deferred · entities · identity · commands · accounting mapping · formulas · dates · edge cases · reports · standalone · fixtures.  
+## Module template
+Compact 9-part template in DOCUMENTATION-STANDARD.md (not 34 sections).  
 Global money/FX/API/idempotency → **one-line pointer** to owner docs.
 
 ## Commit policy

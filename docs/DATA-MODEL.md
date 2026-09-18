@@ -232,3 +232,19 @@ Gate: `scripts/field-preservation-check.js`
 | DEFERRED / REJECTED | reason + owner |
 
 Forbidden storage language: `module_or_core`, `feature ledger via operationId`, wildcards.
+
+
+## result_json is not field-preservation SoT (LOCKED)
+
+`fin_operations.result_json` is a **replay/provenance snapshot**, not accounting SoT and not proof of field preservation.
+
+For every accepted command field, disposition must be one of:
+- **relational SoT** (table.column)
+- **explicit SNAPSHOT** with documented rebuild semantics
+- **DERIVED** (formula + result path)
+- **DEFERRED / REJECTED**
+
+Forbidden claim:
+```
+it survives in result_json → field preservation complete
+```

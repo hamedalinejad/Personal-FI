@@ -211,3 +211,17 @@ Host → src/api/publicRegistry (or multiple public-apis)
 ```
 Features **compose through public APIs only**. No feature→feature internal imports.  
 One book, one journal, many feature packages.
+
+
+## Public API composition (LOCKED)
+
+| Surface | Packages |
+|---------|----------|
+| Licensable vertical public-api | loan, crypto, funds, stocks, metals |
+| Host/core surfaces (Full edition) | accounts, income, expense, cheque, tax, assets, budget, goals, bills |
+
+Standalone editions expose **one** vertical public-api only.  
+`apisForEdition("full")` returns the five verticals; host modules are composed by the Full host app, not as separate edition packages in v1.
+
+Edition ID for funds standalone: **`funds-only`** (not fund-only).  
+`full.requiresAccountsUi = true`; standalone verticals = `false`.

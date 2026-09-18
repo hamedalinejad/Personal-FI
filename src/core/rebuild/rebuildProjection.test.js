@@ -12,7 +12,7 @@ test("rebuildProjection is deterministic for same inputs", () => {
     asOf: "2026-06-01",
     engineVersions: { costBasis: "wac-v1" },
     sourceLedger: { projections: { holdings: [{ id: "h1", qty: "1" }] } },
-    policyVersions: { settlement: "iran-equity-T2-v2" },
+    policyVersions: { settlement: "iran-equity-settlement-v2" },
   };
   const a = rebuildProjection(args);
   const b = rebuildProjection(args);

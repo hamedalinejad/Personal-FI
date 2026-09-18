@@ -63,7 +63,7 @@ List / get / statement-style reads as applicable.
 | * | cancelled | SUPPORTED | none if never cleared | required if prior financial |
 | cleared | rewrite | REJECTED | use reversal op only | required |
 
-No maybe/depends in implementation contracts.
+No DEFERRED/DEFERRED in implementation contracts.
 
 ## 14. State machine
 issued/received → deposited → cleared | bounced | cancelled | returned
@@ -101,11 +101,11 @@ Cheque ships with **Full**. No separate edition in v1. Journal legs via Core onl
 ## Transition accounting matrix (must be explicit)
 | Transition | Informational only? | Payable/receivable reclass? | Cash movement? | Reversal/correction? |
 |------------|---------------------|----------------------------|----------------|----------------------|
-| issued/received → deposited | often no | maybe | maybe | no |
+| issued/received → deposited | often no | DEFERRED | DEFERRED | no |
 | → cleared | no | yes | yes (typical) | no |
-| → bounced | no | yes | maybe reverse prior | possible correction op |
-| → cancelled | depends | yes | no new cash if never cleared | correction if needed |
-| → returned | no | yes | policy-defined | possible |
+| → bounced | no | yes | DEFERRED reverse prior | possible correction op |
+| → cancelled | DEFERRED | yes | no new cash if never cleared | correction if needed |
+| → returned | no | yes | DEFERRED | possible |
 
 Each transition command card must mark which of the four columns apply. Pure status-only transitions that skip journal when cash actually moved are forbidden.
 

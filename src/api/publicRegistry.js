@@ -3,8 +3,11 @@
  * UI and host apps import ONLY this registry or feature public-api barrels —
  * never feature internals, never journal writers.
  *
- * Standalone: import one feature public-api + Core ports.
- * Full: import this registry (or multiple public-apis); shared journal truth.
+ * Architecture (LOCKED):
+ * - Licensable vertical packages expose public-api: loan, crypto, funds, stocks, metals
+ * - General modules (accounts, income, expense, cheque, tax, assets, budget, goals, bills)
+ *   are host/core surfaces in Full edition — not separate edition packages in v1
+ * - Standalone editions never require Accounts UI
  */
 import * as loan from "../features/loan/public-api/index.js";
 import * as crypto from "../features/crypto/public-api/index.js";
@@ -16,11 +19,14 @@ export const EDITIONS = Object.freeze({
   full: {
     id: "full",
     requiresAccountsUi: true,
-    features: ["loan", "crypto", "funds", "stocks", "metals", "accounts"],
+    features: ["loan", "crypto", "funds", "stocks", "metals"],
+    hostSurfaces: ["accounts", "income", "expense", "cheque", "tax", "assets", "budget", "goals", "bills"],
   },
   "loan-only": { id: "loan-only", requiresAccountsUi: false, features: ["loan"] },
   "crypto-only": { id: "crypto-only", requiresAccountsUi: false, features: ["crypto"] },
-  "fund-only": { id: "fund-only", requiresAccountsUi: false, features: ["funds"] },
+  "funds-only": { id: "funds-only", requiresAccountsUi: false, features: ["funds"] },
+  /** @deprecated use funds-only */
+  "fund-only": { id: "funds-only", requiresAccountsUi: false, features: ["funds"] },
   "stocks-only": { id: "stocks-only", requiresAccountsUi: false, features: ["stocks"] },
   "metals-only": { id: "metals-only", requiresAccountsUi: false, features: ["metals"] },
 });
@@ -33,7 +39,6 @@ export const publicApis = Object.freeze({
   metals,
 });
 
-/** Capabilities snapshot for licensing / host boot */
 export function listEditionCapabilities() {
   return {
     loan: loan.capabilities(),
@@ -50,10 +55,6 @@ export function getEdition(editionId = "full") {
   return e;
 }
 
-/**
- * Resolve which public-api modules a host may call for an edition.
- * Full edition gets all; feature-only gets one package + shared Core underneath.
- */
 export function apisForEdition(editionId = "full") {
   const e = getEdition(editionId);
   const out = {};

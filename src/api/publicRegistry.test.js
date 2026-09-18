@@ -8,7 +8,7 @@ import {
 } from "./publicRegistry.js";
 
 test("editions: feature-only never requires Accounts UI", () => {
-  for (const id of ["loan-only", "crypto-only", "fund-only", "stocks-only", "metals-only"]) {
+  for (const id of ["loan-only", "crypto-only", "funds-only", "stocks-only", "metals-only"]) {
     assert.equal(getEdition(id).requiresAccountsUi, false);
   }
   assert.equal(getEdition("full").requiresAccountsUi, true);

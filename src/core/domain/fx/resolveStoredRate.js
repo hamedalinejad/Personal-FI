@@ -1,51 +1,73 @@
 /**
- * Deterministic FX observation resolver (REVIEW-013).
+ * Deterministic FX observation resolver.
  * Historical path: never "latest now". Fail closed if no observation.
  *
- * Selection order:
- * 1. exact asOf match
- * 2. among candidates with as_of <= requested asOf: lowest source_priority, then latest as_of
+ * Selection order (LOCKED):
+ * 1. Prefer exact asOf match among rows with as_of = requested (lowest source_priority, then id)
+ * 2. Else among as_of <= requested: lowest source_priority, then latest as_of, then id
  * 3. if is_stale=1 and allowStale=false → fail
- * 4. otherwise return observation
+ * 4. rate must be positive decimal string
+ *
+ * crossRate.js builds multi-hop paths using this resolver for each hop.
  */
 import { toDecimal } from "../../money/canonicalDecimal.js";
 
 export function resolveStoredRate(db, { fromCurrency, toCurrency, asOf, allowStale = false }) {
-  if (!fromCurrency || !toCurrency) throw new Error("FX_PAIR_REQUIRED");
+  if (!fromCurrency || !toCurrency || !asOf) {
+    throw new Error("FX_RESOLVE_ARGS");
+  }
   if (fromCurrency === toCurrency) {
     return {
       rate: "1",
-      asOf: asOf || null,
+      asOf,
       source: "identity",
-      isStale: false,
       sourcePriority: 0,
+      conversionPath: null,
+      isStale: false,
     };
   }
-  if (!asOf) throw new Error("FX_ASOF_REQUIRED");
 
-  const rows = db
+  // 1) exact asOf
+  let row = db
     .prepare(
-      `SELECT id, rate, as_of as asOf, source, source_priority as sourcePriority,
-              is_stale as isStale, is_manual as isManual
-       FROM cur_exchange_rates
-       WHERE from_currency = ? AND to_currency = ? AND as_of <= ?
-       ORDER BY source_priority ASC, as_of DESC, id ASC`,
+      `SELECT * FROM cur_exchange_rates
+       WHERE from_currency = ? AND to_currency = ? AND as_of = ?
+       ORDER BY source_priority ASC, id ASC
+       LIMIT 1`,
     )
-    .all(fromCurrency, toCurrency, asOf);
+    .get(fromCurrency, toCurrency, asOf);
 
-  if (!rows.length) throw new Error(`FX_RATE_NOT_FOUND:${fromCurrency}/${toCurrency}@${asOf}`);
-
-  const pick = rows[0];
-  if (Number(pick.isStale) === 1 && !allowStale) {
-    throw new Error(`FX_RATE_STALE:${fromCurrency}/${toCurrency}@${pick.asOf}`);
+  // 2) as_of <= requested
+  if (!row) {
+    row = db
+      .prepare(
+        `SELECT * FROM cur_exchange_rates
+         WHERE from_currency = ? AND to_currency = ? AND as_of <= ?
+         ORDER BY source_priority ASC, as_of DESC, id ASC
+         LIMIT 1`,
+      )
+      .get(fromCurrency, toCurrency, asOf);
   }
-  toDecimal(String(pick.rate)); // validate decimal string
+
+  if (!row) {
+    throw new Error(`FX_RATE_NOT_FOUND:${fromCurrency}/${toCurrency}@${asOf}`);
+  }
+  if (row.is_stale === 1 && !allowStale) {
+    throw new Error(`FX_RATE_STALE:${fromCurrency}/${toCurrency}@${row.as_of}`);
+  }
+
+  const rate = toDecimal(row.rate);
+  if (!rate.gt(0)) {
+    throw new Error(`FX_RATE_NONPOSITIVE:${fromCurrency}/${toCurrency}`);
+  }
+
   return {
-    id: pick.id,
-    rate: String(pick.rate),
-    asOf: pick.asOf,
-    source: pick.source,
-    isStale: Number(pick.isStale) === 1,
-    sourcePriority: pick.sourcePriority,
+    rate: rate.toFixed(),
+    asOf: row.as_of,
+    source: row.source,
+    sourcePriority: row.source_priority,
+    conversionPath: row.conversion_path,
+    isStale: row.is_stale === 1,
+    id: row.id,
   };
 }

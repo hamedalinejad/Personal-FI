@@ -100,7 +100,7 @@ NAV observation = **price observation** (`price_history` / asOf), never a transa
 |-------|--------|
 | redeem pricing contract | PARTIAL |
 | distribution dates (ex / record / payment) | PARTIAL / document in card |
-| reinvestment semantics | PARTIAL |
+| reinvestment semantics | **DEFERRED** |
 | tax on distribution | PARTIAL |
 | management / brokerage / subscription / redemption fees | PARTIAL — Fee Engine treatments |
 | current NAV as observation only | LOCKED direction |
@@ -161,3 +161,10 @@ Never copy NAV → transactionPrice or liquidationPrice silently.
 | transactionPrice | inv_fif_transactions.transaction_price only |
 
 Never auto-copy between these three.
+
+
+## funds.distribute v1 (LOCKED)
+
+**Cash distribution only.**  
+`reinvest` field: **REJECTED** at API boundary in v1 (do not accept).  
+Full reinvest economics (ex/record/payment dates, units, transaction price, RoC) = **DEFERRED** until complete contract + golden.

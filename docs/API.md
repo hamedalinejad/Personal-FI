@@ -105,3 +105,7 @@ src/api/publicRegistry.js
 
 Standalone hosts call `apisForEdition("loan-only")` (etc.).  
 Full hosts call `apisForEdition("full")` and route UI sheets to the returned packages.
+
+
+## Edition IDs (LOCKED)
+`full` · `loan-only` · `crypto-only` · `funds-only` · `stocks-only` · `metals-only`

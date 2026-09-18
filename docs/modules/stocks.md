@@ -172,3 +172,9 @@ Do not substitute trade_date for market_date. `settlement_policy_version` requir
 
 ## Holding identity (LOCKED)
 `brokerage_id + account_id? + instrument_id` — never merge portfolios at same broker.
+
+
+## Dividend withholding (v1 LOCKED)
+
+`withholdingTax` on `stocks.dividend` is a **transaction-only withholding adjustment** (journal to stock_withholding_tax expense/payable style account).  
+It does **not** create `tax_events` obligation lineage in v1. Full tax-owner integration = DEFERRED.

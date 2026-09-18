@@ -15,8 +15,27 @@ export function getBookBaseCurrency(dataDir, fallback = DEFAULT_BOOK_BASE_CURREN
   }
 }
 
+/**
+ * C0-POLICY-03: mutable only before first posted financial operation.
+ * Display/UI currency may change independently — never call it book base.
+ */
 export function setBookBaseCurrency(db, code) {
   if (!code) throw new Error("BOOK_BASE_REQUIRED");
+  const cur = db.prepare(`SELECT code FROM cur_currencies WHERE code = ?`).get(code);
+  // Allow set when currencies table empty (bootstrap); reject unknown once table populated
+  const anyCur = db.prepare(`SELECT 1 FROM cur_currencies LIMIT 1`).get();
+  if (anyCur && !cur) throw new Error(`BOOK_BASE_UNKNOWN_CURRENCY:${code}`);
+
+  const posted = db
+    .prepare(`SELECT 1 FROM fin_operations WHERE status = 'posted' LIMIT 1`)
+    .get();
+  if (posted) {
+    const existing = db.prepare(`SELECT value FROM db_meta WHERE key = 'book_base_currency'`).get();
+    if (existing?.value && existing.value !== code) {
+      throw new Error("BOOK_BASE_LOCKED:posted_operations_exist");
+    }
+  }
+
   db.prepare(
     `INSERT INTO db_meta (key, value) VALUES ('book_base_currency', ?)
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
@@ -26,7 +45,6 @@ export function setBookBaseCurrency(db, code) {
 
 /**
  * Resolve operation book base. Never silently uses transaction currency as book base.
- * @param {{ dataDir?: string, explicitBaseCurrency?: string|null, transactionCurrency?: string }} args
  */
 export function resolveBookBaseCurrency({
   dataDir,

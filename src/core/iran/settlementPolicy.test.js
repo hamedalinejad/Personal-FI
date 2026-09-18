@@ -7,13 +7,13 @@ import {
 } from "./settlementPolicy.js";
 
 test("CURRENT policy skips Thu+Fri (Iran equity weekend)", () => {
-  assert.equal(SETTLEMENT_POLICY_VERSION, "iran-equity-T2-v2");
+  assert.equal(SETTLEMENT_POLICY_VERSION, "iran-equity-settlement-v2");
   // 2026-01-01 is Thursday → next business day is Saturday 2026-01-03
   assert.equal(addBusinessDays("2025-12-31", 1), "2026-01-03"); // Wed +1 → Sat
   // T+2 from Wednesday 2025-12-31: Sat + Sun → 2026-01-04
   const r = computeEquitySettlementDate("2025-12-31", { tPlus: 2 });
   assert.equal(r.settlementDate, "2026-01-04");
-  assert.equal(r.policyVersion, "iran-equity-T2-v2");
+  assert.equal(r.policyVersion, "iran-equity-settlement-v2");
 });
 
 test("T+2 from Saturday lands on Monday", () => {

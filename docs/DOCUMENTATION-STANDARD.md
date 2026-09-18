@@ -144,7 +144,7 @@ coding workflow · test workflow · definition of done · status vocabulary · c
 Live status only — not a second requirements system. Rows at most: ID · area · status · owner · test · commit. History in Git/archive.
 
 ### modules/*.md
-Feature-only behavior using the 34-section template in DEVELOPMENT.md.
+Feature-only behavior using the compact template in DEVELOPMENT.md.
 
 
 
@@ -165,7 +165,7 @@ FEATURE → OWNER DOCUMENT → CODE → TEST → FIXTURE/PROOF → QUALITY STATU
 Forbidden: AUDIT → BUG DOC → FIX DOC → NEW MATRIX → NEW FINAL AUDIT.
 
 ## Vertical reference
-`modules/loan.md` is the practical 34-section template reference for other modules.
+`modules/loan.md` is the practical compact template reference for other modules.
 
 ## Forbidden restoration
 Never restore as normative files:
@@ -233,3 +233,19 @@ Use only:
 SUPPORTED | DEFERRED | REJECTED | REQUIRED | OPTIONAL
 | PERSISTED | DERIVED | SNAPSHOT | NOT-PERSISTED
 ```
+
+
+## Compact module template (LOCKED)
+
+Each `docs/modules/*.md` contains only:
+1. scope/status  
+2. supported / deferred / rejected  
+3. entities / identity  
+4. commands / effectClass / journal  
+5. module economics / formulas  
+6. dates / FX / fee deviations from Core  
+7. lifecycle / state machine  
+8. reports  
+9. standalone / proof  
+
+Global money/FX/API/journal/offline/license = **one-line pointers** to owners. Do not expand to a 34-section template.

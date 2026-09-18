@@ -3,44 +3,78 @@
   "description": "License disables capability only — never destroys data. Machine SoT for edition entitlements.",
   "rule": {
     "disable": "capability + public-api surface + UI entry",
-    "never": ["delete history", "mutate journal", "strip backup", "block export of owned data"]
+    "never": [
+      "delete history",
+      "mutate journal",
+      "strip backup",
+      "block export of owned data"
+    ]
   },
   "editions": {
     "loan-only": {
-      "capabilities": ["loan.*"],
+      "capabilities": [
+        "loan.*"
+      ],
       "requiresAccountsUi": false,
       "sharedCore": true,
-      "reports": ["loan.statement", "posted.journal"]
+      "reports": [
+        "loan.statement",
+        "posted.journal"
+      ]
     },
     "crypto-only": {
-      "capabilities": ["crypto.*"],
+      "capabilities": [
+        "crypto.*"
+      ],
       "requiresAccountsUi": false,
       "sharedCore": true,
-      "reports": ["crypto.holdings", "posted.journal"]
+      "reports": [
+        "crypto.holdings",
+        "posted.journal"
+      ]
     },
     "stocks-only": {
-      "capabilities": ["stocks.*"],
+      "capabilities": [
+        "stocks.*"
+      ],
       "requiresAccountsUi": false,
       "sharedCore": true,
-      "reports": ["stocks.holdings", "posted.journal"]
+      "reports": [
+        "stocks.holdings",
+        "posted.journal"
+      ]
     },
     "funds-only": {
-      "capabilities": ["funds.*"],
+      "capabilities": [
+        "funds.*"
+      ],
       "requiresAccountsUi": false,
       "sharedCore": true,
-      "reports": ["funds.holdings", "posted.journal"]
+      "reports": [
+        "funds.holdings",
+        "posted.journal"
+      ]
     },
     "metals-only": {
-      "capabilities": ["metals.*"],
+      "capabilities": [
+        "metals.*"
+      ],
       "requiresAccountsUi": false,
       "sharedCore": true,
-      "reports": ["metals.holdings", "posted.journal"]
+      "reports": [
+        "metals.holdings",
+        "posted.journal"
+      ]
     },
     "full": {
-      "capabilities": ["*"],
-      "requiresAccountsUi": false,
+      "capabilities": [
+        "*"
+      ],
+      "requiresAccountsUi": true,
       "sharedCore": true,
-      "reports": ["*"]
+      "reports": [
+        "*"
+      ]
     }
   },
   "entitlement": {

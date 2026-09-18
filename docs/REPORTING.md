@@ -103,3 +103,11 @@ Until locked: do not ship ambiguous return metrics. v1 remains realized/unrealiz
 **Allowed v1 reporting:** GL, Trial Balance, BS, IS, CF (posted-only), account activity, holdings cost, realized P&L from disposal operations when domain defines it.
 
 **Forbidden:** inventing TWR/MWR “for completeness” without this section being un-deferred + golden fixtures.
+
+
+## v1 report list (LOCKED)
+GL · Trial Balance · BS · IS · CF · Account Activity · Holdings/Cost · Realized P&L · Unrealized P&L · Fee attribution  
+
+**DEFERRED:** TWR · MWR/IRR · Performance FX attribution  
+
+FX conversion context for asOf valuation ≠ released FX performance attribution metric.
