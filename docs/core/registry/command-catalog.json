@@ -54,23 +54,12 @@
           },
           {
             "name": "netQuantity",
-            "required": false,
-            "type": "decimal_string",
-            "note": "derived if omitted"
-          },
-          {
-            "name": "feeQuantity",
-            "required": false,
-            "type": "decimal_string"
-          },
-          {
-            "name": "price",
-            "required": false,
+            "required": true,
             "type": "decimal_string"
           },
           {
             "name": "costTotal",
-            "required": false,
+            "required": true,
             "type": "decimal_string"
           },
           {
@@ -80,9 +69,19 @@
           },
           {
             "name": "currency",
-            "required": false,
+            "required": true,
             "type": "string",
-            "aliasOf": "costCurrency"
+            "note": "must match costCurrency for v1 journal scope"
+          },
+          {
+            "name": "price",
+            "required": true,
+            "type": "decimal_string"
+          },
+          {
+            "name": "priceAsOf",
+            "required": true,
+            "type": "string"
           },
           {
             "name": "exchangeId",
@@ -96,14 +95,24 @@
             "aliasOf": "exchangeId"
           },
           {
-            "name": "networkId",
-            "required": false,
+            "name": "feeRole",
+            "required": true,
             "type": "string"
+          },
+          {
+            "name": "feeQuantity",
+            "required": false,
+            "type": "decimal_string"
           },
           {
             "name": "businessDate",
             "required": true,
             "type": "date"
+          },
+          {
+            "name": "networkId",
+            "required": false,
+            "type": "string"
           },
           {
             "name": "feeAmount",

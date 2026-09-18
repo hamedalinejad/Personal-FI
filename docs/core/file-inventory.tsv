@@ -18,7 +18,6 @@ docs/README.md	A	docs	keep
 docs/REPORTING.md	A	docs	keep
 docs/archive/AUDIT-HISTORY.md	C	history	keep
 docs/core/RELEASE-EVIDENCE.json	B	machine	keep
-docs/core/db/SCHEMA-SYNC-REPORT.md	B	machine	keep
 docs/core/db/schema.manifest.json	B	machine	keep
 docs/core/db/schema.sql	B	machine	keep
 docs/core/field-inventory.checklist.tsv	B	machine	keep

@@ -4,7 +4,7 @@
  * 1) Regenerate manifest hash from schema
  * 2) Verify checked-in manifest matches
  * 3) Verify field-inventory covers every CREATE column
- * 4) Emit docs/core/db/SCHEMA-SYNC-REPORT.md
+ * 4) Emit (stdout only; no markdown artifact)
  */
 import { readFileSync, writeFileSync, existsSync, mkdtempSync } from "fs";
 import { join } from "path";
@@ -17,7 +17,7 @@ const root = process.cwd();
 const schemaPath = join(root, "docs/core/db/schema.sql");
 const manifestPath = join(root, "docs/core/db/schema.manifest.json");
 const invPath = join(root, "docs/core/field-inventory.checklist.tsv");
-const reportPath = join(root, "docs/core/db/SCHEMA-SYNC-REPORT.md");
+const reportPath = join(root, "(stdout only; no markdown artifact)");
 
 if (!existsSync(schemaPath)) {
   console.error("MISSING schema.sql");
@@ -97,9 +97,13 @@ schema.sql → field-inventory-verify → checklist.tsv coverage
 
 Release blocks if missing inventory > 0 or manifest check fails.
 `;
-writeFileSync(reportPath, report);
+console.log("schema-sync-pipeline: report emitted to stdout only");
 if (missing.length) {
   console.error("schema-sync-pipeline: missing inventory", missing.length);
+  process.exit(1);
+}
+if (extra.length) {
+  console.error("schema-sync-pipeline: extra inventory", extra.length, extra.slice(0, 20));
   process.exit(1);
 }
 console.log("schema-sync-pipeline: OK", tables.length, "tables", columns.length, "cols");
