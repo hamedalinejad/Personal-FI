@@ -39,3 +39,13 @@ Iran fee policy data, browser sql.js E2E, TWR/MWR remain deferred (not v1 blocke
 - `scripts/command-constraints-check.js` + `npm run command:constraints` in gates
 - File inventory includes acceptance test previously missing
 - field-preservation gate remains GREEN
+
+## Phase 1 — Money + Accounting Core hardening (2026-09-18)
+
+Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
+- Decimal add/sub/mul/div, zero, large, high-precision quantity
+- Reject JS Number at money boundary
+- FX: identity, direct, two-hop, missing/zero/negative/stale/historical asOf
+- Journal: ≥2 lines when posted, base balance, finite money, rate helpers
+- Immutable posted, fee/qty conservation, invariant gate
+- Idempotency covered by existing `idempotencyConflict.test.js`
