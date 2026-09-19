@@ -115,3 +115,14 @@ test("second reversal of same original is rejected unless it replays same operat
   assert.equal(replay.idempotentReplay, true);
   closeAllDbs();
 });
+
+
+test("inverse helper rejects JS Number money values", () => {
+  assert.throws(
+    () => buildInverseJournalLines([
+      { accountId: "cash", side: "debit", amount: 100, currency: "IRR" },
+      { accountId: "income", side: "credit", amount: "100", currency: "IRR" },
+    ]),
+    /DECIMAL_NOT_STRING/,
+  );
+});
