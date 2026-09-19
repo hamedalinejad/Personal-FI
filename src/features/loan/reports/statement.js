@@ -30,10 +30,26 @@ export function getStatement(loanId, { dataDir, asOf = null, limit = 500 } = {})
 
   // Simple balance from loan + payment portions (domain; journal remains SoT)
   const paidPrincipal = transactions
-    .filter((t) => t.tx_type === "payment")
-    .reduce((s, t) => s.plus(toDecimal(String(t.principal_portion || "0"))), toDecimal("0")).toFixed();
-  // Use string decimal path in future — Number only for display summary warning
-  // Prefer recompute via toDecimal in next iteration
+    .filter((t) => t.tx_type === "payment" || t.tx_type === "reversal")
+    .reduce(
+      (s, t) => {
+        const amount = toDecimal(String(t.principal_portion || "0"));
+        return t.tx_type === "reversal" ? s.minus(amount) : s.plus(amount);
+      },
+      toDecimal("0"),
+    )
+    .toFixed();
+
+  const paidInterest = transactions
+    .filter((t) => t.tx_type === "payment" || t.tx_type === "reversal")
+    .reduce(
+      (s, t) => {
+        const amount = toDecimal(String(t.interest_portion || "0"));
+        return t.tx_type === "reversal" ? s.minus(amount) : s.plus(amount);
+      },
+      toDecimal("0"),
+    )
+    .toFixed();
 
   return {
     asOf: asOf || null,
@@ -49,6 +65,8 @@ export function getStatement(loanId, { dataDir, asOf = null, limit = 500 } = {})
       feeCount: fees.length,
       paymentCount: transactions.filter((t) => t.tx_type === "payment").length,
       reversalCount: transactions.filter((t) => t.tx_type === "reversal").length,
+      paidPrincipal,
+      paidInterest,
     },
   };
 }
