@@ -69,3 +69,29 @@ Do conclude:
 - Phase 4 regression cited as Run 400 is **fixed on main**
 - Phase 5 and Phase 6 are **implemented on main** with local acceptance green
 - Production remains **NO-GO** until freeze/release evidence exists
+
+## 6. Phase 1–3 external audit alignment (same session)
+
+Verified against `main` @ response HEAD.
+
+### Phase 1
+- Material implementation **confirmed**: Decimal boundary, Number rejection, FX, journal invariants, fee/qty conservation, posted immutability, idempotency, economic hash.
+- Registry: **R-M06 = IMPLEMENTED**.
+- Registry: **R-M07 = PARTIAL** (multi-hop + asOf/stale/pair/inverse present; full multi-hop historical golden family still open for FREEZE).
+- Local: `phase1-money-hardening.test.js` **36/36 pass**.
+
+**Result:** implementation substantially complete for claimed foundation; independent freeze-level historical FX proof remains partial — matches external audit.
+
+### Phase 2
+- Kernel areas present on main (journal base path, line_number uniqueness, fee safety, account kinds/roles, reversal helper, result_json non-SoT, constraints, gates).
+- Historical CI Run 390 SUCCESS remains pack evidence; current main supersedes branch-only HEAD `e39adc0…`.
+- PR mergeable state is integration hygiene, not a test failure.
+
+**Result:** VERIFIED for claimed kernel scope — matches external audit.
+
+### Phase 3
+- Integrity firewall, durability ack/reconcile, backup/restore validation, corrupt reject, result_json non-SoT — present on main (`integrity.js`, `worker.js`).
+- Historical CI Run 396 SUCCESS remains pack evidence.
+- **R-M24** still **SPEC_LOCKED** — real browser sql.js + IndexedDB RELEASE E2E open.
+
+**Result:** VERIFIED for claimed scope; browser release proof open — matches external audit.
