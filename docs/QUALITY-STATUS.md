@@ -100,3 +100,23 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - fixtures/CORE-ACCOUNTING-KERNEL-V1.json + golden acceptance
 - command-constraints-check negative tests
 - accounting-invariants-audit.js (no ghost cash tables; fee guards; golden run)
+
+## Phase 0 Semantic Contract Closure (2026-09-19)
+
+Verified against PHASE-0-SEMANTIC-CONTRACT:
+
+| Item | Status |
+|------|--------|
+| R-M03 field matrix 492 rows + gate GREEN | IMPLEMENTED / proof PARTIAL |
+| R-M06 money canonicalization | IMPLEMENTED / proof PARTIAL |
+| loan method canonical (declining_balance, flat_rate, qarz_al_hasaneh, bullet) | LOCKED |
+| loan aliases flat→flat_rate, qarz→qarz_al_hasaneh at API only | LOCKED |
+| frequency monthly/weekly/quarterly/annual; yearly→annual | LOCKED |
+| originationKind required; no silent default | LOCKED |
+| dayCount required | LOCKED |
+| constraint root ↔ card identical | ENFORCED |
+| constraint semantic types (when, pricingMode, positiveDecimal, …) | ENFORCED |
+| field-preservation requiredness parity loan.create | FIXED |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |
+

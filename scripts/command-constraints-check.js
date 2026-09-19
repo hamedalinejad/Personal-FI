@@ -115,7 +115,36 @@ for (const cid of REQUIRED_COMMANDS) {
       }
     }
     if (c.type === "when") {
-      if (!c.when || !c.rule) errors.push(`${cid}.${c.id}: when needs when + rule`);
+      if (!c.when || typeof c.when !== "object") {
+        errors.push(`${cid}.${c.id}: when needs when object`);
+      } else {
+        if (!c.when.field || typeof c.when.field !== "string") {
+          errors.push(`${cid}.${c.id}: when.field required`);
+        } else if (rfSet.size && !rfSet.has(c.when.field)) {
+          errors.push(`${cid}.${c.id}: when.field ${c.when.field} not in requestFields`);
+        }
+        const hasPred =
+          "equals" in c.when || "in" in c.when || "range" in c.when;
+        if (!hasPred) {
+          errors.push(`${cid}.${c.id}: when needs equals|in|range`);
+        }
+        if ("in" in c.when && !Array.isArray(c.when.in)) {
+          errors.push(`${cid}.${c.id}: when.in must be array`);
+        }
+      }
+      if (!c.rule) errors.push(`${cid}.${c.id}: when needs rule`);
+    }
+    if (c.type === "positiveDecimal") {
+      const fields = c.field ? [c.field] : c.fields;
+      if (!Array.isArray(fields) || fields.length < 1) {
+        errors.push(`${cid}.${c.id}: positiveDecimal needs field or fields[]`);
+      } else if (rfSet.size) {
+        for (const f of fields) {
+          if (!rfSet.has(f)) {
+            errors.push(`${cid}.${c.id}: positiveDecimal field ${f} not in requestFields`);
+          }
+        }
+      }
     }
     // requiredness parity: if constraint.required===true, requestField should be required
     if (c.required === true && c.field && cmd.card?.requestFields) {

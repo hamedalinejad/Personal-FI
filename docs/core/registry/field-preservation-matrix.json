@@ -5800,7 +5800,7 @@
     {
       "commandId": "loan.create",
       "field": "originationKind",
-      "required": false,
+      "required": true,
       "accepted": true,
       "stored": "ln_transactions.origination_kind",
       "derived": false,
@@ -12455,7 +12455,7 @@
     {
       "commandId": "loan.create",
       "field": "dayCount",
-      "required": false,
+      "required": true,
       "accepted": true,
       "stored": "ln_loans.day_count",
       "derived": false,

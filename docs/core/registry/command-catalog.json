@@ -5870,5 +5870,6 @@
       "when"
     ],
     "note": "Machine-readable conditional constraints. Enforced by scripts/command-constraints-check.js and runtime validators."
-  }
+  },
+  "constraintAuthority": "commands.<id>.constraints (root); card.constraints must mirror"
 }
