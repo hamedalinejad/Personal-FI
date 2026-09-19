@@ -129,3 +129,25 @@ test("metal valuation requires explicit purity basis", async () => {
   );
   closeAllDbs();
 });
+
+
+test("price observation after report asOf is rejected", async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), "pf-invest-asof-"));
+  const db = openDb(dataDir);
+  const now = new Date().toISOString();
+  const id = randomUUID();
+  insertInstrument(db, id, "stock", "LATE");
+  db.prepare(
+    `INSERT INTO inv_stocks_iran_holdings
+      (id, brokerage_id, account_id, instrument_id, quantity, total_invested, cost_currency, created_at, updated_at)
+      VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?)`,
+  ).run(randomUUID(), "br-asof", id, "1", "10", "IRR", now, now);
+  assert.throws(
+    () => investmentHoldings(dataDir, {
+      valuationContext: { reportCurrency: "IRR", asOf: "2026-09-01" },
+      prices: { [id]: { price: "20", currency: "IRR", quoteType: "last", marketDate: "2026-09-02", unit: "per_unit" } },
+    }),
+    /VALUATION_PRICE_AFTER_ASOF/,
+  );
+  closeAllDbs();
+});
