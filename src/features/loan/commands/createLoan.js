@@ -55,19 +55,27 @@ export async function createLoan(
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!p.dayCount) throw new Error("LOAN_DAY_COUNT_REQUIRED");
   if (p.dayCount !== "period_based") throw new Error("LOAN_DAY_COUNT_UNSUPPORTED");
-  // economicMode is legacy alias → originationKind
-  const originationKind = p.originationKind || p.economicMode || "disburse_now";
+  // economicMode is explicit legacy alias only — no silent default (no-inference)
+  const originationKind = p.originationKind ?? p.economicMode;
+  if (originationKind == null || originationKind === "") {
+    throw new Error("LOAN_ORIGINATION_KIND_REQUIRED");
+  }
   if (!["disburse_now", "record_outstanding"].includes(originationKind)) {
     throw new Error("LOAN_ORIGINATION_KIND_UNSUPPORTED");
   }
-  const FREQ_ALIASES = { month: "monthly", year: "annual", quarter: "quarterly", week: "weekly" };
+  // Canonical frequency vocabulary: monthly|weekly|quarterly|annual
+  // Aliases: month, week, quarter, year, yearly → annual
+  const FREQ_ALIASES = {
+    month: "monthly",
+    week: "weekly",
+    quarter: "quarterly",
+    year: "annual",
+    yearly: "annual",
+  };
   const freqRaw = p.installmentFrequency || p.frequency || "monthly";
   const freq = FREQ_ALIASES[freqRaw] || freqRaw;
   if (!["monthly", "weekly", "quarterly", "annual"].includes(freq)) {
     throw new Error("LOAN_FREQUENCY_INVALID");
-  }
-  if (!["monthly", "weekly", "quarterly", "annual", "yearly"].includes(freq)) {
-    throw new Error("LOAN_FREQUENCY_UNSUPPORTED");
   }
 
   const currency = p.currency;
@@ -92,7 +100,7 @@ export async function createLoan(
     startDate: p.startDate,
     dayCount: p.dayCount,
     feePercent: p.feePercent,
-    frequency: freq === "yearly" ? "annual" : freq,
+    frequency: freq,
   });
 
   const snapshot = buildScheduleSnapshot({
@@ -101,7 +109,7 @@ export async function createLoan(
     rateFractional,
     currency,
     engineVersion,
-    frequency: freq === "yearly" ? "annual" : freq,
+    frequency: freq,
   });
 
   const loanId = p.loanId || randomUUID();
@@ -143,7 +151,7 @@ export async function createLoan(
         currency,
         amountInBase: p.principal,
         exchangeRateToBase: "1",
-        lineKind: "opening",
+        lineKind: "adjustment",
       },
     ];
   }
@@ -174,9 +182,9 @@ export async function createLoan(
         const existing = db.prepare("SELECT id FROM fin_accounts WHERE id = ?").get(eqId);
         if (!existing) {
           db.prepare(
-            `INSERT INTO fin_accounts (id, code, name, account_kind, currency, status, is_archived, created_at)
-             VALUES (?, ?, ?, 'equity', ?, 'active', 0, ?)`
-          ).run(eqId, eqId, `Opening balances (${currency})`, currency, now);
+            `INSERT INTO fin_accounts (id, code, name, account_kind, currency, status, is_archived, created_at, updated_at)
+             VALUES (?, ?, ?, 'equity', ?, 'active', 0, ?, ?)`
+          ).run(eqId, eqId, `Opening balances (${currency})`, currency, now, now);
         }
       }
       db.prepare(
@@ -200,7 +208,7 @@ export async function createLoan(
         parsePeriods(p.periods),
         p.dayCount,
         p.dayCount,
-        freq === "yearly" ? "annual" : freq,
+        freq,
         engineVersion,
         p.notes || null,
         originationKind,

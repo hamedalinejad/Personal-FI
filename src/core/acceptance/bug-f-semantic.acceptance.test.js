@@ -28,6 +28,7 @@ test("BUG-F09 unknown frequency rejected in scheduleFlat", () => {
         periods: "12",
         startDate: "2026-01-01",
         dayCount: "period_based",
+        originationKind: "disburse_now",
         frequency: "banana",
       }),
     /LOAN_FREQUENCY_UNSUPPORTED/,

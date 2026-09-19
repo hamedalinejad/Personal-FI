@@ -41,6 +41,7 @@ test("MATH-001 v1 declining is NOT annuity payment", () => {
     periods: "52",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
     frequency: "weekly",
   });
   const pay0 = toDecimal(s.rows[0].payment);

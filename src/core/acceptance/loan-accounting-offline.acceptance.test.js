@@ -40,6 +40,7 @@ test("LOAN-002 snapshot envelope version", () => {
     method: "declining_balance",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   assert.equal(snap.snapshotSchemaVersion, SCHEDULE_SNAPSHOT_SCHEMA_VERSION);
 });

@@ -23,6 +23,7 @@ test("A8 backup/restore preserves loan + payment", async () => {
         startDate: "2026-01-01",
         businessDate: "2026-01-01",
         dayCount: "period_based",
+        originationKind: "disburse_now",
       },
     },
     { dataDir },

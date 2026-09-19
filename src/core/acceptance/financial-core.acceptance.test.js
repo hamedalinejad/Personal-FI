@@ -57,6 +57,7 @@ test("BUG-CUR-008 flat rate 12% not 1200%", () => {
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   let ti = toDecimal("0");
   for (const r of s.rows) ti = ti.plus(toDecimal(r.interest));
@@ -70,6 +71,7 @@ test("BUG-CUR-009 qarz fee 4% of 100000 = 4000", () => {
     feePercent: "4",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   let tf = toDecimal("0");
   for (const r of s.rows) tf = tf.plus(toDecimal(r.fee || r.interest || "0"));

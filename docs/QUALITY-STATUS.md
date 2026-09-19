@@ -71,3 +71,11 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - Journal matrix tests; result_json corruption → relational SoT still loads
 - Scientific notation rejected at money boundary
 - Production = NO-GO · FREEZE_PROVEN = false · SEMANTIC_CODING_READY = true
+
+## Phase 1 carry-over + CI registry (2026-09-19)
+
+- P1-CARRY-01: dayCount + originationKind required; no silent disburse_now default
+- P1-CARRY-02: yearly → annual frequency alias
+- resolveBaseAmountSync / requireFxIfCrossCurrency: string-only via canonicalDecimalString
+- record_outstanding journal lineKind opening → adjustment (schema CHECK)
+- package-lock + .npmrc: decimal.js from registry.npmjs.org (CI ETIMEDOUT on private mirror)

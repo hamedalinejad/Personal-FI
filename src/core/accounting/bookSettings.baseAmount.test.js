@@ -17,3 +17,16 @@ test("cross currency multiplies", () => {
 test("cross currency requires rate", () => {
   assert.throws(() => resolveBaseAmountSync("10", "USD", "IRR", null));
 });
+
+test("resolveBaseAmountSync rejects Number amount", () => {
+  assert.throws(() => resolveBaseAmountSync(100, "IRR", "IRR", "1"), /DECIMAL_NOT_STRING/);
+});
+
+test("resolveBaseAmountSync rejects Number rate", () => {
+  assert.throws(() => resolveBaseAmountSync("10", "USD", "IRR", 90000), /DECIMAL_NOT_STRING/);
+});
+
+test("resolveBaseAmountSync rejects nonpositive rate", () => {
+  assert.throws(() => resolveBaseAmountSync("10", "USD", "IRR", "0"), /nonpositive|FX|VALIDATION/i);
+  assert.throws(() => resolveBaseAmountSync("10", "USD", "IRR", "-1"), /nonpositive|FX|VALIDATION/i);
+});

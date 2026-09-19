@@ -2413,8 +2413,12 @@
           },
           {
             "name": "dayCount",
-            "required": false,
-            "type": "string"
+            "required": true,
+            "type": "string",
+            "enum": [
+              "period_based"
+            ],
+            "note": "v1 only period_based; required (no silent default)"
           },
           {
             "name": "installmentFrequency",
@@ -2429,10 +2433,11 @@
             "aliases": {
               "month": "monthly",
               "year": "annual",
+              "yearly": "annual",
               "quarter": "quarterly",
               "week": "weekly"
             },
-            "note": "Default monthly when omitted; aliases normalized at command boundary"
+            "note": "Default monthly when omitted; aliases normalized at command boundary; canonical: monthly|weekly|quarterly|annual"
           },
           {
             "name": "businessDate",
@@ -2515,7 +2520,8 @@
           "currency": "required",
           "annualRate": "required",
           "periods": "required",
-          "startDate": "required"
+          "startDate": "required",
+          "dayCount": "required"
         },
         "normalization": [
           "decimal-string money/qty/rate/price",
@@ -2588,7 +2594,14 @@
               "annual"
             ],
             "required": false,
-            "error": "LOAN_FREQUENCY_INVALID"
+            "error": "LOAN_FREQUENCY_INVALID",
+            "aliases": {
+              "month": "monthly",
+              "year": "annual",
+              "yearly": "annual",
+              "quarter": "quarterly",
+              "week": "weekly"
+            }
           }
         ]
       },
@@ -2633,7 +2646,14 @@
             "annual"
           ],
           "required": false,
-          "error": "LOAN_FREQUENCY_INVALID"
+          "error": "LOAN_FREQUENCY_INVALID",
+          "aliases": {
+            "month": "monthly",
+            "year": "annual",
+            "yearly": "annual",
+            "quarter": "quarterly",
+            "week": "weekly"
+          }
         }
       ]
     },

@@ -23,6 +23,7 @@ test("loan recovery: create → backup → restore → loan still readable", asy
         periods: "12",
         frequency: "monthly",
         dayCount: "period_based",
+        originationKind: "disburse_now",
         currency: "IRR",
         businessDate: "2026-01-01",
         startDate: "2026-01-01",

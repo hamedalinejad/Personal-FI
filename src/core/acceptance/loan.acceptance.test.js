@@ -19,6 +19,7 @@ test("D.loan: equal-principal 1200 @ 12% n=12 total interest 78", () => {
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   let ti = toDecimal("0");
   for (const row of s.rows) ti = ti.plus(toDecimal(row.interest));
@@ -34,6 +35,7 @@ test("D.loan: flat 100000 @ 12% one-year interest 12000", () => {
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   let ti = toDecimal("0");
   for (const row of s.rows) ti = ti.plus(toDecimal(row.interest || "0"));
@@ -47,6 +49,7 @@ test("D.loan: qarz 4% fee on 100000 => total fee 4000", () => {
     feePercent: "4",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   let fee = toDecimal("0");
   for (const row of s.rows) fee = fee.plus(toDecimal(row.fee || "0"));
@@ -68,6 +71,7 @@ test("D.loan: annuity reference is NOT v1 equal-principal payment", () => {
     periods: "52",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   const pay0 = toDecimal(s.rows[0].payment);
   // annuity fixed-PMT ≈ 2104660.886 — must not equal equal-principal payment

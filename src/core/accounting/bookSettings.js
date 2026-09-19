@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { openDb } from "../persistence/port.js";
+import { canonicalDecimalString, toDecimal } from "../money/canonicalDecimal.js";
 
 /** Product default for local-first Iran book when db_meta not yet set. */
 export const DEFAULT_BOOK_BASE_CURRENCY = "IRR";
@@ -83,8 +84,8 @@ export function requireFxIfCrossCurrency({
   if (exchangeRateToBase == null || exchangeRateToBase === "") {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   }
-  const rate = new Decimal(String(exchangeRateToBase));
-  if (!rate.isFinite() || rate.lte(0)) {
+  const rate = toDecimal(canonicalDecimalString(exchangeRateToBase));
+  if (rate.lte(0)) {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase_nonpositive");
   }
   return rate.toFixed();
@@ -107,14 +108,18 @@ export function resolveBaseAmountSync(amount, transactionCurrency, bookBaseCurre
   if (transactionCurrency == null || bookBaseCurrency == null) {
     throw new Error("VALIDATION_ERROR:currency");
   }
-  const amt = new Decimal(amount?.toFixed ? amount.toFixed() : String(amount));
+  // string-only money boundary — no Number / toFixed coercion
+  const amt = toDecimal(canonicalDecimalString(amount));
   if (transactionCurrency === bookBaseCurrency) {
     return { amountInBase: amt.toFixed(), exchangeRateToBase: "1" };
   }
   if (exchangeRateToBase == null || exchangeRateToBase === "") {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   }
-  const rate = new Decimal(String(exchangeRateToBase));
+  const rate = toDecimal(canonicalDecimalString(exchangeRateToBase));
+  if (rate.lte(0)) {
+    throw new Error("VALIDATION_ERROR:exchangeRateToBase_nonpositive");
+  }
   return {
     amountInBase: amt.times(rate).toFixed(),
     exchangeRateToBase: rate.toFixed(),

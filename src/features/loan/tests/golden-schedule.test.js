@@ -14,6 +14,7 @@ test("GOLDEN zero interest equal principal", () => {
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   assert.equal(s.rows.length, 12);
   for (const row of s.rows) {
@@ -31,6 +32,7 @@ test("GOLDEN declining equal-principal 12% annual period_based", () => {
     periods: "12",
     startDate: "2026-01-01",
     dayCount: "period_based",
+    originationKind: "disburse_now",
   });
   const interests = s.rows.map((r) => r.interest);
   assert.deepEqual(interests, [

@@ -94,6 +94,7 @@ test("P0-OFFLINE-002 loan+payment survive backup/restore", async () => {
         startDate: "2026-01-01",
         businessDate: "2026-01-01",
         dayCount: "period_based",
+        originationKind: "disburse_now",
       },
     },
     { dataDir },
