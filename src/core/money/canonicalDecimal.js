@@ -59,3 +59,22 @@ export function sumDecimalSides(lines, { amountField = "amount", sideField = "si
   }
   return { debit: debit.toFixed(), credit: credit.toFixed(), balanced: debit.eq(credit) };
 }
+
+/**
+ * Strict aggregation: null/empty is an error (missing ≠ zero).
+ * Prefer this for accounting journal totals.
+ */
+export function sumDecimalStringsStrict(values) {
+  if (!Array.isArray(values)) throw new Error("SUM_DECIMAL_NOT_ARRAY");
+  let total = toDecimal("0");
+  for (const v of values) {
+    if (v == null || v === "") throw new Error("SUM_DECIMAL_MISSING");
+    total = total.plus(toDecimal(v));
+  }
+  return total.toFixed();
+}
+
+/** Optional aggregation: null/empty skipped — name makes semantics explicit. */
+export function sumOptionalDecimalStrings(values) {
+  return sumDecimalStrings(values);
+}

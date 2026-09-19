@@ -49,3 +49,15 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - Journal: ≥2 lines when posted, base balance, finite money, rate helpers
 - Immutable posted, fee/qty conservation, invariant gate
 - Idempotency covered by existing `idempotencyConflict.test.js`
+
+## Phase 1 defect closure (2026-09-18)
+
+- P0-07: `scripts/field-preservation-check.test.js` — fail on stored mismatch, missing reason, missing schema column
+- P1-01: `exchangeRateToBase` + amounts canonicalized before economic hash
+- P1-02/03: removed always-true `|| true` and Number `times(3)` from phase1 tests
+- P1-04: `sumDecimalStringsStrict` (missing ≠ zero)
+- P1-05/06: fee conservation requires direction; qty conservation requires canonical treatment
+- P1-07: `runInvariantGate` receives `baseCurrency`
+- P1-08: journal currency+side required on every line
+- P1-09: FX rates strictly positive in gate; interest may be non-negative
+- P1-10/11: `FX_PAIR_INVALID` + `FX_INVERSE_CONFLICT`

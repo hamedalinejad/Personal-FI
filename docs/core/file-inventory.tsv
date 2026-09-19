@@ -333,3 +333,4 @@ src/features/crypto/tests/qty-conservation.test.js	test
 src/core/acceptance/bug-f-semantic.acceptance.test.js	E	test	keep
 scripts/command-constraints-check.js	E	script	keep
 src/core/money/phase1-money-hardening.test.js	E	test	keep
+scripts/field-preservation-check.test.js	E	test	keep

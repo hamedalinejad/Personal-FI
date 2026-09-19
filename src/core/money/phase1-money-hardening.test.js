@@ -9,6 +9,7 @@ import {
   toDecimal,
   sumDecimalStrings,
   sumDecimalSides,
+  sumDecimalStringsStrict,
 } from "./canonicalDecimal.js";
 import { assertPositive, assertNonNegative } from "./decimalMath.js";
 import {
@@ -41,17 +42,16 @@ test("money: multiplication", () => {
 test("money: division high precision", () => {
   const q = toDecimal("1").div(toDecimal("3"));
   assert.ok(q.toFixed().startsWith("0.333333"));
-  // reconstruct
-  assert.equal(q.times(toDecimal("3")).toFixed().slice(0, 10), "0.99999999".slice(0, 10) || q.times(3).toString());
-  assert.ok(toDecimal("1").minus(q.times(toDecimal("3"))).abs().lt("0.0000000001") || true);
+  const one = toDecimal("1");
+  const back = q.times(toDecimal("3"));
+  assert.ok(one.minus(back).abs().lt(toDecimal("0.0000000001")));
 });
 
 test("money: division exact residual", () => {
-  // 1/3 * 3 may not be exactly 1 at fixed precision — use eq on reconstructed path carefully
   const one = toDecimal("1");
   const third = one.div(toDecimal("3"));
   const back = third.times(toDecimal("3"));
-  assert.ok(one.minus(back).abs().lte(toDecimal("1e-28")) || back.toFixed().startsWith("0.999") || back.eq(one));
+  assert.ok(one.minus(back).abs().lt(toDecimal("0.0000000001")));
 });
 
 test("money: zero normalizes", () => {
@@ -219,16 +219,18 @@ test("journal: posted rows immutable", () => {
 });
 
 test("journal: fee conservation gross-fee=net", () => {
-  assert.doesNotThrow(() => assertFeeConservation({ gross: "10", fee: "1", net: "9" }));
-  assert.throws(() => assertFeeConservation({ gross: "10", fee: "1", net: "8" }), /INV_FEE/);
+  assert.doesNotThrow(() => assertFeeConservation({ gross: "10", fee: "1", net: "9", direction: "subtract" }));
+  assert.throws(() => assertFeeConservation({ gross: "10", fee: "1", net: "8", direction: "subtract" }), /INV_FEE/);
+  assert.throws(() => assertFeeConservation({ gross: "10", fee: "1", net: "9" }), /INV_FEE_DIRECTION/);
+  assert.doesNotThrow(() => assertFeeConservation({ gross: "10", fee: "1", net: "11", direction: "add" }));
 });
 
 test("journal: quantity conservation fee_from_received", () => {
   assert.doesNotThrow(() =>
-    assertQuantityConservation({ gross: "10", fee: "0.1", net: "9.9", role: "fee_from_received" }),
+    assertQuantityConservation({ gross: "10", fee: "0.1", net: "9.9", treatment: "reduce_received_quantity" }),
   );
   assert.throws(
-    () => assertQuantityConservation({ gross: "10", fee: "0.1", net: "10", role: "fee_from_received" }),
+    () => assertQuantityConservation({ gross: "10", fee: "0.1", net: "10", treatment: "reduce_received_quantity" }),
     /INV_QTY/,
   );
 });
@@ -251,4 +253,36 @@ test("journal: sumDecimalSides unbalanced flag", () => {
     { side: "credit", amount: "9" },
   ]);
   assert.equal(r.balanced, false);
+});
+
+test("FX: malformed pair rejected", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "IRR",
+        rates: { "USD/IRR/BROKEN": "42000" },
+      }),
+    /FX_PAIR_INVALID/,
+  );
+});
+
+test("FX: contradictory inverse rates rejected", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "IRR",
+        rates: { "USD/IRR": "42000", "IRR/USD": "0.000030" },
+      }),
+    /FX_INVERSE_CONFLICT|FX_RATE_CONFLICT/,
+  );
+});
+
+test("money: sumDecimalStringsStrict rejects missing", () => {
+  assert.throws(() => sumDecimalStringsStrict(["1", null, "2"]), /SUM_DECIMAL_MISSING/);
+  assert.throws(() => sumDecimalStringsStrict(["1", "", "2"]), /SUM_DECIMAL_MISSING/);
+  assert.equal(sumDecimalStringsStrict(["1.5", "2.5"]), "4");
 });

@@ -19,6 +19,12 @@ export function assertJournalBalanced(lines, opts = {}) {
   let credit = toDecimal("0");
   let currency = null;
   for (const line of lines) {
+    if (!line.side || (line.side !== "debit" && line.side !== "credit")) {
+      throw new Error("INV_JOURNAL_SIDE_REQUIRED");
+    }
+    if (!line.currency || typeof line.currency !== "string") {
+      throw new Error("INV_JOURNAL_CURRENCY_REQUIRED");
+    }
     assertFiniteMoney(line.amount, "line.amount");
     const a = toDecimal(line.amount);
     if (a.lt(0)) throw new Error("INV_JOURNAL_NEGATIVE_AMOUNT");
@@ -102,30 +108,53 @@ export function assertImmutablePost(previousRow) {
   return true;
 }
 
-export function assertFeeConservation({ gross, fee, net }) {
+export function assertFeeConservation({ gross, fee, net, direction }) {
+  if (direction !== "subtract" && direction !== "add") {
+    throw new Error("INV_FEE_DIRECTION_REQUIRED");
+  }
   const g = toDecimal(gross);
   const f = toDecimal(fee);
   const n = toDecimal(net);
-  if (!g.minus(f).eq(n) && !g.plus(f).eq(n)) {
+  const expected = direction === "subtract" ? g.minus(f) : g.plus(f);
+  if (!expected.eq(n)) {
     throw new Error("INV_FEE_CONSERVATION");
   }
   return true;
 }
 
-export function assertQuantityConservation({ gross, fee, net, role }) {
-  if (role === "fee_from_received" || role === "network_burn" || !role) {
+export function assertQuantityConservation({ gross, fee, net, role, treatment }) {
+  // Canonical treatments only — unknown/missing role is reject, not guess
+  const raw = treatment ?? role;
+  if (raw == null || raw === "") {
+    throw new Error("INV_QTY_ROLE_REQUIRED");
+  }
+  let t = String(raw);
+  // legacy aliases → canonical
+  if (t === "fee_from_received" || t === "feeBurnQuantity" || t === "network_burn") {
+    t = "reduce_received_quantity";
+  }
+  if (t === "reduce_received_quantity") {
     if (!toDecimal(gross).minus(toDecimal(fee || "0")).eq(toDecimal(net))) {
       throw new Error("INV_QTY_CONSERVATION");
     }
+    return true;
   }
-  return true;
+  throw new Error(`INV_QTY_ROLE_UNKNOWN:${t}`);
 }
 
 export function runInvariantGate({ journalLines, rates, baseCurrency } = {}) {
   if (journalLines) assertJournalBalanced(journalLines, { baseCurrency });
   if (rates) {
     for (const r of rates) {
-      if (r != null) assertRateNonNegative(typeof r === "string" ? r : r.rate);
+      if (r == null) continue;
+      const rate = typeof r === "string" ? r : r.rate;
+      const kind = typeof r === "object" && r != null ? r.type || r.kind || "fx" : "fx";
+      // FX rates must be strictly positive; interest may be zero via explicit type
+      if (kind === "interest" || kind === "non_negative") {
+        assertRateNonNegative(rate);
+      } else {
+        assertRatePositive(rate);
+      }
     }
   }
   return true;

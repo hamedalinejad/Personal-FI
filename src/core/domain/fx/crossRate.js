@@ -38,11 +38,44 @@ function buildGraph(rates, { asOf = null, allowStale = false } = {}) {
     if (!edges.has(from)) edges.set(from, []);
     edges.get(from).push({ to, ...meta });
   }
+  // Detect contradictory direct inverse pairs before building edges
+  const direct = new Map();
   for (const [pair, raw] of Object.entries(rates)) {
     const n = normalizeRate(raw);
     if (!n) continue;
-    const [a, b] = pair.split("/");
-    if (!a || !b) continue;
+    const parts = pair.split("/");
+    if (parts.length !== 2 || !parts[0] || !parts[1]) {
+      throw new Error(`FX_PAIR_INVALID:${pair}`);
+    }
+    const [a, b] = parts;
+    const key = `${a}/${b}`;
+    const invKey = `${b}/${a}`;
+    if (direct.has(key)) {
+      const prev = direct.get(key);
+      if (!toDecimal(prev).eq(toDecimal(n.rate))) {
+        throw new Error(`FX_RATE_CONFLICT:${key}`);
+      }
+    }
+    direct.set(key, n.rate);
+    if (direct.has(invKey)) {
+      const inv = toDecimal(direct.get(invKey));
+      const expected = toDecimal("1").div(toDecimal(n.rate));
+      // allow tiny relative tolerance via Decimal equality after fixed precision
+      if (!inv.eq(expected) && !inv.times(toDecimal(n.rate)).minus(toDecimal("1")).abs().lt("0.0000000001")) {
+        throw new Error(`FX_INVERSE_CONFLICT:${key}<->${invKey}`);
+      }
+    }
+  }
+  for (const [pair, raw] of Object.entries(rates)) {
+    const n = normalizeRate(raw);
+    if (!n) continue;
+    const parts = pair.split("/");
+    if (parts.length !== 2 || !parts[0] || !parts[1]) {
+      throw new Error(`FX_PAIR_INVALID:${pair}`);
+    }
+    const [a, b] = parts;
+    // Only add inverse auto-edge if the inverse pair was not explicitly provided
+    const invExplicit = rates[`${b}/${a}`] != null;
     add(a, b, {
       rate: n.rate,
       asOf: n.asOf,
@@ -50,13 +83,15 @@ function buildGraph(rates, { asOf = null, allowStale = false } = {}) {
       isStale: n.isStale,
       inverted: false,
     });
-    add(b, a, {
-      rate: toDecimal("1").div(toDecimal(n.rate)).toFixed(),
-      asOf: n.asOf,
-      source: n.source,
-      isStale: n.isStale,
-      inverted: true,
-    });
+    if (!invExplicit) {
+      add(b, a, {
+        rate: toDecimal("1").div(toDecimal(n.rate)).toFixed(),
+        asOf: n.asOf,
+        source: n.source,
+        isStale: n.isStale,
+        inverted: true,
+      });
+    }
   }
   for (const [, list] of edges) list.sort((x, y) => x.to.localeCompare(y.to));
   return edges;

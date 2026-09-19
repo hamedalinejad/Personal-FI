@@ -158,3 +158,64 @@ test("omitted settlementDate and null settlementDate same identity", () => {
   const b = normalizeCommand({ ...base, settlementDate: null });
   assert.equal(computeCommandHash(a), computeCommandHash(b));
 });
+
+test("exchangeRateToBase 42000 == 42000.0 same economic hash", () => {
+  const base = {
+    operationId: "op-fx-canon",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "draft",
+    type: "test.op",
+  };
+  const lineA = {
+    accountId: "a1",
+    side: "debit",
+    amount: "1",
+    currency: "USD",
+    amountInBase: "42000",
+    exchangeRateToBase: "42000",
+  };
+  const lineB = {
+    accountId: "a1",
+    side: "debit",
+    amount: "1",
+    currency: "USD",
+    amountInBase: "42000.0",
+    exchangeRateToBase: "42000.0",
+  };
+  const credit = {
+    accountId: "a2",
+    side: "credit",
+    amount: "42000",
+    currency: "IRR",
+  };
+  const a = normalizeCommand({ ...base, journalLines: [lineA, credit] });
+  const b = normalizeCommand({ ...base, journalLines: [lineB, credit] });
+  assert.equal(a.journalLines[0].exchangeRateToBase, b.journalLines[0].exchangeRateToBase);
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("same-currency amount variants hash equal after canonicalize", () => {
+  const base = {
+    operationId: "op-amt-canon",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "draft",
+    type: "test.op",
+  };
+  const a = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100.00", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "100.0", currency: "IRR" },
+    ],
+  });
+  const b = normalizeCommand({
+    ...base,
+    journalLines: [
+      { accountId: "a1", side: "debit", amount: "100", currency: "IRR" },
+      { accountId: "a2", side: "credit", amount: "100", currency: "IRR" },
+    ],
+  });
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});

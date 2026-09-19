@@ -138,6 +138,12 @@ export function normalizeCommand(command) {
         conversionPath = "identity";
       }
     }
+    if (exchangeRateToBase != null && exchangeRateToBase !== "") {
+      exchangeRateToBase = canonicalDecimalString(String(exchangeRateToBase));
+    }
+    if (amountInBase != null && amountInBase !== "") {
+      amountInBase = canonicalDecimalString(String(amountInBase));
+    }
     return {
       accountId: line.accountId || line.account_id,
       side: line.side,
@@ -286,7 +292,7 @@ export async function runAtomicFinancialOperation(command) {
     }
 
     assertPostedHasJournal(norm.status, norm.journalLines);
-    runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates });
+    runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates, baseCurrency: norm.baseCurrency });
 
     const operationContext = Object.freeze({
       operationId: norm.operationId,
