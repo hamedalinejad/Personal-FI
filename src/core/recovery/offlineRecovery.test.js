@@ -52,7 +52,7 @@ test("P0-OFFLINE-002 recovery: post → backup → restore → load", async () =
   const bak = backupDatabase(dataDir, "crash");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-rec2-"));
-  restoreDatabase(dataDir2, bak);
+  await restoreDatabase(dataDir2, bak);
   const loaded = await loadOperation(opId, { dataDir: dataDir2, mode: "sqlite" });
   assert.equal(loaded.status, "posted");
   closeAllDbs();
@@ -114,7 +114,7 @@ test("P0-OFFLINE-002 loan+payment survive backup/restore", async () => {
   const bak = backupDatabase(dataDir, "loan");
   closeAllDbs();
   const dest = mkdtempSync(join(tmpdir(), "pf-loan-rs-"));
-  restoreDatabase(dest, bak);
+  await restoreDatabase(dest, bak);
   const db = openDb(dest);
   const loans = db.prepare(`SELECT * FROM ln_loans WHERE id = ?`).all(created.loanId);
   assert.equal(loans.length, 1);
@@ -152,7 +152,7 @@ test("P0-OFFLINE-002 import unknown field preservation roundtrip", async () => {
   const bak = backupDatabase(dataDir, "import");
   closeAllDbs();
   const dest = mkdtempSync(join(tmpdir(), "pf-imp2-"));
-  restoreDatabase(dest, bak);
+  await restoreDatabase(dest, bak);
   // sidecar may not be in sqlite backup — prove payload in sqlite if present
   const db2 = openDb(dest);
   try {

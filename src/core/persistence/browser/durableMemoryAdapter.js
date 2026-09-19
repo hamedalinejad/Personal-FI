@@ -26,8 +26,9 @@ export async function persistOperation(record, options = {}) {
   const dataDir = options.dataDir;
   if (dataDir && record?.operationId) {
     await durableCommit(dataDir, record.operationId, result);
+    nodeWorker.markOperationPersisted(dataDir, record.operationId);
   }
-  return { ...result, durable: true };
+  return { ...result, durability_state: "persisted", durable: true };
 }
 
 export function loadOperation(operationId, options = {}) {
@@ -39,6 +40,14 @@ async function durableCommit(dataDir, operationId, snapshot) {
   const path = join(dataDir, `.durable-${operationId}.json`);
   writeFileSync(path, JSON.stringify({ operationId, at: new Date().toISOString(), snapshot }), "utf8");
   durableMarkers.set(operationId, path);
+}
+
+export function markOperationPersisted(dataDir, operationId) {
+  return nodeWorker.markOperationPersisted(dataDir, operationId);
+}
+
+export function reconcileDurabilityState(dataDir) {
+  return nodeWorker.reconcileDurabilityState(dataDir);
 }
 
 export function isDurableAcked(dataDir, operationId) {

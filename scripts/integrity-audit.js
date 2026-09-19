@@ -13,6 +13,7 @@
 import { existsSync } from "fs";
 import { join } from "path";
 import { DatabaseSync } from "node:sqlite";
+import { validateOpenDatabase } from "../src/core/persistence/integrity.js";
 
 const dir = process.argv[2];
 if (!dir) {
@@ -26,6 +27,12 @@ if (!existsSync(dbPath)) {
 }
 const db = new DatabaseSync(dbPath);
 const findings = [];
+
+try {
+  validateOpenDatabase(db);
+} catch (e) {
+  findings.push(`core_integrity:${String(e?.message || e)}`);
+}
 
 try {
   const n = db.prepare(`
