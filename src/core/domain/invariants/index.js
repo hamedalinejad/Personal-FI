@@ -23,12 +23,23 @@ export function assertJournalBalanced(lines, opts = {}) {
   let debit = toDecimal("0");
   let credit = toDecimal("0");
   let currency = null;
+  const lineNumbers = new Set();
   for (const line of lines) {
     if (!line.side || (line.side !== "debit" && line.side !== "credit")) {
       throw new Error("INV_JOURNAL_SIDE_REQUIRED");
     }
     if (!line.currency || typeof line.currency !== "string") {
       throw new Error("INV_JOURNAL_CURRENCY_REQUIRED");
+    }
+    const lineNumber = line.line_number ?? line.lineNumber ?? null;
+    if (lineNumber != null) {
+      if (!Number.isInteger(lineNumber) || lineNumber < 1) {
+        throw new Error("INV_JOURNAL_LINE_NUMBER_INVALID");
+      }
+      if (lineNumbers.has(lineNumber)) {
+        throw new Error("INV_JOURNAL_LINE_NUMBER_DUPLICATE");
+      }
+      lineNumbers.add(lineNumber);
     }
     assertFiniteMoney(line.amount, "line.amount");
     const a = toDecimal(line.amount);
