@@ -190,3 +190,17 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | borrower / variable rate / day-count advanced | DEFERRED |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase 5 Investment Reporting (2026-09-19)
+
+| Item | Status |
+|------|--------|
+| investmentHoldings unified crypto/stocks/funds/metals | ✅ |
+| asOf price cutoff VALUATION_PRICE_AFTER_ASOF | ✅ |
+| cross-currency VALUATION_FX_MISSING | ✅ |
+| fund quoteType nav\|liquidation\|last only | ✅ |
+| metal purityBasis gross\|fine + per_mg\|per_g | ✅ |
+| Decimal totals | ✅ |
+| TWR/MWR/CA deferred | DEFERRED |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |
