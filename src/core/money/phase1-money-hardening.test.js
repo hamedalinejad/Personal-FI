@@ -311,3 +311,14 @@ test("money: 3/7 residual exact under Decimal", () => {
   const back = q.times(toDecimal("7"));
   assert.ok(toDecimal("3").minus(back).abs().lt(toDecimal("0.0000000001")));
 });
+
+test("money: scientific notation rejected at boundary", () => {
+  assert.throws(() => toDecimal("1e0"), /DECIMAL_SCIENTIFIC_NOTATION/);
+  assert.throws(() => toDecimal("4.2E4"), /DECIMAL_SCIENTIFIC_NOTATION/);
+  assert.throws(() => canonicalDecimalString("1e3"), /DECIMAL_SCIENTIFIC_NOTATION/);
+});
+
+test("money: leading zeros canonicalize to same value", () => {
+  assert.equal(canonicalDecimalString("01"), canonicalDecimalString("1"));
+  assert.equal(canonicalDecimalString("1.0"), canonicalDecimalString("1.00"));
+});

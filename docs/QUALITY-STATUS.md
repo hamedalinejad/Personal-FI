@@ -120,3 +120,23 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
 
+## Phase 1 Money/Accounting Foundation Closure (2026-09-19)
+
+| P1 item | Status |
+|---------|--------|
+| P1-01 exchangeRateToBase pre-hash canonical | ✅ |
+| P1-02 no \|\| true assertions | ✅ |
+| P1-03 no Number in financial tests | ✅ |
+| P1-04 sumDecimalStringsStrict (missing≠zero) | ✅ |
+| P1-05 fee conservation direction explicit | ✅ |
+| P1-06 quantity reduce_received_quantity canonical | ✅ |
+| P1-07 runInvariantGate receives baseCurrency | ✅ |
+| P1-08 currency/side/amount always required | ✅ |
+| P1-09 FX rate >0 vs interest ≥0 | ✅ |
+| P1-10 FX_PAIR_INVALID | ✅ |
+| P1-11 FX_INVERSE_CONFLICT | ✅ |
+| P1-12 historical multi-hop asOf family | ✅ expanded |
+| result_json not SoT + corruption tolerance | ✅ |
+| R-M06 IMPLEMENTED / proof PARTIAL | ✅ |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |

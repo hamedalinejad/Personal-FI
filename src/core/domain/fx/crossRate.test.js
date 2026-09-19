@@ -159,3 +159,64 @@ test("historical asOf rejects observation after asOf", () => {
     /MISSING_RATE|FX_OBSERVATION_AFTER_CUTOFF|FX_HISTORICAL_ASOF_REQUIRED/,
   );
 });
+
+
+test("malformed pair USD/IRR/BROKEN → FX_PAIR_INVALID", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "IRR",
+        rates: { "USD/IRR/BROKEN": "42000" },
+      }),
+    /FX_PAIR_INVALID/,
+  );
+});
+
+test("contradictory inverse rates → FX_INVERSE_CONFLICT", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "1",
+        from: "USD",
+        to: "IRR",
+        rates: {
+          "USD/IRR": "42000",
+          "IRR/USD": "0.000030",
+        },
+      }),
+    /FX_INVERSE_CONFLICT/,
+  );
+});
+
+test("multi-hop EUR→USD→IRR same asOf on all hops", () => {
+  const r = convertAmount({
+    amount: "10",
+    from: "EUR",
+    to: "IRR",
+    asOf: "2026-06-01",
+    rates: {
+      "EUR/USD": { rate: "1.1", asOf: "2026-06-01", source: "a" },
+      "USD/IRR": { rate: "42000", asOf: "2026-06-01", source: "b" },
+    },
+  });
+  assert.ok(r.amount);
+});
+
+test("multi-hop rejects hop observation after asOf", () => {
+  assert.throws(
+    () =>
+      convertAmount({
+        amount: "10",
+        from: "EUR",
+        to: "IRR",
+        asOf: "2026-01-01",
+        rates: {
+          "EUR/USD": { rate: "1.1", asOf: "2026-01-01", source: "a" },
+          "USD/IRR": { rate: "42000", asOf: "2026-06-01", source: "b" },
+        },
+      }),
+    /FX_|asOf|FUTURE|STALE|HISTORICAL|MISSING|OBS/i,
+  );
+});
