@@ -9,6 +9,7 @@ import { DatabaseSync } from "node:sqlite";
 import { assertJournalBalanced, assertPostedHasJournal } from "../domain/invariants/index.js";
 import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
 import { ensureSchemaSync } from "../db/migration.js";
+import { validateOpenDatabase } from "./integrity.js";
 
 const DEFAULT_DIR = join(process.cwd(), ".pf-data");
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -428,6 +429,72 @@ async function persistOperationJson(record, dir) {
   await writeFile(tempPath, JSON.stringify(body), "utf8");
   await rename(tempPath, finalPath);
   return body;
+}
+
+export function markOperationPersisted(dataDir, operationId) {
+  if (!dataDir) throw new Error("DURABILITY_DATA_DIR_REQUIRED");
+  if (!operationId || typeof operationId !== "string") throw new Error("DURABILITY_OPERATION_REQUIRED");
+  const db = openDb(dataDir);
+  const row = db
+    .prepare("SELECT id, durability_state FROM fin_operations WHERE id = ?")
+    .get(operationId);
+  if (!row) throw new Error("OP_NOT_FOUND");
+  if (row.durability_state === "persisted") {
+    return { operationId, durability_state: "persisted", changed: false };
+  }
+  if (row.durability_state !== "sql_committed") {
+    throw new Error(`DURABILITY_TRANSITION_INVALID:${row.durability_state}`);
+  }
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare(
+      "UPDATE fin_operations SET durability_state = 'persisted' WHERE id = ? AND durability_state = 'sql_committed'",
+    ).run(operationId);
+    db.prepare(
+      "INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, 'persisted')",
+    ).run(`durability.operation.${operationId}`);
+    db.prepare(
+      "INSERT OR REPLACE INTO db_meta(key, value) VALUES ('durability.last', 'persisted')",
+    ).run();
+    db.exec("COMMIT");
+    return { operationId, durability_state: "persisted", changed: true };
+  } catch (e) {
+    try { db.exec("ROLLBACK"); } catch { /* ignore */ }
+    throw e;
+  }
+}
+
+export function reconcileDurabilityState(dataDir) {
+  if (!dataDir) throw new Error("DURABILITY_DATA_DIR_REQUIRED");
+  const db = openDb(dataDir);
+  validateOpenDatabase(db);
+  const rows = db
+    .prepare(
+      "SELECT id FROM fin_operations WHERE durability_state = 'sql_committed' ORDER BY created_at, id",
+    )
+    .all();
+  if (!rows.length) return { promoted: [], count: 0 };
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    const promoted = [];
+    for (const row of rows) {
+      db.prepare(
+        "UPDATE fin_operations SET durability_state = 'persisted' WHERE id = ? AND durability_state = 'sql_committed'",
+      ).run(row.id);
+      db.prepare(
+        "INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, 'persisted')",
+      ).run(`durability.operation.${row.id}`);
+      promoted.push(row.id);
+    }
+    db.prepare(
+      "INSERT OR REPLACE INTO db_meta(key, value) VALUES ('durability.last', 'persisted')",
+    ).run();
+    db.exec("COMMIT");
+    return { promoted, count: promoted.length };
+  } catch (e) {
+    try { db.exec("ROLLBACK"); } catch { /* ignore */ }
+    throw e;
+  }
 }
 
 export async function loadOperation(operationId, options = {}) {
