@@ -87,3 +87,9 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - P2-01: posted journals force base-currency balance path
 - P2-02: payload economic decimal field canonicalization before hash
 - P2-03: equity_adjustment DEFERRED without allowEquityAdjustment; treatment required
+
+## Phase 2 P2-04..P2-09 (2026-09-19)
+
+- accountMeta includes role/status; cashFlow classifies by role only
+- ACCOUNT_CLOSED explicit; CANONICAL_ACCOUNT_KINDS / CANONICAL_CASH_ROLES
+- accounting-kernel.acceptance.test.js: journal, account, cashFlow, fee, idempotency

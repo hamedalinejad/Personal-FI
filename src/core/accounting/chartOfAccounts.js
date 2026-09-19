@@ -1,11 +1,28 @@
 import { toDecimal } from "../money/canonicalDecimal.js";
 import { openDb } from "../persistence/port.js";
 
+export const CANONICAL_ACCOUNT_KINDS = Object.freeze([
+  "asset",
+  "liability",
+  "equity",
+  "income",
+  "expense",
+]);
+
+/** Cash-role vocabulary for reports (owner: FINANCIAL-CORE / chartOfAccounts). */
+export const CANONICAL_CASH_ROLES = Object.freeze([
+  "cash",
+  "cash_box",
+  "checking",
+  "local_settlement_cash",
+]);
+
+
 export function ensureAccount(db, { id, name, accountKind, currency, systemRole = null }) {
   if (!id || !name || !accountKind || !currency) {
     throw new Error("ACCOUNT_INVALID");
   }
-  if (!["asset", "liability", "equity", "income", "expense"].includes(accountKind)) {
+  if (!CANONICAL_ACCOUNT_KINDS.includes(accountKind)) {
     throw new Error("ACCOUNT_INVALID");
   }
   const existing = db.prepare(`SELECT id, currency FROM fin_accounts WHERE id = ?`).get(id);
@@ -25,7 +42,7 @@ export function getAccount(db, id) {
   const row = db.prepare(`SELECT * FROM fin_accounts WHERE id = ?`).get(id);
   if (!row) throw new Error("ACCOUNT_NOT_FOUND");
   if (row.is_archived === 1 || row.status === "closed") {
-    throw new Error("ACCOUNT_INVALID");
+    throw new Error("ACCOUNT_CLOSED");
   }
   return row;
 }

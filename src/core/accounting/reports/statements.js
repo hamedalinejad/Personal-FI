@@ -103,7 +103,7 @@ export function accountActivity(dataDir, accountId, opts = {}) {
 }
 
 function accountMeta(db, accountId) {
-  return db.prepare(`SELECT id, account_kind, currency, name FROM fin_accounts WHERE id = ?`).get(accountId);
+  return db.prepare(`SELECT id, account_kind, currency, name, role, status, is_archived FROM fin_accounts WHERE id = ?`).get(accountId);
 }
 
 /**
@@ -204,15 +204,15 @@ export function cashFlow(dataDir, { fromDate = null, toDate = null } = {}) {
   const details = [];
   for (const row of lines) {
     const meta = accountMeta(db, row.accountId);
-    // canonical cash selector — role/systemRole, not substring on id
+    // canonical cash selector — account.role only (contract: cash|cash_box|checking|settlement*)
+    const role = meta?.role || "";
     const isCash =
       meta &&
-      (meta.role === "cash_box" ||
-        meta.role === "checking" ||
-        meta.role === "cash" ||
-        (meta.role && String(meta.role).includes("settlement")) ||
-        row.accountId === "local_settlement_cash" ||
-        (typeof row.accountId === "string" && row.accountId.startsWith("local_settlement_cash")));
+      (role === "cash_box" ||
+        role === "checking" ||
+        role === "cash" ||
+        role === "local_settlement_cash" ||
+        (typeof role === "string" && role.includes("settlement")));
     if (!isCash) {
       continue;
     }

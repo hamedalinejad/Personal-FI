@@ -338,3 +338,4 @@ src/core/domain/invariants/journal-matrix.test.js	E	test	keep
 src/core/persistence/result-json-not-sot.test.js	E	test	keep
 src/features/loan/tests/carry-over-contract.test.js	E	test	keep
 .npmrc	E	impl	keep
+src/core/acceptance/accounting-kernel.acceptance.test.js	E	test	keep
