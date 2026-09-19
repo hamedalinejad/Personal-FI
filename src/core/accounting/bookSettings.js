@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import { openDb } from "../persistence/port.js";
-import { Decimal, canonicalDecimalString, toDecimal } from "../money/canonicalDecimal.js";
+import { canonicalDecimalString, toDecimal } from "../money/canonicalDecimal.js";
 
 /** Product default for local-first Iran book when db_meta not yet set. */
 export const DEFAULT_BOOK_BASE_CURRENCY = "IRR";
