@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-18",
+  "updated": "2026-09-19",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
@@ -168,5 +168,15 @@
       "funds-only",
       "metals-only"
     ]
+  },
+  "phase_progress": {
+    "phase0": "implemented_freeze_unproven",
+    "phase1": "implemented_rm07_partial",
+    "phase2": "verified_on_main",
+    "phase3": "verified_on_main_browser_e2e_open",
+    "phase4": "implemented_local_acceptance_green",
+    "phase5": "implemented_local_acceptance_green",
+    "phase6": "implemented_local_acceptance_green",
+    "note": "Branch-based audit snapshots (Run 400 / phase6 blueprint) are superseded by main linear history through a87a9ef+"
   }
 }
