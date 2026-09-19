@@ -31,3 +31,13 @@ export async function persistOperation(record, options = {}) {
 export function loadOperation(operationId, options = {}) {
   return adapter.loadOperation(operationId, options);
 }
+
+export function markOperationPersisted(dataDir, operationId) {
+  if (!adapter.markOperationPersisted) throw new Error("PERSISTENCE_ACK_UNSUPPORTED");
+  return adapter.markOperationPersisted(dataDir, operationId);
+}
+
+export function reconcileDurabilityState(dataDir) {
+  if (!adapter.reconcileDurabilityState) throw new Error("PERSISTENCE_RECOVERY_UNSUPPORTED");
+  return adapter.reconcileDurabilityState(dataDir);
+}
