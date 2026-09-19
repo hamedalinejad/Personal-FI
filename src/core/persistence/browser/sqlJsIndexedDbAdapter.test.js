@@ -50,7 +50,7 @@ test("P0-OFFLINE-001 atomic persist + durable ACK + backup/restore reopen", asyn
   const bak = backupDatabase(dataDir, "t1");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-br2-"));
-  restoreDatabase(dataDir2, bak);
+  await restoreDatabase(dataDir2, bak);
   const loaded = await loadOperation(opId, { dataDir: dataDir2, mode: "sqlite" });
   assert.equal(loaded.operationId, opId);
   assert.equal(loaded.status, "posted");
