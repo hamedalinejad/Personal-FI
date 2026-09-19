@@ -220,3 +220,10 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | parallel cash ledger | forbidden |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase pack INDEX (2026-09-19)
+
+Canonical phase-pack status table lives in `docs/phase-pack/INDEX.md`.
+Synced HEAD at write: `27b465c`.
+Phases 0–6: implemented with local acceptance green where applicable.
+FREEZE_PROVEN = false · RELEASE_PROVEN = false · PRODUCTION = NO-GO.
