@@ -84,6 +84,14 @@ export async function restoreDatabase(dataDir, backupFile) {
   return dbPath(dataDir);
 }
 
+export function markOperationPersisted(dataDir, operationId) {
+  return nodeWorker.markOperationPersisted(dataDir, operationId);
+}
+
+export function reconcileDurabilityState(dataDir) {
+  return nodeWorker.reconcileDurabilityState(dataDir);
+}
+
 export function isDurableAcked(dataDir, operationId) {
   return existsSync(join(dataDir, `.durable-${operationId}.json`));
 }
