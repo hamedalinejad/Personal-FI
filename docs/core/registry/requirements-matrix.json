@@ -30,16 +30,16 @@
     {
       "id": "R-M03",
       "title": "Full field preservation matrix",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "define": [
         "docs/core/field-inventory.checklist.tsv",
         "docs/DATA-MODEL.md"
       ],
       "owner": "docs/DATA-MODEL.md",
-      "closure_note": "412 rows exist; many lack canonicalField/kind/exact persistence — gate strengthening in progress",
-      "evidence": "field-preservation-matrix + field-preservation-check.js",
+      "closure_note": "492 rows; stored==persistence enforced; DEFERRED reason+owner; gate regression tests present. FREEZE still needs conditional contract parity proof.",
+      "evidence": "field-preservation-matrix.json + field-preservation-check.js + field-preservation-check.test.js",
       "contract": "LOCKED",
-      "implementation": "PARTIAL",
+      "implementation": "IMPLEMENTED",
       "proof": "PARTIAL"
     },
     {
@@ -70,17 +70,17 @@
     {
       "id": "R-M06",
       "title": "Money and unit canonicalization table",
-      "status": "SPEC_LOCKED",
+      "status": "IMPLEMENTED",
       "define": [
         "docs/FINANCIAL-CORE.md",
         "src/core/money/canonicalDecimal.js"
       ],
       "owner": "docs/FINANCIAL-CORE.md",
-      "closure_note": "unit policy table",
-      "evidence": "FINANCIAL-CORE money/units section",
+      "closure_note": "canonicalDecimal string-only; phase1 hardening; hash canonicalizes amount/amountInBase/exchangeRateToBase. Notation 1e0 not accepted unless policy expands.",
+      "evidence": "canonicalDecimal.js + phase1-money-hardening.test.js + economicHash.test.js",
       "contract": "LOCKED",
-      "implementation": "NOT_IMPLEMENTED",
-      "proof": "UNPROVEN"
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
     },
     {
       "id": "R-M07",
@@ -90,7 +90,7 @@
         "docs/FINANCIAL-CORE.md"
       ],
       "owner": "docs/FINANCIAL-CORE.md",
-      "closure_note": "crossRate multi-hop present; full historical golden family still open for FREEZE",
+      "closure_note": "multi-hop + stale + asOf + pair invalid + inverse conflict; full multi-hop historical golden family still open for FREEZE",
       "evidence": "crossRate.js multi-hop + stale reject/allow + goldens",
       "contract": "LOCKED",
       "implementation": "PARTIAL",

@@ -2387,7 +2387,18 @@
           {
             "name": "method",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "declining_balance",
+              "flat_rate",
+              "qarz_al_hasaneh",
+              "bullet"
+            ],
+            "aliases": {
+              "flat": "flat_rate",
+              "qarz": "qarz_al_hasaneh"
+            },
+            "note": "Canonical: declining_balance|flat_rate|qarz_al_hasaneh|bullet; aliases flat→flat_rate, qarz→qarz_al_hasaneh"
           },
           {
             "name": "startDate",
@@ -2408,7 +2419,20 @@
           {
             "name": "installmentFrequency",
             "required": false,
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "monthly",
+              "weekly",
+              "quarterly",
+              "annual"
+            ],
+            "aliases": {
+              "month": "monthly",
+              "year": "annual",
+              "quarter": "quarterly",
+              "week": "weekly"
+            },
+            "note": "Default monthly when omitted; aliases normalized at command boundary"
           },
           {
             "name": "businessDate",
@@ -2429,9 +2453,13 @@
           },
           {
             "name": "originationKind",
-            "required": false,
+            "required": true,
             "type": "string",
-            "note": "disburse_now (default) | record_outstanding; economicMode is legacy alias"
+            "note": "Required; economicMode is legacy alias of originationKind",
+            "enum": [
+              "disburse_now",
+              "record_outstanding"
+            ]
           }
         ],
         "validation": [
@@ -2480,7 +2508,14 @@
         "maturity": "strongest",
         "requiredness": {
           "operationId": "required",
-          "businessDate": "required"
+          "businessDate": "required",
+          "method": "required",
+          "originationKind": "required",
+          "principal": "required",
+          "currency": "required",
+          "annualRate": "required",
+          "periods": "required",
+          "startDate": "required"
         },
         "normalization": [
           "decimal-string money/qty/rate/price",
@@ -2531,10 +2566,14 @@
             "field": "method",
             "values": [
               "declining_balance",
-              "flat",
-              "qarz",
+              "flat_rate",
+              "qarz_al_hasaneh",
               "bullet"
             ],
+            "aliases": {
+              "flat": "flat_rate",
+              "qarz": "qarz_al_hasaneh"
+            },
             "required": true,
             "error": "LOAN_METHOD_INVALID"
           },
@@ -2572,10 +2611,14 @@
           "field": "method",
           "values": [
             "declining_balance",
-            "flat",
-            "qarz",
+            "flat_rate",
+            "qarz_al_hasaneh",
             "bullet"
           ],
+          "aliases": {
+            "flat": "flat_rate",
+            "qarz": "qarz_al_hasaneh"
+          },
           "required": true,
           "error": "LOAN_METHOD_INVALID"
         },

@@ -46,6 +46,11 @@ export async function createLoan(
   if (p.annualRate == null || p.annualRate === "") throw new Error("LOAN_RATE_REQUIRED");
   if (!p.periods) throw new Error("LOAN_PERIODS_REQUIRED");
   if (!p.method) throw new Error("LOAN_METHOD_REQUIRED");
+  const METHOD_ALIASES = { flat: "flat_rate", qarz: "qarz_al_hasaneh" };
+  const methodCanon = METHOD_ALIASES[p.method] || p.method;
+  if (!["declining_balance", "flat_rate", "qarz_al_hasaneh", "bullet"].includes(methodCanon)) {
+    throw new Error("LOAN_METHOD_INVALID");
+  }
   if (!p.startDate) throw new Error("LOAN_START_DATE_REQUIRED");
   if (!p.businessDate) throw new Error("OP_BUSINESS_DATE_REQUIRED");
   if (!p.dayCount) throw new Error("LOAN_DAY_COUNT_REQUIRED");
@@ -55,7 +60,12 @@ export async function createLoan(
   if (!["disburse_now", "record_outstanding"].includes(originationKind)) {
     throw new Error("LOAN_ORIGINATION_KIND_UNSUPPORTED");
   }
-  const freq = p.installmentFrequency || p.frequency || "monthly";
+  const FREQ_ALIASES = { month: "monthly", year: "annual", quarter: "quarterly", week: "weekly" };
+  const freqRaw = p.installmentFrequency || p.frequency || "monthly";
+  const freq = FREQ_ALIASES[freqRaw] || freqRaw;
+  if (!["monthly", "weekly", "quarterly", "annual"].includes(freq)) {
+    throw new Error("LOAN_FREQUENCY_INVALID");
+  }
   if (!["monthly", "weekly", "quarterly", "annual", "yearly"].includes(freq)) {
     throw new Error("LOAN_FREQUENCY_UNSUPPORTED");
   }
@@ -75,7 +85,7 @@ export async function createLoan(
 
 
   const schedule = generateSchedule({
-    method: p.method,
+    method: methodCanon,
     principal: p.principal,
     annualRate: p.annualRate,
     periods: p.periods,
@@ -152,7 +162,7 @@ export async function createLoan(
     journalLines,
     domainResult: {
       schedule: snapshot,
-      loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: p.method },
+      loan: { id: loanId, principal: p.principal, startDate: p.startDate, method: methodCanon },
     },
     engineVersions: { loanSchedule: engineVersion, money: "1.0.0" },
     withinTransaction(db) {
@@ -179,7 +189,7 @@ export async function createLoan(
       ).run(
         loanId,
         role,
-        p.method,
+        methodCanon,
         p.principal,
         currency,
         p.annualRate,

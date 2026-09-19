@@ -334,3 +334,5 @@ src/core/acceptance/bug-f-semantic.acceptance.test.js	E	test	keep
 scripts/command-constraints-check.js	E	script	keep
 src/core/money/phase1-money-hardening.test.js	E	test	keep
 scripts/field-preservation-check.test.js	E	test	keep
+src/core/domain/invariants/journal-matrix.test.js	E	test	keep
+src/core/persistence/result-json-not-sot.test.js	E	test	keep

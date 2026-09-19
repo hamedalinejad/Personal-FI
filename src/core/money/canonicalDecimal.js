@@ -15,6 +15,10 @@ export function canonicalDecimalString(input) {
   if (/^nan$/i.test(s) || /^[-+]?infinity$/i.test(s)) {
     throw new Error("DECIMAL_NON_FINITE");
   }
+  // Scientific notation not in v1 money vocabulary (hash stability / no ambiguity)
+  if (/[eE]/.test(s)) {
+    throw new Error("DECIMAL_SCIENTIFIC_NOTATION");
+  }
   let d;
   try {
     d = new Decimal(s);

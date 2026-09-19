@@ -61,3 +61,13 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - P1-08: journal currency+side required on every line
 - P1-09: FX rates strictly positive in gate; interest may be non-negative
 - P1-10/11: `FX_PAIR_INVALID` + `FX_INVERSE_CONFLICT`
+
+## Phase 0/1 closure reflection (2026-09-19)
+
+- R-M03 / R-M06 → IMPLEMENTED (proof PARTIAL until freeze)
+- R-M07 remains PARTIAL (historical multi-hop golden family)
+- Loan method vocabulary: flat_rate / qarz_al_hasaneh (+ aliases flat/qarz)
+- Constraint checker: field-reference + requiredness parity + pricingMode schema
+- Journal matrix tests; result_json corruption → relational SoT still loads
+- Scientific notation rejected at money boundary
+- Production = NO-GO · FREEZE_PROVEN = false · SEMANTIC_CODING_READY = true

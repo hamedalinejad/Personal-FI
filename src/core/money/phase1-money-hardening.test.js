@@ -286,3 +286,28 @@ test("money: sumDecimalStringsStrict rejects missing", () => {
   assert.throws(() => sumDecimalStringsStrict(["1", "", "2"]), /SUM_DECIMAL_MISSING/);
   assert.equal(sumDecimalStringsStrict(["1.5", "2.5"]), "4");
 });
+
+test("money: canonical forms 1 / 1.0 / 1.00 / 01", () => {
+  assert.equal(canonicalDecimalString("1"), "1");
+  assert.equal(canonicalDecimalString("1.0"), "1");
+  assert.equal(canonicalDecimalString("1.00"), "1");
+  assert.equal(canonicalDecimalString("01"), "1");
+});
+
+test("money: scientific notation rejected unless policy expands", () => {
+  assert.throws(() => canonicalDecimalString("1e0"), /DECIMAL/);
+  assert.throws(() => canonicalDecimalString("1E3"), /DECIMAL/);
+});
+
+test("money: missing values reject at boundary", () => {
+  assert.throws(() => canonicalDecimalString(null), /DECIMAL/);
+  assert.throws(() => canonicalDecimalString(undefined), /DECIMAL/);
+  assert.throws(() => canonicalDecimalString(""), /DECIMAL/);
+  assert.throws(() => canonicalDecimalString("   "), /DECIMAL/);
+});
+
+test("money: 3/7 residual exact under Decimal", () => {
+  const q = toDecimal("3").div(toDecimal("7"));
+  const back = q.times(toDecimal("7"));
+  assert.ok(toDecimal("3").minus(back).abs().lt(toDecimal("0.0000000001")));
+});
