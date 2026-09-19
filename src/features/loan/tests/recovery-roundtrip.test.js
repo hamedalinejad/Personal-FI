@@ -36,7 +36,7 @@ test("loan recovery: create → backup → restore → loan still readable", asy
   const bak = backupDatabase(dataDir, "loan");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-loan-rec2-"));
-  restoreDatabase(dataDir2, bak);
+  await restoreDatabase(dataDir2, bak);
   const loan = getLoanById(dataDir2, loanId);
   assert.ok(loan);
   assert.equal(String(loan.principal), "1200");
