@@ -57,3 +57,4 @@ Combined on current main: **17/17 pass**.
 ## Rule
 
 Update this table only when a phase commit lands on `main` or a proof status changes. Do not invent RELEASE-PROVEN from local tests alone.
+| AUDIT-RESPONSE-2026-09-19.md | pack | stale-audit rebuttal | 17/17 local | — | (see git log) |
