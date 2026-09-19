@@ -103,6 +103,7 @@ node --test src/features/accounts/tests/phase6-core-finance.test.js
 - `PHASE-PACK-METADATA.md` ← جدول commit/CI/state فشرده
 - `AUDIT-RESPONSE-2026-09-19.md` ← پاسخ به ممیزی خارجی کهنه (P4/P5/P6)
 - `BACKLOG-DISPOSITION-2026-09-19.md` ← نگاشت BUG/INT/PH6/R-M به وضعیت live main
+- `THINK-TANK-SYNTHESIS-2026-09-19.md` ← جمع‌بندی اتاق فکر تا این نقطه
 - مشخصات اجرایی فازها در conversation/attachments نگهداری شده‌اند؛ authority نهایی = owner docs + registry + code
 - جزئیات وضعیت هر فاز در `docs/QUALITY-STATUS.md` منعکس شده است
 
