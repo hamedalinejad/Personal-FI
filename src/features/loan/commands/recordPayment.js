@@ -40,12 +40,10 @@ function computeOutstanding(db, loanId, loan, asOfDate = null) {
     schedPrin = toDecimal(loan.principal);
   }
 
-  const priorTx = db
-    .prepare(
-      `SELECT tx_type, principal_portion, interest_portion, fee_portion, penalty_portion
-       FROM ln_transactions WHERE loan_id = ? AND tx_type IN ('payment','reversal')`,
-    )
-    .all(loanId);
+  const priorTxSql = `SELECT tx_type, business_date, principal_portion, interest_portion, fee_portion, penalty_portion
+       FROM ln_transactions WHERE loan_id = ? AND tx_type IN ('payment','reversal')${asOfDate ? " AND business_date <= ?" : ""}`;
+  const priorTxParams = asOfDate ? [loanId, asOfDate] : [loanId];
+  const priorTx = db.prepare(priorTxSql).all(...priorTxParams);
 
   let paidPrin = toDecimal("0");
   let paidInt = toDecimal("0");
@@ -186,6 +184,21 @@ export async function recordPayment(
         allocation.fee,
         allocation.penalty,
       );
+
+      // Close only when the complete outstanding balance reaches zero after this payment.
+      const remainingAfterPayment = computeOutstanding(
+        db2,
+        p.loanId,
+        loan2,
+        p.paymentDate || p.businessDate,
+      );
+      const fullySettled =
+        ["principal", "interest", "fee", "penalty"].every((field) => toDecimal(remainingAfterPayment[field] || "0").eq(0));
+      if (fullySettled) {
+        db2.prepare(
+          `UPDATE ln_loans SET status = 'paid_off', updated_at = ? WHERE id = ? AND status = 'active'`,
+        ).run(now, p.loanId);
+      }
     },
   });
 }

@@ -141,6 +141,10 @@ export async function reversePayment(
         toDecimal(origTx.penalty_portion || "0").times("-1").toFixed(),
         origTx.id,
       );
+      // Reversing a settlement payment reopens a previously closed loan.
+      db2.prepare(
+        `UPDATE ln_loans SET status = 'active', updated_at = ? WHERE id = ? AND status = 'paid_off'`,
+      ).run(now, origTx.loan_id);
     },
   });
 }
