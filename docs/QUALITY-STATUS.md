@@ -176,3 +176,17 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | Browser RELEASE E2E | OPEN |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase 4 Loan Reference (2026-09-19)
+
+| Item | Status |
+|------|--------|
+| as-of installments + transactions filter | ✅ |
+| outstanding signed-portion (no double flip) | ✅ |
+| full settlement → paid_off (all components zero) | ✅ |
+| reverse → paid_off reopens active | ✅ |
+| statement paidPrincipal reversal-aware | ✅ |
+| as-of-close acceptance tests | ✅ |
+| borrower / variable rate / day-count advanced | DEFERRED |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |

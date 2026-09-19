@@ -6,8 +6,10 @@ import { openDb } from "../../../core/persistence/port.js";
 import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
 /**
- * Loan statement read-model: loan + schedule + txs + fees + linked operations.
- * Not a substitute for GL; accounting lines remain in journal.
+ * Loan statement read-model.
+ * Contract: payment portions are non-negative; reversal portions are stored signed (negative).
+ * paidPrincipal / paidInterest = sum(portions) — never flip sign again for tx_type=reversal.
+ * Journal remains accounting SoT.
  */
 export function getStatement(loanId, { dataDir, asOf = null, limit = 500 } = {}) {
   const loan = getLoanById(dataDir, loanId);
@@ -24,16 +26,27 @@ export function getStatement(loanId, { dataDir, asOf = null, limit = 500 } = {})
   const opIds = [...new Set(transactions.map((t) => t.operation_id).filter(Boolean))];
   const operations = [];
   for (const id of opIds) {
-    const op = db.prepare(`SELECT id, operation_type, status, business_date, base_currency, posted_at FROM fin_operations WHERE id = ?`).get(id);
+    const op = db
+      .prepare(
+        `SELECT id, operation_type, status, business_date, base_currency, posted_at, reverses_operation_id
+         FROM fin_operations WHERE id = ?`,
+      )
+      .get(id);
     if (op) operations.push(op);
   }
 
-  // Simple balance from loan + payment portions (domain; journal remains SoT)
-  const paidPrincipal = transactions
-    .filter((t) => t.tx_type === "payment")
-    .reduce((s, t) => s.plus(toDecimal(String(t.principal_portion || "0"))), toDecimal("0")).toFixed();
-  // Use string decimal path in future — Number only for display summary warning
-  // Prefer recompute via toDecimal in next iteration
+  let paidPrincipal = toDecimal("0");
+  let paidInterest = toDecimal("0");
+  let paidFee = toDecimal("0");
+  let paidPenalty = toDecimal("0");
+  for (const t of transactions) {
+    if (t.tx_type !== "payment" && t.tx_type !== "reversal") continue;
+    // signed storage: add as stored (reversal already negative)
+    paidPrincipal = paidPrincipal.plus(toDecimal(String(t.principal_portion || "0")));
+    paidInterest = paidInterest.plus(toDecimal(String(t.interest_portion || "0")));
+    paidFee = paidFee.plus(toDecimal(String(t.fee_portion || "0")));
+    paidPenalty = paidPenalty.plus(toDecimal(String(t.penalty_portion || "0")));
+  }
 
   return {
     asOf: asOf || null,
@@ -49,6 +62,10 @@ export function getStatement(loanId, { dataDir, asOf = null, limit = 500 } = {})
       feeCount: fees.length,
       paymentCount: transactions.filter((t) => t.tx_type === "payment").length,
       reversalCount: transactions.filter((t) => t.tx_type === "reversal").length,
+      paidPrincipal: paidPrincipal.toFixed(),
+      paidInterest: paidInterest.toFixed(),
+      paidFee: paidFee.toFixed(),
+      paidPenalty: paidPenalty.toFixed(),
     },
   };
 }

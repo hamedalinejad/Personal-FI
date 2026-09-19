@@ -141,6 +141,11 @@ export async function reversePayment(
         toDecimal(origTx.penalty_portion || "0").times("-1").toFixed(),
         origTx.id,
       );
+      // If this payment closed the loan, re-open
+      const loanRow = db2.prepare(`SELECT status FROM ln_loans WHERE id = ?`).get(origTx.loan_id);
+      if (loanRow && loanRow.status === "paid_off") {
+        db2.prepare(`UPDATE ln_loans SET status = 'active', updated_at = ? WHERE id = ?`).run(now, origTx.loan_id);
+      }
     },
   });
 }

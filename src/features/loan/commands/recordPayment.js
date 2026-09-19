@@ -40,19 +40,22 @@ function computeOutstanding(db, loanId, loan, asOfDate = null) {
     schedPrin = toDecimal(loan.principal);
   }
 
-  const priorTx = db
-    .prepare(
-      `SELECT tx_type, principal_portion, interest_portion, fee_portion, penalty_portion
-       FROM ln_transactions WHERE loan_id = ? AND tx_type IN ('payment','reversal')`,
-    )
-    .all(loanId);
+  // Contract: payment portions >= 0; reversal portions are stored signed (negative).
+  // Always ADD portions — never apply a second sign flip for tx_type=reversal.
+  let priorSql = `SELECT tx_type, principal_portion, interest_portion, fee_portion, penalty_portion, business_date
+       FROM ln_transactions WHERE loan_id = ? AND tx_type IN ('payment','reversal')`;
+  const priorParams = [loanId];
+  if (asOfDate) {
+    priorSql += ` AND business_date <= ?`;
+    priorParams.push(asOfDate);
+  }
+  const priorTx = db.prepare(priorSql).all(...priorParams);
 
   let paidPrin = toDecimal("0");
   let paidInt = toDecimal("0");
   for (const row of priorTx) {
-    const sign = row.tx_type === "reversal" ? toDecimal("-1") : toDecimal("1");
-    paidPrin = paidPrin.plus(toDecimal(row.principal_portion || "0").times(sign));
-    paidInt = paidInt.plus(toDecimal(row.interest_portion || "0").times(sign));
+    paidPrin = paidPrin.plus(toDecimal(row.principal_portion || "0"));
+    paidInt = paidInt.plus(toDecimal(row.interest_portion || "0"));
   }
 
   let feeDue = toDecimal("0");
@@ -186,6 +189,21 @@ export async function recordPayment(
         allocation.fee,
         allocation.penalty,
       );
+
+      // Full settlement: all remaining components zero → paid_off
+      const after = computeOutstanding(db2, p.loanId, loan2, p.paymentDate || p.businessDate);
+      const allZero =
+        toDecimal(after.principal).isZero() &&
+        toDecimal(after.interest).isZero() &&
+        toDecimal(after.fee).isZero() &&
+        toDecimal(after.penalty).isZero();
+      if (allZero) {
+        db2.prepare(`UPDATE ln_loans SET status = 'paid_off', updated_at = ? WHERE id = ?`).run(now, p.loanId);
+      }
     },
   });
 }
+
+/** Exported for statement / tests — same signed-portion contract. */
+export { computeOutstanding };
+
