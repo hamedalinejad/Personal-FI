@@ -3,7 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { runInvariantGate, assertPostedHasJournal } from "../invariants/index.js";
 import { canonicalDecimalString } from "../../money/canonicalDecimal.js";
-import { persistOperation, loadOperation } from "../../persistence/port.js";
+import { persistOperation, loadOperation, openDb } from "../../persistence/port.js";
+import { assertReversalAllowed, buildInverseJournalLines } from "./reversal.js";
 
 /**
  * invariant: optional undefined fields are OMITTED (never serialized as null unless caller set null).
@@ -79,7 +80,7 @@ export function buildEconomicIdentity(norm) {
     const kb = `${b.accountId}|${b.side}|${b.currency}|${b.amount}|${b.lineKind || ""}`;
     return ka < kb ? -1 : ka > kb ? 1 : 0;
   });
-  return {
+  const identity = {
     operationType: norm.type,
     payload: norm.payload ?? null,
     journalLines: lines,
@@ -91,6 +92,8 @@ export function buildEconomicIdentity(norm) {
     rates: norm.rates ?? null,
     engineSemanticVersion: norm.engineVersions?.semantic || norm.engineVersions || null,
   };
+  if (norm.reversesOperationId) identity.reversesOperationId = norm.reversesOperationId;
+  return identity;
 }
 
 export function computeCommandHash(norm) {
@@ -244,6 +247,7 @@ export function normalizeCommand(command) {
     persistMode: command.persistMode || "sqlite",
     withinTransaction: command.withinTransaction,
     prepareDomain: command.prepareDomain || command.applyDomain,
+    reversesOperationId: command.reversesOperationId ?? command.reverses_operation_id ?? null,
     clientCommandHash: command.commandHash ?? null,
   };
 }
@@ -395,6 +399,7 @@ export async function runAtomicFinancialOperation(command) {
       settlementDate: norm.settlementDate ?? null,
       eventAt: norm.eventAt ?? null,
       provenance: norm.provenance ?? null,
+      reversesOperationId: norm.reversesOperationId ?? null,
       withinTransaction: norm.withinTransaction,
     };
 
@@ -418,6 +423,72 @@ export async function runAtomicFinancialOperation(command) {
       await saveIdempotency(dataDir, idMap);
     }
     return result;
+  });
+}
+
+/**
+ * Reverse a posted Core operation using a new immutable operation.
+ * Domain-specific subledger reversal is intentionally supplied by caller via withinTransaction.
+ */
+export async function reverseOperation({
+  originalOperationId,
+  reversalOperationId,
+  businessDate = null,
+  dataDir,
+  sourceChannel = "system",
+  sourceType = "correction",
+  sourceReference = null,
+  payload = {},
+  withinTransaction = null,
+  engineVersions = null,
+} = {}) {
+  if (!originalOperationId || typeof originalOperationId !== "string") {
+    throw new Error("REVERSAL_ORIGINAL_REQUIRED");
+  }
+  if (!reversalOperationId || typeof reversalOperationId !== "string") {
+    throw new Error("REVERSAL_OPERATION_REQUIRED");
+  }
+  if (originalOperationId === reversalOperationId) {
+    throw new Error("REVERSAL_OPERATION_ID_MUST_DIFFER");
+  }
+  if (!dataDir) throw new Error("REVERSAL_DATA_DIR_REQUIRED");
+
+  const original = await loadOperation(originalOperationId, { dataDir, mode: "sqlite" });
+  assertReversalAllowed(original);
+
+  const db = openDb(dataDir);
+  const existing = db
+    .prepare("SELECT id FROM fin_operations WHERE reverses_operation_id = ? LIMIT 1")
+    .get(originalOperationId);
+  if (existing && existing.id !== reversalOperationId) {
+    throw new Error("REVERSAL_ALREADY_EXISTS");
+  }
+
+  const inverseJournal = buildInverseJournalLines(original.journalLines);
+  const effectiveBusinessDate = businessDate || original.businessDate;
+  const effectiveEngineVersions = engineVersions || original.engineVersions || { semantic: "core-reversal-1.0.0" };
+  const reversalPayload = {
+    ...payload,
+    originalOperationId,
+    reversalKind: "full",
+  };
+
+  return runAtomicFinancialOperation({
+    operationId: reversalOperationId,
+    type: "core.reverse",
+    status: "posted",
+    businessDate: effectiveBusinessDate,
+    baseCurrency: original.baseCurrency,
+    dataDir,
+    persistMode: "sqlite",
+    sourceChannel,
+    sourceType,
+    sourceReference,
+    payload: reversalPayload,
+    journalLines: inverseJournal,
+    reversesOperationId: originalOperationId,
+    engineVersions: effectiveEngineVersions,
+    withinTransaction,
   });
 }
 
