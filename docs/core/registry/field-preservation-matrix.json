@@ -5800,9 +5800,9 @@
     {
       "commandId": "loan.create",
       "field": "originationKind",
-      "required": false,
+      "required": true,
       "accepted": true,
-      "stored": "ln_transactions.origination_kind",
+      "stored": "ln_loans.origination_kind",
       "derived": false,
       "returned": true,
       "exported": true,
@@ -5810,18 +5810,19 @@
       "migrated": true,
       "owner": "docs/modules/loan.md",
       "protected": true,
-      "disposition": "DERIVED",
+      "disposition": "PERSISTED",
       "canonicalField": "originationKind",
       "kind": "RAW",
       "persistence": {
-        "mode": "DERIVED",
-        "note": "was ln_transactions.origination_kind"
+        "table": "ln_loans",
+        "column": "origination_kind",
+        "mode": "COLUMN"
       },
       "resultPath": "result.originationKind",
       "exportPath": "export.loan.create.originationKind",
       "reversal": "inverse operation; original field retained on original op",
       "migration": "direct",
-      "nullable": true
+      "nullable": false
     },
     {
       "commandId": "loan.create",
@@ -12455,7 +12456,7 @@
     {
       "commandId": "loan.create",
       "field": "dayCount",
-      "required": false,
+      "required": true,
       "accepted": true,
       "stored": "ln_loans.day_count",
       "derived": false,
@@ -12474,7 +12475,7 @@
       },
       "nullable": true,
       "entryClass": "CANONICAL",
-      "note": "auto-seeded for catalog parity; refine persistence target in closure"
+      "note": "canonical required loan dayCount; persisted on ln_loans.day_count"
     },
     {
       "commandId": "loan.create",

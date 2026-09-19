@@ -16,7 +16,7 @@ export function buildInverseJournalLines(originalLines) {
       throw new Error("REVERSAL_LINE_SIDE");
     }
     const side = line.side === "debit" ? "credit" : "debit";
-    const amount = canonicalDecimalString(String(line.amount));
+    const amount = canonicalDecimalString(line.amount);
     const out = {
       accountId: line.accountId || line.account_id,
       side,
@@ -28,11 +28,11 @@ export function buildInverseJournalLines(originalLines) {
       memo: line.memo ? `reversal:${line.memo}` : "reversal",
     };
     if (line.amountInBase != null || line.amount_in_base != null) {
-      out.amountInBase = canonicalDecimalString(String(line.amountInBase ?? line.amount_in_base));
+      out.amountInBase = canonicalDecimalString(line.amountInBase ?? line.amount_in_base);
     }
     if (line.exchangeRateToBase != null || line.exchange_rate_to_base != null) {
       out.exchangeRateToBase = canonicalDecimalString(
-        String(line.exchangeRateToBase ?? line.exchange_rate_to_base),
+        line.exchangeRateToBase ?? line.exchange_rate_to_base,
       );
     }
     if (line.conversionPath != null) out.conversionPath = line.conversionPath;

@@ -87,8 +87,8 @@ test("P2 account kinds locked", () => {
 test("posted balanced journal → TB includes; draft excluded from GL", async () => {
   const dataDir = mkdtempSync(join(tmpdir(), "pf-ak-"));
   await postSimple(dataDir, { amount: "100" });
-  await postSimple(dataDir, { amount: "50", status: "draft" }).catch(() => {});
-  // draft with journal may still be rejected by engine for posted rules — post only posted
+  const draft = await postSimple(dataDir, { amount: "50", status: "draft" });
+  assert.equal(draft.status, "draft");
   const gl = generalLedger(dataDir);
   assert.ok(gl.some((r) => r.amount === "100"));
   const tb = trialBalance(dataDir, { bookBaseCurrency: "IRR" });
@@ -162,14 +162,10 @@ test("cashFlow uses account.role not id prefix alone", async () => {
   await postSimple(dataDir, { amount: "200" });
   const cf = cashFlow(dataDir);
   // cash_k has role cash — should appear
-  assert.ok(toNumOrZero(cf.netCashChange) !== null);
   assert.equal(cf.netCashChange, "200");
   closeAllDbs();
 });
 
-function toNumOrZero(s) {
-  return s;
-}
 
 test("fee treatment required; equity deferred", () => {
   assert.throws(() => normalizeFeeTreatment(null), /FEE_TREATMENT_REQUIRED/);

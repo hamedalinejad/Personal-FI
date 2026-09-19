@@ -1,6 +1,7 @@
 {
   "version": 3,
   "files": [
+    "CORE-ACCOUNTING-KERNEL-V1.json",
     "CORE-JOURNAL-MULTI-CURRENCY.json",
     "CORE-JOURNAL-SAME-CURRENCY.json",
     "CORE-OPENING-BALANCE.json",
@@ -32,5 +33,5 @@
     "STOCK-CORPORATE-ACTION.json",
     "STOCK-T2-SETTLEMENT.json"
   ],
-  "count": 30
+  "count": 31
 }

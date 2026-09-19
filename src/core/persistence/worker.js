@@ -108,6 +108,7 @@ function persistOperationSqlite(record, dir) {
     status,
     businessDate,
     baseCurrency,
+    reversesOperationId: record.reversesOperationId ?? null,
     engineVersions: record.engineVersions || null,
     domainResult: record.domainResult ?? null,
     journalLines,
@@ -147,9 +148,9 @@ function persistOperationSqlite(record, dir) {
     db.prepare(
       `INSERT INTO fin_operations (
         id, command_hash, operation_type, status, durability_state,
-        business_date, event_at, settlement_date, base_currency, engine_versions,
+        business_date, event_at, settlement_date, base_currency, reverses_operation_id, engine_versions,
         source_channel, source_type, source_reference, source, created_at, posted_at, result_json
-      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`,
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`,
     ).run(
       id,
       record.commandHash || null,
@@ -159,6 +160,7 @@ function persistOperationSqlite(record, dir) {
       record.eventAt ?? null,
       record.settlementDate ?? null,
       baseCurrency,
+      record.reversesOperationId ?? null,
       record.engineVersions ? JSON.stringify(record.engineVersions) : null,
       sourceChannel,
       sourceType,
@@ -331,6 +333,7 @@ function loadOperationSync(db, operationId, replay = false) {
       commandHash: row.command_hash,
       status: row.status,
       durability_state: row.durability_state,
+      reversesOperationId: row.reverses_operation_id ?? snap.reversesOperationId ?? null,
       journalLines: lines,
       domainResult: snap.domainResult ?? null,
       engineVersions: snap.engineVersions ?? (row.engine_versions ? JSON.parse(row.engine_versions) : null),
@@ -364,6 +367,7 @@ function loadOperationSync(db, operationId, replay = false) {
     type: row.operation_type,
     status: row.status,
     durability_state: row.durability_state,
+    reversesOperationId: row.reverses_operation_id ?? null,
     businessDate: row.business_date,
     baseCurrency: row.base_currency,
     journalLines: lines,
@@ -402,6 +406,7 @@ async function persistOperationJson(record, dir) {
     status,
     businessDate: record.businessDate,
     baseCurrency: record.baseCurrency,
+    reversesOperationId: record.reversesOperationId ?? null,
     engineVersions: record.engineVersions || null,
     domainResult: record.domainResult ?? null,
     durability_state: "persisted",

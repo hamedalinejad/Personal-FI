@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-09-18",
+  "updated": "2026-09-19",
   "schema_status": {
     "SPEC_LOCKED": true,
     "FREEZE_PROVEN": false,
@@ -137,10 +137,10 @@
     ]
   },
   "snapshot_tag": "personal-fi-pre-semantic-freeze-2026-09-14",
-  "next_objective": "SEMANTIC_FREEZE_CLOSURE",
+  "next_objective": "PERSISTENCE_RECOVERY",
   "proof": {
-    "GOLDEN": "PARTIAL→improved",
-    "RECOVERY": "PARTIAL→matrix tests + corrupt reject",
+    "GOLDEN": "GREEN (Phase2 kernel)",
+    "RECOVERY": "PARTIAL→Phase3 active",
     "STANDALONE": "PARTIAL",
     "BROWSER": "OPEN",
     "FIELD_PRESERVATION": "PARTIAL→machine matrix from cards"
@@ -153,7 +153,7 @@
     ],
     "ui": "WAIT",
     "freeze_proven": false,
-    "note": "Harden Core+Loan; do not expand human docs"
+    "note": "Phase2 accounting kernel proven by CI; continue Persistence/Recovery hardening; UI remains WAIT"
   },
   "license": {
     "status": "SPEC_LOCKED",

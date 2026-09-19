@@ -71,7 +71,12 @@ test("GOLDEN fixtures marked ACTIVE are non-empty expected", () => {
     if (d.status === "DEFERRED" || d.fixtureStatus === "DEFERRED") continue;
     const exp = d.expected || {};
     const keys = Object.keys(exp);
-    assert.ok(keys.length > 0, name);
+    const cases = Array.isArray(d.cases) ? d.cases : [];
+    const casesValid = cases.length > 0 && cases.every((item) => {
+      const expected = item && item.expected;
+      return expected && typeof expected === "object" && Object.keys(expected).length > 0;
+    });
+    assert.ok(keys.length > 0 || casesValid, name);
   }
 });
 

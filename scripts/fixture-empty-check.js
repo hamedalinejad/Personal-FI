@@ -51,17 +51,22 @@ for (const dir of dirs) {
     checked++;
     const input = data.input || {};
     const expected = data.expected || {};
+    const cases = Array.isArray(data.cases) ? data.cases : [];
+    const caseHasExpected = cases.length > 0 && cases.every((item) => {
+      const exp = item?.expected;
+      return exp && typeof exp === "object" && Object.keys(exp).length > 0 && !isStructurallyEmptyExpected(exp);
+    });
     const status = data.status || data.fixtureStatus;
     if (status === "DEFERRED" || status === "SCAFFOLD") {
       deferred++;
       continue;
     }
-    if (hasClaimedInput(input) && isStructurallyEmptyExpected(expected)) {
+    if (hasClaimedInput(input) && isStructurallyEmptyExpected(expected) && !caseHasExpected) {
       console.error("EMPTY_EXPECTED_FIXTURE", path.relative(root, full));
       failed = true;
     }
     // Scaffold with both empty: must mark DEFERRED
-    if (!hasClaimedInput(input) && isStructurallyEmptyExpected(expected) && status !== "DEFERRED") {
+    if (!hasClaimedInput(input) && isStructurallyEmptyExpected(expected) && cases.length === 0 && status !== "DEFERRED") {
       console.error("UNMARKED_EMPTY_FIXTURE", path.relative(root, full), "→ mark status:DEFERRED");
       failed = true;
     }
