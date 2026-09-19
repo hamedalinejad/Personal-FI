@@ -2,7 +2,7 @@
  * Browser persistence surface (Node harness for P0-OFFLINE-001).
  * Production browser: sql.js bytes in IndexedDB key pf-db-v1.
  */
-import { mkdirSync, writeFileSync, existsSync, renameSync, copyFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, existsSync, renameSync, copyFileSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import * as nodeWorker from "../worker.js";
 
@@ -86,4 +86,37 @@ export function restoreDatabase(dataDir, backupFile) {
 
 export function isDurableAcked(dataDir, operationId) {
   return existsSync(join(dataDir, `.durable-${operationId}.json`));
+}
+
+/** Simulated browser close: flush publish ack */
+export function simulateTabClose(dataDir) {
+  return atomicPublishDbFile(dataDir);
+}
+
+/** Simulated reload: reopen SQLite (IndexedDB key analogy) */
+export function simulateReload(dataDir) {
+  closeAllDbs();
+  return openDb(dataDir);
+}
+
+/** Single-writer token (Node stand-in for navigator.locks) */
+export function acquireWriterLock(dataDir, tabId) {
+  const lockPath = join(dataDir, ".writer-lock");
+  if (existsSync(lockPath)) {
+    const holder = JSON.parse(readFileSync(lockPath, "utf8"));
+    if (holder.tabId !== tabId) {
+      const err = new Error("WRITER_REQUIRED");
+      err.code = "WRITER_REQUIRED";
+      throw err;
+    }
+  }
+  writeFileSync(lockPath, JSON.stringify({ tabId, at: new Date().toISOString() }), "utf8");
+  return { tabId, held: true };
+}
+
+export function releaseWriterLock(dataDir, tabId) {
+  const lockPath = join(dataDir, ".writer-lock");
+  if (!existsSync(lockPath)) return;
+  const holder = JSON.parse(readFileSync(lockPath, "utf8"));
+  if (holder.tabId === tabId) unlinkSync(lockPath);
 }

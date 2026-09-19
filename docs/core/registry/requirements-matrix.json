@@ -354,7 +354,8 @@
       "evidence": "OFFLINE-RELEASE protocol vs release E2E levels",
       "contract": "LOCKED",
       "implementation": "NOT_IMPLEMENTED",
-      "proof": "UNPROVEN"
+      "proof": "UNPROVEN",
+      "note": "Node protocol harness GREEN; in-browser sql.js+IDB E2E still required for RELEASE"
     },
     {
       "id": "R-M25",

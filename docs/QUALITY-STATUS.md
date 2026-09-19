@@ -239,3 +239,9 @@ FREEZE_PROVEN = false · RELEASE_PROVEN = false · PRODUCTION = NO-GO.
 Accounts / Income-Expense / Cheque / Tax / Assets / Planning / Cross-module / Golden family
 Local: phase6-abc-h.test.js 15/15. Journal truth only; planning never posts.
 
+
+## Phase 7–9 (2026-09-19)
+- P7 reportPack GL/TB/BS/IS/CF + as-of; TWR/MWR DEFERRED
+- P8 import unknownFields + rebuildFromDatabase deterministic
+- P9 browser adapter protocol: write/reload/backup/single-writer (R-M24 real browser E2E still OPEN)
+

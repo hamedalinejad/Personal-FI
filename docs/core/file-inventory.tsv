@@ -149,8 +149,10 @@ src/core/accounting/bookSettings.baseAmount.test.js	CURRENT	src
 src/core/accounting/bookSettings.js	CURRENT	src
 src/core/accounting/bookSettings.test.js	CURRENT	src
 src/core/accounting/chartOfAccounts.js	CURRENT	src
+src/core/accounting/reports/index.js	CURRENT	src
 src/core/accounting/reports/investment.js	CURRENT	src
 src/core/accounting/reports/investment.test.js	CURRENT	src
+src/core/accounting/reports/phase7-reporting.test.js	CURRENT	src
 src/core/accounting/reports/statements.js	CURRENT	src
 src/core/accounting/reports/statements.test.js	CURRENT	src
 src/core/api/pagination.js	CURRENT	src
@@ -224,6 +226,8 @@ src/core/fixtures/harness.js	CURRENT	src
 src/core/fixtures/harness.test.js	CURRENT	src
 src/core/import/lineage.js	CURRENT	src
 src/core/import/lineage.test.js	CURRENT	src
+src/core/import/pipeline.js	CURRENT	src
+src/core/import/pipeline.test.js	CURRENT	src
 src/core/integrity/accAccountCurrencyScan.js	CURRENT	src
 src/core/integrity/archivedZeroBalance.js	CURRENT	src
 src/core/integrity/integrity.test.js	CURRENT	src
@@ -243,6 +247,7 @@ src/core/money/sumDecimal.test.js	CURRENT	src
 src/core/persistence/browser/README.md	CURRENT	src
 src/core/persistence/browser/durableMemoryAdapter.js	CURRENT	src
 src/core/persistence/browser/durableMemoryAdapter.test.js	CURRENT	src
+src/core/persistence/browser/phase9-offline.test.js	CURRENT	src
 src/core/persistence/browser/port.contract.js	CURRENT	src
 src/core/persistence/browser/sqlJsIndexedDbAdapter.js	CURRENT	src
 src/core/persistence/browser/sqlJsIndexedDbAdapter.test.js	CURRENT	src
@@ -255,6 +260,8 @@ src/core/persistence/worker.js	CURRENT	src
 src/core/persistence/worker.test.js	CURRENT	src
 src/core/price/mappingResolver.js	CURRENT	src
 src/core/price/mappingResolver.test.js	CURRENT	src
+src/core/rebuild/fromSqlite.js	CURRENT	src
+src/core/rebuild/fromSqlite.test.js	CURRENT	src
 src/core/rebuild/ordering.js	CURRENT	src
 src/core/rebuild/ordering.test.js	CURRENT	src
 src/core/rebuild/rebuildProjection.js	CURRENT	src
