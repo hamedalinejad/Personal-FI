@@ -1,0 +1,25 @@
+{
+  "id": "CORE-TAX",
+  "status": "ACTIVE",
+  "input": {
+    "assess": "1000",
+    "pays": [
+      "400",
+      "600"
+    ]
+  },
+  "expected": {
+    "journal": {
+      "payOps": 2
+    },
+    "projection": {
+      "status": "paid",
+      "amountPaid": "1000"
+    },
+    "balance": {},
+    "status": "pass",
+    "recovery": {
+      "paymentViaOperation": true
+    }
+  }
+}

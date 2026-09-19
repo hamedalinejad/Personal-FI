@@ -1,0 +1,23 @@
+{
+  "id": "CORE-CHEQUE",
+  "status": "ACTIVE",
+  "input": {
+    "path": [
+      "issued",
+      "deposited",
+      "cleared"
+    ],
+    "amount": "500"
+  },
+  "expected": {
+    "journal": {
+      "cashOnClearOnly": true
+    },
+    "projection": {
+      "finalStatus": "cleared"
+    },
+    "balance": {},
+    "status": "pass",
+    "recovery": {}
+  }
+}

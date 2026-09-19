@@ -1,0 +1,22 @@
+{
+  "id": "CORE-INCOME-EXPENSE",
+  "status": "ACTIVE",
+  "input": {
+    "income": "1000",
+    "expense": "300",
+    "reverseExpense": true
+  },
+  "expected": {
+    "journal": {
+      "netCash": "1000"
+    },
+    "projection": {},
+    "balance": {
+      "cash": "1000"
+    },
+    "status": "pass",
+    "recovery": {
+      "reversalNewOp": true
+    }
+  }
+}

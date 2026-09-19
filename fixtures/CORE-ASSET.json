@@ -1,0 +1,24 @@
+{
+  "id": "CORE-ASSET",
+  "status": "ACTIVE",
+  "input": {
+    "register": {
+      "name": "Laptop"
+    },
+    "update": {
+      "name": "Laptop Pro"
+    }
+  },
+  "expected": {
+    "journal": {
+      "count": 0
+    },
+    "projection": {
+      "name": "Laptop Pro"
+    },
+    "balance": {},
+    "status": "pass",
+    "recovery": {},
+    "noJournal": true
+  }
+}

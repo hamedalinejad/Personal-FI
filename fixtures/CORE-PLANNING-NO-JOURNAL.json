@@ -1,0 +1,22 @@
+{
+  "id": "CORE-PLANNING-NO-JOURNAL",
+  "status": "ACTIVE",
+  "input": {
+    "budgetAssigned": "1000",
+    "actualExpense": "700"
+  },
+  "expected": {
+    "journal": {
+      "expenseOnly": "700"
+    },
+    "projection": {
+      "budgetAssigned": "1000"
+    },
+    "balance": {},
+    "status": "pass",
+    "noJournal": false,
+    "recovery": {
+      "budgetNeverPosts": true
+    }
+  }
+}

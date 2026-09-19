@@ -50,10 +50,16 @@ docs/phase-pack/INDEX.md	CURRENT	src
 docs/phase-pack/PHASE-PACK-METADATA.md	CURRENT	src
 docs/phase-pack/THINK-TANK-SYNTHESIS-2026-09-19.md	CURRENT	src
 fixtures/CORE-ACCOUNTING-KERNEL-V1.json	CURRENT	src
+fixtures/CORE-ACCOUNTS.json	CURRENT	src
+fixtures/CORE-ASSET.json	CURRENT	src
+fixtures/CORE-CHEQUE.json	CURRENT	src
+fixtures/CORE-INCOME-EXPENSE.json	CURRENT	src
 fixtures/CORE-JOURNAL-MULTI-CURRENCY.json	CURRENT	src
 fixtures/CORE-JOURNAL-SAME-CURRENCY.json	CURRENT	src
 fixtures/CORE-OPENING-BALANCE.json	CURRENT	src
+fixtures/CORE-PLANNING-NO-JOURNAL.json	CURRENT	src
 fixtures/CORE-REVERSAL-BEFORE-AFTER.json	CURRENT	src
+fixtures/CORE-TAX.json	CURRENT	src
 fixtures/CRITICAL-C2C-SWAP.json	CURRENT	src
 fixtures/CRITICAL-TOMAN-INPUT.json	CURRENT	src
 fixtures/CRITICAL-TRANSFER-FEE.json	CURRENT	src
@@ -273,6 +279,7 @@ src/features/accounts/commands/transfer.js	CURRENT	src
 src/features/accounts/commands/update.js	CURRENT	src
 src/features/accounts/commands/withdraw.js	CURRENT	src
 src/features/accounts/public-api/index.js	CURRENT	src
+src/features/accounts/tests/phase6-abc-h.test.js	CURRENT	src
 src/features/accounts/tests/phase6-core-finance.test.js	CURRENT	src
 src/features/assets/commands/dispose.js	CURRENT	src
 src/features/assets/commands/register.js	CURRENT	src

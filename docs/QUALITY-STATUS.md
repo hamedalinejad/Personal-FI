@@ -234,3 +234,8 @@ FREEZE_PROVEN = false · RELEASE_PROVEN = false · PRODUCTION = NO-GO.
 - npm test 473 pass; npm run gates GREEN locally
 - FREEZE_PROVEN=false RELEASE_PROVEN=false PRODUCTION=NO-GO
 
+
+## Phase 6A–H (2026-09-19)
+Accounts / Income-Expense / Cheque / Tax / Assets / Planning / Cross-module / Golden family
+Local: phase6-abc-h.test.js 15/15. Journal truth only; planning never posts.
+

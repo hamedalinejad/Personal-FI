@@ -177,8 +177,9 @@
     "phase4": "implemented_local_acceptance_green",
     "phase5": "implemented_local_acceptance_green",
     "phase6": "implemented_local_acceptance_green",
-    "note": "Phase 4R/5R: loan reversal sign regressions + investment valuation matrix green locally; FREEZE/RELEASE still false",
+    "note": "Phase 6A–H acceptance + golden family on main; FREEZE/RELEASE false",
     "phase4R": "loan_lifecycle_local_proven",
-    "phase5R": "investment_reporting_local_proven"
+    "phase5R": "investment_reporting_local_proven",
+    "phase6A_H": "accounts_ie_cheque_tax_assets_planning_cross_goldens_green"
   }
 }

@@ -1,0 +1,31 @@
+{
+  "id": "CORE-ACCOUNTS",
+  "status": "ACTIVE",
+  "input": {
+    "ops": [
+      "create",
+      "deposit",
+      "transfer",
+      "withdraw"
+    ],
+    "currency": "IRR",
+    "deposit": "1000",
+    "transfer": "400",
+    "withdraw": "100"
+  },
+  "expected": {
+    "journal": {
+      "minPostedOps": 3
+    },
+    "projection": {
+      "accounts": 2
+    },
+    "balance": {
+      "netCashDelta": "500"
+    },
+    "status": "pass",
+    "recovery": {
+      "idempotentReplay": true
+    }
+  }
+}
