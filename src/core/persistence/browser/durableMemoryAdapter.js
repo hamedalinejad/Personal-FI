@@ -42,6 +42,14 @@ async function durableCommit(dataDir, operationId, snapshot) {
   durableMarkers.set(operationId, path);
 }
 
+export function markOperationPersisted(dataDir, operationId) {
+  return nodeWorker.markOperationPersisted(dataDir, operationId);
+}
+
+export function reconcileDurabilityState(dataDir) {
+  return nodeWorker.reconcileDurabilityState(dataDir);
+}
+
 export function isDurableAcked(dataDir, operationId) {
   const path = join(dataDir, `.durable-${operationId}.json`);
   return existsSync(path);
