@@ -100,6 +100,7 @@ node --test src/features/accounts/tests/phase6-core-finance.test.js
 ## فهرست فایل‌های این pack
 
 - `INDEX.md` ← این فایل (وضعیت زنده pack)
+- `PHASE-PACK-METADATA.md` ← جدول commit/CI/state فشرده
 - مشخصات اجرایی فازها در conversation/attachments نگهداری شده‌اند؛ authority نهایی = owner docs + registry + code
 - جزئیات وضعیت هر فاز در `docs/QUALITY-STATUS.md` منعکس شده است
 
