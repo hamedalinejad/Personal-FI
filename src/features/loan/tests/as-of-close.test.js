@@ -86,7 +86,7 @@ test("fully settled loan closes, reversal reopens it", async () => {
     },
     { dataDir },
   );
-  assert.equal(getLoan(created.loanId, { dataDir }).status, "closed");
+  assert.equal(getLoan(created.loanId, { dataDir }).status, "paid_off");
 
   const reversed = await reversePayment(
     {
