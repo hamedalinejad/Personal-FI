@@ -204,3 +204,19 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | TWR/MWR/CA deferred | DEFERRED |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase 6 Core Finance Modules (2026-09-19)
+
+| Module | Status |
+|--------|--------|
+| accounts.create/update/archive/transfer/deposit/withdraw | ✅ |
+| income.create + reverse | ✅ |
+| expense.create + reverse | ✅ |
+| cheque register/deposit/clear/bounce/cancel | ✅ |
+| tax.assess / tax.pay / tax.adjust | ✅ |
+| assets.register/update/dispose | ✅ |
+| budget.set / goal.create / bill.schedule (no journal) | ✅ |
+| cross-module acceptance | ✅ |
+| parallel cash ledger | forbidden |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |
