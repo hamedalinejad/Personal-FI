@@ -196,7 +196,7 @@ export async function recordPayment(
         ["principal", "interest", "fee", "penalty"].every((field) => toDecimal(remainingAfterPayment[field] || "0").eq(0));
       if (fullySettled) {
         db2.prepare(
-          `UPDATE ln_loans SET status = 'paid_off, updated_at = ? WHERE id = ? AND status = 'active'`,
+          `UPDATE ln_loans SET status = 'paid_off', updated_at = ? WHERE id = ? AND status = 'active'`,
         ).run(now, p.loanId);
       }
     },
