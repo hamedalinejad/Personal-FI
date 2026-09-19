@@ -62,7 +62,7 @@ export async function persistOperation(record, options = {}) {
       "utf8",
     );
   }
-  return { ...result, durable: true, browserAdapter: BROWSER_ADAPTER_STATUS };
+  return { ...result, durability_state: "persisted", durable: true, browserAdapter: BROWSER_ADAPTER_STATUS };
 }
 
 export function loadOperation(operationId, options = {}) {
