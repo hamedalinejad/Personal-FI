@@ -44,6 +44,7 @@ export async function persistOperation(record, options = {}) {
   const result = await nodeWorker.persistOperation(record, { ...options, mode: "sqlite" });
   if (dataDir) {
     atomicPublishDbFile(dataDir);
+    nodeWorker.markOperationPersisted(dataDir, record.operationId);
     writeFileSync(
       join(dataDir, `.durable-${record.operationId}.json`),
       JSON.stringify({
