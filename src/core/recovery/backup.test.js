@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { createLoan, recordPayment, getLoan } from "../../features/loan/public-api/index.js";
 import { backupDatabase, restoreDatabase } from "./backup.js";
-import { closeAllDbs } from "../persistence/worker.js";
+import { closeAllDbs, openDb } from "../persistence/worker.js";
 
 test("A8 backup/restore preserves loan + payment", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-bk-"));
