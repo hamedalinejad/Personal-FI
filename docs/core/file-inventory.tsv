@@ -35,6 +35,7 @@ docs/core/registry/command-catalog.json	CURRENT	src
 docs/core/registry/field-preservation-matrix.json	CURRENT	src
 docs/core/registry/fixture-manifest.json	CURRENT	src
 docs/core/registry/license-editions.json	CURRENT	src
+docs/core/registry/release-proof-checklist.json	CURRENT	src
 docs/core/registry/requirements-matrix.json	CURRENT	src
 docs/core/registry/status.registry.json	CURRENT	src
 docs/modules/accounts.md	CURRENT	src
@@ -241,6 +242,8 @@ src/core/iran/settlementPolicy.js	CURRENT	src
 src/core/iran/settlementPolicy.test.js	CURRENT	src
 src/core/iran/toman.js	CURRENT	src
 src/core/iran/toman.test.js	CURRENT	src
+src/core/license/capabilityGate.js	CURRENT	src
+src/core/license/capabilityGate.test.js	CURRENT	src
 src/core/license/licenseGate.js	CURRENT	src
 src/core/license/licenseGate.test.js	CURRENT	src
 src/core/money/canonicalDecimal.js	CURRENT	src
@@ -406,6 +409,14 @@ src/features/tax/commands/adjust.js	CURRENT	src
 src/features/tax/commands/assess.js	CURRENT	src
 src/features/tax/commands/pay.js	CURRENT	src
 src/features/tax/public-api/index.js	CURRENT	src
+src/platform/adapter/mobilePlatformAdapter.js	CURRENT	src
+src/platform/adapter/mobilePlatformAdapter.test.js	CURRENT	src
+src/platform/android/matrix.js	CURRENT	src
+src/platform/ios/matrix.js	CURRENT	src
+src/platform/release-proof.test.js	CURRENT	src
+src/platform/sync/syncProtocol.js	CURRENT	src
+src/platform/sync/syncProtocol.test.js	CURRENT	src
+src/platform/windows/matrix.js	CURRENT	src
 src/web/apiClient.js	CURRENT	src
 src/web/routes.js	CURRENT	src
 src/web/routes.test.js	CURRENT	src

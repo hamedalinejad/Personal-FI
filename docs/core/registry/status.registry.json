@@ -177,7 +177,7 @@
     "phase4": "implemented_local_acceptance_green",
     "phase5": "implemented_local_acceptance_green",
     "phase6": "implemented_local_acceptance_green",
-    "note": "Web shell scaffold + onboarding state; not production E2E; FREEZE/RELEASE false",
+    "note": "Phases 12–18 contracts/scaffolds on main; no native ship; RELEASE_PROVEN=false",
     "phase4R": "loan_lifecycle_local_proven",
     "phase5R": "investment_reporting_local_proven",
     "phase6A_H": "accounts_ie_cheque_tax_assets_planning_cross_goldens_green",
@@ -185,6 +185,13 @@
     "phase8": "rebuild_import_lineage_local_green",
     "phase9": "browser_protocol_harness_green_rm24_e2e_open",
     "phase10": "web_shell_scaffold_product_routes",
-    "phase11": "onboarding_recovery_surfaces_local"
+    "phase11": "onboarding_recovery_surfaces_local",
+    "phase12": "mobile_adapter_contract_poc_pending",
+    "phase13": "android_matrix_specified",
+    "phase14": "ios_matrix_specified",
+    "phase15": "windows_matrix_specified",
+    "phase16": "sync_protocol_scaffold_out_of_mvp",
+    "phase17": "license_capability_gate_local_green",
+    "phase18": "release_proof_checklist_all_false"
   }
 }

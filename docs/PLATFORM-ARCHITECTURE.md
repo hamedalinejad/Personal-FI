@@ -257,3 +257,9 @@ Allowed differences: UI chrome, storage adapter, native capability metadata only
 ## 19. Supersession
 
 Host-strategy prose belongs here. Economic rules stay in FINANCIAL-CORE / ARCHITECTURE. Offline proof gates stay in OFFLINE-RELEASE. Route lock stays in PRODUCT.
+
+## 20. Phase 12–18 host & release track
+See `src/platform/adapter/mobilePlatformAdapter.js` (POC Capacitor vs Tauri),
+`src/platform/{android,ios,windows}/matrix.js`, `src/platform/sync/syncProtocol.js`,
+`src/core/license/capabilityGate.js`, `docs/core/registry/release-proof-checklist.json`.
+**RELEASE_PROVEN remains false** until per-edition evidence is complete.

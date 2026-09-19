@@ -251,3 +251,10 @@ Local: phase6-abc-h.test.js 15/15. Journal truth only; planning never posts.
 - Surfaces + onboarding/recovery state machine
 - UI boundary: public-api only (tested)
 - Not launch-ready: full E2E/accessibility/performance still OPEN
+
+## Phase 12–18 (2026-09-19)
+- Mobile adapter contract + Node harness; Capacitor vs Tauri POC_PENDING
+- Android/iOS/Windows matrices SPECIFIED (not device-proven)
+- Sync protocol scaffold OUT_OF_MVP; event-level conflicts only
+- License capability gate for editions; history never deleted
+- release-proof-checklist: all false → RELEASE_PROVEN=false

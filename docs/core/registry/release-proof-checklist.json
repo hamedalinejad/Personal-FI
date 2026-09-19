@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "RELEASE_PROVEN": false,
+  "promotionRule": [
+    "Implementation",
+    "Unit tests",
+    "Acceptance",
+    "Golden",
+    "Recovery",
+    "Full gates",
+    "Platform E2E",
+    "Promotion"
+  ],
+  "perEdition": {
+    "full": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false },
+    "loan-only": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false },
+    "crypto-only": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false },
+    "stocks-only": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false },
+    "funds-only": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false },
+    "metals-only": { "contract": false, "fieldPreservation": false, "golden": false, "recovery": false, "standalone": false, "ci": false, "browserNativeE2E": false, "backupRestore": false, "migration": false }
+  },
+  "note": "No phase promotes on code alone. RELEASE_PROVEN stays false until every edition evidence is machine-green."
+}
