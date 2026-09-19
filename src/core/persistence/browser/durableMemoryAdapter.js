@@ -28,7 +28,7 @@ export async function persistOperation(record, options = {}) {
     await durableCommit(dataDir, record.operationId, result);
     nodeWorker.markOperationPersisted(dataDir, record.operationId);
   }
-  return { ...result, durable: true };
+  return { ...result, durability_state: "persisted", durable: true };
 }
 
 export function loadOperation(operationId, options = {}) {
