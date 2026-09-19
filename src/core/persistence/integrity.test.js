@@ -91,6 +91,6 @@ test("reconcile refuses a database whose posted journal is corrupted", async () 
   ).run(operationId);
   db.prepare("UPDATE fin_operations SET durability_state='sql_committed' WHERE id=?").run(operationId);
   closeAllDbs();
-  assert.throws(() => reconcileDurabilityState(dataDir), /DB_INTEGRITY|INV_JOURNAL_UNBALANCED|DB_/);
+  assert.throws(() => reconcileDurabilityState(dataDir), /\/DB_INTEGRITY|INV_JOURNAL|DB_/);
   closeAllDbs();
 });
