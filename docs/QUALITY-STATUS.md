@@ -100,3 +100,12 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - fixtures/CORE-ACCOUNTING-KERNEL-V1.json + golden acceptance
 - command-constraints-check negative tests
 - accounting-invariants-audit.js (no ghost cash tables; fee guards; golden run)
+
+
+## Phase 2 CI proof (2026-09-19)
+
+- GitHub Actions Run 388 on `aeeebb240213ed9867a3b128eca1bdf7a911d899` completed **success**.
+- `npm ci` succeeded.
+- `npm test`: **438/438 passed**.
+- `npm run gates`: **GREEN** through all configured gates, including accounting audit, schema/field preservation, inventory, lint, fixtures and release evidence.
+- Phase 2 remains implementation/proof-complete for its claimed kernel surface; semantic freeze and production release remain unproven.
