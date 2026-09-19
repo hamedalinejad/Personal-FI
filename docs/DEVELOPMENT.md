@@ -71,3 +71,6 @@ No “final audit” commits that only add Markdown authority files.
 
 ## Freeze gate
 `FREEZE_PROVEN=true` only when QUALITY blockers are green **and** `npm run gates` passes on a clean tree for claimed contracts.
+
+## Multi-host
+Target packaging and Persistence Port hosts: `docs/PLATFORM-ARCHITECTURE.md`. Do not implement dual native wrappers before Persistence Port + Core acceptance are stable.

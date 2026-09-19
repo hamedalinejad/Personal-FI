@@ -236,3 +236,7 @@ Edition ID for funds standalone: **`funds-only`** (not fund-only).
 
 Holdings, statements, and portfolio reads for investment packages are provided by **shared Reporting / Core readers**, not by undocumented internal imports.  
 UI must not import feature internals for reads.
+
+## 15. Multi-host target
+See `docs/PLATFORM-ARCHITECTURE.md` for Web / Android / iOS / Windows packaging, Persistence Port hosts, sync-ready metadata, and the equal-economics success criterion.
+Economics remain owned by this file + `docs/FINANCIAL-CORE.md`. Navigation remains owned by `docs/PRODUCT.md`.
