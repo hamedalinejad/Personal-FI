@@ -7,6 +7,7 @@ import { randomUUID } from "node:crypto";
 // createHash via crypto;
 import { DatabaseSync } from "node:sqlite";
 import { assertJournalBalanced, assertPostedHasJournal } from "../domain/invariants/index.js";
+import { validateOpenDatabase } from "./integrity.js";
 import { assertAccountUsable } from "../accounting/chartOfAccounts.js";
 import { ensureSchemaSync } from "../db/migration.js";
 
@@ -438,3 +439,68 @@ export async function loadOperation(operationId, options = {}) {
 }
 
 export { DEFAULT_DIR };
+
+
+/**
+ * Phase 3 — promote sql_committed → persisted after durable publish acknowledgement.
+ * Idempotent if already persisted.
+ */
+export function markOperationPersisted(dataDir, operationId) {
+  const db = openDb(dataDir);
+  const row = db.prepare(`SELECT id, durability_state FROM fin_operations WHERE id = ?`).get(operationId);
+  if (!row) throw new Error("OP_NOT_FOUND");
+  if (row.durability_state === "persisted") {
+    return { operationId, durability_state: "persisted", idempotent: true };
+  }
+  if (row.durability_state !== "sql_committed") {
+    throw new Error(`DURABILITY_TRANSITION_INVALID:${row.durability_state}->persisted`);
+  }
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    db.prepare(`UPDATE fin_operations SET durability_state = 'persisted' WHERE id = ?`).run(operationId);
+    db.prepare(`INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, ?)`).run(
+      `durability.operation.${operationId}`,
+      "persisted",
+    );
+    db.prepare(`INSERT OR REPLACE INTO db_meta(key, value) VALUES ('durability.last', ?)`).run("persisted");
+    db.exec("COMMIT");
+  } catch (e) {
+    try { db.exec("ROLLBACK"); } catch { /* ignore */ }
+    throw e;
+  }
+  return { operationId, durability_state: "persisted", idempotent: false };
+}
+
+/**
+ * Phase 3 — on restart: validate DB, then promote surviving sql_committed → persisted.
+ */
+export function reconcileDurabilityState(dataDir) {
+  const db = openDb(dataDir);
+  validateOpenDatabase(db, { allowPending: false });
+  const rows = db
+    .prepare(`SELECT id FROM fin_operations WHERE durability_state = 'sql_committed'`)
+    .all();
+  const promoted = [];
+  if (!rows.length) {
+    return { ok: true, promoted };
+  }
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    for (const r of rows) {
+      db.prepare(`UPDATE fin_operations SET durability_state = 'persisted' WHERE id = ?`).run(r.id);
+      db.prepare(`INSERT OR REPLACE INTO db_meta(key, value) VALUES (?, ?)`).run(
+        `durability.operation.${r.id}`,
+        "persisted",
+      );
+      promoted.push(r.id);
+    }
+    db.prepare(`INSERT OR REPLACE INTO db_meta(key, value) VALUES ('durability.last', ?)`).run("persisted");
+    db.exec("COMMIT");
+  } catch (e) {
+    try { db.exec("ROLLBACK"); } catch { /* ignore */ }
+    throw e;
+  }
+  return { ok: true, promoted };
+}
+
+export { validateOpenDatabase };

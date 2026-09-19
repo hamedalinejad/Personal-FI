@@ -162,3 +162,17 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | P2-17 Invariants audit | ✅ in gates |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase 3 Persistence/Recovery (2026-09-19)
+
+| Item | Status |
+|------|--------|
+| validateOpenDatabase integrity firewall | ✅ |
+| markOperationPersisted sql_committed→persisted | ✅ |
+| reconcileDurabilityState | ✅ (validate first) |
+| backup validate + checksum + staged integrity | ✅ |
+| restore never replaces on corrupt | ✅ |
+| result_json not SoT | ✅ (Phase 2/3) |
+| Browser RELEASE E2E | OPEN |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |

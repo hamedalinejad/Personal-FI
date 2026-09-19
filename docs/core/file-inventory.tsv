@@ -345,3 +345,5 @@ src/core/acceptance/accounting-golden.acceptance.test.js	E	test	keep
 fixtures/CORE-ACCOUNTING-KERNEL-V1.json	E	fixture	keep
 scripts/command-constraints-check.test.js	E	test	keep
 scripts/accounting-invariants-audit.js	E	script	keep
+src/core/persistence/integrity.js	E	impl	keep
+src/core/persistence/integrity.test.js	E	impl	keep
