@@ -143,7 +143,7 @@ export async function reversePayment(
       );
       // Reversing a settlement payment reopens a previously closed loan.
       db2.prepare(
-        `UPDATE ln_loans SET status = 'active', updated_at = ? WHERE id = ? AND status = 'closed'`,
+        `UPDATE ln_loans SET status = 'active', updated_at = ? WHERE id = ? AND status = 'paid_off'`,
       ).run(now, origTx.loan_id);
     },
   });
