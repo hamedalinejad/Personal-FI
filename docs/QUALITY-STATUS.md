@@ -227,3 +227,10 @@ Canonical phase-pack status table lives in `docs/phase-pack/INDEX.md`.
 Synced HEAD at write: `27b465c`.
 Phases 0–6: implemented with local acceptance green where applicable.
 FREEZE_PROVEN = false · RELEASE_PROVEN = false · PRODUCTION = NO-GO.
+
+## Phase 4R / 5R (2026-09-19)
+- Loan lifecycle: signed reversal portions; partial/full/double-reverse regressions green
+- Investment reporting: stale/missing FX/zero/per_g/per_mg/gross/fine/reportCurrency/mixed holdings green
+- npm test 473 pass; npm run gates GREEN locally
+- FREEZE_PROVEN=false RELEASE_PROVEN=false PRODUCTION=NO-GO
+

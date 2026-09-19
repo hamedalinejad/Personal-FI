@@ -4,13 +4,67 @@
   "core": true,
   "features": [
     {
+      "id": "_shared",
+      "publicApi": false,
+      "commands": false,
+      "fixtures": false
+    },
+    {
+      "id": "accounts",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "assets",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "bills",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "budget",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "cheque",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
       "id": "crypto",
       "publicApi": true,
       "commands": true,
       "fixtures": false
     },
     {
+      "id": "expense",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
       "id": "funds",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "goals",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "income",
       "publicApi": true,
       "commands": true,
       "fixtures": false
@@ -29,6 +83,12 @@
     },
     {
       "id": "stocks",
+      "publicApi": true,
+      "commands": true,
+      "fixtures": false
+    },
+    {
+      "id": "tax",
       "publicApi": true,
       "commands": true,
       "fixtures": false

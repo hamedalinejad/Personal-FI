@@ -1,7 +1,7 @@
 {
   "id": "CORE-ACCOUNTING-KERNEL-V1",
   "version": "1.0.0",
-  "note": "Deterministic economics only \u2014 no random ids or wall-clock timestamps in expected",
+  "note": "Deterministic economics only — no random ids or wall-clock timestamps in expected",
   "cases": [
     {
       "id": "same-currency-balanced",
@@ -192,5 +192,10 @@
         ]
       }
     }
-  ]
+  ],
+  "status": "ACTIVE",
+  "expected": {
+    "caseCount": 6,
+    "pack": "multi-case"
+  }
 }

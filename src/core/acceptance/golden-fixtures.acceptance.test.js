@@ -69,6 +69,12 @@ test("GOLDEN fixtures marked ACTIVE are non-empty expected", () => {
   for (const name of readdirSync(FIX).filter((f) => f.endsWith(".json"))) {
     const d = JSON.parse(readFileSync(join(FIX, name), "utf8"));
     if (d.status === "DEFERRED" || d.fixtureStatus === "DEFERRED") continue;
+    if (Array.isArray(d.cases) && d.cases.length > 0) {
+      for (const c of d.cases) {
+        assert.ok(c.expected && Object.keys(c.expected).length > 0, name + ":" + (c.id || "?"));
+      }
+      continue;
+    }
     const exp = d.expected || {};
     const keys = Object.keys(exp);
     assert.ok(keys.length > 0, name);

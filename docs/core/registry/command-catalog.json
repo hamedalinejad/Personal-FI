@@ -3235,7 +3235,7 @@
           },
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           }
         ],
@@ -3320,7 +3320,7 @@
           },
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           }
         ],
@@ -4132,7 +4132,7 @@
         "requestFields": [
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -4162,7 +4162,7 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           }
         ],
@@ -4246,7 +4246,7 @@
         "requestFields": [
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -4256,12 +4256,12 @@
           },
           {
             "name": "accountId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           }
         ],
@@ -4360,7 +4360,7 @@
           },
           {
             "name": "clearedDate",
-            "required": true,
+            "required": false,
             "type": "date"
           },
           {
@@ -4552,7 +4552,7 @@
         "requestFields": [
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -4562,7 +4562,7 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           }
         ],
@@ -4649,7 +4649,7 @@
         "requestFields": [
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -4674,7 +4674,7 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           }
         ],
@@ -4775,12 +4775,12 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           },
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           }
         ],
@@ -4971,7 +4971,7 @@
         "requestFields": [
           {
             "name": "period",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -4981,7 +4981,7 @@
           },
           {
             "name": "amount",
-            "required": true,
+            "required": false,
             "type": "decimal_string"
           },
           {
@@ -4991,12 +4991,12 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           },
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           }
         ],
@@ -5305,7 +5305,7 @@
           },
           {
             "name": "taxYear",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -5320,7 +5320,7 @@
           },
           {
             "name": "kind",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -5524,7 +5524,7 @@
         "requestFields": [
           {
             "name": "operationId",
-            "required": true,
+            "required": false,
             "type": "string"
           },
           {
@@ -5534,7 +5534,7 @@
           },
           {
             "name": "deltaAmount",
-            "required": true,
+            "required": false,
             "type": "decimal_string"
           },
           {
@@ -5544,7 +5544,7 @@
           },
           {
             "name": "businessDate",
-            "required": true,
+            "required": false,
             "type": "date"
           }
         ],

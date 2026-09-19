@@ -16,7 +16,7 @@ const r = await createLoan(
   {
     operationId: randomUUID(),
     payload: {
-      role: "lent",
+      role: "lender",
       principal: "1000000",
       currency: "IRR",
       annualRate: "18",
@@ -25,6 +25,8 @@ const r = await createLoan(
       startDate: "2026-01-01",
       businessDate: "2026-01-01",
       dayCount: "period_based",
+      installmentFrequency: "monthly",
+      originationKind: "disburse_now",
     },
   },
   { dataDir },

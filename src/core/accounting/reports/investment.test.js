@@ -249,3 +249,155 @@ test("scalar metal price without purityBasis rejected", () => {
   );
   closeAllDbs();
 });
+
+test("stale price rejected unless allowStale", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-stale-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  closeAllDbs();
+  assert.throws(
+    () =>
+      investmentHoldings(dataDir, {
+        valuationContext: { reportCurrency: "IRR", asOf: "2026-06-15" },
+        prices: {
+          "inst-stock": {
+            price: "1200",
+            currency: "IRR",
+            marketDate: "2026-06-10",
+            isStale: true,
+          },
+        },
+      }),
+    /VALUATION_PRICE_STALE/,
+  );
+  const ok = investmentHoldings(dataDir, {
+    valuationContext: {
+      reportCurrency: "IRR",
+      asOf: "2026-06-15",
+      allowStale: true,
+      fxRates: { USD: "42000" },
+    },
+    prices: {
+      "inst-stock": {
+        price: "1200",
+        currency: "IRR",
+        marketDate: "2026-06-10",
+        isStale: true,
+      },
+    },
+  });
+  assert.equal(ok.stocks[0].marketValue, "120000");
+  closeAllDbs();
+});
+
+test("metal per_g vs per_mg and gross vs fine basis", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-metal-units-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  db.prepare(`UPDATE inv_metals_holdings SET purity_ratio = '0.9' WHERE id = 'mh1'`).run();
+  closeAllDbs();
+  const ctx = {
+    reportCurrency: "IRR",
+    asOf: "2026-06-15",
+    fxRates: { USD: "42000" },
+  };
+  const grossMg = investmentHoldings(dataDir, {
+    valuationContext: ctx,
+    prices: {
+      "inst-gold": {
+        price: "6",
+        currency: "IRR",
+        marketDate: "2026-06-10",
+        unit: "per_mg",
+        purityBasis: "gross",
+      },
+    },
+  });
+  assert.equal(grossMg.metals[0].marketValue, "60000");
+  const fineMg = investmentHoldings(dataDir, {
+    valuationContext: ctx,
+    prices: {
+      "inst-gold": {
+        price: "6",
+        currency: "IRR",
+        marketDate: "2026-06-10",
+        unit: "per_mg",
+        purityBasis: "fine",
+      },
+    },
+  });
+  assert.equal(fineMg.metals[0].marketValue, "54000");
+  const grossG = investmentHoldings(dataDir, {
+    valuationContext: ctx,
+    prices: {
+      "inst-gold": {
+        price: "6000",
+        currency: "IRR",
+        marketDate: "2026-06-10",
+        unit: "per_g",
+        purityBasis: "gross",
+      },
+    },
+  });
+  assert.equal(grossG.metals[0].marketValue, "60000");
+  closeAllDbs();
+});
+
+test("report currency converts crypto with explicit FX", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-report-ccy-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  closeAllDbs();
+  const report = investmentHoldings(dataDir, {
+    valuationContext: {
+      reportCurrency: "IRR",
+      asOf: "2026-06-15",
+      fxRates: { USD: "42000" },
+    },
+    prices: {
+      "inst-btc": {
+        price: "50000",
+        currency: "USD",
+        marketDate: "2026-06-10",
+      },
+    },
+  });
+  assert.equal(report.crypto[0].marketValue, "4200000000");
+  assert.equal(report.crypto[0].valuation.reportCurrency, "IRR");
+  closeAllDbs();
+});
+
+test("mixed holdings report includes all verticals when priced", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-mixed-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  closeAllDbs();
+  const report = investmentHoldings(dataDir, {
+    valuationContext: {
+      reportCurrency: "IRR",
+      asOf: "2026-06-15",
+      fxRates: { USD: "42000" },
+    },
+    prices: {
+      "inst-btc": { price: "50000", currency: "USD", marketDate: "2026-06-10" },
+      "inst-stock": { price: "1000", currency: "IRR", marketDate: "2026-06-10" },
+      "inst-fund": {
+        price: "10",
+        currency: "IRR",
+        quoteType: "nav",
+        marketDate: "2026-06-10",
+      },
+      "inst-gold": {
+        price: "5",
+        currency: "IRR",
+        marketDate: "2026-06-10",
+        unit: "per_mg",
+        purityBasis: "gross",
+      },
+    },
+  });
+  assert.equal(report.holdings.length, 4);
+  assert.equal(report.totals.valuedCount, 4);
+  assert.ok(toDecimal(report.totals.totalMarketValue).gt(toDecimal("0")));
+  closeAllDbs();
+});

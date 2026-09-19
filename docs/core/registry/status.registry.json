@@ -177,6 +177,8 @@
     "phase4": "implemented_local_acceptance_green",
     "phase5": "implemented_local_acceptance_green",
     "phase6": "implemented_local_acceptance_green",
-    "note": "Branch-based audit snapshots (Run 400 / phase6 blueprint) are superseded by main linear history through a87a9ef+"
+    "note": "Phase 4R/5R: loan reversal sign regressions + investment valuation matrix green locally; FREEZE/RELEASE still false",
+    "phase4R": "loan_lifecycle_local_proven",
+    "phase5R": "investment_reporting_local_proven"
   }
 }

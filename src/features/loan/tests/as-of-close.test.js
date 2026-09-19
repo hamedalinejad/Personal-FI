@@ -136,3 +136,147 @@ test("fully settled loan closes; reversal reopens; paidPrincipal net zero", asyn
   assert.equal(stmt.summary.paidPrincipal, "0");
   closeAllDbs();
 });
+
+test("partial payment then full reverse → paidPrincipal zero; status active", async () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-loan-partial-rev-"));
+  const { loanId } = await makeZeroRateLoan(dataDir);
+  const payOp = randomUUID();
+  await recordPayment(
+    {
+      operationId: payOp,
+      type: "loan.recordPayment",
+      payload: {
+        loanId,
+        amount: "200",
+        currency: "IRR",
+        businessDate: "2026-02-01",
+        paymentDate: "2026-02-01",
+      },
+    },
+    { dataDir },
+  );
+  let stmt = getStatement(loanId, { dataDir });
+  assert.equal(stmt.summary.paidPrincipal, "200");
+  await reversePayment(
+    {
+      operationId: randomUUID(),
+      type: "loan.reversePayment",
+      payload: {
+        originalOperationId: payOp,
+        businessDate: "2026-02-03",
+        currency: "IRR",
+      },
+    },
+    { dataDir },
+  );
+  stmt = getStatement(loanId, { dataDir });
+  assert.equal(stmt.summary.paymentCount, 1);
+  assert.equal(stmt.summary.reversalCount, 1);
+  assert.equal(stmt.summary.paidPrincipal, "0");
+  assert.equal(stmt.summary.paidInterest, "0");
+  const db = openDb(dataDir);
+  const loan = db.prepare(`SELECT status FROM ln_loans WHERE id = ?`).get(loanId);
+  assert.equal(loan.status, "active");
+  closeAllDbs();
+});
+
+test("two payments + reverse second only → paidPrincipal equals first payment", async () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-loan-multi-rev-"));
+  const { loanId } = await makeZeroRateLoan(dataDir);
+  const pay1 = randomUUID();
+  await recordPayment(
+    {
+      operationId: pay1,
+      type: "loan.recordPayment",
+      payload: {
+        loanId,
+        amount: "150",
+        currency: "IRR",
+        businessDate: "2026-02-01",
+        paymentDate: "2026-02-01",
+      },
+    },
+    { dataDir },
+  );
+  const pay2 = randomUUID();
+  await recordPayment(
+    {
+      operationId: pay2,
+      type: "loan.recordPayment",
+      payload: {
+        loanId,
+        amount: "100",
+        currency: "IRR",
+        businessDate: "2026-03-01",
+        paymentDate: "2026-03-01",
+      },
+    },
+    { dataDir },
+  );
+  await reversePayment(
+    {
+      operationId: randomUUID(),
+      type: "loan.reversePayment",
+      payload: {
+        originalOperationId: pay2,
+        businessDate: "2026-03-02",
+        currency: "IRR",
+      },
+    },
+    { dataDir },
+  );
+  const stmt = getStatement(loanId, { dataDir });
+  assert.equal(stmt.summary.paymentCount, 2);
+  assert.equal(stmt.summary.reversalCount, 1);
+  assert.equal(stmt.summary.paidPrincipal, "150");
+  closeAllDbs();
+});
+
+test("double reverse of same payment is rejected", async () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-loan-dbl-rev-"));
+  const { loanId } = await makeZeroRateLoan(dataDir);
+  const payOp = randomUUID();
+  await recordPayment(
+    {
+      operationId: payOp,
+      type: "loan.recordPayment",
+      payload: {
+        loanId,
+        amount: "100",
+        currency: "IRR",
+        businessDate: "2026-02-01",
+        paymentDate: "2026-02-01",
+      },
+    },
+    { dataDir },
+  );
+  await reversePayment(
+    {
+      operationId: randomUUID(),
+      type: "loan.reversePayment",
+      payload: {
+        originalOperationId: payOp,
+        businessDate: "2026-02-02",
+        currency: "IRR",
+      },
+    },
+    { dataDir },
+  );
+  await assert.rejects(
+    () =>
+      reversePayment(
+        {
+          operationId: randomUUID(),
+          type: "loan.reversePayment",
+          payload: {
+            originalOperationId: payOp,
+            businessDate: "2026-02-03",
+            currency: "IRR",
+          },
+        },
+        { dataDir },
+      ),
+    /ALREADY_REVERSED/,
+  );
+  closeAllDbs();
+});

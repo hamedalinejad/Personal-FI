@@ -104,19 +104,26 @@ export function requireFxIfCrossCurrency({
  * amountInBase = amount × exchangeRateToBase (base units per 1 transaction unit).
  * Same currency forces rate = 1.
  */
+function asDecimalString(value, label = "amount") {
+  if (typeof value === "string") return value;
+  if (value != null && typeof value === "object" && typeof value.toFixed === "function") {
+    return value.toFixed();
+  }
+  throw new Error("DECIMAL_NOT_STRING:" + label);
+}
+
 export function resolveBaseAmountSync(amount, transactionCurrency, bookBaseCurrency, exchangeRateToBase) {
   if (transactionCurrency == null || bookBaseCurrency == null) {
     throw new Error("VALIDATION_ERROR:currency");
   }
-  // string-only money boundary — no Number / toFixed coercion
-  const amt = toDecimal(canonicalDecimalString(amount));
+  const amt = toDecimal(canonicalDecimalString(asDecimalString(amount, "amount")));
   if (transactionCurrency === bookBaseCurrency) {
     return { amountInBase: amt.toFixed(), exchangeRateToBase: "1" };
   }
   if (exchangeRateToBase == null || exchangeRateToBase === "") {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase");
   }
-  const rate = toDecimal(canonicalDecimalString(exchangeRateToBase));
+  const rate = toDecimal(canonicalDecimalString(asDecimalString(exchangeRateToBase, "exchangeRateToBase")));
   if (rate.lte(0)) {
     throw new Error("VALIDATION_ERROR:exchangeRateToBase_nonpositive");
   }

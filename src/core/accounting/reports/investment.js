@@ -57,6 +57,10 @@ export function investmentHoldings(dataDir, { prices = {}, valuationContext = nu
       throw new Error("VALUATION_PRICE_AFTER_ASOF:" + instrumentId);
     }
 
+    if (raw && typeof raw === "object" && raw.isStale === true && valuationContext?.allowStale !== true) {
+      throw new Error("VALUATION_PRICE_STALE:" + instrumentId);
+    }
+
     if (requiredQuoteTypes && !requiredQuoteTypes.has(px.quoteType)) {
       throw new Error("FUND_VALUATION_QUOTE_TYPE_INVALID:" + px.quoteType);
     }

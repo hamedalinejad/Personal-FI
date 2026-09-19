@@ -787,7 +787,7 @@
     {
       "commandId": "assets.register",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -1097,7 +1097,7 @@
     {
       "commandId": "budget.set",
       "field": "period",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "bg_budgets.period_key",
       "derived": false,
@@ -1148,7 +1148,7 @@
     {
       "commandId": "budget.set",
       "field": "amount",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "bg_budgets.total_income",
       "derived": false,
@@ -1280,7 +1280,7 @@
     {
       "commandId": "cheque.cancel",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -1384,7 +1384,7 @@
     {
       "commandId": "cheque.clear",
       "field": "clearedDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "chk_cheques.cleared_date",
       "derived": false,
@@ -1410,7 +1410,7 @@
     {
       "commandId": "cheque.deposit",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -1462,7 +1462,7 @@
     {
       "commandId": "cheque.deposit",
       "field": "accountId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "chk_cheques.account_id",
       "derived": false,
@@ -1488,7 +1488,7 @@
     {
       "commandId": "cheque.deposit",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -1514,7 +1514,7 @@
     {
       "commandId": "cheque.register",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -1829,7 +1829,7 @@
     {
       "commandId": "crypto.sell",
       "field": "currency",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "inv_crypto_transactions.currency",
       "derived": false,
@@ -2671,7 +2671,7 @@
     {
       "commandId": "funds.subscribe",
       "field": "currency",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "inv_fif_transactions.currency",
       "derived": false,
@@ -4902,7 +4902,7 @@
     {
       "commandId": "tax.adjust",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -4952,7 +4952,7 @@
     {
       "commandId": "tax.adjust",
       "field": "deltaAmount",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "tax_events.delta_amount",
       "derived": false,
@@ -5030,7 +5030,7 @@
     {
       "commandId": "tax.assess",
       "field": "taxYear",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "tax_events.tax_year",
       "derived": false,
@@ -5110,7 +5110,7 @@
     {
       "commandId": "tax.assess",
       "field": "kind",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "tax_events.kind",
       "derived": false,
@@ -5691,7 +5691,7 @@
     {
       "commandId": "funds.subscribe",
       "field": "units",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "inv_fif_transactions.quantity",
       "derived": false,
@@ -6097,7 +6097,7 @@
     {
       "commandId": "accounts.update",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -6178,7 +6178,7 @@
     {
       "commandId": "accounts.archive",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -9169,7 +9169,7 @@
     {
       "commandId": "cheque.register",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -9574,7 +9574,7 @@
     {
       "commandId": "cheque.cancel",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -9682,7 +9682,7 @@
     {
       "commandId": "assets.register",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -9790,7 +9790,7 @@
     {
       "commandId": "assets.update",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -9817,7 +9817,7 @@
     {
       "commandId": "assets.update",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -10033,7 +10033,7 @@
     {
       "commandId": "budget.set",
       "field": "operationId",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.id",
       "derived": false,
@@ -10060,7 +10060,7 @@
     {
       "commandId": "budget.set",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,
@@ -10627,7 +10627,7 @@
     {
       "commandId": "tax.adjust",
       "field": "businessDate",
-      "required": true,
+      "required": false,
       "accepted": true,
       "stored": "fin_operations.business_date",
       "derived": false,

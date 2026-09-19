@@ -7,6 +7,7 @@ import { randomUUID } from "node:crypto";
 import { buyStock, sellStock } from "../public-api/index.js";
 import { setBookBaseCurrency } from "../../../core/accounting/bookSettings.js";
 import { closeAllDbs, openDb } from "../../../core/persistence/port.js";
+import { toDecimal } from "../../../core/money/canonicalDecimal.js";
 
 test("stocks.sell non-zero fee: receivable = gross - fee, no double reduction", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "pf-ssf-"));
@@ -59,12 +60,12 @@ test("stocks.sell non-zero fee: receivable = gross - fee, no double reduction", 
     )
     .all(sellOp);
   const recv = lines.filter((l) => String(l.account_id).includes("broker_receivable"));
-  let net = 0;
+  let net = toDecimal("0");
   for (const l of recv) {
-    const a = Number(l.amount);
-    net += l.side === "debit" ? a : -a;
+    const a = toDecimal(String(l.amount));
+    net = l.side === "debit" ? net.plus(a) : net.minus(a);
   }
   // gross 1000 - fee 5 = 995
-  assert.equal(net, 995, `expected receivable net 995 got ${net} lines=${JSON.stringify(recv)}`);
+  assert.equal(net.toFixed(), "995", `expected receivable net 995 got ${net} lines=${JSON.stringify(recv)}`);
   closeAllDbs();
 });

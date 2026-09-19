@@ -1,349 +1,390 @@
-path	class	role	action
-README.md	E	impl	keep
-data/policy/iran/README.md	E	impl	keep
-data/policy/iran/iran-equity-calendar-v0-sample.json	E	impl	keep
-data/policy/iran/iran-equity-calendar-v1.json	E	impl	keep
-data/policy/iran/iran-equity-fees-v0-sample.json	E	impl	keep
-data/policy/iran/iran-equity-fees-v1.json	E	impl	keep
-docs/API.md	A	docs	keep
-docs/ARCHITECTURE.md	A	docs	keep
-docs/DATA-MODEL.md	A	docs	keep
-docs/DEVELOPMENT.md	A	docs	keep
-docs/DOCUMENTATION-STANDARD.md	A	docs	keep
-docs/FINANCIAL-CORE.md	A	docs	keep
-docs/OFFLINE-RELEASE.md	A	docs	keep
-docs/PRODUCT.md	A	docs	keep
-docs/QUALITY-STATUS.md	A	docs	keep
-docs/README.md	A	docs	keep
-docs/REPORTING.md	A	docs	keep
-docs/archive/AUDIT-HISTORY.md	C	history	keep
-docs/core/RELEASE-EVIDENCE.json	B	machine	keep
-docs/core/db/schema.manifest.json	B	machine	keep
-docs/core/db/schema.sql	B	machine	keep
-docs/core/field-inventory.checklist.tsv	B	machine	keep
-docs/core/file-inventory.tsv	B	machine	keep
-docs/core/json-schemas/api-envelope.schema.json	B	machine	keep
-docs/core/json-schemas/operation-result.schema.json	B	machine	keep
-docs/core/json-schemas/schedule-snapshot.schema.json	B	machine	keep
-docs/core/registry.index.json	B	machine	keep
-docs/core/registry/command-catalog.json	B	machine	keep
-docs/core/registry/field-preservation-matrix.json	B	machine	keep
-docs/core/registry/fixture-manifest.json	B	machine	keep
-docs/core/registry/license-editions.json	B	machine	keep
-docs/core/registry/requirements-matrix.json	B	machine	keep
-docs/core/registry/status.registry.json	B	machine	keep
-docs/modules/accounts.md	A	docs	keep
-docs/modules/budget-goals-bills.md	A	docs	keep
-docs/modules/cheque.md	A	docs	keep
-docs/modules/crypto.md	A	docs	keep
-docs/modules/funds.md	A	docs	keep
-docs/modules/income-expense.md	A	docs	keep
-docs/modules/loan.md	A	docs	keep
-docs/modules/metals.md	A	docs	keep
-docs/modules/physical-assets.md	A	docs	keep
-docs/modules/stocks.md	A	docs	keep
-docs/modules/tax.md	A	docs	keep
-fixtures/CORE-JOURNAL-MULTI-CURRENCY.json	D	test	keep
-fixtures/CORE-JOURNAL-SAME-CURRENCY.json	D	test	keep
-fixtures/CORE-OPENING-BALANCE.json	D	test	keep
-fixtures/CORE-REVERSAL-BEFORE-AFTER.json	D	test	keep
-fixtures/CRITICAL-C2C-SWAP.json	D	test	keep
-fixtures/CRITICAL-TOMAN-INPUT.json	D	test	keep
-fixtures/CRITICAL-TRANSFER-FEE.json	D	test	keep
-fixtures/CRYPTO-BRIDGE-FEE.json	D	test	keep
-fixtures/CRYPTO-BTC-USDT-IRR-PNL.json	D	test	keep
-fixtures/CRYPTO-BUY-FEE-FROM-BASE.json	D	test	keep
-fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json	D	test	keep
-fixtures/CRYPTO-SELL-FEE.json	D	test	keep
-fixtures/FUND-DIVIDEND-REINVEST.json	D	test	keep
-fixtures/FUND-NAV-VS-TX-PRICE.json	D	test	keep
-fixtures/FX-TWO-HOP.json	D	test	keep
-fixtures/LOAN-ANNUAL-FREQUENCY.json	D	test	keep
-fixtures/LOAN-BULLET.json	D	test	keep
-fixtures/LOAN-DECLINING.json	D	test	keep
-fixtures/LOAN-FLAT.json	D	test	keep
-fixtures/LOAN-QARZ.json	D	test	keep
-fixtures/METAL-FINEWEIGHT.json	D	test	keep
-fixtures/METAL-PURITY-18K.json	D	test	keep
-fixtures/STANDALONE-CRYPTO.json	D	test	keep
-fixtures/STANDALONE-FUND.json	D	test	keep
-fixtures/STANDALONE-LOAN.json	D	test	keep
-fixtures/STANDALONE-METALS.json	D	test	keep
-fixtures/STANDALONE-STOCKS.json	D	test	keep
-fixtures/STOCK-BUY-SELL-FEE.json	D	test	keep
-fixtures/STOCK-CORPORATE-ACTION.json	D	test	keep
-fixtures/STOCK-T2-SETTLEMENT.json	D	test	keep
-package-lock.json	E	impl	keep
-package.json	E	impl	keep
-scripts/bench-smoke.js	E	impl	keep
-scripts/command-catalog-check.js	E	impl	keep
-scripts/dependency-graph-check.js	E	impl	keep
-scripts/docs-check-refs.js	E	impl	keep
-scripts/docs-consistency.js	E	impl	keep
-scripts/docs-validator.js	E	impl	keep
-scripts/feature-field-diff.js	E	impl	keep
-scripts/field-inventory-verify.js	E	impl	keep
-scripts/field-preservation-check.js	E	impl	keep
-scripts/file-inventory-check.js	E	impl	keep
-scripts/fixture-empty-check.js	E	impl	keep
-scripts/fixture-manifest.js	E	impl	keep
-scripts/freeze-check.js	E	impl	keep
-scripts/integrity-audit.js	E	impl	keep
-scripts/lint-boundaries.js	E	impl	keep
-scripts/lint-no-number-money.js	E	impl	keep
-scripts/lint-no-sql-sum-money.js	E	impl	keep
-scripts/lint-query-purity.js	E	impl	keep
-scripts/registry-index.js	E	impl	keep
-scripts/release-evidence.js	E	impl	keep
-scripts/requirements-matrix-check.js	E	impl	keep
-scripts/requirements-matrix-check.test.js	D	test	keep
-scripts/schema-drift-smoke.js	E	impl	keep
-scripts/schema-drift-test.js	E	impl	keep
-scripts/schema-manifest-check.js	E	impl	keep
-scripts/schema-manifest.js	E	impl	keep
-scripts/schema-sync-pipeline.js	E	impl	keep
-scripts/source-vocab-check.js	E	impl	keep
-scripts/status-registry-check.js	E	impl	keep
-src/api/publicRegistry.js	E	impl	keep
-src/api/publicRegistry.test.js	D	test	keep
-src/core/acceptance/domain-feature.acceptance.test.js	D	test	keep
-src/core/acceptance/fee-fx.acceptance.test.js	D	test	keep
-src/core/acceptance/financial-core.acceptance.test.js	D	test	keep
-src/core/acceptance/full-edition-integration.acceptance.test.js	D	test	keep
-src/core/acceptance/golden-fixtures.acceptance.test.js	D	test	keep
-src/core/acceptance/journal-base.acceptance.test.js	D	test	keep
-src/core/acceptance/journal.acceptance.test.js	D	test	keep
-src/core/acceptance/loan-accounting-offline.acceptance.test.js	D	test	keep
-src/core/acceptance/loan-flat-fixture.acceptance.test.js	D	test	keep
-src/core/acceptance/loan.acceptance.test.js	D	test	keep
-src/core/acceptance/math-vectors.acceptance.test.js	D	test	keep
-src/core/acceptance/operation.acceptance.test.js	D	test	keep
-src/core/acceptance/provenance-tax.acceptance.test.js	D	test	keep
-src/core/acceptance/recovery-matrix.acceptance.test.js	D	test	keep
-src/core/acceptance/reporting.acceptance.test.js	D	test	keep
-src/core/acceptance/standalone-edition-packs.acceptance.test.js	D	test	keep
-src/core/acceptance/standalone.acceptance.test.js	D	test	keep
-src/core/acceptance/tax.acceptance.test.js	D	test	keep
-src/core/accounting/bookSettings.baseAmount.test.js	D	test	keep
-src/core/accounting/bookSettings.js	E	impl	keep
-src/core/accounting/bookSettings.test.js	D	test	keep
-src/core/accounting/chartOfAccounts.js	E	impl	keep
-src/core/accounting/reports/investment.js	E	impl	keep
-src/core/accounting/reports/statements.js	E	impl	keep
-src/core/accounting/reports/statements.test.js	D	test	keep
-src/core/api/pagination.js	E	impl	keep
-src/core/api/responseEnvelope.js	E	impl	keep
-src/core/api/responseEnvelope.test.js	D	test	keep
-src/core/costBasis/acquisitionFeeFromReceived.js	E	impl	keep
-src/core/costBasis/acquisitionFeeFromReceived.test.js	D	test	keep
-src/core/costBasis/applyEconomicSwap.js	E	impl	keep
-src/core/costBasis/applyEconomicSwap.test.js	D	test	keep
-src/core/costBasis/transferCost.js	E	impl	keep
-src/core/costBasis/transferCost.test.js	D	test	keep
-src/core/costBasis/valuationAttribution.js	E	impl	keep
-src/core/costBasis/valuationAttribution.test.js	D	test	keep
-src/core/dates/isoDate.js	E	impl	keep
-src/core/dates/isoDate.test.js	D	test	keep
-src/core/db/migration.js	E	impl	keep
-src/core/db/migration.test.js	D	test	keep
-src/core/domain/cash/cashSettlementPort.js	E	impl	keep
-src/core/domain/cash/settlementAdapter.js	E	impl	keep
-src/core/domain/cash/settlementAdapter.test.js	D	test	keep
-src/core/domain/category/assertNoCategoryCycle.js	E	impl	keep
-src/core/domain/category/assertNoCategoryCycle.test.js	D	test	keep
-src/core/domain/costBasis/engine.js	E	impl	keep
-src/core/domain/costBasis/engine.test.js	D	test	keep
-src/core/domain/fee/feeEngine.js	E	impl	keep
-src/core/domain/fee/feeEngine.test.js	D	test	keep
-src/core/domain/fee/reduceProceeds.test.js	D	test	keep
-src/core/domain/funds/engine.js	E	impl	keep
-src/core/domain/funds/engine.test.js	D	test	keep
-src/core/domain/fx/amountInBase.test.js	D	test	keep
-src/core/domain/fx/crossRate.js	E	impl	keep
-src/core/domain/fx/crossRate.test.js	D	test	keep
-src/core/domain/fx/resolveStoredRate.js	E	impl	keep
-src/core/domain/fx/resolveStoredRate.test.js	D	test	keep
-src/core/domain/instrument/registry.js	E	impl	keep
-src/core/domain/instrument/registry.test.js	D	test	keep
-src/core/domain/instrument/resolve.js	E	impl	keep
-src/core/domain/instrument/resolve.test.js	D	test	keep
-src/core/domain/invariants/index.js	E	impl	keep
-src/core/domain/loan/rate-normalize.test.js	D	test	keep
-src/core/domain/loan/scheduleAnnual.test.js	D	test	keep
-src/core/domain/loan/scheduleConservation.test.js	D	test	keep
-src/core/domain/loan/scheduleEngine.js	E	impl	keep
-src/core/domain/loan/scheduleEngine.test.js	D	test	keep
-src/core/domain/metals/fineWeight.js	E	impl	keep
-src/core/domain/metals/fineWeight.test.js	D	test	keep
-src/core/domain/operation/economicHash.test.js	D	test	keep
-src/core/domain/operation/field-preservation.test.js	D	test	keep
-src/core/domain/operation/idempotencyConflict.test.js	D	test	keep
-src/core/domain/operation/journalBalance.test.js	D	test	keep
-src/core/domain/operation/operation-roundtrip.test.js	D	test	keep
-src/core/domain/operation/operationEngine.js	E	impl	keep
-src/core/domain/operation/operationEngine.test.js	D	test	keep
-src/core/domain/operation/operationEnvelope.test.js	D	test	keep
-src/core/domain/operation/recovery.idempotency.test.js	D	test	keep
-src/core/domain/price/mappingConflict.js	E	impl	keep
-src/core/domain/price/mappingConflict.test.js	D	test	keep
-src/core/domain/price/provider.js	E	impl	keep
-src/core/domain/reconcile/engine.js	E	impl	keep
-src/core/domain/reconcile/engine.test.js	D	test	keep
-src/core/domain/stocks/corporateAction.js	E	impl	keep
-src/core/domain/stocks/corporateAction.test.js	D	test	keep
-src/core/domain/validation/index.js	E	impl	keep
-src/core/domain/validation/positiveMoney.js	E	impl	keep
-src/core/domain/validation/positiveMoney.test.js	D	test	keep
-src/core/fixtures/core-vectors.test.js	D	test	keep
-src/core/fixtures/harness.js	E	impl	keep
-src/core/fixtures/harness.test.js	D	test	keep
-src/core/import/lineage.js	E	impl	keep
-src/core/import/lineage.test.js	D	test	keep
-src/core/integrity/accAccountCurrencyScan.js	E	impl	keep
-src/core/integrity/archivedZeroBalance.js	E	impl	keep
-src/core/integrity/integrity.test.js	D	test	keep
-src/core/integrity/loanRoleDirection.js	E	impl	keep
-src/core/integrity/postedJournalCurrencyScan.js	E	impl	keep
-src/core/iran/settlementPolicy.js	E	impl	keep
-src/core/iran/settlementPolicy.test.js	D	test	keep
-src/core/iran/toman.js	E	impl	keep
-src/core/iran/toman.test.js	D	test	keep
-src/core/license/licenseGate.js	E	impl	keep
-src/core/license/licenseGate.test.js	D	test	keep
-src/core/money/canonicalDecimal.js	E	impl	keep
-src/core/money/canonicalDecimal.test.js	D	test	keep
-src/core/money/decimalMath.js	E	impl	keep
-src/core/money/sumDecimal.test.js	D	test	keep
-src/core/persistence/browser/README.md	E	impl	keep
-src/core/persistence/browser/durableMemoryAdapter.js	E	impl	keep
-src/core/persistence/browser/durableMemoryAdapter.test.js	D	test	keep
-src/core/persistence/browser/port.contract.js	E	impl	keep
-src/core/persistence/browser/sqlJsIndexedDbAdapter.js	E	impl	keep
-src/core/persistence/browser/sqlJsIndexedDbAdapter.test.js	D	test	keep
-src/core/persistence/port.js	E	impl	keep
-src/core/persistence/resultSnapshot.js	E	impl	keep
-src/core/persistence/worker.js	E	impl	keep
-src/core/persistence/worker.test.js	D	test	keep
-src/core/price/mappingResolver.js	E	impl	keep
-src/core/price/mappingResolver.test.js	D	test	keep
-src/core/rebuild/ordering.js	E	impl	keep
-src/core/rebuild/ordering.test.js	D	test	keep
-src/core/rebuild/rebuildProjection.js	E	impl	keep
-src/core/rebuild/rebuildProjection.test.js	D	test	keep
-src/core/recovery/backup.js	E	impl	keep
-src/core/recovery/backup.test.js	D	test	keep
-src/core/recovery/offlineRecovery.test.js	D	test	keep
-src/core/sync/tabWriter.js	E	impl	keep
-src/core/sync/tabWriter.test.js	D	test	keep
-src/core/tax/taxEvents.js	E	impl	keep
-src/core/tax/taxEvents.test.js	D	test	keep
-src/core/tax/taxStatus.test.js	D	test	keep
-src/core/valuation/reportContext.js	E	impl	keep
-src/core/valuation/reportContext.test.js	D	test	keep
-src/core/valuation/valuationContext.js	E	impl	keep
-src/core/valuation/valuationContext.test.js	D	test	keep
-src/features/crypto/commands/buy.js	E	impl	keep
-src/features/crypto/commands/sell.js	E	impl	keep
-src/features/crypto/commands/transfer.js	E	impl	keep
-src/features/crypto/package.json	E	impl	keep
-src/features/crypto/public-api/index.js	E	impl	keep
-src/features/crypto/tests/buy.test.js	D	test	keep
-src/features/crypto/tests/multicurrency.test.js	D	test	keep
-src/features/crypto/tests/recovery-roundtrip.test.js	D	test	keep
-src/features/crypto/tests/sell.test.js	D	test	keep
-src/features/crypto/tests/standalone.test.js	D	test	keep
-src/features/crypto/tests/transfer.test.js	D	test	keep
-src/features/funds/commands/distribution.js	E	impl	keep
-src/features/funds/commands/redeem.js	E	impl	keep
-src/features/funds/commands/subscribe.js	E	impl	keep
-src/features/funds/domain/cashPath.js	E	impl	keep
-src/features/funds/package.json	E	impl	keep
-src/features/funds/public-api/index.js	E	impl	keep
-src/features/funds/tests/distribution.test.js	D	test	keep
-src/features/funds/tests/fund-field-preservation.test.js	D	test	keep
-src/features/funds/tests/redeem.test.js	D	test	keep
-src/features/funds/tests/standalone.test.js	D	test	keep
-src/features/funds/tests/subscribe.test.js	D	test	keep
-src/features/loan/adapters/accountsCashAdapter.js	E	impl	keep
-src/features/loan/adapters/localSettlementAdapter.js	E	impl	keep
-src/features/loan/commands/capabilities.js	E	impl	keep
-src/features/loan/commands/createLoan.js	E	impl	keep
-src/features/loan/commands/generateSchedule.js	E	impl	keep
-src/features/loan/commands/previewSchedule.js	E	impl	keep
-src/features/loan/commands/recordPayment.js	E	impl	keep
-src/features/loan/commands/reversePayment.js	E	impl	keep
-src/features/loan/domain/feeTier.js	E	impl	keep
-src/features/loan/domain/loanState.js	E	impl	keep
-src/features/loan/domain/paymentAllocation.js	E	impl	keep
-src/features/loan/domain/remainingBalance.js	E	impl	keep
-src/features/loan/domain/role.js	E	impl	keep
-src/features/loan/domain/scheduleFacade.js	E	impl	keep
-src/features/loan/domain/scheduleSnapshot.js	E	impl	keep
-src/features/loan/fixtures/loan-create.test.js	D	test	keep
-src/features/loan/ledger/feeRepository.js	E	impl	keep
-src/features/loan/ledger/loanRepository.js	E	impl	keep
-src/features/loan/ledger/scheduleRepository.js	E	impl	keep
-src/features/loan/ledger/transactionRepository.js	E	impl	keep
-src/features/loan/package.json	E	impl	keep
-src/features/loan/ports/cashSettlementPort.js	E	impl	keep
-src/features/loan/public-api/index.js	E	impl	keep
-src/features/loan/queries/getLoan.js	E	impl	keep
-src/features/loan/queries/getSchedule.js	E	impl	keep
-src/features/loan/queries/getStatement.js	E	impl	keep
-src/features/loan/queries/listLoans.js	E	impl	keep
-src/features/loan/reports/statement.js	E	impl	keep
-src/features/loan/tests/atomic-loan.test.js	D	test	keep
-src/features/loan/tests/fee-repository.test.js	D	test	keep
-src/features/loan/tests/golden-schedule.test.js	D	test	keep
-src/features/loan/tests/payment-allocation.test.js	D	test	keep
-src/features/loan/tests/recovery-roundtrip.test.js	D	test	keep
-src/features/loan/tests/standalone-boot.test.js	D	test	keep
-src/features/metals/commands/buy.js	E	impl	keep
-src/features/metals/commands/delivery.js	E	impl	keep
-src/features/metals/commands/sell.js	E	impl	keep
-src/features/metals/domain/valuationBasis.js	E	impl	keep
-src/features/metals/package.json	E	impl	keep
-src/features/metals/public-api/index.js	E	impl	keep
-src/features/metals/tests/buy.test.js	D	test	keep
-src/features/metals/tests/delivery-fee-separation.test.js	D	test	keep
-src/features/metals/tests/delivery.test.js	D	test	keep
-src/features/metals/tests/metals-field-preservation.test.js	D	test	keep
-src/features/metals/tests/purity-holding.test.js	D	test	keep
-src/features/metals/tests/sell.test.js	D	test	keep
-src/features/metals/tests/standalone.test.js	D	test	keep
-src/features/stocks/commands/buy.js	E	impl	keep
-src/features/stocks/commands/dividend.js	E	impl	keep
-src/features/stocks/commands/sell.js	E	impl	keep
-src/features/stocks/commands/settle.js	E	impl	keep
-src/features/stocks/package.json	E	impl	keep
-src/features/stocks/public-api/index.js	E	impl	keep
-src/features/stocks/tests/buy.test.js	D	test	keep
-src/features/stocks/tests/dividend.test.js	D	test	keep
-src/features/stocks/tests/sell.test.js	D	test	keep
-src/features/stocks/tests/settle.test.js	D	test	keep
-src/features/stocks/tests/standalone.test.js	D	test	keep
-src/features/stocks/tests/stocks-field-preservation.test.js	D	test	keep
-scripts/command-contract-check.js	script
-src/core/acceptance/module-handoff.acceptance.test.js	test
-src/features/crypto/tests/capitalize-fee.test.js	test
-src/features/loan/tests/frequency-command.test.js	test
-src/features/stocks/tests/sell-fee.test.js	test
-src/features/funds/tests/redeem-price-mismatch.test.js	test
-src/features/crypto/tests/qty-conservation.test.js	test
-src/core/acceptance/bug-f-semantic.acceptance.test.js	E	test	keep
-scripts/command-constraints-check.js	E	script	keep
-src/core/money/phase1-money-hardening.test.js	E	test	keep
-scripts/field-preservation-check.test.js	E	test	keep
-src/core/domain/invariants/journal-matrix.test.js	E	test	keep
-src/core/persistence/result-json-not-sot.test.js	E	test	keep
-src/features/loan/tests/carry-over-contract.test.js	E	test	keep
-.npmrc	E	impl	keep
-src/core/acceptance/accounting-kernel.acceptance.test.js	E	test	keep
-src/core/domain/operation/reversal.js	E	impl	keep
-src/core/domain/operation/reversal.test.js	E	test	keep
-src/core/acceptance/accounting-golden.acceptance.test.js	E	test	keep
-fixtures/CORE-ACCOUNTING-KERNEL-V1.json	E	fixture	keep
-scripts/command-constraints-check.test.js	E	test	keep
-scripts/accounting-invariants-audit.js	E	script	keep
-src/core/persistence/integrity.js	E	impl	keep
-src/core/persistence/integrity.test.js	E	impl	keep
+path	status	class
+.npmrc	CURRENT	src
+README.md	CURRENT	src
+data/policy/iran/README.md	CURRENT	src
+data/policy/iran/iran-equity-calendar-v0-sample.json	CURRENT	src
+data/policy/iran/iran-equity-calendar-v1.json	CURRENT	src
+data/policy/iran/iran-equity-fees-v0-sample.json	CURRENT	src
+data/policy/iran/iran-equity-fees-v1.json	CURRENT	src
+docs/API.md	CURRENT	src
+docs/ARCHITECTURE.md	CURRENT	src
+docs/DATA-MODEL.md	CURRENT	src
+docs/DEVELOPMENT.md	CURRENT	src
+docs/DOCUMENTATION-STANDARD.md	CURRENT	src
+docs/FINANCIAL-CORE.md	CURRENT	src
+docs/OFFLINE-RELEASE.md	CURRENT	src
+docs/PLATFORM-ARCHITECTURE.md	CURRENT	src
+docs/PRODUCT.md	CURRENT	src
+docs/QUALITY-STATUS.md	CURRENT	src
+docs/README.md	CURRENT	src
+docs/REPORTING.md	CURRENT	src
+docs/archive/AUDIT-HISTORY.md	CURRENT	src
+docs/core/RELEASE-EVIDENCE.json	CURRENT	src
+docs/core/db/schema.manifest.json	CURRENT	src
+docs/core/db/schema.sql	CURRENT	src
+docs/core/field-inventory.checklist.tsv	CURRENT	src
+docs/core/json-schemas/api-envelope.schema.json	CURRENT	src
+docs/core/json-schemas/operation-result.schema.json	CURRENT	src
+docs/core/json-schemas/schedule-snapshot.schema.json	CURRENT	src
+docs/core/registry.index.json	CURRENT	src
+docs/core/registry/command-catalog.json	CURRENT	src
+docs/core/registry/field-preservation-matrix.json	CURRENT	src
+docs/core/registry/fixture-manifest.json	CURRENT	src
+docs/core/registry/license-editions.json	CURRENT	src
+docs/core/registry/requirements-matrix.json	CURRENT	src
+docs/core/registry/status.registry.json	CURRENT	src
+docs/modules/accounts.md	CURRENT	src
+docs/modules/budget-goals-bills.md	CURRENT	src
+docs/modules/cheque.md	CURRENT	src
+docs/modules/crypto.md	CURRENT	src
+docs/modules/funds.md	CURRENT	src
+docs/modules/income-expense.md	CURRENT	src
+docs/modules/loan.md	CURRENT	src
+docs/modules/metals.md	CURRENT	src
+docs/modules/physical-assets.md	CURRENT	src
+docs/modules/stocks.md	CURRENT	src
+docs/modules/tax.md	CURRENT	src
+docs/phase-pack/AUDIT-RESPONSE-2026-09-19.md	CURRENT	src
+docs/phase-pack/BACKLOG-DISPOSITION-2026-09-19.md	CURRENT	src
+docs/phase-pack/INDEX.md	CURRENT	src
+docs/phase-pack/PHASE-PACK-METADATA.md	CURRENT	src
+docs/phase-pack/THINK-TANK-SYNTHESIS-2026-09-19.md	CURRENT	src
+fixtures/CORE-ACCOUNTING-KERNEL-V1.json	CURRENT	src
+fixtures/CORE-JOURNAL-MULTI-CURRENCY.json	CURRENT	src
+fixtures/CORE-JOURNAL-SAME-CURRENCY.json	CURRENT	src
+fixtures/CORE-OPENING-BALANCE.json	CURRENT	src
+fixtures/CORE-REVERSAL-BEFORE-AFTER.json	CURRENT	src
+fixtures/CRITICAL-C2C-SWAP.json	CURRENT	src
+fixtures/CRITICAL-TOMAN-INPUT.json	CURRENT	src
+fixtures/CRITICAL-TRANSFER-FEE.json	CURRENT	src
+fixtures/CRYPTO-BRIDGE-FEE.json	CURRENT	src
+fixtures/CRYPTO-BTC-USDT-IRR-PNL.json	CURRENT	src
+fixtures/CRYPTO-BUY-FEE-FROM-BASE.json	CURRENT	src
+fixtures/CRYPTO-BUY-FEE-IN-QUOTE.json	CURRENT	src
+fixtures/CRYPTO-SELL-FEE.json	CURRENT	src
+fixtures/FUND-DIVIDEND-REINVEST.json	CURRENT	src
+fixtures/FUND-NAV-VS-TX-PRICE.json	CURRENT	src
+fixtures/FX-TWO-HOP.json	CURRENT	src
+fixtures/LOAN-ANNUAL-FREQUENCY.json	CURRENT	src
+fixtures/LOAN-BULLET.json	CURRENT	src
+fixtures/LOAN-DECLINING.json	CURRENT	src
+fixtures/LOAN-FLAT.json	CURRENT	src
+fixtures/LOAN-QARZ.json	CURRENT	src
+fixtures/METAL-FINEWEIGHT.json	CURRENT	src
+fixtures/METAL-PURITY-18K.json	CURRENT	src
+fixtures/STANDALONE-CRYPTO.json	CURRENT	src
+fixtures/STANDALONE-FUND.json	CURRENT	src
+fixtures/STANDALONE-LOAN.json	CURRENT	src
+fixtures/STANDALONE-METALS.json	CURRENT	src
+fixtures/STANDALONE-STOCKS.json	CURRENT	src
+fixtures/STOCK-BUY-SELL-FEE.json	CURRENT	src
+fixtures/STOCK-CORPORATE-ACTION.json	CURRENT	src
+fixtures/STOCK-T2-SETTLEMENT.json	CURRENT	src
+package.json	CURRENT	src
+scripts/accounting-invariants-audit.js	CURRENT	src
+scripts/bench-smoke.js	CURRENT	src
+scripts/command-catalog-check.js	CURRENT	src
+scripts/command-constraints-check.js	CURRENT	src
+scripts/command-constraints-check.test.js	CURRENT	src
+scripts/command-contract-check.js	CURRENT	src
+scripts/dependency-graph-check.js	CURRENT	src
+scripts/docs-check-refs.js	CURRENT	src
+scripts/docs-consistency.js	CURRENT	src
+scripts/docs-validator.js	CURRENT	src
+scripts/feature-field-diff.js	CURRENT	src
+scripts/field-inventory-verify.js	CURRENT	src
+scripts/field-preservation-check.js	CURRENT	src
+scripts/field-preservation-check.test.js	CURRENT	src
+scripts/file-inventory-check.js	CURRENT	src
+scripts/fixture-empty-check.js	CURRENT	src
+scripts/fixture-manifest.js	CURRENT	src
+scripts/freeze-check.js	CURRENT	src
+scripts/integrity-audit.js	CURRENT	src
+scripts/lint-boundaries.js	CURRENT	src
+scripts/lint-no-number-money.js	CURRENT	src
+scripts/lint-no-sql-sum-money.js	CURRENT	src
+scripts/lint-query-purity.js	CURRENT	src
+scripts/registry-index.js	CURRENT	src
+scripts/release-evidence.js	CURRENT	src
+scripts/requirements-matrix-check.js	CURRENT	src
+scripts/requirements-matrix-check.test.js	CURRENT	src
+scripts/schema-drift-smoke.js	CURRENT	src
+scripts/schema-drift-test.js	CURRENT	src
+scripts/schema-manifest-check.js	CURRENT	src
+scripts/schema-manifest.js	CURRENT	src
+scripts/schema-sync-pipeline.js	CURRENT	src
+scripts/source-vocab-check.js	CURRENT	src
+scripts/status-registry-check.js	CURRENT	src
+src/api/publicRegistry.js	CURRENT	src
+src/api/publicRegistry.test.js	CURRENT	src
+src/core/acceptance/accounting-golden.acceptance.test.js	CURRENT	src
+src/core/acceptance/accounting-kernel.acceptance.test.js	CURRENT	src
+src/core/acceptance/bug-f-semantic.acceptance.test.js	CURRENT	src
+src/core/acceptance/domain-feature.acceptance.test.js	CURRENT	src
+src/core/acceptance/fee-fx.acceptance.test.js	CURRENT	src
+src/core/acceptance/financial-core.acceptance.test.js	CURRENT	src
+src/core/acceptance/full-edition-integration.acceptance.test.js	CURRENT	src
+src/core/acceptance/golden-fixtures.acceptance.test.js	CURRENT	src
+src/core/acceptance/journal-base.acceptance.test.js	CURRENT	src
+src/core/acceptance/journal.acceptance.test.js	CURRENT	src
+src/core/acceptance/loan-accounting-offline.acceptance.test.js	CURRENT	src
+src/core/acceptance/loan-flat-fixture.acceptance.test.js	CURRENT	src
+src/core/acceptance/loan.acceptance.test.js	CURRENT	src
+src/core/acceptance/math-vectors.acceptance.test.js	CURRENT	src
+src/core/acceptance/module-handoff.acceptance.test.js	CURRENT	src
+src/core/acceptance/operation.acceptance.test.js	CURRENT	src
+src/core/acceptance/provenance-tax.acceptance.test.js	CURRENT	src
+src/core/acceptance/recovery-matrix.acceptance.test.js	CURRENT	src
+src/core/acceptance/reporting.acceptance.test.js	CURRENT	src
+src/core/acceptance/standalone-edition-packs.acceptance.test.js	CURRENT	src
+src/core/acceptance/standalone.acceptance.test.js	CURRENT	src
+src/core/acceptance/tax.acceptance.test.js	CURRENT	src
+src/core/accounting/bookSettings.baseAmount.test.js	CURRENT	src
+src/core/accounting/bookSettings.js	CURRENT	src
+src/core/accounting/bookSettings.test.js	CURRENT	src
+src/core/accounting/chartOfAccounts.js	CURRENT	src
+src/core/accounting/reports/investment.js	CURRENT	src
+src/core/accounting/reports/investment.test.js	CURRENT	src
+src/core/accounting/reports/statements.js	CURRENT	src
+src/core/accounting/reports/statements.test.js	CURRENT	src
+src/core/api/pagination.js	CURRENT	src
+src/core/api/responseEnvelope.js	CURRENT	src
+src/core/api/responseEnvelope.test.js	CURRENT	src
+src/core/costBasis/acquisitionFeeFromReceived.js	CURRENT	src
+src/core/costBasis/acquisitionFeeFromReceived.test.js	CURRENT	src
+src/core/costBasis/applyEconomicSwap.js	CURRENT	src
+src/core/costBasis/applyEconomicSwap.test.js	CURRENT	src
+src/core/costBasis/transferCost.js	CURRENT	src
+src/core/costBasis/transferCost.test.js	CURRENT	src
+src/core/costBasis/valuationAttribution.js	CURRENT	src
+src/core/costBasis/valuationAttribution.test.js	CURRENT	src
+src/core/dates/isoDate.js	CURRENT	src
+src/core/dates/isoDate.test.js	CURRENT	src
+src/core/db/migration.js	CURRENT	src
+src/core/db/migration.test.js	CURRENT	src
+src/core/domain/cash/cashSettlementPort.js	CURRENT	src
+src/core/domain/cash/settlementAdapter.js	CURRENT	src
+src/core/domain/cash/settlementAdapter.test.js	CURRENT	src
+src/core/domain/category/assertNoCategoryCycle.js	CURRENT	src
+src/core/domain/category/assertNoCategoryCycle.test.js	CURRENT	src
+src/core/domain/costBasis/engine.js	CURRENT	src
+src/core/domain/costBasis/engine.test.js	CURRENT	src
+src/core/domain/fee/feeEngine.js	CURRENT	src
+src/core/domain/fee/feeEngine.test.js	CURRENT	src
+src/core/domain/fee/reduceProceeds.test.js	CURRENT	src
+src/core/domain/funds/engine.js	CURRENT	src
+src/core/domain/funds/engine.test.js	CURRENT	src
+src/core/domain/fx/amountInBase.test.js	CURRENT	src
+src/core/domain/fx/crossRate.js	CURRENT	src
+src/core/domain/fx/crossRate.test.js	CURRENT	src
+src/core/domain/fx/resolveStoredRate.js	CURRENT	src
+src/core/domain/fx/resolveStoredRate.test.js	CURRENT	src
+src/core/domain/instrument/registry.js	CURRENT	src
+src/core/domain/instrument/registry.test.js	CURRENT	src
+src/core/domain/instrument/resolve.js	CURRENT	src
+src/core/domain/instrument/resolve.test.js	CURRENT	src
+src/core/domain/invariants/index.js	CURRENT	src
+src/core/domain/invariants/journal-matrix.test.js	CURRENT	src
+src/core/domain/loan/rate-normalize.test.js	CURRENT	src
+src/core/domain/loan/scheduleAnnual.test.js	CURRENT	src
+src/core/domain/loan/scheduleConservation.test.js	CURRENT	src
+src/core/domain/loan/scheduleEngine.js	CURRENT	src
+src/core/domain/loan/scheduleEngine.test.js	CURRENT	src
+src/core/domain/metals/fineWeight.js	CURRENT	src
+src/core/domain/metals/fineWeight.test.js	CURRENT	src
+src/core/domain/operation/economicHash.test.js	CURRENT	src
+src/core/domain/operation/field-preservation.test.js	CURRENT	src
+src/core/domain/operation/idempotencyConflict.test.js	CURRENT	src
+src/core/domain/operation/journalBalance.test.js	CURRENT	src
+src/core/domain/operation/operation-roundtrip.test.js	CURRENT	src
+src/core/domain/operation/operationEngine.js	CURRENT	src
+src/core/domain/operation/operationEngine.test.js	CURRENT	src
+src/core/domain/operation/operationEnvelope.test.js	CURRENT	src
+src/core/domain/operation/recovery.idempotency.test.js	CURRENT	src
+src/core/domain/operation/reversal.js	CURRENT	src
+src/core/domain/operation/reversal.test.js	CURRENT	src
+src/core/domain/price/mappingConflict.js	CURRENT	src
+src/core/domain/price/mappingConflict.test.js	CURRENT	src
+src/core/domain/price/provider.js	CURRENT	src
+src/core/domain/reconcile/engine.js	CURRENT	src
+src/core/domain/reconcile/engine.test.js	CURRENT	src
+src/core/domain/stocks/corporateAction.js	CURRENT	src
+src/core/domain/stocks/corporateAction.test.js	CURRENT	src
+src/core/domain/validation/index.js	CURRENT	src
+src/core/domain/validation/positiveMoney.js	CURRENT	src
+src/core/domain/validation/positiveMoney.test.js	CURRENT	src
+src/core/fixtures/core-vectors.test.js	CURRENT	src
+src/core/fixtures/harness.js	CURRENT	src
+src/core/fixtures/harness.test.js	CURRENT	src
+src/core/import/lineage.js	CURRENT	src
+src/core/import/lineage.test.js	CURRENT	src
+src/core/integrity/accAccountCurrencyScan.js	CURRENT	src
+src/core/integrity/archivedZeroBalance.js	CURRENT	src
+src/core/integrity/integrity.test.js	CURRENT	src
+src/core/integrity/loanRoleDirection.js	CURRENT	src
+src/core/integrity/postedJournalCurrencyScan.js	CURRENT	src
+src/core/iran/settlementPolicy.js	CURRENT	src
+src/core/iran/settlementPolicy.test.js	CURRENT	src
+src/core/iran/toman.js	CURRENT	src
+src/core/iran/toman.test.js	CURRENT	src
+src/core/license/licenseGate.js	CURRENT	src
+src/core/license/licenseGate.test.js	CURRENT	src
+src/core/money/canonicalDecimal.js	CURRENT	src
+src/core/money/canonicalDecimal.test.js	CURRENT	src
+src/core/money/decimalMath.js	CURRENT	src
+src/core/money/phase1-money-hardening.test.js	CURRENT	src
+src/core/money/sumDecimal.test.js	CURRENT	src
+src/core/persistence/browser/README.md	CURRENT	src
+src/core/persistence/browser/durableMemoryAdapter.js	CURRENT	src
+src/core/persistence/browser/durableMemoryAdapter.test.js	CURRENT	src
+src/core/persistence/browser/port.contract.js	CURRENT	src
+src/core/persistence/browser/sqlJsIndexedDbAdapter.js	CURRENT	src
+src/core/persistence/browser/sqlJsIndexedDbAdapter.test.js	CURRENT	src
+src/core/persistence/integrity.js	CURRENT	src
+src/core/persistence/integrity.test.js	CURRENT	src
+src/core/persistence/port.js	CURRENT	src
+src/core/persistence/result-json-not-sot.test.js	CURRENT	src
+src/core/persistence/resultSnapshot.js	CURRENT	src
+src/core/persistence/worker.js	CURRENT	src
+src/core/persistence/worker.test.js	CURRENT	src
+src/core/price/mappingResolver.js	CURRENT	src
+src/core/price/mappingResolver.test.js	CURRENT	src
+src/core/rebuild/ordering.js	CURRENT	src
+src/core/rebuild/ordering.test.js	CURRENT	src
+src/core/rebuild/rebuildProjection.js	CURRENT	src
+src/core/rebuild/rebuildProjection.test.js	CURRENT	src
+src/core/recovery/backup.js	CURRENT	src
+src/core/recovery/backup.test.js	CURRENT	src
+src/core/recovery/offlineRecovery.test.js	CURRENT	src
+src/core/sync/tabWriter.js	CURRENT	src
+src/core/sync/tabWriter.test.js	CURRENT	src
+src/core/tax/taxEvents.js	CURRENT	src
+src/core/tax/taxEvents.test.js	CURRENT	src
+src/core/tax/taxStatus.test.js	CURRENT	src
+src/core/valuation/reportContext.js	CURRENT	src
+src/core/valuation/reportContext.test.js	CURRENT	src
+src/core/valuation/valuationContext.js	CURRENT	src
+src/core/valuation/valuationContext.test.js	CURRENT	src
+src/features/_shared/commandGuard.js	CURRENT	src
+src/features/accounts/commands/archive.js	CURRENT	src
+src/features/accounts/commands/create.js	CURRENT	src
+src/features/accounts/commands/deposit.js	CURRENT	src
+src/features/accounts/commands/transfer.js	CURRENT	src
+src/features/accounts/commands/update.js	CURRENT	src
+src/features/accounts/commands/withdraw.js	CURRENT	src
+src/features/accounts/public-api/index.js	CURRENT	src
+src/features/accounts/tests/phase6-core-finance.test.js	CURRENT	src
+src/features/assets/commands/dispose.js	CURRENT	src
+src/features/assets/commands/register.js	CURRENT	src
+src/features/assets/commands/update.js	CURRENT	src
+src/features/assets/public-api/index.js	CURRENT	src
+src/features/bills/commands/schedule.js	CURRENT	src
+src/features/bills/public-api/index.js	CURRENT	src
+src/features/budget/commands/set.js	CURRENT	src
+src/features/budget/public-api/index.js	CURRENT	src
+src/features/cheque/commands/bounce.js	CURRENT	src
+src/features/cheque/commands/cancel.js	CURRENT	src
+src/features/cheque/commands/clear.js	CURRENT	src
+src/features/cheque/commands/deposit.js	CURRENT	src
+src/features/cheque/commands/register.js	CURRENT	src
+src/features/cheque/public-api/index.js	CURRENT	src
+src/features/crypto/commands/buy.js	CURRENT	src
+src/features/crypto/commands/sell.js	CURRENT	src
+src/features/crypto/commands/transfer.js	CURRENT	src
+src/features/crypto/package.json	CURRENT	src
+src/features/crypto/public-api/index.js	CURRENT	src
+src/features/crypto/tests/buy.test.js	CURRENT	src
+src/features/crypto/tests/capitalize-fee.test.js	CURRENT	src
+src/features/crypto/tests/multicurrency.test.js	CURRENT	src
+src/features/crypto/tests/qty-conservation.test.js	CURRENT	src
+src/features/crypto/tests/recovery-roundtrip.test.js	CURRENT	src
+src/features/crypto/tests/sell.test.js	CURRENT	src
+src/features/crypto/tests/standalone.test.js	CURRENT	src
+src/features/crypto/tests/transfer.test.js	CURRENT	src
+src/features/expense/commands/create.js	CURRENT	src
+src/features/expense/commands/reverse.js	CURRENT	src
+src/features/expense/public-api/index.js	CURRENT	src
+src/features/funds/commands/distribution.js	CURRENT	src
+src/features/funds/commands/redeem.js	CURRENT	src
+src/features/funds/commands/subscribe.js	CURRENT	src
+src/features/funds/domain/cashPath.js	CURRENT	src
+src/features/funds/package.json	CURRENT	src
+src/features/funds/public-api/index.js	CURRENT	src
+src/features/funds/tests/distribution.test.js	CURRENT	src
+src/features/funds/tests/fund-field-preservation.test.js	CURRENT	src
+src/features/funds/tests/redeem-price-mismatch.test.js	CURRENT	src
+src/features/funds/tests/redeem.test.js	CURRENT	src
+src/features/funds/tests/standalone.test.js	CURRENT	src
+src/features/funds/tests/subscribe.test.js	CURRENT	src
+src/features/goals/commands/create.js	CURRENT	src
+src/features/goals/public-api/index.js	CURRENT	src
+src/features/income/commands/create.js	CURRENT	src
+src/features/income/commands/reverse.js	CURRENT	src
+src/features/income/public-api/index.js	CURRENT	src
+src/features/loan/adapters/accountsCashAdapter.js	CURRENT	src
+src/features/loan/adapters/localSettlementAdapter.js	CURRENT	src
+src/features/loan/commands/capabilities.js	CURRENT	src
+src/features/loan/commands/createLoan.js	CURRENT	src
+src/features/loan/commands/generateSchedule.js	CURRENT	src
+src/features/loan/commands/previewSchedule.js	CURRENT	src
+src/features/loan/commands/recordPayment.js	CURRENT	src
+src/features/loan/commands/reversePayment.js	CURRENT	src
+src/features/loan/domain/feeTier.js	CURRENT	src
+src/features/loan/domain/loanState.js	CURRENT	src
+src/features/loan/domain/paymentAllocation.js	CURRENT	src
+src/features/loan/domain/remainingBalance.js	CURRENT	src
+src/features/loan/domain/role.js	CURRENT	src
+src/features/loan/domain/scheduleFacade.js	CURRENT	src
+src/features/loan/domain/scheduleSnapshot.js	CURRENT	src
+src/features/loan/fixtures/loan-create.test.js	CURRENT	src
+src/features/loan/ledger/feeRepository.js	CURRENT	src
+src/features/loan/ledger/loanRepository.js	CURRENT	src
+src/features/loan/ledger/scheduleRepository.js	CURRENT	src
+src/features/loan/ledger/transactionRepository.js	CURRENT	src
+src/features/loan/package.json	CURRENT	src
+src/features/loan/ports/cashSettlementPort.js	CURRENT	src
+src/features/loan/public-api/index.js	CURRENT	src
+src/features/loan/queries/getLoan.js	CURRENT	src
+src/features/loan/queries/getSchedule.js	CURRENT	src
+src/features/loan/queries/getStatement.js	CURRENT	src
+src/features/loan/queries/listLoans.js	CURRENT	src
+src/features/loan/reports/statement.js	CURRENT	src
+src/features/loan/tests/as-of-close.test.js	CURRENT	src
+src/features/loan/tests/atomic-loan.test.js	CURRENT	src
+src/features/loan/tests/carry-over-contract.test.js	CURRENT	src
+src/features/loan/tests/fee-repository.test.js	CURRENT	src
+src/features/loan/tests/frequency-command.test.js	CURRENT	src
+src/features/loan/tests/golden-schedule.test.js	CURRENT	src
+src/features/loan/tests/payment-allocation.test.js	CURRENT	src
+src/features/loan/tests/recovery-roundtrip.test.js	CURRENT	src
+src/features/loan/tests/standalone-boot.test.js	CURRENT	src
+src/features/metals/commands/buy.js	CURRENT	src
+src/features/metals/commands/delivery.js	CURRENT	src
+src/features/metals/commands/sell.js	CURRENT	src
+src/features/metals/domain/valuationBasis.js	CURRENT	src
+src/features/metals/package.json	CURRENT	src
+src/features/metals/public-api/index.js	CURRENT	src
+src/features/metals/tests/buy.test.js	CURRENT	src
+src/features/metals/tests/delivery-fee-separation.test.js	CURRENT	src
+src/features/metals/tests/delivery.test.js	CURRENT	src
+src/features/metals/tests/metals-field-preservation.test.js	CURRENT	src
+src/features/metals/tests/purity-holding.test.js	CURRENT	src
+src/features/metals/tests/sell.test.js	CURRENT	src
+src/features/metals/tests/standalone.test.js	CURRENT	src
+src/features/stocks/commands/buy.js	CURRENT	src
+src/features/stocks/commands/dividend.js	CURRENT	src
+src/features/stocks/commands/sell.js	CURRENT	src
+src/features/stocks/commands/settle.js	CURRENT	src
+src/features/stocks/package.json	CURRENT	src
+src/features/stocks/public-api/index.js	CURRENT	src
+src/features/stocks/tests/buy.test.js	CURRENT	src
+src/features/stocks/tests/dividend.test.js	CURRENT	src
+src/features/stocks/tests/sell-fee.test.js	CURRENT	src
+src/features/stocks/tests/sell.test.js	CURRENT	src
+src/features/stocks/tests/settle.test.js	CURRENT	src
+src/features/stocks/tests/standalone.test.js	CURRENT	src
+src/features/stocks/tests/stocks-field-preservation.test.js	CURRENT	src
+src/features/tax/commands/adjust.js	CURRENT	src
+src/features/tax/commands/assess.js	CURRENT	src
+src/features/tax/commands/pay.js	CURRENT	src
+src/features/tax/public-api/index.js	CURRENT	src
