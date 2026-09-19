@@ -348,3 +348,4 @@ scripts/accounting-invariants-audit.js	E	script	keep
 src/core/persistence/integrity.js	E	impl	keep
 src/core/persistence/integrity.test.js	D	test	keep
 src/features/loan/tests/as-of-close.test.js	D	test	keep
+src/core/accounting/reports/investment.test.js	D	test	keep
