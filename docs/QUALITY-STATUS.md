@@ -93,3 +93,10 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - accountMeta includes role/status; cashFlow classifies by role only
 - ACCOUNT_CLOSED explicit; CANONICAL_ACCOUNT_KINDS / CANONICAL_CASH_ROLES
 - accounting-kernel.acceptance.test.js: journal, account, cashFlow, fee, idempotency
+
+## Phase 2 P2-06..P2-17 progress (2026-09-19)
+
+- buildInverseJournalLines + assertReversalAllowed
+- fixtures/CORE-ACCOUNTING-KERNEL-V1.json + golden acceptance
+- command-constraints-check negative tests
+- accounting-invariants-audit.js (no ghost cash tables; fee guards; golden run)

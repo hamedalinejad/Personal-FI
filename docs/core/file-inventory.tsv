@@ -339,3 +339,9 @@ src/core/persistence/result-json-not-sot.test.js	E	test	keep
 src/features/loan/tests/carry-over-contract.test.js	E	test	keep
 .npmrc	E	impl	keep
 src/core/acceptance/accounting-kernel.acceptance.test.js	E	test	keep
+src/core/domain/operation/reversal.js	E	impl	keep
+src/core/domain/operation/reversal.test.js	E	test	keep
+src/core/acceptance/accounting-golden.acceptance.test.js	E	test	keep
+fixtures/CORE-ACCOUNTING-KERNEL-V1.json	E	fixture	keep
+scripts/command-constraints-check.test.js	E	test	keep
+scripts/accounting-invariants-audit.js	E	script	keep
