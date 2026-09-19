@@ -100,3 +100,13 @@ test("reduce_received_quantity without context rejects", () => {
     /FEE_FROM_RECEIVED_CONTEXT_REQUIRED/,
   );
 });
+
+test("equity_adjustment deferred without allowEquityAdjustment", () => {
+  assert.throws(() => normalizeFeeTreatment("equity_adjustment"), /FEE_TREATMENT_DEFERRED/);
+  assert.equal(normalizeFeeTreatment("equity_adjustment", { allowEquityAdjustment: true }), "equity_adjustment");
+});
+
+test("treatment required — no silent expense default", () => {
+  assert.throws(() => normalizeFeeTreatment(null), /FEE_TREATMENT_REQUIRED/);
+  assert.throws(() => normalizeFeeTreatment(""), /FEE_TREATMENT_REQUIRED/);
+});

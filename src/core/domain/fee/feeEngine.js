@@ -50,6 +50,10 @@ export function normalizeFeeTreatment(raw, opts = {}) {
   if (!CANONICAL_FEE_TREATMENTS.includes(canonical)) {
     throw new Error(`FEE_TREATMENT_INVALID:${raw}`);
   }
+  // equity_adjustment economics not freeze-locked — require explicit opt-in
+  if (canonical === "equity_adjustment" && !opts.allowEquityAdjustment) {
+    throw new Error("FEE_TREATMENT_DEFERRED:equity_adjustment");
+  }
   return canonical;
 }
 

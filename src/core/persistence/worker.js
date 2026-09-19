@@ -297,10 +297,16 @@ function loadOperationSync(db, operationId, replay = false) {
   if (!row) throw new Error("OP_NOT_FOUND");
 
   if (row.result_json) {
-    const snap = JSON.parse(row.result_json);
+    let snap = null;
+    try {
+      snap = JSON.parse(row.result_json);
+    } catch {
+      // corrupt transport snapshot — ignore; relational tables are SoT
+      snap = { _resultJsonCorrupt: true };
+    }
     // result_json is replay metadata only; journal always from relational tables
     // verify stored hash against payload without result_hash field
-    if (row.result_hash && snap && typeof snap === "object") {
+    if (row.result_hash && snap && typeof snap === "object" && !snap._resultJsonCorrupt) {
       const { result_hash: _rh, ...canonical } = snap;
       const recomputed = createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
       if (recomputed !== row.result_hash) {

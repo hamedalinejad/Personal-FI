@@ -77,7 +77,7 @@ test("BUG-005 money Number in payload rejected by hash", () => {
           payload: { amount: 0.1 },
         }),
       ),
-    /HASH_NUMBER_FORBIDDEN/,
+    /HASH_NUMBER_FORBIDDEN|PAYLOAD_ECONOMIC_NOT_STRING/,
   );
 });
 
@@ -218,4 +218,36 @@ test("same-currency amount variants hash equal after canonicalize", () => {
     ],
   });
   assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("H-payload: costTotal 100 vs 100.0 same hash when string economic field", () => {
+  const base = {
+    operationId: "op-payload-dec",
+    businessDate: "2026-01-01",
+    baseCurrency: "IRR",
+    status: "draft",
+    type: "test.op",
+    journalLines: [],
+  };
+  const a = normalizeCommand({ ...base, payload: { costTotal: "100" } });
+  const b = normalizeCommand({ ...base, payload: { costTotal: "100.0" } });
+  assert.equal(a.payload.costTotal, "100");
+  assert.equal(b.payload.costTotal, "100");
+  assert.equal(computeCommandHash(a), computeCommandHash(b));
+});
+
+test("H-payload: Number economic field rejected", () => {
+  assert.throws(
+    () =>
+      normalizeCommand({
+        operationId: "op-payload-num",
+        businessDate: "2026-01-01",
+        baseCurrency: "IRR",
+        status: "draft",
+        type: "test.op",
+        journalLines: [],
+        payload: { costTotal: 100 },
+      }),
+    /PAYLOAD_ECONOMIC_NOT_STRING/,
+  );
 });

@@ -119,3 +119,17 @@ test("missing side → FAIL", () => {
     /SIDE_REQUIRED|INV_JOURNAL/i,
   );
 });
+
+test("posted multi-currency without base fields → FAIL at kernel", () => {
+  assert.throws(
+    () =>
+      bal(
+        [
+          { side: "debit", amount: "1", currency: "USD" },
+          { side: "credit", amount: "1", currency: "USD" },
+        ],
+        { baseCurrency: "IRR", posted: true },
+      ),
+    /MISSING_AMOUNT_IN_BASE|INV_JOURNAL/i,
+  );
+});

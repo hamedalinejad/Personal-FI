@@ -79,3 +79,11 @@ Executable vectors in `src/core/money/phase1-money-hardening.test.js`:
 - resolveBaseAmountSync / requireFxIfCrossCurrency: string-only via canonicalDecimalString
 - record_outstanding journal lineKind opening → adjustment (schema CHECK)
 - package-lock + .npmrc: decimal.js from registry.npmjs.org (CI ETIMEDOUT on private mirror)
+
+## Phase 2 kernel progress (2026-09-19)
+
+- P2-00 carry-over: closed on 34a1d9d
+- result_json invalid JSON → relational SoT load (boundary for Phase 3)
+- P2-01: posted journals force base-currency balance path
+- P2-02: payload economic decimal field canonicalization before hash
+- P2-03: equity_adjustment DEFERRED without allowEquityAdjustment; treatment required

@@ -100,6 +100,50 @@ export function computeCommandHash(norm) {
 /**
  * Normalize BEFORE hash — never mutate after hashing.
  */
+
+/** Known economic decimal field names — only string values are canonicalized. */
+const DEFAULT_ECONOMIC_DECIMAL_FIELDS = Object.freeze([
+  "amount",
+  "costTotal",
+  "price",
+  "feeAmount",
+  "feeQuantity",
+  "grossQuantity",
+  "netQuantity",
+  "proceedsTotal",
+  "principal",
+  "annualRate",
+  "exchangeRateToBase",
+  "units",
+  "quantity",
+  "premiumAmount",
+  "metalPrice",
+  "metalPricePerMg",
+  "commission",
+  "tax",
+  "otherFee",
+  "withholdingTax",
+]);
+
+function canonicalizePayloadEconomics(payload, extraFields) {
+  if (payload == null || typeof payload !== "object" || Array.isArray(payload)) return payload;
+  const fields = new Set([
+    ...DEFAULT_ECONOMIC_DECIMAL_FIELDS,
+    ...(Array.isArray(extraFields) ? extraFields : []),
+  ]);
+  const out = { ...payload };
+  for (const key of fields) {
+    if (!Object.prototype.hasOwnProperty.call(out, key)) continue;
+    const v = out[key];
+    if (v == null || v === "") continue;
+    if (typeof v !== "string") {
+      throw new Error(`PAYLOAD_ECONOMIC_NOT_STRING:${key}`);
+    }
+    out[key] = canonicalDecimalString(v);
+  }
+  return out;
+}
+
 export function normalizeCommand(command) {
   if (!command || typeof command !== "object") throw new Error("OP_INVALID_COMMAND");
   if (!command.operationId || typeof command.operationId !== "string") {
@@ -186,7 +230,10 @@ export function normalizeCommand(command) {
     sourceChannel: command.sourceChannel ?? command.source_channel ?? command.source ?? null,
     sourceType: command.sourceType ?? command.source_type ?? null,
     sourceReference: command.sourceReference ?? command.source_reference ?? null,
-    payload: command.payload ?? null,
+    payload: canonicalizePayloadEconomics(
+      command.payload ?? null,
+      command.economicDecimalFields,
+    ),
     journalLines,
     rates: command.rates || [],
     domainResult: command.domainResult ?? null,
@@ -292,7 +339,7 @@ export async function runAtomicFinancialOperation(command) {
     }
 
     assertPostedHasJournal(norm.status, norm.journalLines);
-    runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates, baseCurrency: norm.baseCurrency });
+    runInvariantGate({ journalLines: norm.journalLines, rates: norm.rates, baseCurrency: norm.baseCurrency, status: norm.status });
 
     const operationContext = Object.freeze({
       operationId: norm.operationId,

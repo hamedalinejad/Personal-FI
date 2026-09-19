@@ -14,7 +14,12 @@ export function assertJournalBalanced(lines, opts = {}) {
     throw new Error("INV_JOURNAL_MIN_LINES");
   }
   const baseCurrency = opts.baseCurrency || null;
-  const anyBase = lines.some((l) => l.amountInBase != null || l.amount_in_base != null);
+  const posted = opts.posted === true || opts.requireBaseFields === true;
+  let anyBase = lines.some((l) => l.amountInBase != null || l.amount_in_base != null);
+  // Posted journals with a book base must balance in base — never allow foreign-only balance
+  if (posted && baseCurrency) {
+    anyBase = true;
+  }
   let debit = toDecimal("0");
   let credit = toDecimal("0");
   let currency = null;
@@ -142,8 +147,13 @@ export function assertQuantityConservation({ gross, fee, net, role, treatment })
   throw new Error(`INV_QTY_ROLE_UNKNOWN:${t}`);
 }
 
-export function runInvariantGate({ journalLines, rates, baseCurrency } = {}) {
-  if (journalLines) assertJournalBalanced(journalLines, { baseCurrency });
+export function runInvariantGate({ journalLines, rates, baseCurrency, status } = {}) {
+  if (journalLines) {
+    assertJournalBalanced(journalLines, {
+      baseCurrency,
+      posted: status === "posted",
+    });
+  }
   if (rates) {
     for (const r of rates) {
       if (r == null) continue;
