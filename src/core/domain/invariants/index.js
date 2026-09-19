@@ -13,6 +13,19 @@ export function assertJournalBalanced(lines, opts = {}) {
   if (!Array.isArray(lines) || lines.length < 2) {
     throw new Error("INV_JOURNAL_MIN_LINES");
   }
+  // Structural line_number: integer >= 1, unique when present (not economic)
+  {
+    const seenLn = new Set();
+    for (const line of lines) {
+      const ln = line.line_number ?? line.lineNumber;
+      if (ln != null && ln !== "") {
+        const n = Number(ln);
+        if (!Number.isInteger(n) || n < 1) throw new Error("INV_JOURNAL_LINE_NUMBER_INVALID");
+        if (seenLn.has(n)) throw new Error("INV_JOURNAL_LINE_NUMBER_DUPLICATE");
+        seenLn.add(n);
+      }
+    }
+  }
   const baseCurrency = opts.baseCurrency || null;
   const posted = opts.posted === true || opts.requireBaseFields === true;
   let anyBase = lines.some((l) => l.amountInBase != null || l.amount_in_base != null);

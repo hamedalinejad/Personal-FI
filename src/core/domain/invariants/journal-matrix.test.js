@@ -133,3 +133,33 @@ test("posted multi-currency without base fields → FAIL at kernel", () => {
     /MISSING_AMOUNT_IN_BASE|INV_JOURNAL/i,
   );
 });
+
+test("duplicate line_number → FAIL", () => {
+  assert.throws(
+    () =>
+      assertJournalBalanced(
+        [
+          {
+            accountId: "a",
+            side: "debit",
+            amount: "10",
+            currency: "IRR",
+            amountInBase: "10",
+            exchangeRateToBase: "1",
+            line_number: 1,
+          },
+          {
+            accountId: "b",
+            side: "credit",
+            amount: "10",
+            currency: "IRR",
+            amountInBase: "10",
+            exchangeRateToBase: "1",
+            line_number: 1,
+          },
+        ],
+        { baseCurrency: "IRR", posted: true },
+      ),
+    /INV_JOURNAL_LINE_NUMBER_DUPLICATE/,
+  );
+});

@@ -140,3 +140,25 @@ Verified against PHASE-0-SEMANTIC-CONTRACT:
 | R-M06 IMPLEMENTED / proof PARTIAL | ✅ |
 | FREEZE_PROVEN | false |
 | PRODUCTION | NO-GO |
+
+## Phase 2 Accounting Kernel Closure (2026-09-19)
+
+| Package | Status |
+|---------|--------|
+| P2-00 Phase1 carryovers | ✅ |
+| P2-01 Journal kernel | ✅ (+ line_number unique) |
+| P2-02 Economic identity | ✅ |
+| P2-03 Fee kernel | ✅ equity_adjustment DEFERRED |
+| P2-04 Account kernel | ✅ |
+| P2-05 Posting pipeline | ✅ |
+| P2-06 Reversal | ✅ |
+| P2-07 Reporting boundary | ✅ role-based cashFlow |
+| P2-08 Decimal reports | ✅ |
+| P2-09 Acceptance suite | ✅ |
+| P2-10 Golden pack | ✅ CORE-ACCOUNTING-KERNEL-V1 |
+| P2-11/53 Constraints | ✅ |
+| P2-12 result_json boundary | ✅ |
+| P2-13 No parallel cash | ✅ audit |
+| P2-17 Invariants audit | ✅ in gates |
+| FREEZE_PROVEN | false |
+| PRODUCTION | NO-GO |
