@@ -3,9 +3,11 @@
  * Production browser: sql.js bytes in IndexedDB key pf-db-v1.
  */
 import { mkdirSync, writeFileSync, existsSync, renameSync, copyFileSync } from "node:fs";
+import { DatabaseSync } from "node:sqlite";
 import { join } from "node:path";
 import * as nodeWorker from "../worker.js";
 import { restoreDatabase as restoreNodeDatabase } from "../../recovery/backup.js";
+import { validateOpenDatabase } from "../integrity.js";
 
 export const BROWSER_ADAPTER_STATUS = "PROTOCOL_PROVEN_NODE_HARNESS";
 export const IDB_KEY = "pf-db-v1";
@@ -22,9 +24,13 @@ function backupPath(dataDir, label = "backup") {
 
 export function atomicPublishDbFile(dataDir) {
   mkdirSync(dataDir, { recursive: true });
+  // Close active SQLite handles before replacing the database file.
+  nodeWorker.closeAllDbs?.();
   const src = dbPath(dataDir);
   if (!existsSync(src)) {
-    nodeWorker.openDb(dataDir);
+    const db = nodeWorker.openDb(dataDir);
+    db.close?.();
+    nodeWorker.closeAllDbs?.();
   }
   if (!existsSync(src)) {
     writeFileSync(src, "");
@@ -72,7 +78,18 @@ export function closeAllDbs() {
 }
 
 export function backupDatabase(dataDir, label = "manual") {
-  atomicPublishDbFile(dataDir);
+  mkdirSync(dataDir, { recursive: true });
+  nodeWorker.closeAllDbs?.();
+  if (!existsSync(dbPath(dataDir))) {
+    nodeWorker.openDb(dataDir);
+    nodeWorker.closeAllDbs?.();
+  }
+  const source = new DatabaseSync(dbPath(dataDir), { readOnly: true });
+  try {
+    validateOpenDatabase(source);
+  } finally {
+    source.close();
+  }
   const dest = backupPath(dataDir, label);
   copyFileSync(dbPath(dataDir), dest);
   return dest;
