@@ -52,7 +52,7 @@ test("P0-OFFLINE-002 recovery: post → backup → restore → load", async () =
   const bak = backupDatabase(dataDir, "crash");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-rec2-"));
-  restoreDatabase(dataDir2, bak);
+  await restoreDatabase(dataDir2, bak);
   const loaded = await loadOperation(opId, { dataDir: dataDir2, mode: "sqlite" });
   assert.equal(loaded.status, "posted");
   closeAllDbs();
