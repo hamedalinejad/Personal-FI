@@ -31,12 +31,12 @@ function withMutatedMatrix(mutate, fn) {
   }
 }
 
-test("gate PASS on current matrix", () => {
+test("gate PASS on current matrix", { concurrency: false }, () => {
   const r = runGate();
   assert.equal(r.status, 0, r.stderr || r.stdout);
 });
 
-test("gate FAIL when stored != persistence.table.column", () => {
+test("gate FAIL when stored != persistence.table.column", { concurrency: false }, () => {
   const r = withMutatedMatrix((m) => {
     const row = m.rows.find(
       (x) =>
@@ -51,7 +51,7 @@ test("gate FAIL when stored != persistence.table.column", () => {
   assert.match(r.stderr + r.stdout, /stored|persistence|mismatch|FAIL/i);
 });
 
-test("gate FAIL when DEFERRED missing reason", () => {
+test("gate FAIL when DEFERRED missing reason", { concurrency: false }, () => {
   const r = withMutatedMatrix((m) => {
     const row = m.rows.find((x) => String(x.disposition).toUpperCase() === "DEFERRED");
     if (!row) {
@@ -70,7 +70,7 @@ test("gate FAIL when DEFERRED missing reason", () => {
   assert.notEqual(r.status, 0);
 });
 
-test("gate FAIL when schema column missing for PERSISTED", () => {
+test("gate FAIL when schema column missing for PERSISTED", { concurrency: false }, () => {
   const r = withMutatedMatrix((m) => {
     const row = m.rows.find((x) => x.disposition === "PERSISTED" && x.persistence);
     assert.ok(row);
