@@ -20,10 +20,14 @@ test("P0-01 single canonical enum includes reduce_proceeds", () => {
   assert.equal(normalizeFeeTreatment("reduce_proceeds"), "reduce_proceeds");
 });
 
-test("all locked treatments normalize", () => {
-  for (const t of CANONICAL_FEE_TREATMENTS) {
+test("all currently active treatments normalize", () => {
+  for (const t of CANONICAL_FEE_TREATMENTS.filter((x) => x !== "equity_adjustment")) {
     assert.equal(normalizeFeeTreatment(t), t);
   }
+});
+
+test("equity_adjustment remains explicitly deferred", () => {
+  assert.throws(() => normalizeFeeTreatment("equity_adjustment"), /FEE_TREATMENT_DEFERRED/);
 });
 
 test("reduce_proceeds: journal Dr fee_expense Cr cash; domain netProceeds = gross − fee", () => {
