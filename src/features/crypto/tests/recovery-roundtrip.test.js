@@ -36,7 +36,7 @@ test("crypto recovery: buy → backup → restore → holding survives", async (
   const bak = backupDatabase(dataDir, "crypto");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-cr2-"));
-  restoreDatabase(dataDir2, bak);
+  await restoreDatabase(dataDir2, bak);
   const db = openDb(dataDir2);
   const h = db.prepare(`SELECT * FROM inv_crypto_holdings WHERE instrument_id = ?`).get("inst-btc-rec");
   assert.ok(h);
