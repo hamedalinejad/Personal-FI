@@ -95,3 +95,23 @@ Verified against `main` @ response HEAD.
 - **R-M24** still **SPEC_LOCKED** — real browser sql.js + IndexedDB RELEASE E2E open.
 
 **Result:** VERIFIED for claimed scope; browser release proof open — matches external audit.
+
+
+## 7. Closure of residual audit blockers (same HEAD lineage)
+
+| Prior audit blocker | Disposition on main |
+|---------------------|---------------------|
+| Phase 4 sign-model failure (paidPrincipal 400) | Fixed in `8aa1ae4`; acceptance green |
+| Phase 5 CI-unproven branch HEAD | Code on main `12fb3b6`+; local acceptance green |
+| P5-STATIC-01 zero → null | Fixed: `market != null` / `unrealized != null`; test asserts `"0"` |
+| P5-STATIC-02 scalar metal purity default | Already contract-safe: scalar purityBasis null + metals path requires explicit basis; test rejects scalar metal |
+| Phase 6 blueprint only | Implemented `27b465c`; catalog status → IMPLEMENTED for those commands |
+| Catalog PARTIAL for P6 commands | Updated to IMPLEMENTED (maturity=local_acceptance; not RELEASE-PROVEN) |
+
+Still true:
+
+```
+FREEZE_PROVEN = false
+RELEASE_PROVEN = false
+PRODUCTION = NO-GO
+```

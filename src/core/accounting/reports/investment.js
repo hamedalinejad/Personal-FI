@@ -105,8 +105,8 @@ export function investmentHoldings(dataDir, { prices = {}, valuationContext = nu
       quantity: typeof quantity === "string" ? quantity : quantity.toFixed(),
       cost: cost.toFixed(),
       costCurrency,
-      marketValue: market ? market.toFixed() : null,
-      unrealizedPnl: unrealized ? unrealized.toFixed() : null,
+      marketValue: market != null ? market.toFixed() : null,
+      unrealizedPnl: unrealized != null ? unrealized.toFixed() : null,
       valuation: valuationMeta,
       ...extra,
     };

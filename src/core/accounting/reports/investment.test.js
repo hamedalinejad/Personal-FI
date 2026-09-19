@@ -206,3 +206,46 @@ test("missing FX rejects cross-currency valuation", () => {
   );
   closeAllDbs();
 });
+
+
+test("zero market value remains string zero not null", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-zero-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  closeAllDbs();
+  const report = investmentHoldings(dataDir, {
+    valuationContext: {
+      reportCurrency: "IRR",
+      asOf: "2026-06-15",
+      fxRates: { USD: "42000" },
+    },
+    prices: {
+      "inst-stock": {
+        price: "0",
+        currency: "IRR",
+        quoteType: "last",
+        marketDate: "2026-06-10",
+      },
+    },
+  });
+  assert.equal(report.stocks[0].marketValue, "0");
+  // cost 5000000, market 0 → unrealized -5000000 (must not be null)
+  assert.equal(report.stocks[0].unrealizedPnl, "-5000000");
+  closeAllDbs();
+});
+
+test("scalar metal price without purityBasis rejected", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-inv-scalar-metal-"));
+  const db = openDb(dataDir);
+  seedAll(db);
+  closeAllDbs();
+  assert.throws(
+    () =>
+      investmentHoldings(dataDir, {
+        valuationContext: { reportCurrency: "IRR", asOf: "2026-06-15" },
+        prices: { "inst-gold": "6000" },
+      }),
+    /METAL_VALUATION_PURITY_BASIS_REQUIRED|VALUATION_/,
+  );
+  closeAllDbs();
+});

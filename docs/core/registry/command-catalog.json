@@ -3119,7 +3119,7 @@
     "accounts.create": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.create",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Create cash/bank/card account projection + optional opening balance path",
         "requestFields": [
@@ -3214,7 +3214,7 @@
     "accounts.update": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.update",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Update non-financial metadata of an account",
         "requestFields": [
@@ -3309,7 +3309,7 @@
     "accounts.archive": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.archive",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Archive account only if journal balance is zero",
         "requestFields": [
@@ -3388,7 +3388,7 @@
     "accounts.transfer": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.transfer",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Transfer between two cash accounts",
         "requestFields": [
@@ -3493,7 +3493,7 @@
     "accounts.deposit": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.deposit",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "External cash in",
         "requestFields": [
@@ -3604,7 +3604,7 @@
     "accounts.withdraw": {
       "owner": "docs/modules/accounts.md",
       "capability": "accounts.withdraw",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "External cash out",
         "requestFields": [
@@ -3710,7 +3710,7 @@
     "income.create": {
       "owner": "docs/modules/income-expense.md",
       "capability": "income.create",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Record income event",
         "requestFields": [
@@ -3822,7 +3822,7 @@
     "expense.create": {
       "owner": "docs/modules/income-expense.md",
       "capability": "expense.create",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Record expense event",
         "requestFields": [
@@ -3934,7 +3934,7 @@
     "income.reverse": {
       "owner": "docs/modules/income-expense.md",
       "capability": "income.reverse",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Reverse prior income operation",
         "requestFields": [
@@ -4030,7 +4030,7 @@
     "expense.reverse": {
       "owner": "docs/modules/income-expense.md",
       "capability": "expense.reverse",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Reverse prior expense operation",
         "requestFields": [
@@ -4126,7 +4126,7 @@
     "cheque.register": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.register",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Register cheque instrument event",
         "requestFields": [
@@ -4240,7 +4240,7 @@
     "cheque.deposit": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.deposit",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Deposit cheque toward clearing",
         "requestFields": [
@@ -4344,7 +4344,7 @@
     "cheque.clear": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.clear",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Mark cheque cleared; cash effect if policy requires",
         "requestFields": [
@@ -4445,7 +4445,7 @@
     "cheque.bounce": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.bounce",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Bounce cheque; reverse pending cash if needed",
         "requestFields": [
@@ -4546,7 +4546,7 @@
     "cheque.cancel": {
       "owner": "docs/modules/cheque.md",
       "capability": "cheque.cancel",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Cancel cheque before clear",
         "requestFields": [
@@ -4643,7 +4643,7 @@
     "assets.register": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.register",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Register physical/non-investment asset",
         "requestFields": [
@@ -4754,7 +4754,7 @@
     "assets.update": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.update",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Update asset metadata",
         "requestFields": [
@@ -4858,7 +4858,7 @@
     "assets.dispose": {
       "owner": "docs/modules/physical-assets.md",
       "capability": "assets.dispose",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Dispose asset with optional proceeds",
         "requestFields": [
@@ -4965,7 +4965,7 @@
     "budget.set": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "budget.set",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Set budget period amounts (planning; not journal truth)",
         "requestFields": [
@@ -5075,7 +5075,7 @@
     "goal.create": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "goal.create",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Create savings/investment goal",
         "requestFields": [
@@ -5184,7 +5184,7 @@
     "bill.schedule": {
       "owner": "docs/modules/budget-goals-bills.md",
       "capability": "bill.schedule",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Schedule recurring bill reminder / obligation projection",
         "requestFields": [
@@ -5294,7 +5294,7 @@
     "tax.assess": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.assess",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Create tax obligation (assessment event)",
         "requestFields": [
@@ -5406,7 +5406,7 @@
     "tax.pay": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.pay",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Pay tax obligation — only path that can mark paid",
         "requestFields": [
@@ -5518,7 +5518,7 @@
     "tax.adjust": {
       "owner": "docs/modules/tax.md",
       "capability": "tax.adjust",
-      "status": "PARTIAL",
+      "status": "IMPLEMENTED",
       "card": {
         "purpose": "Adjust assessment; not a silent paid flag",
         "requestFields": [
