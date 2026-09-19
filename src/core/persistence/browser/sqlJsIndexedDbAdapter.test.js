@@ -45,6 +45,8 @@ test("P0-OFFLINE-001 atomic persist + durable ACK + backup/restore reopen", asyn
     { dataDir, mode: "sqlite" },
   );
   assert.ok(isDurableAcked(dataDir, opId));
+  const committed = await loadOperation(opId, { dataDir, mode: "sqlite" });
+  assert.equal(committed.durability_state, "persisted");
   const bak = backupDatabase(dataDir, "t1");
   closeAllDbs();
   const dataDir2 = mkdtempSync(join(tmpdir(), "pf-br2-"));
