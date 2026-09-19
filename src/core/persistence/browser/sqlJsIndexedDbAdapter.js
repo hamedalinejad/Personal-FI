@@ -5,6 +5,7 @@
 import { mkdirSync, writeFileSync, existsSync, renameSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
 import * as nodeWorker from "../worker.js";
+import { restoreDatabase as restoreNodeDatabase } from "../../recovery/backup.js";
 
 export const BROWSER_ADAPTER_STATUS = "PROTOCOL_PROVEN_NODE_HARNESS";
 export const IDB_KEY = "pf-db-v1";
@@ -77,11 +78,9 @@ export function backupDatabase(dataDir, label = "manual") {
   return dest;
 }
 
-export function restoreDatabase(dataDir, backupFile) {
+export async function restoreDatabase(dataDir, backupFile) {
   if (!existsSync(backupFile)) throw new Error("BACKUP_NOT_FOUND");
-  nodeWorker.closeAllDbs?.();
-  mkdirSync(dataDir, { recursive: true });
-  copyFileSync(backupFile, dbPath(dataDir));
+  await restoreNodeDatabase(backupFile, dataDir);
   return dbPath(dataDir);
 }
 
