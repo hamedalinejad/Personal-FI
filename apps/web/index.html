@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Personal-FI</title>
+  <link rel="stylesheet" href="./src/styles/shell.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <strong>Personal-FI</strong>
+      <button type="button" data-surface="search" aria-label="Search">Search</button>
+      <button type="button" data-surface="quick-add" aria-label="Quick add">+</button>
+    </header>
+    <main id="view" class="view" role="main"></main>
+    <nav class="tabbar" aria-label="Primary">
+      <a href="#/" data-route="/">Home</a>
+      <a href="#/money" data-route="/money">Money</a>
+      <a href="#/transactions" data-route="/transactions">Tx</a>
+      <a href="#/investments" data-route="/investments">Invest</a>
+      <a href="#/loans" data-route="/loans">Loans</a>
+      <a href="#/more" data-route="/more">More</a>
+    </nav>
+    <div id="sheet" class="sheet" hidden role="dialog" aria-modal="true"></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

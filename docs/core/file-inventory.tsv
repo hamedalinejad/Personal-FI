@@ -1,6 +1,10 @@
 path	status	class
 .npmrc	CURRENT	src
 README.md	CURRENT	src
+apps/web/index.html	CURRENT	src
+apps/web/manifest.webmanifest	CURRENT	src
+apps/web/src/main.js	CURRENT	src
+apps/web/src/styles/shell.css	CURRENT	src
 data/policy/iran/README.md	CURRENT	src
 data/policy/iran/iran-equity-calendar-v0-sample.json	CURRENT	src
 data/policy/iran/iran-equity-calendar-v1.json	CURRENT	src
@@ -402,3 +406,8 @@ src/features/tax/commands/adjust.js	CURRENT	src
 src/features/tax/commands/assess.js	CURRENT	src
 src/features/tax/commands/pay.js	CURRENT	src
 src/features/tax/public-api/index.js	CURRENT	src
+src/web/apiClient.js	CURRENT	src
+src/web/routes.js	CURRENT	src
+src/web/routes.test.js	CURRENT	src
+src/web/shellState.js	CURRENT	src
+src/web/surfaces.js	CURRENT	src

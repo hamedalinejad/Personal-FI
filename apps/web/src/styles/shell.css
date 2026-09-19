@@ -1,0 +1,10 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; }
+body { margin: 0; background: #0f172a; color: #e2e8f0; }
+.topbar, .tabbar { display: flex; gap: .75rem; padding: .75rem 1rem; background: #1e293b; }
+.tabbar { position: sticky; bottom: 0; justify-content: space-around; }
+.tabbar a { color: #94a3b8; text-decoration: none; }
+.tabbar a.active { color: #38bdf8; }
+.view { padding: 1rem; min-height: 60vh; }
+.sheet { position: fixed; inset: auto 0 0 0; background: #1e293b; padding: 1rem; border-radius: 1rem 1rem 0 0; max-height: 80vh; overflow: auto; }
+.sheet:not([hidden]) { display: block; }
+button { background: #334155; color: inherit; border: 0; border-radius: .5rem; padding: .4rem .7rem; }

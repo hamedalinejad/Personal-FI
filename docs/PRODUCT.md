@@ -30,6 +30,10 @@ Money · cashflow · cheques/loans · investments (crypto/stocks/funds/metals) �
 Create/edit = sheets/drawers/modals — **not** new top-level routes.  
 Do not add `/crypto`, `/stocks`, `/accounting`, `/journal`, …
 
+### Phase 10 shell mapping
+Reports, planning, settings, backup, import live under **`/more/*`** sheets — not extra top-level routes.
+
+
 ## 6. Standalone editions (LOCKED)
 | Edition | Surface |
 |---------|---------|

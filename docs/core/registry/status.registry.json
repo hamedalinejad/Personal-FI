@@ -177,12 +177,14 @@
     "phase4": "implemented_local_acceptance_green",
     "phase5": "implemented_local_acceptance_green",
     "phase6": "implemented_local_acceptance_green",
-    "note": "Phase 7–9 local acceptance; TWR/MWR deferred; R-M24 real browser E2E still OPEN",
+    "note": "Web shell scaffold + onboarding state; not production E2E; FREEZE/RELEASE false",
     "phase4R": "loan_lifecycle_local_proven",
     "phase5R": "investment_reporting_local_proven",
     "phase6A_H": "accounts_ie_cheque_tax_assets_planning_cross_goldens_green",
     "phase7": "reporting_pack_local_green",
     "phase8": "rebuild_import_lineage_local_green",
-    "phase9": "browser_protocol_harness_green_rm24_e2e_open"
+    "phase9": "browser_protocol_harness_green_rm24_e2e_open",
+    "phase10": "web_shell_scaffold_product_routes",
+    "phase11": "onboarding_recovery_surfaces_local"
   }
 }

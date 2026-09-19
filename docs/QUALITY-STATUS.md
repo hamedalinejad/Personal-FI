@@ -245,3 +245,9 @@ Local: phase6-abc-h.test.js 15/15. Journal truth only; planning never posts.
 - P8 import unknownFields + rebuildFromDatabase deterministic
 - P9 browser adapter protocol: write/reload/backup/single-writer (R-M24 real browser E2E still OPEN)
 
+
+## Phase 10–11 (2026-09-19)
+- Web shell: PRODUCT six routes; reports/planning/settings under /more
+- Surfaces + onboarding/recovery state machine
+- UI boundary: public-api only (tested)
+- Not launch-ready: full E2E/accessibility/performance still OPEN
