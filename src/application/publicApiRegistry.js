@@ -1,12 +1,13 @@
 /**
  * Public API command + query registry.
- * Maps command ids to handlers. Host uses this at execute boundary.
  */
 
 import { deposit } from "../features/accounts/commands/deposit.js";
 import { createAccount } from "../features/accounts/commands/createAccount.js";
 import { withdraw } from "../features/accounts/commands/withdraw.js";
 import { transfer } from "../features/accounts/commands/transfer.js";
+import { createIncome } from "../features/income/commands/create.js";
+import { createExpense } from "../features/expense/commands/create.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
 
@@ -15,6 +16,8 @@ export const commandHandlers = {
   "accounts.deposit": deposit,
   "accounts.withdraw": withdraw,
   "accounts.transfer": transfer,
+  "income.create": createIncome,
+  "expense.create": createExpense,
 };
 
 export const queryHandlers = {
