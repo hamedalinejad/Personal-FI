@@ -9,6 +9,7 @@ import { transfer } from "../features/accounts/commands/transfer.js";
 import { createIncome } from "../features/income/commands/create.js";
 import { createExpense } from "../features/expense/commands/create.js";
 import { createLoan } from "../features/loan/commands/createLoan.js";
+import { recordPayment } from "../features/loan/commands/recordPayment.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
 import { buyCrypto } from "../features/crypto/commands/buy.js";
@@ -23,6 +24,7 @@ export const commandHandlers = {
   "income.create": createIncome,
   "expense.create": createExpense,
   "loan.create": createLoan,
+  "loan.recordPayment": recordPayment,
   "crypto.buy": buyCrypto,
   "metals.buy": buyMetals,
   "tax.adjust": adjustTax,
