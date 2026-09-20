@@ -1,0 +1,45 @@
+{
+  "PRODUCTION": "NO-GO",
+  "RELEASE_PROVEN": false,
+  "FREEZE_PROVEN": false,
+  "updated": "2026-09-20",
+  "officialUi": "apps/web-react",
+  "legacyUi": {
+    "path": "apps/web",
+    "status": "RETIRE_CANDIDATE",
+    "reason": "scaffold stubs only; zero product surface; delete after inventory gate"
+  },
+  "requirements": {
+    "R-M03": { "status": "PARTIAL", "action": "close refine targets in field matrix" },
+    "R-M05": { "status": "SPEC_LOCKED", "action": "stable identity ownership via book_id + instrument ids" },
+    "R-M07": { "status": "PARTIAL", "action": "historical FX golden family" },
+    "R-M09": { "status": "SPEC_LOCKED", "action": "crypto network fee contract + tests" },
+    "R-M10": { "status": "PARTIAL", "action": "Iran settlement versioned policy proof" },
+    "R-M11": { "status": "SPEC_LOCKED", "action": "Iran commission/tax versioned package" },
+    "R-M12": { "status": "DEFERRED", "action": "corporate actions only when scheduled" },
+    "R-M14": { "status": "PARTIAL", "action": "reinvest remains REJECTED in v1" },
+    "R-M16": { "status": "SPEC_LOCKED", "action": "loan fee taxonomy if claimed" },
+    "R-M17": { "status": "SPEC_LOCKED", "action": "loan schedule policy versioning" },
+    "R-M19": { "status": "PARTIAL", "action": "statements release proof" },
+    "R-M21": { "status": "PARTIAL", "action": "full ledger replay proof" },
+    "R-M22": { "status": "PARTIAL", "action": "import batch lifecycle" },
+    "R-M23": { "status": "PARTIAL", "action": "browser recovery proof" },
+    "R-M24": { "status": "NOT_IMPLEMENTED", "action": "sql.js + IDB + writer E2E" },
+    "R-M25": { "status": "PARTIAL", "action": "machine license contract + runtime proof" },
+    "R-M26": { "status": "PARTIAL", "action": "six-route IA acceptance proof" },
+    "R-M27": { "status": "PARTIAL", "action": "central commandRegistry coverage" },
+    "R-M28": { "status": "PARTIAL", "action": "UI/domain boundary gate" },
+    "R-M29": { "status": "PARTIAL", "action": "schema/manifest/field consistency proof" },
+    "R-M30": { "status": "PARTIAL", "action": "final golden family" },
+    "R-OFFLINE-01": { "status": "PARTIAL", "action": "full recovery matrix green" },
+    "R-OFFLINE-03": { "status": "NOT_IMPLEMENTED", "action": "real browser offline E2E" },
+    "R-LICENSE-01": { "status": "PARTIAL", "action": "edition gating proven at host" }
+  },
+  "deferredLocked": [
+    "TWR", "MWR", "IRR",
+    "crypto.deposit", "crypto.withdrawal", "crypto.swap", "crypto.airdrop", "crypto.opening_balance",
+    "stocks.full_corporate_actions",
+    "funds.reinvest",
+    "loan.borrower_mode", "loan.variable_rate", "loan.advanced_day_count", "loan.mid_reschedule"
+  ]
+}

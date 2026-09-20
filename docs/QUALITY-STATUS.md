@@ -1,31 +1,40 @@
 # Personal-FI Quality Status
 
 **Updated:** 2026-09-20  
+**HEAD snapshot:** see `docs/core/registry/SNAPSHOT-2026-09-20.json`  
 **PRODUCTION:** NO-GO  
-**RELEASE_PROVEN:** false
+**RELEASE_PROVEN:** false  
+**FREEZE_PROVEN:** false (Phase 0 contract freeze in progress)
 
-## Closed arcs
-- P0-01..08 financial integrity + browser backup contract
-- P1-01..12 InvestmentsScreen / valuation / cheque
-- P1-13 Option B: fin_operation_payloads table + writeOperationPayload helper
-- P1-14 book identity from db_meta only (bootstrapRuntime fixed)
-- P1-16 commandRegistry single machine source
-- P1-17 reportRegistry for /more/reports
-- P1-18 money totals Mode A (per-currency; netCash null if mixed without reportCurrency)
-- REL-P1-01..04 documented EXPECTED_FK + schema append + orphan helper
-- DEFERRED-V1.md explicit loan/crypto/stocks/funds/reports deferrals
+## Phase 0 — Contract freeze
+- Snapshot hashes recorded (schema + commandRegistry)
+- `status.registry.json` + `requirements-matrix.json` machine-checked requirements
+- `commandRegistry.js` expanded (import stages registered)
+- `import.commitBatch` **rejects** until mapping complete (no false-green import)
+- `capabilities.ts` UI reader only; host enforces
+- `entitlementContract.js` edition matrix helper (R-M25)
+- Official UI: **apps/web-react** only
+- `apps/web`: RETIRE_CANDIDATE (2 scaffold stubs) — delete after inventory gate
+- Deferred locked in DEFERRED-V1.md + status.registry (not TODO)
 
-## Still OPEN
-- Full import.createBatch…commitBatch lifecycle
-- sql.js WASM in web package + main.tsx boot
-- Playwright Journey A–I
-- FK migration rebuild for existing DBs (greenfield schema notes present)
-- Field matrix gate automation for 64 refine rows
-- a11y + performance fixtures
-- Push to origin after history rebase
+## Blockers for GO
+| ID | Status |
+|----|--------|
+| R-M24 offline browser persistence | NOT_IMPLEMENTED (E2E) |
+| R-OFFLINE-03 browser offline E2E | NOT_IMPLEMENTED |
+| R-M22 import full lifecycle | PARTIAL (create/ingest only) |
+| R-M03 field preservation refine rows | PARTIAL |
+| R-LICENSE-01 edition proof matrix | PARTIAL |
 
-## Tests snapshot
-- book identity: 3 pass
-- backup + cheque SM: 16 pass
-- valuation + crypto/metals: 18 pass
-- core money/FX/license: 35+ pass
+## Intentionally DEFERRED (do not implement now)
+TWR/MWR/IRR · crypto deposit/withdraw/swap/airdrop · full corporate actions · funds reinvest · loan borrower/variable-rate/advanced day-count
+
+## Keep (do not delete)
+- Node browser harness adapters until R-M24 green
+- commandQueryGateway.js / browserHostBridge.js dual until test boundary unified
+- docs/archive history
+
+## Tests
+- commandRegistry: 6 pass
+- book identity: 3 pass  
+- backup package: 6 pass

@@ -1,0 +1,15 @@
+{
+  "snapshotAt": "2026-09-20T17:55:00+01:00",
+  "head": "ece3ee6b0726aed1867a71e4b7e03791e3363883",
+  "phase": "PHASE_0_CONTRACT_FREEZE",
+  "hashes": {
+    "schema.sql": "cce5fb3acab21875b9a02ca58d527ced283f0ecc32028c183af8386a1c8ade40",
+    "commandRegistry.js": "d41be3dddb2467c489b94496b5b8e6498b0587be23cd0a7ab5c023891f9e644e"
+  },
+  "notes": [
+    "Snapshot before further business-logic expansion per Step 0.1",
+    "Deferred items locked in docs/DEFERRED-V1.md — not TODO",
+    "apps/web is scaffold-only (2 module stubs); official UI is apps/web-react",
+    "Browser offline E2E (R-M24 / R-OFFLINE-03) remains production blocker"
+  ]
+}

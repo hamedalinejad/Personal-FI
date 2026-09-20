@@ -17,6 +17,13 @@ import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
 import { bounceCheque } from "../features/cheque/commands/bounce.js";
+import {
+  createBatch as importCreateBatch,
+  ingestRaw as importIngestRaw,
+  commitBatch as importCommitBatch,
+  getBatch as importGetBatch,
+} from "../features/import/public-api/index.js";
+import { buildCommandHandlers } from "./commandRegistry.js";
 
 export const commandHandlers = {
   "accounts.create": createAccount,
@@ -31,6 +38,10 @@ export const commandHandlers = {
   "metals.buy": buyMetals,
   "tax.adjust": adjustTax,
   "cheque.bounce": bounceCheque,
+  "import.createBatch": importCreateBatch,
+  "import.ingestRaw": importIngestRaw,
+  "import.commitBatch": importCommitBatch,
+  "import.getBatch": importGetBatch,
 };
 
 export const queryHandlers = {

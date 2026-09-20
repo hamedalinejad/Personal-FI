@@ -18,6 +18,12 @@ import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
 import { bounceCheque } from "../features/cheque/commands/bounce.js";
+import {
+  createBatch as importCreateBatch,
+  ingestRaw as importIngestRaw,
+  commitBatch as importCommitBatch,
+  getBatch as importGetBatch,
+} from "../features/import/public-api/index.js";
 
 /** @type {Record<string, { kind: "command"|"query", module: string, capability: string, handler?: Function, idempotent?: boolean }>} */
 export const COMMAND_REGISTRY = Object.freeze({
@@ -42,6 +48,12 @@ export const COMMAND_REGISTRY = Object.freeze({
   // Tax / cheque
   "tax.adjust": { kind: "command", module: "tax", capability: "tax.*", handler: adjustTax, idempotent: true },
   "cheque.bounce": { kind: "command", module: "cheque", capability: "cheque.*", handler: bounceCheque, idempotent: true },
+
+  // Import (R-M22) — commitBatch intentionally rejects until mapping complete
+  "import.createBatch": { kind: "command", module: "import", capability: "import.*", handler: importCreateBatch, idempotent: true },
+  "import.ingestRaw": { kind: "command", module: "import", capability: "import.*", handler: importIngestRaw, idempotent: false },
+  "import.commitBatch": { kind: "command", module: "import", capability: "import.*", handler: importCommitBatch, idempotent: true },
+  "import.getBatch": { kind: "command", module: "import", capability: "import.*", handler: importGetBatch, idempotent: true },
 
   // Queries
   "accounts.list": { kind: "query", module: "accounts", capability: "accounts.*" },

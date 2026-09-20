@@ -1,0 +1,30 @@
+{
+  "version": "1",
+  "updated": "2026-09-20",
+  "items": [
+    { "id": "R-M03", "requirement": "full field preservation", "status": "PARTIAL", "requiredAction": "close every refine target" },
+    { "id": "R-M05", "requirement": "internal vs external identifier policy", "status": "SPEC_LOCKED", "requiredAction": "implement stable identity ownership" },
+    { "id": "R-M07", "requirement": "historical FX valuation", "status": "PARTIAL", "requiredAction": "close full multi-hop historical golden family" },
+    { "id": "R-M09", "requirement": "crypto network fee policy", "status": "SPEC_LOCKED", "requiredAction": "complete product contract + tests" },
+    { "id": "R-M10", "requirement": "Iran settlement runtime", "status": "PARTIAL", "requiredAction": "official/versioned policy proof" },
+    { "id": "R-M11", "requirement": "Iran commission/tax policy", "status": "SPEC_LOCKED", "requiredAction": "versioned policy package" },
+    { "id": "R-M12", "requirement": "corporate action model", "status": "DEFERRED", "requiredAction": "implement only when explicitly scheduled" },
+    { "id": "R-M14", "requirement": "fund distribution/reinvest", "status": "PARTIAL", "requiredAction": "complete or keep reinvest rejected" },
+    { "id": "R-M16", "requirement": "loan fee taxonomy", "status": "SPEC_LOCKED", "requiredAction": "complete policy if claimed supported" },
+    { "id": "R-M17", "requirement": "loan schedule policy versioning", "status": "SPEC_LOCKED", "requiredAction": "lock policy + evidence" },
+    { "id": "R-M19", "requirement": "financial statements", "status": "PARTIAL", "requiredAction": "complete release proof" },
+    { "id": "R-M21", "requirement": "deterministic rebuild", "status": "PARTIAL", "requiredAction": "full ledger replay proof" },
+    { "id": "R-M22", "requirement": "import lineage runtime", "status": "PARTIAL", "requiredAction": "full batch lifecycle" },
+    { "id": "R-M23", "requirement": "backup format/recovery", "status": "PARTIAL", "requiredAction": "browser and recovery proof" },
+    { "id": "R-M24", "requirement": "offline browser persistence", "status": "NOT_IMPLEMENTED", "requiredAction": "real sql.js + IndexedDB + writer E2E" },
+    { "id": "R-M25", "requirement": "license entitlement model", "status": "PARTIAL", "requiredAction": "machine license contract + runtime proof" },
+    { "id": "R-M26", "requirement": "minimal navigation IA", "status": "PARTIAL", "requiredAction": "lock implementation/acceptance proof" },
+    { "id": "R-M27", "requirement": "API registry coverage", "status": "PARTIAL", "requiredAction": "centralize command/query registry" },
+    { "id": "R-M28", "requirement": "UI/domain separation", "status": "PARTIAL", "requiredAction": "final boundary gate" },
+    { "id": "R-M29", "requirement": "schema/manifest/field consistency", "status": "PARTIAL", "requiredAction": "final release proof" },
+    { "id": "R-M30", "requirement": "golden fixture machine format", "status": "PARTIAL", "requiredAction": "final golden family" },
+    { "id": "R-OFFLINE-01", "requirement": "executable recovery matrix", "status": "PARTIAL", "requiredAction": "full green matrix" },
+    { "id": "R-OFFLINE-03", "requirement": "browser offline E2E", "status": "NOT_IMPLEMENTED", "requiredAction": "real browser run" },
+    { "id": "R-LICENSE-01", "requirement": "edition contract", "status": "PARTIAL", "requiredAction": "implement/prove edition gating" }
+  ]
+}
