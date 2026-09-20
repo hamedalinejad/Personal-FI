@@ -2,12 +2,14 @@
   "name": "personal-fi",
   "private": true,
   "type": "module",
-  "description": "Personal-FI \u2014 Core engines bootstrap (docs + src skeleton)",
+  "description": "Personal-FI — offline-first personal finance (Iran-ready, journal SoT)",
   "scripts": {
-    "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/db/*.test.js",
-    "lint": "node -e \"console.log('ESLint: enable when feature packages land (B-007)');\"",
+    "test": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/core/fixtures/*.test.js src/core/domain/**/*.test.js src/core/persistence/*.test.js src/core/db/*.test.js src/features/**/*.test.js src/application/**/*.test.js src/core/license/**/*.test.js src/core/accounting/**/*.test.js",
+    "test:core": "node --test src/core/money/*.test.js src/core/costBasis/*.test.js src/features/_shared/*.test.js src/core/license/*.test.js src/application/*.test.js src/core/accounting/reports/*.test.js",
+    "lint": "node -e \"console.log('ESLint: enable when feature packages land');\"",
     "docs:check-refs": "node -e \"console.log('docs-only checks manual');\"",
-    "schema:smoke": "node scripts/schema-drift-smoke.js"
+    "schema:smoke": "node scripts/schema-drift-smoke.js",
+    "gates": "npm run test:core && npm run schema:smoke"
   },
   "dependencies": {
     "decimal.js": "^10.4.3"
