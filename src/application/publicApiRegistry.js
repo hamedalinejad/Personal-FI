@@ -8,6 +8,7 @@ import { withdraw } from "../features/accounts/commands/withdraw.js";
 import { transfer } from "../features/accounts/commands/transfer.js";
 import { createIncome } from "../features/income/commands/create.js";
 import { createExpense } from "../features/expense/commands/create.js";
+import { createLoan } from "../features/loan/commands/createLoan.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
 
@@ -18,6 +19,7 @@ export const commandHandlers = {
   "accounts.transfer": transfer,
   "income.create": createIncome,
   "expense.create": createExpense,
+  "loan.create": createLoan,
 };
 
 export const queryHandlers = {
