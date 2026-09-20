@@ -12,6 +12,7 @@ import { createLoan } from "../features/loan/commands/createLoan.js";
 import { recordPayment } from "../features/loan/commands/recordPayment.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
+import { computeMoneyTotals } from "./reporting/moneyTotals.js";
 import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
@@ -52,6 +53,16 @@ export const queryHandlers = {
       presentationBalance: queryPresentationBalance(db, r.id, r.account_kind),
     };
   },
+  "money.totals": async ({ db, params }) => {
+    const fxMap = new Map();
+    if (params?.fxRates && typeof params.fxRates === "object") {
+      for (const [k, v] of Object.entries(params.fxRates)) fxMap.set(k, String(v));
+    }
+    return computeMoneyTotals(db, {
+      reportCurrency: params?.reportCurrency || null,
+      fxToReport: fxMap,
+    });
+  },
   "accounts.options": async ({ db }) => {
     return queryAll(
       db,
@@ -59,8 +70,11 @@ export const queryHandlers = {
     );
   },
   "meta.book": async ({ db }) => ({
+    id: getMeta(db, "book_id"),
     bookId: getMeta(db, "book_id"),
+    name: getMeta(db, "book_name") || "Personal Book",
     baseCurrency: getMeta(db, "book_base_currency"),
+    createdAt: getMeta(db, "book_created_at"),
     schemaVersion: getMeta(db, "schemaVersion"),
   }),
 };

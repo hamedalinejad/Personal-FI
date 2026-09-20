@@ -719,3 +719,27 @@ CREATE TABLE IF NOT EXISTS sec_access_log (
 -- quote_type TEXT
 
 -- fin_reconcile_runs.reconciled_by
+
+-- ─── REL-P1-01..04 / BUG-P1-13 schema hardening (2026-09-20) ───
+
+-- REL-P1-01: crypto holdings exchange FK (recreate-safe note: new installs)
+-- Existing DBs: apply via migration script; CREATE TABLE IF NOT EXISTS cannot alter FKs.
+-- For greenfield / migration v1.1:
+-- ALTER is not portable in SQLite; migration rebuilds table when needed.
+
+CREATE TABLE IF NOT EXISTS fin_operation_payloads (
+  operation_id   TEXT PRIMARY KEY REFERENCES fin_operations(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  schema_version TEXT NOT NULL DEFAULT '1',
+  payload_json   TEXT NOT NULL,
+  canonical_hash TEXT,
+  created_at     TEXT NOT NULL
+);
+
+-- Stocks holdings optional account scope (REL-P1-04)
+-- account_id added via migration for existing; greenfield note:
+-- inv_stocks_iran_holdings may include account_id TEXT REFERENCES acc_accounts(id)
+
+CREATE TABLE IF NOT EXISTS inv_stocks_iran_holdings_account_scope (
+  holding_id TEXT PRIMARY KEY REFERENCES inv_stocks_iran_holdings(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  account_id TEXT REFERENCES acc_accounts(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);

@@ -100,8 +100,16 @@ export async function bootstrapRuntime(opts?: {
         adapterNote: `edition=${edition}`,
       };
     }
-    const data = bookRes.data as { name?: string | null; baseCurrency?: string | null };
-    if (!data?.name || !data?.baseCurrency) {
+    // BUG-P1-14: never fabricate id/createdAt — only persisted values from host
+    const data = bookRes.data as {
+      id?: string | null;
+      bookId?: string | null;
+      name?: string | null;
+      baseCurrency?: string | null;
+      createdAt?: string | null;
+    };
+    const bookId = data?.id || data?.bookId;
+    if (!bookId || !data?.baseCurrency) {
       return {
         phase: "onboarding",
         book: null,
@@ -113,14 +121,14 @@ export async function bootstrapRuntime(opts?: {
     return {
       phase: "ready",
       book: {
-        id: `db:${data.name}`,
-        name: data.name,
+        id: bookId,
+        name: data.name || "Personal Book",
         baseCurrency: data.baseCurrency,
-        createdAt: new Date().toISOString(),
+        createdAt: data.createdAt || "",
       },
       hostBound: true,
       error: null,
-      adapterNote: `edition=${edition};book_from=host.query(book.get)`,
+      adapterNote: `edition=${edition};book_from=host.query(book.get|meta.book)`,
     };
   } catch (e) {
     return {
