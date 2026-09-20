@@ -5,13 +5,16 @@
 
 import { deposit } from "../features/accounts/commands/deposit.js";
 import { createAccount } from "../features/accounts/commands/createAccount.js";
+import { withdraw } from "../features/accounts/commands/withdraw.js";
+import { transfer } from "../features/accounts/commands/transfer.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
-// Note: paths relative to src/application
 
 export const commandHandlers = {
   "accounts.create": createAccount,
   "accounts.deposit": deposit,
+  "accounts.withdraw": withdraw,
+  "accounts.transfer": transfer,
 };
 
 export const queryHandlers = {
@@ -33,6 +36,12 @@ export const queryHandlers = {
       ...r,
       presentationBalance: queryPresentationBalance(db, r.id, r.account_kind),
     };
+  },
+  "accounts.options": async ({ db }) => {
+    return queryAll(
+      db,
+      `SELECT id, name, currency, account_kind FROM fin_accounts WHERE is_archived = 0 ORDER BY name`
+    );
   },
   "meta.book": async ({ db }) => ({
     bookId: getMeta(db, "book_id"),
