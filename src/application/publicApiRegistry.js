@@ -11,6 +11,9 @@ import { createExpense } from "../features/expense/commands/create.js";
 import { createLoan } from "../features/loan/commands/createLoan.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
+import { buyCrypto } from "../features/crypto/commands/buy.js";
+import { buyMetals } from "../features/metals/commands/buy.js";
+import { adjustTax } from "../features/tax/commands/adjust.js";
 
 export const commandHandlers = {
   "accounts.create": createAccount,
@@ -20,6 +23,9 @@ export const commandHandlers = {
   "income.create": createIncome,
   "expense.create": createExpense,
   "loan.create": createLoan,
+  "crypto.buy": buyCrypto,
+  "metals.buy": buyMetals,
+  "tax.adjust": adjustTax,
 };
 
 export const queryHandlers = {

@@ -5,47 +5,45 @@
 **RELEASE_PROVEN:** false  
 **FREEZE_PROVEN:** false
 
-## Completed this session (Wave 1–4 foundations + money path)
+## Completed this session
 
-| Item | Status | Evidence |
-|------|--------|----------|
-| singleWriter (navigator.locks + IDB lease) | IMPLEMENTED | `src/core/persistence/browser/singleWriter.js` |
-| idbByteStore | IMPLEMENTED | `src/core/persistence/browser/idbByteStore.js` |
-| browserSqlAdapter + durable persist | IMPLEMENTED | `src/core/persistence/browser/browserSqlAdapter.js` |
-| FinancialHost + license gate | IMPLEMENTED | `src/platform/web/financialHost.js`, `src/core/license/capabilityGate.js` |
-| QUERY_CATALOG exact membership (P1-21) | IMPLEMENTED | `src/application/queryCatalog.js` + web `queryIds.ts` + host bridge |
-| resolveMoneyOperationFx (no silent base) | IMPLEMENTED | `src/features/_shared/operationFx.js` |
-| accounts.create / deposit (inflowKind required) | IMPLEMENTED | deposit requires explicit inflowKind |
-| accounts.withdraw / transfer | IMPLEMENTED | |
-| income.create / expense.create | IMPLEMENTED | category analytical only (P1-28) |
-| presentationBalance (P1-24) | IMPLEMENTED | normal-side helper + tests |
-| durable book_id in db_meta (P1-27) | IMPLEMENTED | `ensureBookMeta` / `createOrOpenBook` |
-| Core unit tests | 35 pass | `npm run test:core` |
+### Wave 1–4 foundations
+| Item | Status |
+|------|--------|
+| singleWriter + IDB + browserSqlAdapter | IMPLEMENTED |
+| FinancialHost + license gate | IMPLEMENTED |
+| QUERY_CATALOG exact membership (P1-21) | IMPLEMENTED |
+| resolveMoneyOperationFx | IMPLEMENTED |
+| accounts.create/deposit/withdraw/transfer | IMPLEMENTED |
+| income.create / expense.create | IMPLEMENTED |
+| presentationBalance (P1-24) | IMPLEMENTED |
+| durable book_id (P1-27) | IMPLEMENTED |
+| loan.create | IMPLEMENTED |
 
-## Still OPEN (priority order)
+### P0 financial integrity (this pass)
+| Bug | Status | Evidence |
+|-----|--------|----------|
+| BUG-P0-01 mixed-currency valuation | FIXED | `investment.js` valueHoldings — no invalid subtraction |
+| BUG-P0-02 partial as ready | FIXED | strict state enum; ready only when all valued |
+| BUG-P0-03 crypto netQuantity | FIXED | Core derives net; UI omits netQuantity |
+| BUG-P0-04 metals purity default 1 | FIXED | UI empty; Core requires purity unless fixed_1 |
+| BUG-P0-05 tax.adjust desync | FIXED | event + journal + mandatory audit |
 
-1. Wire full sql.js WASM in web production build (P1-37)
-2. Playwright browser E2E + Journey A–I (P1-20, Wave 11)
-3. Loan UI complete (create/preview/pay/reverse) — Wave 7
-4. Unified investments UI — Wave 8
-5. Reports live viewer — Wave 9
-6. Backup/restore + corrupt refuse — Wave 10
-7. Accessibility baseline proof (P1-34)
-8. Performance fixture 10k ops (P1-35)
-9. Cheque state machine exact E2E (P1-19)
-10. LicenseScreen runtime capabilities UI (P1-33)
+### Tests
+- Core + P0: **62+ pass** (35 prior + 18 P0 + domain)
+- `node --test` investment/crypto/metals: 18/18
 
-## Deferred (honest P2 — do not fake)
+## Still OPEN
+1. sql.js WASM production web dependency (P1-37)
+2. Playwright browser E2E Journey A–I (P1-20)
+3. loan payment + reverse sheets fully wired
+4. cheque state machine exact E2E (P1-19)
+5. Backup/restore corrupt refuse proven in browser
+6. Accessibility baseline (P1-34)
+7. Performance 10k fixture (P1-35)
+8. Full report surface
+9. Standalone edition proof matrix
+10. Field-preservation remaining refine rows
 
-- TWR / MWR
-- Funds reinvestment Boolean
-- Advanced loan borrower / variable-rate
-- Full Iranian fee-policy data
-- Multi-device sync
-- Native shells
-
-## Commits this session
-
-- `39d5609` Wave-1..4 foundations
-- `8fbe5d4` withdraw/transfer + P1-21 bridge
-- `6f41692` income/expense + web-react persistence
+## Deferred P2 (honest)
+TWR/MWR · funds reinvest · advanced loan borrower · full Iran fee data · multi-device sync · native shells
