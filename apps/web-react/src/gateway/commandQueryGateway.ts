@@ -50,3 +50,11 @@ export function createBrowserGateway(_edition = "full"): Gateway {
     },
   };
 }
+
+import { useMemo } from "react";
+import { createHostBoundGateway } from "../persistence/browserHostBridge";
+
+/** React hook — gateway bound to FinancialHost or fail-closed */
+export function useGateway(): Gateway {
+  return useMemo(() => createHostBoundGateway(), []);
+}

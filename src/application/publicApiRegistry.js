@@ -15,6 +15,7 @@ import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browser
 import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
+import { bounceCheque } from "../features/cheque/commands/bounce.js";
 
 export const commandHandlers = {
   "accounts.create": createAccount,
@@ -28,6 +29,7 @@ export const commandHandlers = {
   "crypto.buy": buyCrypto,
   "metals.buy": buyMetals,
   "tax.adjust": adjustTax,
+  "cheque.bounce": bounceCheque,
 };
 
 export const queryHandlers = {
