@@ -18,9 +18,13 @@ import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
 import { bounceCheque } from "../features/cheque/commands/bounce.js";
+import { clearCheque } from "../features/cheque/commands/clear.js";
 import {
   createBatch as importCreateBatch,
   ingestRaw as importIngestRaw,
+  normalizeBatch as importNormalizeBatch,
+  mapBatch as importMapBatch,
+  validateBatch as importValidateBatch,
   commitBatch as importCommitBatch,
   getBatch as importGetBatch,
 } from "../features/import/public-api/index.js";
@@ -48,10 +52,14 @@ export const COMMAND_REGISTRY = Object.freeze({
   // Tax / cheque
   "tax.adjust": { kind: "command", module: "tax", capability: "tax.*", handler: adjustTax, idempotent: true },
   "cheque.bounce": { kind: "command", module: "cheque", capability: "cheque.*", handler: bounceCheque, idempotent: true },
+  "cheque.clear": { kind: "command", module: "cheque", capability: "cheque.*", handler: clearCheque, idempotent: true },
 
   // Import (R-M22) — commitBatch intentionally rejects until mapping complete
   "import.createBatch": { kind: "command", module: "import", capability: "import.*", handler: importCreateBatch, idempotent: true },
   "import.ingestRaw": { kind: "command", module: "import", capability: "import.*", handler: importIngestRaw, idempotent: false },
+  "import.normalizeBatch": { kind: "command", module: "import", capability: "import.*", handler: importNormalizeBatch, idempotent: true },
+  "import.mapBatch": { kind: "command", module: "import", capability: "import.*", handler: importMapBatch, idempotent: true },
+  "import.validateBatch": { kind: "command", module: "import", capability: "import.*", handler: importValidateBatch, idempotent: true },
   "import.commitBatch": { kind: "command", module: "import", capability: "import.*", handler: importCommitBatch, idempotent: true },
   "import.getBatch": { kind: "command", module: "import", capability: "import.*", handler: importGetBatch, idempotent: true },
 

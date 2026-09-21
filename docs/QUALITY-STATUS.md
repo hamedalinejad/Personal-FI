@@ -1,40 +1,48 @@
 # Personal-FI Quality Status
 
-**Updated:** 2026-09-20  
-**HEAD snapshot:** see `docs/core/registry/SNAPSHOT-2026-09-20.json`  
+**Updated:** 2026-09-21  
 **PRODUCTION:** NO-GO  
-**RELEASE_PROVEN:** false  
-**FREEZE_PROVEN:** false (Phase 0 contract freeze in progress)
+**RELEASE_PROVEN:** false
 
-## Phase 0 — Contract freeze
-- Snapshot hashes recorded (schema + commandRegistry)
-- `status.registry.json` + `requirements-matrix.json` machine-checked requirements
-- `commandRegistry.js` expanded (import stages registered)
-- `import.commitBatch` **rejects** until mapping complete (no false-green import)
-- `capabilities.ts` UI reader only; host enforces
-- `entitlementContract.js` edition matrix helper (R-M25)
-- Official UI: **apps/web-react** only
-- `apps/web`: RETIRE_CANDIDATE (2 scaffold stubs) — delete after inventory gate
-- Deferred locked in DEFERRED-V1.md + status.registry (not TODO)
+## PHASE 1–5 progress
 
-## Blockers for GO
-| ID | Status |
-|----|--------|
-| R-M24 offline browser persistence | NOT_IMPLEMENTED (E2E) |
-| R-OFFLINE-03 browser offline E2E | NOT_IMPLEMENTED |
-| R-M22 import full lifecycle | PARTIAL (create/ingest only) |
-| R-M03 field preservation refine rows | PARTIAL |
-| R-LICENSE-01 edition proof matrix | PARTIAL |
+### PHASE 1 — identity & persistence
+| Step | Status |
+|------|--------|
+| 1.1 immutable book_id + created_at | DONE (db_meta; bootstrap no fabricate) |
+| 1.2 field preservation decisions | DONE — `field-preservation-decisions.json` (no refine-later) |
+| 1.3 FK expected matrix + payload table | DONE docs/helpers; migration rebuild for live DBs still ops task |
 
-## Intentionally DEFERRED (do not implement now)
-TWR/MWR/IRR · crypto deposit/withdraw/swap/airdrop · full corporate actions · funds reinvest · loan borrower/variable-rate/advanced day-count
+### PHASE 2 — valuation
+| Step | Status |
+|------|--------|
+| 2.1–2.3 shared enum + valueHoldings | DONE |
+| 2.4 golden cases | DONE (IRR, cross+FX, mixed, partial, missing FX, stale, future, metal, fund price≠NAV) |
 
-## Keep (do not delete)
-- Node browser harness adapters until R-M24 green
-- commandQueryGateway.js / browserHostBridge.js dual until test boundary unified
-- docs/archive history
+### PHASE 3 — investment UI
+| Step | Status |
+|------|--------|
+| 3.1–3.5 no fallback/coerce; capability actions; crypto net Core; metals purity empty | DONE prior arc |
 
-## Tests
-- commandRegistry: 6 pass
-- book identity: 3 pass  
-- backup package: 6 pass
+### PHASE 4 — tax/cheque
+| Step | Status |
+|------|--------|
+| 4.1 tax.adjust atomic | DONE prior |
+| 4.2 cheque lifecycle SM + bounce/clear with ops | DONE (clear added) |
+| 4.3 golden SM tests | DONE transitions |
+
+### PHASE 5 — import
+| Step | Status |
+|------|--------|
+| 5.1 public API | DONE |
+| 5.2–5.4 batch/record lifecycle + dedupe keys | DONE (create→ingest→normalize→map→validate) |
+| 5.5–5.6 commit | GATED — requires validated + commandId mapping; no false-green |
+
+## Still blocking GO
+- R-M24 / R-OFFLINE-03 real browser sql.js+IDB E2E
+- Host loop for import commit of mapped public commands
+- Field matrix machine gate vs decisions file
+- origin push after rebase
+
+## Deferred (locked)
+See DEFERRED-V1.md — TWR/MWR/IRR, crypto deposit/withdraw, reinvest, borrower mode, etc.

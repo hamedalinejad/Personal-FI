@@ -20,6 +20,9 @@ import { bounceCheque } from "../features/cheque/commands/bounce.js";
 import {
   createBatch as importCreateBatch,
   ingestRaw as importIngestRaw,
+  normalizeBatch as importNormalizeBatch,
+  mapBatch as importMapBatch,
+  validateBatch as importValidateBatch,
   commitBatch as importCommitBatch,
   getBatch as importGetBatch,
 } from "../features/import/public-api/index.js";
@@ -40,6 +43,9 @@ export const commandHandlers = {
   "cheque.bounce": bounceCheque,
   "import.createBatch": importCreateBatch,
   "import.ingestRaw": importIngestRaw,
+  "import.normalizeBatch": importNormalizeBatch,
+  "import.mapBatch": importMapBatch,
+  "import.validateBatch": importValidateBatch,
   "import.commitBatch": importCommitBatch,
   "import.getBatch": importGetBatch,
 };

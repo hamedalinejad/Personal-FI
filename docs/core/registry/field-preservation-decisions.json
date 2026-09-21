@@ -1,0 +1,52 @@
+{
+  "version": "1",
+  "updated": "2026-09-20",
+  "policy": "No 'refine later' after PHASE 1.2. Each field is TYPED_COLUMN | CANONICAL_PAYLOAD | DEFERRED | REJECTED.",
+  "canonicalPayloadTable": "fin_operation_payloads",
+  "resultJsonRole": "idempotent replay snapshot ONLY — not RAW SoT",
+  "decisions": [
+    { "field": "crypto.buy.feeRole", "decision": "CANONICAL_PAYLOAD", "owner": "crypto", "note": "stored in fin_operation_payloads + inv_crypto_transactions if column exists" },
+    { "field": "crypto.buy.feeTreatment", "decision": "CANONICAL_PAYLOAD", "owner": "crypto", "targetColumn": "inv_crypto_transactions.economic_kind" },
+    { "field": "crypto.transfer.fromExchangeId", "decision": "TYPED_COLUMN", "owner": "crypto", "targetColumn": "inv_crypto_transactions — via holding/exchange context; DEFERRED full transfer cmd", "status": "DEFERRED_CMD" },
+    { "field": "crypto.transfer.toExchangeId", "decision": "TYPED_COLUMN", "owner": "crypto", "status": "DEFERRED_CMD" },
+    { "field": "funds.subscribe.pricingMode", "decision": "CANONICAL_PAYLOAD", "owner": "funds" },
+    { "field": "funds.subscribe.quoteType", "decision": "CANONICAL_PAYLOAD", "owner": "funds" },
+    { "field": "metals.buy.inputMassUnit", "decision": "CANONICAL_PAYLOAD", "owner": "metals", "note": "mass stored as quantity_mg; unit in payload" },
+    { "field": "metals.buy.purityPolicy", "decision": "CANONICAL_PAYLOAD", "owner": "metals" },
+    { "field": "metals.buy.priceUnit", "decision": "CANONICAL_PAYLOAD", "owner": "metals" },
+    { "field": "metals.buy.pricePurityBasis", "decision": "CANONICAL_PAYLOAD", "owner": "metals" },
+    { "field": "metals.buy.feeTreatment", "decision": "CANONICAL_PAYLOAD", "owner": "metals" },
+    { "field": "metals.sell.platformId", "decision": "TYPED_COLUMN", "owner": "metals", "targetColumn": "inv_metals_transactions / platform via holding" },
+    { "field": "metals.sell.purityRatio", "decision": "CANONICAL_PAYLOAD", "owner": "metals" },
+    { "field": "accounts.deposit.inflowKind", "decision": "CANONICAL_PAYLOAD", "owner": "accounts", "note": "also audit payload" },
+    { "field": "loan.create.calculationMethod", "decision": "TYPED_COLUMN", "owner": "loan", "targetColumn": "ln_loans.calculation_method" },
+    { "field": "loan.create.scheduleSnapshot", "decision": "TYPED_COLUMN", "owner": "loan", "targetColumn": "ln_schedule_snapshots.snapshot_json" },
+    { "field": "tax.adjust.reason", "decision": "TYPED_COLUMN", "owner": "tax", "targetColumn": "fin_audit_log.reason + tax_events" },
+    { "field": "tax.adjust.delta", "decision": "TYPED_COLUMN", "owner": "tax", "targetColumn": "tax_events.amount" },
+    { "field": "cheque.bounce.fromStatus", "decision": "CANONICAL_PAYLOAD", "owner": "cheque" },
+    { "field": "import.raw.unknownFields", "decision": "TYPED_COLUMN", "owner": "import", "targetColumn": "import_raw_records.unknown_fields_json" },
+    { "field": "import.raw.payload", "decision": "TYPED_COLUMN", "owner": "import", "targetColumn": "import_raw_records.payload_json" },
+    { "field": "book.name", "decision": "TYPED_COLUMN", "owner": "meta", "targetColumn": "db_meta.book_name" },
+    { "field": "book.id", "decision": "TYPED_COLUMN", "owner": "meta", "targetColumn": "db_meta.book_id" },
+    { "field": "book.createdAt", "decision": "TYPED_COLUMN", "owner": "meta", "targetColumn": "db_meta.book_created_at" },
+    { "field": "book.baseCurrency", "decision": "TYPED_COLUMN", "owner": "meta", "targetColumn": "db_meta.book_base_currency" },
+    { "field": "funds.reinvest", "decision": "REJECTED", "owner": "funds", "reason": "v1 economic model incomplete; DEFERRED-V1" },
+    { "field": "reports.twr", "decision": "DEFERRED", "owner": "reports", "reason": "formula not release-safe" },
+    { "field": "reports.mwr", "decision": "DEFERRED", "owner": "reports", "reason": "formula not release-safe" },
+    { "field": "reports.irr", "decision": "DEFERRED", "owner": "reports", "reason": "formula not release-safe" },
+    { "field": "loan.borrowerRole", "decision": "DEFERRED", "owner": "loan", "reason": "standalone v1 lender-only" },
+    { "field": "loan.variableRate", "decision": "DEFERRED", "owner": "loan", "reason": "DEFERRED-V1" },
+    { "field": "crypto.deposit", "decision": "DEFERRED", "owner": "crypto", "reason": "DEFERRED-V1" },
+    { "field": "crypto.withdrawal", "decision": "DEFERRED", "owner": "crypto", "reason": "DEFERRED-V1" },
+    { "field": "stocks.corporateAction.full", "decision": "DEFERRED", "owner": "stocks", "reason": "R-M12 scheduled only" }
+  ],
+  "gate": {
+    "failIf": [
+      "PERSISTED without table.column or CANONICAL_PAYLOAD",
+      "DEFERRED without reason and owner",
+      "REJECTED without rule"
+    ]
+  }
+}
+EOF
+echo "field-preservation-decisions written"

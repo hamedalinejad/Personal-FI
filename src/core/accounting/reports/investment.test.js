@@ -93,3 +93,37 @@ describe("valueHoldings BUG-P0-01/02", () => {
     assert.equal(r.totals.marketValue, "0");
   });
 });
+
+describe("valueHoldings golden PHASE 2.4 extras", () => {
+  it("metal-style quantity with same currency values", () => {
+    const r = valueHoldings({
+      holdings: [
+        {
+          instrumentId: "gold-18k",
+          quantity: "10000",
+          costBasis: "50000000",
+          costCurrency: "IRR",
+          assetClass: "metals",
+        },
+      ],
+      prices: new Map([["gold-18k", { price: "6000", currency: "IRR", asOf: "2026-01-01" }]]),
+    });
+    assert.equal(r.state, "ready");
+    assert.equal(r.rows[0].marketValue, "60000000");
+  });
+
+  it("fund: price is transaction/liquidation separate from NAV label — valuation uses supplied price only", () => {
+    // NAV must never silently replace transaction price; here we only pass explicit price
+    const r = valueHoldings({
+      holdings: [
+        { instrumentId: "fund-a", quantity: "100", costBasis: "1000000", costCurrency: "IRR" },
+      ],
+      prices: new Map([
+        ["fund-a", { price: "11000", currency: "IRR", asOf: "2026-01-01" }],
+      ]),
+    });
+    assert.equal(r.state, "ready");
+    assert.equal(r.rows[0].marketValue, "1100000");
+    assert.equal(r.rows[0].unrealizedPnl, "100000");
+  });
+});
