@@ -61,3 +61,16 @@ export function settleT2Broker({
   }
   throw new Error("SETTLE_T2_PHASE");
 }
+
+
+/** Contract alias — CashSettlementPort */
+export function settleCash(opts) {
+  return settle({
+    finAccountId: opts.accountRef || opts.finAccountId,
+    counterAccountId: opts.counterAccountId,
+    amount: opts.amount,
+    side: opts.direction === "out" ? "credit" : opts.side || "debit",
+    operationId: opts.operationId,
+    memo: opts.memo || "settlement",
+  });
+}

@@ -480,3 +480,47 @@ input:focus, select:focus, textarea:focus {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* —— Elevated product surface (Core contract UI shell) —— */
+.app-shell {
+  background: linear-gradient(180deg, #eef2ff 0%, var(--color-bg) 120px);
+}
+.topbar {
+  backdrop-filter: saturate(1.2) blur(8px);
+  background: rgba(255, 255, 255, 0.92);
+}
+.metric-card:hover {
+  border-color: #bfdbfe;
+  box-shadow: var(--shadow-md);
+}
+.menu-list button:active,
+.menu-list a:active {
+  background: var(--color-primary-soft);
+}
+.tabbar a:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.screen h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.quick-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
