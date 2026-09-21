@@ -48,9 +48,15 @@ async function loadSqlJs(): Promise<any> {
   if (typeof window === "undefined") {
     throw Object.assign(new Error("NOT_BROWSER"), { code: "NOT_BROWSER" });
   }
-  if (!window.initSqlJs) {
+  const localJs = "/sqljs/sql-wasm.js";
+  const localWasm = (f: string) => `/sqljs/${f}`;
+  const cdnJs = "https://sql.js.org/dist/sql-wasm.js";
+  const cdnWasm = (f: string) => `https://sql.js.org/dist/${f}`;
+
+  async function inject(src: string): Promise<void> {
+    if (window.initSqlJs) return;
     await new Promise<void>((resolve, reject) => {
-      const existing = document.querySelector("script[data-pf-sqljs]");
+      const existing = document.querySelector(`script[data-pf-sqljs="${src}"]`);
       if (existing) {
         existing.addEventListener("load", () => resolve());
         existing.addEventListener("error", () =>
@@ -59,21 +65,27 @@ async function loadSqlJs(): Promise<any> {
         return;
       }
       const s = document.createElement("script");
-      s.src = "https://sql.js.org/dist/sql-wasm.js";
+      s.src = src;
       s.async = true;
-      s.dataset.pfSqljs = "1";
+      s.dataset.pfSqljs = src;
       s.onload = () => resolve();
       s.onerror = () =>
         reject(Object.assign(new Error("SQLJS_SCRIPT_LOAD_FAILED"), { code: "SQLJS_SCRIPT_LOAD_FAILED" }));
       document.head.appendChild(s);
     });
   }
+
+  let locate = localWasm;
+  try {
+    await inject(localJs);
+  } catch {
+    locate = cdnWasm;
+    await inject(cdnJs);
+  }
   if (!window.initSqlJs) {
     throw Object.assign(new Error("SQLJS_RUNTIME_MISSING"), { code: "SQLJS_RUNTIME_MISSING" });
   }
-  const SQL = await window.initSqlJs({
-    locateFile: (f: string) => `https://sql.js.org/dist/${f}`,
-  });
+  const SQL = await window.initSqlJs({ locateFile: locate });
   if (!SQL?.Database) {
     throw Object.assign(new Error("SQLJS_DATABASE_MISSING"), { code: "SQLJS_DATABASE_MISSING" });
   }

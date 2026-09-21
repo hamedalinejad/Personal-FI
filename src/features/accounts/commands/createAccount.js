@@ -3,6 +3,7 @@
  */
 
 import { assertDbPassed } from "../../_shared/atomicDb.js";
+import { stripZwAndSpace, normalizeIban, normalizeAccountNumber } from "../../../core/text/iranNormalize.js";
 
 const ALLOWED_KINDS = Object.freeze([
   "asset.cash",
@@ -20,7 +21,15 @@ const ALLOWED_KINDS = Object.freeze([
  */
 export async function createAccount({ db, payload, baseCurrency }) {
   assertDbPassed(db, "accounts.create");
-  const { name, accountKind, currency, code = null } = payload || {};
+  const pl = payload || {};
+  const name = stripZwAndSpace(pl.name);
+  const accountKind = pl.accountKind;
+  const currency = pl.currency;
+  const code = pl.code != null ? stripZwAndSpace(pl.code) : null;
+  const iban = pl.iban != null ? normalizeIban(pl.iban) : null;
+  const accountNumber = pl.accountNumber != null ? normalizeAccountNumber(pl.accountNumber) : null;
+  const bankName = pl.bankName != null ? stripZwAndSpace(pl.bankName) : null;
+  const branch = pl.branch != null ? stripZwAndSpace(pl.branch) : null;
   if (!name || typeof name !== "string") {
     throw Object.assign(new Error("NAME_REQUIRED"), { code: "VALIDATION_ERROR" });
   }

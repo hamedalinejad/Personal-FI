@@ -42,6 +42,12 @@ export async function transfer({ db, payload, baseCurrency }) {
   if (from.currency !== txnCcy) {
     throw Object.assign(new Error("FROM_CURRENCY_MISMATCH"), { code: "VALIDATION_ERROR" });
   }
+  if (to.currency !== from.currency) {
+    throw Object.assign(
+      new Error("CROSS_CURRENCY_TRANSFER_REQUIRES_TWO_LEG"),
+      { code: "CROSS_CURRENCY_TRANSFER_REQUIRES_TWO_LEG" }
+    );
+  }
 
   const fx = resolveMoneyOperationFx({
     bookBaseCurrency: baseCurrency,
