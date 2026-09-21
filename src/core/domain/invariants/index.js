@@ -41,3 +41,22 @@ export function runInvariantGate({ journalLines, rates = [] }) {
   for (const r of rates) assertRatePositive(r);
   return true;
 }
+
+
+export function assertQuantityNonNegative(value, field = "quantity") {
+  assertFiniteMoney(value, field);
+  if (toDecimal(value).lt(0)) throw new Error(`INV_QUANTITY_NEGATIVE:${field}`);
+}
+
+export function assertCostNonNegative(value, field = "cost") {
+  assertFiniteMoney(value, field);
+  if (toDecimal(value).lt(0)) throw new Error(`INV_COST_NEGATIVE:${field}`);
+}
+
+/** missing input must not become zero silently */
+export function assertPresentMoney(value, field = "amount") {
+  if (value == null || value === "") {
+    throw new Error(`INV_MISSING_INPUT:${field}`);
+  }
+  assertFiniteMoney(value, field);
+}

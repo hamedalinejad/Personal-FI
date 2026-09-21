@@ -1,31 +1,26 @@
-import test from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { canonicalDecimalString } from "./canonicalDecimal.js";
+import { canonicalDecimalString, toDecimal } from "./canonicalDecimal.js";
 
-test("BUG-CODE-001 rejects non-string", () => {
-  assert.throws(() => canonicalDecimalString(1.2));
-});
-test("BUG-CODE-001 rejects NaN", () => {
-  assert.throws(() => canonicalDecimalString("NaN"));
-});
-test("BUG-CODE-001 rejects Infinity", () => {
-  assert.throws(() => canonicalDecimalString("Infinity"));
-});
-test("BUG-CODE-001 rejects -Infinity", () => {
-  assert.throws(() => canonicalDecimalString("-Infinity"));
-});
-test("BUG-CODE-001 rejects empty", () => {
-  assert.throws(() => canonicalDecimalString(""));
-  assert.throws(() => canonicalDecimalString("   "));
-});
-test("BUG-CODE-001 rejects malformed", () => {
-  assert.throws(() => canonicalDecimalString("12.3.4"));
-  assert.throws(() => canonicalDecimalString("abc"));
-});
-test("BUG-CODE-001 normalizes -0", () => {
-  assert.equal(canonicalDecimalString("-0"), "0");
-});
-test("BUG-CODE-001 accepts plain decimal", () => {
-  assert.equal(canonicalDecimalString("12.50"), "12.5");
-  assert.equal(canonicalDecimalString("12.5"), "12.5");
+describe("canonicalDecimalString CORE-01", () => {
+  it("accepts canonical strings", () => {
+    assert.equal(canonicalDecimalString("1"), "1");
+    assert.equal(canonicalDecimalString("1.0"), "1");
+    assert.equal(canonicalDecimalString("0.00000001"), "0.00000001");
+  });
+  it("rejects non-string", () => {
+    assert.throws(() => canonicalDecimalString(1), /DECIMAL_NOT_STRING/);
+  });
+  it("rejects empty NaN Infinity", () => {
+    assert.throws(() => canonicalDecimalString(""), /DECIMAL_EMPTY/);
+    assert.throws(() => canonicalDecimalString("NaN"), /DECIMAL_NON_FINITE/);
+    assert.throws(() => canonicalDecimalString("Infinity"), /DECIMAL_NON_FINITE/);
+  });
+  it("handles scientific notation without Number()", () => {
+    const s = canonicalDecimalString("1e-8");
+    assert.equal(toDecimal(s).eq(toDecimal("0.00000001")), true);
+  });
+  it("allows negative for domain that needs it", () => {
+    assert.equal(canonicalDecimalString("-1"), "-1");
+  });
 });

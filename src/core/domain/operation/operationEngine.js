@@ -1,3 +1,8 @@
+/**
+ * NOT CANONICAL for browser runtime (§57).
+ * Filesystem idempotency — use operationRunner.js (DB-backed) instead.
+ * Kept only until all imports migrate; do not extend.
+ */
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";

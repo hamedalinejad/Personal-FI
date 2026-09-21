@@ -68,3 +68,45 @@ export function queryPresentationBalance(db, accountId, accountKind) {
   stmt.free();
   return presentationBalance(lines, accountKind);
 }
+
+/**
+ * Contract §45 — rebuild balance from journal only (snapshot is never SoT).
+ * @param {{ db: any, accountId: string, asOf?: string|null, accountKind?: string }} opts
+ * @returns {{ balance: string, normalSide: string, asOf: string|null, lineCount: number }}
+ */
+export function calculateAccountBalance({ db, accountId, asOf = null, accountKind = null }) {
+  if (!db || !accountId) {
+    throw Object.assign(new Error("BALANCE_ACCOUNT_REQUIRED"), { code: "BALANCE_ACCOUNT_REQUIRED" });
+  }
+  let kind = accountKind;
+  if (!kind) {
+    const s = db.prepare("SELECT account_kind FROM fin_accounts WHERE id = ?");
+    s.bind([accountId]);
+    if (s.step()) kind = s.getAsObject().account_kind;
+    s.free();
+  }
+  kind = kind || "asset.cash";
+
+  let sql = `SELECT jl.side, jl.amount_in_base, jl.amount
+     FROM fin_journal_lines jl
+     JOIN fin_journal_entries je ON je.id = jl.entry_id
+     JOIN fin_operations op ON op.id = je.operation_id
+     WHERE jl.account_id = ? AND op.status = 'posted'`;
+  const params = [accountId];
+  if (asOf) {
+    sql += ` AND je.business_date <= ?`;
+    params.push(asOf);
+  }
+  const stmt = db.prepare(sql);
+  stmt.bind(params);
+  const lines = [];
+  while (stmt.step()) lines.push(stmt.getAsObject());
+  stmt.free();
+
+  return {
+    balance: presentationBalance(lines, kind),
+    normalSide: normalSide(kind),
+    asOf: asOf || null,
+    lineCount: lines.length,
+  };
+}
