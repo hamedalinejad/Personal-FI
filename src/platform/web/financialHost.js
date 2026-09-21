@@ -1,13 +1,20 @@
 /**
  * Browser FinancialHost — single entry for commands and queries.
  * License gate at execute boundary.
- * Wave-1 / Wave-3.
+ * Response shape §25: { ok, data, invalidated } | { ok: false, code, message }
  */
 
 import { isQueryId } from "../../application/queryCatalog.js";
 import { assertCommandAllowed, getRuntimeCapabilities } from "../../core/license/capabilityGate.js";
-import { getMeta, queryAll, queryOne, withImmediateTransaction, durablePersist } from "../../core/persistence/browser/browserSqlAdapter.js";
+import {
+  getMeta,
+  queryAll,
+  queryOne,
+  withImmediateTransaction,
+  durablePersist,
+} from "../../core/persistence/browser/browserSqlAdapter.js";
 import { toDecimal, canonicalDecimalString } from "../../core/money/canonicalDecimal.js";
+import { ok, fail, normalizeResult } from "../../application/contracts/apiEnvelope.js";
 
 /**
  * @param {{ db: any, edition?: string, commandHandlers?: Record<string, Function>, queryHandlers?: Record<string, Function> }} opts
@@ -34,11 +41,11 @@ export function createFinancialHost(opts) {
     }
     try {
       const result = await handler({ db, payload, meta, bookId, baseCurrency, host });
-      // Durable persist after successful mutation
-      if (result && result.success !== false && meta.skipPersist !== true) {
+      const normalized = normalizeResult(result, meta);
+      if (normalized.ok && meta.skipPersist !== true) {
         await durablePersist(db);
       }
-      return normalizeResult(result, meta);
+      return normalized;
     } catch (err) {
       return fail(err.code || "COMMAND_FAILED", err.message || String(err));
     }
@@ -50,11 +57,13 @@ export function createFinancialHost(opts) {
     }
     const handler = queryHandlers[queryId];
     if (!handler) {
-      // Built-in meta queries
       if (queryId === "meta.book") {
         return ok({
+          id: bookId,
           bookId,
+          name: getMeta(db, "book_name") || "Personal Book",
           baseCurrency,
+          createdAt: getMeta(db, "book_created_at"),
           schemaVersion: getMeta(db, "schemaVersion"),
         });
       }
@@ -78,7 +87,6 @@ export function createFinancialHost(opts) {
     getBaseCurrency: () => baseCurrency,
     getEdition: () => edition,
     getDb: () => db,
-    // helpers exposed for handlers
     queryAll: (sql, p) => queryAll(db, sql, p),
     queryOne: (sql, p) => queryOne(db, sql, p),
     getMeta: (k) => getMeta(db, k),
@@ -90,43 +98,4 @@ export function createFinancialHost(opts) {
   return host;
 }
 
-function ok(data) {
-  return {
-    success: true,
-    data: data ?? null,
-    errors: [],
-    meta: { api_version: "1", schema_version: "1" },
-  };
-}
-
-function fail(code, message) {
-  return {
-    success: false,
-    data: null,
-    errors: [{ code, message: message || code }],
-    meta: { api_version: "1", schema_version: "1" },
-  };
-}
-
-function normalizeResult(result, meta) {
-  if (result && typeof result.success === "boolean") {
-    return {
-      ...result,
-      meta: {
-        api_version: "1",
-        schema_version: "1",
-        request_id: meta.requestId || null,
-        operation_id: result.data?.operationId || result.operationId || null,
-        ...(result.meta || {}),
-      },
-    };
-  }
-  // legacy {ok, data, code} adapter
-  if (result && typeof result.ok === "boolean") {
-    if (result.ok) {
-      return ok(result.data);
-    }
-    return fail(result.code || "COMMAND_FAILED", result.message);
-  }
-  return ok(result);
-}
+export { ok, fail, normalizeResult };

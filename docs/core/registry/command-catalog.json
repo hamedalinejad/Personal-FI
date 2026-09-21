@@ -1,0 +1,279 @@
+{
+  "version": "1",
+  "updated": "2026-09-21",
+  "contract": "src/application/commandRegistry.js is runtime authority; this JSON is machine export",
+  "commands": [
+    {
+      "id": "accounts.create",
+      "kind": "command",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "accounts.deposit",
+      "kind": "command",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "accounts.withdraw",
+      "kind": "command",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "accounts.transfer",
+      "kind": "command",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "income.create",
+      "kind": "command",
+      "module": "income",
+      "capability": "income.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "expense.create",
+      "kind": "command",
+      "module": "expense",
+      "capability": "expense.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "loan.create",
+      "kind": "command",
+      "module": "loan",
+      "capability": "loan.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "loan.recordPayment",
+      "kind": "command",
+      "module": "loan",
+      "capability": "loan.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "crypto.buy",
+      "kind": "command",
+      "module": "crypto",
+      "capability": "crypto.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "metals.buy",
+      "kind": "command",
+      "module": "metals",
+      "capability": "metals.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "tax.adjust",
+      "kind": "command",
+      "module": "tax",
+      "capability": "tax.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "cheque.bounce",
+      "kind": "command",
+      "module": "cheque",
+      "capability": "cheque.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "cheque.clear",
+      "kind": "command",
+      "module": "cheque",
+      "capability": "cheque.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.createBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.ingestRaw",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": false,
+      "hasHandler": true
+    },
+    {
+      "id": "import.normalizeBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.mapBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.validateBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.commitBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "import.getBatch",
+      "kind": "command",
+      "module": "import",
+      "capability": "import.*",
+      "idempotent": true,
+      "hasHandler": true
+    },
+    {
+      "id": "accounts.list",
+      "kind": "query",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "accounts.get",
+      "kind": "query",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "accounts.options",
+      "kind": "query",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "money.totals",
+      "kind": "query",
+      "module": "accounts",
+      "capability": "accounts.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "investments.holdings",
+      "kind": "query",
+      "module": "investments",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "meta.book",
+      "kind": "query",
+      "module": "meta",
+      "capability": "meta.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "meta.license",
+      "kind": "query",
+      "module": "meta",
+      "capability": "meta.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.trialBalance",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.balanceSheet",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.incomeStatement",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.cashFlow",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.generalLedger",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.netWorth",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    },
+    {
+      "id": "reports.investmentHoldings",
+      "kind": "query",
+      "module": "reports",
+      "capability": "reports.*",
+      "idempotent": null,
+      "hasHandler": false
+    }
+  ]
+}
