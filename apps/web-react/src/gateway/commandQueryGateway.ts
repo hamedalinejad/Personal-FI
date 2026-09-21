@@ -50,7 +50,6 @@ export function createBrowserGateway(_edition = "full"): Gateway {
     },
   };
 }
-<<<<<<< HEAD
 
 import { useMemo } from "react";
 import { createHostBoundGateway } from "../persistence/browserHostBridge";
@@ -59,5 +58,3 @@ import { createHostBoundGateway } from "../persistence/browserHostBridge";
 export function useGateway(): Gateway {
   return useMemo(() => createHostBoundGateway(), []);
 }
-=======
->>>>>>> origin/main

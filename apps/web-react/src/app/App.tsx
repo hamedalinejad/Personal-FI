@@ -11,7 +11,6 @@ import { InvestmentsScreen } from "../routes/InvestmentsScreen";
 import { LoansScreen } from "../routes/LoansScreen";
 import { MoreScreen } from "../routes/MoreScreen";
 import { SheetHost } from "../sheets/SheetHost";
-<<<<<<< HEAD
 import { Button } from "../components/common/Button";
 
 function BootstrappingScreen() {
@@ -19,20 +18,11 @@ function BootstrappingScreen() {
     <section className="onboarding" dir="rtl" lang="fa">
       <h1>در حال آماده‌سازی</h1>
       <p className="muted">باز کردن پایگاه داده محلی (sql.js + IndexedDB)…</p>
-=======
-
-function BootstrappingScreen() {
-  return (
-    <section className="onboarding">
-      <h1>در حال آماده‌سازی</h1>
-      <p className="muted">باز کردن پایگاه داده محلی…</p>
->>>>>>> origin/main
     </section>
   );
 }
 
 function AwaitingHostScreen() {
-<<<<<<< HEAD
   const { bootstrapNote, lastError } = useAppState();
   return (
     <section className="onboarding" dir="rtl" lang="fa">
@@ -63,17 +53,6 @@ function AwaitingHostScreen() {
       <Button type="button" onClick={() => window.location.reload()}>
         تلاش مجدد
       </Button>
-=======
-  const { bootstrapNote } = useAppState();
-  return (
-    <section className="onboarding">
-      <h1>اتصال موتور مالی</h1>
-      <p className="muted">
-        FinancialHost هنوز bind نشده است. برای توسعه: <code>window.__PF_HOST__</code> یا{" "}
-        <code>setFinancialHost</code> پس از sql.js+IndexedDB.
-      </p>
-      {bootstrapNote ? <p className="muted">{bootstrapNote}</p> : null}
->>>>>>> origin/main
     </section>
   );
 }

@@ -89,24 +89,17 @@ export async function bootstrapRuntime(opts?: {
 
   // 2) Authoritative book metadata from host (DB), not localStorage
   try {
-<<<<<<< HEAD
     let bookRes = await host.query("book.get", {});
     if (!bookRes.ok) {
       bookRes = await host.query("meta.book", {});
     }
     if (!bookRes.ok) {
       // Host works but queries failed oddly — still allow onboarding if host bound
-=======
-    const bookRes = await host.query("book.get", {});
-    if (!bookRes.ok) {
-      // Host works but no book yet → onboarding
->>>>>>> origin/main
       return {
         phase: "onboarding",
         book: null,
         hostBound: true,
         error: null,
-<<<<<<< HEAD
         adapterNote: `edition=${edition};book_query=${bookRes.code}`,
       };
     }
@@ -120,13 +113,6 @@ export async function bootstrapRuntime(opts?: {
     };
     const bookId = data?.id || data?.bookId;
     if (!bookId || !data?.baseCurrency) {
-=======
-        adapterNote: `edition=${edition}`,
-      };
-    }
-    const data = bookRes.data as { name?: string | null; baseCurrency?: string | null };
-    if (!data?.name || !data?.baseCurrency) {
->>>>>>> origin/main
       return {
         phase: "onboarding",
         book: null,
@@ -138,7 +124,6 @@ export async function bootstrapRuntime(opts?: {
     return {
       phase: "ready",
       book: {
-<<<<<<< HEAD
         id: bookId,
         name: data.name || "Personal Book",
         baseCurrency: data.baseCurrency,
@@ -147,16 +132,6 @@ export async function bootstrapRuntime(opts?: {
       hostBound: true,
       error: null,
       adapterNote: `edition=${edition};book_from=host.query(book.get|meta.book)`,
-=======
-        id: `db:${data.name}`,
-        name: data.name,
-        baseCurrency: data.baseCurrency,
-        createdAt: new Date().toISOString(),
-      },
-      hostBound: true,
-      error: null,
-      adapterNote: `edition=${edition};book_from=host.query(book.get)`,
->>>>>>> origin/main
     };
   } catch (e) {
     return {

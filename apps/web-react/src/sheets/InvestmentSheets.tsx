@@ -77,11 +77,7 @@ export function CryptoBuySheet({ onClose }: { onClose: () => void }) {
         venueId: exchangeId,
         grossQuantity: grossQty.trim(),
         feeQuantity: feeQty.trim() || "0",
-<<<<<<< HEAD
         // netQuantity omitted — Core derives net = gross - fee (BUG-P0-03)
-=======
-        netQuantity: grossQty.trim(),
->>>>>>> origin/main
         costTotal: costTotal.trim() || price.trim(),
         costCurrency,
         currency: costCurrency,
@@ -561,11 +557,7 @@ export function MetalsBuySheet({ onClose }: { onClose: () => void }) {
   const [platformId, setPlatformId] = useState("");
   const [instrumentId, setInstrumentId] = useState("");
   const [quantityMg, setQty] = useState("");
-<<<<<<< HEAD
   const [purityRatio, setPurity] = useState(""); // empty unless instrument purityPolicy=fixed_1 (BUG-P0-04)
-=======
-  const [purityRatio, setPurity] = useState("1");
->>>>>>> origin/main
   const [metalPricePerMg, setPrice] = useState("");
   const [premium, setPremium] = useState("0");
   const [feeAmount, setFee] = useState("0");
