@@ -55,3 +55,29 @@ export function fail(errors, {
     },
   };
 }
+
+
+/**
+ * Gateway boundary shape (contract §42):
+ * { ok:true, data, invalidated } | { ok:false, code, message }
+ * Maps legacy success/errors envelope without dual coexistence at API edge.
+ */
+export function toGatewayEnvelope(result) {
+  if (!result) return { ok: false, code: "EMPTY_RESULT", message: "empty" };
+  if (typeof result.ok === "boolean") {
+    if (result.ok) return { ok: true, data: result.data, invalidated: result.invalidated || [] };
+    return { ok: false, code: result.code || "ERROR", message: result.message || result.code || "ERROR" };
+  }
+  if (result.success === true) {
+    return { ok: true, data: result.data, invalidated: result.invalidated || [] };
+  }
+  if (result.success === false) {
+    const err = (result.errors && result.errors[0]) || {};
+    return {
+      ok: false,
+      code: err.code || "ERROR",
+      message: err.message || err.code || "ERROR",
+    };
+  }
+  return { ok: true, data: result };
+}

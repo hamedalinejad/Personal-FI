@@ -1,22 +1,19 @@
 /**
- * Machine license entitlement contract (R-M25 / R-LICENSE-01).
- * capabilityGate.js remains the runtime enforcer.
- * This module is the declarative contract for editions + proof harnesses.
+ * Machine license entitlement contract.
+ * Core only knows assertCapability / edition matrix against a capability map
+ * provided by Application (never imports application/*).
  */
 
 import { EDITIONS, isCommandAllowed, assertCommandAllowed, getRuntimeCapabilities } from "./capabilityGate.js";
-import { COMMAND_REGISTRY, capabilityFor } from "../../application/commandRegistry.js";
 
 /**
- * Prove edition cannot execute disallowed commands (sample matrix).
  * @param {string} edition
- * @returns {{ edition: string, allowed: string[], denied: string[], ok: boolean }}
+ * @param {Iterable<string>} commandIds — supplied by Application layer
  */
-export function proveEditionMatrix(edition) {
+export function proveEditionMatrix(edition, commandIds = []) {
   const allowed = [];
   const denied = [];
-  for (const id of Object.keys(COMMAND_REGISTRY)) {
-    if (COMMAND_REGISTRY[id].kind !== "command") continue;
+  for (const id of commandIds) {
     if (isCommandAllowed(edition, id)) allowed.push(id);
     else denied.push(id);
   }
@@ -32,12 +29,29 @@ export function proveEditionMatrix(edition) {
 /**
  * @param {string} edition
  * @param {string} commandId
+ * @param {string} [capability] — optional label from Application registry
  */
-export function assertEditionCommand(edition, commandId) {
-  // Prefer registry capability when present
-  const cap = capabilityFor(commandId);
+export function assertEditionCommand(edition, commandId, capability = null) {
   assertCommandAllowed(edition, commandId);
-  return { edition, commandId, capability: cap };
+  return { edition, commandId, capability };
 }
 
-export { EDITIONS, isCommandAllowed, getRuntimeCapabilities };
+/**
+ * Generic Core gate — Application maps commandId → capability externally.
+ * @param {{ has: (cap: string) => boolean }} capabilities
+ * @param {string} capability
+ */
+export function assertCapability(capabilities, capability) {
+  if (!capability) return true;
+  if (!capabilities || typeof capabilities.has !== "function") {
+    throw Object.assign(new Error("CAPABILITY_MAP_REQUIRED"), { code: "CAPABILITY_MAP_REQUIRED" });
+  }
+  if (!capabilities.has(capability)) {
+    throw Object.assign(new Error(`CAPABILITY_DENIED:${capability}`), {
+      code: "CAPABILITY_DENIED",
+    });
+  }
+  return true;
+}
+
+export { EDITIONS, isCommandAllowed, assertCommandAllowed, getRuntimeCapabilities };

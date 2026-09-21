@@ -34,7 +34,8 @@ describe("standalone editions PHASE 7", () => {
   });
 
   it("proveEditionMatrix returns allowed/denied partitions", () => {
-    const m = proveEditionMatrix("free");
+    const cmds = Object.keys(COMMAND_REGISTRY).filter((id) => COMMAND_REGISTRY[id].kind === "command");
+    const m = proveEditionMatrix("free", cmds);
     assert.ok(m.allowed.length > 0);
     assert.ok(m.denied.length > 0);
     assert.ok(m.denied.includes("loan.create") || m.denied.includes("crypto.buy"));
