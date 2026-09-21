@@ -1,4 +1,5 @@
 :root {
+<<<<<<< HEAD
   --bg: #0f172a;
   --panel: #1e293b;
   --text: #f8fafc;
@@ -40,3 +41,78 @@ input, select { padding: 10px; border-radius: 8px; border: 1px solid var(--borde
 .badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: #334155; }
 .code-block { background: #0b1220; padding: 12px; overflow: auto; border-radius: 8px; font-size: 0.8rem; }
 .empty { padding: 24px; text-align: center; }
+=======
+  --pf-bg: #0b1220;
+  --pf-surface: #111827;
+  --pf-text: #e5e7eb;
+  --pf-muted: #9ca3af;
+  --pf-accent: #38bdf8;
+  --pf-danger: #f87171;
+  --pf-ok: #34d399;
+  --pf-radius: 12px;
+  --pf-tabbar-h: 56px;
+  font-family: system-ui, "Segoe UI", Tahoma, sans-serif;
+}
+html, body, #root { height: 100%; margin: 0; background: var(--pf-bg); color: var(--pf-text); }
+.app-shell { min-height: 100%; display: flex; flex-direction: column; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #1f2937; }
+.content { flex: 1; padding: 16px; padding-bottom: calc(var(--pf-tabbar-h) + 16px); }
+.tabbar {
+  position: fixed; bottom: 0; inset-inline: 0; height: var(--pf-tabbar-h);
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  background: var(--pf-surface); border-top: 1px solid #1f2937;
+}
+.tabbar a { display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--pf-muted); font-size: 12px; }
+.tabbar a.active { color: var(--pf-accent); }
+.badge { font-size: 12px; color: var(--pf-ok); border: 1px solid #065f46; border-radius: 999px; padding: 2px 8px; }
+.muted { color: var(--pf-muted); }
+h1 { font-size: 1.25rem; margin: 0 0 8px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.form { display: flex; flex-direction: column; gap: 10px; }
+.form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+.form input, .form select { padding: 8px; border-radius: 8px; border: 1px solid #374151; background: #0f172a; color: var(--pf-text); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.actions button, .page-header button, .filters button, button {
+  background: #1e293b; color: var(--pf-text); border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; cursor: pointer;
+}
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.filters button.active, .actions button:first-child { border-color: var(--pf-accent); color: var(--pf-accent); }
+.empty { color: var(--pf-muted); padding: 16px 0; }
+.list { list-style: none; padding: 0; }
+.list li { padding: 10px 0; border-bottom: 1px solid #1f2937; }
+.metrics { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.metric { background: var(--pf-surface); padding: 8px 12px; border-radius: var(--pf-radius); font-size: 0.85rem; }
+.sheet-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: flex-end; justify-content: center; z-index: 40;
+}
+.sheet {
+  width: min(520px, 100%); max-height: 90vh; overflow: auto;
+  background: var(--pf-surface); border-radius: 16px 16px 0 0; padding: 16px 16px 24px;
+}
+.onboarding { max-width: 420px; margin: 40px auto; }
+.valuation-bar {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  padding: 8px 12px; margin: 8px 0 12px;
+  background: #0f172a; border: 1px solid #1f2937; border-radius: var(--pf-radius);
+  font-size: 0.8rem; color: var(--pf-muted);
+}
+
+.btn {
+  cursor: pointer;
+  border-radius: var(--pf-radius, 8px);
+  padding: 8px 12px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: inherit;
+}
+.btn-primary { background: #0ea5e9; border-color: #0284c7; color: #0f172a; font-weight: 600; }
+.btn-ghost { background: transparent; }
+.btn-danger { background: #7f1d1d; border-color: #991b1b; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.error { color: #fca5a5; margin: 8px 0; }
+.money.missing { color: var(--pf-muted, #94a3b8); }
+.account-card { padding: 8px 0; border-bottom: 1px solid #1f2937; }
+.filter { display: block; margin: 12px 0; }
+.filter input { width: 100%; margin-top: 4px; }
+.onboarding, .recovery { max-width: 420px; margin: 0 auto; padding: 24px 16px; }
+>>>>>>> origin/main

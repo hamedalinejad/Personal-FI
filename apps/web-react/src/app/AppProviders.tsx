@@ -18,7 +18,10 @@ import {
   type BookMeta,
   type BootstrapPhase,
 } from "../persistence/bootstrapRuntime";
+<<<<<<< HEAD
 import { tryBootProductionHost } from "../persistence/bootProductionHost";
+=======
+>>>>>>> origin/main
 
 export type ShellPhase = BootstrapPhase | "bootstrapping";
 
@@ -111,6 +114,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     setBootOnce(true);
     let cancelled = false;
     (async () => {
+<<<<<<< HEAD
       const boot = await tryBootProductionHost({ edition: "standalone" });
       if (cancelled) return;
       if (!boot.ok) {
@@ -125,14 +129,23 @@ export function AppProviders({ children }: { children: ReactNode }) {
         return;
       }
       const result = await bootstrapRuntime({ edition: "standalone" });
+=======
+      const result = await bootstrapRuntime({ edition: "full" });
+>>>>>>> origin/main
       if (cancelled) return;
       dispatch({
         type: "BOOTSTRAP_RESULT",
         phase: result.phase,
         book: result.book,
+<<<<<<< HEAD
         hostBound: result.hostBound || true,
         error: result.error,
         note: result.adapterNote || "production_host_bound",
+=======
+        hostBound: result.hostBound,
+        error: result.error,
+        note: result.adapterNote,
+>>>>>>> origin/main
       });
     })();
     return () => {
@@ -197,12 +210,17 @@ export function useCompleteOnboarding() {
         throw new Error("HOST_BRIDGE_UNWIRED: cannot complete onboarding without FinancialHost");
       }
       const res = await gateway.execute("book.create", {
+<<<<<<< HEAD
         name: input.bookName,
         baseCurrency: input.baseCurrency,
+=======
+        payload: { name: input.bookName, baseCurrency: input.baseCurrency },
+>>>>>>> origin/main
       });
       if (!res.ok) {
         throw new Error(res.message || res.code);
       }
+<<<<<<< HEAD
       const data = res.data as {
         id?: string;
         bookId?: string;
@@ -221,6 +239,16 @@ export function useCompleteOnboarding() {
           name: data.name,
           baseCurrency: data.baseCurrency,
           createdAt: data.createdAt || "",
+=======
+      const data = res.data as { name: string; baseCurrency: string; createdAt?: string };
+      dispatch({
+        type: "COMPLETE_ONBOARDING",
+        book: {
+          id: `db:${data.name}`,
+          name: data.name,
+          baseCurrency: data.baseCurrency,
+          createdAt: data.createdAt || new Date().toISOString(),
+>>>>>>> origin/main
         },
       });
     },

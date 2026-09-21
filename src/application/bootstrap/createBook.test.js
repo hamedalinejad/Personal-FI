@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
@@ -36,4 +37,29 @@ describe("book identity BUG-P1-14", () => {
     const b = buildBookFromHost({ bookId: "b2", baseCurrency: "USD", name: "X" });
     assert.equal(b.id, "b2");
   });
+=======
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { closeAllDbs } from "../../core/persistence/port.js";
+import { createBook, getBookInfo } from "./createBook.js";
+
+test("createBook sets name and base currency", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-book-"));
+  const b = createBook({ name: "Personal Book", baseCurrency: "IRR" }, { dataDir });
+  assert.equal(b.baseCurrency, "IRR");
+  assert.equal(b.name, "Personal Book");
+  const info = getBookInfo({ dataDir });
+  assert.equal(info.name, "Personal Book");
+  assert.equal(info.baseCurrency, "IRR");
+  closeAllDbs();
+});
+
+test("createBook rejects missing currency", () => {
+  const dataDir = mkdtempSync(join(tmpdir(), "pf-book-"));
+  assert.throws(() => createBook({ name: "X" }, { dataDir }), /baseCurrency/);
+  closeAllDbs();
+>>>>>>> origin/main
 });

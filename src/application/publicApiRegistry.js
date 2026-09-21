@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createBook, getBook } from "../features/meta/commands/createBook.js";
 /**
  * Public API command + query registry.
@@ -132,3 +133,94 @@ export function getCommandHandler(id) {
 export function getQueryHandler(id) {
   return queryHandlers[id] || null;
 }
+=======
+/**
+ * Full application surface composition.
+ * UI hosts import ONLY this registry (or feature public-api barrels).
+ * License SoT: docs/core/registry/license-editions.json via capabilityGate.
+ */
+import * as accounts from "../features/accounts/public-api/index.js";
+import * as income from "../features/income/public-api/index.js";
+import * as expense from "../features/expense/public-api/index.js";
+import * as cheque from "../features/cheque/public-api/index.js";
+import * as tax from "../features/tax/public-api/index.js";
+import * as assets from "../features/assets/public-api/index.js";
+import * as budget from "../features/budget/public-api/index.js";
+import * as goals from "../features/goals/public-api/index.js";
+import * as bills from "../features/bills/public-api/index.js";
+import * as loan from "../features/loan/public-api/index.js";
+import * as crypto from "../features/crypto/public-api/index.js";
+import * as stocks from "../features/stocks/public-api/index.js";
+import * as funds from "../features/funds/public-api/index.js";
+import * as metals from "../features/metals/public-api/index.js";
+import { reportPack } from "./reporting/reportPack.js";
+import { nodeOfflineHarness } from "../platform/node/offlineHarness.js";
+import {
+  assertCommandAllowed,
+  isCommandAllowed,
+  listEditions,
+  downgradeEdition,
+  capabilitiesForEdition,
+} from "../core/license/capabilityGate.js";
+
+export const modules = Object.freeze({
+  accounts,
+  income,
+  expense,
+  cheque,
+  tax,
+  assets,
+  budget,
+  goals,
+  bills,
+  loan,
+  crypto,
+  stocks,
+  funds,
+  metals,
+});
+
+export const applicationApi = Object.freeze({
+  ...modules,
+  reports: { reportPack },
+  offline: nodeOfflineHarness,
+  license: {
+    listEditions,
+    isCommandAllowed,
+    assertCommandAllowed,
+    downgradeEdition,
+  },
+});
+
+export const APPLICATION_MODULE_KEYS = Object.freeze(Object.keys(modules));
+
+export function toCommandId(moduleName, methodName) {
+  if (moduleName === "goals" && methodName === "create") return "goal.create";
+  if (moduleName === "bills" && methodName === "schedule") return "bill.schedule";
+  return `${moduleName}.${methodName}`;
+}
+
+function editionAllows(editionId, commandId) {
+  const caps = capabilitiesForEdition(editionId);
+  if (caps.includes("*")) return true;
+  if (caps.includes(commandId)) return true;
+  return caps.some((c) => c.endsWith(".*") && commandId.startsWith(c.slice(0, -1)));
+}
+
+export async function gatedCommand(editionId, moduleName, methodName, ...args) {
+  const commandId = toCommandId(moduleName, methodName);
+  if (!editionAllows(editionId, commandId)) {
+    // Host modules (accounts, income, …) are full-edition only unless capability * 
+    const err = new Error("LICENSE_REQUIRED");
+    err.code = "LICENSE_REQUIRED";
+    err.commandId = commandId;
+    err.editionId = editionId;
+    throw err;
+  }
+  const mod = modules[moduleName];
+  if (!mod || typeof mod[methodName] !== "function") {
+    throw new Error(`COMMAND_NOT_FOUND:${moduleName}.${methodName}`);
+  }
+  return mod[methodName](...args);
+}
+>>>>>>> origin/main

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Personal-FI Web (React)
 
 ## Run locally
@@ -28,3 +29,17 @@ window.__PF_HOST__ = myHost;
 ## Production honesty
 
 `PRODUCTION=NO-GO` until Playwright E2E green. Modules and UI paths are wired for real use in development.
+=======
+# Personal-FI Web (WAVE 1)
+
+React + TypeScript + Vite foundation.
+
+- Six routes only (`/`, `/money`, `/transactions`, `/investments`, `/loans`, `/more`)
+- `dir=rtl` · `lang=fa`
+- Command/Query gateway: orchestration only (no Core math in host)
+- Domain authority remains `src/features` + `src/application/publicApiRegistry.js`
+
+```bash
+cd apps/web-react && npm install && npm run dev
+```
+>>>>>>> origin/main

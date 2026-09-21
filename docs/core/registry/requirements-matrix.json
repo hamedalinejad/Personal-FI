@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "version": "1",
   "updated": "2026-09-20",
   "items": [
@@ -27,4 +28,575 @@
     { "id": "R-OFFLINE-03", "requirement": "browser offline E2E", "status": "NOT_IMPLEMENTED", "requiredAction": "real browser run" },
     { "id": "R-LICENSE-01", "requirement": "edition contract", "status": "PARTIAL", "requiredAction": "implement/prove edition gating" }
   ]
+=======
+  "version": 2,
+  "requirements": [
+    {
+      "id": "R-M01",
+      "title": "Canonical status registry",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/core/registry/status.registry.json",
+        "scripts/status-registry-check.js"
+      ],
+      "evidence": "status:check CI",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M02",
+      "title": "Schema freeze proof vocabulary",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/core/registry/status.registry.json",
+        "docs/QUALITY-STATUS.md"
+      ],
+      "note": "SPEC_LOCKED vs FREEZE_PROVEN vs RELEASE-PROVEN separated; FREEZE_PROVEN still false",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M03",
+      "title": "Full field preservation matrix",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/core/field-inventory.checklist.tsv",
+        "docs/DATA-MODEL.md"
+      ],
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "492 rows; stored==persistence enforced; DEFERRED reason+owner; gate regression tests present. FREEZE still needs conditional contract parity proof.",
+      "evidence": "field-preservation-matrix.json + field-preservation-check.js + field-preservation-check.test.js",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M04",
+      "title": "Journal cardinality contract",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M05",
+      "title": "Internal vs external identifier policy",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/DATA-MODEL.md"
+      ],
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "identity table + schema",
+      "evidence": "DATA-MODEL identity vs provider symbol",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M06",
+      "title": "Money and unit canonicalization table",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/FINANCIAL-CORE.md",
+        "src/core/money/canonicalDecimal.js"
+      ],
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "canonicalDecimal string-only; phase1 hardening; hash canonicalizes amount/amountInBase/exchangeRateToBase. Notation 1e0 not accepted unless policy expands.",
+      "evidence": "canonicalDecimal.js + phase1-money-hardening.test.js + economicHash.test.js",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M07",
+      "title": "FX historical valuation contract",
+      "status": "PARTIAL",
+      "define": [
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "multi-hop + stale + asOf + pair invalid + inverse conflict; full multi-hop historical golden family still open for FREEZE",
+      "evidence": "crossRate.js multi-hop + stale reject/allow + goldens",
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M08",
+      "title": "Crypto accounting completion",
+      "status": "PARTIAL",
+      "define": [
+        "src/features/crypto/commands/"
+      ],
+      "implemented_commands": [
+        "buy",
+        "sell",
+        "transfer"
+      ],
+      "owner": "docs/modules/crypto.md",
+      "closure_note": "defer or implement lifecycle",
+      "evidence": "crypto buy/sell/transfer; deferred deposit/swap explicit",
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M09",
+      "title": "Crypto network fee policy",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/FINANCIAL-CORE.md",
+        "src/features/crypto/commands/transfer.js"
+      ],
+      "note": "fee_from_received and transfer feeCarrying defined; not all fee roles productized",
+      "owner": "docs/modules/crypto.md",
+      "closure_note": "network fee taxonomy in cards",
+      "evidence": "crypto.transfer fee fields in module+catalog",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M10",
+      "title": "Stocks Iran settlement runtime",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/core/iran/settlementPolicy.js",
+        "src/features/stocks/commands/buy.js",
+        "src/features/stocks/commands/settle.js",
+        "docs/modules/stocks.md"
+      ],
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "sample iran-equity-calendar-v0-sample.json present; official data OPEN",
+      "evidence": "stocks.settle + calendar policy version",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M11",
+      "title": "Iran commission/tax/fee policy",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "src/features/stocks/commands/buy.js"
+      ],
+      "note": "commission/tax/otherFee separate on buy; full policy table versioned incomplete",
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "sample iran-equity-fees-v0-sample.json present; rates null until locked",
+      "evidence": "iran-equity-fees-v1 structure; explicit feeAmount on trades",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M12",
+      "title": "Corporate action master model",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/modules/stocks.md"
+      ],
+      "owner": "docs/modules/stocks.md",
+      "closure_note": "CA deferred until command+fixture+rebuild",
+      "evidence": "deferred corporate actions listed in catalog.deferred",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M13",
+      "title": "Fund transaction-price/NAV contract",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/features/funds/commands/subscribe.js",
+        "src/features/funds/tests/"
+      ],
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M14",
+      "title": "Fund distribution/reinvest semantics",
+      "status": "PARTIAL",
+      "define": [
+        "src/features/funds/commands/distribution.js"
+      ],
+      "owner": "docs/modules/funds.md",
+      "closure_note": "NAV≠txPrice locked; full reinvest/distribution economic contract not complete",
+      "evidence": "funds.distribute + FUND-DIVIDEND-REINVEST fixture",
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M15",
+      "title": "Metals physical/financial split",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/features/metals/commands/buy.js",
+        "src/features/metals/commands/delivery.js"
+      ],
+      "owner": "docs/modules/metals.md",
+      "closure_note": "physical field-level contracts",
+      "evidence": "metals buy/sell/delivery; fineWeight locked",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M16",
+      "title": "Loan complete fee taxonomy",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/core/db/schema.sql",
+        "src/features/loan/ledger/feeRepository.js"
+      ],
+      "owner": "docs/modules/loan.md",
+      "closure_note": "loan fee event catalog",
+      "evidence": "fee taxonomy canonical; loan fee tiers domain",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M17",
+      "title": "Loan schedule policy versioning",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "src/core/domain/loan/scheduleEngine.js"
+      ],
+      "note": "engineVersions on operations; variable rate reset incomplete",
+      "owner": "docs/modules/loan.md",
+      "closure_note": "schedule policy versioning",
+      "evidence": "schedule snapshot schema version fields",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M18",
+      "title": "Loan standalone report contract",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/features/loan/reports/statement.js",
+        "src/features/loan/tests/standalone-boot.test.js"
+      ],
+      "owner": "docs/modules/loan.md",
+      "closure_note": "standalone report pack",
+      "evidence": "loan statement queries + standalone pack",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M19",
+      "title": "Accounting financial statements",
+      "status": "PARTIAL",
+      "define": [
+        "src/core/accounting/reports/statements.js"
+      ],
+      "implemented": [
+        "GL",
+        "TB",
+        "accountActivity",
+        "BS",
+        "IS",
+        "CF"
+      ],
+      "owner": "docs/REPORTING.md",
+      "closure_note": "posted-only statements scaffold; full BS/IS/CF not RELEASE-PROVEN",
+      "evidence": "statements.js GL/TB/BS/IS/CF scaffold + posted filter",
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M20",
+      "title": "Investment performance model",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "src/core/accounting/reports/investment.js"
+      ],
+      "owner": "docs/REPORTING.md",
+      "closure_note": "perf formulas or explicit defer",
+      "evidence": "REPORTING.md TWR/MWR deferred lock; v1 statements posted-only",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M21",
+      "title": "Deterministic rebuild contract",
+      "status": "PARTIAL",
+      "define": [
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "owner": "docs/FINANCIAL-CORE.md",
+      "closure_note": "rebuildProjection API scaffold; full ledger event replay open",
+      "evidence": [
+        "src/core/rebuild/rebuildProjection.js",
+        "src/core/rebuild/rebuildProjection.test.js",
+        "src/core/rebuild/fromSqlite.js",
+        "src/core/rebuild/ordering.js",
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "UNPROVEN",
+      "evidence_note": "inputHash + deterministic rebuild; full ledger event replay still PARTIAL"
+    },
+    {
+      "id": "R-M22",
+      "title": "Import lineage runtime gate",
+      "status": "PARTIAL",
+      "define": [
+        "docs/OFFLINE-RELEASE.md",
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "pipeline.js + tests for raw/hash/unknownFields; full batch lifecycle + release proof still open",
+      "evidence": [
+        "src/core/import/pipeline.js",
+        "src/core/import/pipeline.test.js",
+        "src/core/import/lineage.js",
+        "docs/core/db/schema.sql"
+      ],
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "UNPROVEN",
+      "evidence_note": "import_batches FKs in schema"
+    },
+    {
+      "id": "R-M23",
+      "title": "Backup format contract",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/OFFLINE-RELEASE.md"
+      ],
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "backup/restore executable",
+      "evidence": "backup.js formatVersion + checksum sidecar",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M24",
+      "title": "Offline browser persistence",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "src/core/persistence/browser/durableMemoryAdapter.js"
+      ],
+      "owner": "docs/OFFLINE-RELEASE.md",
+      "closure_note": "sql.js+IDB E2E",
+      "evidence": "OFFLINE-RELEASE protocol vs release E2E levels",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN",
+      "note": "Node protocol harness GREEN; in-browser sql.js+IDB E2E still required for RELEASE"
+    },
+    {
+      "id": "R-M25",
+      "title": "License entitlement model",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/OFFLINE-RELEASE.md",
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "owner": "docs/PRODUCT.md",
+      "closure_note": "license entitlement proof",
+      "evidence": "PRODUCT/ARCHITECTURE capability gates",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M26",
+      "title": "Minimal navigation IA",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/PRODUCT.md",
+        "docs/DOCUMENTATION-STANDARD.md"
+      ],
+      "note": "Navigation IA is Product-owned; not Financial Core.",
+      "evidence": "PRODUCT six routes",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-M27",
+      "title": "API registry coverage",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/API.md",
+        "docs/core/registry/status.registry.json"
+      ],
+      "owner": "docs/API.md",
+      "closure_note": "complete command cards",
+      "evidence": "command-catalog 42 cards with full key set",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M28",
+      "title": "UI/domain separation gate",
+      "status": "IMPLEMENTED",
+      "define": [
+        "docs/DEVELOPMENT.md",
+        "scripts/lint-boundaries.js"
+      ],
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M29",
+      "title": "Automated schema/manifest/field consistency",
+      "status": "IMPLEMENTED",
+      "define": [
+        "scripts/schema-drift-test.js",
+        "scripts/field-inventory-verify.js",
+        "scripts/schema-manifest-check.js"
+      ],
+      "owner": "docs/DATA-MODEL.md",
+      "closure_note": "schema/field consistency gate",
+      "evidence": "schema:manifest + inventory gates",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-M30",
+      "title": "Golden fixture machine format",
+      "status": "IMPLEMENTED",
+      "define": [
+        "fixtures/",
+        "docs/core/registry/fixture-manifest.json",
+        "scripts/fixture-manifest.js"
+      ],
+      "owner": "docs/DEVELOPMENT.md",
+      "closure_note": "fixture machine format",
+      "evidence": "fixtures non-empty + fixture:empty gate",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-REPORT-01",
+      "title": "TWR formula",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md"
+      ],
+      "evidence": "Explicitly deferred until formula+fixtures locked"
+    },
+    {
+      "id": "R-REPORT-02",
+      "title": "MWR/IRR formula",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md"
+      ],
+      "evidence": "Explicitly deferred"
+    },
+    {
+      "id": "R-REPORT-03",
+      "title": "FX attribution in performance reports",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md",
+        "docs/FINANCIAL-CORE.md"
+      ],
+      "evidence": "Deferred with TWR/MWR"
+    },
+    {
+      "id": "R-REPORT-04",
+      "title": "Distribution and fee treatment in performance reports",
+      "status": "DEFERRED",
+      "define": [
+        "docs/REPORTING.md",
+        "docs/modules/funds.md"
+      ],
+      "evidence": "Deferred with performance model"
+    },
+    {
+      "id": "R-OFFLINE-01",
+      "title": "Executable recovery matrix",
+      "status": "PARTIAL",
+      "define": [
+        "docs/OFFLINE-RELEASE.md",
+        "src/core/acceptance/recovery-matrix.acceptance.test.js"
+      ],
+      "evidence": "Named scenarios + executable tests",
+      "contract": "LOCKED",
+      "implementation": "PARTIAL",
+      "proof": "PARTIAL",
+      "closure_note": "recovery matrix tests exist; suite not fully RELEASE-PROVEN"
+    },
+    {
+      "id": "R-OFFLINE-02",
+      "title": "Backup package complete",
+      "status": "IMPLEMENTED",
+      "define": [
+        "src/core/recovery/backup.js"
+      ],
+      "evidence": "formatVersion + checksum sidecar",
+      "contract": "LOCKED",
+      "implementation": "IMPLEMENTED",
+      "proof": "PARTIAL"
+    },
+    {
+      "id": "R-OFFLINE-03",
+      "title": "Browser sql.js + IndexedDB + single-writer E2E",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/OFFLINE-RELEASE.md"
+      ],
+      "evidence": "Protocol harness proven; real-tab E2E OPEN for shipping",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    },
+    {
+      "id": "R-LICENSE-01",
+      "title": "License edition machine contract",
+      "status": "SPEC_LOCKED",
+      "define": [
+        "docs/PRODUCT.md",
+        "docs/core/registry/license-editions.json"
+      ],
+      "evidence": "Capability-only gate; never delete data",
+      "contract": "LOCKED",
+      "implementation": "NOT_IMPLEMENTED",
+      "proof": "UNPROVEN"
+    }
+  ],
+  "description": "Live requirements matrix — statuses in JSON only; no parallel requirements Markdown",
+  "status_model": {
+    "contract": [
+      "LOCKED",
+      "DEFERRED",
+      "REJECTED",
+      "SPEC_LOCKED"
+    ],
+    "implementation": [
+      "NOT_IMPLEMENTED",
+      "PARTIAL",
+      "IMPLEMENTED"
+    ],
+    "proof": [
+      "UNPROVEN",
+      "PARTIAL",
+      "GREEN"
+    ],
+    "note": "Legacy single status field remains for compatibility; prefer contract+implementation+proof. IMPLEMENTED alone does not mean proof GREEN."
+  }
+>>>>>>> origin/main
 }
