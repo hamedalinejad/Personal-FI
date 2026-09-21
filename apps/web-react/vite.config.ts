@@ -29,7 +29,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["sql.js", "decimal.js"],
+    include: ["decimal.js"],
   },
   build: {
     target: "esnext",
