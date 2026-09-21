@@ -8,7 +8,7 @@
  * - asset-aware action registry + edition capability filter
  */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useGateway } from "../gateway/commandQueryGateway";
+import { useGateway } from "../app/AppProviders";
 import {
   VALUATION_STATES,
   normalizeValuationState,
