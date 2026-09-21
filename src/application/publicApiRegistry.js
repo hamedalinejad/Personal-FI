@@ -11,6 +11,7 @@ import { createExpense } from "../features/expense/commands/create.js";
 import { createLoan } from "../features/loan/commands/createLoan.js";
 import { recordPayment } from "../features/loan/commands/recordPayment.js";
 import { queryPresentationBalance } from "../core/accounting/reports/presentationBalance.js";
+import { trialBalance, netWorth } from "../core/accounting/reports/statements.js";
 import { queryAll, queryOne, getMeta } from "../core/persistence/browser/browserSqlAdapter.js";
 import { computeMoneyTotals } from "./reporting/moneyTotals.js";
 import { buyCrypto } from "../features/crypto/commands/buy.js";
@@ -86,6 +87,8 @@ export const queryHandlers = {
       `SELECT id, name, currency, account_kind FROM fin_accounts WHERE is_archived = 0 ORDER BY name`
     );
   },
+  "reports.trialBalance": async ({ db, params }) => trialBalance(db, { asOf: params?.asOf }),
+  "reports.netWorth": async ({ db, params }) => netWorth(db, { asOf: params?.asOf }),
   "meta.book": async ({ db }) => ({
     id: getMeta(db, "book_id"),
     bookId: getMeta(db, "book_id"),

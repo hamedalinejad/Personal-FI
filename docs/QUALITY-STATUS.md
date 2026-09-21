@@ -2,47 +2,27 @@
 
 **Updated:** 2026-09-21  
 **PRODUCTION:** NO-GO  
+**FREEZE_PROVEN:** false  
 **RELEASE_PROVEN:** false
 
-## PHASE 1–5 progress
+## PHASE 6–10
 
-### PHASE 1 — identity & persistence
-| Step | Status |
-|------|--------|
-| 1.1 immutable book_id + created_at | DONE (db_meta; bootstrap no fabricate) |
-| 1.2 field preservation decisions | DONE — `field-preservation-decisions.json` (no refine-later) |
-| 1.3 FK expected matrix + payload table | DONE docs/helpers; migration rebuild for live DBs still ops task |
+| Phase | Status |
+|-------|--------|
+| 6 Browser offline engine (modules) | IMPLEMENTED (singleWriter, IDB, sql adapter, backup, production host) — **E2E NEEDS_BROWSER** |
+| 7 Standalone editions matrix | TESTED (pro/free/standalone + loan-only conceptual) |
+| 8 Report registry + trialBalance/netWorth | IMPLEMENTED (no TWR/MWR/IRR) |
+| 9 Recovery matrix 12 scenarios | 6 executable in Node; 3 browser E2E pending; 3 SPEC |
+| 10 Release gates script | `npm run gates:release` — structural 13/13; GO blocked |
 
-### PHASE 2 — valuation
-| Step | Status |
-|------|--------|
-| 2.1–2.3 shared enum + valueHoldings | DONE |
-| 2.4 golden cases | DONE (IRR, cross+FX, mixed, partial, missing FX, stale, future, metal, fund price≠NAV) |
+## Financial rules §24
+`src/core/money/financialRules.js` — no Number money, FX, metals fine, crypto net, loan waterfall, funds NAV separation. Tests green.
 
-### PHASE 3 — investment UI
-| Step | Status |
-|------|--------|
-| 3.1–3.5 no fallback/coerce; capability actions; crypto net Core; metals purity empty | DONE prior arc |
+## Blockers for PRODUCTION=GO
+1. Real browser sql.js + IndexedDB E2E (scenarios 5, 9, 10)
+2. Host-loop import commit for mapped rows
+3. Full rebuild golden from journal
+4. Edition boot→backup→restore suite in browser
 
-### PHASE 4 — tax/cheque
-| Step | Status |
-|------|--------|
-| 4.1 tax.adjust atomic | DONE prior |
-| 4.2 cheque lifecycle SM + bounce/clear with ops | DONE (clear added) |
-| 4.3 golden SM tests | DONE transitions |
-
-### PHASE 5 — import
-| Step | Status |
-|------|--------|
-| 5.1 public API | DONE |
-| 5.2–5.4 batch/record lifecycle + dedupe keys | DONE (create→ingest→normalize→map→validate) |
-| 5.5–5.6 commit | GATED — requires validated + commandId mapping; no false-green |
-
-## Still blocking GO
-- R-M24 / R-OFFLINE-03 real browser sql.js+IDB E2E
-- Host loop for import commit of mapped public commands
-- Field matrix machine gate vs decisions file
-- origin push after rebase
-
-## Deferred (locked)
-See DEFERRED-V1.md — TWR/MWR/IRR, crypto deposit/withdraw, reinvest, borrower mode, etc.
+## Deferred locked
+TWR/MWR/IRR · crypto deposit/withdraw/swap · funds reinvest · loan borrower/variable-rate
