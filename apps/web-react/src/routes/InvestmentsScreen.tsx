@@ -1,247 +1,147 @@
-/**
- * /investments — unified holdings. BUG-P1-01..07:
- * - no silent crypto fallback on unified failure
- * - no coerce unknown asset → crypto
- * - missing quantity stays unavailable (not "0")
- * - valuation state never defaults to ready
- * - shared valuation vocabulary
- * - asset-aware action registry + edition capability filter
- */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useGateway } from "../app/AppProviders";
+import { useAppDispatch, useGateway } from "../app/AppProviders";
+import { Button } from "../components/common/Button";
+import { EmptyState } from "../components/common/EmptyState";
+import { InlineError } from "../components/common/InlineError";
+import { LoadingState } from "../components/common/LoadingState";
 import {
-  VALUATION_STATES,
   normalizeValuationState,
   normalizeAssetClass,
-  ALLOWED_ASSET_CLASSES,
 } from "../contracts/valuationState";
 
-type HoldingRow = {
-  instrumentId: string;
-  symbol?: string | null;
-  assetClass: string | null;
-  quantity: string | null;
-  costBasis?: string | null;
-  costCurrency?: string | null;
-  marketValue?: string | null;
-  unrealizedPnl?: string | null;
-  valuationState?: string;
-  reason?: string | null;
-  invalid?: boolean;
+const TABS = [
+  { id: "all", label: "همه" },
+  { id: "crypto", label: "کریپتو" },
+  { id: "stocks", label: "سهام ایران" },
+  { id: "funds", label: "صندوق" },
+  { id: "metals", label: "فلزات" },
+] as const;
+
+const ACTIONS: Record<string, { sheet: string; label: string }[]> = {
+  crypto: [
+    { sheet: "crypto.buy", label: "خرید" },
+    { sheet: "crypto.sell", label: "فروش" },
+    { sheet: "crypto.transfer", label: "انتقال" },
+    { sheet: "crypto.c2c", label: "C2C" },
+  ],
+  stocks: [
+    { sheet: "stocks.buy", label: "خرید" },
+    { sheet: "stocks.sell", label: "فروش" },
+    { sheet: "stocks.dividend", label: "سود" },
+    { sheet: "stocks.corporateAction", label: "رویداد شرکتی" },
+  ],
+  funds: [
+    { sheet: "fund.subscribe", label: "خرید واحد" },
+    { sheet: "fund.redeem", label: "ابطال" },
+    { sheet: "fund.nav", label: "NAV" },
+    { sheet: "fund.distribution", label: "توزیع" },
+    { sheet: "fund.reinvest", label: "Reinvest" },
+  ],
+  metals: [
+    { sheet: "metals.buy", label: "خرید" },
+    { sheet: "metals.sell", label: "فروش" },
+    { sheet: "metals.delivery", label: "تحویل فیزیکی" },
+  ],
+  all: [
+    { sheet: "crypto.buy", label: "کریپتو" },
+    { sheet: "stocks.buy", label: "سهام" },
+    { sheet: "fund.subscribe", label: "صندوق" },
+    { sheet: "metals.buy", label: "فلز" },
+  ],
 };
-
-type ValuationState = (typeof VALUATION_STATES)[number];
-
-const ACTION_REGISTRY: Record<string, string[]> = {
-  crypto: ["buy", "sell", "transfer"],
-  stocks: ["buy", "sell", "settle", "dividend"],
-  funds: ["subscribe", "redeem", "distribution"],
-  metals: ["buy", "sell", "delivery"],
-};
-
-function quantityDisplay(q: unknown): string {
-  if (q === null || q === undefined || q === "") return "—"; // unavailable, not zero
-  return String(q);
-}
 
 export function InvestmentsScreen() {
   const gateway = useGateway();
-  const [rows, setRows] = useState<HoldingRow[]>([]);
-  const [valuationState, setValuationState] = useState<ValuationState | "invalid_context">("loading");
+  const dispatch = useAppDispatch();
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("all");
+  const [rows, setRows] = useState<any[]>([]);
+  const [state, setState] = useState<string>("unpriced");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [capabilities, setCapabilities] = useState<string[] | null>(null);
-  const [activeAsset, setActiveAsset] = useState<string>("crypto");
-  const [sheet, setSheet] = useState<string | null>(null);
+
+  const open = (sheet: string) => dispatch({ type: "OPEN_SHEET", sheet });
 
   const load = useCallback(async () => {
+    setLoading(true);
     setError(null);
-    setValuationState("loading");
-    try {
-      const res = await gateway.execute("investments.holdings", {});
-      // Prefer query path when host supports it
-      const q = await gateway.execute("investments.holdings" as string, {}).catch(() => res);
-
-      if (!q || (q as { ok?: boolean }).ok === false) {
-        // BUG-P1-01: do NOT fall back to crypto-only
-        const code = (q as { code?: string })?.code || "UNIFIED_HOLDINGS_FAILED";
-        const message = (q as { message?: string })?.message || "Unified investment holdings failed";
-        setError(`${code}: ${message}`);
-        // keep prior rows if any
-        setValuationState("error");
-        return;
-      }
-
-      const data = (q as { data?: unknown }).data as {
-        rows?: unknown[];
-        valuationState?: string;
-        state?: string;
-      } | null;
-
-      const rawState = data?.valuationState ?? data?.state;
-      // BUG-P1-04: never default to ready
-      const state = normalizeValuationState(rawState);
-      if (rawState != null && !VALUATION_STATES.includes(rawState as ValuationState)) {
-        setError(`INVALID_VALUATION_STATE:${String(rawState)}`);
-        setValuationState("error");
-      } else {
-        setValuationState(state as ValuationState);
-      }
-
-      const mapped: HoldingRow[] = [];
-      for (const h of data?.rows || []) {
-        const row = h as Record<string, unknown>;
-        const assetClass = normalizeAssetClass(row.assetClass ?? row.asset_class);
-        if (!assetClass) {
-          // BUG-P1-02: do not coerce to crypto
-          mapped.push({
-            instrumentId: String(row.instrumentId || row.instrument_id || "?"),
-            symbol: (row.symbol as string) || null,
-            assetClass: null,
-            quantity: null,
-            invalid: true,
-            reason: `QUERY_CONTRACT_INVALID:assetClass=${String(row.assetClass ?? row.asset_class)}`,
-            valuationState: "error",
-          });
-          continue;
-        }
-        const qtyRaw = row.quantity;
-        mapped.push({
-          instrumentId: String(row.instrumentId || row.instrument_id || ""),
-          symbol: (row.symbol as string) || null,
-          assetClass,
-          quantity: qtyRaw === null || qtyRaw === undefined || qtyRaw === "" ? null : String(qtyRaw),
-          costBasis: row.costBasis != null ? String(row.costBasis) : row.cost_basis != null ? String(row.cost_basis) : null,
-          costCurrency: (row.costCurrency || row.cost_currency) as string | null,
-          marketValue: row.marketValue != null ? String(row.marketValue) : null,
-          unrealizedPnl: row.unrealizedPnl != null ? String(row.unrealizedPnl) : null,
-          valuationState: normalizeValuationState(row.valuationState),
-          reason: (row.reason as string) || null,
-        });
-      }
-      setRows(mapped);
-    } catch (e) {
-      setError(String((e as Error)?.message || e));
-      setValuationState("error");
+    const res = await gateway.execute<any>("investments.holdings", {});
+    if (!res.ok) {
+      setError(res.message || res.code);
+      setRows([]);
+    } else {
+      const data = res.data || {};
+      setRows(data.rows || []);
+      setState(normalizeValuationState(data.valuationState || data.state || "unpriced"));
     }
+    setLoading(false);
   }, [gateway]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  useEffect(() => {
-    // BUG-P1-07: capability query for UX gating (host still enforces)
-    void (async () => {
-      try {
-        const res = await gateway.execute("meta.license", {});
-        if ((res as { ok?: boolean; success?: boolean }).ok !== false && (res as { success?: boolean }).success !== false) {
-          const data = (res as { data?: { capabilities?: string[] } }).data;
-          setCapabilities(data?.capabilities || null);
-        }
-      } catch {
-        setCapabilities(null);
-      }
-    })();
-  }, [gateway]);
-
-  const actions = useMemo(() => {
-    const list = ACTION_REGISTRY[activeAsset] || [];
-    if (!capabilities) return list;
-    // filter by capability if edition restricts
-    return list.filter((action) => {
-      const cmd = `${activeAsset === "stocks" ? "stocks" : activeAsset}.${action === "subscribe" ? "subscribe" : action}`;
-      if (capabilities.includes("*")) return true;
-      return capabilities.some(
-        (c) => c === cmd || c === `${activeAsset}.*` || c.endsWith(".*") && cmd.startsWith(c.slice(0, -1))
-      );
-    });
-  }, [activeAsset, capabilities]);
+  const visible = useMemo(() => {
+    if (tab === "all") return rows;
+    return rows.filter((r) => normalizeAssetClass(r.assetClass) === tab);
+  }, [rows, tab]);
 
   return (
-    <div className="screen investments" dir="rtl" lang="fa">
+    <section className="screen">
       <header className="screen-header">
-        <h1>سرمایه‌گذاری‌ها</h1>
-        <button type="button" onClick={() => void load()}>
-          بروزرسانی
-        </button>
+        <div>
+          <h1>سرمایه‌گذاری</h1>
+          <p className="subtitle">پرتفوی یکپارچه · valuation: {state}</p>
+        </div>
+        <Button type="button" variant="ghost" onClick={() => void load()}>
+          تازه‌سازی
+        </Button>
       </header>
 
-      <div className="valuation-banner" data-state={valuationState} role="status">
-        وضعیت ارزش‌گذاری: <strong>{valuationState}</strong>
-      </div>
-
-      {error ? (
-        <div className="error-banner" role="alert">
-          {error}
-          <p className="muted">خطای گزارش یکپارچه — بدون fallback خودکار به crypto</p>
-        </div>
-      ) : null}
-
-      <div className="asset-tabs" role="tablist">
-        {ALLOWED_ASSET_CLASSES.map((a) => (
-          <button
-            key={a}
+      <div className="row gap" style={{ flexWrap: "wrap" }}>
+        {TABS.map((t) => (
+          <Button
+            key={t.id}
             type="button"
-            role="tab"
-            aria-selected={activeAsset === a}
-            onClick={() => setActiveAsset(a)}
+            variant={tab === t.id ? "soft" : "ghost"}
+            onClick={() => setTab(t.id)}
           >
-            {a}
-          </button>
+            {t.label}
+          </Button>
         ))}
       </div>
 
-      <div className="actions-bar">
-        {actions.map((action) => (
-          <button key={action} type="button" onClick={() => setSheet(`${activeAsset}.${action}`)}>
-            {action}
-          </button>
-        ))}
+      <div className="panel stack">
+        <div className="section-title">عملیات {TABS.find((t) => t.id === tab)?.label}</div>
+        <div className="row gap" style={{ flexWrap: "wrap" }}>
+          {(ACTIONS[tab] || ACTIONS.all).map((a) => (
+            <Button key={a.sheet} type="button" variant="ghost" onClick={() => open(a.sheet)}>
+              {a.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
-      <table className="holdings-table">
-        <thead>
-          <tr>
-            <th>نماد</th>
-            <th>کلاس</th>
-            <th>مقدار</th>
-            <th>بهای تمام‌شده</th>
-            <th>ارزش بازار</th>
-            <th>سود/زیان</th>
-            <th>وضعیت</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.length === 0 ? (
-            <tr>
-              <td colSpan={7}>نگهداری ثبت‌نشده</td>
-            </tr>
-          ) : (
-            rows.map((r) => (
-              <tr key={r.instrumentId} data-invalid={r.invalid ? "1" : "0"}>
-                <td>{r.symbol || r.instrumentId}</td>
-                <td>{r.assetClass ?? "INVALID"}</td>
-                <td>{quantityDisplay(r.quantity)}</td>
-                <td>{r.costBasis ?? "—"}</td>
-                <td>{r.marketValue ?? "—"}</td>
-                <td>{r.unrealizedPnl ?? "—"}</td>
-                <td>{r.invalid ? r.reason : r.valuationState}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
-      {sheet ? (
-        <p className="muted">
-          اکشن انتخاب‌شده: {sheet} (sheet جدا در SheetHost باز می‌شود)
-          <button type="button" onClick={() => setSheet(null)}>
-            بستن
-          </button>
-        </p>
+      {loading ? <LoadingState /> : null}
+      {error ? <InlineError message={error} /> : null}
+      {!loading && visible.length === 0 ? (
+        <EmptyState title="موجودی نیست" hint="از عملیات بالا یک معامله ثبت کنید." />
       ) : null}
-    </div>
+
+      <ul className="card-list">
+        {visible.map((r, i) => (
+          <li key={r.instrumentId || i} className="list-card">
+            <strong>{r.symbol || r.instrumentId || "—"}</strong>
+            <span className="muted">
+              {" "}
+              {normalizeAssetClass(r.assetClass) || "?"} · qty {r.quantity ?? "—"}
+            </span>
+            <div className="muted" style={{ fontSize: "0.8rem" }}>
+              {r.valuationState || state}
+              {r.reason ? ` · ${r.reason}` : ""}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
-
-export default InvestmentsScreen;

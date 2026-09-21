@@ -24,28 +24,26 @@ export function MoneyScreen() {
   const [error, setError] = useState<string | null>(null);
   const [totalsNote, setTotalsNote] = useState<string | null>(null);
 
+  const open = (sheet: string) => dispatch({ type: "OPEN_SHEET", sheet });
+
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const list = await gateway.execute<{ accounts?: AccountRow[]; rows?: AccountRow[] }>("accounts.list", {});
-    const totals = await gateway.execute<{
-      byCurrency?: { currency: string; balance: string }[];
-      netCash?: string | null;
-      netCashState?: string;
-    }>("money.totals", {});
+    const list = await gateway.execute<any>("accounts.list", {});
+    const totals = await gateway.execute<any>("money.totals", {});
     if (!list.ok) {
       setError(list.message || list.code);
       setRows([]);
     } else {
-      const data = list.data as any;
-      setRows(data.accounts || data.rows || (Array.isArray(data) ? data : []));
+      const data = list.data;
+      setRows(data?.accounts || data?.rows || (Array.isArray(data) ? data : []));
     }
     if (totals.ok && totals.data) {
       const t = totals.data;
       if (t.netCashState === "mixed_currency_needs_report_currency") {
-        setTotalsNote("چند ارز فعال — جمع خالص بدون ارز گزارش در دسترس نیست");
+        setTotalsNote("چند ارز — بدون ارز گزارش جمع خالص نیست");
       } else if (t.netCash != null) {
-        setTotalsNote(`جمع نقد: ${formatMoney(t.netCash, book?.baseCurrency || "IRR")}`);
+        setTotalsNote(`جمع: ${formatMoney(t.netCash, book?.baseCurrency || "IRR")}`);
       } else setTotalsNote(null);
     }
     setLoading(false);
@@ -66,30 +64,45 @@ export function MoneyScreen() {
           <Button type="button" variant="ghost" onClick={() => void refresh()}>
             تازه‌سازی
           </Button>
-          <Button type="button" variant="soft" onClick={() => dispatch({ type: "OPEN_SHEET", sheet: "account.create" })}>
-            حساب
-          </Button>
-          <Button type="button" onClick={() => dispatch({ type: "OPEN_SHEET", sheet: "deposit" })}>
-            واریز
-          </Button>
         </div>
       </header>
+
+      <div className="panel stack">
+        <div className="section-title">عملیات سریع</div>
+        <div className="row gap" style={{ flexWrap: "wrap" }}>
+          <Button type="button" onClick={() => open("account.create")}>حساب جدید</Button>
+          <Button type="button" variant="soft" onClick={() => open("deposit")}>واریز</Button>
+          <Button type="button" variant="ghost" onClick={() => open("withdraw")}>برداشت</Button>
+          <Button type="button" variant="ghost" onClick={() => open("transfer")}>انتقال</Button>
+          <Button type="button" variant="ghost" onClick={() => open("income.create")}>درآمد</Button>
+          <Button type="button" variant="ghost" onClick={() => open("expense.create")}>هزینه</Button>
+          <Button type="button" variant="ghost" onClick={() => open("cheque.receive")}>دریافت چک</Button>
+          <Button type="button" variant="ghost" onClick={() => open("cheque.pay")}>پرداخت چک</Button>
+        </div>
+      </div>
 
       {loading ? <LoadingState /> : null}
       {error ? <InlineError message={error} /> : null}
       {!loading && !error && rows.length === 0 ? (
-        <EmptyState title="هنوز حسابی ندارید" hint="با «حساب» یک حساب نقد بسازید، بعد واریز کنید." />
+        <EmptyState title="حسابی نیست" hint="با «حساب جدید» شروع کنید." />
       ) : null}
 
       <ul className="card-list">
         {rows.map((a) => (
           <li key={a.id}>
-            <AccountCard
-              name={a.name}
-              currency={a.currency}
-              balance={a.presentationBalance ?? "0"}
-              kindLabel={a.account_kind}
-            />
+            <button
+              type="button"
+              className="account-card"
+              style={{ width: "100%", textAlign: "start", cursor: "pointer", border: "1px solid var(--color-border)" }}
+              onClick={() => open("account.detail")}
+            >
+              <AccountCard
+                name={a.name}
+                currency={a.currency}
+                balance={a.presentationBalance ?? "0"}
+                kindLabel={a.account_kind}
+              />
+            </button>
           </li>
         ))}
       </ul>
