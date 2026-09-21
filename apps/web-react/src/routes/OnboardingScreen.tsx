@@ -25,17 +25,19 @@ export function OnboardingScreen() {
 
   return (
     <section className="onboarding" dir="rtl" lang="fa">
-      <h1>راه‌اندازی Personal-FI</h1>
-      <p className="muted">دفتر مالی آفلاین شما — ارز پایه پس از ایجاد قابل تغییر نیست.</p>
+      <div className="topbar-logo" style={{ width: 48, height: 48, fontSize: "1rem" }} aria-hidden>
+        FI
+      </div>
+      <div>
+        <h1>راه‌اندازی Personal-FI</h1>
+        <p className="muted" style={{ marginTop: 8 }}>
+          دفتر مالی آفلاین شما. ارز پایه بعد از ایجاد ثابت می‌ماند.
+        </p>
+      </div>
       <form onSubmit={onSubmit} className="stack">
         <label>
           نام دفتر
-          <input
-            value={name}
-            onChange={(ev) => setName(ev.target.value)}
-            required
-            aria-required="true"
-          />
+          <input value={name} onChange={(ev) => setName(ev.target.value)} required aria-required="true" />
         </label>
         <label>
           ارز پایه
@@ -47,7 +49,7 @@ export function OnboardingScreen() {
         </label>
         {error ? <InlineError message={error} /> : null}
         <Button type="submit" disabled={busy}>
-          {busy ? "در حال ایجاد…" : "ایجاد دفتر"}
+          {busy ? "در حال ایجاد…" : "شروع"}
         </Button>
       </form>
     </section>

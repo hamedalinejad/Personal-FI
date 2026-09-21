@@ -12,7 +12,7 @@ type AccountRow = {
   name: string;
   currency: string;
   presentationBalance?: string;
-  accountKind?: string;
+  account_kind?: string;
 };
 
 export function MoneyScreen() {
@@ -43,12 +43,10 @@ export function MoneyScreen() {
     if (totals.ok && totals.data) {
       const t = totals.data;
       if (t.netCashState === "mixed_currency_needs_report_currency") {
-        setTotalsNote("چند ارز — جمع خالص بدون ارز گزارش در دسترس نیست");
+        setTotalsNote("چند ارز فعال — جمع خالص بدون ارز گزارش در دسترس نیست");
       } else if (t.netCash != null) {
-        setTotalsNote(`نقد: ${formatMoney(t.netCash, book?.baseCurrency || "IRR")}`);
-      } else {
-        setTotalsNote(null);
-      }
+        setTotalsNote(`جمع نقد: ${formatMoney(t.netCash, book?.baseCurrency || "IRR")}`);
+      } else setTotalsNote(null);
     }
     setLoading(false);
   }, [gateway, book?.baseCurrency]);
@@ -58,27 +56,31 @@ export function MoneyScreen() {
   }, [refresh]);
 
   return (
-    <section dir="rtl" lang="fa" className="screen">
+    <section className="screen">
       <header className="screen-header">
-        <h1>پول</h1>
-        <div className="row gap">
-          <Button type="button" onClick={() => dispatch({ type: "OPEN_SHEET", sheet: "account.create" })}>
-            حساب جدید
+        <div>
+          <h1>پول</h1>
+          <p className="subtitle">{totalsNote || "حساب‌های نقد و بانکی"}</p>
+        </div>
+        <div className="screen-actions">
+          <Button type="button" variant="ghost" onClick={() => void refresh()}>
+            تازه‌سازی
+          </Button>
+          <Button type="button" variant="soft" onClick={() => dispatch({ type: "OPEN_SHEET", sheet: "account.create" })}>
+            حساب
           </Button>
           <Button type="button" onClick={() => dispatch({ type: "OPEN_SHEET", sheet: "deposit" })}>
             واریز
           </Button>
-          <Button type="button" variant="ghost" onClick={() => void refresh()}>
-            تازه‌سازی
-          </Button>
         </div>
       </header>
-      {totalsNote ? <p className="muted">{totalsNote}</p> : null}
+
       {loading ? <LoadingState /> : null}
       {error ? <InlineError message={error} /> : null}
       {!loading && !error && rows.length === 0 ? (
-        <EmptyState title="حسابی نیست" hint="اول یک حساب بسازید، سپس واریز کنید." />
+        <EmptyState title="هنوز حسابی ندارید" hint="با «حساب» یک حساب نقد بسازید، بعد واریز کنید." />
       ) : null}
+
       <ul className="card-list">
         {rows.map((a) => (
           <li key={a.id}>
@@ -86,6 +88,7 @@ export function MoneyScreen() {
               name={a.name}
               currency={a.currency}
               balance={a.presentationBalance ?? "0"}
+              kindLabel={a.account_kind}
             />
           </li>
         ))}

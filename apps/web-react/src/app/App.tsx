@@ -16,8 +16,11 @@ import { Button } from "../components/common/Button";
 function BootstrappingScreen() {
   return (
     <section className="onboarding" dir="rtl" lang="fa">
+      <div className="topbar-logo" style={{ width: 48, height: 48, fontSize: "1rem" }} aria-hidden>
+        FI
+      </div>
       <h1>در حال آماده‌سازی</h1>
-      <p className="muted">باز کردن پایگاه داده محلی (sql.js + IndexedDB)…</p>
+      <p className="muted">باز کردن پایگاه داده محلی…</p>
     </section>
   );
 }
@@ -27,9 +30,7 @@ function AwaitingHostScreen() {
   return (
     <section className="onboarding" dir="rtl" lang="fa">
       <h1>اتصال موتور مالی</h1>
-      <p className="muted">
-        موتور مالی هنوز آماده نیست. این صفحه فقط وقتی دیده می‌شود که boot شکست خورده باشد.
-      </p>
+      <p className="muted">موتور مالی هنوز آماده نیست.</p>
       {lastError ? (
         <p role="alert" className="error">
           <code>{lastError.code}</code>
@@ -38,18 +39,6 @@ function AwaitingHostScreen() {
         </p>
       ) : null}
       {bootstrapNote ? <p className="muted">{bootstrapNote}</p> : null}
-      <ol className="muted" style={{ textAlign: "right", lineHeight: 1.8 }}>
-        <li>
-          از ریشهٔ ریپو: <code>cd apps/web-react && npm install</code>
-        </li>
-        <li>
-          مطمئن شوید <code>public/schema.sql</code> وجود دارد
-        </li>
-        <li>
-          <code>npm run dev</code> و صفحه را یک‌بار hard-refresh کنید
-        </li>
-        <li>دسترسی شبکه برای WASM sql.js (cdn sql.js.org) لازم است مگر اینکه بسته نصب شده باشد</li>
-      </ol>
       <Button type="button" onClick={() => window.location.reload()}>
         تلاش مجدد
       </Button>
