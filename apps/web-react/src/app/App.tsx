@@ -11,26 +11,48 @@ import { InvestmentsScreen } from "../routes/InvestmentsScreen";
 import { LoansScreen } from "../routes/LoansScreen";
 import { MoreScreen } from "../routes/MoreScreen";
 import { SheetHost } from "../sheets/SheetHost";
+import { Button } from "../components/common/Button";
 
 function BootstrappingScreen() {
   return (
-    <section className="onboarding">
+    <section className="onboarding" dir="rtl" lang="fa">
       <h1>در حال آماده‌سازی</h1>
-      <p className="muted">باز کردن پایگاه داده محلی…</p>
+      <p className="muted">باز کردن پایگاه داده محلی (sql.js + IndexedDB)…</p>
     </section>
   );
 }
 
 function AwaitingHostScreen() {
-  const { bootstrapNote } = useAppState();
+  const { bootstrapNote, lastError } = useAppState();
   return (
-    <section className="onboarding">
+    <section className="onboarding" dir="rtl" lang="fa">
       <h1>اتصال موتور مالی</h1>
       <p className="muted">
-        FinancialHost هنوز bind نشده است. برای توسعه: <code>window.__PF_HOST__</code> یا{" "}
-        <code>setFinancialHost</code> پس از sql.js+IndexedDB.
+        موتور مالی هنوز آماده نیست. این صفحه فقط وقتی دیده می‌شود که boot شکست خورده باشد.
       </p>
+      {lastError ? (
+        <p role="alert" className="error">
+          <code>{lastError.code}</code>
+          <br />
+          {lastError.message}
+        </p>
+      ) : null}
       {bootstrapNote ? <p className="muted">{bootstrapNote}</p> : null}
+      <ol className="muted" style={{ textAlign: "right", lineHeight: 1.8 }}>
+        <li>
+          از ریشهٔ ریپو: <code>cd apps/web-react && npm install</code>
+        </li>
+        <li>
+          مطمئن شوید <code>public/schema.sql</code> وجود دارد
+        </li>
+        <li>
+          <code>npm run dev</code> و صفحه را یک‌بار hard-refresh کنید
+        </li>
+        <li>دسترسی شبکه برای WASM sql.js (cdn sql.js.org) لازم است مگر اینکه بسته نصب شده باشد</li>
+      </ol>
+      <Button type="button" onClick={() => window.location.reload()}>
+        تلاش مجدد
+      </Button>
     </section>
   );
 }

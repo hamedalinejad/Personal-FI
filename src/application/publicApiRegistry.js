@@ -60,10 +60,11 @@ export const queryHandlers = {
       `SELECT id, code, name, account_kind, currency, is_archived, created_at, updated_at
        FROM fin_accounts WHERE is_archived = 0 ORDER BY name`
     );
-    return rows.map((r) => ({
+    const accounts = rows.map((r) => ({
       ...r,
       presentationBalance: queryPresentationBalance(db, r.id, r.account_kind),
     }));
+    return { accounts, rows: accounts };
   },
   "accounts.get": async ({ db, params }) => {
     const r = queryOne(db, `SELECT * FROM fin_accounts WHERE id = ?`, [params.accountId]);

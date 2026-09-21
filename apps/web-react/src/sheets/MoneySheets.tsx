@@ -13,7 +13,7 @@ export function MoneySheets({ kind, onClose }: Props) {
   const [accounts, setAccounts] = useState<{ id: string; name: string; currency: string }[]>([]);
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [inflowKind, setInflowKind] = useState("external_deposit");
+  const [inflowKind, setInflowKind] = useState("external_income");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -116,9 +116,12 @@ export function MoneySheets({ kind, onClose }: Props) {
             <label>
               نوع ورودی
               <select value={inflowKind} onChange={(e) => setInflowKind(e.target.value)}>
-                <option value="external_deposit">واریز خارجی</option>
-                <option value="opening_balance">موجودی اول دوره</option>
-                <option value="transfer_in">انتقال ورودی</option>
+                <option value="external_income">درآمد / واریز خارجی</option>
+                <option value="opening_equity">موجودی اول دوره (حقوق صاحبان)</option>
+                <option value="internal_transfer">انتقال داخلی</option>
+                <option value="loan_disbursement">پرداخت وام</option>
+                <option value="investment_proceeds">عواید سرمایه‌گذاری</option>
+                <option value="other">سایر</option>
               </select>
             </label>
           ) : null}

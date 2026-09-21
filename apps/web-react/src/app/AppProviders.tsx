@@ -111,16 +111,28 @@ export function AppProviders({ children }: { children: ReactNode }) {
     setBootOnce(true);
     let cancelled = false;
     (async () => {
-      await tryBootProductionHost({ edition: "standalone" });
-        const result = await bootstrapRuntime({ edition: "full" });
+      const boot = await tryBootProductionHost({ edition: "standalone" });
+      if (cancelled) return;
+      if (!boot.ok) {
+        dispatch({
+          type: "BOOTSTRAP_RESULT",
+          phase: "awaiting_host",
+          book: null,
+          hostBound: false,
+          error: { code: boot.code, message: boot.message },
+          note: `boot_failed:${boot.code}`,
+        });
+        return;
+      }
+      const result = await bootstrapRuntime({ edition: "standalone" });
       if (cancelled) return;
       dispatch({
         type: "BOOTSTRAP_RESULT",
         phase: result.phase,
         book: result.book,
-        hostBound: result.hostBound,
+        hostBound: result.hostBound || true,
         error: result.error,
-        note: result.adapterNote,
+        note: result.adapterNote || "production_host_bound",
       });
     })();
     return () => {

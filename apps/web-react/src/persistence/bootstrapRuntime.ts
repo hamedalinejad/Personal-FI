@@ -89,15 +89,18 @@ export async function bootstrapRuntime(opts?: {
 
   // 2) Authoritative book metadata from host (DB), not localStorage
   try {
-    const bookRes = await host.query("book.get", {});
+    let bookRes = await host.query("book.get", {});
     if (!bookRes.ok) {
-      // Host works but no book yet → onboarding
+      bookRes = await host.query("meta.book", {});
+    }
+    if (!bookRes.ok) {
+      // Host works but queries failed oddly — still allow onboarding if host bound
       return {
         phase: "onboarding",
         book: null,
         hostBound: true,
         error: null,
-        adapterNote: `edition=${edition}`,
+        adapterNote: `edition=${edition};book_query=${bookRes.code}`,
       };
     }
     // BUG-P1-14: never fabricate id/createdAt — only persisted values from host
