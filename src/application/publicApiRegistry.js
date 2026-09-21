@@ -75,26 +75,18 @@ export const queryHandlers = {
     };
   },
   "loans.list": async ({ db }) => {
-    try {
-      const rows = queryAll(db, "SELECT id, role, principal, currency, status, interest_rate FROM ln_loans");
-      return { loans: rows };
-    } catch {
-      return { loans: [] };
-    }
+    const rows = queryAll(db, "SELECT id, role, principal, currency, status, interest_rate FROM ln_loans");
+    return { loans: rows };
   },
   "operations.list": async ({ db, params }) => {
     const limit = Math.min(Number(params?.limit) || 50, 200);
-    try {
-      const rows = queryAll(
-        db,
-        `SELECT id, operation_type, status, business_date, created_at FROM fin_operations
-         ORDER BY created_at DESC LIMIT ?`,
-        [limit]
-      );
-      return { operations: rows };
-    } catch {
-      return { operations: [] };
-    }
+    const rows = queryAll(
+      db,
+      `SELECT id, operation_type, status, business_date, created_at FROM fin_operations
+       ORDER BY created_at DESC LIMIT ?`,
+      [limit]
+    );
+    return { operations: rows };
   },
   "money.totals": async ({ db, params }) => {
     const fxMap = new Map();

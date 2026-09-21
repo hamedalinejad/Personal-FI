@@ -6,7 +6,7 @@
 
 import { assertDbPassed } from "../../_shared/atomicDb.js";
 import { resolveMoneyOperationFx, journalPair } from "../../_shared/operationFx.js";
-import { scheduleDeclining } from "../../../core/domain/loan/scheduleEngine.js";
+import { buildSchedule } from "../../../core/domain/loan/scheduleEngine.js";
 import { canonicalDecimalString } from "../../../core/money/canonicalDecimal.js";
 
 /**
@@ -15,23 +15,23 @@ import { canonicalDecimalString } from "../../../core/money/canonicalDecimal.js"
 export async function createLoan({ db, payload, baseCurrency }) {
   assertDbPassed(db, "loan.create");
 
-  const {
-    name,
-    principal,
-    annualRate,
-    periods,
-    startDate,
-    currency,
-    fxRate = null,
-    cashAccountId,
-    memo = null,
-    operationId = null,
-    calculationMethod = "declining_balance",
-  } = payload || {};
+  const pl = payload || {};
+  const name = pl.name || pl.counterpartyName || (pl.role === "borrowed" ? "وام دریافتی" : "وام پرداختی");
+  const principal = pl.principal;
+  const annualRate = pl.annualRate ?? pl.interestRate ?? "0";
+  const periods = pl.periods ?? pl.termPeriods ?? "12";
+  const startDate = pl.startDate || pl.businessDate;
+  const currency = pl.currency;
+  const fxRate = pl.fxRate ?? null;
+  const cashAccountId = pl.cashAccountId || pl.accountId || null;
+  const memo = pl.memo ?? null;
+  const operationId = pl.operationId ?? null;
+  const calculationMethod = pl.calculationMethod || "declining_balance";
+  const role = pl.role === "borrowed" ? "borrowed" : "lent";
 
-  if (!name) throw Object.assign(new Error("NAME_REQUIRED"), { code: "VALIDATION_ERROR" });
-  if (principal == null) throw Object.assign(new Error("PRINCIPAL_REQUIRED"), { code: "VALIDATION_ERROR" });
-  if (annualRate == null) throw Object.assign(new Error("ANNUAL_RATE_REQUIRED"), { code: "VALIDATION_ERROR" });
+  if (principal == null || principal === "") {
+    throw Object.assign(new Error("PRINCIPAL_REQUIRED"), { code: "VALIDATION_ERROR" });
+  }
   if (!periods || Number(periods) <= 0) {
     throw Object.assign(new Error("PERIODS_REQUIRED"), { code: "VALIDATION_ERROR" });
   }
@@ -50,7 +50,7 @@ export async function createLoan({ db, payload, baseCurrency }) {
     amount: principal,
   });
 
-  const schedule = scheduleDeclining({
+  const schedule = buildSchedule(calculationMethod, {
     principal: fx.amountInTxn,
     annualRate: String(annualRate),
     periods: String(periods),
@@ -83,9 +83,10 @@ export async function createLoan({ db, payload, baseCurrency }) {
     db.run(
       `INSERT INTO ln_loans (
         id, role, calculation_method, principal, currency, interest_rate, status, created_at
-      ) VALUES (?, 'lent', ?, ?, ?, ?, 'active', ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?)`,
       [
         loanId,
+        role,
         calculationMethod,
         fx.amountInTxn,
         txnCcy,

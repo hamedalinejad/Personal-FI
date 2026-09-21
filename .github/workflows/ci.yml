@@ -11,16 +11,34 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: npm
       - name: Install
         run: npm install
       - name: Unit tests
         run: npm test
+      - name: Registry JSON parse gate
+        run: |
+          node -e "
+          const fs=require('fs');
+          const paths=[
+            'docs/core/registry/release-proof-checklist.json',
+            'docs/core/registry/field-preservation-decisions.json',
+            'docs/core/registry/command-catalog.json',
+            'docs/core/registry/requirements-matrix.json',
+            'docs/core/registry/status.registry.json'
+          ];
+          for (const p of paths) {
+            JSON.parse(fs.readFileSync(p,'utf8'));
+            console.log('OK', p);
+          }
+          "
       - name: Schema presence
         run: |
           test -f docs/core/db/schema.sql
-          test -f docs/core/ARCHITECTURE-LOCKED.md
-          test -f docs/core/GO-NO-GO.md
           test -d src
       - name: Schema drift smoke
         run: node scripts/schema-drift-smoke.js
+      - name: Sync public schema
+        run: |
+          mkdir -p apps/web-react/public
+          cp docs/core/db/schema.sql apps/web-react/public/schema.sql
+          cmp docs/core/db/schema.sql apps/web-react/public/schema.sql

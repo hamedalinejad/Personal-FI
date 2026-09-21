@@ -130,7 +130,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         type: "BOOTSTRAP_RESULT",
         phase: result.phase,
         book: result.book,
-        hostBound: result.hostBound || true,
+        hostBound: result.hostBound,
         error: result.error,
         note: result.adapterNote || "production_host_bound",
       });
@@ -140,24 +140,20 @@ export function AppProviders({ children }: { children: ReactNode }) {
     };
   }, [bootOnce]);
 
-  // Re-check if host injected after mount (e.g. test harness)
+  // One-shot harness injection (no polling)
   useEffect(() => {
-    const id = window.setInterval(() => {
-      const h = getFinancialHost();
-      if (h && !state.hostBound) {
-        void bootstrapRuntime({ edition: "full" }).then((result) => {
-          dispatch({
-            type: "BOOTSTRAP_RESULT",
-            phase: result.phase,
-            book: result.book,
-            hostBound: result.hostBound,
-            error: result.error,
-            note: result.adapterNote,
-          });
-        });
-      }
-    }, 500);
-    return () => window.clearInterval(id);
+    if (typeof window === "undefined" || !window.__PF_HOST__) return;
+    if (state.hostBound) return;
+    void bootstrapRuntime({ edition: "standalone" }).then((result) => {
+      dispatch({
+        type: "BOOTSTRAP_RESULT",
+        phase: result.phase,
+        book: result.book,
+        hostBound: result.hostBound,
+        error: result.error,
+        note: result.adapterNote,
+      });
+    });
   }, [state.hostBound]);
 
   return (

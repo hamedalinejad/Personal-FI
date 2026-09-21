@@ -145,22 +145,19 @@ export async function buyCrypto({ db, payload, baseCurrency }) {
     // Feature RAW row
     db.run(
       `INSERT INTO inv_crypto_transactions (
-        id, operation_id, instrument_id, side, gross_quantity, fee_quantity, net_quantity,
-        cost_total, cost_currency, price, price_as_of, fee_treatment, exchange_id, created_at
-      ) VALUES (?, ?, ?, 'buy', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, operation_id, holding_id, instrument_id, tx_type, business_date,
+        gross_quantity, fee_quantity, net_quantity, fee_currency, economic_kind, created_at
+      ) VALUES (?, ?, NULL, ?, 'buy', ?, ?, ?, ?, ?, ?, ?)`,
       [
         txId,
         opId,
         instId,
+        businessDate,
         canonicalDecimalString(gross.toFixed()),
         canonicalDecimalString(feeQty.toFixed()),
         canonicalDecimalString(net.toFixed()),
-        fx.amountInTxn,
         txnCcy,
-        price,
-        priceAsOf,
-        feeTreatment,
-        exchangeId,
+        feeTreatment || 'buy',
         now,
       ]
     );
@@ -237,15 +234,15 @@ function ensureSystemAccount(db, code, currency, now) {
 
 function upsertHolding(db, instrumentId, netQty, costInBase, currency, now) {
   try {
-    const stmt = db.prepare("SELECT id, quantity, cost_basis FROM inv_crypto_holdings WHERE instrument_id = ?");
+    const stmt = db.prepare("SELECT id, quantity, total_invested FROM inv_crypto_holdings WHERE instrument_id = ?");
     stmt.bind([instrumentId]);
     if (stmt.step()) {
       const row = stmt.getAsObject();
       stmt.free();
       const newQty = toDecimal(row.quantity || "0").plus(netQty);
-      const newCost = toDecimal(row.cost_basis || "0").plus(toDecimal(costInBase));
+      const newCost = toDecimal(row.total_invested || "0").plus(toDecimal(costInBase));
       db.run(
-        `UPDATE inv_crypto_holdings SET quantity = ?, cost_basis = ?, updated_at = ? WHERE id = ?`,
+        `UPDATE inv_crypto_holdings SET quantity = ?, total_invested = ?, updated_at = ? WHERE id = ?`,
         [canonicalDecimalString(newQty.toFixed()), canonicalDecimalString(newCost.toFixed()), now, row.id]
       );
       return;
@@ -256,7 +253,7 @@ function upsertHolding(db, instrumentId, netQty, costInBase, currency, now) {
         ? crypto.randomUUID()
         : `hold-${Date.now()}`;
     db.run(
-      `INSERT INTO inv_crypto_holdings (id, instrument_id, quantity, cost_basis, cost_currency, created_at, updated_at)
+      `INSERT INTO inv_crypto_holdings (id, instrument_id, quantity, total_invested, cost_currency, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
