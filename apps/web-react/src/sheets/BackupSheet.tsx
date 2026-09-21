@@ -4,7 +4,7 @@
  * Corrupt restore must be rejected without touching live data (BUG-P0-08).
  */
 import React, { useRef, useState } from "react";
-import { useGateway } from "../gateway/commandQueryGateway";
+import { useGateway } from "../app/AppProviders";
 
 type BackupPackage = {
   bytes: number[];

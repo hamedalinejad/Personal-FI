@@ -47,6 +47,7 @@ export const QUERY_CATALOG = Object.freeze({
   "planning.bills": { description: "Bills / occurrences" },
 
   // Meta
+  "book.get": { description: "Persisted book identity" },
   "meta.book": { description: "Book id + base currency + schema version" },
   "meta.license": { description: "Current edition + capabilities" },
 });

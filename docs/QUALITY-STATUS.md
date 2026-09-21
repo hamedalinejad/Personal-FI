@@ -1,28 +1,28 @@
 # Personal-FI Quality Status
 
 **Updated:** 2026-09-21  
-**PRODUCTION:** NO-GO  
-**FREEZE_PROVEN:** false  
-**RELEASE_PROVEN:** false
+**PRODUCTION:** NO-GO (E2E browser proof still required for GO claim)  
+**USER_DEV_READY:** PARTIAL — six routes + sheets + book/account/deposit + host boot path
 
-## §25 API contract
-`apiEnvelope.js` + `financialHost.js`:  
-Success `{ ok: true, data, invalidated }` · Failure `{ ok: false, code, message }`  
-(`success` kept for compatibility.)
+## What users can do in dev
+- Onboarding with durable book_id
+- Accounts create + deposit/withdraw sheets
+- Home dashboard via money.totals / loans.list / investments.holdings
+- Loans list + create sheet
+- Investments screen (no false crypto fallback)
+- More: reports list, backup, license, import batch create
+- API envelope §25
 
-## §26–27 UI
-Form flow: Draft → validate → payload → Gateway → Core → atomic → refresh.  
-Six routes only. No /crypto /stocks /funds /metals /tax /reports /backup /import top-level.
+## Wired this session
+- Fixed browserHostBridge merge conflict (QUERY_CATALOG only)
+- Missing routes recreated (Money, Transactions, Loans, More, Onboarding, Recovery)
+- SheetHost + Money/Loan/Import/License sheets
+- book.create command + bootProductionHost (sql.js CDN + /schema.sql)
+- vite alias @pf → src
+- public/schema.sql
 
-## §28 Retain / delete
-KEEP registries, harness, QUALITY-STATUS.  
-DELETE candidate: apps/web after zero-ref. phase-pack absent or promote-then-delete.
-
-## §29 Acceptance
-Not complete: browser E2E offline, single-writer E2E, clean CI, full rebuild golden, import host commit.
-
-## Registries
-command-catalog.json · release-proof-checklist.json · status.registry.json · requirements-matrix.json · field-preservation-decisions.json
-
-## Blockers
-browser_sqljs_idb_e2e · single_writer_e2e · clean_ci · import_host_commit_loop · full_rebuild_golden
+## Still not GO
+- Playwright Journey A proof
+- multi-tab single-writer E2E
+- import commit host loop
+- CI green evidence

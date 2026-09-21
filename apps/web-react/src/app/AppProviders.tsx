@@ -18,6 +18,7 @@ import {
   type BookMeta,
   type BootstrapPhase,
 } from "../persistence/bootstrapRuntime";
+import { tryBootProductionHost } from "../persistence/bootProductionHost";
 
 export type ShellPhase = BootstrapPhase | "bootstrapping";
 
@@ -110,7 +111,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
     setBootOnce(true);
     let cancelled = false;
     (async () => {
-      const result = await bootstrapRuntime({ edition: "full" });
+      await tryBootProductionHost({ edition: "standalone" });
+        const result = await bootstrapRuntime({ edition: "full" });
       if (cancelled) return;
       dispatch({
         type: "BOOTSTRAP_RESULT",
@@ -183,19 +185,30 @@ export function useCompleteOnboarding() {
         throw new Error("HOST_BRIDGE_UNWIRED: cannot complete onboarding without FinancialHost");
       }
       const res = await gateway.execute("book.create", {
-        payload: { name: input.bookName, baseCurrency: input.baseCurrency },
+        name: input.bookName,
+        baseCurrency: input.baseCurrency,
       });
       if (!res.ok) {
         throw new Error(res.message || res.code);
       }
-      const data = res.data as { name: string; baseCurrency: string; createdAt?: string };
+      const data = res.data as {
+        id?: string;
+        bookId?: string;
+        name: string;
+        baseCurrency: string;
+        createdAt?: string | null;
+      };
+      const id = data.id || data.bookId;
+      if (!id) {
+        throw new Error("BOOK_ID_MISSING_FROM_CREATE");
+      }
       dispatch({
         type: "COMPLETE_ONBOARDING",
         book: {
-          id: `db:${data.name}`,
+          id,
           name: data.name,
           baseCurrency: data.baseCurrency,
-          createdAt: data.createdAt || new Date().toISOString(),
+          createdAt: data.createdAt || "",
         },
       });
     },

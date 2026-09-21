@@ -1,3 +1,4 @@
+import { createBook, getBook } from "../features/meta/commands/createBook.js";
 /**
  * Public API command + query registry.
  */
@@ -30,6 +31,7 @@ import {
 import { buildCommandHandlers } from "./commandRegistry.js";
 
 export const commandHandlers = {
+  "book.create": createBook,
   "accounts.create": createAccount,
   "accounts.deposit": deposit,
   "accounts.withdraw": withdraw,
@@ -71,6 +73,28 @@ export const queryHandlers = {
       presentationBalance: queryPresentationBalance(db, r.id, r.account_kind),
     };
   },
+  "loans.list": async ({ db }) => {
+    try {
+      const rows = queryAll(db, "SELECT id, role, principal, currency, status, interest_rate FROM ln_loans");
+      return { loans: rows };
+    } catch {
+      return { loans: [] };
+    }
+  },
+  "operations.list": async ({ db, params }) => {
+    const limit = Math.min(Number(params?.limit) || 50, 200);
+    try {
+      const rows = queryAll(
+        db,
+        `SELECT id, operation_type, status, business_date, created_at FROM fin_operations
+         ORDER BY created_at DESC LIMIT ?`,
+        [limit]
+      );
+      return { operations: rows };
+    } catch {
+      return { operations: [] };
+    }
+  },
   "money.totals": async ({ db, params }) => {
     const fxMap = new Map();
     if (params?.fxRates && typeof params.fxRates === "object") {
@@ -89,6 +113,7 @@ export const queryHandlers = {
   },
   "reports.trialBalance": async ({ db, params }) => trialBalance(db, { asOf: params?.asOf }),
   "reports.netWorth": async ({ db, params }) => netWorth(db, { asOf: params?.asOf }),
+  "book.get": async ({ db }) => (await getBook({ db })).data,
   "meta.book": async ({ db }) => ({
     id: getMeta(db, "book_id"),
     bookId: getMeta(db, "book_id"),

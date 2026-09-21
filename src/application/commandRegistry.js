@@ -18,6 +18,7 @@ import { buyCrypto } from "../features/crypto/commands/buy.js";
 import { buyMetals } from "../features/metals/commands/buy.js";
 import { adjustTax } from "../features/tax/commands/adjust.js";
 import { bounceCheque } from "../features/cheque/commands/bounce.js";
+import { createBook, getBook } from "../features/meta/commands/createBook.js";
 import { clearCheque } from "../features/cheque/commands/clear.js";
 import {
   createBatch as importCreateBatch,
@@ -32,6 +33,8 @@ import {
 /** @type {Record<string, { kind: "command"|"query", module: string, capability: string, handler?: Function, idempotent?: boolean }>} */
 export const COMMAND_REGISTRY = Object.freeze({
   // Accounts
+  "book.create": { kind: "command", module: "meta", capability: "meta.*", handler: createBook, idempotent: true },
+  "book.get": { kind: "query", module: "meta", capability: "meta.*" },
   "accounts.create": { kind: "command", module: "accounts", capability: "accounts.*", handler: createAccount, idempotent: true },
   "accounts.deposit": { kind: "command", module: "accounts", capability: "accounts.*", handler: deposit, idempotent: true },
   "accounts.withdraw": { kind: "command", module: "accounts", capability: "accounts.*", handler: withdraw, idempotent: true },

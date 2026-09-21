@@ -10,7 +10,7 @@ export type FinancialHostLike = {
   execute(commandId: string, input?: unknown): Promise<ApiResult<unknown>>;
   query(queryId: string, input?: unknown): Promise<ApiResult<unknown>>;
   backup?(label?: string): Promise<ApiResult<unknown>>;
-  restore?(path: unknown): Promise<ApiResult<unknown>>;
+  restore?(pkg: unknown): Promise<ApiResult<unknown>>;
   getRecoveryState?(): Promise<ApiResult<unknown>>;
 };
 
@@ -24,9 +24,9 @@ export function setFinancialHost(next: FinancialHostLike | null) {
   }
   setGatewayBackend(async (id, input) => {
     if (isQueryId(id) && next.query) {
-      return next.query(id, input);
+      return next.query(id, input) as Promise<ApiResult<unknown>>;
     }
-    return next.execute(id, input);
+    return next.execute(id, input) as Promise<ApiResult<unknown>>;
   });
 }
 
@@ -41,7 +41,7 @@ export function createHostBoundGateway(): Gateway {
         return {
           ok: false,
           code: "HOST_BRIDGE_UNWIRED",
-          message: `"${id}" awaits FinancialHost (sql.js + IndexedDB or Node dataDir).`,
+          message: `"${id}" awaits FinancialHost (sql.js + IndexedDB or injection).`,
         };
       }
       try {

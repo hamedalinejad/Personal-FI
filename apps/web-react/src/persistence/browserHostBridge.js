@@ -1,22 +1,13 @@
 /**
- * Bridges React gateway to FinancialHost (browser sql.js + IDB or injected).
- * P1-21: query detection uses QUERY_CATALOG exact membership only.
+ * Bridges React gateway to FinancialHost.
+ * Query detection: QUERY_CATALOG membership only.
  */
-import type { ApiResult, Gateway } from "../gateway/commandQueryGateway";
-import { setGatewayBackend } from "../gateway/commandQueryGateway";
-import { isQueryId } from "./queryIds";
+import { setGatewayBackend } from "../gateway/commandQueryGateway.js";
+import { isQueryId } from "./queryIds.js";
 
-export type FinancialHostLike = {
-  execute(commandId: string, input?: unknown): Promise<ApiResult<unknown>>;
-  query(queryId: string, input?: unknown): Promise<ApiResult<unknown>>;
-  backup?(label?: string): Promise<ApiResult<unknown>>;
-  restore?(path: unknown): Promise<ApiResult<unknown>>;
-  getRecoveryState?(): Promise<ApiResult<unknown>>;
-};
+let host = null;
 
-let host: FinancialHostLike | null = null;
-
-export function setFinancialHost(next: FinancialHostLike | null) {
+export function setFinancialHost(next) {
   host = next;
   if (!next) {
     setGatewayBackend(null);
@@ -30,27 +21,27 @@ export function setFinancialHost(next: FinancialHostLike | null) {
   });
 }
 
-export function getFinancialHost(): FinancialHostLike | null {
+export function getFinancialHost() {
   return host;
 }
 
-export function createHostBoundGateway(): Gateway {
+export function createHostBoundGateway() {
   return {
-    async execute<T = unknown>(id: string, input?: unknown) {
+    async execute(id, input) {
       if (!host) {
         return {
           ok: false,
           code: "HOST_BRIDGE_UNWIRED",
-          message: `"${id}" awaits FinancialHost (sql.js + IndexedDB or Node dataDir).`,
+          message: `"${id}" awaits FinancialHost (sql.js + IndexedDB or injection).`,
         };
       }
       try {
         if (isQueryId(id) && host.query) {
-          return (await host.query(id, input)) as ApiResult<T>;
+          return await host.query(id, input);
         }
-        return (await host.execute(id, input)) as ApiResult<T>;
+        return await host.execute(id, input);
       } catch (e) {
-        const message = String((e as Error)?.message || e);
+        const message = String(e?.message || e);
         return { ok: false, code: message.split(":")[0] || "HOST_ERROR", message };
       }
     },
